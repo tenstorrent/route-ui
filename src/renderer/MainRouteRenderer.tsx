@@ -10,7 +10,7 @@ import './MainRouteRenderer.scss';
 
 export default function MainRouteRenderer() {
 
-    const svgData = useContext(DataSource);
+    const {svgData} = useContext(DataSource);
     const svgRef = useRef();
     const [gridWidth, setGridWidth] = useState(0);
     const [gridHeight, setGridHeight] = useState(0);
@@ -31,7 +31,7 @@ export default function MainRouteRenderer() {
 
         const zoomBehavior = zoom()
             .on('zoom', (event) => {
-                const { transform } = event;
+                const {transform} = event;
                 console.log(transform);
                 svg.attr('transform', transform);
             });
