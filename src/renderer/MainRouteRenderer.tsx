@@ -4,15 +4,14 @@ import React, {
 } from 'react';
 import * as d3 from 'd3';
 import { zoom } from 'd3';
-import { DataSource } from '../data/DataSource';
+import DataSource from '../data/DataSource';
 import SVGData, { ComputeNode, Loc } from '../data/DataStructures';
 import './MainRouteRenderer.scss';
 
-
 export default function MainRouteRenderer() {
 
-    const { svgData, setSvgData } = useContext(DataSource);
-    const svgRef: HTMLDivElement = useRef();
+    const svgData = useContext(DataSource);
+    const svgRef = useRef();
     const [gridWidth, setGridWidth] = useState(0);
     const [gridHeight, setGridHeight] = useState(0);
     // let gridHeight = 0;

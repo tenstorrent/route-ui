@@ -1,3 +1,5 @@
 import React, { createContext } from 'react';
+import SVGData from './DataStructures';
 
-export const DataSource: React.Context<null> = createContext(null);
+const DataSource = createContext<SVGData>(new SVGData(null));
+export default DataSource;
