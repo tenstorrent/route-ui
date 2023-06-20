@@ -3,10 +3,11 @@ import fs from 'fs';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { DataSource } from '../data/DataSource';
+import SVGData from '../data/DataStructures';
 
 export default function FileLoader() {
     const navigate = useNavigate();
-    const { fileData, setFileData } = useContext(DataSource);
+    const { svgData, setSvgData } = useContext(DataSource);
 
     const loadFile = () => {
         // eslint-disable-next-line global-require
@@ -33,7 +34,8 @@ export default function FileLoader() {
                 }
                 try {
                     const doc = yaml.load(data);
-                    setFileData(doc);
+
+                    setSvgData(new SVGData(doc));
                     navigate('/render');
                     //
                 } catch (error) {

@@ -22,14 +22,14 @@ function SplashScreen() {
 
 export default function App() {
     // eslint-disable-next-line no-use-before-define
-    const [fileData, setFileData] = useState(null);
+    const [svgData, setSvgData] = useState(null);
 
     return (
         <>
             <div className="Hello">
                 <TenstorrentLogo />
             </div>
-            <DataSource.Provider value={{ fileData, setFileData }}>
+            <DataSource.Provider value={{ svgData, setSvgData }}>
                 <Router>
                     <Routes>
                         <Route path="/" element={<SplashScreen />} />

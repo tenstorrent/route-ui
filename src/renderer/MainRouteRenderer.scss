@@ -1,0 +1,46 @@
+.temp-grid {
+    display: grid;
+    margin: 50px;
+    grid-gap: 20px;
+    align-content: space-between;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+
+    .element {
+        border: 1px solid #aaa;
+        width: 100px;
+        height: 100px;
+    }
+}
+
+.node {
+    &:hover {
+        fill: #ececec;
+    }
+
+
+}
+
+.node-type-d {
+    fill: #7abdcc;
+}
+
+.node-type-c {
+    fill: #a5cc7a;
+}
+
+.node-type-r {
+    fill: #d0c079;
+}
+
+.node-type-e {
+    fill: #a794ee;
+}
+
+.grid-container {
+    margin: 50px;
+    overflow: hidden;
+    height: calc(100vh - 150px);
+    width: 50vw;
+}
