@@ -1,5 +1,3 @@
-import { strict } from 'assert';
-import { constructor } from 'mini-css-extract-plugin';
 
 export enum ComputeNodeType {
     NONE = '',
@@ -19,6 +17,17 @@ export type Loc = {
     y: number;
 };
 
+export interface Node {
+    location: number[];
+    type: string;
+    id: string;
+    noc: string;
+}
+
+export interface SVGJson {
+    nodes: Node[];
+}
+
 export default class SVGData {
     // eslint-disable-next-line no-use-before-define
     public nodes: ComputeNode[] = [];
@@ -27,9 +36,10 @@ export default class SVGData {
 
     public totalRows: number = 0;
 
-    constructor(data) {
+    constructor(data: SVGJson) {
 
-        const list = data['nodes'];
+
+        const list = data.nodes;
         this.nodes = list.reverse().map((el) => {
             const loc: Loc = { x: el.location[1], y: el.location[0] };
             this.totalCols = Math.max(loc.y, this.totalCols);
@@ -52,7 +62,7 @@ export class ComputeNode {
 
     public json;
 
-    constructor(json: JSON) {
+    constructor(json: Node) {
         this.json = json;
     }
 

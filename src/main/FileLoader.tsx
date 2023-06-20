@@ -2,8 +2,8 @@ import yaml from 'js-yaml';
 import fs from 'fs';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { DataSource } from '../data/DataSource';
-import SVGData from '../data/DataStructures';
+import DataSource from '../data/DataSource';
+import SVGData, { SVGJson } from '../data/DataStructures';
 
 export default function FileLoader() {
     const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function FileLoader() {
         const fileDialog = async (): Promise<void> => {
             let filename = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: { name: 'file', extensions: ['yaml'] },
+                filters: { name: 'file', extensions: ['yaml'] }
             });
 
             // if nothing was selected, return
@@ -35,7 +35,7 @@ export default function FileLoader() {
                 try {
                     const doc = yaml.load(data);
 
-                    setSvgData(new SVGData(doc));
+                    setSvgData(new SVGData(doc as SVGJson));
                     navigate('/render');
                     //
                 } catch (error) {
