@@ -8,21 +8,14 @@ import DataSource from '../data/DataSource';
 import SVGData from '../data/DataStructures';
 
 function SplashScreen() {
-
     return (
-        <>
-
-            <div className="splash-screen">
-
-                <FileLoader />
-
-            </div>
-        </>
+        <div className="splash-screen">
+            <FileLoader />
+        </div>
     );
 }
 
 export default function App() {
-    // eslint-disable-next-line no-use-before-define
     const [svgData, setSvgData] = useState(new SVGData({ nodes: [] }));
 
     return (

@@ -1,4 +1,3 @@
-
 export enum ComputeNodeType {
     NONE = '',
     ROUTER = 'router',
@@ -6,6 +5,14 @@ export enum ComputeNodeType {
     DRAM = 'dram',
     ETHERNET = 'eth',
     PCIE = 'pcix',
+}
+
+export enum LinkDirection {
+    NONE,
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN
 }
 
 export enum NOC {
@@ -22,10 +29,19 @@ export interface Node {
     type: string;
     id: string;
     noc: string;
+    op_name: string;
+    op_cycles: number;
+    links: {};
 }
 
 export interface SVGJson {
     nodes: Node[];
+}
+
+export interface NOCLinkJson {
+    num_occupants: number;
+    bandwidth: number;
+    mapped_pipes: { [key: string]: number };
 }
 
 export default class SVGData {
@@ -37,17 +53,15 @@ export default class SVGData {
     public totalRows: number = 0;
 
     constructor(data: SVGJson) {
-
-
         const list = data.nodes;
         this.nodes = list.reverse().map((el) => {
-            const loc: Loc = { x: el.location[1], y: el.location[0] };
+            const loc: Loc = {x: el.location[1], y: el.location[0]};
             this.totalCols = Math.max(loc.y, this.totalCols);
             this.totalRows = Math.max(loc.x, this.totalRows);
             // eslint-disable-next-line no-use-before-define
             const computeNode = new ComputeNode(el);
             computeNode.type = el.type;
-            computeNode.loc = { x: el.location[0], y: el.location[1] };
+            computeNode.loc = {x: el.location[0], y: el.location[1]};
             return computeNode;
         });
     }
@@ -58,12 +72,25 @@ export class ComputeNode {
 
     public type: string = ''; // ComputeNodeType = ComputeNodeType.NONE;
 
-    public loc: Loc = { x: 0, y: 0 };
+    public loc: Loc = {x: 0, y: 0};
+
+    public opName: string = '';
+
+    public opCycles: number = 0;
 
     public json;
 
+    public links: Map<any, NOCLink>;
+
     constructor(json: Node) {
         this.json = json;
+        this.opName = json.op_name;
+        this.opCycles = json.op_cycles;
+        this.links = new Map();
+        const keys = Object.keys(json.links);
+        keys.forEach((link) => {
+            this.links.set(link, new NOCLink(link, json.links[link]));
+        });
     }
 
     public getType(): string {
@@ -80,8 +107,87 @@ export class ComputeNode {
             return 'e';
         }
         if (this.type === ComputeNodeType.PCIE) {
+            return 'p';
         }
         return '';
+    }
+
+    public getLinksForDirection(direction: LinkDirection): NOCLink[] {
+        const links:NOCLink[] = [];
+        this.links.forEach((link) => {
+            if (link.direction === direction) {
+                links.push(link);
+            }
+        });
+        return links;
+    }
+}
+
+export class NOCLink {
+    public numOccupants: number = 0;
+
+    public bandwidth: number = 0;
+
+    public pipes: Map<string, Pipe>;
+
+    public loc: Loc = {x: 0, y: 0};
+
+    public id: string = '';
+
+    public selected: boolean = false;
+
+    public direction: LinkDirection = LinkDirection.NONE;
+
+    constructor(id: string, json: NOCLinkJson) {
+        this.id = id;
+        this.numOccupants = json.num_occupants;
+        this.bandwidth = json.bandwidth;
+        this.pipes = new Map();
+        const keys = Object.keys(json.mapped_pipes);
+        switch (id) {
+            case 'noc0_in_north':
+            case 'noc0_out_south':
+                this.direction = LinkDirection.DOWN;
+                break;
+            case 'noc1_in_south':
+            case 'noc1_out_north':
+                this.direction = LinkDirection.UP;
+                break;
+            case 'noc0_in_west':
+            case 'noc0_out_east':
+                this.direction = LinkDirection.RIGHT;
+                break;
+            case 'noc1_in_east':
+            case 'noc1_out_west':
+                this.direction = LinkDirection.RIGHT;
+                break;
+            default:
+                this.direction = LinkDirection.NONE;
+        }
+        keys.forEach((pipe) => {
+            this.pipes.set(
+                pipe,
+                new Pipe(pipe, json.mapped_pipes[pipe] as number, id)
+            );
+        });
+    }
+}
+
+export class Pipe {
+    id: string = '';
+
+    location: Loc = {x: 0, y: 0};
+
+    bandwidth: number = 0;
+
+    nocId: string = '';
+
+    public selected: boolean = false;
+
+    constructor(id: string, bandwidth: number, nocId: string = '') {
+        this.id = id;
+        this.nocId = nocId;
+        this.bandwidth = bandwidth;
     }
 }
 
