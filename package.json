@@ -95,6 +95,10 @@
     }
   },
   "dependencies": {
+    "@blueprintjs/core": "^4.20.2",
+    "@blueprintjs/popover2": "^1.14.11",
+    "@blueprintjs/select": "^4.9.24",
+    "@blueprintjs/table": "^4.10.12",
     "@electron/remote": "^2.0.10",
     "d3": "^7.8.5",
     "d3-zoom": "^3.0.0",
