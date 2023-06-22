@@ -7,21 +7,19 @@ import SVGData, { SVGJson } from '../data/DataStructures';
 
 export default function FileLoader() {
     const navigate = useNavigate();
-    const { svgData, setSvgData } = useContext(DataSource);
+    const { setSvgData } = useContext(DataSource);
 
     const loadFile = () => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
         const { dialog } = remote;
 
-
         const fileDialog = async (): Promise<void> => {
             let filename = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: { name: 'file', extensions: ['yaml'] }
+                filters: [{ name: 'file', extensions: ['yaml'] }],
             });
 
-            // if nothing was selected, return
             if (!filename) {
                 return;
             }
@@ -37,7 +35,6 @@ export default function FileLoader() {
 
                     setSvgData(new SVGData(doc as SVGJson));
                     navigate('/render');
-                    //
                 } catch (error) {
                     console.log(error);
                 }
