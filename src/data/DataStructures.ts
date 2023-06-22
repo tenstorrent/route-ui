@@ -7,16 +7,16 @@ export enum ComputeNodeType {
     PCIE = 'pcix',
 }
 
-export enum LinkDirection {
-    NONE,
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN
-}
 
 export enum NOC {
     IN_NORTH,
+    OUT_NORTH,
+    IN_SOUTH,
+    OUT_SOUTH,
+    IN_EAST,
+    OUT_EAST,
+    IN_WEST,
+    OUT_WEST,
 }
 
 export type Loc = {
@@ -113,7 +113,7 @@ export class ComputeNode {
     }
 
     public getLinksForDirection(direction: LinkDirection): NOCLink[] {
-        const links:NOCLink[] = [];
+        const links: NOCLink[] = [];
         this.links.forEach((link) => {
             if (link.direction === direction) {
                 links.push(link);
@@ -121,6 +121,19 @@ export class ComputeNode {
         });
         return links;
     }
+}
+
+
+export enum LinkDirection {
+    NONE = 'none',
+    NORTH_IN = 'north_in',
+    SOUTH_OUT = 'south_out',
+    EAST_IN = 'east_in',
+    WEST_OUT = 'west_out',
+    WEST_IN = 'west_in',
+    EAST_OUT = 'east_out',
+    SOUTH_IN = 'south_in',
+    NORTH_OUT = 'north_out',
 }
 
 export class NOCLink {
@@ -146,20 +159,28 @@ export class NOCLink {
         const keys = Object.keys(json.mapped_pipes);
         switch (id) {
             case 'noc0_in_north':
+                this.direction = LinkDirection.NORTH_IN;
+                break;
             case 'noc0_out_south':
-                this.direction = LinkDirection.DOWN;
+                this.direction = LinkDirection.SOUTH_OUT;
                 break;
             case 'noc1_in_south':
+                this.direction = LinkDirection.SOUTH_IN;
+                break;
             case 'noc1_out_north':
-                this.direction = LinkDirection.UP;
+                this.direction = LinkDirection.NORTH_OUT;
                 break;
             case 'noc0_in_west':
+                this.direction = LinkDirection.WEST_IN;
+                break;
             case 'noc0_out_east':
-                this.direction = LinkDirection.RIGHT;
+                this.direction = LinkDirection.EAST_OUT;
                 break;
             case 'noc1_in_east':
+                this.direction = LinkDirection.EAST_IN;
+                break;
             case 'noc1_out_west':
-                this.direction = LinkDirection.RIGHT;
+                this.direction = LinkDirection.WEST_OUT;
                 break;
             default:
                 this.direction = LinkDirection.NONE;

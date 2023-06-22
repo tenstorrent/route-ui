@@ -1,13 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
+import {useContext, useEffect, useState} from 'react';
 import DataSource from '../data/DataSource';
-import { Pipe } from '../data/DataStructures';
+import {Pipe} from '../data/DataStructures';
 
 export default function PropertiesPanel() {
     const { svgData, setSvgData } = useContext(DataSource);
     const [html, setHtml] = useState(null);
 
     useEffect(() => {
-        const pipes = new Map();
+        const pipes: Map<string, Pipe[]> = new Map();
         svgData.nodes.forEach((n) => {
             n.links.forEach((l) => {
                 l.pipes.forEach((p) => {
@@ -20,7 +20,7 @@ export default function PropertiesPanel() {
         });
 
         const out: JSX.Element[] = [];
-        pipes.forEach((pipe: Pipe, key: string) => {
+        pipes.forEach((pipe: Pipe[], key: string) => {
             out.push(
                 <p
                     key={key}
@@ -30,6 +30,7 @@ export default function PropertiesPanel() {
                         type="checkbox"
                         checked={pipe[0].selected}
                         onChange={(e) => {
+                            // console.log(pipe)
                             selectLinks(key, e.target.checked);
                         }}
                     />
@@ -55,8 +56,11 @@ export default function PropertiesPanel() {
                     });
                 });
             });
-            setSvgData({ ...svgData });
+            setSvgData({...svgData});
         };
+
+
+        // selectLinks('100115900000', true)
     }, [svgData]);
 
     const clearAll = () => {
@@ -65,7 +69,7 @@ export default function PropertiesPanel() {
                 l.selected = false;
             });
         });
-        setSvgData({ ...svgData });
+        setSvgData({...svgData});
     };
 
     return (
