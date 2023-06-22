@@ -22,6 +22,13 @@
     fill: #a794ee;
 }
 
+.main-wrapper {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
 .main-container {
     width: 100vw;
     display: grid;
@@ -29,17 +36,18 @@
 }
 
 .grid-container {
-    margin: 50px;
+    //margin: 50px;
     overflow: hidden;
     height: calc(100vh - 150px);
     width: 50vw;
 }
 
-.properties-panel__content{
+.properties-panel__content {
     display: inline-flex;
     flex-wrap: wrap;
     gap: 10px;
-    p{
+
+    p {
         //display: inline-block;
     }
 }

@@ -502,7 +502,15 @@ $footer-height: 20px;
     margin-top: 5px;
 }
 
-.splash-screen{
+.header {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+}
+
+.splash-screen {
     display: grid;
     width: 100vw;
     height: calc(100vh - 50px);
@@ -511,6 +519,7 @@ $footer-height: 20px;
     align-items: center;
 
 }
+
 button, .button {
     //@include common-monserrat;
     background-color: $tt-medium-blue;
@@ -524,8 +533,8 @@ button, .button {
     align-items: center;
     font-weight: 200;
     font-size: 16px;
-    line-height: 140%;
-    padding: 10px 36px;
+    line-height: 120%;
+    padding: 5px 36px;
     text-align: center;
     text-decoration: none;
     transition: color 250ms linear, background-color 250ms linear;

@@ -1,23 +1,25 @@
 import yaml from 'js-yaml';
 import fs from 'fs';
-import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useContext} from 'react';
 import DataSource from '../data/DataSource';
-import SVGData, { SVGJson } from '../data/DataStructures';
+import SVGData, {SVGJson} from '../data/DataStructures';
+import {IconNames} from '@blueprintjs/icons';
+import {Button} from '@blueprintjs/core';
 
 export default function FileLoader() {
     const navigate = useNavigate();
-    const { setSvgData } = useContext(DataSource);
+    const {setSvgData} = useContext(DataSource);
 
     const loadFile = () => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
-        const { dialog } = remote;
+        const {dialog} = remote;
 
         const fileDialog = async (): Promise<void> => {
             let filename = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: [{ name: 'file', extensions: ['yaml'] }],
+                filters: [{name: 'file', extensions: ['yaml']}],
             });
 
             if (!filename) {
@@ -45,9 +47,12 @@ export default function FileLoader() {
     };
     return (
         <div className="">
-            <button type="button" onClick={loadFile}>
-                Load .yaml
-            </button>
+
+            <Button
+                icon={IconNames.UPLOAD}
+                text="load file"
+                onClick={loadFile}
+            />
         </div>
     );
 }
