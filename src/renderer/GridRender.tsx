@@ -5,8 +5,8 @@ import DataSource from '../data/DataSource';
 import {ComputeNode, LinkDirection} from '../data/DataStructures';
 
 export default function GridRender() {
-    const {svgData} = useContext(DataSource);
-    const svgRef = useRef();
+    const {svgData, setSvgData} = useContext(DataSource);
+    const svgRef = useRef<SVGSVGElement | null>(null);
     const [gridWidth, setGridWidth] = useState(0);
     const [gridHeight, setGridHeight] = useState(0);
     // let gridHeight = 0;
@@ -18,17 +18,14 @@ export default function GridRender() {
         const NODE_SIZE = 75;
         const ROUTER_SIZE = 20;
 
-
         // @ts-ignore
-        const svg = d3.select(svgRef.current);
+        let svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
 
-        const zoomBehavior = zoom()
-            .on('zoom', (event) => {
-                const {transform} = event;
-                svg.attr('transform', transform);
-            });
-
+        const zoomBehavior = zoom().on('zoom', (event) => {
+            const {transform} = event;
+            svg.attr('transform', transform);
+        });
 
         // @ts-ignore
         // svg = svg.call(zoomBehavior).call(zoomBehavior.transform, d3.zoomIdentity);
@@ -37,10 +34,8 @@ export default function GridRender() {
 
         const nodeData: ComputeNode[] = svgData.nodes;
 
-
         setGridWidth((svgData.totalCols + 1) * (NODE_SIZE + NODE_GAP) + SVG_MARGIN * 2);
         setGridHeight((svgData.totalRows + 1) * (NODE_SIZE + NODE_GAP) + SVG_MARGIN * 2);
-
 
         // Create scales for positioning elements
         // const xScale = d3.scaleLinear().range([0, gridWidth]).domain([0, gridSize]);
@@ -56,7 +51,10 @@ export default function GridRender() {
             .data(nodeData)
             .enter()
             .append('g')
-            .attr('fill', '#d7d7d7')
+            // .attr('fill', '#d7d7d7')
+            .attr('fill', (d) => {
+                return d.selected ? '#ffffff' : '#676767';
+            })
             .attr('fill-opacity', '1')
             .attr('transform', (d: ComputeNode) => {
                 return `translate(${d.loc.x * (NODE_SIZE + NODE_GAP) + SVG_MARGIN},${d.loc.y * (NODE_SIZE + NODE_GAP) + SVG_MARGIN})`;
@@ -66,7 +64,11 @@ export default function GridRender() {
             .append('rect')
             .attr('class', 'node')
             .attr('width', NODE_SIZE)
-            .attr('height', NODE_SIZE);
+            .attr('height', NODE_SIZE)
+            .attr('stroke', (d) => {
+                return d.selected ? '#e253e7' : 'none';
+            })
+            .attr('stroke-width', 2);
 
         // .attr('stroke', 'steelblue');
 
@@ -76,7 +78,7 @@ export default function GridRender() {
             .attr('x', NODE_SIZE - 20)
             .attr('y', 5)
             .attr('fill', 'none')
-            .attr('stroke', '#939393')
+            .attr('stroke', 'none')
             .attr('width', 15)
             .attr('height', 15)
             .style('pointer-events', 'none');
@@ -122,12 +124,9 @@ export default function GridRender() {
         // Draw arrow line
         // accepts direction as 'up', 'down', 'left', 'right'
 
-        const drawArrow = (selector, direction: LinkDirection) => {
-
-
+        const drawArrow = (selector: d3.Selection<SVGGElement, ComputeNode, d3.BaseType, unknown>, direction: LinkDirection) => {
             const STARTING_POINT = 20; // offset from the edge
             const LINE_OFFSET = 25; // (for router)
-
 
             let lineStartX = STARTING_POINT;
             let lineEndX = STARTING_POINT;
@@ -148,7 +147,6 @@ export default function GridRender() {
             const yOff = 4;
 
             switch (direction) {
-
                 case LinkDirection.NORTH_OUT:
                     // up out
                     arrowOffset = 5;
@@ -157,12 +155,8 @@ export default function GridRender() {
 
                     lineEndY -= LINE_OFFSET;
 
-                    arr1 = `${lineEndX - arrowHeadWidth / 2},${
-                        lineStartY + arrowHeadHeight + arrowOffset
-                    }`;
-                    arr2 = `${lineEndX + arrowHeadWidth / 2},${
-                        lineStartY + arrowHeadHeight + arrowOffset
-                    }`;
+                    arr1 = `${lineEndX - arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
+                    arr2 = `${lineEndX + arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
                     arr3 = `${lineEndX},${lineStartY + arrowOffset}`;
                     break;
                 case LinkDirection.SOUTH_IN:
@@ -171,7 +165,7 @@ export default function GridRender() {
                     lineStartX += xOff;
                     lineEndX += xOff;
 
-                    lineStartY = NODE_SIZE - LINE_OFFSET + (ROUTER_SIZE / 2);
+                    lineStartY = NODE_SIZE - LINE_OFFSET + ROUTER_SIZE / 2;
                     lineEndY = NODE_SIZE;
                     // lineEndY -= STARTING_POINT;
 
@@ -179,18 +173,13 @@ export default function GridRender() {
                     arr2 = `0,0`;
                     arr3 = `0,0`;
 
-                    arr1 = `${lineEndX - arrowHeadWidth / 2},${
-                        lineStartY + arrowHeadHeight + arrowOffset
-                    }`;
-                    arr2 = `${lineEndX + arrowHeadWidth / 2},${
-                        lineStartY + arrowHeadHeight + arrowOffset
-                    }`;
+                    arr1 = `${lineEndX - arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
+                    arr2 = `${lineEndX + arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
                     arr3 = `${lineEndX},${lineStartY + arrowOffset}`;
                     // lineStartX = 0;
                     // lineStartY = 0;
                     // lineEndX = 0;
                     // lineEndY = 0;
-
 
                     break;
                 case LinkDirection.NORTH_IN:
@@ -200,12 +189,8 @@ export default function GridRender() {
                     lineStartX -= xOff;
                     lineEndX -= xOff;
                     lineEndY -= LINE_OFFSET;
-                    arr1 = `${lineEndX - arrowHeadWidth / 2},${
-                        lineEndY - arrowHeadHeight - arrowOffset
-                    }`;
-                    arr2 = `${lineEndX + arrowHeadWidth / 2},${
-                        lineEndY - arrowHeadHeight - arrowOffset
-                    }`;
+                    arr1 = `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`;
+                    arr2 = `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`;
                     arr3 = `${lineEndX},${lineEndY - arrowOffset}`;
 
                     break;
@@ -215,14 +200,10 @@ export default function GridRender() {
                     arrowOffset = 0;
                     lineStartX -= xOff;
                     lineEndX -= xOff;
-                    lineStartY = NODE_SIZE - LINE_OFFSET + (ROUTER_SIZE / 2);
+                    lineStartY = NODE_SIZE - LINE_OFFSET + ROUTER_SIZE / 2;
                     lineEndY = NODE_SIZE;
-                    arr1 = `${lineEndX - arrowHeadWidth / 2},${
-                        lineEndY - arrowHeadHeight - arrowOffset
-                    }`;
-                    arr2 = `${lineEndX + arrowHeadWidth / 2},${
-                        lineEndY - arrowHeadHeight - arrowOffset
-                    }`;
+                    arr1 = `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`;
+                    arr2 = `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`;
                     arr3 = `${lineEndX},${lineEndY - arrowOffset}`;
 
                     break;
@@ -235,14 +216,9 @@ export default function GridRender() {
                     lineStartY = NODE_SIZE - STARTING_POINT + yOff;
                     lineEndY = NODE_SIZE - STARTING_POINT + yOff;
                     lineStartX += LINE_OFFSET;
-                    arr1 = `${lineStartX + arrowHeadHeight + arrowOffset},${
-                        lineEndY - arrowHeadWidth / 2
-                    }`;
-                    arr2 = `${lineStartX + arrowHeadHeight + arrowOffset},${
-                        lineEndY + arrowHeadWidth / 2
-                    }`;
+                    arr1 = `${lineStartX + arrowHeadHeight + arrowOffset},${lineEndY - arrowHeadWidth / 2}`;
+                    arr2 = `${lineStartX + arrowHeadHeight + arrowOffset},${lineEndY + arrowHeadWidth / 2}`;
                     arr3 = `${lineStartX + arrowOffset},${lineEndY}`;
-
 
                     // lineStartX = 0;
                     // lineStartY = 0;
@@ -253,17 +229,13 @@ export default function GridRender() {
                 case LinkDirection.WEST_OUT:
                     // left out
                     arrowOffset = 0;
-                    lineStartX = 0
+                    lineStartX = 0;
                     lineEndX = LINE_OFFSET - ROUTER_SIZE / 2;
                     lineStartY = NODE_SIZE - STARTING_POINT + yOff;
                     lineEndY = NODE_SIZE - STARTING_POINT + yOff;
                     // lineStartX += LINE_OFFSET;
-                    arr1 = `${lineStartX + arrowHeadHeight + arrowOffset},${
-                        lineEndY - arrowHeadWidth / 2
-                    }`;
-                    arr2 = `${lineStartX + arrowHeadHeight + arrowOffset},${
-                        lineEndY + arrowHeadWidth / 2
-                    }`;
+                    arr1 = `${lineStartX + arrowHeadHeight + arrowOffset},${lineEndY - arrowHeadWidth / 2}`;
+                    arr2 = `${lineStartX + arrowHeadHeight + arrowOffset},${lineEndY + arrowHeadWidth / 2}`;
                     arr3 = `${lineStartX + arrowOffset},${lineEndY}`;
 
                     break;
@@ -275,12 +247,8 @@ export default function GridRender() {
                     lineStartY = NODE_SIZE - STARTING_POINT - yOff;
                     lineEndY = NODE_SIZE - STARTING_POINT - yOff;
                     lineStartX += LINE_OFFSET;
-                    arr1 = `${lineEndX - arrowHeadHeight - arrowOffset},${
-                        lineEndY - arrowHeadWidth / 2
-                    }`;
-                    arr2 = `${lineEndX - arrowHeadHeight - arrowOffset},${
-                        lineEndY + arrowHeadWidth / 2
-                    }`;
+                    arr1 = `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY - arrowHeadWidth / 2}`;
+                    arr2 = `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY + arrowHeadWidth / 2}`;
                     arr3 = `${lineEndX - arrowOffset},${lineEndY}`;
                     break;
                 case LinkDirection.WEST_IN:
@@ -290,12 +258,8 @@ export default function GridRender() {
                     lineEndX = LINE_OFFSET - ROUTER_SIZE / 2;
                     lineStartY = NODE_SIZE - STARTING_POINT - yOff;
                     lineEndY = NODE_SIZE - STARTING_POINT - yOff;
-                    arr1 = `${lineEndX - arrowHeadHeight - arrowOffset},${
-                        lineEndY - arrowHeadWidth / 2
-                    }`;
-                    arr2 = `${lineEndX - arrowHeadHeight - arrowOffset},${
-                        lineEndY + arrowHeadWidth / 2
-                    }`;
+                    arr1 = `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY - arrowHeadWidth / 2}`;
+                    arr2 = `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY + arrowHeadWidth / 2}`;
                     arr3 = `${lineEndX - arrowOffset},${lineEndY}`;
                     break;
                 default:
@@ -306,13 +270,10 @@ export default function GridRender() {
                     console.warn(`Invalid direction ${direction}`);
             }
 
-
             const getColor = (d: ComputeNode) => {
-                const selected = d
-                    .getLinksForDirection(direction)
-                    .filter((link) => {
-                        return link.selected;
-                    });
+                const selected = d.getLinksForDirection(direction).filter((link) => {
+                    return link.selected;
+                });
                 if (selected.length > 0) {
                     return '#AD2E00'; // '#3A3A46';
                 }
@@ -336,23 +297,14 @@ export default function GridRender() {
             selector
                 .append('polygon')
                 .attr('points', `${arr1} ${arr2} ${arr3}`)
-                .attr('fill', (d => {
+                .attr('fill', (d) => {
                     return getColor(d);
-                }));
-
+                });
         };
 
-
-        // const directions = Object.values(LinkDirection);
-        // console.log(directions);
-        // for (const dir of directions) {
-        //     if (dir !== LinkDirection.NONE) {
-        //         drawArrow(links, dir);
-        //         console.log('drawing', dir);
-        //     }
-        // }
         Object.entries(LinkDirection).forEach(([key, direction]) => {
             if (direction !== LinkDirection.NONE) {
+                // @ts-ignore
                 drawArrow(links, LinkDirection[key]);
             }
         });
@@ -371,15 +323,15 @@ export default function GridRender() {
         // <polygon stroke="black" points="124,120.5 114,120.5 119,110.5 124,120.5" visibility="" fill="#3A3A46" stroke-width="0"></polygon>
         // </g>
 
-
         nodes.on('click', (event: PointerEvent, d) => {
             // @ts-ignore
-            console.log(d);
-            console.log(d.links)
-            // console.log(d.json.links);
+            // console.log(d);
+            // console.log(d.links)
+            d.selected = !d.selected;
+            console.log(d.json);
+            setSvgData({...svgData});
         });
     }, [svgData]);
-
 
     // }, [list]);
     // const pipeDrawings = svg
@@ -400,9 +352,7 @@ export default function GridRender() {
         const blue = Math.floor(Math.random() * 200);
 
         // eslint-disable-next-line no-bitwise
-        const hex = ((red << 16) | (green << 8) | blue)
-            .toString(16)
-            .padStart(6, '0');
+        const hex = ((red << 16) | (green << 8) | blue).toString(16).padStart(6, '0');
 
         return `#${hex}`;
     };
@@ -415,12 +365,7 @@ export default function GridRender() {
 
     return (
         <div className="grid-container">
-            <svg
-                className="svg-grid"
-                ref={svgRef}
-                width={gridWidth}
-                height={gridHeight}
-            />
+            <svg className="svg-grid" ref={svgRef} width={gridWidth} height={gridHeight}/>
         </div>
     );
 }
