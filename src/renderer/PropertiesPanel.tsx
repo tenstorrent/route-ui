@@ -1,18 +1,52 @@
-import {useContext, useEffect, useState} from 'react';
-import {Button, Tab, TabId, Tabs} from '@blueprintjs/core';
+import React, {useContext, useEffect, useState} from 'react';
+import {Button, InputGroup, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
+import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
 import {ComputeNode, convertBytes, NOCLink, NOCLinkInternal, Pipe} from '../data/DataStructures';
+import getPipeColor from '../data/ColorGenerator';
+import Typeahead from './components/Typeahead';
+import HighlightedText from './components/HighlightedText';
+
+interface OperationItem {
+    operation: string;
+    nodes: ComputeNode[];
+}
 
 export default function PropertiesPanel() {
     const {svgData, setSvgData} = useContext(DataSource);
-    const [html, setHtml] = useState(null);
 
     const [selectedNodes, setSelectedNodes] = useState<ComputeNode[]>([]);
+    const [pipesList, setPipesList] = useState<Pipe[]>([]);
+    const [selectedPipe, setSelectedPipe] = useState<Pipe | null>(null);
+    const [pipeFilter, setPipeFilter] = useState<string>('');
+    const [opsFilter, setOpsFilter] = useState<string>('');
+
+    const [operationsList, setOperationsList] = useState<OperationItem[]>([]);
 
     useEffect(() => {
         const selection: ComputeNode[] = svgData.nodes.filter((n) => n.selected);
         setSelectedNodes(selection);
+    }, [svgData]);
+
+    useEffect(() => {
+        const opNames: Map<string, ComputeNode[]> = new Map<string, ComputeNode[]>();
+        const opList: OperationItem[] = [];
+        svgData.nodes.map((n) => {
+            // get all opNames into a list
+            const {opName} = n;
+            if (opName !== '') {
+                if (!opNames.has(opName)) {
+                    opNames.set(opName, []);
+                }
+                // @ts-ignore
+                opNames.get(opName).push(n);
+            }
+        });
+        opNames.forEach((n: ComputeNode[], op: string) => {
+            opList.push({operation: op, nodes: n});
+        });
+        setOperationsList(opList);
     }, [svgData]);
 
     const getLinksForNode = (node: ComputeNode): NOCLink[] => {
@@ -23,6 +57,9 @@ export default function PropertiesPanel() {
         return out;
     };
 
+    const getOps = () => {
+    };
+
     const getPipesForLink = (link: NOCLinkInternal): Pipe[] => {
         const out: Pipe[] = [];
         link.pipes.forEach((p) => {
@@ -31,15 +68,15 @@ export default function PropertiesPanel() {
         return out;
     };
 
-    const getPipesForNode = (node: ComputeNode): Pipe[] => {
-        const out: Pipe[] = [];
-        node.links.forEach((l) => {
-            l.pipes.forEach((p) => {
-                out.push(p);
-            });
-        });
-        return out;
-    };
+    // const getPipesForNode = (node: ComputeNode): Pipe[] => {
+    //     const out: Pipe[] = [];
+    //     node.links.forEach((l) => {
+    //         l.pipes.forEach((p) => {
+    //             out.push(p);
+    //         });
+    //     });
+    //     return out;
+    // };
 
     const getInternalLinksForNode = (node: ComputeNode): NOCLinkInternal[] => {
         const out: NOCLinkInternal[] = [];
@@ -56,38 +93,40 @@ export default function PropertiesPanel() {
                     if (!pipes.has(p.id)) {
                         pipes.set(p.id, []);
                     }
+                    // @ts-ignore
+                    pipes.get(p.id).push(p);
+                });
+            });
+            n.internalLinks.forEach((l) => {
+                l.pipes.forEach((p) => {
+                    if (!pipes.has(p.id)) {
+                        pipes.set(p.id, []);
+                    }
+                    // @ts-ignore
                     pipes.get(p.id).push(p);
                 });
             });
         });
 
-        const out: JSX.Element[] = [];
-        pipes.forEach((pipe: Pipe[], key: string) => {
-            out.push(
-                <p
-                    key={key}
-                    // className={pipe[0].selected ? 'selected' : ''}
-                >
-                    <input
-                        type="checkbox"
-                        checked={pipe[0].selected}
-                        onChange={(e) => {
-                            // console.log(pipe)
-                            selectLinksByPipe(key, e.target.checked);
-                        }}
-                    />
-                    {key}
-                </p>
-            );
-
-            // console.log(key, pipe);
+        let list: Pipe[] = [];
+        pipes.forEach((pipe: Pipe[]) => {
+            list.push(pipe[0]);
+        });
+        list = list.sort((a, b) => {
+            if (a.id < b.id) {
+                return -1;
+            }
+            if (a.id > b.id) {
+                return 1;
+            }
+            return 0;
         });
 
-        setHtml(out);
+        setPipesList(list);
 
         // selectLinks('100115900000', true)
     }, [svgData]);
-    const selectLinksByPipe = (pipeId: string, val: boolean = false) => {
+    const selectPipe = (pipeId: string, val: boolean = false) => {
         svgData.nodes.forEach((n) => {
             n.links.forEach((l) => {
                 l.pipes.forEach((p) => {
@@ -108,27 +147,46 @@ export default function PropertiesPanel() {
         });
         setSvgData({...svgData});
     };
-    const selectLink = (node: ComputeNode, linkId: string, val: boolean = false) => {
+    const selectNode = (node: ComputeNode, val: boolean) => {
+        node.selected = val;
+        setSvgData({...svgData});
+    };
+
+    const selectNodesByOp = (op: string, val: boolean) => {
         svgData.nodes.forEach((n) => {
-            if (n === node) {
-                n.links.forEach((l) => {
-                    if (l.id === linkId) {
-                        l.selected = val;
-                    }
-                });
-                n.internalLinks.forEach((l) => {
-                    if (l.id === linkId) {
-                        l.selected = val;
-                    }
-                });
+            if (n.opName === op) {
+                n.selected = val;
+            } else {
+                n.selected = false;
             }
         });
         setSvgData({...svgData});
     };
+    // const selectLink = (node: ComputeNode, linkId: string, val: boolean = false) => {
+    //     svgData.nodes.forEach((n) => {
+    //         if (n === node) {
+    //             n.links.forEach((l) => {
+    //                 if (l.id === linkId) {
+    //                     l.selected = val;
+    //                 }
+    //             });
+    //             n.internalLinks.forEach((l) => {
+    //                 if (l.id === linkId) {
+    //                     l.selected = val;
+    //                 }
+    //             });
+    //         }
+    //     });
+    //     setSvgData({...svgData});
+    // };
     const clearAll = () => {
         svgData.nodes.forEach((n) => {
             n.links.forEach((l) => {
-                l.selected = false;
+                l.pipes.forEach((p) => {
+                    p.selected = false;
+                });
+            });
+            n.internalLinks.forEach((l) => {
                 l.pipes.forEach((p) => {
                     p.selected = false;
                 });
@@ -145,25 +203,33 @@ export default function PropertiesPanel() {
 
     return (
         <div className="properties-panel">
-            <Tabs id="my-tabs" selectedTabId={selectedTab} onChange={handleTabChange}>
+            <Tabs id="my-tabs" selectedTabId={selectedTab} onChange={handleTabChange} className="properties-tabs">
                 <Tab
                     id="tab1"
-                    title="ComputeNode properties"
+                    title="Compute Node"
                     panel={
                         <>
                             <Button icon={IconNames.CLEAN} onClick={clearAll}>
                                 Clear pipes
                             </Button>
 
-                            {selectedNodes.length ? <div>Selected compute nodes</div> : ''}
+                            {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className="properties-panel-nodes">
                                 {selectedNodes.map((node: ComputeNode, index) => (
                                     <div className="node-element" key={index}>
                                         <h3 className={`node-type-${node.getType()}`}>
-                                            {node.type.toUpperCase()} - {node.loc.y}, {node.loc.x}
+                                            {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
+                                            <Tooltip content="Close ComputeNode">
+                                                <Button
+                                                    icon={IconNames.CROSS}
+                                                    onClick={() => {
+                                                        selectNode(node, false);
+                                                    }}
+                                                />
+                                            </Tooltip>
                                         </h3>
-                                        <p>{node.opCycles} cycles</p>
-                                        <p>
+                                        {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
+                                        <p className="opname">
                                             <strong>{node.opName}</strong>
                                         </p>
                                         <div className="node-links-wrap">
@@ -172,13 +238,13 @@ export default function PropertiesPanel() {
                                             {getInternalLinksForNode(node).map((link: NOCLinkInternal, index) => (
                                                 <div key={index}>
                                                     <h5>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={link.selected}
-                                                            onChange={(e) => {
-                                                                selectLink(node, link.id, e.target.checked);
-                                                            }}
-                                                        />
+                                                        {/* <input */}
+                                                        {/*    type="checkbox" */}
+                                                        {/*    checked={link.selected} */}
+                                                        {/*    onChange={(e) => { */}
+                                                        {/*        selectLink(node, link.id, e.target.checked); */}
+                                                        {/*    }} */}
+                                                        {/* /> */}
                                                         <span>
                                                             {link.id} - {convertBytes(link.totalDataBytes)} - {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
                                                         </span>
@@ -190,11 +256,17 @@ export default function PropertiesPanel() {
                                                                     type="checkbox"
                                                                     checked={pipe.selected}
                                                                     onChange={(e) => {
-                                                                        selectLinksByPipe(pipe.id, e.target.checked);
+                                                                        selectPipe(pipe.id, e.target.checked);
                                                                     }}
                                                                 />
                                                                 <span className="label">
-                                                                    {pipe.id}:{convertBytes(pipe.bandwidth)}
+                                                                    {pipe.id}:{convertBytes(pipe.bandwidth)}{' '}
+                                                                    <span
+                                                                        className={`pipe-color ${pipe.selected ? '' : 'transparent'}`}
+                                                                        style={{backgroundColor: getPipeColor(pipe.id)}}
+                                                                    >
+                                                                        {' '}
+                                                                    </span>
                                                                 </span>
                                                             </li>
                                                         ))}
@@ -207,15 +279,8 @@ export default function PropertiesPanel() {
                                             {getLinksForNode(node).map((link: NOCLink, index) => (
                                                 <div key={index}>
                                                     <h5 className={link.totalDataBytes === 0 ? 'inactive' : ''}>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={link.selected}
-                                                            onChange={(e) => {
-                                                                selectLink(node, link.id, e.target.checked);
-                                                            }}
-                                                        />
                                                         <span>
-                                                            {link.id} - {convertBytes(link.totalDataBytes)} - {link.bpc}, {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
+                                                            {link.id} - {convertBytes(link.totalDataBytes)} - {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
                                                         </span>
                                                     </h5>
                                                     <ul className="node-pipelist">
@@ -225,11 +290,17 @@ export default function PropertiesPanel() {
                                                                     type="checkbox"
                                                                     checked={pipe.selected}
                                                                     onChange={(e) => {
-                                                                        selectLinksByPipe(pipe.id, e.target.checked);
+                                                                        selectPipe(pipe.id, e.target.checked);
                                                                     }}
                                                                 />
                                                                 <span className="label">
-                                                                    {pipe.id}:{convertBytes(pipe.bandwidth)}
+                                                                    {pipe.id}:{convertBytes(pipe.bandwidth)}{' '}
+                                                                    <span
+                                                                        className={`pipe-color ${pipe.selected ? '' : 'transparent'}`}
+                                                                        style={{backgroundColor: getPipeColor(pipe.id)}}
+                                                                    >
+                                                                        {' '}
+                                                                    </span>
                                                                 </span>
                                                             </li>
                                                         ))}
@@ -248,16 +319,60 @@ export default function PropertiesPanel() {
                     id="tab2"
                     title="All pipes"
                     panel={
-                        <>
-                            <Button icon={IconNames.CLEAN} onClick={clearAll}>
-                                Clear pipes
-                            </Button>
-
-                            <div className="properties-panel__content">{html}</div>
-                        </>
+                        <div className="pipe-renderer-panel">
+                            <div className="search-field">
+                                <Button icon={IconNames.CLEAN} onClick={clearAll}>
+                                    Clear pipes
+                                </Button>
+                            </div>
+                            <div className="search-field">
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
+                            </div>
+                            <div className="properties-panel__content">
+                                <div className="pipelist-wrap">
+                                    <ul className="node-pipelist">
+                                        {pipesList.map((pipe) => (
+                                            <li>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={pipe.selected}
+                                                    onChange={(e) => {
+                                                        selectPipe(pipe.id, e.target.checked);
+                                                    }}
+                                                />
+                                                <span className={`label ${selectedPipe?.id === pipe.id ? 'is-selected-pipe' : ''}`}>
+                                                    <HighlightedText text={pipe.id} filter={pipeFilter}/> : {convertBytes(pipe.bandwidth)}{' '}
+                                                    <span className={`pipe-color ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}>
+                                                        {' '}
+                                                    </span>
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     }
                 />
-                <Tab id="tab3" title="Tab 3" panel={<div>Content for Tab 3</div>}/>
+                <Tab
+                    id="tab3"
+                    title="Operations"
+                    panel={
+                        <div>
+                            <div className="search-field">
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
+                            </div>
+                            <div className="operations-wrap">
+                                {operationsList.map((op) => (
+                                    <div className="op-element">
+                                        <input type="checkbox" onChange={(e) => selectNodesByOp(op.operation, e.target.checked)}/>
+                                        <HighlightedText text={op.operation} filter={opsFilter}/> : {op.nodes.length}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    }
+                />
             </Tabs>
         </div>
     );
