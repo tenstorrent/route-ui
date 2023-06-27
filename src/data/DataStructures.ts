@@ -71,8 +71,8 @@ export default class SVGData {
 
         this.nodes = list.reverse().map((el) => {
             const loc: Loc = {x: el.location[1], y: el.location[0]};
-            this.totalCols = Math.max(loc.y, this.totalCols);
-            this.totalRows = Math.max(loc.x, this.totalRows);
+            this.totalCols = Math.max(loc.x, this.totalRows);
+            this.totalRows = Math.max(loc.y, this.totalCols);
             const computeNode = new ComputeNode(el, totalOpCycles);
             computeNode.type = el.type;
             computeNode.loc = {x: el.location[0], y: el.location[1]};
@@ -121,6 +121,32 @@ export class ComputeNode {
         });
     }
 
+    public getSelections(direction: LinkDirection | LinkDirectionInternal): string[] {
+        const pipelist: string[] = [];
+        this.links.forEach((link) => {
+            if (link.direction === direction) {
+                link.pipes.forEach((pipe) => {
+                    if (pipe.selected) {
+                        pipelist.push(pipe.id);
+                    }
+                });
+            }
+        });
+
+        this.internalLinks.forEach((link) => {
+            if (link.inOut === direction) {
+                link.pipes.forEach((pipe) => {
+                    if (pipe.selected) {
+                        pipelist.push(pipe.id);
+                    }
+                });
+            }
+        });
+
+
+        return pipelist;
+    }
+
     public getType(): string {
         if (this.type === ComputeNodeType.CORE) {
             return 'c';
@@ -140,10 +166,17 @@ export class ComputeNode {
         return '';
     }
 
-    public getLinksForDirection(direction: LinkDirection): NOCLink[] {
-        const links: NOCLink[] = [];
+    public getLinksForDirection(direction: LinkDirection | LinkDirectionInternal): NOCLinkInternal[] {
+        const links: NOCLinkInternal[] = [];
+
+
         this.links.forEach((link) => {
             if (link.direction === direction) {
+                links.push(link);
+            }
+        });
+        this.internalLinks.forEach((link) => {
+            if (link.inOut === direction) {
                 links.push(link);
             }
         });
@@ -277,9 +310,14 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     // eslint-disable-next-line no-param-reassign
 
-    if (bytes === 0) return '0 B';
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    if (bytes === 0) {
+        return '0 B';
+    }
+    if (bytes < 1) {
+        return `${bytes.toFixed(numAfterComma)} B`;
+    }
 
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return `${(bytes / 1024 ** i).toFixed(numAfterComma)} ${sizes[i]}`;
 };
 

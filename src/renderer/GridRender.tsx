@@ -2,7 +2,8 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import * as d3 from 'd3';
 import {zoom} from 'd3';
 import DataSource from '../data/DataSource';
-import {ComputeNode, LinkDirection} from '../data/DataStructures';
+import {ComputeNode, LinkDirection, LinkDirectionInternal, Pipe} from '../data/DataStructures';
+import getPipeColor from '../data/ColorGenerator';
 
 export default function GridRender() {
     const {svgData, setSvgData} = useContext(DataSource);
@@ -12,14 +13,15 @@ export default function GridRender() {
     // let gridHeight = 0;
 
     useEffect(() => {
+        const permSt = performance.now();
         // const list = svgData.nodes;
         const SVG_MARGIN = 0;
         const NODE_GAP = 1;
-        const NODE_SIZE = 75;
+        const NODE_SIZE = 80;
         const ROUTER_SIZE = 20;
 
         // @ts-ignore
-        let svg = d3.select(svgRef.current);
+        const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
 
         const zoomBehavior = zoom().on('zoom', (event) => {
@@ -53,7 +55,7 @@ export default function GridRender() {
             .append('g')
             // .attr('fill', '#d7d7d7')
             .attr('fill', (d) => {
-                return d.selected ? '#ffffff' : '#676767';
+                return d.selected ? '#777777' : '#676767';
             })
             .attr('fill-opacity', '1')
             .attr('transform', (d: ComputeNode) => {
@@ -94,39 +96,42 @@ export default function GridRender() {
             .attr('fill', '#000000')
             .style('pointer-events', 'none');
 
-        nodes
-            .append('text')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('width', 15)
-            .attr('font-size', 5)
-            .text((d) => d.opName)
-            .attr('text-anchor', 'left')
-            .attr('alignment-baseline', 'hanging')
-            .attr('fill', '#000000')
-            .style('pointer-events', 'none');
+        // nodes
+        //     .append('text')
+        //     .attr('x', 0)
+        //     .attr('y', 0)
+        //     .attr('width', 15)
+        //     .attr('font-size', 5)
+        //     .text((d) => d.opName)
+        //     .attr('text-anchor', 'left')
+        //     .attr('alignment-baseline', 'hanging')
+        //     .attr('fill', '#000000')
+        //     .style('pointer-events', 'none');
 
-        // router
+        // router - might still need this
         const links = nodes.append('g').attr('class', 'links');
 
-        nodes
-            .append('circle')
-            .attr('cx', 20)
-            .attr('cy', NODE_SIZE - 20)
-            .attr('r', ROUTER_SIZE / 2)
-            .attr('fill', 'none')
-            // .attr('fill-opacity', 0.5)
-            // .attr('stroke', '#939393')
-            .attr('stroke', '#939393')
-            .attr('stroke-width', 3)
-            .style('pointer-events', 'none');
+        // nodes
+        //     .append('circle')
+        //     .attr('cx', 20)
+        //     .attr('cy', NODE_SIZE - 20)
+        //     .attr('r', ROUTER_SIZE / 2)
+        //     .attr('fill', 'none')
+        //     // .attr('fill-opacity', 0.5)
+        //     // .attr('stroke', '#939393')
+        //     .attr('stroke', '#939393')
+        //     .attr('stroke-width', 3)
+        //     .style('pointer-events', 'none');
 
         // Draw arrow line
         // accepts direction as 'up', 'down', 'left', 'right'
 
-        const drawArrow = (selector: d3.Selection<SVGGElement, ComputeNode, d3.BaseType, unknown>, direction: LinkDirection) => {
+        const getLinkDrawing = (direction: LinkDirection | LinkDirectionInternal) => {
             const STARTING_POINT = 20; // offset from the edge
             const LINE_OFFSET = 25; // (for router)
+            const INTERNAL_LINK_ENDPOINT = 22; // (for internal links)
+            const INTERNAL_LINK_START = 6; // (for internal links)
+            const INTERNAL_LINK_OFFSET = 3; // (for internal links)
 
             let lineStartX = STARTING_POINT;
             let lineEndX = STARTING_POINT;
@@ -138,6 +143,8 @@ export default function GridRender() {
             const arrowHeadWidth = 9;
 
             let arrowOffset = 0;
+            let transform = '';
+            let angle = 0;
 
             let arr1;
             let arr2;
@@ -176,10 +183,6 @@ export default function GridRender() {
                     arr1 = `${lineEndX - arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
                     arr2 = `${lineEndX + arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
                     arr3 = `${lineEndX},${lineStartY + arrowOffset}`;
-                    // lineStartX = 0;
-                    // lineStartY = 0;
-                    // lineEndX = 0;
-                    // lineEndY = 0;
 
                     break;
                 case LinkDirection.NORTH_IN:
@@ -262,6 +265,33 @@ export default function GridRender() {
                     arr2 = `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY + arrowHeadWidth / 2}`;
                     arr3 = `${lineEndX - arrowOffset},${lineEndY}`;
                     break;
+                case LinkDirectionInternal.LINK_IN:
+                    arrowOffset = -10;
+                    lineStartX = NODE_SIZE - INTERNAL_LINK_ENDPOINT - INTERNAL_LINK_OFFSET;
+                    lineStartY = INTERNAL_LINK_ENDPOINT - INTERNAL_LINK_OFFSET;
+                    lineEndX = STARTING_POINT + xOff - INTERNAL_LINK_OFFSET + INTERNAL_LINK_START;
+                    lineEndY = NODE_SIZE - LINE_OFFSET - INTERNAL_LINK_OFFSET - INTERNAL_LINK_START;
+
+                    arr1 = `${lineEndX - arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
+                    arr2 = `${lineEndX + arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
+                    arr3 = `${lineEndX},${lineStartY + arrowOffset}`;
+                    angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI - 90;
+
+                    transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+                    break;
+                case LinkDirectionInternal.LINK_OUT:
+                    arrowOffset = -55;
+                    lineEndX = NODE_SIZE - INTERNAL_LINK_ENDPOINT + INTERNAL_LINK_OFFSET;
+                    lineEndY = INTERNAL_LINK_ENDPOINT + INTERNAL_LINK_OFFSET;
+                    lineStartX = STARTING_POINT + xOff + INTERNAL_LINK_OFFSET + INTERNAL_LINK_START;
+                    lineStartY = NODE_SIZE - LINE_OFFSET + INTERNAL_LINK_OFFSET - INTERNAL_LINK_START;
+                    arr1 = `${lineEndX - arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
+                    arr2 = `${lineEndX + arrowHeadWidth / 2},${lineStartY + arrowHeadHeight + arrowOffset}`;
+                    arr3 = `${lineEndX},${lineStartY + arrowOffset}`;
+                    angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI - 90;
+
+                    transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+                    break;
                 default:
                     lineStartX = 0;
                     lineStartY = 0;
@@ -269,16 +299,11 @@ export default function GridRender() {
                     lineEndY = 0;
                     console.warn(`Invalid direction ${direction}`);
             }
+            return {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform};
+        };
 
-            const getColor = (d: ComputeNode) => {
-                const selected = d.getLinksForDirection(direction).filter((link) => {
-                    return link.selected;
-                });
-                if (selected.length > 0) {
-                    return '#AD2E00'; // '#3A3A46';
-                }
-                return '#939393';
-            };
+        const drawArrow = (selector: d3.Selection<SVGGElement, ComputeNode, d3.BaseType, unknown>, direction: LinkDirection | LinkDirectionInternal) => {
+            const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkDrawing(direction);
 
             // Draw line
             selector
@@ -288,29 +313,23 @@ export default function GridRender() {
                 .attr('y1', lineStartY)
                 .attr('x2', lineEndX)
                 .attr('y2', lineEndY)
-                .attr('stroke-width', 3)
-                .attr('stroke', (d: ComputeNode) => {
-                    return getColor(d);
-                });
+                .attr('stroke-width', 2)
+                // .attr('stroke', '#6e6e6e');
+                .attr('stroke', '#7e7e7e');
 
             // Draw arrowhead
-            selector
-                .append('polygon')
-                .attr('points', `${arr1} ${arr2} ${arr3}`)
-                .attr('fill', (d) => {
-                    return getColor(d);
-                });
+            selector.append('polygon').attr('points', `${arr1} ${arr2} ${arr3}`).attr('transform', transform).attr('fill', '#7e7e7e');
+            // .attr('fill', (d) => {
+            //     return getColor(d)[0];
+            // });
         };
 
-        Object.entries(LinkDirection).forEach(([key, direction]) => {
-            if (direction !== LinkDirection.NONE) {
-                // @ts-ignore
-                drawArrow(links, LinkDirection[key]);
-            }
-        });
 
-        // drawArrow(links, LinkDirection.NORTH_IN);
+        // MAKE THIS TOGGLABLE
+        // drawArrow(links, LinkDirectionInternal.LINK_IN);
+        // drawArrow(links, LinkDirectionInternal.LINK_OUT);
         // drawArrow(links, LinkDirection.NORTH_OUT);
+        // drawArrow(links, LinkDirection.NORTH_IN);
         // drawArrow(links, LinkDirection.SOUTH_IN);
         // drawArrow(links, LinkDirection.SOUTH_OUT);
         // drawArrow(links, LinkDirection.EAST_IN);
@@ -318,6 +337,73 @@ export default function GridRender() {
         // drawArrow(links, LinkDirection.WEST_IN);
         // drawArrow(links, LinkDirection.WEST_OUT);
 
+
+        const drawSelections = (node: ComputeNode, link: d3.Selection<SVGGElement, ComputeNode, SVGSVGElement | null, unknown>, direction: LinkDirection | LinkDirectionInternal) => {
+            const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkDrawing(direction);
+            const pipeIds = node.getSelections(direction);
+            const strokeLength = 5;
+            if (pipeIds.length) {
+                if (direction !== LinkDirection.SOUTH_IN && direction !== LinkDirection.WEST_IN && direction !== LinkDirection.SOUTH_OUT && direction !== LinkDirection.WEST_OUT) {
+                    link.append('polygon').attr('points', `${arr1} ${arr2} ${arr3}`).attr('transform', transform).attr('fill', '#9e9e9e');
+                }
+            }
+            const dashArray = [strokeLength, (pipeIds.length - 1) * strokeLength];
+            pipeIds.forEach((pipeId: string, index: number) => {
+                link.append('line')
+                    .attr('class', `arrow-${direction}`)
+                    .attr('x1', lineStartX)
+                    .attr('y1', lineStartY)
+                    .attr('x2', lineEndX)
+                    .attr('y2', lineEndY)
+                    .attr('stroke-width', 2)
+                    .attr('stroke', getPipeColor(pipeId))
+                    .attr('stroke-dasharray', dashArray.join(','))
+                    .attr('stroke-dashoffset', index * dashArray[0]);
+            });
+
+            return pipeIds.length;
+
+        };
+
+
+        nodeData.forEach((node, nodeIndex) => {
+            const link = nodes
+                .filter((d, i) => i === nodeIndex)
+                .append('g')
+                .attr('class', 'links-new');
+
+
+            let selectedPipesNum = 0;
+            selectedPipesNum += drawSelections(node, link, LinkDirection.EAST_OUT);
+            selectedPipesNum += drawSelections(node, link, LinkDirection.WEST_IN);
+            selectedPipesNum += drawSelections(node, link, LinkDirection.NORTH_OUT);
+            selectedPipesNum += drawSelections(node, link, LinkDirection.SOUTH_IN);
+            selectedPipesNum += drawSelections(node, link, LinkDirection.SOUTH_OUT);
+            selectedPipesNum += drawSelections(node, link, LinkDirection.WEST_OUT);
+            selectedPipesNum += drawSelections(node, link, LinkDirection.NORTH_IN);
+            selectedPipesNum += drawSelections(node, link, LinkDirection.EAST_IN);
+            selectedPipesNum += drawSelections(node, link, LinkDirectionInternal.LINK_IN);
+            selectedPipesNum += drawSelections(node, link, LinkDirectionInternal.LINK_OUT);
+
+            // console.log('pipes?', selectedPipesNum)
+
+            if (selectedPipesNum > 0) {
+                link
+                    .append('circle')
+                    .attr('cx', 20)
+                    .attr('cy', NODE_SIZE - 20)
+                    .attr('r', ROUTER_SIZE / 2)
+                    .attr('fill', 'none')
+                    // .attr('fill-opacity', 0.5)
+                    // .attr('stroke', '#939393')
+                    .attr('stroke', '#939393')
+                    .attr('stroke-width', 3)
+                    .style('pointer-events', 'none');
+            }
+
+        });
+        const permEnd = performance.now();
+        console.log(`perm: ${permEnd - permSt}`);
         // <g>
         // <line x1="119" x2="119" y1="150" y2="95" visibility="" stroke="#3A3A46" stroke-width="3" stroke-dasharray="" stroke-dashoffset="0" style="cursor: pointer;"></line>
         // <polygon stroke="black" points="124,120.5 114,120.5 119,110.5 124,120.5" visibility="" fill="#3A3A46" stroke-width="0"></polygon>
@@ -364,7 +450,7 @@ export default function GridRender() {
     //     op_cycles: 1000
 
     return (
-        <div className="grid-container">
+        <div className="grid-container" style={{width: `${gridWidth}px`}}>
             <svg className="svg-grid" ref={svgRef} width={gridWidth} height={gridHeight}/>
         </div>
     );
