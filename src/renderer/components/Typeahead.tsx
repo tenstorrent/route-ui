@@ -53,4 +53,5 @@ const Typeahead: FC<TypeaheadProps> = ({items, selected, setSelected}) => {
     );
 };
 
+// TEMP component may be used ina  future
 export default Typeahead;

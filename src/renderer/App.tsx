@@ -1,6 +1,6 @@
 import {MemoryRouter as Router, Routes, Route, useNavigate} from 'react-router-dom';
 import './App.scss';
-import { useState } from 'react';
+import {useState} from 'react';
 import FileLoader from '../main/FileLoader';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import MainRouteRenderer from './MainRouteRenderer';
@@ -16,14 +16,14 @@ function SplashScreen() {
 }
 
 export default function App() {
-    const [svgData, setSvgData] = useState(new SVGData({ nodes: [] }));
+    const [svgData, setSvgData] = useState<SVGData>(new SVGData({nodes: []}));
     return (
         <>
             <div className="header">
                 <TenstorrentLogo />
             </div>
             {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-            <DataSource.Provider value={{ svgData, setSvgData }}>
+            <DataSource.Provider value={{svgData, setSvgData}}>
                 <Router>
                     <Routes>
                         <Route path="/" element={<SplashScreen />} />

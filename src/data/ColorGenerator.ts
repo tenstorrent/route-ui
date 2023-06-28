@@ -1,3 +1,4 @@
+// colors have not been finilized yet
 const colorList: string[] = [
     // '#000000', // Black
     '#FFFFFF', // White
@@ -31,7 +32,7 @@ function* colorGenerator(): IterableIterator<string> {
 
 const getNextColor = colorGenerator();
 const pipeMap = new Map<string, string>();
-const getPipeColor = (pipeId: string) => {
+const getPipeColor = (pipeId: string): string => {
     if (!pipeMap.has(pipeId)) {
         pipeMap.set(pipeId, getNextColor.next().value);
     }

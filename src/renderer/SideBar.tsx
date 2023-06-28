@@ -7,11 +7,7 @@ export default function SideBar() {
     return (
         <div className="sidebar">
             <Tooltip content="Load new analyzer output .yaml file">
-                <Button
-                    icon={IconNames.REFRESH}
-                    text=""
-                    onClick={() => navigate('/')}
-                />
+                <Button icon={IconNames.REFRESH} text="" onClick={() => navigate('/')} />
             </Tooltip>
         </div>
     );

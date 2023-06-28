@@ -1,11 +1,9 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Button, InputGroup, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
-import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
 import {ComputeNode, convertBytes, NOCLink, NOCLinkInternal, Pipe} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
-import Typeahead from './components/Typeahead';
 import HighlightedText from './components/HighlightedText';
 
 interface OperationItem {
@@ -33,13 +31,11 @@ export default function PropertiesPanel() {
         const opNames: Map<string, ComputeNode[]> = new Map<string, ComputeNode[]>();
         const opList: OperationItem[] = [];
         svgData.nodes.map((n) => {
-            // get all opNames into a list
             const {opName} = n;
             if (opName !== '') {
                 if (!opNames.has(opName)) {
                     opNames.set(opName, []);
                 }
-                // @ts-ignore
                 opNames.get(opName).push(n);
             }
         });
@@ -57,9 +53,6 @@ export default function PropertiesPanel() {
         return out;
     };
 
-    const getOps = () => {
-    };
-
     const getPipesForLink = (link: NOCLinkInternal): Pipe[] => {
         const out: Pipe[] = [];
         link.pipes.forEach((p) => {
@@ -67,16 +60,6 @@ export default function PropertiesPanel() {
         });
         return out;
     };
-
-    // const getPipesForNode = (node: ComputeNode): Pipe[] => {
-    //     const out: Pipe[] = [];
-    //     node.links.forEach((l) => {
-    //         l.pipes.forEach((p) => {
-    //             out.push(p);
-    //         });
-    //     });
-    //     return out;
-    // };
 
     const getInternalLinksForNode = (node: ComputeNode): NOCLinkInternal[] => {
         const out: NOCLinkInternal[] = [];
@@ -123,8 +106,6 @@ export default function PropertiesPanel() {
         });
 
         setPipesList(list);
-
-        // selectLinks('100115900000', true)
     }, [svgData]);
     const selectPipe = (pipeId: string, val: boolean = false) => {
         svgData.nodes.forEach((n) => {
@@ -162,23 +143,6 @@ export default function PropertiesPanel() {
         });
         setSvgData({...svgData});
     };
-    // const selectLink = (node: ComputeNode, linkId: string, val: boolean = false) => {
-    //     svgData.nodes.forEach((n) => {
-    //         if (n === node) {
-    //             n.links.forEach((l) => {
-    //                 if (l.id === linkId) {
-    //                     l.selected = val;
-    //                 }
-    //             });
-    //             n.internalLinks.forEach((l) => {
-    //                 if (l.id === linkId) {
-    //                     l.selected = val;
-    //                 }
-    //             });
-    //         }
-    //     });
-    //     setSvgData({...svgData});
-    // };
     const clearAll = () => {
         svgData.nodes.forEach((n) => {
             n.links.forEach((l) => {
@@ -238,13 +202,6 @@ export default function PropertiesPanel() {
                                             {getInternalLinksForNode(node).map((link: NOCLinkInternal, index) => (
                                                 <div key={index}>
                                                     <h5>
-                                                        {/* <input */}
-                                                        {/*    type="checkbox" */}
-                                                        {/*    checked={link.selected} */}
-                                                        {/*    onChange={(e) => { */}
-                                                        {/*        selectLink(node, link.id, e.target.checked); */}
-                                                        {/*    }} */}
-                                                        {/* /> */}
                                                         <span>
                                                             {link.id} - {convertBytes(link.totalDataBytes)} - {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
                                                         </span>
@@ -326,7 +283,7 @@ export default function PropertiesPanel() {
                                 </Button>
                             </div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap">
@@ -341,7 +298,7 @@ export default function PropertiesPanel() {
                                                     }}
                                                 />
                                                 <span className={`label ${selectedPipe?.id === pipe.id ? 'is-selected-pipe' : ''}`}>
-                                                    <HighlightedText text={pipe.id} filter={pipeFilter}/> : {convertBytes(pipe.bandwidth)}{' '}
+                                                    <HighlightedText text={pipe.id} filter={pipeFilter} /> : {convertBytes(pipe.bandwidth)}{' '}
                                                     <span className={`pipe-color ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}>
                                                         {' '}
                                                     </span>
@@ -360,13 +317,13 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
                             </div>
                             <div className="operations-wrap">
                                 {operationsList.map((op) => (
                                     <div className="op-element">
-                                        <input type="checkbox" onChange={(e) => selectNodesByOp(op.operation, e.target.checked)}/>
-                                        <HighlightedText text={op.operation} filter={opsFilter}/> : {op.nodes.length}
+                                        <input type="checkbox" onChange={(e) => selectNodesByOp(op.operation, e.target.checked)} />
+                                        <HighlightedText text={op.operation} filter={opsFilter} /> : {op.nodes.length}
                                     </div>
                                 ))}
                             </div>

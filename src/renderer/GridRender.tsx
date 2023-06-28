@@ -1,26 +1,24 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import * as d3 from 'd3';
 import {zoom} from 'd3';
-import DataSource from '../data/DataSource';
-import {ComputeNode, LinkDirection, LinkDirectionInternal, Pipe} from '../data/DataStructures';
+import DataSource, {SVGContext} from '../data/DataSource';
+import SVGData, {ComputeNode, LinkDirection, LinkDirectionInternal, Pipe} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
 
 export default function GridRender() {
-    const {svgData, setSvgData} = useContext(DataSource);
+    const {svgData, setSvgData} = useContext<SVGContext>(DataSource);
     const svgRef = useRef<SVGSVGElement | null>(null);
     const [gridWidth, setGridWidth] = useState(0);
     const [gridHeight, setGridHeight] = useState(0);
-    // let gridHeight = 0;
 
     useEffect(() => {
         const permSt = performance.now();
-        // const list = svgData.nodes;
+
         const SVG_MARGIN = 0;
         const NODE_GAP = 1;
         const NODE_SIZE = 80;
         const ROUTER_SIZE = 20;
 
-        // @ts-ignore
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
 
@@ -29,7 +27,7 @@ export default function GridRender() {
             svg.attr('transform', transform);
         });
 
-        // @ts-ignore
+        // zoom functionality may or may not be needed
         // svg = svg.call(zoomBehavior).call(zoomBehavior.transform, d3.zoomIdentity);
         // zoomBehavior.translateExtent([[-this.props.width, -this.props.height], [2*this.props.width, 2*this.props.height]]);
         zoomBehavior.scaleExtent([1, 4]);
@@ -39,15 +37,6 @@ export default function GridRender() {
         setGridWidth((svgData.totalCols + 1) * (NODE_SIZE + NODE_GAP) + SVG_MARGIN * 2);
         setGridHeight((svgData.totalRows + 1) * (NODE_SIZE + NODE_GAP) + SVG_MARGIN * 2);
 
-        // Create scales for positioning elements
-        // const xScale = d3.scaleLinear().range([0, gridWidth]).domain([0, gridSize]);
-        // const yScale = d3
-        //     .scaleLinear()
-        //     .range([0, gridHeight])
-        //     .domain([0, gridSize]);
-
-        // Draw grid squares
-        // @ts-ignore
         const nodes = svg
             .selectAll('g')
             .data(nodeData)
@@ -96,35 +85,8 @@ export default function GridRender() {
             .attr('fill', '#000000')
             .style('pointer-events', 'none');
 
-        // nodes
-        //     .append('text')
-        //     .attr('x', 0)
-        //     .attr('y', 0)
-        //     .attr('width', 15)
-        //     .attr('font-size', 5)
-        //     .text((d) => d.opName)
-        //     .attr('text-anchor', 'left')
-        //     .attr('alignment-baseline', 'hanging')
-        //     .attr('fill', '#000000')
-        //     .style('pointer-events', 'none');
-
         // router - might still need this
-        const links = nodes.append('g').attr('class', 'links');
-
-        // nodes
-        //     .append('circle')
-        //     .attr('cx', 20)
-        //     .attr('cy', NODE_SIZE - 20)
-        //     .attr('r', ROUTER_SIZE / 2)
-        //     .attr('fill', 'none')
-        //     // .attr('fill-opacity', 0.5)
-        //     // .attr('stroke', '#939393')
-        //     .attr('stroke', '#939393')
-        //     .attr('stroke-width', 3)
-        //     .style('pointer-events', 'none');
-
-        // Draw arrow line
-        // accepts direction as 'up', 'down', 'left', 'right'
+        // const links = nodes.append('g').attr('class', 'links');
 
         const getLinkDrawing = (direction: LinkDirection | LinkDirectionInternal) => {
             const STARTING_POINT = 20; // offset from the edge
@@ -223,11 +185,6 @@ export default function GridRender() {
                     arr2 = `${lineStartX + arrowHeadHeight + arrowOffset},${lineEndY + arrowHeadWidth / 2}`;
                     arr3 = `${lineStartX + arrowOffset},${lineEndY}`;
 
-                    // lineStartX = 0;
-                    // lineStartY = 0;
-                    // lineEndX = 0;
-                    // lineEndY = 0;
-
                     break;
                 case LinkDirection.WEST_OUT:
                     // left out
@@ -316,16 +273,11 @@ export default function GridRender() {
                 .attr('stroke-width', 2)
                 // .attr('stroke', '#6e6e6e');
                 .attr('stroke', '#7e7e7e');
-
-            // Draw arrowhead
+            // arrowhead
             selector.append('polygon').attr('points', `${arr1} ${arr2} ${arr3}`).attr('transform', transform).attr('fill', '#7e7e7e');
-            // .attr('fill', (d) => {
-            //     return getColor(d)[0];
-            // });
         };
 
-
-        // MAKE THIS TOGGLABLE
+        // WILL MAKE THIS TOGGLABLE
         // drawArrow(links, LinkDirectionInternal.LINK_IN);
         // drawArrow(links, LinkDirectionInternal.LINK_OUT);
         // drawArrow(links, LinkDirection.NORTH_OUT);
@@ -337,8 +289,11 @@ export default function GridRender() {
         // drawArrow(links, LinkDirection.WEST_IN);
         // drawArrow(links, LinkDirection.WEST_OUT);
 
-
-        const drawSelections = (node: ComputeNode, link: d3.Selection<SVGGElement, ComputeNode, SVGSVGElement | null, unknown>, direction: LinkDirection | LinkDirectionInternal) => {
+        const drawSelections = (
+            node: ComputeNode,
+            link: d3.Selection<SVGGElement, ComputeNode, SVGSVGElement | null, unknown>,
+            direction: LinkDirection | LinkDirectionInternal
+        ) => {
             const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkDrawing(direction);
             const pipeIds = node.getSelections(direction);
             const strokeLength = 5;
@@ -362,16 +317,13 @@ export default function GridRender() {
             });
 
             return pipeIds.length;
-
         };
-
 
         nodeData.forEach((node, nodeIndex) => {
             const link = nodes
                 .filter((d, i) => i === nodeIndex)
                 .append('g')
                 .attr('class', 'links-new');
-
 
             let selectedPipesNum = 0;
             selectedPipesNum += drawSelections(node, link, LinkDirection.EAST_OUT);
@@ -388,70 +340,29 @@ export default function GridRender() {
             // console.log('pipes?', selectedPipesNum)
 
             if (selectedPipesNum > 0) {
-                link
-                    .append('circle')
+                link.append('circle')
                     .attr('cx', 20)
                     .attr('cy', NODE_SIZE - 20)
                     .attr('r', ROUTER_SIZE / 2)
                     .attr('fill', 'none')
-                    // .attr('fill-opacity', 0.5)
-                    // .attr('stroke', '#939393')
                     .attr('stroke', '#939393')
                     .attr('stroke-width', 3)
                     .style('pointer-events', 'none');
             }
-
         });
         const permEnd = performance.now();
         console.log(`perm: ${permEnd - permSt}`);
-        // <g>
-        // <line x1="119" x2="119" y1="150" y2="95" visibility="" stroke="#3A3A46" stroke-width="3" stroke-dasharray="" stroke-dashoffset="0" style="cursor: pointer;"></line>
-        // <polygon stroke="black" points="124,120.5 114,120.5 119,110.5 124,120.5" visibility="" fill="#3A3A46" stroke-width="0"></polygon>
-        // </g>
 
         nodes.on('click', (event: PointerEvent, d) => {
-            // @ts-ignore
-            // console.log(d);
-            // console.log(d.links)
             d.selected = !d.selected;
-            console.log(d.json);
+            console.log(d);
             setSvgData({...svgData});
         });
     }, [svgData]);
 
-    // }, [list]);
-    // const pipeDrawings = svg
-    //     .selectAll('g')
-    //     .data(nodeList)
-    //     .enter()
-    //     .append('g')
-    //     .attr('fill', '#ffffff')
-    //     .attr('transform', (d: ComputeNode, i) => {
-    //         return `translate(
-    //         ${d.loc.x * squareSize},
-    //         ${d.loc.y * squareSize}
-    //         )`;
-    //     });
-    const randomColor = () => {
-        const red = Math.floor(Math.random() * 200);
-        const green = Math.floor(Math.random() * 200);
-        const blue = Math.floor(Math.random() * 200);
-
-        // eslint-disable-next-line no-bitwise
-        const hex = ((red << 16) | (green << 8) | blue).toString(16).padStart(6, '0');
-
-        return `#${hex}`;
-    };
-
-    /* ALWAYS ON */
-
-    //     type: core
-    //     op_name: layernorm_91.dc.sqrt.6
-    //     op_cycles: 1000
-
     return (
         <div className="grid-container" style={{width: `${gridWidth}px`}}>
-            <svg className="svg-grid" ref={svgRef} width={gridWidth} height={gridHeight}/>
+            <svg className="svg-grid" ref={svgRef} width={gridWidth} height={gridHeight} />
         </div>
     );
 }
