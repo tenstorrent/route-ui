@@ -1,10 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, InputGroup, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
+import {Button, Checkbox, InputGroup, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
 import {ComputeNode, convertBytes, NOCLink, NOCLinkInternal, Pipe} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
 import HighlightedText from './components/HighlightedText';
+import FilterableComponent from './components/FilterableComponent';
 
 interface OperationItem {
     operation: string;
@@ -283,27 +284,32 @@ export default function PropertiesPanel() {
                                 </Button>
                             </div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap">
                                     <ul className="node-pipelist">
                                         {pipesList.map((pipe) => (
-                                            <li>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={pipe.selected}
-                                                    onChange={(e) => {
-                                                        selectPipe(pipe.id, e.target.checked);
-                                                    }}
-                                                />
-                                                <span className={`label ${selectedPipe?.id === pipe.id ? 'is-selected-pipe' : ''}`}>
-                                                    <HighlightedText text={pipe.id} filter={pipeFilter} /> : {convertBytes(pipe.bandwidth)}{' '}
-                                                    <span className={`pipe-color ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}>
-                                                        {' '}
-                                                    </span>
-                                                </span>
-                                            </li>
+                                            <FilterableComponent
+                                                text={pipe.id}
+                                                filter={pipeFilter}
+                                                component={
+                                                    <li>
+                                                        <Checkbox
+                                                            checked={pipe.selected}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                selectPipe(pipe.id, e.target.checked);
+                                                            }}
+                                                        />
+                                                        <span className={`label ${selectedPipe?.id === pipe.id ? 'is-selected-pipe' : ''}`}>
+                                                            <HighlightedText text={pipe.id} filter={pipeFilter}/> : {convertBytes(pipe.bandwidth)}{' '}
+                                                            <span className={`pipe-color ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}>
+                                                                {' '}
+                                                            </span>
+                                                        </span>
+                                                    </li>
+                                                }
+                                            />
                                         ))}
                                     </ul>
                                 </div>
@@ -317,14 +323,20 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
                             </div>
                             <div className="operations-wrap">
                                 {operationsList.map((op) => (
-                                    <div className="op-element">
-                                        <input type="checkbox" onChange={(e) => selectNodesByOp(op.operation, e.target.checked)} />
-                                        <HighlightedText text={op.operation} filter={opsFilter} /> : {op.nodes.length}
-                                    </div>
+                                    <FilterableComponent
+                                        text={op.operation}
+                                        filter={opsFilter}
+                                        component={
+                                            <div className="op-element">
+                                                <input type="checkbox" onChange={(e) => selectNodesByOp(op.operation, e.target.checked)}/>
+                                                <HighlightedText text={op.operation} filter={opsFilter}/> :
+                                            </div>
+                                        }
+                                    />
                                 ))}
                             </div>
                         </div>

@@ -8,7 +8,6 @@ interface HighlightedTextProps {
 const HighlightedText: FC<HighlightedTextProps> = ({text, filter}) => {
     const index = text.toLowerCase().indexOf(filter.toLowerCase());
 
-
     if (index === -1) {
         return <span>{text}</span>;
     }
