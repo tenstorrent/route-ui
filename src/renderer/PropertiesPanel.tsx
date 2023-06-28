@@ -284,11 +284,11 @@ export default function PropertiesPanel() {
                                 </Button>
                             </div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
                             </div>
                             <div className="properties-panel__content">
-                                <div className="pipelist-wrap">
-                                    <ul className="node-pipelist">
+                                <div className="pipelist-wrap list-wrap">
+                                    <ul className="scrollable-content">
                                         {pipesList.map((pipe) => (
                                             <FilterableComponent
                                                 text={pipe.id}
@@ -302,10 +302,11 @@ export default function PropertiesPanel() {
                                                             }}
                                                         />
                                                         <span className={`label ${selectedPipe?.id === pipe.id ? 'is-selected-pipe' : ''}`}>
-                                                            <HighlightedText text={pipe.id} filter={pipeFilter}/> : {convertBytes(pipe.bandwidth)}{' '}
-                                                            <span className={`pipe-color ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}>
-                                                                {' '}
-                                                            </span>
+                                                            <HighlightedText text={pipe.id} filter={pipeFilter} /> {convertBytes(pipe.bandwidth)}{' '}
+                                                            <span
+                                                                className={`color-swatch ${pipe.selected ? '' : 'transparent'}`}
+                                                                style={{backgroundColor: getPipeColor(pipe.id)}}
+                                                            />
                                                         </span>
                                                     </li>
                                                 }
@@ -323,21 +324,27 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
                             </div>
-                            <div className="operations-wrap">
-                                {operationsList.map((op) => (
-                                    <FilterableComponent
-                                        text={op.operation}
-                                        filter={opsFilter}
-                                        component={
-                                            <div className="op-element">
-                                                <input type="checkbox" onChange={(e) => selectNodesByOp(op.operation, e.target.checked)}/>
-                                                <HighlightedText text={op.operation} filter={opsFilter}/> :
-                                            </div>
-                                        }
-                                    />
-                                ))}
+                            <div className="operations-wrap list-wrap">
+                                <div className="scrollable-content">
+                                    {operationsList.map((op) => (
+                                        <FilterableComponent
+                                            text={op.operation}
+                                            filter={opsFilter}
+                                            component={
+                                                <div className="op-element">
+                                                    <Checkbox
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                            selectNodesByOp(op.operation, e.target.checked);
+                                                        }}
+                                                    />
+                                                    <HighlightedText text={op.operation} filter={opsFilter} />
+                                                </div>
+                                            }
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     }
