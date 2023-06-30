@@ -4,8 +4,8 @@ import {useState} from 'react';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import DataSource from '../data/DataSource';
 import SVGData from '../data/DataStructures';
-import SplashScreen from './SplashScreen';
 import MainRouteRenderer from './MainRouteRenderer';
+import SplashScreen from './SplashScreen';
 
 export default function App() {
     const [svgData, setSvgData] = useState<SVGData>(new SVGData({nodes: []}));
