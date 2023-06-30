@@ -1,6 +1,8 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import * as d3 from 'd3';
 import {zoom} from 'd3';
+import {Position, Switch} from '@blueprintjs/core';
+import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource, {SVGContext} from '../data/DataSource';
 import SVGData, {ComputeNode, LinkDirection, LinkDirectionInternal, Pipe} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
@@ -10,6 +12,7 @@ export default function GridRender() {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const [gridWidth, setGridWidth] = useState(0);
     const [gridHeight, setGridHeight] = useState(0);
+    const [showEmptyLinks, setShowEmptyLinks] = useState(false);
 
     useEffect(() => {
         const permSt = performance.now();
@@ -86,7 +89,7 @@ export default function GridRender() {
             .style('pointer-events', 'none');
 
         // router - might still need this
-        // const links = nodes.append('g').attr('class', 'links');
+        const links = nodes.append('g').attr('class', 'links');
 
         const getLinkDrawing = (direction: LinkDirection | LinkDirectionInternal) => {
             const STARTING_POINT = 20; // offset from the edge
@@ -278,16 +281,18 @@ export default function GridRender() {
         };
 
         // WILL MAKE THIS TOGGLABLE
-        // drawArrow(links, LinkDirectionInternal.LINK_IN);
-        // drawArrow(links, LinkDirectionInternal.LINK_OUT);
-        // drawArrow(links, LinkDirection.NORTH_OUT);
-        // drawArrow(links, LinkDirection.NORTH_IN);
-        // drawArrow(links, LinkDirection.SOUTH_IN);
-        // drawArrow(links, LinkDirection.SOUTH_OUT);
-        // drawArrow(links, LinkDirection.EAST_IN);
-        // drawArrow(links, LinkDirection.EAST_OUT);
-        // drawArrow(links, LinkDirection.WEST_IN);
-        // drawArrow(links, LinkDirection.WEST_OUT);
+        if (showEmptyLinks) {
+            drawArrow(links, LinkDirectionInternal.LINK_IN);
+            drawArrow(links, LinkDirectionInternal.LINK_OUT);
+            drawArrow(links, LinkDirection.NORTH_OUT);
+            drawArrow(links, LinkDirection.NORTH_IN);
+            drawArrow(links, LinkDirection.SOUTH_IN);
+            drawArrow(links, LinkDirection.SOUTH_OUT);
+            drawArrow(links, LinkDirection.EAST_IN);
+            drawArrow(links, LinkDirection.EAST_OUT);
+            drawArrow(links, LinkDirection.WEST_IN);
+            drawArrow(links, LinkDirection.WEST_OUT);
+        }
 
         const drawSelections = (
             node: ComputeNode,
@@ -358,11 +363,20 @@ export default function GridRender() {
             console.log(d);
             setSvgData({...svgData});
         });
-    }, [svgData]);
+    }, [svgData, showEmptyLinks]);
 
     return (
-        <div className="grid-container" style={{width: `${gridWidth}px`}}>
-            <svg className="svg-grid" ref={svgRef} width={gridWidth} height={gridHeight} />
-        </div>
+        <>
+            <div className="top-bar">
+                <div>
+                    <Tooltip2 content="Show all links overlay" position={Position.RIGHT}>
+                        <Switch checked={showEmptyLinks} label="" onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}/>
+                    </Tooltip2>
+                </div>
+            </div>
+            <div className="grid-container" style={{width: `${gridWidth}px`}}>
+                <svg className="svg-grid" ref={svgRef} width={gridWidth} height={gridHeight}/>
+            </div>
+        </>
     );
 }
