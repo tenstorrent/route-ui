@@ -30,8 +30,8 @@ export interface NodeJson {
     noc: string;
     op_name: string;
     op_cycles: number;
-    links: {[key: string]: NOCLinkJson};
-    internal_links: {[key: string]: NOCLinkJsonInternal};
+    links: { [key: string]: NOCLinkJson };
+    internal_links: { [key: string]: NOCLinkJsonInternal };
 }
 
 export interface SVGJson {
@@ -40,13 +40,14 @@ export interface SVGJson {
     nodes: NodeJson[];
 }
 
-export interface NOCLinkJson extends NOCLinkJsonInternal {}
+export interface NOCLinkJson extends NOCLinkJsonInternal {
+}
 
 export interface NOCLinkJsonInternal {
     num_occupants: number;
     total_data_in_bytes: number;
     max_link_bw: number;
-    mapped_pipes: {[key: string]: number};
+    mapped_pipes: { [key: string]: number };
 }
 
 export default class SVGData {
@@ -146,19 +147,10 @@ export class ComputeNode {
     }
 
     public getLinksForDirection(direction: LinkDirection | LinkDirectionInternal): NOCLinkInternal[] {
-        const links: NOCLinkInternal[] = [];
-
-        this.links.forEach((link) => {
-            if (link.direction === direction) {
-                links.push(link);
-            }
-        });
-        this.internalLinks.forEach((link) => {
-            if (link.inOut === direction) {
-                links.push(link);
-            }
-        });
-        return links;
+        return [
+            ...Array.from(this.links.values()).filter((link) => link.direction === direction),
+            ...Array.from(this.internalLinks.values()).filter((link) => link.inOut === direction),
+        ];
     }
 }
 
