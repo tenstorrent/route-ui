@@ -1,9 +1,10 @@
+import React from 'react';
 import './MainRouteRenderer.scss';
 import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
 import SideBar from './SideBar';
 
-export default function MainRouteRenderer() {
+const MainRouteRenderer: React.FC = () => {
     return (
         <div className="main-wrapper">
             <SideBar />
@@ -13,4 +14,6 @@ export default function MainRouteRenderer() {
             </div>
         </div>
     );
-}
+};
+
+export default MainRouteRenderer;
