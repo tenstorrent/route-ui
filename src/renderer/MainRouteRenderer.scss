@@ -71,7 +71,10 @@ p.opname {
     background-color: #cbcbcb;
     padding: 10px;
     flex-grow: 1;
+    overflow-x: scroll;
+    white-space: nowrap;
 }
+
 
 .properties-panel-nodes {
     display: flex;

@@ -65,7 +65,7 @@ export default function GridRender() {
 
         nodes
             .append('rect')
-            .attr('class', (d) => `node-type-${d.getType()}`)
+            .attr('class', (d) => `node-type-${d.getNodeLabel()}`)
             .attr('x', NODE_SIZE - 20)
             .attr('y', 5)
             .attr('fill', 'none')
@@ -79,7 +79,7 @@ export default function GridRender() {
             .attr('x', NODE_SIZE - 20 + 7.5)
             .attr('y', 5)
             .attr('width', 15)
-            .text((d) => d.getType())
+            .text((d) => d.getNodeLabel())
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'hanging')
             .attr('fill', '#000000')

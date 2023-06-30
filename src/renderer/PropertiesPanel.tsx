@@ -182,7 +182,7 @@ export default function PropertiesPanel() {
                             <div className="properties-panel-nodes">
                                 {selectedNodes.map((node: ComputeNode) => (
                                     <div className="node-element" key={node.uid}>
-                                        <h3 className={`node-type-${node.getType()}`}>
+                                        <h3 className={`node-type-${node.getNodeLabel()}`}>
                                             {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
                                             <Tooltip content="Close ComputeNode">
                                                 <Button
@@ -261,6 +261,7 @@ export default function PropertiesPanel() {
                                     <ul className="scrollable-content">
                                         {pipesList.map((pipe) => (
                                             <FilterableComponent
+                                                key={pipe.id}
                                                 filterableString={pipe.id}
                                                 filterQuery={pipeFilter}
                                                 component={
@@ -288,6 +289,7 @@ export default function PropertiesPanel() {
                                 <div className="scrollable-content">
                                     {operationsList.map((op) => (
                                         <FilterableComponent
+                                            key={op.operation}
                                             filterableString={op.operation}
                                             filterQuery={opsFilter}
                                             component={<SelectableOperation op={op} selectFunc={selectNodesByOp} stringFilter={opsFilter}/>}

@@ -30,8 +30,8 @@ export interface NodeJson {
     noc: string;
     op_name: string;
     op_cycles: number;
-    links: { [key: string]: NOCLinkJson };
-    internal_links: { [key: string]: NOCLinkJsonInternal };
+    links: {[key: string]: NOCLinkJson};
+    internal_links: {[key: string]: NOCLinkJsonInternal};
 }
 
 export interface SVGJson {
@@ -40,14 +40,13 @@ export interface SVGJson {
     nodes: NodeJson[];
 }
 
-export interface NOCLinkJson extends NOCLinkJsonInternal {
-}
+export interface NOCLinkJson extends NOCLinkJsonInternal {}
 
 export interface NOCLinkJsonInternal {
     num_occupants: number;
     total_data_in_bytes: number;
     max_link_bw: number;
-    mapped_pipes: { [key: string]: number };
+    mapped_pipes: {[key: string]: number};
 }
 
 export default class SVGData {
@@ -63,20 +62,16 @@ export default class SVGData {
     public bwLimitedOpCycles: number = 0;
 
     constructor(data: SVGJson) {
-        const list = data.nodes;
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
 
         const totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
-        this.nodes = list.reverse().map((el, i) => {
-            const loc: Loc = {x: el.location[1], y: el.location[0]};
+        this.nodes = data.nodes.reverse().map((node, i) => {
+            const loc: Loc = {x: node.location[1], y: node.location[0]};
             this.totalCols = Math.max(loc.x, this.totalRows);
             this.totalRows = Math.max(loc.y, this.totalCols);
-            const computeNode = new ComputeNode(el, i, totalOpCycles);
-            computeNode.type = el.type;
-            computeNode.loc = {x: el.location[0], y: el.location[1]};
-            return computeNode;
+            return new ComputeNode(node, i, totalOpCycles);
         });
     }
 }
@@ -111,46 +106,27 @@ export class ComputeNode {
         this.opCycles = json.op_cycles;
         this.links = new Map();
         this.totalOpCycles = totalOpCycles;
+        this.type = json.type;
+        this.loc = {x: json.location[0], y: json.location[1]};
 
-        const keys = Object.keys(json.links);
-        keys.forEach((l) => {
-            this.links.set(l, new NOCLink(l, json.links[l], this.totalOpCycles));
-        });
-
-        this.internalLinks = new Map();
-        const intKeys = Object.keys(json.internal_links);
-        intKeys.forEach((l) => {
-            this.internalLinks.set(l, new NOCLinkInternal(l, json.internal_links[l], this.totalOpCycles));
-        });
+        this.links = new Map(Object.entries(json.links).map(([link, linkJson]) => [link, new NOCLink(link, linkJson, this.totalOpCycles)]));
+        this.internalLinks = new Map(Object.entries(json.internal_links).map(([link, linkJson]) => [link, new NOCLinkInternal(link, linkJson, this.totalOpCycles)]));
     }
 
     public getSelections(direction: LinkDirection | LinkDirectionInternal): string[] {
-        const pipelist: string[] = [];
-        this.links.forEach((link) => {
-            if (link.direction === direction) {
-                link.pipes.forEach((pipe) => {
-                    if (pipe.selected) {
-                        pipelist.push(pipe.id);
-                    }
-                });
-            }
-        });
+        const allMatchingLinks = [
+            ...Array.from(this.links.values()).filter((link) => link.direction === direction),
+            ...Array.from(this.internalLinks.values()).filter((link) => link.inOut === direction),
+        ];
+        const selectedPipes: string[] = allMatchingLinks
+            .map((link) => Array.from(link.pipes.values()).filter((pipe) => pipe.selected))
+            .map((pipes) => pipes.map((pipe) => pipe.id))
+            .flat();
 
-        this.internalLinks.forEach((link) => {
-            if (link.inOut === direction) {
-                link.pipes.forEach((pipe) => {
-                    if (pipe.selected) {
-                        pipelist.push(pipe.id);
-                    }
-                });
-            }
-        });
-
-
-        return pipelist;
+        return selectedPipes;
     }
 
-    public getType(): string {
+    public getNodeLabel(): string {
         if (this.type === ComputeNodeType.CORE) {
             return 'c';
         }
@@ -171,7 +147,6 @@ export class ComputeNode {
 
     public getLinksForDirection(direction: LinkDirection | LinkDirectionInternal): NOCLinkInternal[] {
         const links: NOCLinkInternal[] = [];
-
 
         this.links.forEach((link) => {
             if (link.direction === direction) {
@@ -215,8 +190,6 @@ export class NOCLinkInternal {
 
     public pipes: Map<string, Pipe>;
 
-    public loc: Loc = {x: 0, y: 0};
-
     public id: string = '';
 
     public inOut: LinkDirectionInternal | null = null;
@@ -232,8 +205,7 @@ export class NOCLinkInternal {
         this.maxBandwidth = json.max_link_bw;
         this.bpc = this.totalDataBytes / totalOpCycles;
         this.linkSaturation = this.bpc / this.maxBandwidth;
-        this.pipes = new Map();
-        const keys = Object.keys(json.mapped_pipes);
+
         switch (id) {
             case 'link_in':
                 this.inOut = LinkDirectionInternal.LINK_IN;
@@ -244,9 +216,13 @@ export class NOCLinkInternal {
             default:
                 this.inOut = null;
         }
-        keys.forEach((pipe) => {
-            this.pipes.set(pipe, new Pipe(pipe, json.mapped_pipes[pipe] as number, id));
-        });
+
+        this.populatePipes(json, id);
+    }
+
+    populatePipes(json: NOCLinkJsonInternal, id: string) {
+        this.pipes = new Map();
+        this.pipes = new Map(Object.entries(json.mapped_pipes).map(([pipe, pipeJson]) => [pipe, new Pipe(pipe, pipeJson, id)]));
     }
 }
 
@@ -255,8 +231,6 @@ export class NOCLink extends NOCLinkInternal {
 
     constructor(id: string, json: NOCLinkJson, totalOpCycles: number) {
         super(id, json, totalOpCycles);
-
-        const keys = Object.keys(json.mapped_pipes);
         switch (id) {
             case 'noc0_in_north':
                 this.direction = LinkDirection.NORTH_IN;
@@ -285,9 +259,7 @@ export class NOCLink extends NOCLinkInternal {
             default:
                 this.direction = LinkDirection.NONE;
         }
-        keys.forEach((pipe) => {
-            this.pipes.set(pipe, new Pipe(pipe, json.mapped_pipes[pipe] as number, id));
-        });
+        super.populatePipes(json, id);
     }
 }
 
@@ -311,7 +283,6 @@ export class Pipe {
 
 export const convertBytes = (bytes: number, numAfterComma = 0) => {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    // eslint-disable-next-line no-param-reassign
 
     if (bytes === 0) {
         return '0 B';
@@ -323,4 +294,3 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     return `${(bytes / 1024 ** i).toFixed(numAfterComma)} ${sizes[i]}`;
 };
-
