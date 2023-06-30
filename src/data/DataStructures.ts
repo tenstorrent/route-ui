@@ -69,11 +69,11 @@ export default class SVGData {
 
         const totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
-        this.nodes = list.reverse().map((el) => {
+        this.nodes = list.reverse().map((el, i) => {
             const loc: Loc = {x: el.location[1], y: el.location[0]};
             this.totalCols = Math.max(loc.x, this.totalRows);
             this.totalRows = Math.max(loc.y, this.totalCols);
-            const computeNode = new ComputeNode(el, totalOpCycles);
+            const computeNode = new ComputeNode(el, i, totalOpCycles);
             computeNode.type = el.type;
             computeNode.loc = {x: el.location[0], y: el.location[1]};
             return computeNode;
@@ -82,6 +82,8 @@ export default class SVGData {
 }
 
 export class ComputeNode {
+    public uid: number;
+
     public id: string = '';
 
     public type: string = ''; // ComputeNodeType = ComputeNodeType.NONE;
@@ -102,7 +104,8 @@ export class ComputeNode {
 
     public totalOpCycles: number = 0;
 
-    constructor(json: NodeJson, totalOpCycles: number = 0) {
+    constructor(json: NodeJson, uid: number, totalOpCycles: number = 0) {
+        this.uid = uid;
         this.json = json;
         this.opName = json.op_name;
         this.opCycles = json.op_cycles;

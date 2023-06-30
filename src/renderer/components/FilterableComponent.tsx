@@ -1,14 +1,14 @@
 import {FC, ReactNode} from 'react';
 
 interface FilterableComponentProps {
-    text: string;
-    filter: string;
+    filterableString: string;
+    filterQuery: string;
     component: ReactNode;
 }
 
-const FilterableComponent: FC<FilterableComponentProps> = ({text, filter, component}) => {
-    const index = text.toLowerCase().indexOf(filter.toLowerCase());
-    if (index === -1 && filter !== '') {
+const FilterableComponent: FC<FilterableComponentProps> = ({filterableString, filterQuery, component}) => {
+    const includes = filterableString.toLowerCase().includes(filterQuery.toLowerCase());
+    if (!includes && filterQuery !== '') {
         return null;
     }
     return component;
