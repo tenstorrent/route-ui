@@ -1,10 +1,11 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Button, InputGroup, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
+import React, {ChangeEvent, FC, useContext, useEffect, useState} from 'react';
+import {Button, Checkbox, InputGroup, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
 import {ComputeNode, convertBytes, NOCLink, NOCLinkInternal, Pipe} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
 import HighlightedText from './components/HighlightedText';
+import FilterableComponent from './components/FilterableComponent';
 
 interface OperationItem {
     operation: string;
@@ -179,8 +180,8 @@ export default function PropertiesPanel() {
 
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className="properties-panel-nodes">
-                                {selectedNodes.map((node: ComputeNode, index) => (
-                                    <div className="node-element" key={index}>
+                                {selectedNodes.map((node: ComputeNode) => (
+                                    <div className="node-element" key={node.uid}>
                                         <h3 className={`node-type-${node.getType()}`}>
                                             {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
                                             <Tooltip content="Close ComputeNode">
@@ -207,24 +208,9 @@ export default function PropertiesPanel() {
                                                         </span>
                                                     </h5>
                                                     <ul className="node-pipelist">
-                                                        {getPipesForLink(link).map((pipe: Pipe, pi) => (
-                                                            <li key={pi}>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={pipe.selected}
-                                                                    onChange={(e) => {
-                                                                        selectPipe(pipe.id, e.target.checked);
-                                                                    }}
-                                                                />
-                                                                <span className="label">
-                                                                    {pipe.id}:{convertBytes(pipe.bandwidth)}{' '}
-                                                                    <span
-                                                                        className={`pipe-color ${pipe.selected ? '' : 'transparent'}`}
-                                                                        style={{backgroundColor: getPipeColor(pipe.id)}}
-                                                                    >
-                                                                        {' '}
-                                                                    </span>
-                                                                </span>
+                                                        {getPipesForLink(link).map((pipe: Pipe) => (
+                                                            <li key={pipe.id}>
+                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter=""/>
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -241,24 +227,9 @@ export default function PropertiesPanel() {
                                                         </span>
                                                     </h5>
                                                     <ul className="node-pipelist">
-                                                        {getPipesForLink(link).map((pipe: Pipe, pi) => (
-                                                            <li key={pi}>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={pipe.selected}
-                                                                    onChange={(e) => {
-                                                                        selectPipe(pipe.id, e.target.checked);
-                                                                    }}
-                                                                />
-                                                                <span className="label">
-                                                                    {pipe.id}:{convertBytes(pipe.bandwidth)}{' '}
-                                                                    <span
-                                                                        className={`pipe-color ${pipe.selected ? '' : 'transparent'}`}
-                                                                        style={{backgroundColor: getPipeColor(pipe.id)}}
-                                                                    >
-                                                                        {' '}
-                                                                    </span>
-                                                                </span>
+                                                        {getPipesForLink(link).map((pipe: Pipe) => (
+                                                            <li key={pipe.id}>
+                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter=""/>
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -283,27 +254,21 @@ export default function PropertiesPanel() {
                                 </Button>
                             </div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
                             </div>
                             <div className="properties-panel__content">
-                                <div className="pipelist-wrap">
-                                    <ul className="node-pipelist">
+                                <div className="pipelist-wrap list-wrap">
+                                    <ul className="scrollable-content">
                                         {pipesList.map((pipe) => (
-                                            <li>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={pipe.selected}
-                                                    onChange={(e) => {
-                                                        selectPipe(pipe.id, e.target.checked);
-                                                    }}
-                                                />
-                                                <span className={`label ${selectedPipe?.id === pipe.id ? 'is-selected-pipe' : ''}`}>
-                                                    <HighlightedText text={pipe.id} filter={pipeFilter} /> : {convertBytes(pipe.bandwidth)}{' '}
-                                                    <span className={`pipe-color ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}>
-                                                        {' '}
-                                                    </span>
-                                                </span>
-                                            </li>
+                                            <FilterableComponent
+                                                filterableString={pipe.id}
+                                                filterQuery={pipeFilter}
+                                                component={
+                                                    <li>
+                                                        <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter={pipeFilter}/>
+                                                    </li>
+                                                }
+                                            />
                                         ))}
                                     </ul>
                                 </div>
@@ -317,15 +282,18 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
                             </div>
-                            <div className="operations-wrap">
-                                {operationsList.map((op) => (
-                                    <div className="op-element">
-                                        <input type="checkbox" onChange={(e) => selectNodesByOp(op.operation, e.target.checked)} />
-                                        <HighlightedText text={op.operation} filter={opsFilter} /> : {op.nodes.length}
-                                    </div>
-                                ))}
+                            <div className="operations-wrap list-wrap">
+                                <div className="scrollable-content">
+                                    {operationsList.map((op) => (
+                                        <FilterableComponent
+                                            filterableString={op.operation}
+                                            filterQuery={opsFilter}
+                                            component={<SelectableOperation op={op} selectFunc={selectNodesByOp} stringFilter={opsFilter}/>}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     }
@@ -334,3 +302,48 @@ export default function PropertiesPanel() {
         </div>
     );
 }
+
+//
+interface SelectablePipeProps {
+    pipe: Pipe;
+    selectPipe: (id: string, checked: boolean) => void;
+    pipeFilter: string;
+}
+
+const SelectablePipe: FC<SelectablePipeProps> = ({pipe, selectPipe, pipeFilter}) => {
+    return (
+        <>
+            <Checkbox
+                checked={pipe.selected}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    selectPipe(pipe.id, e.target.checked);
+                }}
+            />
+            <span className="label">
+                <HighlightedText text={pipe.id} filter={pipeFilter}/> {convertBytes(pipe.bandwidth)}{' '}
+                <span className={`color-swatch ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}/>
+            </span>
+        </>
+    );
+};
+
+interface SelectableOperationProps {
+    op: {
+        operation: string;
+    };
+    selectFunc: (operation: string, checked: boolean) => void;
+    stringFilter: string;
+}
+
+const SelectableOperation: FC<SelectableOperationProps> = ({op, selectFunc, stringFilter}) => {
+    return (
+        <div className="op-element">
+            <Checkbox
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    selectFunc(op.operation, e.target.checked);
+                }}
+            />
+            <HighlightedText text={op.operation} filter={stringFilter}/>
+        </div>
+    );
+};

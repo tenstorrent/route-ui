@@ -77,18 +77,15 @@ p.opname {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: scroll;
-    overflow-y: auto;
+    overflow-y: scroll;
     width: 100%;
-
-    //grid-template-columns: repeat(3, auto); /* Two columns with automatic width */
-    //grid-auto-columns: auto;
-    //grid-auto-columns: minmax(100px, auto);
     gap: 20px;
-    //width: 50%;
+    max-height: calc(100vh - 200px);
 
     .node-element {
         width: 25%;
-        min-width: 20%;
+        height: 100%;
+        min-width: 250px;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -103,10 +100,6 @@ p.opname {
             justify-content: space-between;
         }
     }
-
-    //    display: inline-flex;
-    //
-    //}
 }
 
 .node-links-wrap {
@@ -133,7 +126,8 @@ p.opname {
 
 }
 
-.node-pipelist {
+.node-pipelist,
+.scrollable-content {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -143,14 +137,27 @@ p.opname {
     flex-direction: column;
 
     li {
+
+        padding-top: 4px;
+        padding-left: 5px;
         font-size: 12px;
         padding-bottom: 5px;
         display: inline-flex;
-        align-content: center;
+        align-items: center;
         font-weight: 100;
+
+        .bp4-control.bp4-checkbox {
+            margin-bottom: 0;
+        }
+
+        .label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
     }
 
-    .pipe-color {
+    .color-swatch {
         width: 10px;
         height: 10px;
         border: 1px solid #ffffff;
@@ -162,13 +169,14 @@ p.opname {
     }
 }
 
-.pipelist-wrap {
+
+.list-wrap {
     overflow-y: scroll;
-    max-height: 72vh;
+    max-height: calc(100vh - 240px);
     width: 100%;
     margin-top: 20px;
 
-    .node-pipelist {
+    .scrollable-content {
         width: 100%;
         padding-left: 0;
     }
@@ -205,19 +213,19 @@ p.opname {
         }
     }
 }
-.search-field{
+
+.search-field {
     display: flex;
     min-width: 250px;
 
 }
-.operations-wrap{
-    max-height: 80vh;
-    overflow-y: scroll;
-    .op-element{
+
+.operations-wrap {
+    .op-element {
         color: #000;
         display: flex;
         align-content: center;
-        gap: 10px;
+        gap: 5px;
     }
 }
 

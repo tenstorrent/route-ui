@@ -1,19 +1,11 @@
-import {MemoryRouter as Router, Routes, Route, useNavigate} from 'react-router-dom';
+import {MemoryRouter as Router, Routes, Route} from 'react-router-dom';
 import './App.scss';
 import {useState} from 'react';
-import FileLoader from '../main/FileLoader';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
-import MainRouteRenderer from './MainRouteRenderer';
 import DataSource from '../data/DataSource';
 import SVGData from '../data/DataStructures';
-
-function SplashScreen() {
-    return (
-        <div className="splash-screen">
-            <FileLoader />
-        </div>
-    );
-}
+import MainRouteRenderer from './MainRouteRenderer';
+import SplashScreen from './SplashScreen';
 
 export default function App() {
     const [svgData, setSvgData] = useState<SVGData>(new SVGData({nodes: []}));
