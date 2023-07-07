@@ -1,3 +1,6 @@
+import {NodeData, PipeSelection} from './store';
+import {SVGJson, NodeJson, NOCLinkJsonInternal, NOCLinkJson} from './JSONDataTypes';
+
 export enum ComputeNodeType {
     NONE = '',
     ROUTER = 'router',
@@ -23,35 +26,7 @@ export type Loc = {
     y: number;
 };
 
-export interface NodeJson {
-    location: number[];
-    type: string;
-    id: string;
-    noc: string;
-    op_name: string;
-    op_cycles: number;
-    links: { [key: string]: NOCLinkJson };
-    internal_links: { [key: string]: NOCLinkJsonInternal };
-}
-
-export interface SVGJson {
-    slowest_op_cycles: number;
-    bw_limited_op_cycles: number;
-    nodes: NodeJson[];
-}
-
-export interface NOCLinkJson extends NOCLinkJsonInternal {
-}
-
-export interface NOCLinkJsonInternal {
-    num_occupants: number;
-    total_data_in_bytes: number;
-    max_link_bw: number;
-    mapped_pipes: { [key: string]: number };
-}
-
 export default class SVGData {
-    // eslint-disable-next-line no-use-before-define
     public nodes: ComputeNode[] = [];
 
     public totalCols: number = 0;
@@ -62,18 +37,93 @@ export default class SVGData {
 
     public bwLimitedOpCycles: number = 0;
 
+    private uniquePipeList: Pipe[] = [];
+
     constructor(data: SVGJson) {
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
 
         const totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
-        this.nodes = data.nodes.reverse().map((node, i) => {
-            const loc: Loc = {x: node.location[1], y: node.location[0]};
-            this.totalCols = Math.max(loc.x, this.totalRows);
-            this.totalRows = Math.max(loc.y, this.totalCols);
-            return new ComputeNode(node, i, totalOpCycles);
+        this.nodes = data.nodes
+            .map((node, i) => {
+                const loc: Loc = {x: node.location[1], y: node.location[0]};
+                this.totalCols = Math.max(loc.x, this.totalRows);
+                this.totalRows = Math.max(loc.y, this.totalCols);
+                return new ComputeNode(node, i, totalOpCycles);
+            })
+            .sort((a, b) => {
+                if (a.loc.y !== b.loc.y) {
+                    return a.loc.y - b.loc.y;
+                }
+                return a.loc.x - b.loc.x;
+            });
+    }
+
+    getAllNodes(): NodeData[] {
+        return this.nodes.map((node) => {
+            return {id: node.uid, selected: false, loc: node.loc, opName: node.opName} as NodeData;
         });
+    }
+
+    getAllPipeIds(): PipeSelection[] {
+        const allPipes: PipeSelection[] = [];
+        this.nodes.forEach((node) => {
+            node.links.forEach((link) => {
+                const pipes = link.pipes.map((pipe) => {
+                    return {id: pipe.id, selected: false};
+                });
+                allPipes.push(...pipes);
+            });
+            node.internalLinks.forEach((link) => {
+                const pipes = link.pipes.map((pipe) => {
+                    return {id: pipe.id, selected: false};
+                });
+                allPipes.push(...pipes);
+            });
+        });
+
+        return Array.from(
+            new Set(
+                allPipes.map((pipeSelection) => {
+                    return {id: pipeSelection.id, selected: false};
+                })
+            )
+        );
+    }
+
+    get allUniquePipes(): Pipe[] {
+        if (!this.uniquePipeList.length) {
+            this.uniquePipeList = this.getAllPipes();
+        }
+        return this.uniquePipeList;
+    }
+
+    private getAllPipes(): Pipe[] {
+        let list: Pipe[] = [];
+        this.nodes.forEach((node) => {
+            node.links.forEach((link) => {
+                list.push(...link.pipes);
+            });
+            node.internalLinks.forEach((link) => {
+                list.push(...link.pipes);
+            });
+        });
+        const uniquePipeObj: {[key: string]: Pipe} = {};
+        for (let i = 0; i < list.length; i++) {
+            uniquePipeObj[list[i].id] = list[i];
+        }
+        list = Object.values(uniquePipeObj).sort((a, b) => {
+            if (a.id < b.id) {
+                return -1;
+            }
+            if (a.id > b.id) {
+                return 1;
+            }
+            return 0;
+        });
+
+        return list;
     }
 }
 
@@ -96,8 +146,6 @@ export class ComputeNode {
 
     public internalLinks: Map<any, NOCLinkInternal>;
 
-    public selected: boolean = false;
-
     public totalOpCycles: number = 0;
 
     constructor(json: NodeJson, uid: number, totalOpCycles: number = 0) {
@@ -114,17 +162,8 @@ export class ComputeNode {
         this.internalLinks = new Map(Object.entries(json.internal_links).map(([link, linkJson]) => [link, new NOCLinkInternal(link, linkJson, this.totalOpCycles)]));
     }
 
-    public getSelections(direction: LinkDirection | LinkDirectionInternal): string[] {
-        const allMatchingLinks = [
-            ...Array.from(this.links.values()).filter((link) => link.direction === direction),
-            ...Array.from(this.internalLinks.values()).filter((link) => link.inOut === direction),
-        ];
-        const selectedPipes: string[] = allMatchingLinks
-            .map((link) => Array.from(link.pipes.values()).filter((pipe) => pipe.selected))
-            .map((pipes) => pipes.map((pipe) => pipe.id))
-            .flat();
-
-        return selectedPipes;
+    public getPipesForDirection(direction: LinkDirection | LinkDirectionInternal): string[] {
+        return this.links.get(direction)?.pipes.map((pipe) => pipe.id) || this.internalLinks.get(direction)?.pipes.map((pipe) => pipe.id) || [];
     }
 
     public getNodeLabel(): string {
@@ -145,13 +184,6 @@ export class ComputeNode {
         }
         return '';
     }
-
-    public getLinksForDirection(direction: LinkDirection | LinkDirectionInternal): NOCLinkInternal[] {
-        return [
-            ...Array.from(this.links.values()).filter((link) => link.direction === direction),
-            ...Array.from(this.internalLinks.values()).filter((link) => link.inOut === direction),
-        ];
-    }
 }
 
 export enum LinkDirectionInternal {
@@ -161,26 +193,24 @@ export enum LinkDirectionInternal {
 
 export enum LinkDirection {
     NONE = 'none',
-    NORTH_IN = 'north_in',
-    SOUTH_OUT = 'south_out',
-    EAST_IN = 'east_in',
-    WEST_OUT = 'west_out',
-    WEST_IN = 'west_in',
-    EAST_OUT = 'east_out',
-    SOUTH_IN = 'south_in',
-    NORTH_OUT = 'north_out',
+    NORTH_IN = 'noc0_in_north',
+    SOUTH_OUT = 'noc0_out_south',
+    WEST_IN = 'noc0_in_west',
+    EAST_OUT = 'noc0_out_east',
+    WEST_OUT = 'noc1_out_west',
+    EAST_IN = 'noc1_in_east',
+    SOUTH_IN = 'noc1_in_south',
+    NORTH_OUT = 'noc1_out_north',
 }
 
 export class NOCLinkInternal {
-    public selected: boolean = false;
-
     public numOccupants: number = 0;
 
     public totalDataBytes: number = 0;
 
     public maxBandwidth: number = 0;
 
-    public pipes: Map<string, Pipe>;
+    public pipes: Pipe[] = []; // Map<string, Pipe>;
 
     public id: string = '';
 
@@ -213,8 +243,7 @@ export class NOCLinkInternal {
     }
 
     populatePipes(json: NOCLinkJsonInternal, id: string) {
-        this.pipes = new Map();
-        this.pipes = new Map(Object.entries(json.mapped_pipes).map(([pipe, pipeJson]) => [pipe, new Pipe(pipe, pipeJson, id)]));
+        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, pipeJson]) => new Pipe(pipe, pipeJson, id));
     }
 }
 
@@ -263,8 +292,6 @@ export class Pipe {
     bandwidth: number = 0;
 
     nocId: string = '';
-
-    public selected: boolean = false;
 
     constructor(id: string, bandwidth: number, nocId: string = '') {
         this.id = id;

@@ -101,6 +101,7 @@
     "@blueprintjs/select": "^4.9.24",
     "@blueprintjs/table": "^4.10.12",
     "@electron/remote": "^2.0.10",
+    "@reduxjs/toolkit": "^1.9.5",
     "ajv": "^8.12.0",
     "d3": "^7.8.5",
     "d3-zoom": "^3.0.0",
@@ -110,6 +111,7 @@
     "normalize.css": "^8.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^8.1.1",
     "react-router-dom": "^6.11.2",
     "yaml": "^2.3.1"
   },

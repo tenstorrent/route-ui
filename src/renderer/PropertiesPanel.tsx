@@ -1,11 +1,14 @@
 import React, {ChangeEvent, FC, useContext, useEffect, useState} from 'react';
-import {Button, Checkbox, InputGroup, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
+import {useDispatch, useSelector} from 'react-redux';
+import {Button, Checkbox, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
 import {ComputeNode, convertBytes, NOCLink, NOCLinkInternal, Pipe} from '../data/DataStructures';
-import getPipeColor from '../data/ColorGenerator';
+import getPipeColor, {getGroupColor} from '../data/ColorGenerator';
 import HighlightedText from './components/HighlightedText';
+
 import FilterableComponent from './components/FilterableComponent';
+import {clearAllPipes, RootState, selectGroup, selectPipeSelectionById, updateNodeSelection, updatePipeSelection} from '../data/store';
 
 interface OperationItem {
     operation: string;
@@ -13,20 +16,27 @@ interface OperationItem {
 }
 
 export default function PropertiesPanel() {
-    const {svgData, setSvgData} = useContext(DataSource);
+    const {svgData} = useContext(DataSource);
 
     const [selectedNodes, setSelectedNodes] = useState<ComputeNode[]>([]);
-    const [pipesList, setPipesList] = useState<Pipe[]>([]);
+    // const [pipesList, setPipesList] = useState<Pipe[]>([]);
     const [selectedPipe, setSelectedPipe] = useState<Pipe | null>(null);
     const [pipeFilter, setPipeFilter] = useState<string>('');
     const [opsFilter, setOpsFilter] = useState<string>('');
 
     const [operationsList, setOperationsList] = useState<OperationItem[]>([]);
+    const dispatch = useDispatch();
 
+    const nodeSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    // console.log(selectedNodes)
     useEffect(() => {
-        const selection: ComputeNode[] = svgData.nodes.filter((n) => n.selected);
+        const selected = nodeSelectionState.nodeList.filter((n) => n.selected);
+        const selection: ComputeNode[] = svgData.nodes.filter((node: ComputeNode) => {
+            return selected.filter((n) => n.id === node.uid).length > 0;
+        });
+
         setSelectedNodes(selection);
-    }, [svgData]);
+    }, [svgData, nodeSelectionState]);
 
     useEffect(() => {
         const opNames: Map<string, ComputeNode[]> = new Map<string, ComputeNode[]>();
@@ -69,98 +79,23 @@ export default function PropertiesPanel() {
         });
         return out;
     };
-    useEffect(() => {
-        const pipes: Map<string, Pipe[]> = new Map();
-        svgData.nodes.forEach((n) => {
-            n.links.forEach((l) => {
-                l.pipes.forEach((p) => {
-                    if (!pipes.has(p.id)) {
-                        pipes.set(p.id, []);
-                    }
-                    // @ts-ignore
-                    pipes.get(p.id).push(p);
-                });
-            });
-            n.internalLinks.forEach((l) => {
-                l.pipes.forEach((p) => {
-                    if (!pipes.has(p.id)) {
-                        pipes.set(p.id, []);
-                    }
-                    // @ts-ignore
-                    pipes.get(p.id).push(p);
-                });
-            });
-        });
 
-        let list: Pipe[] = [];
-        pipes.forEach((pipe: Pipe[]) => {
-            list.push(pipe[0]);
-        });
-        list = list.sort((a, b) => {
-            if (a.id < b.id) {
-                return -1;
-            }
-            if (a.id > b.id) {
-                return 1;
-            }
-            return 0;
-        });
-
-        setPipesList(list);
-    }, [svgData]);
-    const selectPipe = (pipeId: string, val: boolean = false) => {
-        svgData.nodes.forEach((n) => {
-            n.links.forEach((l) => {
-                l.pipes.forEach((p) => {
-                    if (p.id === pipeId) {
-                        l.selected = val;
-                        p.selected = val;
-                    }
-                });
-            });
-            n.internalLinks.forEach((l) => {
-                l.pipes.forEach((p) => {
-                    if (p.id === pipeId) {
-                        l.selected = val;
-                        p.selected = val;
-                    }
-                });
-            });
-        });
-        setSvgData({...svgData});
+    const selectPipe = (pipeId: string, selected: boolean = false) => {
+        dispatch(updatePipeSelection({id: pipeId, selected}));
     };
-    const selectNode = (node: ComputeNode, val: boolean) => {
-        node.selected = val;
-        setSvgData({...svgData});
+    const selectNode = (node: ComputeNode, selected: boolean) => {
+        console.log('selecting node', node.uid, selected);
+        dispatch(updateNodeSelection({id: node.uid, selected}));
     };
 
-    const selectNodesByOp = (op: string, val: boolean) => {
-        svgData.nodes.forEach((n) => {
-            if (n.opName === op) {
-                n.selected = val;
-            } else {
-                n.selected = false;
-            }
-        });
-        setSvgData({...svgData});
+    const selectNodesByOp = (opName: string, selected: boolean) => {
+        dispatch(selectGroup({opName, selected}));
     };
     const clearAll = () => {
-        svgData.nodes.forEach((n) => {
-            n.links.forEach((l) => {
-                l.pipes.forEach((p) => {
-                    p.selected = false;
-                });
-            });
-            n.internalLinks.forEach((l) => {
-                l.pipes.forEach((p) => {
-                    p.selected = false;
-                });
-            });
-        });
-        setSvgData({...svgData});
+        dispatch(clearAllPipes());
     };
 
-    const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
+    const [selectedTab, setSelectedTab] = useState<TabId>('tab2');
 
     const handleTabChange = (newTabId: TabId) => {
         setSelectedTab(newTabId);
@@ -194,9 +129,22 @@ export default function PropertiesPanel() {
                                             </Tooltip>
                                         </h3>
                                         {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
-                                        <p className="opname">
-                                            <strong>{node.opName}</strong>
-                                        </p>
+                                        {node.opName !== '' && (
+                                            <div className="opname">
+                                                <Tooltip
+                                                    content={nodeSelectionState.groups[node.opName][0].selected ? 'Will deselect all compute nodes with this operation' : ''}
+                                                    position={PopoverPosition.TOP}
+                                                >
+                                                    <SelectableOperation
+                                                        op={{nodes: [], operation: node.opName}}
+                                                        value={nodeSelectionState.groups[node.opName][0].selected}
+                                                        selectFunc={selectNodesByOp}
+                                                        stringFilter=""
+                                                    />
+                                                </Tooltip>
+                                            </div>
+                                        )}
+
                                         <div className="node-links-wrap">
                                             <h4>Internal Links</h4>
 
@@ -210,7 +158,7 @@ export default function PropertiesPanel() {
                                                     <ul className="node-pipelist">
                                                         {getPipesForLink(link).map((pipe: Pipe) => (
                                                             <li key={pipe.id}>
-                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter=""/>
+                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter="" />
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -229,7 +177,7 @@ export default function PropertiesPanel() {
                                                     <ul className="node-pipelist">
                                                         {getPipesForLink(link).map((pipe: Pipe) => (
                                                             <li key={pipe.id}>
-                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter=""/>
+                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter="" />
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -254,19 +202,19 @@ export default function PropertiesPanel() {
                                 </Button>
                             </div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
                                     <ul className="scrollable-content">
-                                        {pipesList.map((pipe) => (
+                                        {svgData.allUniquePipes.map((pipe) => (
                                             <FilterableComponent
                                                 key={pipe.id}
                                                 filterableString={pipe.id}
                                                 filterQuery={pipeFilter}
                                                 component={
                                                     <li>
-                                                        <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter={pipeFilter}/>
+                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
                                                     </li>
                                                 }
                                             />
@@ -283,7 +231,7 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
@@ -292,7 +240,14 @@ export default function PropertiesPanel() {
                                             key={op.operation}
                                             filterableString={op.operation}
                                             filterQuery={opsFilter}
-                                            component={<SelectableOperation op={op} selectFunc={selectNodesByOp} stringFilter={opsFilter}/>}
+                                            component={
+                                                <SelectableOperation
+                                                    op={op}
+                                                    value={nodeSelectionState.groups[op.operation][0].selected}
+                                                    selectFunc={selectNodesByOp}
+                                                    stringFilter={opsFilter}
+                                                />
+                                            }
                                         />
                                     ))}
                                 </div>
@@ -308,22 +263,27 @@ export default function PropertiesPanel() {
 //
 interface SelectablePipeProps {
     pipe: Pipe;
-    selectPipe: (id: string, checked: boolean) => void;
     pipeFilter: string;
 }
 
-const SelectablePipe: FC<SelectablePipeProps> = ({pipe, selectPipe, pipeFilter}) => {
+const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter}) => {
+    const dispatch = useDispatch();
+    const pipeState = useSelector((state: RootState) => selectPipeSelectionById(state, pipe.id));
+
+    // if (!pipe) {
+    //     return null;
+    // }
+
+    const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
+        dispatch(updatePipeSelection({id: pipeState.id, selected: e.target.checked}));
+    };
+
     return (
         <>
-            <Checkbox
-                checked={pipe.selected}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                    selectPipe(pipe.id, e.target.checked);
-                }}
-            />
+            <Checkbox checked={pipeState.selected} onChange={handleCheckboxChange} />
             <span className="label">
-                <HighlightedText text={pipe.id} filter={pipeFilter}/> {convertBytes(pipe.bandwidth)}{' '}
-                <span className={`color-swatch ${pipe.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipe.id)}}/>
+                <HighlightedText text={pipeState.id} filter={pipeFilter} /> {convertBytes(pipe.bandwidth)}{' '}
+                <span className={`color-swatch ${pipeState.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}} />
             </span>
         </>
     );
@@ -333,19 +293,22 @@ interface SelectableOperationProps {
     op: {
         operation: string;
     };
+    value: boolean;
     selectFunc: (operation: string, checked: boolean) => void;
     stringFilter: string;
 }
 
-const SelectableOperation: FC<SelectableOperationProps> = ({op, selectFunc, stringFilter}) => {
+const SelectableOperation: FC<SelectableOperationProps> = ({op, selectFunc, value, stringFilter}) => {
     return (
         <div className="op-element">
             <Checkbox
+                checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     selectFunc(op.operation, e.target.checked);
                 }}
             />
-            <HighlightedText text={op.operation} filter={stringFilter}/>
+            <HighlightedText text={op.operation} filter={stringFilter} />
+            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(op.operation)}} />
         </div>
     );
 };

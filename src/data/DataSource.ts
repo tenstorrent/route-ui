@@ -1,5 +1,5 @@
 import React, {createContext} from 'react';
-import SVGData from './DataStructures';
+import SVGData, {SVGJson} from './DataStructures';
 
 export interface SVGContext {
     svgData: SVGData;
@@ -7,7 +7,8 @@ export interface SVGContext {
 }
 
 const DataSource: React.Context<SVGContext> = createContext<SVGContext>({
-    svgData: new SVGData({nodes: []}),
+    // @ts-ignore
+    svgData: new SVGData(<SVGJson>{nodes: []}),
     setSvgData: () => {
         throw Error('Not implemented');
     },
