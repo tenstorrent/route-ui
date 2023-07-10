@@ -5,7 +5,7 @@ import {Position, Slider, Switch} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 
 import DataSource, {SVGContext} from '../data/DataSource';
-import {ComputeNode, LinkDirection, LinkDirectionInternal} from '../data/DataStructures';
+import {ComputeNode, LinkDirection} from '../data/DataStructures';
 import getPipeColor, {getGroupColor} from '../data/ColorGenerator';
 import {drawLink, getLinkPoints, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
 import {RootState, selectNodeSelectionById, updateNodeSelection} from '../data/store';
@@ -97,7 +97,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({node, showEmptyLinks, show
             drawLink(svg, LinkDirection.NOC1_IN);
         }
 
-        const drawSelections = (link: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection | LinkDirectionInternal) => {
+        const drawSelections = (link: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection) => {
             const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
             const nodePipeIds = node.getPipesForDirection(direction);
             const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));

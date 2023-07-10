@@ -45,9 +45,6 @@ const ymlSchema = {
                 op_cycles: {
                     $ref: '#/definitions/OpCycles',
                 },
-                internal_links: {
-                    $ref: '#/definitions/InternalLinks',
-                },
                 links: {
                     type: 'object',
                     additionalProperties: {

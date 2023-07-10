@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {LinkDirection, LinkDirectionInternal} from '../data/DataStructures';
+import {LinkDirection} from '../data/DataStructures';
 
 export const SVG_MARGIN = 0;
 export const NODE_GAP = 1;
@@ -19,7 +19,7 @@ export const NOC_CONFIGURATION = {
     core: {x: CORE_CENTER.x, y: CORE_CENTER.y},
 };
 
-export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection | LinkDirectionInternal) => {
+export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection) => {
     const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
 
     /** TEMP DEBUGGING COLOR FUNCITON */
@@ -59,7 +59,7 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
             .attr('fill', '#7e7e7e');
     }
 };
-export const getLinkPoints = (direction: LinkDirection | LinkDirectionInternal) => {
+export const getLinkPoints = (direction: LinkDirection) => {
     let lineStartX = 0;
     let lineEndX = 0;
     let lineStartY = 0;

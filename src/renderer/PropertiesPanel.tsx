@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, Checkbox, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
-import {ComputeNode, convertBytes, NOCLink, NOCLinkInternal, Pipe} from '../data/DataStructures';
+import SVGData, {ComputeNode, convertBytes, LinkDirection, NOCLink, Pipe} from '../data/DataStructures';
 import getPipeColor, {getGroupColor} from '../data/ColorGenerator';
 import HighlightedText from './components/HighlightedText';
 
@@ -57,27 +57,16 @@ export default function PropertiesPanel() {
     }, [svgData]);
 
     const getLinksForNode = (node: ComputeNode): NOCLink[] => {
-        const out: NOCLink[] = [];
+        const nocLinks: NOCLink[] = [];
         node.links.forEach((l) => {
-            out.push(l);
+            nocLinks.push(l);
         });
-        return out;
-    };
 
-    const getPipesForLink = (link: NOCLinkInternal): Pipe[] => {
-        const out: Pipe[] = [];
-        link.pipes.forEach((p) => {
-            out.push(p);
+        return nocLinks.sort((a, b) => {
+            const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.direction) ?? Infinity;
+            const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.direction) ?? Infinity;
+            return firstKeyOrder - secondKeyOrder;
         });
-        return out;
-    };
-
-    const getInternalLinksForNode = (node: ComputeNode): NOCLinkInternal[] => {
-        const out: NOCLinkInternal[] = [];
-        node.internalLinks.forEach((l) => {
-            out.push(l);
-        });
-        return out;
     };
 
     const selectPipe = (pipeId: string, selected: boolean = false) => {

@@ -10,23 +10,32 @@ export enum ComputeNodeType {
     PCIE = 'pcix',
 }
 
-export enum NOC {
-    IN_NORTH,
-    OUT_NORTH,
-    IN_SOUTH,
-    OUT_SOUTH,
-    IN_EAST,
-    OUT_EAST,
-    IN_WEST,
-    OUT_WEST,
-}
-
 export type Loc = {
     x: number;
     y: number;
 };
 
+export enum NOC {
+    NOC0 = 'noc0',
+    NOC1 = 'noc1',
+}
+
 export default class SVGData {
+    private static NOC_ORDER: Map<LinkDirection, number>;
+
+    public static GET_NOC_ORDER(): Map<LinkDirection, number> {
+        if (!SVGData.NOC_ORDER) {
+            SVGData.NOC_ORDER = new Map(
+                Object.keys(LinkDirection)
+                    .map((key) => LinkDirection[key])
+                    .map((noc, index) => [noc, index])
+            );
+            console.log(SVGData.NOC_ORDER);
+        }
+
+        return SVGData.NOC_ORDER;
+    }
+
     public nodes: ComputeNode[] = [];
 
     public totalCols: number = 0;
@@ -40,6 +49,8 @@ export default class SVGData {
     private uniquePipeList: Pipe[] = [];
 
     constructor(data: SVGJson) {
+        SVGData.GET_NOC_ORDER();
+
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
 
@@ -75,12 +86,6 @@ export default class SVGData {
                 });
                 allPipes.push(...pipes);
             });
-            node.internalLinks.forEach((link) => {
-                const pipes = link.pipes.map((pipe) => {
-                    return {id: pipe.id, selected: false};
-                });
-                allPipes.push(...pipes);
-            });
         });
 
         return Array.from(
@@ -105,9 +110,9 @@ export default class SVGData {
             node.links.forEach((link) => {
                 list.push(...link.pipes);
             });
-            node.internalLinks.forEach((link) => {
-                list.push(...link.pipes);
-            });
+            // node.internalLinks.forEach((link) => {
+            //     list.push(...link.pipes);
+            // });
         });
         const uniquePipeObj: {[key: string]: Pipe} = {};
         for (let i = 0; i < list.length; i++) {
@@ -144,8 +149,6 @@ export class ComputeNode {
 
     public links: Map<any, NOCLink>;
 
-    public internalLinks: Map<any, NOCLinkInternal> = new Map();
-
     public totalOpCycles: number = 0;
 
     constructor(json: NodeJson, uid: number, totalOpCycles: number = 0) {
@@ -159,11 +162,10 @@ export class ComputeNode {
         this.loc = {x: json.location[0], y: json.location[1]};
 
         this.links = new Map(Object.entries(json.links).map(([link, linkJson]) => [link, new NOCLink(link, linkJson, this.totalOpCycles)]));
-        // this.internalLinks = new Map(Object.entries(json.internal_links).map(([link, linkJson]) => [link, new NOCLinkInternal(link, linkJson, this.totalOpCycles)]));
     }
 
-    public getPipesForDirection(direction: LinkDirection | LinkDirectionInternal): string[] {
-        return this.links.get(direction)?.pipes.map((pipe) => pipe.id) || this.internalLinks.get(direction)?.pipes.map((pipe) => pipe.id) || [];
+    public getPipesForDirection(direction: LinkDirection): string[] {
+        return this.links.get(direction)?.pipes.map((pipe) => pipe.id) || [];
     }
 
     public getNodeLabel(): string {
@@ -186,28 +188,23 @@ export class ComputeNode {
     }
 }
 
-export enum LinkDirectionInternal {
-    LINK_IN = 'link_in',
-    LINK_OUT = 'link_out',
-}
-
 export enum LinkDirection {
     NONE = 'none',
+    NOC0_IN = 'noc0_link_in',
+    NOC0_OUT = 'noc0_link_out',
     NOC0_NORTH_IN = 'noc0_in_north',
     NOC0_SOUTH_OUT = 'noc0_out_south',
     NOC0_WEST_IN = 'noc0_in_west',
     NOC0_EAST_OUT = 'noc0_out_east',
+    NOC1_IN = 'noc1_link_in',
+    NOC1_OUT = 'noc1_link_out',
     NOC1_WEST_OUT = 'noc1_out_west',
     NOC1_EAST_IN = 'noc1_in_east',
     NOC1_SOUTH_IN = 'noc1_in_south',
     NOC1_NORTH_OUT = 'noc1_out_north',
-    NOC0_IN = 'noc0_link_in',
-    NOC0_OUT = 'noc0_link_out',
-    NOC1_IN = 'noc1_link_in',
-    NOC1_OUT = 'noc1_link_out',
 }
 
-export class NOCLinkInternal {
+export class NOCLink {
     public numOccupants: number = 0;
 
     public totalDataBytes: number = 0;
@@ -218,75 +215,25 @@ export class NOCLinkInternal {
 
     public id: string = '';
 
-    public inOut: LinkDirectionInternal | null = null;
+    public direction: LinkDirection = LinkDirection.NONE;
 
     public bpc = 0;
 
     public linkSaturation = 0;
 
-    constructor(id: string, json: NOCLinkJsonInternal, totalOpCycles: number) {
+    public noc: NOC;
+
+    constructor(id: string, json: NOCLinkJson, totalOpCycles: number) {
         this.id = id;
         this.numOccupants = json.num_occupants;
         this.totalDataBytes = json.total_data_in_bytes;
         this.maxBandwidth = json.max_link_bw;
         this.bpc = this.totalDataBytes / totalOpCycles;
         this.linkSaturation = this.bpc / this.maxBandwidth;
+        this.direction = id as LinkDirection;
+        this.noc = id.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
 
-        switch (id) {
-            case 'link_in':
-                this.inOut = LinkDirectionInternal.LINK_IN;
-                break;
-            case 'link_out':
-                this.inOut = LinkDirectionInternal.LINK_OUT;
-                break;
-            default:
-                this.inOut = null;
-        }
-
-        this.populatePipes(json, id);
-    }
-
-    populatePipes(json: NOCLinkJsonInternal, id: string) {
         this.pipes = Object.entries(json.mapped_pipes).map(([pipe, pipeJson]) => new Pipe(pipe, pipeJson, id));
-    }
-}
-
-export class NOCLink extends NOCLinkInternal {
-    public direction: LinkDirection = LinkDirection.NONE;
-
-    constructor(id: string, json: NOCLinkJson, totalOpCycles: number) {
-        super(id, json, totalOpCycles);
-        this.direction = id;
-        //
-        // switch (id) {
-        //     case 'noc0_in_north':
-        //         this.direction = LinkDirection.NORTH_IN;
-        //         break;
-        //     case 'noc0_out_south':
-        //         this.direction = LinkDirection.SOUTH_OUT;
-        //         break;
-        //     case 'noc1_in_south':
-        //         this.direction = LinkDirection.SOUTH_IN;
-        //         break;
-        //     case 'noc1_out_north':
-        //         this.direction = LinkDirection.NORTH_OUT;
-        //         break;
-        //     case 'noc0_in_west':
-        //         this.direction = LinkDirection.WEST_IN;
-        //         break;
-        //     case 'noc0_out_east':
-        //         this.direction = LinkDirection.EAST_OUT;
-        //         break;
-        //     case 'noc1_in_east':
-        //         this.direction = LinkDirection.EAST_IN;
-        //         break;
-        //     case 'noc1_out_west':
-        //         this.direction = LinkDirection.WEST_OUT;
-        //         break;
-        //     default:
-        //         this.direction = LinkDirection.NONE;
-        // }
-        super.populatePipes(json, id);
     }
 }
 

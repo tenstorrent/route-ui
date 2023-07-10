@@ -6,7 +6,6 @@ export interface NodeJson {
     op_name: string;
     op_cycles: number;
     links: {[key: string]: NOCLinkJson};
-    internal_links: {[key: string]: NOCLinkJsonInternal};
 }
 
 export interface SVGJson {
@@ -15,11 +14,11 @@ export interface SVGJson {
     nodes: NodeJson[];
 }
 
-export interface NOCLinkJson extends NOCLinkJsonInternal {}
-
-export interface NOCLinkJsonInternal {
+export interface NOCLinkJson {
     num_occupants: number;
     total_data_in_bytes: number;
     max_link_bw: number;
     mapped_pipes: {[key: string]: number};
 }
+
+
