@@ -55,7 +55,7 @@ const ymlSchema = {
                     },
                 },
             },
-            required: ['internal_links', 'links', 'location', 'op_cycles', 'op_name', 'type'],
+            required: ['links', 'location', 'op_cycles', 'op_name', 'type'],
             title: 'Node',
         },
         InternalLinks: {

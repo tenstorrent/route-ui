@@ -1,36 +1,57 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import * as d3 from 'd3';
-import {Position, Switch} from '@blueprintjs/core';
+import {Position, Slider, Switch} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 
 import DataSource, {SVGContext} from '../data/DataSource';
 import {ComputeNode, LinkDirection, LinkDirectionInternal} from '../data/DataStructures';
 import getPipeColor, {getGroupColor} from '../data/ColorGenerator';
-import {drawArrow, NODE_SIZE, NODE_GAP, SVG_MARGIN, ROUTER_SIZE, getLinkDrawing} from '../utils/DrawingAPI';
+import {drawLink, getLinkPoints, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
 import {RootState, selectNodeSelectionById, updateNodeSelection} from '../data/store';
 
 export default function GridRender() {
     const {svgData} = useContext<SVGContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
+    const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
     const [showNodeLocation, setShowNodeLocation] = useState(false);
+    const [gridZoom, setGridZoom] = useState(1);
+
+
 
     return (
         <>
             <div className="inner-sidebar">
-                <Tooltip2 content="Show all links overlay" position={Position.RIGHT}>
-                    <Switch checked={showEmptyLinks} label="links" onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)} />
+                Zoom
+                <Slider
+                    min={0.5}
+                    max={3}
+                    stepSize={0.25}
+                    labelStepSize={1}
+                    value={gridZoom}
+                    onChange={(value: number) => setGridZoom(value)}
+                    labelRenderer={(value) => `${value.toFixed(1)}`}
+                />
+                <hr />
+                <Tooltip2 content="Show pipes" position={Position.RIGHT}>
+                    <Switch checked={showPipes} label="pipes" onChange={(event) => setShowPipes(event.currentTarget.checked)} />
+                </Tooltip2>
+                <hr />
+                <Tooltip2 content="Show all links overlay" position={Position.RIGHT} >
+                    <Switch checked={showEmptyLinks} label="links" disabled={!showPipes} onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)} />
                 </Tooltip2>
                 <Tooltip2 content="Show all operations colors" position={Position.RIGHT}>
-                    <Switch checked={showOperationColors} label="ops" onChange={(event) => setShowOperationColors(event.currentTarget.checked)} />
+                    <Switch checked={showOperationColors} label="operations" onChange={(event) => setShowOperationColors(event.currentTarget.checked)} />
                 </Tooltip2>
                 <Tooltip2 content="Show Compute Node locations" position={Position.RIGHT}>
                     <Switch checked={showNodeLocation} label="location" onChange={(event) => setShowNodeLocation(event.currentTarget.checked)} />
                 </Tooltip2>
+                <hr />
+                {/*Link saturation*/}
             </div>
-            <div className="grid-container">
-                <div className="node-container" style={{gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
+            <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
+                <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}} >
                     {svgData.nodes.map((node, index) => {
                         return (
                             <NodeComponent node={node} showEmptyLinks={showEmptyLinks} showNodeLocation={showNodeLocation} showOperationColors={showOperationColors} key={index} />
@@ -62,34 +83,45 @@ const NodeComponent: React.FC<NodeComponentProps> = ({node, showEmptyLinks, show
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
         if (showEmptyLinks) {
-            drawArrow(svg, LinkDirectionInternal.LINK_IN);
-            drawArrow(svg, LinkDirectionInternal.LINK_OUT);
-            drawArrow(svg, LinkDirection.NORTH_OUT);
-            drawArrow(svg, LinkDirection.NORTH_IN);
-            drawArrow(svg, LinkDirection.SOUTH_IN);
-            drawArrow(svg, LinkDirection.SOUTH_OUT);
-            drawArrow(svg, LinkDirection.EAST_IN);
-            drawArrow(svg, LinkDirection.EAST_OUT);
-            drawArrow(svg, LinkDirection.WEST_IN);
-            drawArrow(svg, LinkDirection.WEST_OUT);
+            drawLink(svg, LinkDirection.NOC1_NORTH_OUT);
+            drawLink(svg, LinkDirection.NOC0_NORTH_IN);
+            drawLink(svg, LinkDirection.NOC1_SOUTH_IN);
+            drawLink(svg, LinkDirection.NOC0_SOUTH_OUT);
+            drawLink(svg, LinkDirection.NOC1_EAST_IN);
+            drawLink(svg, LinkDirection.NOC0_EAST_OUT);
+            drawLink(svg, LinkDirection.NOC0_WEST_IN);
+            drawLink(svg, LinkDirection.NOC1_WEST_OUT);
+            drawLink(svg, LinkDirection.NOC1_OUT);
+            drawLink(svg, LinkDirection.NOC0_OUT);
+            drawLink(svg, LinkDirection.NOC0_IN);
+            drawLink(svg, LinkDirection.NOC1_IN);
         }
 
         const drawSelections = (link: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection | LinkDirectionInternal) => {
-            const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkDrawing(direction);
+            const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
             const nodePipeIds = node.getPipesForDirection(direction);
             const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
 
-            // console.log(selectedPipes);
-
             const strokeLength = 5;
             if (pipeIds.length) {
-                if (direction !== LinkDirection.SOUTH_IN && direction !== LinkDirection.WEST_IN && direction !== LinkDirection.SOUTH_OUT && direction !== LinkDirection.WEST_OUT) {
-                    link.append('polygon').attr('points', `${arr1} ${arr2} ${arr3}`).attr('transform', transform).attr('fill', '#9e9e9e');
+                if (
+                    direction !== LinkDirection.NOC1_SOUTH_IN &&
+                    direction !== LinkDirection.NOC0_WEST_IN &&
+                    direction !== LinkDirection.NOC0_SOUTH_OUT &&
+                    direction !== LinkDirection.NOC1_WEST_OUT
+                ) {
+                    link
+                        // keep prettier at bay
+                        .append('polygon')
+                        .attr('points', `${arr1} ${arr2} ${arr3}`)
+                        .attr('transform', transform)
+                        .attr('fill', '#9e9e9e');
                 }
             }
             const dashArray = [strokeLength, (pipeIds.length - 1) * strokeLength];
             pipeIds.forEach((pipeId: string, index: number) => {
                 link.append('line')
+                    // keep prettier at bay
                     .attr('class', `arrow-${direction}`)
                     .attr('x1', lineStartX)
                     .attr('y1', lineStartY)
@@ -104,38 +136,48 @@ const NodeComponent: React.FC<NodeComponentProps> = ({node, showEmptyLinks, show
             return pipeIds.length;
         };
 
-        let selectedPipesNum = 0;
-        selectedPipesNum += drawSelections(svg, LinkDirection.EAST_OUT);
-        selectedPipesNum += drawSelections(svg, LinkDirection.WEST_IN);
-        selectedPipesNum += drawSelections(svg, LinkDirection.NORTH_OUT);
-        selectedPipesNum += drawSelections(svg, LinkDirection.SOUTH_IN);
-        selectedPipesNum += drawSelections(svg, LinkDirection.SOUTH_OUT);
-        selectedPipesNum += drawSelections(svg, LinkDirection.WEST_OUT);
-        selectedPipesNum += drawSelections(svg, LinkDirection.NORTH_IN);
-        selectedPipesNum += drawSelections(svg, LinkDirection.EAST_IN);
-        selectedPipesNum += drawSelections(svg, LinkDirectionInternal.LINK_IN);
-        selectedPipesNum += drawSelections(svg, LinkDirectionInternal.LINK_OUT);
+        let noc0selection = 0;
+        let noc1selection = 0;
+        noc0selection += drawSelections(svg, LinkDirection.NOC0_EAST_OUT);
+        noc0selection += drawSelections(svg, LinkDirection.NOC0_WEST_IN);
+        noc0selection += drawSelections(svg, LinkDirection.NOC0_SOUTH_OUT);
+        noc0selection += drawSelections(svg, LinkDirection.NOC0_NORTH_IN);
+        noc0selection += drawSelections(svg, LinkDirection.NOC0_IN);
+        noc0selection += drawSelections(svg, LinkDirection.NOC0_OUT);
 
+        noc1selection += drawSelections(svg, LinkDirection.NOC1_NORTH_OUT);
+        noc1selection += drawSelections(svg, LinkDirection.NOC1_SOUTH_IN);
+        noc1selection += drawSelections(svg, LinkDirection.NOC1_WEST_OUT);
+        noc1selection += drawSelections(svg, LinkDirection.NOC1_EAST_IN);
+        noc1selection += drawSelections(svg, LinkDirection.NOC1_IN);
+        noc1selection += drawSelections(svg, LinkDirection.NOC1_OUT);
 
-
-        if (selectedPipesNum > 0) {
-
-            //TODO: we will render two nocs instead
-
-            // link.append('circle')
-            //     .attr('cx', 20)
-            //     .attr('cy', NODE_SIZE - 20)
-            //     .attr('r', ROUTER_SIZE / 2)
-            //     .attr('fill', 'none')
-            //     .attr('stroke', '#939393')
-            //     .attr('stroke-width', 3)
-            //     .style('pointer-events', 'none');
+        if (noc0selection > 0) {
+            const point = NOC_CONFIGURATION.noc0;
+            svg.append('circle')
+                //
+                .attr('cx', point.x)
+                .attr('cy', point.y)
+                .attr('r', 4)
+                .attr('stroke-width', 2)
+                .attr('fill', '#9e9e9e')
+                .attr('stroke', '#9e9e9e');
+        }
+        if (noc1selection > 0) {
+            const point = NOC_CONFIGURATION.noc1;
+            svg.append('circle')
+                //
+                .attr('cx', point.x)
+                .attr('cy', point.y)
+                .attr('r', 4)
+                .attr('stroke-width', 2)
+                .attr('fill', '#9e9e9e')
+                .attr('stroke', '#9e9e9e');
         }
 
         //
-    }, [showEmptyLinks, svgRef, selectedPipeIds]);
+    }, [svgRef, selectedPipeIds]);
     const triggerSelection = () => {
-        console.log('trigger selection', node.uid);
         dispatch(updateNodeSelection({id: node.uid, selected: !nodeState.selected}));
     };
 

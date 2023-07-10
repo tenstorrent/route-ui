@@ -132,7 +132,7 @@ export default function PropertiesPanel() {
                                         {node.opName !== '' && (
                                             <div className="opname">
                                                 <Tooltip
-                                                    content={nodeSelectionState.groups[node.opName][0].selected ? 'Will deselect all compute nodes with this operation' : ''}
+                                                    content={node.opName}
                                                     position={PopoverPosition.TOP}
                                                 >
                                                     <SelectableOperation
@@ -146,26 +146,6 @@ export default function PropertiesPanel() {
                                         )}
 
                                         <div className="node-links-wrap">
-                                            <h4>Internal Links</h4>
-
-                                            {getInternalLinksForNode(node).map((link: NOCLinkInternal, index) => (
-                                                <div key={index}>
-                                                    <h5>
-                                                        <span>
-                                                            {link.id} - {convertBytes(link.totalDataBytes)} - {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
-                                                        </span>
-                                                    </h5>
-                                                    <ul className="node-pipelist">
-                                                        {getPipesForLink(link).map((pipe: Pipe) => (
-                                                            <li key={pipe.id}>
-                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter="" />
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="node-links-wrap">
                                             <h4>Links</h4>
                                             {getLinksForNode(node).map((link: NOCLink, index) => (
                                                 <div key={index}>
@@ -175,9 +155,9 @@ export default function PropertiesPanel() {
                                                         </span>
                                                     </h5>
                                                     <ul className="node-pipelist">
-                                                        {getPipesForLink(link).map((pipe: Pipe) => (
+                                                        {link.pipes.map((pipe: Pipe) => (
                                                             <li key={pipe.id}>
-                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter="" />
+                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter=""/>
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -202,7 +182,7 @@ export default function PropertiesPanel() {
                                 </Button>
                             </div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
@@ -214,7 +194,7 @@ export default function PropertiesPanel() {
                                                 filterQuery={pipeFilter}
                                                 component={
                                                     <li>
-                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
+                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter}/>
                                                     </li>
                                                 }
                                             />
@@ -231,7 +211,7 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
@@ -241,12 +221,15 @@ export default function PropertiesPanel() {
                                             filterableString={op.operation}
                                             filterQuery={opsFilter}
                                             component={
-                                                <SelectableOperation
-                                                    op={op}
-                                                    value={nodeSelectionState.groups[op.operation][0].selected}
-                                                    selectFunc={selectNodesByOp}
-                                                    stringFilter={opsFilter}
-                                                />
+                                                <>
+                                                    <SelectableOperation
+                                                        op={op}
+                                                        value={nodeSelectionState.groups[op.operation][0].selected}
+                                                        selectFunc={selectNodesByOp}
+                                                        stringFilter={opsFilter}
+                                                    />
+                                                    {op.nodes.length}
+                                                </>
                                             }
                                         />
                                     ))}
@@ -280,10 +263,10 @@ const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter}) => {
 
     return (
         <>
-            <Checkbox checked={pipeState.selected} onChange={handleCheckboxChange} />
+            <Checkbox checked={pipeState.selected} onChange={handleCheckboxChange}/>
             <span className="label">
-                <HighlightedText text={pipeState.id} filter={pipeFilter} /> {convertBytes(pipe.bandwidth)}{' '}
-                <span className={`color-swatch ${pipeState.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}} />
+                <HighlightedText text={pipeState.id} filter={pipeFilter}/> {convertBytes(pipe.bandwidth)}{' '}
+                <span className={`color-swatch ${pipeState.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}}/>
             </span>
         </>
     );
@@ -307,8 +290,8 @@ const SelectableOperation: FC<SelectableOperationProps> = ({op, selectFunc, valu
                     selectFunc(op.operation, e.target.checked);
                 }}
             />
-            <HighlightedText text={op.operation} filter={stringFilter} />
-            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(op.operation)}} />
+            <HighlightedText text={op.operation} filter={stringFilter}/>
+            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(op.operation)}}/>
         </div>
     );
 };
