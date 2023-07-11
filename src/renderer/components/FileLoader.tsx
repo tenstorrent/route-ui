@@ -1,17 +1,25 @@
 // import yaml from 'js-yaml';
-import { parse } from 'yaml';
+import {useDispatch} from 'react-redux';
+import {parse} from 'yaml';
 import fs from 'fs';
 import {useNavigate} from 'react-router-dom';
-import {useContext} from 'react';
+import {FC, useContext} from 'react';
 import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
 import SVGData, {SVGJson} from '../../data/DataStructures';
 import yamlValidate from '../../data/DataUtils';
+import {loadNodesData, loadPipeSelection} from '../../data/store';
 
-export default function FileLoader() {
+interface FileLoaderProps {
+    updateData: (data: SVGData) => void;
+}
+
+const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
     const navigate = useNavigate();
     const {setSvgData} = useContext(DataSource);
+
+    const dispatch = useDispatch();
 
     const loadFile = async () => {
         // eslint-disable-next-line global-require
@@ -19,7 +27,7 @@ export default function FileLoader() {
         const {dialog} = remote;
 
         await (async () => {
-            let filename = await dialog.showOpenDialogSync({
+            const filename = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
                 filters: [{name: 'file', extensions: ['yaml']}],
             });
@@ -28,8 +36,7 @@ export default function FileLoader() {
                 return;
             }
 
-            filename = String(filename);
-            fs.readFile(filename, 'utf-8', (err, data) => {
+            fs.readFile(String(filename), 'utf-8', (err, data) => {
                 if (err) {
                     console.error(err);
                     alert(`An error occurred reading the file: ${err.message}`);
@@ -39,11 +46,17 @@ export default function FileLoader() {
                     const doc = parse(data);
                     const isValid = yamlValidate(doc);
                     if (isValid) {
-                        setSvgData(new SVGData(doc as SVGJson));
+                        const svgData = new SVGData(doc as SVGJson);
+                        updateData(svgData);
+                        dispatch(loadPipeSelection(svgData.getAllPipeIds()));
+                        dispatch(loadNodesData(svgData.getAllNodes()));
                         navigate('/render');
                     } else {
-                        console.error(yamlValidate.errors);
-                        alert(`An error occurred parsing the file: ${yamlValidate.errors}`);
+                        const errors = yamlValidate.errors?.map((error) => {
+                            return error.message;
+                        });
+                        console.error(errors?.join('\n'));
+                        alert(`An error occurred parsing the file: ${errors?.join('\n')}`);
                     }
                 } catch (error) {
                     console.error(error);
@@ -57,4 +70,6 @@ export default function FileLoader() {
             <Button icon={IconNames.UPLOAD} text="Load visualizer output yaml file" onClick={loadFile}/>
         </div>
     );
-}
+};
+
+export default FileLoader;

@@ -42,13 +42,64 @@
     width: calc(100% - 100px);
 }
 
+.inner-sidebar {
+    display: flex;
+    flex-direction: column;
+    hr{
+        width: 100%;
+    }
+}
+
 .grid-container {
-    //margin: 50px;
-    //flex-shrink: 0;
     flex: none;
-    overflow: hidden;
+    overflow: scroll;
     height: calc(100vh - 150px);
-    width: 50vw;
+    max-width: 50vw;
+
+    &.pipes-hidden{
+        .node-svg{
+            display: none;
+        }
+    }
+
+    .node-container {
+        display: grid;
+
+        .node-item {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            border: 1px solid #1c2127;
+
+            .op-color-swatch {
+                width: 20px;
+                height: 20px;
+                position: absolute;
+                top: 0;
+                right: 20px;
+            }
+
+            &.selected {
+                border: 1px solid #7abdcc;
+            }
+
+            .node-type-label {
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                top: 0;
+                right: 0;
+                color: #1c2127;
+                font-size: 16px;
+                line-height: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+
+
 }
 
 .properties-panel__content {
@@ -61,10 +112,12 @@
     }
 }
 
-p.opname {
-    max-width: 100%;
-    word-wrap: break-word;
-    overflow-wrap: anywhere;
+.opname {
+    //max-width: 100%;
+    //word-wrap: break-word;
+    //overflow-wrap: anywhere;
+    //text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .properties-panel {
@@ -94,6 +147,7 @@ p.opname {
         gap: 10px;
         background-color: #707070;
         padding: 10px;
+
 
         h3 {
             color: #000000;
@@ -223,12 +277,33 @@ p.opname {
 
 }
 
+.opname,
 .operations-wrap {
     .op-element {
         color: #000;
         display: flex;
-        align-content: center;
         gap: 5px;
+        justify-items: center;
+        align-items: center;
+
+        .color-swatch {
+            width: 10px;
+            height: 10px;
+            border: 1px solid #ffffff;
+            display: inline-block;
+
+            &.transparent {
+                //display: none;
+            }
+        }
+    }
+
+    label {
+        margin-bottom: 0;
     }
 }
 
+.bp4-control input:focus ~ .bp4-control-indicator {
+    outline: none;
+    box-shadow: none;
+}
