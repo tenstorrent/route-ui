@@ -35,17 +35,17 @@ const getNextColor = colorGenerator();
 const getNextGroupColor = colorGenerator();
 const pipeMap = new Map<string, string>();
 const groupMap = new Map<string, string>();
-const getPipeColor = (pipeId: string): string | undefined => {
+const getPipeColor = (pipeId: string): string => {
     if (!pipeMap.has(pipeId)) {
         pipeMap.set(pipeId, getNextColor.next().value);
     }
-    return pipeMap.get(pipeId);
+    return pipeMap.get(pipeId) || '#ffffff';
 };
 export const getGroupColor = (groupName: string): string | undefined => {
     if (!groupMap.has(groupName)) {
         groupMap.set(groupName, getNextGroupColor.next().value);
     }
     return groupMap.get(groupName);
-}
+};
 
 export default getPipeColor;

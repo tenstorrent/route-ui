@@ -13,7 +13,6 @@ import {SVGJson} from '../data/JSONDataTypes';
 export default function App() {
     // @ts-ignore
     const [svgData, setSvgData] = useState<SVGData>(new SVGData({nodes: []} as SVGJson));
-    // @ts-ignore
     return (
         <>
             <div className="header">

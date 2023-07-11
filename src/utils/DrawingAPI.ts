@@ -1,8 +1,7 @@
 import * as d3 from 'd3';
-import {LinkDirection} from '../data/DataStructures';
+import {ComputeNode, LinkDirection} from '../data/DataStructures';
+import getPipeColor from '../data/ColorGenerator';
 
-export const SVG_MARGIN = 0;
-export const NODE_GAP = 1;
 export const NODE_SIZE = 100;
 const NOC_CENTER = {x: 30, y: NODE_SIZE - 30};
 const CENTER_DISPERSION = 10; // dispersion from the starting point
@@ -22,7 +21,7 @@ export const NOC_CONFIGURATION = {
 export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection) => {
     const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
 
-    /** TEMP DEBUGGING COLOR FUNCITON */
+    /** TEMP DEBUGGING COLOR FUNCTION */
     // const getColor = () => {
     //     if (direction.includes('noc0')) {
     //         return direction.includes('_in') ? '#ff0000' : '#ff6600';
@@ -36,7 +35,7 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
     selector
         // keeping this here for the prettier
         .append('line')
-        .attr('class', `arrow-${direction}`)
+        // .attr('class', `arrow-${direction}`) // class name is only for debugging
         .attr('x1', lineStartX)
         .attr('y1', lineStartY)
         .attr('x2', lineEndX)
@@ -60,11 +59,10 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
     }
 };
 export const getLinkPoints = (direction: LinkDirection) => {
-    let lineStartX = 0;
-    let lineEndX = 0;
-    let lineStartY = 0;
-
-    let lineEndY = 0;
+    let lineStartX: number;
+    let lineEndX: number;
+    let lineStartY: number;
+    let lineEndY: number;
 
     const arrowHeadHeight = 9;
     const arrowHeadWidth = 9;
@@ -256,7 +254,57 @@ export const getLinkPoints = (direction: LinkDirection) => {
             lineStartY = 0;
             lineEndX = 0;
             lineEndY = 0;
-            console.warn(`Invalid direction ${direction}`);
+        // console.warn(`Invalid direction ${direction}`);
     }
     return {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform};
+};
+
+export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection, node: ComputeNode, selectedPipeIds: string[]) => {
+    const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
+    const nodePipeIds = node.getPipesForDirection(direction);
+    const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
+
+    const strokeLength = 5;
+    if (pipeIds.length) {
+        if (
+            direction !== LinkDirection.NOC1_SOUTH_IN &&
+            direction !== LinkDirection.NOC0_WEST_IN &&
+            direction !== LinkDirection.NOC0_SOUTH_OUT &&
+            direction !== LinkDirection.NOC1_WEST_OUT
+        ) {
+            svg
+                // only draw arrows for long links
+                .append('polygon')
+                .attr('points', `${arr1} ${arr2} ${arr3}`)
+                .attr('transform', transform)
+                .attr('fill', '#9e9e9e');
+        }
+    }
+    const dashArray = [strokeLength, (pipeIds.length - 1) * strokeLength];
+    pipeIds.forEach((pipeId: string, index: number) => {
+        svg.append('line')
+            // keep prettier at bay
+            // .attr('class', `arrow-${direction}`) // class name is only for debugging
+            .attr('x1', lineStartX)
+            .attr('y1', lineStartY)
+            .attr('x2', lineEndX)
+            .attr('y2', lineEndY)
+            .attr('stroke-width', 2)
+            .attr('stroke', getPipeColor(pipeId))
+            .attr('stroke-dasharray', dashArray.join(','))
+            .attr('stroke-dashoffset', index * dashArray[0]);
+    });
+
+    return pipeIds.length;
+};
+
+export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: {x: number; y: number}) => {
+    svg.append('circle')
+        //
+        .attr('cx', point.x)
+        .attr('cy', point.y)
+        .attr('r', 4)
+        .attr('stroke-width', 2)
+        .attr('fill', '#9e9e9e')
+        .attr('stroke', '#9e9e9e');
 };
