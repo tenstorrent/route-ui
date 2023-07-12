@@ -8,7 +8,17 @@ import getPipeColor, {getGroupColor} from '../data/ColorGenerator';
 import HighlightedText from './components/HighlightedText';
 
 import FilterableComponent from './components/FilterableComponent';
-import {clearAllPipes, RootState, selectGroup, selectPipeSelectionById, updateNodeSelection, updatePipeSelection} from '../data/store';
+import {
+    clearAllPipes,
+    RootState,
+    selectGroup,
+    selectLinkSaturation,
+    selectPipeSelectionById,
+    selectShowLinkSaturation,
+    updateNodeSelection,
+    updatePipeSelection,
+} from '../data/store';
+import {calculateIntensity} from '../utils/DrawingAPI';
 
 interface OperationItem {
     operation: string;
@@ -19,8 +29,6 @@ export default function PropertiesPanel() {
     const {svgData} = useContext(DataSource);
 
     const [selectedNodes, setSelectedNodes] = useState<ComputeNode[]>([]);
-    // const [pipesList, setPipesList] = useState<Pipe[]>([]);
-    const [selectedPipe, setSelectedPipe] = useState<Pipe | null>(null);
     const [pipeFilter, setPipeFilter] = useState<string>('');
     const [opsFilter, setOpsFilter] = useState<string>('');
 
@@ -28,7 +36,7 @@ export default function PropertiesPanel() {
     const dispatch = useDispatch();
 
     const nodeSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    // console.log(selectedNodes)
+
     useEffect(() => {
         const selected = nodeSelectionState.nodeList.filter((n) => n.selected);
         const selection: ComputeNode[] = svgData.nodes.filter((node: ComputeNode) => {
@@ -90,6 +98,9 @@ export default function PropertiesPanel() {
         setSelectedTab(newTabId);
     };
 
+    const showLinkSaturation = useSelector(selectShowLinkSaturation);
+    const linkSaturationTreshold: number = useSelector(selectLinkSaturation);
+
     return (
         <div className="properties-panel">
             <Tabs id="my-tabs" selectedTabId={selectedTab} onChange={handleTabChange} className="properties-tabs">
@@ -120,10 +131,7 @@ export default function PropertiesPanel() {
                                         {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
                                         {node.opName !== '' && (
                                             <div className="opname">
-                                                <Tooltip
-                                                    content={node.opName}
-                                                    position={PopoverPosition.TOP}
-                                                >
+                                                <Tooltip content={node.opName} position={PopoverPosition.TOP}>
                                                     <SelectableOperation
                                                         op={{nodes: [], operation: node.opName}}
                                                         value={nodeSelectionState.groups[node.opName][0].selected}
@@ -140,13 +148,28 @@ export default function PropertiesPanel() {
                                                 <div key={index}>
                                                     <h5 className={link.totalDataBytes === 0 ? 'inactive' : ''}>
                                                         <span>
-                                                            {link.id} - {convertBytes(link.totalDataBytes)} - {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
+                                                            {link.id} - {convertBytes(link.totalDataBytes)} <br /> {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
+                                                            {showLinkSaturation === true && (
+                                                                <>
+                                                                    {' '}
+                                                                    {link.linkSaturation.toFixed(2)}%
+                                                                    <span
+                                                                        style={{
+                                                                            marginLeft: '5px',
+                                                                            display: 'inline-block',
+                                                                            width: '20px',
+                                                                            height: '10px',
+                                                                            backgroundColor: calculateIntensity(link.linkSaturation, linkSaturationTreshold),
+                                                                        }}
+                                                                    />
+                                                                </>
+                                                            )}
                                                         </span>
                                                     </h5>
                                                     <ul className="node-pipelist">
                                                         {link.pipes.map((pipe: Pipe) => (
                                                             <li key={pipe.id}>
-                                                                <SelectablePipe pipe={pipe} selectPipe={selectPipe} pipeFilter=""/>
+                                                                <SelectablePipe pipe={pipe} pipeFilter="" showBandwidthUse />
                                                             </li>
                                                         ))}
                                                     </ul>
@@ -171,7 +194,7 @@ export default function PropertiesPanel() {
                                 </Button>
                             </div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
@@ -183,7 +206,7 @@ export default function PropertiesPanel() {
                                                 filterQuery={pipeFilter}
                                                 component={
                                                     <li>
-                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter}/>
+                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
                                                     </li>
                                                 }
                                             />
@@ -200,7 +223,7 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
@@ -217,7 +240,6 @@ export default function PropertiesPanel() {
                                                         selectFunc={selectNodesByOp}
                                                         stringFilter={opsFilter}
                                                     />
-                                                    {op.nodes.length}
                                                 </>
                                             }
                                         />
@@ -236,9 +258,10 @@ export default function PropertiesPanel() {
 interface SelectablePipeProps {
     pipe: Pipe;
     pipeFilter: string;
+    showBandwidthUse?: boolean;
 }
 
-const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter}) => {
+const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter, showBandwidthUse = false}) => {
     const dispatch = useDispatch();
     const pipeState = useSelector((state: RootState) => selectPipeSelectionById(state, pipe.id));
 
@@ -252,10 +275,13 @@ const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter}) => {
 
     return (
         <>
-            <Checkbox checked={pipeState.selected} onChange={handleCheckboxChange}/>
+            <Checkbox checked={pipeState.selected} onChange={handleCheckboxChange} />
             <span className="label">
-                <HighlightedText text={pipeState.id} filter={pipeFilter}/> {convertBytes(pipe.bandwidth)}{' '}
-                <span className={`color-swatch ${pipeState.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}}/>
+                <HighlightedText text={pipeState.id} filter={pipeFilter} /> {convertBytes(pipe.bandwidth)}
+                {showBandwidthUse && <span>{pipe.bandwidthUse.toFixed(0)}%</span>}
+                <span className={`color-swatch ${pipeState.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}} />
+                <br />
+                {showBandwidthUse && <ProgressBar percent={pipe.bandwidthUse} />}
             </span>
         </>
     );
@@ -279,8 +305,20 @@ const SelectableOperation: FC<SelectableOperationProps> = ({op, selectFunc, valu
                     selectFunc(op.operation, e.target.checked);
                 }}
             />
-            <HighlightedText text={op.operation} filter={stringFilter}/>
-            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(op.operation)}}/>
+            <HighlightedText text={op.operation} filter={stringFilter} />
+            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(op.operation)}} />
         </div>
+    );
+};
+
+interface ProgressBarProps {
+    percent: number;
+}
+
+const ProgressBar: FC<ProgressBarProps> = ({percent}) => {
+    return (
+        <span className="progress-bar">
+            <span style={{width: `${percent}%`}} />
+        </span>
     );
 };

@@ -9,11 +9,11 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import {app, BrowserWindow, shell, ipcMain} from 'electron';
+import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import {resolveHtmlPath} from './util';
 import remoteMain from "@electron/remote/main";
 
 class AppUpdater {
@@ -75,8 +75,8 @@ const createWindow = async () => {
 
     mainWindow = new BrowserWindow({
         show: false,
-        width: 1024,
-        height: 728,
+        width: 1800,
+        height: 1000,
         icon: getAssetPath('icon.png'),
         webPreferences: {
             nodeIntegration: true,
@@ -112,12 +112,14 @@ const createWindow = async () => {
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
         shell.openExternal(edata.url);
-        return { action: 'deny' };
+        return {action: 'deny'};
     });
+
+
 
     // Remove this if your app does not use auto updates
     // eslint-disable-next-line
-  new AppUpdater();
+    new AppUpdater();
 };
 
 /**

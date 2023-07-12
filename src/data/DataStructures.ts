@@ -30,7 +30,6 @@ export default class SVGData {
                     .map((key) => LinkDirection[key])
                     .map((noc, index) => [noc, index])
             );
-            console.log(SVGData.NOC_ORDER);
         }
 
         return SVGData.NOC_ORDER;
@@ -57,7 +56,7 @@ export default class SVGData {
         const totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
         this.nodes = data.nodes
-            .map((node, i) => {
+            .map((node, i: number) => {
                 const loc: Loc = {x: node.location[1], y: node.location[0]};
                 this.totalCols = Math.max(loc.y, this.totalCols);
                 this.totalRows = Math.max(loc.x, this.totalRows);
@@ -114,7 +113,7 @@ export default class SVGData {
             //     list.push(...link.pipes);
             // });
         });
-        const uniquePipeObj: {[key: string]: Pipe} = {};
+        const uniquePipeObj: { [key: string]: Pipe } = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -229,11 +228,11 @@ export class NOCLink {
         this.totalDataBytes = json.total_data_in_bytes;
         this.maxBandwidth = json.max_link_bw;
         this.bpc = this.totalDataBytes / totalOpCycles;
-        this.linkSaturation = this.bpc / this.maxBandwidth;
+        this.linkSaturation = (this.bpc / this.maxBandwidth) * 100;
         this.direction = id as LinkDirection;
         this.noc = id.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
 
-        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, pipeJson]) => new Pipe(pipe, pipeJson, id));
+        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new Pipe(pipe, bandwidth, id, this.totalDataBytes));
     }
 }
 
@@ -246,10 +245,14 @@ export class Pipe {
 
     nocId: string = '';
 
-    constructor(id: string, bandwidth: number, nocId: string = '') {
+    bandwidthUse: number = 0;
+
+
+    constructor(id: string, bandwidth: number, nocId: string = '', linkTotalData: number = 0) {
         this.id = id;
         this.nocId = nocId;
         this.bandwidth = bandwidth;
+        this.bandwidthUse = (this.bandwidth / linkTotalData) * 100;
     }
 }
 

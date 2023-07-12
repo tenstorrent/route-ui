@@ -25,7 +25,7 @@ const pipeSelectionSlice = createSlice({
                 state.pipeIds.push(item.id);
             });
         },
-        updatePipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
+        updatePipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
             const {id, selected} = action.payload;
             if (state.pipes[id]) {
                 state.pipes[id].selected = selected;
@@ -42,7 +42,7 @@ export const selectPipeSelectionById = (state: RootState, id: string) => state.p
 export const {loadPipeSelection, updatePipeSelection, clearAllPipes} = pipeSelectionSlice.actions;
 
 export interface NodeData extends NodeSelection {
-    loc: { x: number; y: number };
+    loc: {x: number; y: number};
     opName: string;
 }
 
@@ -78,7 +78,7 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        updateNodeSelection(state, action: PayloadAction<{ id: number; selected: boolean }>) {
+        updateNodeSelection(state, action: PayloadAction<{id: number; selected: boolean}>) {
             const {id, selected} = action.payload;
             const node: NodeData | undefined = state.nodeList[id];
 
@@ -96,7 +96,7 @@ const nodeSelectionSlice = createSlice({
                 }
             }
         },
-        selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
+        selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
             const {opName, selected} = action.payload;
             const group = state.groups[opName];
             if (group) {
@@ -111,13 +111,31 @@ const nodeSelectionSlice = createSlice({
 export const selectNodeSelectionById = (state: RootState, id: number) => state.nodeSelection.nodeList[id];
 export const {loadNodesData, updateNodeSelection, selectGroup} = nodeSelectionSlice.actions;
 
-const rootReducer = {
-    pipeSelection: pipeSelectionSlice.reducer,
-    nodeSelection: nodeSelectionSlice.reducer,
-};
+const linkSaturationSlice = createSlice({
+    name: 'linkSaturation',
+    initialState: {
+        linkSaturation: 75,
+        showLinkSaturation: false,
+    },
+    reducers: {
+        updateLinkSatuation: (state, action: PayloadAction<number>) => {
+            state.linkSaturation = action.payload;
+        },
+        updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
+            state.showLinkSaturation = action.payload;
+        },
+    },
+});
+export const {updateLinkSatuation, updateShowLinkSaturation} = linkSaturationSlice.actions;
+export const selectLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturation;
+export const selectShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
 
 const store = configureStore({
-    reducer: rootReducer,
+    reducer: {
+        pipeSelection: pipeSelectionSlice.reducer,
+        nodeSelection: nodeSelectionSlice.reducer,
+        linkSaturation: linkSaturationSlice.reducer,
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

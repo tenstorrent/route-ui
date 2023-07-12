@@ -1,14 +1,14 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import * as d3 from 'd3';
-import {Position, Slider, Switch} from '@blueprintjs/core';
+import {Position, RangeSlider, Slider, Switch} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 
 import DataSource, {SVGContext} from '../data/DataSource';
 import {ComputeNode, LinkDirection} from '../data/DataStructures';
 import {getGroupColor} from '../data/ColorGenerator';
-import {drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
-import {RootState, selectNodeSelectionById, updateNodeSelection} from '../data/store';
+import {calculateIntensity, drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
+import {PipeSelection, RootState, selectNodeSelectionById, updateLinkSatuation, updateNodeSelection, updateShowLinkSaturation} from '../data/store';
 
 export default function GridRender() {
     const {svgData} = useContext<SVGContext>(DataSource);
@@ -17,7 +17,19 @@ export default function GridRender() {
     const [showOperationColors, setShowOperationColors] = useState(false);
     const [showNodeLocation, setShowNodeLocation] = useState(false);
     const [gridZoom, setGridZoom] = useState(1);
+    const [showLinkSaturation, setShowLinkSaturation] = useState(false);
+    const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(75);
 
+    const dispatch = useDispatch();
+
+    const onLinkSaturationChange = (value: number) => {
+        setLinkSaturationTreshold(value);
+        dispatch(updateLinkSatuation(value));
+    };
+    const onShowLinkSaturation = (value: boolean) => {
+        setShowLinkSaturation(value);
+        dispatch(updateShowLinkSaturation(value));
+    };
     return (
         <>
             <div className="inner-sidebar">
@@ -47,12 +59,32 @@ export default function GridRender() {
                 </Tooltip2>
                 <hr />
                 {/* Link saturation */}
+                <Tooltip2 content="Show link congestion" position={Position.RIGHT}>
+                    <Switch checked={showLinkSaturation} label="congestion" onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)} />
+                </Tooltip2>
+                <Slider
+                    min={0}
+                    max={100}
+                    disabled={!showLinkSaturation}
+                    labelStepSize={25}
+                    value={linkSaturationTreshold}
+                    onChange={onLinkSaturationChange}
+                    labelRenderer={(value) => `${value.toFixed(0)}`}
+                />
             </div>
             <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
                 <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
                     {svgData.nodes.map((node, index) => {
                         return (
-                            <NodeComponent node={node} showEmptyLinks={showEmptyLinks} showNodeLocation={showNodeLocation} showOperationColors={showOperationColors} key={index} />
+                            <NodeComponent
+                                node={node}
+                                showEmptyLinks={showEmptyLinks}
+                                showNodeLocation={showNodeLocation}
+                                showOperationColors={showOperationColors}
+                                showLinkSaturation={showLinkSaturation}
+                                linkSaturationTreshold={linkSaturationTreshold}
+                                key={index}
+                            />
                         );
                     })}
                 </div>
@@ -66,16 +98,26 @@ interface NodeComponentProps {
     showEmptyLinks: boolean;
     showOperationColors: boolean;
     showNodeLocation: boolean;
+    showLinkSaturation: boolean;
+    linkSaturationTreshold: number;
 }
 
-const NodeComponent: React.FC<NodeComponentProps> = ({node, showEmptyLinks, showOperationColors, showNodeLocation}) => {
+const NodeComponent: React.FC<NodeComponentProps> = ({
+    node,
+    showEmptyLinks,
+    showOperationColors,
+    showNodeLocation,
+    showLinkSaturation,
+    linkSaturationTreshold,
+    //
+}) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
     const selectedPipeIds = Object.values(allPipes)
-        .filter((pipe) => pipe.selected)
-        .map((pipe) => pipe.id);
+        .filter((pipe: PipeSelection) => pipe.selected)
+        .map((pipe: PipeSelection) => pipe.id);
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
@@ -93,6 +135,14 @@ const NodeComponent: React.FC<NodeComponentProps> = ({node, showEmptyLinks, show
             drawLink(svg, LinkDirection.NOC0_OUT);
             drawLink(svg, LinkDirection.NOC0_IN);
             drawLink(svg, LinkDirection.NOC1_IN);
+        }
+
+        if (showLinkSaturation) {
+            node.links.forEach((link) => {
+                if (link.linkSaturation >= linkSaturationTreshold) {
+                    drawLink(svg, link.direction, calculateIntensity(link.linkSaturation, linkSaturationTreshold), 5);
+                }
+            });
         }
 
         let noc0numPipes = 0;
