@@ -7,9 +7,10 @@ import {FC, useContext} from 'react';
 import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
-import SVGData, {SVGJson} from '../../data/DataStructures';
+import SVGData from '../../data/DataStructures';
 import yamlValidate from '../../data/DataUtils';
 import {loadNodesData, loadPipeSelection} from '../../data/store';
+import {SVGJson} from '../../data/JSONDataTypes';
 
 interface FileLoaderProps {
     updateData: (data: SVGData) => void;
@@ -67,7 +68,7 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
 
     return (
         <div className="">
-            <Button icon={IconNames.UPLOAD} text="Load visualizer output yaml file" onClick={loadFile}/>
+            <Button icon={IconNames.UPLOAD} text="Load visualizer output yaml file" onClick={loadFile} />
         </div>
     );
 };

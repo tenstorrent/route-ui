@@ -18,7 +18,7 @@ export const NOC_CONFIGURATION = {
     core: {x: CORE_CENTER.x, y: CORE_CENTER.y},
 };
 
-export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection) => {
+export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection, color?: string, stroke: number = 1) => {
     const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
 
     /** TEMP DEBUGGING COLOR FUNCTION */
@@ -40,7 +40,8 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
         .attr('y1', lineStartY)
         .attr('x2', lineEndX)
         .attr('y2', lineEndY)
-        .attr('stroke', '#4d4d4d');
+        .attr('stroke-width', stroke)
+        .attr('stroke', color || '#4d4d4d');
 
     // arrowhead
     if (
@@ -307,4 +308,15 @@ export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, u
         .attr('stroke-width', 2)
         .attr('fill', '#9e9e9e')
         .attr('stroke', '#9e9e9e');
+};
+export const calculateIntensity = (value: number, min: number): string => {
+    const max = 99.999998;
+    if (value < min) {
+        return '';
+    }
+    const normalizedVal = Math.min(value, max);
+    const ratio = (normalizedVal - min) / (max - min);
+    const intensity = Math.round(ratio * (255 - 50) + 50);
+    const hexIntensity = intensity.toString(16).padStart(2, '0');
+    return `#${hexIntensity}0000`;
 };

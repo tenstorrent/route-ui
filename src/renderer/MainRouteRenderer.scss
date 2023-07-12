@@ -45,7 +45,8 @@
 .inner-sidebar {
     display: flex;
     flex-direction: column;
-    hr{
+
+    hr {
         width: 100%;
     }
 }
@@ -56,8 +57,8 @@
     height: calc(100vh - 150px);
     max-width: 50vw;
 
-    &.pipes-hidden{
-        .node-svg{
+    &.pipes-hidden {
+        .node-svg {
             display: none;
         }
     }
@@ -145,7 +146,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background-color: #707070;
+        background-color: #494949;
         padding: 10px;
 
 
@@ -161,8 +162,8 @@
 
 .node-links-wrap {
     background-color: #494949;
-    padding: 10px;
-    border: 1px solid;
+    //padding: 10px;
+    //border: 1px solid;
 
     h5 {
         display: flex;
@@ -208,6 +209,7 @@
         }
 
         .label {
+            position: relative;
             display: inline-flex;
             align-items: center;
             gap: 5px;
@@ -302,8 +304,30 @@
         margin-bottom: 0;
     }
 }
+.opname{
+    span{
+        color: #fff;
+    }
+}
 
 .bp4-control input:focus ~ .bp4-control-indicator {
     outline: none;
     box-shadow: none;
+}
+
+.congested-link {
+    color: #ff0000;
+}
+
+.progress-bar {
+    width: 100px;
+    background-color: #262626;
+    height: 4px;
+    position: absolute;
+    bottom: -2px;
+    span{
+        background-color: #7abdcc;
+        height: 4px;
+        display: block;
+    }
 }
