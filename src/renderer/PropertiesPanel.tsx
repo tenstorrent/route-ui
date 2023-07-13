@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, Checkbox, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
-import SVGData, {ComputeNode, convertBytes, LinkDirection, NOCLink, Pipe} from '../data/DataStructures';
+import SVGData, {ComputeNode, convertBytes, NOCLink, Pipe} from '../data/DataStructures';
 import getPipeColor, {getGroupColor} from '../data/ColorGenerator';
 import HighlightedText from './components/HighlightedText';
 
@@ -18,7 +18,7 @@ import {
     updateNodeSelection,
     updatePipeSelection,
 } from '../data/store';
-import {calculateIntensity} from '../utils/DrawingAPI';
+import {calculateIntensity, calculateLinkCongestionColor} from '../utils/DrawingAPI';
 
 interface OperationItem {
     operation: string;
@@ -81,7 +81,6 @@ export default function PropertiesPanel() {
         dispatch(updatePipeSelection({id: pipeId, selected}));
     };
     const selectNode = (node: ComputeNode, selected: boolean) => {
-        console.log('selecting node', node.uid, selected);
         dispatch(updateNodeSelection({id: node.uid, selected}));
     };
 
@@ -109,10 +108,6 @@ export default function PropertiesPanel() {
                     title="Compute Node"
                     panel={
                         <>
-                            <Button icon={IconNames.CLEAN} onClick={clearAll}>
-                                Clear pipes
-                            </Button>
-
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className="properties-panel-nodes">
                                 {selectedNodes.map((node: ComputeNode) => (
@@ -134,7 +129,7 @@ export default function PropertiesPanel() {
                                                 <Tooltip content={node.opName} position={PopoverPosition.TOP}>
                                                     <SelectableOperation
                                                         op={{nodes: [], operation: node.opName}}
-                                                        value={nodeSelectionState.groups[node.opName][0].selected}
+                                                        value={nodeSelectionState.groups[node.opName].selected}
                                                         selectFunc={selectNodesByOp}
                                                         stringFilter=""
                                                     />
@@ -144,37 +139,30 @@ export default function PropertiesPanel() {
 
                                         <div className="node-links-wrap">
                                             <h4>Links</h4>
-                                            {getLinksForNode(node).map((link: NOCLink, index) => (
-                                                <div key={index}>
-                                                    <h5 className={link.totalDataBytes === 0 ? 'inactive' : ''}>
-                                                        <span>
-                                                            {link.id} - {convertBytes(link.totalDataBytes)} <br /> {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
-                                                            {showLinkSaturation === true && (
-                                                                <>
-                                                                    {' '}
-                                                                    {link.linkSaturation.toFixed(2)}%
-                                                                    <span
-                                                                        style={{
-                                                                            marginLeft: '5px',
-                                                                            display: 'inline-block',
-                                                                            width: '20px',
-                                                                            height: '10px',
-                                                                            backgroundColor: calculateIntensity(link.linkSaturation, linkSaturationTreshold),
-                                                                        }}
-                                                                    />
-                                                                </>
+                                            {getLinksForNode(node).map((link: NOCLink, index) => {
+                                                const color: string = calculateLinkCongestionColor(link.linkSaturation, 0);
+                                                return (
+                                                    <div key={index}>
+                                                        <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
+                                                            <span>
+                                                                {link.id} - {convertBytes(link.totalDataBytes)} <br/> {convertBytes(link.bpc, 2)} of{' '}
+                                                                {convertBytes(link.maxBandwidth)}
+                                                                <span style={{color}}> {link.linkSaturation.toFixed(2)}%</span>
+                                                            </span>
+                                                            {link.totalDataBytes > 0 && (
+                                                                <ProgressBar percent={link.linkSaturation} color={color}/>
                                                             )}
-                                                        </span>
-                                                    </h5>
-                                                    <ul className="node-pipelist">
-                                                        {link.pipes.map((pipe: Pipe) => (
-                                                            <li key={pipe.id}>
-                                                                <SelectablePipe pipe={pipe} pipeFilter="" showBandwidthUse />
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ))}
+                                                        </h5>
+                                                        <ul className="node-pipelist">
+                                                            {link.pipes.map((pipe: Pipe) => (
+                                                                <li key={pipe.id}>
+                                                                    <SelectablePipe pipe={pipe} pipeFilter="" showBandwidthUse/>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 ))}
@@ -189,12 +177,7 @@ export default function PropertiesPanel() {
                     panel={
                         <div className="pipe-renderer-panel">
                             <div className="search-field">
-                                <Button icon={IconNames.CLEAN} onClick={clearAll}>
-                                    Clear pipes
-                                </Button>
-                            </div>
-                            <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}/>
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
@@ -206,7 +189,7 @@ export default function PropertiesPanel() {
                                                 filterQuery={pipeFilter}
                                                 component={
                                                     <li>
-                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
+                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter}/>
                                                     </li>
                                                 }
                                             />
@@ -223,7 +206,7 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
+                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}/>
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
@@ -233,14 +216,12 @@ export default function PropertiesPanel() {
                                             filterableString={op.operation}
                                             filterQuery={opsFilter}
                                             component={
-                                                <>
-                                                    <SelectableOperation
-                                                        op={op}
-                                                        value={nodeSelectionState.groups[op.operation][0].selected}
-                                                        selectFunc={selectNodesByOp}
-                                                        stringFilter={opsFilter}
-                                                    />
-                                                </>
+                                                <SelectableOperation
+                                                    op={op}
+                                                    value={nodeSelectionState.groups[op.operation].selected}
+                                                    selectFunc={selectNodesByOp}
+                                                    stringFilter={opsFilter}
+                                                />
                                             }
                                         />
                                     ))}
@@ -275,13 +256,13 @@ const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter, showBandwidt
 
     return (
         <>
-            <Checkbox checked={pipeState.selected} onChange={handleCheckboxChange} />
+            <Checkbox checked={pipeState.selected} onChange={handleCheckboxChange}/>
             <span className="label">
-                <HighlightedText text={pipeState.id} filter={pipeFilter} /> {convertBytes(pipe.bandwidth)}
+                <HighlightedText text={pipeState.id} filter={pipeFilter}/> {convertBytes(pipe.bandwidth)}
                 {showBandwidthUse && <span>{pipe.bandwidthUse.toFixed(0)}%</span>}
-                <span className={`color-swatch ${pipeState.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}} />
-                <br />
-                {showBandwidthUse && <ProgressBar percent={pipe.bandwidthUse} />}
+                <span className={`color-swatch ${pipeState.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}}/>
+                <br/>
+                {showBandwidthUse && <ProgressBar percent={pipe.bandwidthUse}/>}
             </span>
         </>
     );
@@ -305,20 +286,28 @@ const SelectableOperation: FC<SelectableOperationProps> = ({op, selectFunc, valu
                     selectFunc(op.operation, e.target.checked);
                 }}
             />
-            <HighlightedText text={op.operation} filter={stringFilter} />
-            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(op.operation)}} />
+            <HighlightedText text={op.operation} filter={stringFilter}/>
+            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(op.operation)}}/>
         </div>
     );
 };
 
 interface ProgressBarProps {
     percent: number;
+    color?: string;
 }
 
-const ProgressBar: FC<ProgressBarProps> = ({percent}) => {
+const ProgressBar: FC<ProgressBarProps> = ({percent, color}) => {
+    let styles: {} = {width: `${percent}%`};
+    if (color) {
+        styles = {...styles, backgroundColor: color};
+    }
     return (
         <span className="progress-bar">
-            <span style={{width: `${percent}%`}} />
+            <span className="track" style={styles}/>
         </span>
     );
+};
+ProgressBar.defaultProps = {
+    color: undefined,
 };

@@ -47,15 +47,20 @@
     flex-direction: column;
 
     hr {
+        border: none;
         width: 100%;
+        border-top: 1px solid #676767;
+
     }
 }
 
 .grid-container {
     flex: none;
-    overflow: scroll;
+    overflow: auto;
     height: calc(100vh - 150px);
     max-width: 50vw;
+    margin: 0;
+    padding: 5px;
 
     &.pipes-hidden {
         .node-svg {
@@ -80,8 +85,33 @@
                 right: 20px;
             }
 
+            .node-location{
+                position: absolute;
+                top: 0;
+                left: 20px;
+            }
             &.selected {
-                border: 1px solid #7abdcc;
+                .node-border {
+                    $inset: 4px;
+                    border: 2px solid #ffd500;
+                    position: absolute;
+                    top: $inset;
+                    left: $inset;
+                    bottom: $inset;
+                    right: $inset;
+                    z-index: 0;
+                }
+            }
+
+            .group-border {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                z-index: 0;
             }
 
             .node-type-label {
@@ -96,6 +126,12 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                z-index: 0;
+            }
+
+            .node-svg {
+                position: absolute;
+                z-index: 1;
             }
         }
     }
@@ -165,7 +201,8 @@
     //padding: 10px;
     //border: 1px solid;
 
-    h5 {
+    .link-title-details {
+        position: relative;
         display: flex;
         justify-content: flex-start;
         flex-direction: row;
@@ -178,6 +215,12 @@
 
             input {
                 opacity: 0.5;
+            }
+        }
+
+        .progress-bar {
+            .track {
+                //background-color: #a20c0f;
             }
         }
     }
@@ -304,8 +347,9 @@
         margin-bottom: 0;
     }
 }
-.opname{
-    span{
+
+.opname {
+    span {
         color: #fff;
     }
 }
@@ -325,9 +369,26 @@
     height: 4px;
     position: absolute;
     bottom: -2px;
-    span{
+
+    span {
         background-color: #7abdcc;
         height: 4px;
         display: block;
+    }
+}
+
+
+
+.link-saturation-slider {
+    .bp4-slider-track {
+        .bp4-slider-progress {
+            background-color: #2d72d2;
+
+            &.bp4-intent-primary,
+            &:first-of-type {
+                background-color: rgba(95, 107, 124, 0.2);
+            }
+        }
+
     }
 }

@@ -317,6 +317,23 @@ export const calculateIntensity = (value: number, min: number): string => {
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
     const intensity = Math.round(ratio * (255 - 50) + 50);
-    const hexIntensity = intensity.toString(16).padStart(2, '0');
-    return `#${hexIntensity}0000`;
+    return `rgb(${intensity}, ${200 - intensity}, 0)`;
 };
+export const calculateLinkCongestionColor = (value: number, min: number): string => {
+    const max = 100;
+    const normalizedVal = Math.min(value, max);
+    const ratio = (normalizedVal - min) / (max - min);
+    const intensity = Math.round(ratio * (255 - 0) + 0);
+    return `rgb(${intensity}, ${255 - intensity}, 0)`;
+};
+// export const calculateIntensity = (value: number, unused:any): string => {
+//     const min = 0;
+//     const max = 125;
+//     if (value < min) {
+//         return '';
+//     }
+//     const normalizedVal = Math.min(value, max);
+//     const ratio = 1 - (normalizedVal - min) / (max - min);
+//     const intensity = Math.round(ratio * (255 - 50) + 50);
+//     return `rgb(${intensity}, 0, 0)`;
+// };
