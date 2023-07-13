@@ -44,6 +44,7 @@ export const {loadPipeSelection, updatePipeSelection, clearAllPipes} = pipeSelec
 export interface NodeData extends NodeSelection {
     loc: {x: number; y: number};
     opName: string;
+    border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
 }
 
 export interface NodeSelection {
@@ -52,19 +53,24 @@ export interface NodeSelection {
 }
 
 interface NodeSelectionState {
-    groups: Record<string, NodeData[]>;
+    groups: Record<string, {data: NodeData[]; selected: boolean}>;
     nodeList: NodeData[];
+    filename: string;
 }
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: [],
     groups: {},
+    filename: '',
 };
 
 const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
+        loadedFilename(state, action: PayloadAction<string>) {
+            state.filename = action.payload;
+        },
         loadNodesData(state, action: PayloadAction<NodeData[]>) {
             state.groups = {};
             state.nodeList = [];
@@ -72,10 +78,31 @@ const nodeSelectionSlice = createSlice({
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
                     if (!state.groups[item.opName]) {
-                        state.groups[item.opName] = [];
+                        state.groups[item.opName] = {data: [], selected: false};
                     }
-                    state.groups[item.opName].push(item);
+                    state.groups[item.opName].data.push(item);
                 }
+            });
+
+            function setBorders(nodes: NodeData[]) {
+                const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
+                nodes.forEach((node) => {
+                    const leftLoc = {x: node.loc.x - 1, y: node.loc.y};
+                    const rightLoc = {x: node.loc.x + 1, y: node.loc.y};
+                    const topLoc = {x: node.loc.x, y: node.loc.y - 1};
+                    const bottomLoc = {x: node.loc.x, y: node.loc.y + 1};
+                    node.border = {
+                        left: !locations.has(JSON.stringify(leftLoc)),
+                        right: !locations.has(JSON.stringify(rightLoc)),
+                        top: !locations.has(JSON.stringify(topLoc)),
+                        bottom: !locations.has(JSON.stringify(bottomLoc)),
+                    };
+                });
+            }
+
+            // this only runs ones per file load
+            Object.values(state.groups).forEach((group) => {
+                setBorders(group.data);
             });
         },
         updateNodeSelection(state, action: PayloadAction<{id: number; selected: boolean}>) {
@@ -84,32 +111,26 @@ const nodeSelectionSlice = createSlice({
 
             if (node) {
                 node.selected = selected;
-
-                if (!selected) {
-                    const group = state.groups[node.opName];
-                    if (group) {
-                        group.forEach((groupNode) => {
-                            groupNode.selected = false;
-                            state.nodeList[groupNode.id].selected = selected;
-                        });
-                    }
-                }
             }
         },
         selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
             const {opName, selected} = action.payload;
             const group = state.groups[opName];
             if (group) {
-                group.forEach((node) => {
-                    node.selected = selected;
-                    state.nodeList[node.id].selected = selected;
-                });
+                group.selected = selected;
             }
+        },
+        clearAllOperations(state) {
+            Object.values(state.groups).forEach((group) => {
+                group.selected = false;
+            });
         },
     },
 });
+
 export const selectNodeSelectionById = (state: RootState, id: number) => state.nodeSelection.nodeList[id];
-export const {loadNodesData, updateNodeSelection, selectGroup} = nodeSelectionSlice.actions;
+export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
+export const {loadNodesData, updateNodeSelection, selectGroup, clearAllOperations, loadedFilename} = nodeSelectionSlice.actions;
 
 const linkSaturationSlice = createSlice({
     name: 'linkSaturation',

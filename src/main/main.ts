@@ -9,12 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import {app, BrowserWindow, shell, ipcMain} from 'electron';
+import {app, BrowserWindow, shell, ipcMain, nativeImage} from 'electron';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
+// import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
 import {resolveHtmlPath} from './util';
-import remoteMain from "@electron/remote/main";
 
 class AppUpdater {
     constructor() {
@@ -37,8 +37,7 @@ if (process.env.NODE_ENV === 'production') {
     sourceMapSupport.install();
 }
 
-const isDebug =
-    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+const isDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 if (isDebug) {
     require('electron-debug')();
@@ -62,9 +61,7 @@ const createWindow = async () => {
         await installExtensions();
     }
 
-    const RESOURCES_PATH = app.isPackaged
-        ? path.join(process.resourcesPath, 'assets')
-        : path.join(__dirname, '../../assets');
+    const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
 
     const getAssetPath = (...paths: string[]): string => {
         return path.join(RESOURCES_PATH, ...paths);
@@ -86,6 +83,12 @@ const createWindow = async () => {
             //     : path.join(__dirname, '../../.erb/dll/preload.js'),
         },
     });
+
+    const icon = nativeImage.createFromPath(path.join(getAssetPath('icon.png')));
+    if (app.dock) {
+        app.dock.setIcon(icon);
+        app.dock.setBadge('Route');
+    }
 
     remoteMain.enable(mainWindow.webContents);
 
@@ -114,8 +117,6 @@ const createWindow = async () => {
         shell.openExternal(edata.url);
         return {action: 'deny'};
     });
-
-
 
     // Remove this if your app does not use auto updates
     // eslint-disable-next-line
