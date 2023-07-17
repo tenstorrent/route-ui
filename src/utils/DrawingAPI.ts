@@ -299,7 +299,7 @@ export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, 
     return pipeIds.length;
 };
 
-export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: {x: number; y: number}) => {
+export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: { x: number; y: number }) => {
     svg.append('circle')
         //
         .attr('cx', point.x)
@@ -309,31 +309,12 @@ export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, u
         .attr('fill', '#9e9e9e')
         .attr('stroke', '#9e9e9e');
 };
-export const calculateIntensity = (value: number, min: number): string => {
-    const max = 99.999998;
-    if (value < min) {
-        return '';
-    }
+
+export const calculateLinkCongestionColor = (value: number, min: number = 0): string => {
+    const max = 120;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
-    const intensity = Math.round(ratio * (255 - 50) + 50);
-    return `rgb(${intensity}, ${200 - intensity}, 0)`;
-};
-export const calculateLinkCongestionColor = (value: number, min: number): string => {
-    const max = 100;
-    const normalizedVal = Math.min(value, max);
-    const ratio = (normalizedVal - min) / (max - min);
-    const intensity = Math.round(ratio * (255 - 0) + 0);
+    const intensity = Math.round(ratio * 255);
     return `rgb(${intensity}, ${255 - intensity}, 0)`;
 };
-// export const calculateIntensity = (value: number, unused:any): string => {
-//     const min = 0;
-//     const max = 125;
-//     if (value < min) {
-//         return '';
-//     }
-//     const normalizedVal = Math.min(value, max);
-//     const ratio = 1 - (normalizedVal - min) / (max - min);
-//     const intensity = Math.round(ratio * (255 - 50) + 50);
-//     return `rgb(${intensity}, 0, 0)`;
-// };
+

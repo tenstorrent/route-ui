@@ -2,8 +2,6 @@
     &:hover {
         fill: #ececec;
     }
-
-
 }
 
 .node-type-d {
@@ -34,9 +32,6 @@
 }
 
 .main-container {
-    //width: 100vw;
-    //display: grid;
-    //grid-template-columns: 1fr 1fr;
     display: flex;
     gap: 50px;
     width: calc(100% - 100px);
@@ -85,11 +80,12 @@
                 right: 20px;
             }
 
-            .node-location{
+            .node-location {
                 position: absolute;
                 top: 0;
                 left: 20px;
             }
+
             &.selected {
                 .node-border {
                     $inset: 4px;
@@ -144,16 +140,10 @@
     flex-wrap: wrap;
     gap: 10px;
 
-    p {
-        //display: inline-block;
-    }
+
 }
 
 .opname {
-    //max-width: 100%;
-    //word-wrap: break-word;
-    //overflow-wrap: anywhere;
-    //text-overflow: ellipsis;
     overflow: hidden;
 }
 
@@ -192,6 +182,14 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .node-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
         }
     }
 }
@@ -376,7 +374,6 @@
         display: block;
     }
 }
-
 
 
 .link-saturation-slider {

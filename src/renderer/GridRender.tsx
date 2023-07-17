@@ -2,12 +2,12 @@ import React, {useContext, useState} from 'react';
 import {useDispatch} from 'react-redux';
 import {Button, Position, Slider, Switch, Tooltip} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
-
 import {IconNames} from '@blueprintjs/icons';
 import DataSource, {SVGContext} from '../data/DataSource';
 import {NODE_SIZE} from '../utils/DrawingAPI';
 import {clearAllOperations, clearAllPipes, updateLinkSatuation, updateShowLinkSaturation} from '../data/store';
 import NodeComponent from './NodeComponent';
+import {ComputeNode} from '../data/DataStructures';
 
 export default function GridRender() {
     const {svgData} = useContext<SVGContext>(DataSource);
@@ -29,9 +29,7 @@ export default function GridRender() {
         setShowLinkSaturation(value);
         dispatch(updateShowLinkSaturation(value));
     };
-    const clearAllSelectedPipes = () => {
-        dispatch(clearAllPipes());
-    };
+
     return (
         <>
             <div className="inner-sidebar">
@@ -77,20 +75,20 @@ export default function GridRender() {
                 <hr />
                 <Tooltip content="Clear all selected pipes">
                     <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}>
-                        Clear pipes
+                        Deselect pipes
                     </Button>
                 </Tooltip>
                 <hr />
                 <Tooltip content="Decelect all operations">
                     <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
-                        Clear ops
+                        Deselect ops
                     </Button>
                 </Tooltip>
                 <hr />
             </div>
             <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
                 <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
-                    {svgData.nodes.map((node, index) => {
+                    {svgData.nodes.map((node: ComputeNode) => {
                         return (
                             <NodeComponent
                                 node={node}
@@ -99,7 +97,7 @@ export default function GridRender() {
                                 showOperationColors={showOperationColors}
                                 showLinkSaturation={showLinkSaturation}
                                 linkSaturationTreshold={linkSaturationTreshold}
-                                key={index}
+                                key={node.uid}
                             />
                         );
                     })}

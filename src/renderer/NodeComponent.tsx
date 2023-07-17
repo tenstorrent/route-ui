@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import * as d3 from 'd3';
 import {getGroup, PipeSelection, RootState, selectNodeSelectionById, updateNodeSelection} from '../data/store';
 import {ComputeNode, LinkDirection} from '../data/DataStructures';
-import {calculateIntensity, drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
+import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
 import {getGroupColor} from '../data/ColorGenerator';
 
 interface NodeComponentProps {
@@ -55,7 +55,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         if (showLinkSaturation) {
             node.links.forEach((link) => {
                 if (link.linkSaturation >= linkSaturationTreshold) {
-                    drawLink(svg, link.direction, calculateIntensity(link.linkSaturation, linkSaturationTreshold), 5);
+                    drawLink(svg, link.direction, calculateLinkCongestionColor(link.linkSaturation, 0), 5);
                 }
             });
         }
@@ -115,11 +115,8 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         operationStyles = {};
     }
 
-    // const borderColorStyles = nodeState.selected ? {borderColor: getGroupColor(node.opName)} : {};
-
     return (
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-        <div className={`node-item  ${nodeState.selected ? 'selected' : ''}`} onClick={triggerSelection}>
+        <div className={`node-item  ${nodeState.selected ? 'selected' : ''}`} onClick={triggerSelection} role="button">
             <div className="group-border" style={operationStyles} />
             <div className="node-border" />
             {node.opName !== '' && showOperationColors && <div className="op-color-swatch" style={{backgroundColor: getGroupColor(node.opName)}} />}

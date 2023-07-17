@@ -6,6 +6,7 @@ module.exports = {
         'import/no-extraneous-dependencies': 'off',
         'react/react-in-jsx-scope': 'off',
         'react/jsx-filename-extension': 'off',
+        "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }],
         'import/extensions': 'off',
         'import/no-unresolved': 'off',
         'import/no-import-module-exports': 'off',
@@ -15,6 +16,7 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': 'warn',
         'no-use-before-define': 'off',
         'max-classes-per-file': 'off',
+        "react/function-component-definition": 0,
     },
     parserOptions: {
         ecmaVersion: 2020,

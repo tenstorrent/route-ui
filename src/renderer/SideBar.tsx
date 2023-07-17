@@ -10,11 +10,11 @@ export default function SideBar() {
     const reloadApp = () => {
         dispatch(loadedFilename(''));
         navigate('/');
-    }
+    };
     return (
         <div className="sidebar">
             <Tooltip content="Load new analyzer output .yaml file">
-                <Button icon={IconNames.REFRESH} text="" onClick={reloadApp}/>
+                <Button icon={IconNames.REFRESH} text="" onClick={reloadApp} />
             </Tooltip>
         </div>
     );

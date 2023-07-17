@@ -1,5 +1,5 @@
 import {MemoryRouter as Router, Routes, Route} from 'react-router-dom';
-import {Provider, useSelector} from 'react-redux';
+import {Provider} from 'react-redux';
 import './App.scss';
 import {useState} from 'react';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
