@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import * as d3 from 'd3';
-import {getGroup, PipeSelection, RootState, selectNodeSelectionById, updateNodeSelection} from '../data/store';
+import {getDramGroup, getGroup, PipeSelection, RootState, selectNodeSelectionById, selectPipeSelectionById, updateNodeSelection} from '../data/store';
 import {ComputeNode, LinkDirection} from '../data/DataStructures';
 import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
 import {getGroupColor} from '../data/ColorGenerator';
@@ -33,6 +33,8 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         .map((pipe: PipeSelection) => pipe.id);
 
     const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
+
+    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
@@ -111,13 +113,35 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         const gradientColor = color?.replace(')', ', 0.25)').replace('rgb', 'rgba');
         const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
         operationStyles = {...operationStyles, background: gradient};
-    } else {
-        operationStyles = {};
+    }
+    let dramStyles = {};
+    if (node.dramChannel > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
+        const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
+        const color = 'rgba(248,226,112,.25)';
+        const gradientColor = 'rgba(248,226,112,0.2)';
+        dramStyles = {borderColor: color};
+        const borderSize = 2;
+        if (border.left) {
+            dramStyles = {...dramStyles, borderLeft: `${borderSize}px solid ${color}`};
+        }
+        if (border.right) {
+            dramStyles = {...dramStyles, borderRight: `${borderSize}px solid ${color}`};
+        }
+        if (border.top) {
+            dramStyles = {...dramStyles, borderTop: `${borderSize}px solid ${color}`};
+        }
+        if (border.bottom) {
+            dramStyles = {...dramStyles, borderBottom: `${borderSize}px solid ${color}`};
+        }
+        const gradientSize = 6;
+        const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${gradientSize * 2}px)`;
+        dramStyles = {...dramStyles, background: gradient};
     }
 
     return (
         <div className={`node-item  ${nodeState.selected ? 'selected' : ''}`} onClick={triggerSelection} role="button">
             <div className="group-border" style={operationStyles} />
+            <div className="dram-border" style={dramStyles} />
             <div className="node-border" />
             {node.opName !== '' && showOperationColors && <div className="op-color-swatch" style={{backgroundColor: getGroupColor(node.opName)}} />}
             {showNodeLocation && (

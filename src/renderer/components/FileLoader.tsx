@@ -45,6 +45,7 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                 }
                 try {
                     const doc = parse(data);
+                    console.log(doc);
                     const isValid = yamlValidate(doc);
                     if (isValid) {
                         const svgData = new SVGData(doc as SVGJson);
@@ -57,6 +58,7 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                         const errors = yamlValidate.errors?.map((error) => {
                             return error.message;
                         });
+                        console.error(errors);
                         console.error(errors?.join('\n'));
                         alert(`An error occurred parsing the file: ${errors?.join('\n')}`);
                     }

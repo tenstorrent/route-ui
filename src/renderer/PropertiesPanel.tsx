@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
-import SVGData, {ComputeNode, convertBytes, NOCLink, Pipe} from '../data/DataStructures';
+import SVGData, {ComputeNode, ComputeNodeType, convertBytes, NOCLink, Pipe} from '../data/DataStructures';
 
 import FilterableComponent from './components/FilterableComponent';
 import {RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
@@ -108,6 +108,7 @@ export default function PropertiesPanel() {
                                             </Tooltip>
                                         </h3>
                                         {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
+                                        {node.type === ComputeNodeType.DRAM ? <p>Channel {node.dramChannel}, Sub {node.dramSubchannel}</p> : null}
                                         {node.opName !== '' && (
                                             <div className="opname">
                                                 <Tooltip content={node.opName} position={PopoverPosition.TOP}>

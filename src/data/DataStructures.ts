@@ -45,6 +45,8 @@ export default class SVGData {
 
     public bwLimitedOpCycles: number = 0;
 
+    public architecture: string = '';
+
     private uniquePipeList: Pipe[] = [];
 
     constructor(data: SVGJson) {
@@ -52,6 +54,7 @@ export default class SVGData {
 
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
+        this.architecture = data.arch;
 
         const totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
@@ -60,6 +63,7 @@ export default class SVGData {
                 const loc: Loc = {x: node.location[1], y: node.location[0]};
                 this.totalCols = Math.max(loc.y, this.totalCols);
                 this.totalRows = Math.max(loc.x, this.totalRows);
+                // console.log(node.dram_channel, node.dram_subchannel);
                 return new ComputeNode(node, i, totalOpCycles);
             })
             .sort((a, b) => {
@@ -72,7 +76,14 @@ export default class SVGData {
 
     getAllNodes(): NodeData[] {
         return this.nodes.map((node) => {
-            return {id: node.uid, selected: false, loc: node.loc, opName: node.opName} as NodeData;
+            return {
+                id: node.uid,
+                selected: false,
+                loc: node.loc,
+                opName: node.opName,
+                dramChannel: node.dramChannel,
+                dramSubchannel: node.dramSubchannel,
+            } as NodeData;
         });
     }
 
@@ -109,11 +120,8 @@ export default class SVGData {
             node.links.forEach((link) => {
                 list.push(...link.pipes);
             });
-            // node.internalLinks.forEach((link) => {
-            //     list.push(...link.pipes);
-            // });
         });
-        const uniquePipeObj: { [key: string]: Pipe } = {};
+        const uniquePipeObj: {[key: string]: Pipe} = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -136,7 +144,7 @@ export class ComputeNode {
 
     public id: string = '';
 
-    public type: string = ''; // ComputeNodeType = ComputeNodeType.NONE;
+    public type: ComputeNodeType = ComputeNodeType.NONE;
 
     public loc: Loc = {x: 0, y: 0};
 
@@ -150,6 +158,10 @@ export class ComputeNode {
 
     public totalOpCycles: number = 0;
 
+    public dramChannel: number = -1;
+
+    public dramSubchannel: number = 0;
+
     constructor(json: NodeJson, uid: number, totalOpCycles: number = 0) {
         this.uid = uid;
         this.json = json;
@@ -157,7 +169,12 @@ export class ComputeNode {
         this.opCycles = json.op_cycles;
         this.links = new Map();
         this.totalOpCycles = totalOpCycles;
-        this.type = json.type;
+        this.type = json.type as ComputeNodeType;
+        if (json.dram_channel !== undefined && json.dram_channel !== null) {
+            this.dramChannel = json.dram_channel;
+            this.dramSubchannel = json.dram_subchannel || 0;
+            console.log(this.dramChannel, this.dramSubchannel);
+        }
         this.loc = {x: json.location[0], y: json.location[1]};
 
         this.links = new Map(Object.entries(json.links).map(([link, linkJson]) => [link, new NOCLink(link, linkJson, this.totalOpCycles)]));
@@ -246,7 +263,6 @@ export class Pipe {
     nocId: string = '';
 
     bandwidthUse: number = 0;
-
 
     constructor(id: string, bandwidth: number, nocId: string = '', linkTotalData: number = 0) {
         this.id = id;

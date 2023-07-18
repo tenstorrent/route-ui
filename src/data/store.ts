@@ -39,12 +39,15 @@ const pipeSelectionSlice = createSlice({
     },
 });
 export const selectPipeSelectionById = (state: RootState, id: string) => state.pipeSelection.pipes[id];
+export const getDramGroup = (state: RootState, id: number) => (id > -1 ? state.nodeSelection.dram[id] : null);
 export const {loadPipeSelection, updatePipeSelection, clearAllPipes} = pipeSelectionSlice.actions;
 
 export interface NodeData extends NodeSelection {
     loc: {x: number; y: number};
     opName: string;
     border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
+    dramChannel: number | -1;
+    dramSubchannel: number | -1;
 }
 
 export interface NodeSelection {
@@ -56,12 +59,30 @@ interface NodeSelectionState {
     groups: Record<string, {data: NodeData[]; selected: boolean}>;
     nodeList: NodeData[];
     filename: string;
+    dram: {data: NodeData[]; selected: boolean}[];
 }
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: [],
     groups: {},
     filename: '',
+    dram: [],
+};
+
+const setBorders = (nodes: NodeData[]) => {
+    const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
+    nodes.forEach((node) => {
+        const leftLoc = {x: node.loc.x - 1, y: node.loc.y};
+        const rightLoc = {x: node.loc.x + 1, y: node.loc.y};
+        const topLoc = {x: node.loc.x, y: node.loc.y - 1};
+        const bottomLoc = {x: node.loc.x, y: node.loc.y + 1};
+        node.border = {
+            left: !locations.has(JSON.stringify(leftLoc)),
+            right: !locations.has(JSON.stringify(rightLoc)),
+            top: !locations.has(JSON.stringify(topLoc)),
+            bottom: !locations.has(JSON.stringify(bottomLoc)),
+        };
+    });
 };
 
 const nodeSelectionSlice = createSlice({
@@ -74,6 +95,7 @@ const nodeSelectionSlice = createSlice({
         loadNodesData(state, action: PayloadAction<NodeData[]>) {
             state.groups = {};
             state.nodeList = [];
+            state.dram = [];
             action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
@@ -82,27 +104,21 @@ const nodeSelectionSlice = createSlice({
                     }
                     state.groups[item.opName].data.push(item);
                 }
+                if (item.dramChannel !== -1) {
+                    if (!state.dram[item.dramChannel]) {
+                        state.dram[item.dramChannel] = {data: [], selected: false};
+                    }
+                    state.dram[item.dramChannel].data.push(item);
+                }
             });
 
-            function setBorders(nodes: NodeData[]) {
-                const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
-                nodes.forEach((node) => {
-                    const leftLoc = {x: node.loc.x - 1, y: node.loc.y};
-                    const rightLoc = {x: node.loc.x + 1, y: node.loc.y};
-                    const topLoc = {x: node.loc.x, y: node.loc.y - 1};
-                    const bottomLoc = {x: node.loc.x, y: node.loc.y + 1};
-                    node.border = {
-                        left: !locations.has(JSON.stringify(leftLoc)),
-                        right: !locations.has(JSON.stringify(rightLoc)),
-                        top: !locations.has(JSON.stringify(topLoc)),
-                        bottom: !locations.has(JSON.stringify(bottomLoc)),
-                    };
-                });
-            }
-
-            // this only runs ones per file load
+            // this only runs one time per file load
             Object.values(state.groups).forEach((group) => {
                 setBorders(group.data);
+            });
+            state.dram.forEach((dramElement) => {
+                setBorders(dramElement.data);
+                console.log(dramElement.data);
             });
         },
         updateNodeSelection(state, action: PayloadAction<{id: number; selected: boolean}>) {
@@ -112,6 +128,13 @@ const nodeSelectionSlice = createSlice({
             if (node) {
                 node.selected = selected;
             }
+            state.dram.forEach((dramGroup) => {
+                if (dramGroup.data.map((n) => n.id).filter((nodeid) => state.nodeList[nodeid].selected).length > 0) {
+                    dramGroup.selected = true;
+                } else {
+                    dramGroup.selected = false;
+                }
+            });
         },
         selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
             const {opName, selected} = action.payload;
