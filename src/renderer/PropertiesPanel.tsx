@@ -141,7 +141,7 @@ export default function PropertiesPanel() {
                                             <Button disabled icon={IconNames.PROPERTIES} onClick={() => dispatch(openDetailedView(node.uid))}>
                                                 Detailed View
                                             </Button>
-                                            
+
                                             <Button icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
                                                 Select internal pipes
                                             </Button>
