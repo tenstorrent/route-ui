@@ -3,10 +3,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
-import SVGData, {ComputeNode, ComputeNodeType, convertBytes, NOCLink, Pipe} from '../data/DataStructures';
+import SVGData, {ComputeNode, ComputeNodeType, convertBytes, LinkDirection, NOCLink, Pipe} from '../data/DataStructures';
 
 import FilterableComponent from './components/FilterableComponent';
-import {RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
+import {openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
 import {calculateLinkCongestionColor} from '../utils/DrawingAPI';
 import ProgressBar from './components/ProgressBar';
 import SelectableOperation from './components/SelectableOperation';
@@ -65,6 +65,18 @@ export default function PropertiesPanel() {
         return pipes;
     };
 
+    const getInternalPipeIDsForNode = (node: ComputeNode): string[] => {
+        const pipes: string[] = [];
+        const internalLinks = [LinkDirection.NOC0_IN, LinkDirection.NOC0_OUT, LinkDirection.NOC1_IN, LinkDirection.NOC1_OUT];
+        node.links.forEach((link) => {
+            if (internalLinks.includes(link.direction)) {
+                pipes.push(...link.pipes.map((pipe) => pipe.id));
+            }
+        });
+
+        return pipes;
+    };
+
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
             dispatch(updatePipeSelection({id: pipeId, selected: state}));
@@ -108,7 +120,11 @@ export default function PropertiesPanel() {
                                             </Tooltip>
                                         </h3>
                                         {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
-                                        {node.type === ComputeNodeType.DRAM ? <p>Channel {node.dramChannel}, Sub {node.dramSubchannel}</p> : null}
+                                        {node.type === ComputeNodeType.DRAM ? (
+                                            <p>
+                                                Channel {node.dramChannel}, Sub {node.dramSubchannel}
+                                            </p>
+                                        ) : null}
                                         {node.opName !== '' && (
                                             <div className="opname">
                                                 <Tooltip content={node.opName} position={PopoverPosition.TOP}>
@@ -122,6 +138,12 @@ export default function PropertiesPanel() {
                                             </div>
                                         )}
                                         <div className="node-controls">
+                                            <Button icon={IconNames.PROPERTIES} onClick={() => dispatch(openDetailedView(node.uid))}>
+                                                Detailed View
+                                            </Button>
+                                            <Button icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
+                                                Select internal pipes
+                                            </Button>
                                             <Button icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(getPipeIdsForNode(node), true)}>
                                                 Select all pipes
                                             </Button>
