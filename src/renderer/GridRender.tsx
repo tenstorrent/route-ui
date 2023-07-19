@@ -8,6 +8,7 @@ import {NODE_SIZE} from '../utils/DrawingAPI';
 import {clearAllOperations, clearAllPipes, updateLinkSatuation, updateShowLinkSaturation} from '../data/store';
 import NodeComponent from './NodeComponent';
 import {ComputeNode} from '../data/DataStructures';
+import DetailedView from './components/DetailedView';
 
 export default function GridRender() {
     const {svgData} = useContext<SVGContext>(DataSource);
@@ -103,6 +104,7 @@ export default function GridRender() {
                     })}
                 </div>
             </div>
+            <DetailedView />
         </>
     );
 }

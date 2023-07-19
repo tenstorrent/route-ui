@@ -173,7 +173,6 @@ export class ComputeNode {
         if (json.dram_channel !== undefined && json.dram_channel !== null) {
             this.dramChannel = json.dram_channel;
             this.dramSubchannel = json.dram_subchannel || 0;
-            console.log(this.dramChannel, this.dramSubchannel);
         }
         this.loc = {x: json.location[0], y: json.location[1]};
 

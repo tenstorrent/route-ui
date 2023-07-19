@@ -9,7 +9,7 @@ import {Button} from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
 import SVGData from '../../data/DataStructures';
 import yamlValidate from '../../data/DataUtils';
-import {loadedFilename, loadNodesData, loadPipeSelection} from '../../data/store';
+import {loadedFilename, loadNodesData, loadPipeSelection, setArchitecture} from '../../data/store';
 import {SVGJson} from '../../data/JSONDataTypes';
 
 interface FileLoaderProps {
@@ -46,10 +46,12 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                 try {
                     const doc = parse(data);
                     console.log(doc);
-                    const isValid = yamlValidate(doc);
+                    /* TEMPORARY vallidation off */
+                    const isValid = true; // yamlValidate(doc);
                     if (isValid) {
                         const svgData = new SVGData(doc as SVGJson);
                         updateData(svgData);
+                        dispatch(setArchitecture(svgData.architecture));
                         dispatch(loadedFilename(filename));
                         dispatch(loadPipeSelection(svgData.getAllPipeIds()));
                         dispatch(loadNodesData(svgData.getAllNodes()));

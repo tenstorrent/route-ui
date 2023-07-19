@@ -7,8 +7,16 @@ const TopHeaderComponent: React.FC = () => {
     const fileName = useSelector((state: RootState) => {
         return state.nodeSelection.filename;
     });
+    const architecture = useSelector((state: RootState) => {
+        return state.nodeSelection.architecture;
+    });
 
-    return <div className="top-header-component">{fileName ? `Loaded ${path.basename(fileName[0])}` : ''}</div>;
+    return (
+        <div className="top-header-component">
+            {fileName ? `Loaded ${path.basename(fileName[0])}` : ''} <br />
+            {architecture ? ` Architecture: ${architecture}` : ''}
+        </div>
+    );
 };
 
 export default TopHeaderComponent;

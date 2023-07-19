@@ -1,0 +1,17 @@
+<svg width="340" height="353" viewBox="0 0 340 353" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="Group 1">
+        <rect id="noc0router" width="150" height="50"/>
+        <rect id="noc1router" x="190" width="150" height="50"/>
+        <rect id="noc2axi0" y="110" width="150" height="50"/>
+        <rect id="noc2axi1" x="190" y="110" width="150" height="50"/>
+        <rect id="axi" x="72" y="220" width="214" height="50"/>
+        <rect id="offchip" x="72" y="320" width="214" height="33" fill="#D9D9D9"/>
+        <text id="NOC0 ROUTER" fill="black" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="32" y="29.8636">NOC0 ROUTER</tspan></text>
+        <text id="NOC1 ROUTER" fill="black" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="223" y="29.8636">NOC1 ROUTER</tspan></text>
+        <text id="NOC2AXI" fill="black" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="48.4219" y="139.864">NOC2AXI</tspan></text>
+        <text id="NOC2AXI_2" fill="black" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="238.422" y="139.864">NOC2AXI</tspan></text>
+        <text id="AXI 2:1 XBAR" fill="black" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="166.008" y="241.864">AXI&#10;</tspan>
+            <tspan x="150.094" y="256.864">2:1 XBAR</tspan></text>
+        <text id="Off-Chip DRAM" fill="black" xml:space="preserve" style="white-space: pre" font-family="Inter" font-size="12" letter-spacing="0em"><tspan x="131.295" y="340.864">Off-Chip DRAM</tspan></text>
+    </g>
+</svg>

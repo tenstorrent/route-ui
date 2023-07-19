@@ -1,5 +1,32 @@
 import {createSlice, configureStore, PayloadAction} from '@reduxjs/toolkit';
 
+interface DetailedViewState {
+    isOpen: boolean;
+    uid: number | null;
+}
+
+const detailedViewInitialState: DetailedViewState = {
+    isOpen: false,
+    uid: null,
+};
+
+export const detailedViewSlice = createSlice({
+    name: 'detailedView',
+    initialState: detailedViewInitialState,
+    reducers: {
+        openDetailedView: (state, action: PayloadAction<number>) => {
+            state.isOpen = true;
+            state.uid = action.payload;
+        },
+        closeDetailedView: (state) => {
+            state.isOpen = false;
+            state.uid = null;
+        },
+    },
+});
+
+export const {openDetailedView, closeDetailedView} = detailedViewSlice.actions;
+
 export interface PipeSelection {
     id: string;
     selected: boolean;
@@ -25,7 +52,7 @@ const pipeSelectionSlice = createSlice({
                 state.pipeIds.push(item.id);
             });
         },
-        updatePipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
+        updatePipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
             const {id, selected} = action.payload;
             if (state.pipes[id]) {
                 state.pipes[id].selected = selected;
@@ -43,9 +70,9 @@ export const getDramGroup = (state: RootState, id: number) => (id > -1 ? state.n
 export const {loadPipeSelection, updatePipeSelection, clearAllPipes} = pipeSelectionSlice.actions;
 
 export interface NodeData extends NodeSelection {
-    loc: {x: number; y: number};
+    loc: { x: number; y: number };
     opName: string;
-    border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
+    border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
     dramChannel: number | -1;
     dramSubchannel: number | -1;
 }
@@ -56,10 +83,11 @@ export interface NodeSelection {
 }
 
 interface NodeSelectionState {
-    groups: Record<string, {data: NodeData[]; selected: boolean}>;
+    groups: Record<string, { data: NodeData[]; selected: boolean }>;
     nodeList: NodeData[];
     filename: string;
-    dram: {data: NodeData[]; selected: boolean}[];
+    dram: { data: NodeData[]; selected: boolean }[];
+    architecture: string;
 }
 
 const nodesInitialState: NodeSelectionState = {
@@ -67,6 +95,7 @@ const nodesInitialState: NodeSelectionState = {
     groups: {},
     filename: '',
     dram: [],
+    architecture: '',
 };
 
 const setBorders = (nodes: NodeData[]) => {
@@ -91,6 +120,9 @@ const nodeSelectionSlice = createSlice({
     reducers: {
         loadedFilename(state, action: PayloadAction<string>) {
             state.filename = action.payload;
+        },
+        setArchitecture(state, action: PayloadAction<string>) {
+            state.architecture = action.payload;
         },
         loadNodesData(state, action: PayloadAction<NodeData[]>) {
             state.groups = {};
@@ -118,10 +150,9 @@ const nodeSelectionSlice = createSlice({
             });
             state.dram.forEach((dramElement) => {
                 setBorders(dramElement.data);
-                console.log(dramElement.data);
             });
         },
-        updateNodeSelection(state, action: PayloadAction<{id: number; selected: boolean}>) {
+        updateNodeSelection(state, action: PayloadAction<{ id: number; selected: boolean }>) {
             const {id, selected} = action.payload;
             const node: NodeData | undefined = state.nodeList[id];
 
@@ -136,7 +167,7 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
+        selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
             const {opName, selected} = action.payload;
             const group = state.groups[opName];
             if (group) {
@@ -153,7 +184,15 @@ const nodeSelectionSlice = createSlice({
 
 export const selectNodeSelectionById = (state: RootState, id: number) => state.nodeSelection.nodeList[id];
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
-export const {loadNodesData, updateNodeSelection, selectGroup, clearAllOperations, loadedFilename} = nodeSelectionSlice.actions;
+export const {
+    //
+    loadNodesData,
+    updateNodeSelection,
+    selectGroup,
+    clearAllOperations,
+    loadedFilename,
+    setArchitecture,
+} = nodeSelectionSlice.actions;
 
 const linkSaturationSlice = createSlice({
     name: 'linkSaturation',
@@ -179,6 +218,7 @@ const store = configureStore({
         pipeSelection: pipeSelectionSlice.reducer,
         nodeSelection: nodeSelectionSlice.reducer,
         linkSaturation: linkSaturationSlice.reducer,
+        detailedView: detailedViewSlice.reducer,
     },
 });
 

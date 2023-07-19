@@ -37,7 +37,7 @@ const ymlSchema = {
         },
         DRAMChannel: {
             type: 'object',
-            additionalProperties: false,
+            additionalProperties: true,
             properties: {
                 subchannels: {
                     type: 'array',
@@ -55,7 +55,7 @@ const ymlSchema = {
                     $ref: '#/definitions/Dram0Inout',
                 },
             },
-            required: ['dram0_inout', 'dram1_inout', 'subchannels'],
+            required: [],
             title: 'DRAMChannel',
         },
         MappedPipes: {

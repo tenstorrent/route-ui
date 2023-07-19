@@ -138,9 +138,10 @@ export default function PropertiesPanel() {
                                             </div>
                                         )}
                                         <div className="node-controls">
-                                            <Button icon={IconNames.PROPERTIES} onClick={() => dispatch(openDetailedView(node.uid))}>
+                                            <Button disabled icon={IconNames.PROPERTIES} onClick={() => dispatch(openDetailedView(node.uid))}>
                                                 Detailed View
                                             </Button>
+                                            
                                             <Button icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
                                                 Select internal pipes
                                             </Button>
