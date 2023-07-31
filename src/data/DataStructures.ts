@@ -99,11 +99,9 @@ export default class SVGData {
                 }
                 return a.loc.x - b.loc.x;
             });
-
-        // console.log(data.dram_channels,  typeof data.dram_channels);
+        
         if (data.dram_channels) {
             this.dramChannels = data.dram_channels.map((dramChannel) => {
-                console.log(dramChannel);
                 return new DramChannel(dramChannel.channel_id, dramChannel, totalOpCycles);
             });
         }
@@ -183,7 +181,7 @@ export class DramChannel {
 
     constructor(id: number, json: DramChannelJson, totalOpCycles: number) {
         this.id = id;
-        if(json.subchannels) {
+        if (json.subchannels) {
             this.subchannels = json.subchannels.map((subchannel, i) => {
                 return new DramSubchannel(i, subchannel);
             });
@@ -241,19 +239,7 @@ export class GenericNOCLink {
 }
 
 export class DramLink extends GenericNOCLink {
-    // public numOccupants: number = 0;
-
-    // public totalDataBytes: number = 0;
-
-    // public maxBandwidth: number = 0;
-
-    // public pipes: Pipe[] = []; // Map<string, Pipe>;
-
     public id: DramID;
-
-    // public bpc = 0;
-
-    // public linkSaturation = 0;
 
     constructor(id: DramID, json: NOCLinkJson, totalOpCycles: number) {
         super(id, json, totalOpCycles);
@@ -268,12 +254,9 @@ export class DramLink extends GenericNOCLink {
 export class NOCLink extends GenericNOCLink {
     public id: LinkID;
 
-    public direction: LinkID = LinkID.NONE;
-
     constructor(id: LinkID, json: NOCLinkJson, totalOpCycles: number) {
         super(id, json, totalOpCycles);
         this.id = id;
-        this.direction = id; // TODO: need to get rid of this
     }
 }
 

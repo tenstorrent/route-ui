@@ -50,8 +50,8 @@ export default function PropertiesPanel() {
         });
 
         return nocLinks.sort((a, b) => {
-            const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.direction) ?? Infinity;
-            const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.direction) ?? Infinity;
+            const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.id) ?? Infinity;
+            const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.id) ?? Infinity;
             return firstKeyOrder - secondKeyOrder;
         });
     };
@@ -70,7 +70,7 @@ export default function PropertiesPanel() {
         const pipes: string[] = [];
         const internalLinks = [LinkID.NOC0_IN, LinkID.NOC0_OUT, LinkID.NOC1_IN, LinkID.NOC1_OUT];
         node.links.forEach((link) => {
-            if (internalLinks.includes(link.direction)) {
+            if (internalLinks.includes(link.id)) {
                 pipes.push(...link.pipes.map((pipe) => pipe.id));
             }
         });

@@ -57,7 +57,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         if (showLinkSaturation) {
             node.links.forEach((link) => {
                 if (link.linkSaturation >= linkSaturationTreshold) {
-                    drawLink(svg, link.direction, calculateLinkCongestionColor(link.linkSaturation, 0), 5);
+                    drawLink(svg, link.id, calculateLinkCongestionColor(link.linkSaturation, 0), 5);
                 }
             });
         }
