@@ -87,23 +87,25 @@ export default function GridRender() {
                 </Tooltip>
                 <hr />
             </div>
-            <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
-                <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
-                    {svgData.nodes.map((node: ComputeNode) => {
-                        return (
-                            <NodeComponent
-                                node={node}
-                                showEmptyLinks={showEmptyLinks}
-                                showNodeLocation={showNodeLocation}
-                                showOperationColors={showOperationColors}
-                                showLinkSaturation={showLinkSaturation}
-                                linkSaturationTreshold={linkSaturationTreshold}
-                                key={node.uid}
-                            />
-                        );
-                    })}
+            {svgData && (
+                <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
+                    <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
+                        {svgData.nodes.map((node: ComputeNode) => {
+                            return (
+                                <NodeComponent
+                                    node={node}
+                                    showEmptyLinks={showEmptyLinks}
+                                    showNodeLocation={showNodeLocation}
+                                    showOperationColors={showOperationColors}
+                                    showLinkSaturation={showLinkSaturation}
+                                    linkSaturationTreshold={linkSaturationTreshold}
+                                    key={node.uid}
+                                />
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
             <DetailedView />
         </>
     );

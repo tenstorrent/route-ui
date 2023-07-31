@@ -24,6 +24,14 @@
     background-color: #a794ee;
 }
 
+.node-type {
+    border-bottom: 2px solid transparent;
+
+    &.detailed-view {
+        border-bottom: 2px solid #99ff00;
+    }
+}
+
 .main-wrapper {
     margin-top: 20px;
     display: flex;
@@ -96,6 +104,12 @@
                     bottom: $inset;
                     right: $inset;
                     z-index: 0;
+                }
+
+                &.detailed-view {
+                    .node-border {
+                        border: 2px solid #99ff00;
+                    }
                 }
             }
 
@@ -390,9 +404,11 @@
 
     }
 }
-.detailed-view-card{
+
+.detailed-view-card {
     color: #1c2127;
 }
+
 .detailed-view-wrap {
     color: #1c2127;
 

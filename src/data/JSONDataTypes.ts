@@ -15,6 +15,7 @@ export interface SVGJson {
     bw_limited_op_cycles: number;
     arch: string;
     nodes: NodeJson[];
+    dram_channels: DramChannelJson[];
 }
 
 export interface NOCLinkJson {
@@ -23,3 +24,12 @@ export interface NOCLinkJson {
     max_link_bw: number;
     mapped_pipes: {[key: string]: number};
 }
+
+export interface DramChannelJson {
+    channel_id: number;
+    subchannels: [{[key: string]: NOCLinkJson}];
+    dram0_inout: NOCLinkJson;
+    dram1_inout: NOCLinkJson;
+}
+
+

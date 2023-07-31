@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {ComputeNode, LinkDirection} from '../data/DataStructures';
+import {ComputeNode, DramID, LinkID} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
 
 export const NODE_SIZE = 100;
@@ -18,8 +18,10 @@ export const NOC_CONFIGURATION = {
     core: {x: CORE_CENTER.x, y: CORE_CENTER.y},
 };
 
-export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection, color?: string, stroke: number = 1) => {
-    const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
+export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkID, color?: string, stroke: number = 1) => {
+    const {lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform} = getLinkPoints(direction);
+    const {arr1, arr2, arr3} = arrow;
+    const {arr4, arr5, arr6} = arrowSecondary;
 
     /** TEMP DEBUGGING COLOR FUNCTION */
     // const getColor = () => {
@@ -44,12 +46,7 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
         .attr('stroke', color || '#4d4d4d');
 
     // arrowhead
-    if (
-        direction !== LinkDirection.NOC1_SOUTH_IN &&
-        direction !== LinkDirection.NOC0_WEST_IN &&
-        direction !== LinkDirection.NOC0_SOUTH_OUT &&
-        direction !== LinkDirection.NOC1_WEST_OUT
-    ) {
+    if (direction !== LinkID.NOC1_SOUTH_IN && direction !== LinkID.NOC0_WEST_IN && direction !== LinkID.NOC0_SOUTH_OUT && direction !== LinkID.NOC1_WEST_OUT) {
         selector
             // keeping this here for the prettier
             .append('polygon')
@@ -59,7 +56,7 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
             .attr('fill', '#7e7e7e');
     }
 };
-export const getLinkPoints = (direction: LinkDirection) => {
+export const getLinkPoints = (direction: LinkID | DramID) => {
     let lineStartX: number;
     let lineEndX: number;
     let lineStartY: number;
@@ -76,8 +73,10 @@ export const getLinkPoints = (direction: LinkDirection) => {
     let arr2;
     let arr3;
 
+    let arrowSecondary = {arr4: '', arr5: '', arr6: ''};
+
     switch (direction) {
-        case LinkDirection.NOC1_NORTH_OUT:
+        case LinkID.NOC1_NORTH_OUT:
             // up out
             arrowOffset = 5;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
@@ -89,7 +88,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
             arr2 = `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`;
             arr3 = `${lineEndX},${lineEndY + arrowOffset}`;
             break;
-        case LinkDirection.NOC1_SOUTH_IN:
+        case LinkID.NOC1_SOUTH_IN:
             // up in
             arrowOffset = 5;
 
@@ -108,7 +107,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
 
             break;
 
-        case LinkDirection.NOC1_EAST_IN:
+        case LinkID.NOC1_EAST_IN:
             // left in
 
             arrowOffset = 10;
@@ -122,7 +121,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
             arr3 = `${lineEndX + arrowOffset},${lineEndY}`;
 
             break;
-        case LinkDirection.NOC1_WEST_OUT:
+        case LinkID.NOC1_WEST_OUT:
             // left out
             arrowOffset = 0;
 
@@ -137,7 +136,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
 
             break;
 
-        case LinkDirection.NOC0_NORTH_IN:
+        case LinkID.NOC0_NORTH_IN:
             // down in
 
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET;
@@ -150,7 +149,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
             arr3 = `${lineEndX},${lineEndY - arrowOffset}`;
 
             break;
-        case LinkDirection.NOC0_SOUTH_OUT:
+        case LinkID.NOC0_SOUTH_OUT:
             // down out
             //
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET;
@@ -163,7 +162,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
 
             break;
         //
-        case LinkDirection.NOC0_EAST_OUT:
+        case LinkID.NOC0_EAST_OUT:
             // right out
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET;
             lineEndX = NODE_SIZE;
@@ -174,7 +173,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
             arr2 = `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY + arrowHeadWidth / 2}`;
             arr3 = `${lineEndX - arrowOffset},${lineEndY}`;
             break;
-        case LinkDirection.NOC0_WEST_IN:
+        case LinkID.NOC0_WEST_IN:
             // right in
             //     arrowOffset = 5;
             lineStartX = 0;
@@ -186,7 +185,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
             arr3 = `${lineEndX - arrowOffset},${lineEndY}`;
             break;
 
-        case LinkDirection.NOC0_IN:
+        case LinkID.NOC0_IN:
             arrowOffset = -10;
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
             lineEndX = CORE_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
@@ -200,7 +199,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
 
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
             break;
-        case LinkDirection.NOC0_OUT:
+        case LinkID.NOC0_OUT:
             arrowOffset = -10;
 
             lineStartX = CORE_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
@@ -214,11 +213,9 @@ export const getLinkPoints = (direction: LinkDirection) => {
             angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
 
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
-
-            transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
             break;
 
-        case LinkDirection.NOC1_IN:
+        case LinkID.NOC1_IN:
             arrowOffset = -10;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
             lineEndX = CORE_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
@@ -232,7 +229,7 @@ export const getLinkPoints = (direction: LinkDirection) => {
 
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
             break;
-        case LinkDirection.NOC1_OUT:
+        case LinkID.NOC1_OUT:
             arrowOffset = -10;
 
             lineStartX = CORE_CENTER.x + NOC_1_X_OFFSET + CORE_DISPERSION;
@@ -246,10 +243,49 @@ export const getLinkPoints = (direction: LinkDirection) => {
             angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
 
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+            break;
+        case DramID.NOC_IN:
+            lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET;
+            lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET;
+            lineStartY = 0;
+            lineEndY = NOC_CENTER.y + NOC_1_Y_OFFSET;
 
-            transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+            arr1 = `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`;
+            arr2 = `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`;
+            arr3 = `${lineEndX},${lineEndY - arrowOffset}`;
+
             break;
 
+        case DramID.NOC_OUT:
+            arrowOffset = 5;
+            lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
+            lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET;
+            lineEndY = 0;
+
+            arr1 = `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`;
+            arr2 = `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`;
+            arr3 = `${lineEndX},${lineEndY + arrowOffset}`;
+            break;
+        case DramID.NOC0_NOC2AXI:
+        case DramID.NOC1_NOC2AXI:
+            arrowOffset = 5;
+            lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
+            lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET;
+            lineEndY = 0;
+
+            arr1 = `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`;
+            arr2 = `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`;
+            arr3 = `${lineEndX},${lineEndY + arrowOffset}`;
+
+            arrowSecondary = {
+                arr4: `${lineStartX - arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
+                arr5: `${lineStartX + arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
+                arr6: `${lineStartX},${lineStartY - arrowOffset}`,
+            };
+
+            break;
         default:
             lineStartX = 0;
             lineStartY = 0;
@@ -257,26 +293,28 @@ export const getLinkPoints = (direction: LinkDirection) => {
             lineEndY = 0;
         // console.warn(`Invalid direction ${direction}`);
     }
-    return {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform};
+    return {lineEndX, lineEndY, lineStartX, lineStartY, arrow: {arr1, arr2, arr3}, arrowSecondary, transform};
 };
 
-export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkDirection, node: ComputeNode, selectedPipeIds: string[]) => {
-    const {lineEndX, lineEndY, lineStartX, lineStartY, arr1, arr2, arr3, transform} = getLinkPoints(direction);
-    const nodePipeIds = node.getPipesForDirection(direction);
-    const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
-
+export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkID | DramID, pipeIds: string[]) => {
+    const {lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform} = getLinkPoints(direction);
+    const {arr1, arr2, arr3} = arrow;
+    const {arr4, arr5, arr6} = arrowSecondary;
     const strokeLength = 5;
     if (pipeIds.length) {
-        if (
-            direction !== LinkDirection.NOC1_SOUTH_IN &&
-            direction !== LinkDirection.NOC0_WEST_IN &&
-            direction !== LinkDirection.NOC0_SOUTH_OUT &&
-            direction !== LinkDirection.NOC1_WEST_OUT
-        ) {
+        if (direction !== LinkID.NOC1_SOUTH_IN && direction !== LinkID.NOC0_WEST_IN && direction !== LinkID.NOC0_SOUTH_OUT && direction !== LinkID.NOC1_WEST_OUT) {
             svg
                 // only draw arrows for long links
                 .append('polygon')
                 .attr('points', `${arr1} ${arr2} ${arr3}`)
+                .attr('transform', transform)
+                .attr('fill', '#9e9e9e');
+        }
+        if (direction === DramID.NOC0_NOC2AXI || direction === DramID.NOC1_NOC2AXI) {
+            svg
+                // only draw arrows for long links
+                .append('polygon')
+                .attr('points', `${arr4} ${arr5} ${arr6}`)
                 .attr('transform', transform)
                 .attr('fill', '#9e9e9e');
         }
@@ -295,7 +333,12 @@ export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, 
             .attr('stroke-dasharray', dashArray.join(','))
             .attr('stroke-dashoffset', index * dashArray[0]);
     });
+};
 
+export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, direction: LinkID, node: ComputeNode, selectedPipeIds: string[]) => {
+    const nodePipeIds = node.getPipesForDirection(direction);
+    const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
+    drawPipesDirect(svg, direction, pipeIds);
     return pipeIds.length;
 };
 
@@ -317,4 +360,3 @@ export const calculateLinkCongestionColor = (value: number, min: number = 0): st
     const intensity = Math.round(ratio * 255);
     return `rgb(${intensity}, ${255 - intensity}, 0)`;
 };
-

@@ -1,8 +1,8 @@
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import * as d3 from 'd3';
-import {getDramGroup, getGroup, PipeSelection, RootState, selectNodeSelectionById, selectPipeSelectionById, updateNodeSelection} from '../data/store';
-import {ComputeNode, LinkDirection} from '../data/DataStructures';
+import {getDramGroup, getGroup, openDetailedView, PipeSelection, RootState, selectNodeSelectionById, selectPipeSelectionById, updateNodeSelection} from '../data/store';
+import {ComputeNode, LinkID} from '../data/DataStructures';
 import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
 import {getGroupColor} from '../data/ColorGenerator';
 
@@ -33,25 +33,25 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         .map((pipe: PipeSelection) => pipe.id);
 
     const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
-
+    const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
     const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
         if (showEmptyLinks) {
-            drawLink(svg, LinkDirection.NOC1_NORTH_OUT);
-            drawLink(svg, LinkDirection.NOC0_NORTH_IN);
-            drawLink(svg, LinkDirection.NOC1_SOUTH_IN);
-            drawLink(svg, LinkDirection.NOC0_SOUTH_OUT);
-            drawLink(svg, LinkDirection.NOC1_EAST_IN);
-            drawLink(svg, LinkDirection.NOC0_EAST_OUT);
-            drawLink(svg, LinkDirection.NOC0_WEST_IN);
-            drawLink(svg, LinkDirection.NOC1_WEST_OUT);
-            drawLink(svg, LinkDirection.NOC1_OUT);
-            drawLink(svg, LinkDirection.NOC0_OUT);
-            drawLink(svg, LinkDirection.NOC0_IN);
-            drawLink(svg, LinkDirection.NOC1_IN);
+            drawLink(svg, LinkID.NOC1_NORTH_OUT);
+            drawLink(svg, LinkID.NOC0_NORTH_IN);
+            drawLink(svg, LinkID.NOC1_SOUTH_IN);
+            drawLink(svg, LinkID.NOC0_SOUTH_OUT);
+            drawLink(svg, LinkID.NOC1_EAST_IN);
+            drawLink(svg, LinkID.NOC0_EAST_OUT);
+            drawLink(svg, LinkID.NOC0_WEST_IN);
+            drawLink(svg, LinkID.NOC1_WEST_OUT);
+            drawLink(svg, LinkID.NOC1_OUT);
+            drawLink(svg, LinkID.NOC0_OUT);
+            drawLink(svg, LinkID.NOC0_IN);
+            drawLink(svg, LinkID.NOC1_IN);
         }
 
         if (showLinkSaturation) {
@@ -64,19 +64,19 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
 
         let noc0numPipes = 0;
         let noc1numPipes = 0;
-        noc0numPipes += drawSelections(svg, LinkDirection.NOC0_EAST_OUT, node, selectedPipeIds);
-        noc0numPipes += drawSelections(svg, LinkDirection.NOC0_WEST_IN, node, selectedPipeIds);
-        noc0numPipes += drawSelections(svg, LinkDirection.NOC0_SOUTH_OUT, node, selectedPipeIds);
-        noc0numPipes += drawSelections(svg, LinkDirection.NOC0_NORTH_IN, node, selectedPipeIds);
-        noc0numPipes += drawSelections(svg, LinkDirection.NOC0_IN, node, selectedPipeIds);
-        noc0numPipes += drawSelections(svg, LinkDirection.NOC0_OUT, node, selectedPipeIds);
+        noc0numPipes += drawSelections(svg, LinkID.NOC0_EAST_OUT, node, selectedPipeIds);
+        noc0numPipes += drawSelections(svg, LinkID.NOC0_WEST_IN, node, selectedPipeIds);
+        noc0numPipes += drawSelections(svg, LinkID.NOC0_SOUTH_OUT, node, selectedPipeIds);
+        noc0numPipes += drawSelections(svg, LinkID.NOC0_NORTH_IN, node, selectedPipeIds);
+        noc0numPipes += drawSelections(svg, LinkID.NOC0_IN, node, selectedPipeIds);
+        noc0numPipes += drawSelections(svg, LinkID.NOC0_OUT, node, selectedPipeIds);
 
-        noc1numPipes += drawSelections(svg, LinkDirection.NOC1_NORTH_OUT, node, selectedPipeIds);
-        noc1numPipes += drawSelections(svg, LinkDirection.NOC1_SOUTH_IN, node, selectedPipeIds);
-        noc1numPipes += drawSelections(svg, LinkDirection.NOC1_WEST_OUT, node, selectedPipeIds);
-        noc1numPipes += drawSelections(svg, LinkDirection.NOC1_EAST_IN, node, selectedPipeIds);
-        noc1numPipes += drawSelections(svg, LinkDirection.NOC1_IN, node, selectedPipeIds);
-        noc1numPipes += drawSelections(svg, LinkDirection.NOC1_OUT, node, selectedPipeIds);
+        noc1numPipes += drawSelections(svg, LinkID.NOC1_NORTH_OUT, node, selectedPipeIds);
+        noc1numPipes += drawSelections(svg, LinkID.NOC1_SOUTH_IN, node, selectedPipeIds);
+        noc1numPipes += drawSelections(svg, LinkID.NOC1_WEST_OUT, node, selectedPipeIds);
+        noc1numPipes += drawSelections(svg, LinkID.NOC1_EAST_IN, node, selectedPipeIds);
+        noc1numPipes += drawSelections(svg, LinkID.NOC1_IN, node, selectedPipeIds);
+        noc1numPipes += drawSelections(svg, LinkID.NOC1_OUT, node, selectedPipeIds);
 
         if (noc0numPipes > 0) {
             drawNOC(svg, NOC_CONFIGURATION.noc0);
@@ -88,7 +88,12 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         //
     }, [svgRef, selectedPipeIds]);
     const triggerSelection = () => {
-        dispatch(updateNodeSelection({id: node.uid, selected: !nodeState.selected}));
+        const selectedState = nodeState.selected;
+        if (isOpen && selectedState) {
+            dispatch(openDetailedView(node.uid));
+        } else {
+            dispatch(updateNodeSelection({id: node.uid, selected: !nodeState.selected}));
+        }
     };
 
     let operationStyles = {};
@@ -139,7 +144,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
     }
 
     return (
-        <div className={`node-item  ${nodeState.selected ? 'selected' : ''}`} onClick={triggerSelection} role="button">
+        <div className={`node-item  ${nodeState.selected ? 'selected' : ''} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`} onClick={triggerSelection} role="button">
             <div className="group-border" style={operationStyles} />
             <div className="dram-border" style={dramStyles} />
             <div className="node-border" />
