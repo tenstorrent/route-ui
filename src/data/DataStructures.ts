@@ -99,7 +99,7 @@ export default class SVGData {
                 }
                 return a.loc.x - b.loc.x;
             });
-        
+
         if (data.dram_channels) {
             this.dramChannels = data.dram_channels.map((dramChannel) => {
                 return new DramChannel(dramChannel.channel_id, dramChannel, totalOpCycles);
