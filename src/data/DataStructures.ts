@@ -197,7 +197,7 @@ export class DramChannel {
         this.id = id;
         if (json.subchannels) {
             this.subchannels = json.subchannels.map((subchannel, i) => {
-                return new DramSubchannel(i, subchannel);
+                return new DramSubchannel(i, subchannel, totalOpCycles);
             });
             this.links.push(new DramLink(DramID.DRAM0_INOUT, json.dram0_inout, totalOpCycles));
             this.links.push(new DramLink(DramID.DRAM1_INOUT, json.dram1_inout, totalOpCycles));
@@ -210,12 +210,12 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, json: { [key: string]: NOCLinkJson }) {
+    constructor(id: number, json: { [key: string]: NOCLinkJson }, totalOpCycles: number) {
         this.subchannelId = id;
         Object.entries(json).forEach(([key, value]) => {
             // console.log(`Key: ${key}`);
             // console.log(value);
-            this.links.push(new DramLink(key as DramID, value, 0));
+            this.links.push(new DramLink(key as DramID, value, totalOpCycles));
             // Here you can access key and value for each entry in your object
         });
         // this.links = json.forEach((link, i) => {

@@ -80,7 +80,7 @@ export default function GridRender() {
                     </Button>
                 </Tooltip>
                 <hr />
-                <Tooltip content="Decelect all operations">
+                <Tooltip content="Deselect all operations">
                     <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
                         Deselect ops
                     </Button>
@@ -106,7 +106,8 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
-            <DetailedView />
+            <DetailedView showLinkSaturation={showLinkSaturation}
+                          linkSaturationTreshold={linkSaturationTreshold} />
         </>
     );
 }

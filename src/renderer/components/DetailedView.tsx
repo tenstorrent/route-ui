@@ -1,14 +1,20 @@
 import React, {useContext, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Card, Overlay} from '@blueprintjs/core';
+import {Button, Card, Overlay, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
-import {closeDetailedView, RootState} from '../../data/store';
+import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
 import DataSource, {SVGContext} from '../../data/DataSource';
 import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramID, LinkID, NOC, NOCLink} from '../../data/DataStructures';
 import './detailed-view-components/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
+import {getInternalPipeIDsForNode} from '../../data/utils';
 
-const DetailedView: React.FC = () => {
+interface DetailedViewProps {
+    showLinkSaturation: boolean;
+    linkSaturationTreshold: number;
+}
+
+const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSaturationTreshold}) => {
     const {svgData} = useContext<SVGContext>(DataSource);
     const architecture = useSelector((state: RootState) => {
         return state.nodeSelection.architecture;
@@ -29,13 +35,14 @@ const DetailedView: React.FC = () => {
             setNode(selectedNode || null);
             setNodeList(allNodes || []);
             setDram(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
-
-            // console.log(selectedNode);
-            // console.log(allNodes);
-            // console.log(svgData?.dramChannels);
-            // console.log(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel));
         }
     }, [uid, svgData, isOpen]);
+
+    const changePipeState = (pipeList: string[], state: boolean) => {
+        pipeList.forEach((pipeId) => {
+            dispatch(updatePipeSelection({id: pipeId, selected: state}));
+        });
+    };
 
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false}>
@@ -53,7 +60,7 @@ const DetailedView: React.FC = () => {
                             {node.type} {node.loc.x},{node.loc.y}
                         </h3>
                     )}
-                    <Button icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
+                    <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                 </div>
                 <div className={`detailed-view-wrap arch-${architecture} type-${node?.type}`}>
                     {node?.type === ComputeNodeType.DRAM && dram && (
@@ -72,9 +79,33 @@ const DetailedView: React.FC = () => {
                                     }
                                     return (
                                         <div key={subchannel.subchannelId} className={`${node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''} subchannel`}>
-                                            {dram?.subchannels.length > 1 && <h3 className="subchannel-name">Subchannel {subchannel.subchannelId}</h3>}
-                                            <div className=" dram-subchannel">
-                                                <div className=" noc noc0">
+                                            {dram?.subchannels.length > 1 && (
+                                                <h3 className="subchannel-name">
+                                                    {currentNode && (
+                                                        <Button
+                                                            style={{marginRight: '5px'}}
+                                                            small
+                                                            disabled={currentNode.uid === node.uid}
+                                                            icon={IconNames.PROPERTIES}
+                                                            onClick={() => {
+                                                                dispatch(updateNodeSelection({id: currentNode.uid, selected: true}));
+                                                                dispatch(openDetailedView(currentNode.uid));
+                                                            }}
+                                                        />
+                                                    )}
+                                                    Sub {subchannel.subchannelId} [{currentNode?.loc.x},{currentNode?.loc.y}]
+                                                </h3>
+                                            )}
+                                            <Button
+                                                className="pipe-selection"
+                                                small
+                                                icon={IconNames.FILTER_LIST}
+                                                onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), true)}
+                                            >
+                                                Select internal pipes
+                                            </Button>
+                                            <div className="dram-subchannel">
+                                                <div className="noc noc0">
                                                     <div className=" router">
                                                         <p className="label">
                                                             NOC0

@@ -11,6 +11,7 @@ import {calculateLinkCongestionColor} from '../utils/DrawingAPI';
 import ProgressBar from './components/ProgressBar';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
+import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
 
 export default function PropertiesPanel() {
     const {svgData} = useContext(DataSource);
@@ -42,41 +43,6 @@ export default function PropertiesPanel() {
         });
         setOperationsList(opList);
     }, []);
-
-    const getLinksForNode = (node: ComputeNode): NOCLink[] => {
-        const nocLinks: NOCLink[] = [];
-        node.links.forEach((l) => {
-            nocLinks.push(l);
-        });
-
-        return nocLinks.sort((a, b) => {
-            const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.id) ?? Infinity;
-            const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.id) ?? Infinity;
-            return firstKeyOrder - secondKeyOrder;
-        });
-    };
-
-    const getPipeIdsForNode = (node: ComputeNode): string[] => {
-        const pipes: string[] = [];
-
-        node.links.forEach((link) => {
-            pipes.push(...link.pipes.map((pipe) => pipe.id));
-        });
-
-        return pipes;
-    };
-
-    const getInternalPipeIDsForNode = (node: ComputeNode): string[] => {
-        const pipes: string[] = [];
-        const internalLinks = [LinkID.NOC0_IN, LinkID.NOC0_OUT, LinkID.NOC1_IN, LinkID.NOC1_OUT];
-        node.links.forEach((link) => {
-            if (internalLinks.includes(link.id)) {
-                pipes.push(...link.pipes.map((pipe) => pipe.id));
-            }
-        });
-
-        return pipes;
-    };
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -113,6 +79,7 @@ export default function PropertiesPanel() {
                                             {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
                                             <Tooltip content="Close ComputeNode">
                                                 <Button
+                                                    small
                                                     icon={IconNames.CROSS}
                                                     onClick={() => {
                                                         selectNode(node, false);
@@ -140,18 +107,23 @@ export default function PropertiesPanel() {
                                         )}
                                         <div className="node-controls">
                                             {node.type === ComputeNodeType.DRAM && (
-                                                <Button icon={IconNames.PROPERTIES} disabled={node.uid === uid && isOpen} onClick={() => dispatch(openDetailedView(node.uid))}>
+                                                <Button
+                                                    small
+                                                    icon={IconNames.PROPERTIES}
+                                                    disabled={node.uid === uid && isOpen}
+                                                    onClick={() => dispatch(openDetailedView(node.uid))}
+                                                >
                                                     Detailed View
                                                 </Button>
                                             )}
 
-                                            <Button icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
+                                            <Button small icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
                                                 Select internal pipes
                                             </Button>
-                                            <Button icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(getPipeIdsForNode(node), true)}>
+                                            <Button small icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(getPipeIdsForNode(node), true)}>
                                                 Select all pipes
                                             </Button>
-                                            <Button icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(getPipeIdsForNode(node), false)}>
+                                            <Button small icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(getPipeIdsForNode(node), false)}>
                                                 Deselect all pipes
                                             </Button>
                                         </div>
