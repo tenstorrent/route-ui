@@ -124,4 +124,13 @@
     .pipe-selection {
         margin-bottom: 5px;
     }
+
+    .controls-wrap {
+        display: flex;
+        gap: 5px;
+
+        .bp4-button:not([class*=bp4-intent-]):disabled, .bp4-button:not([class*=bp4-intent-]).bp4-disabled {
+            color: #000;
+        }
+    }
 }

@@ -77,6 +77,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                         noc1links.push(currentNode.links.get(LinkID.NOC1_IN) as NOCLink);
                                         noc1links.push(currentNode.links.get(LinkID.NOC1_OUT) as NOCLink);
                                     }
+                                    const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
                                     return (
                                         <div key={subchannel.subchannelId} className={`${node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''} subchannel`}>
                                             {dram?.subchannels.length > 1 && (
@@ -96,14 +97,23 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                     Sub {subchannel.subchannelId} [{currentNode?.loc.x},{currentNode?.loc.y}]
                                                 </h3>
                                             )}
-                                            <Button
-                                                className="pipe-selection"
-                                                small
-                                                icon={IconNames.FILTER_LIST}
-                                                onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), true)}
-                                            >
-                                                Select internal pipes
-                                            </Button>
+                                            <div className="controls-wrap">
+                                                
+                                                <Button
+                                                    className="pipe-selection"
+                                                    small
+                                                    icon={IconNames.FILTER_LIST}
+                                                    disabled={numPipes === 0}
+                                                    onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), true)}
+                                                />
+                                                <Button
+                                                    className="pipe-selection"
+                                                    small
+                                                    icon={IconNames.FILTER_REMOVE}
+                                                    disabled={numPipes === 0}
+                                                    onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), false)}
+                                                />
+                                            </div>
                                             <div className="dram-subchannel">
                                                 <div className="noc noc0">
                                                     <div className=" router">
