@@ -4,12 +4,15 @@ import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, RootState} from '../../data/store';
 import DataSource, {SVGContext} from '../../data/DataSource';
-import {ComputeNode, ComputeNodeType, DramChannel, DramID, LinkID, NOC, NOCLink} from '../../data/DataStructures';
+import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramID, LinkID, NOC, NOCLink} from '../../data/DataStructures';
 import './detailed-view-components/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 
 const DetailedView: React.FC = () => {
     const {svgData} = useContext<SVGContext>(DataSource);
+    const architecture = useSelector((state: RootState) => {
+        return state.nodeSelection.architecture;
+    });
     const dispatch = useDispatch();
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
     const [node, setNode] = React.useState<ComputeNode | null>(null);
@@ -52,10 +55,10 @@ const DetailedView: React.FC = () => {
                     )}
                     <Button icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                 </div>
-                <div className="detailed-view-wrap">
+                <div className={`detailed-view-wrap arch-${architecture} type-${node?.type}`}>
                     {node?.type === ComputeNodeType.DRAM && dram && (
                         <div className="dram">
-                            <div className="dram-channels">
+                            <div className="dram-subchannels">
                                 {dram?.subchannels.map((subchannel) => {
                                     const currentNode = nodeList.find((n) => n.dramSubchannel === subchannel.subchannelId);
                                     // console.log(nodeList);
@@ -69,7 +72,7 @@ const DetailedView: React.FC = () => {
                                     }
                                     return (
                                         <div key={subchannel.subchannelId} className={`${node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''} subchannel`}>
-                                            <h3 className="subchannel-name">Subchannel {subchannel.subchannelId}</h3>
+                                            {dram?.subchannels.length > 1 && <h3 className="subchannel-name">Subchannel {subchannel.subchannelId}</h3>}
                                             <div className=" dram-subchannel">
                                                 <div className=" noc noc0">
                                                     <div className=" router">
@@ -106,20 +109,34 @@ const DetailedView: React.FC = () => {
                             </div>
                             <div className="axi">
                                 <p className="label">AXI</p>
+                                {architecture === ARCHITECTURE.WORMHOLE && <>6:2 XBAR</>}
+                                {architecture === ARCHITECTURE.GRAYSKULL && <>2:1 XBAR</>}
                             </div>
                             <div className="off-chip">
-                                <div className="axi-dram-wrap">
-                                    <PipeRenderer className="centered-svg" links={dram.links.filter((link) => link.id === DramID.DRAM0_INOUT)} />
-                                    <div className="axi-dram">
-                                        <p className="label">AXI DRAM0</p>
+                                {architecture === ARCHITECTURE.WORMHOLE && (
+                                    <>
+                                        <div className="axi-dram-wrap">
+                                            <PipeRenderer className="centered-svg" links={dram.links.filter((link) => link.id === DramID.DRAM0_INOUT)} />
+                                            <div className="axi-dram">
+                                                <p className="label">AXI DRAM0</p>
+                                            </div>
+                                        </div>
+                                        <div className="axi-dram-wrap">
+                                            <PipeRenderer className="centered-svg" links={dram.links.filter((link) => link.id === DramID.DRAM1_INOUT)} />
+                                            <div className="axi-dram">
+                                                <p className="label">AXI DRAM1</p>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                                {architecture === ARCHITECTURE.GRAYSKULL && (
+                                    <div className="axi-dram-wrap">
+                                        <PipeRenderer className="centered-svg" links={dram.links.filter((link) => link.id === DramID.DRAM0_INOUT)} />
+                                        <div className="axi-dram">
+                                            <p className="label">Off-chip DRAM</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="axi-dram-wrap">
-                                    <PipeRenderer className="centered-svg" links={dram.links.filter((link) => link.id === DramID.DRAM1_INOUT)} />
-                                    <div className="axi-dram">
-                                        <p className="label">AXI DRAM1</p>
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     )}

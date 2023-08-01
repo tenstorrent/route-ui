@@ -272,7 +272,7 @@ export const getLinkPoints = (linkID: LinkID | DramID) => {
             arrowOffset = 5;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
             lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
-            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET*2;
+            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
             lineEndY = 0;
             arrow = {
                 p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
@@ -280,6 +280,8 @@ export const getLinkPoints = (linkID: LinkID | DramID) => {
                 p3: `${lineEndX},${lineEndY + arrowOffset}`,
             };
             break;
+        // TODO: needs to be refactored to something more generic
+        case DramID.DRAM_INOUT:
         case DramID.NOC0_NOC2AXI:
         case DramID.NOC1_NOC2AXI:
             arrowOffset = 5;
@@ -333,7 +335,7 @@ export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown,
                 .attr('transform', transform)
                 .attr('fill', '#9e9e9e');
         }
-        if (linkID === DramID.NOC0_NOC2AXI || linkID === DramID.NOC1_NOC2AXI) {
+        if (linkID === DramID.NOC0_NOC2AXI || DramID.NOC1_NOC2AXI || DramID.DRAM_INOUT) {
             svg
                 //
                 .append('polygon')

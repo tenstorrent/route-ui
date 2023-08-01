@@ -28,7 +28,7 @@
         margin: 0;
     }
 
-    .dram-channels {
+    .dram-subchannels {
         display: flex;
         flex-direction: row;
         gap: 20px;
@@ -107,9 +107,17 @@
 
         .svg {
             margin-left: 15px;
+
             &.centered-svg {
                 margin-left: 0px;
             }
+        }
+    }
+
+    &.arch-grayskull {
+        .axi {
+            width: 200px;
+            margin: 0 auto;
         }
     }
 }

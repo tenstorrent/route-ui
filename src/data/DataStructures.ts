@@ -17,11 +17,18 @@ export enum LinkID {
     NOC1_NORTH_OUT = 'noc1_out_north',
 }
 
+export enum ARCHITECTURE {
+    NONE = '',
+    GRAYSKULL = 'grayskull',
+    WORMHOLE = 'wormhole',
+}
+
 export enum DramID {
     NOC_IN = 'noc_in',
     NOC_OUT = 'noc_out',
     NOC0_NOC2AXI = 'noc0_noc2axi',
     NOC1_NOC2AXI = 'noc1_noc2axi',
+    DRAM_INOUT = 'dram_inout',
     DRAM0_INOUT = 'dram0_inout',
     DRAM1_INOUT = 'dram1_inout',
 }
@@ -70,7 +77,7 @@ export default class SVGData {
 
     public bwLimitedOpCycles: number = 0;
 
-    public architecture: string = '';
+    public architecture: ARCHITECTURE = ARCHITECTURE.NONE;
 
     private uniquePipeList: Pipe[] = [];
 
@@ -81,7 +88,14 @@ export default class SVGData {
 
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
-        this.architecture = data.arch;
+        if (data.arch) {
+            if (data.arch.includes(ARCHITECTURE.GRAYSKULL)) {
+                this.architecture = ARCHITECTURE.GRAYSKULL;
+            }
+            if (data.arch.includes(ARCHITECTURE.WORMHOLE)) {
+                this.architecture = ARCHITECTURE.WORMHOLE;
+            }
+        }
 
         const totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
@@ -154,7 +168,7 @@ export default class SVGData {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: {[key: string]: Pipe} = {};
+        const uniquePipeObj: { [key: string]: Pipe } = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -196,7 +210,7 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, json: {[key: string]: NOCLinkJson}) {
+    constructor(id: number, json: { [key: string]: NOCLinkJson }) {
         this.subchannelId = id;
         Object.entries(json).forEach(([key, value]) => {
             // console.log(`Key: ${key}`);

@@ -41,11 +41,12 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, className}) => {
                         link.pipes.map((pipe) => pipe.id)
                     );
                     break;
+                case DramID.DRAM_INOUT:
                 case DramID.DRAM0_INOUT:
                 case DramID.DRAM1_INOUT:
                     drawPipesDirect(
                         svg,
-                        DramID.NOC0_NOC2AXI,
+                        DramID.DRAM_INOUT,
                         link.pipes.map((pipe) => pipe.id)
                     );
                     break;

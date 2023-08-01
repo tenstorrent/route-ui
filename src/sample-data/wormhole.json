@@ -13615,7 +13615,7 @@
                     }
                 }
             ],
-            "dram0_inout": {
+            "ext_inout": {
                 "num_occupants": 1,
                 "total_data_in_bytes": 286720,
                 "mapped_pipes": {
@@ -13623,7 +13623,44 @@
                 },
                 "max_link_bw": 10.67
             },
-            "dram1_inout": {
+            "ext0_inout": {
+                "num_occupants": 1,
+                "total_data_in_bytes": 286720,
+                "mapped_pipes": {
+                    "1990000000000": 286720
+                },
+                "max_link_bw": 10.67
+            },
+            "ext1_inout": {
+                "num_occupants": 1,
+                "total_data_in_bytes": 286720,
+                "mapped_pipes": {
+                    "1990000000000": 286720
+                },
+                "max_link_bw": 10.67
+            }
+        },
+        {
+            "channel_id": 5,
+            "subchannels": [
+                {
+                    "noc0_noc2axi": {
+                        "num_occupants": 0,
+                        "total_data_in_bytes": 0,
+                        "mapped_pipes": {},
+                        "max_link_bw": 32
+                    },
+                    "noc1_noc2axi": {
+                        "num_occupants": 1,
+                        "total_data_in_bytes": 286720,
+                        "mapped_pipes": {
+                            "1990000000000": 286720
+                        },
+                        "max_link_bw": 32
+                    }
+                }
+            ],
+            "ext_inout": {
                 "num_occupants": 1,
                 "total_data_in_bytes": 286720,
                 "mapped_pipes": {
