@@ -222,6 +222,11 @@
         align-content: center;
         gap: 10px;
         margin-bottom: 5px;
+        color: #fff;
+
+        span {
+            color: #fff;
+        }
 
         &.inactive {
             color: #a5a5a5;
