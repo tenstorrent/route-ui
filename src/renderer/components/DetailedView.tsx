@@ -98,7 +98,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                 </h3>
                                             )}
                                             <div className="controls-wrap">
-                                                
+
                                                 <Button
                                                     className="pipe-selection"
                                                     small

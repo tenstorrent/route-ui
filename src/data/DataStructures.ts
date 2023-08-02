@@ -168,7 +168,7 @@ export default class SVGData {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: { [key: string]: Pipe } = {};
+        const uniquePipeObj: {[key: string]: Pipe} = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -199,8 +199,9 @@ export class DramChannel {
             this.subchannels = json.subchannels.map((subchannel, i) => {
                 return new DramSubchannel(i, subchannel, totalOpCycles);
             });
-            this.links.push(new DramLink(DramID.DRAM0_INOUT, json.dram0_inout, totalOpCycles));
-            this.links.push(new DramLink(DramID.DRAM1_INOUT, json.dram1_inout, totalOpCycles));
+            if (json.dram_inout) this.links.push(new DramLink(DramID.DRAM_INOUT, json.dram_inout, totalOpCycles));
+            if (json.dram0_inout) this.links.push(new DramLink(DramID.DRAM0_INOUT, json.dram0_inout, totalOpCycles));
+            if (json.dram1_inout) this.links.push(new DramLink(DramID.DRAM1_INOUT, json.dram1_inout, totalOpCycles));
         }
     }
 }
@@ -210,16 +211,11 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, json: { [key: string]: NOCLinkJson }, totalOpCycles: number) {
+    constructor(id: number, json: {[key: string]: NOCLinkJson}, totalOpCycles: number) {
         this.subchannelId = id;
         Object.entries(json).forEach(([key, value]) => {
-            // console.log(`Key: ${key}`);
-            // console.log(value);
             this.links.push(new DramLink(key as DramID, value, totalOpCycles));
-            // Here you can access key and value for each entry in your object
         });
-        // this.links = json.forEach((link, i) => {
-        //     return new DramLink(link);
     }
 }
 

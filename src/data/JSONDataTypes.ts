@@ -28,8 +28,9 @@ export interface NOCLinkJson {
 export interface DramChannelJson {
     channel_id: number;
     subchannels: [{[key: string]: NOCLinkJson}];
-    dram0_inout: NOCLinkJson;
-    dram1_inout: NOCLinkJson;
+    dram_inout: NOCLinkJson | null;
+    dram0_inout: NOCLinkJson | null;
+    dram1_inout: NOCLinkJson | null;
 }
 
 
