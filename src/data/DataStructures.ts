@@ -1,5 +1,5 @@
 import {NodeData, PipeSelection} from './store';
-import {SVGJson, NodeJson, NOCLinkJsonInternal, NOCLinkJson, DramChannelJson} from './JSONDataTypes';
+import {SVGJson, NodeJson, NOCLinkJson, DramChannelJson} from './JSONDataTypes';
 
 export enum LinkID {
     NONE = 'none',
