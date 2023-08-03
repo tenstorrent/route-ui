@@ -1,28 +1,24 @@
-import React, {useContext, useEffect, useRef} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Card, Overlay, Tooltip} from '@blueprintjs/core';
+import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
 import DataSource, {SVGContext} from '../../data/DataSource';
-import {ARCHITECTURE, ComputeNode, ComputeNodeType, convertBytes, DramChannel, DramID, LinkID, NOC, NOCLink, Pipe} from '../../data/DataStructures';
+import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramID, LinkID, NOC, NOCLink} from '../../data/DataStructures';
 import './detailed-view-components/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
-import {getInternalLinksForNode, getInternalPipeIDsForNode, getLinksForNode} from '../../data/utils';
-import {calculateLinkCongestionColor} from '../../utils/DrawingAPI';
-import ProgressBar from './ProgressBar';
-import SelectablePipe from './SelectablePipe';
+import {getInternalLinksForNode, getInternalPipeIDsForNode} from '../../data/utils';
 import LinkComponent from './LinkComponent';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
     linkSaturationTreshold: number;
+    zoom: number;
 }
 
-const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSaturationTreshold}) => {
+const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSaturationTreshold, zoom}) => {
     const {svgData} = useContext<SVGContext>(DataSource);
-    const architecture = useSelector((state: RootState) => {
-        return state.nodeSelection.architecture;
-    });
+    const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);
     const dispatch = useDispatch();
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
     const [node, setNode] = React.useState<ComputeNode | null>(null);
@@ -39,10 +35,6 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
             setNode(selectedNode || null);
             setNodeList(allNodes || []);
             setDram(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
-
-            console.log(selectedNode);
-            console.log(allNodes);
-            console.log(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel));
         }
     }, [uid, svgData, isOpen]);
 
@@ -60,6 +52,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                     bottom: '10px',
                     left: '10px',
                     zIndex: 100,
+                    zoom,
                 }}
             >
                 <div className="detailed-view-header">
@@ -77,7 +70,6 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 <div className="dram-subchannels">
                                     {dram?.subchannels.map((subchannel) => {
                                         const currentNode = nodeList.find((n) => n.dramSubchannel === subchannel.subchannelId);
-                                        // console.log(nodeList);
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
                                         if (currentNode) {
@@ -217,7 +209,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
                                         return getInternalLinksForNode(n).map((link: NOCLink) => {
-                                            return <LinkComponent link={link} index={index} showEmpty={false} />;
+                                            return <LinkComponent link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
                                         });
                                     })}
                                     {dram.subchannels
