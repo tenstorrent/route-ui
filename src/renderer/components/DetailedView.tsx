@@ -5,7 +5,7 @@ import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
 import DataSource, {SVGContext} from '../../data/DataSource';
 import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramID, LinkID, NOC, NOCLink} from '../../data/DataStructures';
-import './detailed-view-components/DetailedView.scss';
+import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 import {getInternalLinksForNode, getInternalPipeIDsForNode} from '../../data/utils';
 import LinkComponent from './LinkComponent';

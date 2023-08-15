@@ -1,14 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
+import {Button, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
-import SVGData, {ComputeNode, ComputeNodeType, convertBytes, LinkID, NOCLink, Pipe} from '../data/DataStructures';
+import {ComputeNode, ComputeNodeType, NOCLink} from '../data/DataStructures';
 
 import FilterableComponent from './components/FilterableComponent';
 import {openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
-import {calculateLinkCongestionColor} from '../utils/DrawingAPI';
-import ProgressBar from './components/ProgressBar';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
