@@ -335,6 +335,20 @@
     display: flex;
     min-width: 250px;
 
+    .bp4-input-group {
+        display: flex;
+        align-items: center;
+
+        .bp4-input-action {
+            top: unset;
+            >.bp4-icon{
+                margin-right:5px;
+                svg{
+                    fill: $tt-dark-gray
+                }
+            }
+        }
+    }
 }
 
 .opname,

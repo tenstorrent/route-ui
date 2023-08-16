@@ -146,7 +146,24 @@ export default function PropertiesPanel() {
                     panel={
                         <div className="pipe-renderer-panel">
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
+                                <InputGroup
+                                    rightElement={
+                                        pipeFilter ? (
+                                            <Button
+                                                minimal
+                                                onClick={() => {
+                                                    setPipeFilter('');
+                                                }}
+                                                icon={IconNames.CROSS}
+                                            />
+                                        ) : (
+                                            <Icon icon={IconNames.SEARCH} />
+                                        )
+                                    }
+                                    placeholder=""
+                                    value={pipeFilter}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}
+                                />
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
@@ -177,7 +194,24 @@ export default function PropertiesPanel() {
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
+                                <InputGroup
+                                    rightElement={
+                                        opsFilter ? (
+                                            <Button
+                                                minimal
+                                                onClick={() => {
+                                                    setOpsFilter('');
+                                                }}
+                                                icon={IconNames.CROSS}
+                                            />
+                                        ) : (
+                                            <Icon icon={IconNames.SEARCH} />
+                                        )
+                                    }
+                                    placeholder=""
+                                    value={opsFilter}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}
+                                />
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
