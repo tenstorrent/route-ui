@@ -15,6 +15,7 @@ type PipeRendererProps = {
 const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, linkSaturationTreshold, className}) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
+    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
 
     const validLinkIds = [
         LinkID.NOC0_IN,
@@ -35,7 +36,7 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
         const drawCongestion = (link: GenericNOCLink, id: DramID | LinkID) => {
             if (showLinkSaturation) {
                 if (link.linkSaturation >= linkSaturationTreshold) {
-                    drawLink(svg, id, calculateLinkCongestionColor(link.linkSaturation, 0), 5);
+                    drawLink(svg, id, calculateLinkCongestionColor(link.linkSaturation, 0, isHighContrast), 5);
                 }
             }
         };
@@ -75,7 +76,7 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
                 }
             }
         });
-    }, [svgRef, links, allPipes]);
+    }, [svgRef, links, allPipes, isHighContrast]);
     return (
         <div className="pipe-renderer">
             {/* DEBUGGING CODE BELOW */}

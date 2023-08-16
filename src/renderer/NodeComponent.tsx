@@ -16,14 +16,14 @@ interface NodeComponentProps {
 }
 
 const NodeComponent: React.FC<NodeComponentProps> = ({
-    node,
-    showEmptyLinks,
-    showOperationColors,
-    showNodeLocation,
-    showLinkSaturation,
-    linkSaturationTreshold,
-    //
-}) => {
+                                                         node,
+                                                         showEmptyLinks,
+                                                         showOperationColors,
+                                                         showNodeLocation,
+                                                         showLinkSaturation,
+                                                         linkSaturationTreshold,
+                                                         //
+                                                     }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const dispatch = useDispatch();
@@ -35,6 +35,8 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
     const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
     const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
+    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
+
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
@@ -57,7 +59,8 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         if (showLinkSaturation) {
             node.links.forEach((link) => {
                 if (link.linkSaturation >= linkSaturationTreshold) {
-                    drawLink(svg, link.id, calculateLinkCongestionColor(link.linkSaturation, 0), 5);
+                    const color = calculateLinkCongestionColor(link.linkSaturation, 0, isHighContrast);
+                    drawLink(svg, link.id, color, 5);
                 }
             });
         }
@@ -86,7 +89,7 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
         }
 
         //
-    }, [svgRef, selectedPipeIds]);
+    }, [svgRef, selectedPipeIds, isHighContrast]);
     const triggerSelection = () => {
         const selectedState = nodeState.selected;
         if (isOpen && selectedState) {

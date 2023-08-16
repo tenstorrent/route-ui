@@ -370,7 +370,7 @@ export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, 
     return pipeIds.length;
 };
 
-export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: { x: number; y: number }) => {
+export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: {x: number; y: number}) => {
     svg.append('circle')
         //
         .attr('cx', point.x)
@@ -381,10 +381,14 @@ export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, u
         .attr('stroke', '#9e9e9e');
 };
 
-export const calculateLinkCongestionColor = (value: number, min: number = 0): string => {
+export const calculateLinkCongestionColor = (value: number, min: number = 0, isHC: boolean = false): string => {
     const max = 120;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
     const intensity = Math.round(ratio * 255);
+    if (isHC) {
+        return `rgb(${intensity},${intensity},${255 - intensity})`;
+    }
+
     return `rgb(${intensity}, ${255 - intensity}, 0)`;
 };

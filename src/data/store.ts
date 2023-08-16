@@ -1,5 +1,25 @@
 import {createSlice, configureStore, PayloadAction} from '@reduxjs/toolkit';
 
+interface HighContrastState {
+    enabled: boolean;
+}
+
+const highContrastInitialState: HighContrastState = {
+    enabled: false,
+};
+
+export const highContrastSlice = createSlice({
+    name: 'highContrast',
+    initialState: highContrastInitialState,
+    reducers: {
+        setHighContrastState: (state, action: PayloadAction<boolean>) => {
+            state.enabled = action.payload;
+        },
+    },
+});
+export const {setHighContrastState} = highContrastSlice.actions;
+export const getHighContrastState = (state: RootState) => state.highContrast.enabled;
+
 interface DetailedViewState {
     isOpen: boolean;
     uid: number | null;
@@ -52,7 +72,7 @@ const pipeSelectionSlice = createSlice({
                 state.pipeIds.push(item.id);
             });
         },
-        updatePipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
+        updatePipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
             const {id, selected} = action.payload;
             if (state.pipes[id]) {
                 state.pipes[id].selected = selected;
@@ -63,16 +83,27 @@ const pipeSelectionSlice = createSlice({
                 state.pipes[id].selected = false;
             });
         },
+        selectAllPipes(state) {
+            state.pipeIds.forEach((id) => {
+                state.pipes[id].selected = true;
+            });
+        },
     },
 });
 export const selectPipeSelectionById = (state: RootState, id: string) => state.pipeSelection.pipes[id];
 export const getDramGroup = (state: RootState, id: number) => (id > -1 ? state.nodeSelection.dram[id] : null);
-export const {loadPipeSelection, updatePipeSelection, clearAllPipes} = pipeSelectionSlice.actions;
+export const {
+    //
+    loadPipeSelection,
+    updatePipeSelection,
+    clearAllPipes,
+    selectAllPipes,
+} = pipeSelectionSlice.actions;
 
 export interface NodeData extends NodeSelection {
-    loc: { x: number; y: number };
+    loc: {x: number; y: number};
     opName: string;
-    border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
+    border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
     dramChannel: number | -1;
     dramSubchannel: number | -1;
 }
@@ -83,10 +114,10 @@ export interface NodeSelection {
 }
 
 interface NodeSelectionState {
-    groups: Record<string, { data: NodeData[]; selected: boolean }>;
+    groups: Record<string, {data: NodeData[]; selected: boolean}>;
     nodeList: NodeData[];
     filename: string;
-    dram: { data: NodeData[]; selected: boolean }[];
+    dram: {data: NodeData[]; selected: boolean}[];
     architecture: string;
 }
 
@@ -152,7 +183,7 @@ const nodeSelectionSlice = createSlice({
                 setBorders(dramElement.data);
             });
         },
-        updateNodeSelection(state, action: PayloadAction<{ id: number; selected: boolean }>) {
+        updateNodeSelection(state, action: PayloadAction<{id: number; selected: boolean}>) {
             const {id, selected} = action.payload;
             const node: NodeData | undefined = state.nodeList[id];
 
@@ -167,7 +198,7 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
+        selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
             const {opName, selected} = action.payload;
             const group = state.groups[opName];
             if (group) {
@@ -210,8 +241,8 @@ const linkSaturationSlice = createSlice({
     },
 });
 export const {updateLinkSatuation, updateShowLinkSaturation} = linkSaturationSlice.actions;
-export const selectLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturation;
-export const selectShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
+// export const selectLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturation;
+// export const selectShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
 
 const store = configureStore({
     reducer: {
@@ -219,6 +250,7 @@ const store = configureStore({
         nodeSelection: nodeSelectionSlice.reducer,
         linkSaturation: linkSaturationSlice.reducer,
         detailedView: detailedViewSlice.reducer,
+        highContrast: highContrastSlice.reducer,
     },
 });
 

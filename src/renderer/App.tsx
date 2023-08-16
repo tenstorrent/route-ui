@@ -5,11 +5,11 @@ import {useState} from 'react';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import DataSource from '../data/DataSource';
 import SVGData from '../data/DataStructures';
-import MainRouteRenderer from './components/MainRouteRenderer';
+import MainRouteRenderer from './MainRouteRenderer';
 import SplashScreen from './SplashScreen';
 import store from '../data/store';
 import {SVGJson} from '../data/JSONDataTypes';
-import TopHeaderComponent from './TopHeaderComponent';
+import TopHeaderComponent from './components/TopHeaderComponent';
 
 
 export default function App() {

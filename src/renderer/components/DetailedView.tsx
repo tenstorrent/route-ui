@@ -36,7 +36,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
             setNodeList(allNodes || []);
             setDram(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
         }
-    }, [uid, svgData, isOpen]);
+    }, [uid, svgData, isOpen, showLinkSaturation]);
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -209,7 +209,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
                                         return getInternalLinksForNode(n).map((link: NOCLink) => {
-                                            return <LinkComponent link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
+                                            return <LinkComponent key={link.id} link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
                                         });
                                     })}
                                     {dram.subchannels
@@ -217,12 +217,12 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                         .map((links) =>
                                             links.map((link) => (
                                                 //
-                                                <LinkComponent link={link} showEmpty={false} />
+                                                <LinkComponent key={link.id} link={link} showEmpty={false} />
                                             ))
                                         )}
                                     {dram.links.map((link) => (
                                         //
-                                        <LinkComponent link={link} showEmpty={false} />
+                                        <LinkComponent key={link.id} link={link} showEmpty={false} />
                                     ))}
                                 </div>
                             </div>

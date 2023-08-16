@@ -1,8 +1,10 @@
 import React from 'react';
+import {useSelector} from 'react-redux';
 import {Pipe, convertBytes, GenericNOCLink} from '../../data/DataStructures';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import {calculateLinkCongestionColor} from '../../utils/DrawingAPI';
+import {RootState} from '../../data/store';
 
 type LinkComponentProps = {
     link: GenericNOCLink;
@@ -11,7 +13,8 @@ type LinkComponentProps = {
 };
 
 const LinkComponent: React.FC<LinkComponentProps> = ({link, showEmpty, index}) => {
-    const color: string = calculateLinkCongestionColor(link.linkSaturation, 0);
+    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
+    const color: string = calculateLinkCongestionColor(link.linkSaturation, 0, isHighContrast);
     if (!showEmpty) {
         if (link.totalDataBytes === 0) {
             return null;
