@@ -6,7 +6,7 @@ import {IconNames} from '@blueprintjs/icons';
 import DataSource, {SVGContext} from '../data/DataSource';
 import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
 import {clearAllOperations, clearAllPipes, RootState, selectAllPipes, updateLinkSatuation, updateShowLinkSaturation} from '../data/store';
-import NodeComponent from './NodeComponent';
+import NodeComponent from './components/NodeComponent';
 import {ComputeNode} from '../data/DataStructures';
 import DetailedView from './components/DetailedView';
 
@@ -95,18 +95,18 @@ export default function GridRender() {
                     labelRenderer={(value) => `${value.toFixed(0)}`}
                 />
                 <hr />
-                <Tooltip2 content="Clear all selected pipes">
+                <Tooltip2 content="Select all pipes">
                     <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())}>
                         Select all pipes
                     </Button>
                 </Tooltip2>
-                <Tooltip2 content="Clear all selected pipes">
+                <Tooltip2 content="Clear all pipes selection">
                     <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}>
                         Deselect pipes
                     </Button>
                 </Tooltip2>
                 <hr />
-                <Tooltip2 content="Deselect all operations">
+                <Tooltip2 content="Clear all operation selection">
                     <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
                         Deselect ops
                     </Button>

@@ -1,10 +1,10 @@
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import * as d3 from 'd3';
-import {getDramGroup, getGroup, openDetailedView, PipeSelection, RootState, selectNodeSelectionById, selectPipeSelectionById, updateNodeSelection} from '../data/store';
-import {ComputeNode, LinkID} from '../data/DataStructures';
-import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../utils/DrawingAPI';
-import {getGroupColor} from '../data/ColorGenerator';
+import {getDramGroup, getGroup, openDetailedView, PipeSelection, RootState, selectNodeSelectionById, selectPipeSelectionById, updateNodeSelection} from '../../data/store';
+import {ComputeNode, LinkID} from '../../data/DataStructures';
+import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, NOC_CONFIGURATION, NODE_SIZE} from '../../utils/DrawingAPI';
+import {getGroupColor} from '../../data/ColorGenerator';
 
 interface NodeComponentProps {
     node: ComputeNode;

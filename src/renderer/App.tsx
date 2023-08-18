@@ -11,10 +11,7 @@ import store from '../data/store';
 import {SVGJson} from '../data/JSONDataTypes';
 import TopHeaderComponent from './components/TopHeaderComponent';
 
-
 export default function App() {
-    // @ts-ignore
-    // const [svgData, setSvgData] = useState<SVGData>(new SVGData({nodes: [], dram_channels:[]} as SVGJson));
     const [svgData, setSvgData] = useState<SVGData>(null);
 
     return (
@@ -23,7 +20,6 @@ export default function App() {
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
             <DataSource.Provider value={{svgData}}>
                 <Router>
                     <Routes>

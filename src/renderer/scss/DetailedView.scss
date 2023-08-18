@@ -145,4 +145,9 @@
             color: $tt-very-dark-gray;
         }
     }
+
+    .detailed-view-data {
+        max-height: 476px;
+        overflow-y: auto;
+    }
 }

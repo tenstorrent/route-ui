@@ -25,7 +25,7 @@ const LinkComponent: React.FC<LinkComponentProps> = ({link, showEmpty, index}) =
         <div key={link.id}>
             <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
                 <span>
-                    {link.id} - {index > -1 ? `${index} - ` : ''}
+                    {link.id} - {index && index > -1 ? `${index} - ` : ''}
                     {convertBytes(link.totalDataBytes)} <br /> {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
                     <span style={{color}}> {link.linkSaturation.toFixed(2)}%</span>
                 </span>
