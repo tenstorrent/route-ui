@@ -18,7 +18,7 @@ export const NOC_CONFIGURATION = {
     core: {x: CORE_CENTER.x, y: CORE_CENTER.y},
 };
 
-export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkID, color?: string, stroke: number = 1) => {
+export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkID | DramID, color?: string, stroke: number = 1) => {
     const {
         //
         lineEndX,
@@ -26,6 +26,7 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
         lineStartX,
         lineStartY,
         arrow,
+        arrowSecondary,
         transform,
     } = getLinkPoints(linkID);
 
@@ -57,15 +58,22 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
             .append('polygon')
             .attr('points', `${arrow.p1} ${arrow.p2} ${arrow.p3}`)
             .attr('transform', transform)
-            .attr('class', `arrow-${linkID}`)
-            .attr('fill', '#7e7e7e');
+            .attr('fill', color || '#7e7e7e');
+    }
+    if (linkID === DramID.NOC0_NOC2AXI || DramID.NOC1_NOC2AXI || DramID.DRAM_INOUT) {
+        selector
+            //
+            .append('polygon')
+            .attr('points', `${arrowSecondary.p1} ${arrowSecondary.p2} ${arrowSecondary.p3}`)
+            .attr('transform', transform)
+            .attr('fill', color || '#7e7e7e');
     }
 };
-export const getLinkPoints = (linkID: LinkID | DramID) => {
-    let lineStartX: number;
-    let lineEndX: number;
-    let lineStartY: number;
-    let lineEndY: number;
+export const getLinkPoints = (linkID: LinkID | DramID | string) => {
+    let lineStartX: number = 0;
+    let lineEndX: number = 0;
+    let lineStartY: number = 0;
+    let lineEndY: number = 0;
 
     const arrowHeadHeight = 9;
     const arrowHeadWidth = 9;
@@ -303,11 +311,7 @@ export const getLinkPoints = (linkID: LinkID | DramID) => {
 
             break;
         default:
-            lineStartX = 0;
-            lineStartY = 0;
-            lineEndX = 0;
-            lineEndY = 0;
-        // console.warn(`Invalid direction ${direction}`);
+            break;
     }
     return {lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform};
 };

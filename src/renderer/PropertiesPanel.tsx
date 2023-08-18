@@ -12,6 +12,7 @@ import ProgressBar from './components/ProgressBar';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
+import LinkComponent from './components/LinkComponent';
 
 export default function PropertiesPanel() {
     const {svgData} = useContext(DataSource);
@@ -130,28 +131,9 @@ export default function PropertiesPanel() {
 
                                         <div className="node-links-wrap">
                                             <h4>Links</h4>
-                                            {getLinksForNode(node).map((link: NOCLink, index) => {
-                                                const color: string = calculateLinkCongestionColor(link.linkSaturation, 0);
-                                                return (
-                                                    <div key={link.id}>
-                                                        <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
-                                                            <span>
-                                                                {link.id} - {convertBytes(link.totalDataBytes)} <br /> {convertBytes(link.bpc, 2)} of{' '}
-                                                                {convertBytes(link.maxBandwidth)}
-                                                                <span style={{color}}> {link.linkSaturation.toFixed(2)}%</span>
-                                                            </span>
-                                                            {link.totalDataBytes > 0 && <ProgressBar percent={link.linkSaturation} color={color} />}
-                                                        </h5>
-                                                        <ul className="node-pipelist">
-                                                            {link.pipes.map((pipe: Pipe) => (
-                                                                <li key={pipe.id}>
-                                                                    <SelectablePipe pipe={pipe} pipeFilter="" showBandwidthUse />
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                );
-                                            })}
+                                            {getLinksForNode(node).map((link: NOCLink, index) => (
+                                                <LinkComponent link={link} showEmpty />
+                                            ))}
                                         </div>
                                     </div>
                                 ))}
