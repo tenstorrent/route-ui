@@ -13,7 +13,8 @@ import TopHeaderComponent from './TopHeaderComponent';
 
 export default function App() {
     // @ts-ignore
-    const [svgData, setSvgData] = useState<SVGData>(new SVGData({nodes: []} as SVGJson));
+    // const [svgData, setSvgData] = useState<SVGData>(new SVGData({nodes: [], dram_channels:[]} as SVGJson));
+    const [svgData, setSvgData] = useState<SVGData>(null);
 
     return (
         <Provider store={store}>

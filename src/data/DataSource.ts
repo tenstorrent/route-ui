@@ -1,8 +1,9 @@
 import React, {createContext} from 'react';
-import SVGData, {SVGJson} from './DataStructures';
+import SVGData from './DataStructures';
+import {SVGJson} from './JSONDataTypes';
 
 export interface SVGContext {
-    svgData: SVGData;
+    svgData: SVGData | null;
     setSvgData: (data: SVGData) => void;
 }
 

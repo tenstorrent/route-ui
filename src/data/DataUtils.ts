@@ -10,6 +10,9 @@ const ymlSchema = {
             type: 'object',
             additionalProperties: false,
             properties: {
+                arch: {
+                    type: 'string',
+                },
                 slowest_op_cycles: {
                     type: 'integer',
                 },
@@ -22,9 +25,63 @@ const ymlSchema = {
                         $ref: '#/definitions/Node',
                     },
                 },
+                dram_channels: {
+                    type: 'array',
+                    items: {
+                        $ref: '#/definitions/DRAMChannel',
+                    },
+                },
             },
-            required: ['bw_limited_op_cycles', 'nodes', 'slowest_op_cycles'],
+            required: ['arch', 'bw_limited_op_cycles', 'nodes', 'slowest_op_cycles'],
             title: 'Welcome2',
+        },
+        DRAMChannel: {
+            type: 'object',
+            additionalProperties: true,
+            properties: {
+                subchannels: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        additionalProperties: {
+                            $ref: '#/definitions/Dram0Inout',
+                        },
+                    },
+                },
+                dram0_inout: {
+                    $ref: '#/definitions/Dram0Inout',
+                },
+                dram1_inout: {
+                    $ref: '#/definitions/Dram0Inout',
+                },
+            },
+            required: [],
+            title: 'DRAMChannel',
+        },
+        MappedPipes: {
+            type: 'object',
+            additionalProperties: false,
+            title: 'MappedPipes',
+        },
+        Dram0Inout: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+                num_occupants: {
+                    type: 'integer',
+                },
+                total_data_in_bytes: {
+                    type: 'integer',
+                },
+                mapped_pipes: {
+                    $ref: '#/definitions/MappedPipes',
+                },
+                max_link_bw: {
+                    type: 'number',
+                },
+            },
+            required: ['mapped_pipes', 'max_link_bw', 'num_occupants', 'total_data_in_bytes'],
+            title: 'Dram0Inout',
         },
         Node: {
             type: 'object',
@@ -48,26 +105,18 @@ const ymlSchema = {
                 links: {
                     type: 'object',
                     additionalProperties: {
-                        $ref: '#/definitions/LinkValue',
+                        $ref: '#/definitions/Link',
                     },
+                },
+                dram_channel: {
+                    type: 'integer',
+                },
+                dram_subchannel: {
+                    type: 'integer',
                 },
             },
             required: ['links', 'location', 'op_cycles', 'op_name', 'type'],
             title: 'Node',
-        },
-        InternalLinks: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                link_in: {
-                    $ref: '#/definitions/Link',
-                },
-                link_out: {
-                    $ref: '#/definitions/Link',
-                },
-            },
-            required: ['link_in', 'link_out'],
-            title: 'InternalLinks',
         },
         Link: {
             type: 'object',
@@ -86,34 +135,11 @@ const ymlSchema = {
                     },
                 },
                 max_link_bw: {
-                    type: 'number',
+                    type: 'integer',
                 },
             },
             required: ['mapped_pipes', 'max_link_bw', 'num_occupants', 'total_data_in_bytes'],
             title: 'Link',
-        },
-        LinkValue: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                num_occupants: {
-                    type: 'integer',
-                },
-                total_data_in_bytes: {
-                    type: 'integer',
-                },
-                mapped_pipes: {
-                    type: 'object',
-                    additionalProperties: {
-                        type: 'integer',
-                    },
-                },
-                max_link_bw: {
-                    type: 'integer',
-                },
-            },
-            required: ['mapped_pipes', 'max_link_bw', 'num_occupants', 'total_data_in_bytes'],
-            title: 'LinkValue',
         },
         OpCycles: {
             anyOf: [
@@ -128,7 +154,7 @@ const ymlSchema = {
         },
         Type: {
             type: 'string',
-            enum: ['core', 'router', 'dram', 'eth', 'pcix'],
+            enum: ['core', 'dram', 'router', 'eth'],
             title: 'Type',
         },
     },
@@ -137,7 +163,6 @@ const ymlSchema = {
 const ajv = new Ajv();
 ajv.addMetaSchema(draft06);
 addFormats(ajv);
-
 
 const yamlValidate: ValidateFunction<any> = ajv.compile(ymlSchema);
 export default yamlValidate;

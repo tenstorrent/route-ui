@@ -3,14 +3,16 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource from '../data/DataSource';
-import SVGData, {ComputeNode, convertBytes, NOCLink, Pipe} from '../data/DataStructures';
+import SVGData, {ComputeNode, ComputeNodeType, convertBytes, LinkID, NOCLink, Pipe} from '../data/DataStructures';
 
 import FilterableComponent from './components/FilterableComponent';
-import {RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
+import {openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
 import {calculateLinkCongestionColor} from '../utils/DrawingAPI';
 import ProgressBar from './components/ProgressBar';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
+import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
+import LinkComponent from './components/LinkComponent';
 
 export default function PropertiesPanel() {
     const {svgData} = useContext(DataSource);
@@ -24,6 +26,7 @@ export default function PropertiesPanel() {
 
     const nodeSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const groups = useSelector((state: RootState) => state.nodeSelection.groups);
+    const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
 
     useEffect(() => {
         const selected = nodeSelectionState.nodeList.filter((n) => n.selected);
@@ -41,29 +44,6 @@ export default function PropertiesPanel() {
         });
         setOperationsList(opList);
     }, []);
-
-    const getLinksForNode = (node: ComputeNode): NOCLink[] => {
-        const nocLinks: NOCLink[] = [];
-        node.links.forEach((l) => {
-            nocLinks.push(l);
-        });
-
-        return nocLinks.sort((a, b) => {
-            const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.direction) ?? Infinity;
-            const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.direction) ?? Infinity;
-            return firstKeyOrder - secondKeyOrder;
-        });
-    };
-
-    const getPipeIdsForNode = (node: ComputeNode): string[] => {
-        const pipes: string[] = [];
-
-        node.links.forEach((link) => {
-            pipes.push(...link.pipes.map((pipe) => pipe.id));
-        });
-
-        return pipes;
-    };
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -96,10 +76,11 @@ export default function PropertiesPanel() {
                             <div className="properties-panel-nodes">
                                 {selectedNodes.map((node: ComputeNode) => (
                                     <div className="node-element" key={node.uid}>
-                                        <h3 className={`node-type-${node.getNodeLabel()}`}>
+                                        <h3 className={`node-type node-type-${node.getNodeLabel()} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}>
                                             {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
                                             <Tooltip content="Close ComputeNode">
                                                 <Button
+                                                    small
                                                     icon={IconNames.CROSS}
                                                     onClick={() => {
                                                         selectNode(node, false);
@@ -108,6 +89,11 @@ export default function PropertiesPanel() {
                                             </Tooltip>
                                         </h3>
                                         {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
+                                        {node.type === ComputeNodeType.DRAM ? (
+                                            <p>
+                                                Channel {node.dramChannel}, Sub {node.dramSubchannel}
+                                            </p>
+                                        ) : null}
                                         {node.opName !== '' && (
                                             <div className="opname">
                                                 <Tooltip content={node.opName} position={PopoverPosition.TOP}>
@@ -121,38 +107,33 @@ export default function PropertiesPanel() {
                                             </div>
                                         )}
                                         <div className="node-controls">
-                                            <Button icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(getPipeIdsForNode(node), true)}>
+                                            {node.type === ComputeNodeType.DRAM && (
+                                                <Button
+                                                    small
+                                                    icon={IconNames.PROPERTIES}
+                                                    disabled={node.uid === uid && isOpen}
+                                                    onClick={() => dispatch(openDetailedView(node.uid))}
+                                                >
+                                                    Detailed View
+                                                </Button>
+                                            )}
+
+                                            <Button small icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
+                                                Select internal pipes
+                                            </Button>
+                                            <Button small icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(getPipeIdsForNode(node), true)}>
                                                 Select all pipes
                                             </Button>
-                                            <Button icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(getPipeIdsForNode(node), false)}>
+                                            <Button small icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(getPipeIdsForNode(node), false)}>
                                                 Deselect all pipes
                                             </Button>
                                         </div>
 
                                         <div className="node-links-wrap">
                                             <h4>Links</h4>
-                                            {getLinksForNode(node).map((link: NOCLink, index) => {
-                                                const color: string = calculateLinkCongestionColor(link.linkSaturation, 0);
-                                                return (
-                                                    <div key={index}>
-                                                        <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
-                                                            <span>
-                                                                {link.id} - {convertBytes(link.totalDataBytes)} <br /> {convertBytes(link.bpc, 2)} of{' '}
-                                                                {convertBytes(link.maxBandwidth)}
-                                                                <span style={{color}}> {link.linkSaturation.toFixed(2)}%</span>
-                                                            </span>
-                                                            {link.totalDataBytes > 0 && <ProgressBar percent={link.linkSaturation} color={color} />}
-                                                        </h5>
-                                                        <ul className="node-pipelist">
-                                                            {link.pipes.map((pipe: Pipe) => (
-                                                                <li key={pipe.id}>
-                                                                    <SelectablePipe pipe={pipe} pipeFilter="" showBandwidthUse />
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                );
-                                            })}
+                                            {getLinksForNode(node).map((link: NOCLink, index) => (
+                                                <LinkComponent link={link} showEmpty />
+                                            ))}
                                         </div>
                                     </div>
                                 ))}
@@ -171,20 +152,22 @@ export default function PropertiesPanel() {
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
-                                    <ul className="scrollable-content">
-                                        {svgData.allUniquePipes.map((pipe) => (
-                                            <FilterableComponent
-                                                key={pipe.id}
-                                                filterableString={pipe.id}
-                                                filterQuery={pipeFilter}
-                                                component={
-                                                    <li>
-                                                        <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
-                                                    </li>
-                                                }
-                                            />
-                                        ))}
-                                    </ul>
+                                    {svgData && (
+                                        <ul className="scrollable-content">
+                                            {svgData.allUniquePipes.map((pipe) => (
+                                                <FilterableComponent
+                                                    key={pipe.id}
+                                                    filterableString={pipe.id}
+                                                    filterQuery={pipeFilter}
+                                                    component={
+                                                        <li>
+                                                            <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
+                                                        </li>
+                                                    }
+                                                />
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
                         </div>

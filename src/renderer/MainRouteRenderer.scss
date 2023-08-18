@@ -24,6 +24,14 @@
     background-color: #a794ee;
 }
 
+.node-type {
+    border-bottom: 2px solid transparent;
+
+    &.detailed-view {
+        border-bottom: 2px solid #99ff00;
+    }
+}
+
 .main-wrapper {
     margin-top: 20px;
     display: flex;
@@ -97,9 +105,16 @@
                     right: $inset;
                     z-index: 0;
                 }
+
+                &.detailed-view {
+                    .node-border {
+                        border: 2px solid #99ff00;
+                    }
+                }
             }
 
-            .group-border {
+            .group-border,
+            .dram-border {
                 width: 100%;
                 height: 100%;
                 position: absolute;
@@ -207,6 +222,11 @@
         align-content: center;
         gap: 10px;
         margin-bottom: 5px;
+        color: #fff;
+
+        span {
+            color: #fff;
+        }
 
         &.inactive {
             color: #a5a5a5;
@@ -389,3 +409,18 @@
 
     }
 }
+
+.detailed-view-card {
+    color: #1c2127;
+}
+
+.detailed-view-wrap {
+    color: #1c2127;
+
+    .detailed-view-svg {
+        rect {
+            fill: #a6bce5;
+        }
+    }
+}
+

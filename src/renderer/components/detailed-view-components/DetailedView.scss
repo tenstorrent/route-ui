@@ -1,0 +1,149 @@
+.detailed-view-card {
+    padding: 15px;
+    padding-bottom: 20px;
+    background-color: #33333d;
+    color: #fff;
+    box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);
+    border: 1px solid #808080;
+    border-radius: 0;
+
+    .detailed-view-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+
+        h3 {
+            text-transform: uppercase;
+        }
+
+    }
+}
+
+.detailed-view-wrap {
+    background-color: #33333d;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+
+    .node-links-wrap {
+        min-width: 250px;
+        padding: 5px;
+    }
+
+    span.label {
+        color: #Fff;
+    }
+
+    p.label {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .dram-subchannels {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+
+        .subchannel {
+            .subchannel-name {
+                margin-bottom: 5px;
+                color: #99c4ff;
+            }
+
+            &.current {
+                .subchannel-name {
+                    color: #99ff00;
+                    //&:after {
+                    //    content: " \2713";
+                    //}
+                }
+            }
+        }
+
+        .dram-subchannel {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        .noc {
+            display: flex;
+            flex-direction: column;
+            column-gap: 10px;
+            //background-color: #33333d;
+
+            .noc2axi,
+            .router {
+                background-color: #a6bce5;
+                color: #1c2127;
+                width: 120px;
+                text-align: center;
+                padding: 6px;
+            }
+
+        }
+    }
+
+    .axi {
+        background-color: #a6bce5;
+        color: #1c2127;
+        width: 100%;
+        text-align: center;
+        padding: 6px;
+    }
+
+    .off-chip {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+
+        .axi-dram-wrap {
+            width: 150px;
+            display: flex;
+            flex-direction: column;
+
+            .axi-dram {
+                background-color: #a6bce5;
+                color: #1c2127;
+                text-align: center;
+                padding: 6px;
+            }
+        }
+    }
+
+    .pipe-renderer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .svg {
+            margin-left: 15px;
+
+            &.centered-svg {
+                margin-left: 0px;
+            }
+        }
+    }
+
+    &.arch-grayskull {
+        .axi {
+            width: 200px;
+            margin: 0 auto;
+        }
+    }
+
+    .pipe-selection {
+        margin-bottom: 5px;
+    }
+
+    .controls-wrap {
+        display: flex;
+        gap: 5px;
+
+        .bp4-button:not([class*=bp4-intent-]):disabled, .bp4-button:not([class*=bp4-intent-]).bp4-disabled {
+            color: #000;
+        }
+    }
+}

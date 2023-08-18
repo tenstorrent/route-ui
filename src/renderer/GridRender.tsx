@@ -1,13 +1,14 @@
 import React, {useContext, useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Button, Position, Slider, Switch, Tooltip} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 import {IconNames} from '@blueprintjs/icons';
 import DataSource, {SVGContext} from '../data/DataSource';
 import {NODE_SIZE} from '../utils/DrawingAPI';
-import {clearAllOperations, clearAllPipes, updateLinkSatuation, updateShowLinkSaturation} from '../data/store';
+import {clearAllOperations, clearAllPipes, RootState, updateLinkSatuation, updateShowLinkSaturation} from '../data/store';
 import NodeComponent from './NodeComponent';
 import {ComputeNode} from '../data/DataStructures';
+import DetailedView from './components/DetailedView';
 
 export default function GridRender() {
     const {svgData} = useContext<SVGContext>(DataSource);
@@ -18,8 +19,11 @@ export default function GridRender() {
     const [gridZoom, setGridZoom] = useState(1);
     const [showLinkSaturation, setShowLinkSaturation] = useState(false);
     const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(75);
+    const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
+    const {isOpen} = useSelector((state: RootState) => state.detailedView);
 
     const dispatch = useDispatch();
+
 
     const onLinkSaturationChange = (value: number) => {
         setLinkSaturationTreshold(value);
@@ -79,30 +83,46 @@ export default function GridRender() {
                     </Button>
                 </Tooltip>
                 <hr />
-                <Tooltip content="Decelect all operations">
+                <Tooltip content="Deselect all operations">
                     <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
                         Deselect ops
                     </Button>
                 </Tooltip>
                 <hr />
+                Detailed view zoom
+                <Slider
+                    min={0.5}
+                    max={1}
+                    stepSize={0.1}
+                    labelStepSize={1}
+                    disabled={!isOpen}
+                    value={detailedViewZoom}
+                    onChange={(value: number) => setDetailedViewZoom(value)}
+                    labelRenderer={(value) => `${value.toFixed(1)}`}
+                />
             </div>
-            <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
-                <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
-                    {svgData.nodes.map((node: ComputeNode) => {
-                        return (
-                            <NodeComponent
-                                node={node}
-                                showEmptyLinks={showEmptyLinks}
-                                showNodeLocation={showNodeLocation}
-                                showOperationColors={showOperationColors}
-                                showLinkSaturation={showLinkSaturation}
-                                linkSaturationTreshold={linkSaturationTreshold}
-                                key={node.uid}
-                            />
-                        );
-                    })}
+            {svgData && (
+                <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
+                    <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
+                        {svgData.nodes.map((node: ComputeNode) => {
+                            return (
+                                <NodeComponent
+                                    node={node}
+                                    showEmptyLinks={showEmptyLinks}
+                                    showNodeLocation={showNodeLocation}
+                                    showOperationColors={showOperationColors}
+                                    showLinkSaturation={showLinkSaturation}
+                                    linkSaturationTreshold={linkSaturationTreshold}
+                                    key={node.uid}
+                                />
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
+            <DetailedView showLinkSaturation={showLinkSaturation}
+                          zoom={detailedViewZoom}
+                          linkSaturationTreshold={linkSaturationTreshold} />
         </>
     );
 }

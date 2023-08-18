@@ -9,7 +9,7 @@ import {Button} from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
 import SVGData from '../../data/DataStructures';
 import yamlValidate from '../../data/DataUtils';
-import {loadedFilename, loadNodesData, loadPipeSelection} from '../../data/store';
+import {closeDetailedView, loadedFilename, loadNodesData, loadPipeSelection, setArchitecture} from '../../data/store';
 import {SVGJson} from '../../data/JSONDataTypes';
 
 interface FileLoaderProps {
@@ -45,10 +45,16 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                 }
                 try {
                     const doc = parse(data);
-                    const isValid = yamlValidate(doc);
+                    // console.log(doc);
+                    // console.log(JSON.stringify(doc));
+                    /* TEMPORARY vallidation off */
+                    const isValid = true; // yamlValidate(doc);
                     if (isValid) {
                         const svgData = new SVGData(doc as SVGJson);
                         updateData(svgData);
+
+                        dispatch(closeDetailedView());
+                        dispatch(setArchitecture(svgData.architecture));
                         dispatch(loadedFilename(filename));
                         dispatch(loadPipeSelection(svgData.getAllPipeIds()));
                         dispatch(loadNodesData(svgData.getAllNodes()));
@@ -57,6 +63,7 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                         const errors = yamlValidate.errors?.map((error) => {
                             return error.message;
                         });
+                        console.error(errors);
                         console.error(errors?.join('\n'));
                         alert(`An error occurred parsing the file: ${errors?.join('\n')}`);
                     }

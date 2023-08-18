@@ -1,5 +1,32 @@
 import {createSlice, configureStore, PayloadAction} from '@reduxjs/toolkit';
 
+interface DetailedViewState {
+    isOpen: boolean;
+    uid: number | null;
+}
+
+const detailedViewInitialState: DetailedViewState = {
+    isOpen: false,
+    uid: null,
+};
+
+export const detailedViewSlice = createSlice({
+    name: 'detailedView',
+    initialState: detailedViewInitialState,
+    reducers: {
+        openDetailedView: (state, action: PayloadAction<number>) => {
+            state.isOpen = true;
+            state.uid = action.payload;
+        },
+        closeDetailedView: (state) => {
+            state.isOpen = false;
+            state.uid = null;
+        },
+    },
+});
+
+export const {openDetailedView, closeDetailedView} = detailedViewSlice.actions;
+
 export interface PipeSelection {
     id: string;
     selected: boolean;
@@ -25,7 +52,7 @@ const pipeSelectionSlice = createSlice({
                 state.pipeIds.push(item.id);
             });
         },
-        updatePipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
+        updatePipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
             const {id, selected} = action.payload;
             if (state.pipes[id]) {
                 state.pipes[id].selected = selected;
@@ -39,12 +66,15 @@ const pipeSelectionSlice = createSlice({
     },
 });
 export const selectPipeSelectionById = (state: RootState, id: string) => state.pipeSelection.pipes[id];
+export const getDramGroup = (state: RootState, id: number) => (id > -1 ? state.nodeSelection.dram[id] : null);
 export const {loadPipeSelection, updatePipeSelection, clearAllPipes} = pipeSelectionSlice.actions;
 
 export interface NodeData extends NodeSelection {
-    loc: {x: number; y: number};
+    loc: { x: number; y: number };
     opName: string;
-    border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
+    border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
+    dramChannel: number | -1;
+    dramSubchannel: number | -1;
 }
 
 export interface NodeSelection {
@@ -53,15 +83,35 @@ export interface NodeSelection {
 }
 
 interface NodeSelectionState {
-    groups: Record<string, {data: NodeData[]; selected: boolean}>;
+    groups: Record<string, { data: NodeData[]; selected: boolean }>;
     nodeList: NodeData[];
     filename: string;
+    dram: { data: NodeData[]; selected: boolean }[];
+    architecture: string;
 }
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: [],
     groups: {},
     filename: '',
+    dram: [],
+    architecture: '',
+};
+
+const setBorders = (nodes: NodeData[]) => {
+    const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
+    nodes.forEach((node) => {
+        const leftLoc = {x: node.loc.x - 1, y: node.loc.y};
+        const rightLoc = {x: node.loc.x + 1, y: node.loc.y};
+        const topLoc = {x: node.loc.x, y: node.loc.y - 1};
+        const bottomLoc = {x: node.loc.x, y: node.loc.y + 1};
+        node.border = {
+            left: !locations.has(JSON.stringify(leftLoc)),
+            right: !locations.has(JSON.stringify(rightLoc)),
+            top: !locations.has(JSON.stringify(topLoc)),
+            bottom: !locations.has(JSON.stringify(bottomLoc)),
+        };
+    });
 };
 
 const nodeSelectionSlice = createSlice({
@@ -71,9 +121,13 @@ const nodeSelectionSlice = createSlice({
         loadedFilename(state, action: PayloadAction<string>) {
             state.filename = action.payload;
         },
+        setArchitecture(state, action: PayloadAction<string>) {
+            state.architecture = action.payload;
+        },
         loadNodesData(state, action: PayloadAction<NodeData[]>) {
             state.groups = {};
             state.nodeList = [];
+            state.dram = [];
             action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
@@ -82,38 +136,38 @@ const nodeSelectionSlice = createSlice({
                     }
                     state.groups[item.opName].data.push(item);
                 }
+                if (item.dramChannel !== -1) {
+                    if (!state.dram[item.dramChannel]) {
+                        state.dram[item.dramChannel] = {data: [], selected: false};
+                    }
+                    state.dram[item.dramChannel].data.push(item);
+                }
             });
 
-            function setBorders(nodes: NodeData[]) {
-                const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
-                nodes.forEach((node) => {
-                    const leftLoc = {x: node.loc.x - 1, y: node.loc.y};
-                    const rightLoc = {x: node.loc.x + 1, y: node.loc.y};
-                    const topLoc = {x: node.loc.x, y: node.loc.y - 1};
-                    const bottomLoc = {x: node.loc.x, y: node.loc.y + 1};
-                    node.border = {
-                        left: !locations.has(JSON.stringify(leftLoc)),
-                        right: !locations.has(JSON.stringify(rightLoc)),
-                        top: !locations.has(JSON.stringify(topLoc)),
-                        bottom: !locations.has(JSON.stringify(bottomLoc)),
-                    };
-                });
-            }
-
-            // this only runs ones per file load
+            // this only runs one time per file load
             Object.values(state.groups).forEach((group) => {
                 setBorders(group.data);
             });
+            state.dram.forEach((dramElement) => {
+                setBorders(dramElement.data);
+            });
         },
-        updateNodeSelection(state, action: PayloadAction<{id: number; selected: boolean}>) {
+        updateNodeSelection(state, action: PayloadAction<{ id: number; selected: boolean }>) {
             const {id, selected} = action.payload;
             const node: NodeData | undefined = state.nodeList[id];
 
             if (node) {
                 node.selected = selected;
             }
+            state.dram.forEach((dramGroup) => {
+                if (dramGroup.data.map((n) => n.id).filter((nodeid) => state.nodeList[nodeid].selected).length > 0) {
+                    dramGroup.selected = true;
+                } else {
+                    dramGroup.selected = false;
+                }
+            });
         },
-        selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
+        selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
             const {opName, selected} = action.payload;
             const group = state.groups[opName];
             if (group) {
@@ -130,7 +184,15 @@ const nodeSelectionSlice = createSlice({
 
 export const selectNodeSelectionById = (state: RootState, id: number) => state.nodeSelection.nodeList[id];
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
-export const {loadNodesData, updateNodeSelection, selectGroup, clearAllOperations, loadedFilename} = nodeSelectionSlice.actions;
+export const {
+    //
+    loadNodesData,
+    updateNodeSelection,
+    selectGroup,
+    clearAllOperations,
+    loadedFilename,
+    setArchitecture,
+} = nodeSelectionSlice.actions;
 
 const linkSaturationSlice = createSlice({
     name: 'linkSaturation',
@@ -156,6 +218,7 @@ const store = configureStore({
         pipeSelection: pipeSelectionSlice.reducer,
         nodeSelection: nodeSelectionSlice.reducer,
         linkSaturation: linkSaturationSlice.reducer,
+        detailedView: detailedViewSlice.reducer,
     },
 });
 

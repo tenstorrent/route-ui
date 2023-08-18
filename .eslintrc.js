@@ -17,6 +17,8 @@ module.exports = {
         'no-use-before-define': 'off',
         'max-classes-per-file': 'off',
         "react/function-component-definition": 0,
+        "no-plusplus": 'off',
+
     },
     parserOptions: {
         ecmaVersion: 2020,
