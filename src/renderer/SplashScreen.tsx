@@ -11,7 +11,7 @@ const SplashScreen: FC<SplashScreenProps> = ({updateData}) => {
     return (
         <div className="splash-screen">
             <FileLoader updateData={updateData} />
-            <TempFileLoader updateData={updateData} />
+            {/*<TempFileLoader updateData={updateData} />*/}
         </div>
     );
 };
