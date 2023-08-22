@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
+import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
 import {ComputeNode, ComputeNodeType, NOCLink, Pipe} from '../data/DataStructures';
 
@@ -11,7 +12,6 @@ import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
 import LinkComponent from './components/LinkComponent';
-import {Tooltip2} from '@blueprintjs/popover2';
 
 export default function PropertiesPanel() {
     const {svgData} = useContext(DataSource);
@@ -46,6 +46,11 @@ export default function PropertiesPanel() {
         });
         setOperationsList(opList);
     }, [groups]);
+
+    // useEffect(() => {
+    //     console.log(selectedNodes);
+    // }, [selectedNodes]);
+
 
     const selectFilteredPipes = () => {
         if (!svgData) {

@@ -20,6 +20,7 @@ const LinkComponent: React.FC<LinkComponentProps> = ({link, showEmpty, index}) =
             return null;
         }
     }
+    console.log('re-rendering link?');
 
     return (
         <div key={link.id}>

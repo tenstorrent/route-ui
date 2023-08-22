@@ -16,14 +16,14 @@ interface NodeComponentProps {
 }
 
 const NodeComponent: React.FC<NodeComponentProps> = ({
-                                                         node,
-                                                         showEmptyLinks,
-                                                         showOperationColors,
-                                                         showNodeLocation,
-                                                         showLinkSaturation,
-                                                         linkSaturationTreshold,
-                                                         //
-                                                     }) => {
+    node,
+    showEmptyLinks,
+    showOperationColors,
+    showNodeLocation,
+    showLinkSaturation,
+    linkSaturationTreshold,
+    //
+}) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const dispatch = useDispatch();
@@ -36,7 +36,6 @@ const NodeComponent: React.FC<NodeComponentProps> = ({
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
     const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
-
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);

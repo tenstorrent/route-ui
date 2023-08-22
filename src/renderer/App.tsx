@@ -20,7 +20,7 @@ export default function App() {
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            <DataSource.Provider value={{svgData}}>
+            <DataSource.Provider value={{svgData, setSvgData}}>
                 <Router>
                     <Routes>
                         <Route path="/" element={<SplashScreen updateData={setSvgData} />} />

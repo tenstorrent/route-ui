@@ -1,8 +1,9 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Position, Slider, Switch} from '@blueprintjs/core';
+import {Button, InputGroup, NumericInput, Position, Slider, Switch} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 import {IconNames} from '@blueprintjs/icons';
+import {svg} from 'd3';
 import DataSource, {SVGContext} from '../data/DataSource';
 import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
 import {clearAllOperations, clearAllPipes, RootState, selectAllPipes, updateLinkSatuation, updateShowLinkSaturation} from '../data/store';
@@ -11,7 +12,7 @@ import {ComputeNode} from '../data/DataStructures';
 import DetailedView from './components/DetailedView';
 
 export default function GridRender() {
-    const {svgData} = useContext<SVGContext>(DataSource);
+    const {svgData, setSvgData} = useContext<SVGContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
     const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
@@ -20,6 +21,7 @@ export default function GridRender() {
     const [showLinkSaturation, setShowLinkSaturation] = useState(false);
     const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(75);
     const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
+    const [opCycles, setOpCycles] = useState<number>(0);
 
     const isHC = useSelector((state: RootState) => state.highContrast.enabled);
     const dispatch = useDispatch();
@@ -40,6 +42,39 @@ export default function GridRender() {
             isHC
         )})`,
     };
+
+    const updateOpCycles = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            console.log('Enter key pressed');
+            if (svgData) {
+                // Get the current value from the event target
+                const newValue = e.currentTarget.value;
+                console.log(newValue);
+                // Update the value or perform any other action here
+                setOpCycles(Number(newValue));
+                svgData.updateTotalOpCycles(Number(newValue));
+                svgData.totalOpCycles = Number(newValue);
+                setSvgData(svgData);
+
+
+                // a hack to rerender
+                setLinkSaturationTreshold(linkSaturationTreshold - 1);
+                dispatch(updateLinkSatuation(linkSaturationTreshold - 1));
+
+                // setTimeout(()=>{
+                //     console.log('svgData.totalOpCycles');
+                //     console.log(svgData.totalOpCycles);
+                // })
+            }
+            // If you have a state or some method to update the value, call it here
+            // e.g., setValue(newValue);
+        }
+    };
+    useEffect(() => {
+        if (svgData) {
+            setOpCycles(svgData.totalOpCycles);
+        }
+    }, [svgData]);
 
     return (
         <>
@@ -111,6 +146,14 @@ export default function GridRender() {
                         Deselect ops
                     </Button>
                 </Tooltip2>
+                <InputGroup
+                    //
+                    placeholder={svgData?.totalOpCycles.toString()}
+                    value={opCycles.toString()}
+                    onKeyDown={updateOpCycles}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpCycles(Number(e.target.value))}
+                />
+                {opCycles}:{svgData?.totalOpCycles}
                 <hr />
             </div>
             {svgData && (

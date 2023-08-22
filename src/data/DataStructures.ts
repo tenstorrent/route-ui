@@ -83,8 +83,14 @@ export default class SVGData {
 
     public dramChannels: DramChannel[] = [];
 
-    constructor(data: SVGJson) {
+    public totalOpCycles: number = 0;
+
+    constructor(data?: SVGJson) {
         SVGData.GET_NOC_ORDER();
+
+        if (!data) {
+            return;
+        }
 
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
@@ -97,7 +103,7 @@ export default class SVGData {
             }
         }
 
-        const totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
+        this.totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
         this.nodes = data.nodes
             .map((node, i: number) => {
@@ -105,7 +111,7 @@ export default class SVGData {
                 this.totalCols = Math.max(loc.y, this.totalCols);
                 this.totalRows = Math.max(loc.x, this.totalRows);
                 // console.log(node.dram_channel, node.dram_subchannel);
-                return new ComputeNode(node, i, totalOpCycles);
+                return new ComputeNode(node, i, this.totalOpCycles);
             })
             .sort((a, b) => {
                 if (a.loc.y !== b.loc.y) {
@@ -116,9 +122,16 @@ export default class SVGData {
 
         if (data.dram_channels) {
             this.dramChannels = data.dram_channels.map((dramChannel) => {
-                return new DramChannel(dramChannel.channel_id, dramChannel, totalOpCycles);
+                return new DramChannel(dramChannel.channel_id, dramChannel, this.totalOpCycles);
             });
         }
+    }
+
+    updateTotalOpCycles(val: number) {
+        this.totalOpCycles = val;
+        this.nodes.forEach((node) => {
+            node.updateTotalOpCycles(val);
+        });
     }
 
     getAllNodes(): NodeData[] {
@@ -168,7 +181,7 @@ export default class SVGData {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: {[key: string]: Pipe} = {};
+        const uniquePipeObj: { [key: string]: Pipe } = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -211,7 +224,7 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, json: {[key: string]: NOCLinkJson}, totalOpCycles: number) {
+    constructor(id: number, json: { [key: string]: NOCLinkJson }, totalOpCycles: number) {
         this.subchannelId = id;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(new DramLink(key as DramID, value, totalOpCycles));
@@ -246,6 +259,12 @@ export class GenericNOCLink {
 
         this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new Pipe(pipe, bandwidth, id, this.totalDataBytes));
     }
+
+    public updateTotalOpCycles(totalOpCycles: number) {
+        // console.log('updating', this.bpc, '=>', this.totalDataBytes / totalOpCycles);
+        this.bpc = this.totalDataBytes / totalOpCycles;
+        this.linkSaturation = (this.bpc / this.maxBandwidth) * 100;
+    }
 }
 
 export class DramLink extends GenericNOCLink {
@@ -271,7 +290,7 @@ export class NOCLink extends GenericNOCLink {
 }
 
 export class ComputeNode {
-    public uid: number;
+    public uid: number; // TODO: possibly update, we shoudl no longeer be relying on order
 
     public id: string = '';
 
@@ -308,6 +327,13 @@ export class ComputeNode {
         this.loc = {x: json.location[0], y: json.location[1]};
 
         this.links = new Map(Object.entries(json.links).map(([link, linkJson]) => [link, new NOCLink(link as LinkID, linkJson, this.totalOpCycles)]));
+    }
+
+    public updateTotalOpCycles(val: number) {
+        this.totalOpCycles = val;
+        this.links.forEach((link) => {
+            link.updateTotalOpCycles(val);
+        });
     }
 
     public getPipesForDirection(direction: LinkID): string[] {
