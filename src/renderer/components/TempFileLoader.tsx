@@ -85,7 +85,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
 
                                     links: {},
                                 };
-                                const n = new ComputeNode(nodeData, idx, 0);
+                                const n = new ComputeNode(nodeData, idx);
                                 n.loc = simpleNode.loc;
                                 return n;
                             });
