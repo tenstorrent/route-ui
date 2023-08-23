@@ -1,5 +1,7 @@
 import {createSlice, configureStore, PayloadAction} from '@reduxjs/toolkit';
+import {updateOPCycles} from './DataStructures';
 
+// TODO: reset methods for saturation
 interface HighContrastState {
     enabled: boolean;
 }
@@ -225,12 +227,31 @@ export const {
     setArchitecture,
 } = nodeSelectionSlice.actions;
 
+export interface LinkData {
+    id: string;
+    totalDataBytes: number;
+    bpc: number;
+    saturation: number;
+    maxBandwidth: number;
+}
+
+interface LinkSaturationState {
+    linkSaturation: number;
+    showLinkSaturation: boolean;
+    links: Record<string, LinkData>;
+    totalOps: number;
+}
+
+const linkSaturationState: LinkSaturationState = {
+    linkSaturation: 75, // TODO: MAGIC NUMBER!!!
+    showLinkSaturation: false,
+    links: {},
+    totalOps: 0,
+};
+
 const linkSaturationSlice = createSlice({
     name: 'linkSaturation',
-    initialState: {
-        linkSaturation: 75,
-        showLinkSaturation: false,
-    },
+    initialState: linkSaturationState,
     reducers: {
         updateLinkSatuation: (state, action: PayloadAction<number>) => {
             state.linkSaturation = action.payload;
@@ -238,9 +259,27 @@ const linkSaturationSlice = createSlice({
         updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
             state.showLinkSaturation = action.payload;
         },
+        updateTotalOPs: (state, action: PayloadAction<number>) => {
+            state.totalOps = action.payload;
+            Object.values(state.links).forEach((link) => {
+                updateOPCycles(link, action.payload);
+            });
+        },
+        loadLinkData: (state, action: PayloadAction<LinkData[]>) => {
+            action.payload.forEach((item) => {
+                state.links[item.id] = item;
+            });
+        },
     },
 });
-export const {updateLinkSatuation, updateShowLinkSaturation} = linkSaturationSlice.actions;
+export const getLinkData = (state: RootState, id: string) => state.linkSaturation.links[id];
+export const {
+    //
+    loadLinkData,
+    updateTotalOPs,
+    updateLinkSatuation,
+    updateShowLinkSaturation,
+} = linkSaturationSlice.actions;
 // export const selectLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturation;
 // export const selectShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
 

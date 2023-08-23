@@ -11,7 +11,7 @@ import {clearAllOperations, clearAllPipes, openDetailedView, RootState, selectGr
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
-import LinkComponent from './components/LinkComponent';
+import LinkDetails from './components/LinkDetails';
 
 export default function PropertiesPanel() {
     const {svgData} = useContext(DataSource);
@@ -50,7 +50,6 @@ export default function PropertiesPanel() {
     // useEffect(() => {
     //     console.log(selectedNodes);
     // }, [selectedNodes]);
-
 
     const selectFilteredPipes = () => {
         if (!svgData) {
@@ -161,7 +160,7 @@ export default function PropertiesPanel() {
                                         <div className="node-links-wrap">
                                             <h4>Links</h4>
                                             {getLinksForNode(node).map((link: NOCLink, index) => (
-                                                <LinkComponent key={link.id} link={link} showEmpty />
+                                                <LinkDetails key={link.name} link={link} showEmpty />
                                             ))}
                                         </div>
                                     </div>

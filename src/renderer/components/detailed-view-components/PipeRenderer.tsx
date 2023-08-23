@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import * as d3 from 'd3';
 import {useSelector} from 'react-redux';
-import {DramID, GenericNOCLink, LinkID} from '../../../data/DataStructures';
+import {DramName, GenericNOCLink, LinkName} from '../../../data/DataStructures';
 import {calculateLinkCongestionColor, drawLink, drawPipesDirect} from '../../../utils/DrawingAPI';
 import {PipeSelection, RootState} from '../../../data/store';
 
@@ -18,22 +18,22 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
 
     const validLinkIds = [
-        LinkID.NOC0_IN,
-        LinkID.NOC1_IN,
-        LinkID.NOC0_OUT,
-        LinkID.NOC1_OUT,
-        DramID.NOC0_NOC2AXI,
-        DramID.NOC1_NOC2AXI,
-        DramID.DRAM_INOUT,
-        DramID.DRAM0_INOUT,
-        DramID.DRAM1_INOUT,
+        LinkName.NOC0_IN,
+        LinkName.NOC1_IN,
+        LinkName.NOC0_OUT,
+        LinkName.NOC1_OUT,
+        DramName.NOC0_NOC2AXI,
+        DramName.NOC1_NOC2AXI,
+        DramName.DRAM_INOUT,
+        DramName.DRAM0_INOUT,
+        DramName.DRAM1_INOUT,
     ];
 
     useEffect(() => {
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
 
-        const drawCongestion = (link: GenericNOCLink, id: DramID | LinkID) => {
+        const drawCongestion = (link: GenericNOCLink, id: DramName | LinkName) => {
             if (showLinkSaturation) {
                 if (link.linkSaturation >= linkSaturationTreshold) {
                     drawLink(svg, id, calculateLinkCongestionColor(link.linkSaturation, 0, isHighContrast), 5);
@@ -47,29 +47,29 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
 
             const validPipes = link.pipes.map((pipe) => pipe.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
 
-            const {id} = link;
-            if (id && validLinkIds.includes(id as LinkID | DramID)) {
-                switch (id) {
-                    case LinkID.NOC0_IN:
-                    case LinkID.NOC1_IN:
-                        drawCongestion(link, DramID.NOC_IN);
-                        drawPipesDirect(svg, DramID.NOC_IN, validPipes);
+            const {name} = link;
+            if (name && validLinkIds.includes(name as LinkName | DramName)) {
+                switch (name) {
+                    case LinkName.NOC0_IN:
+                    case LinkName.NOC1_IN:
+                        drawCongestion(link, DramName.NOC_IN);
+                        drawPipesDirect(svg, DramName.NOC_IN, validPipes);
                         break;
-                    case LinkID.NOC0_OUT:
-                    case LinkID.NOC1_OUT:
-                        drawCongestion(link, DramID.NOC_OUT);
-                        drawPipesDirect(svg, DramID.NOC_OUT, validPipes);
+                    case LinkName.NOC0_OUT:
+                    case LinkName.NOC1_OUT:
+                        drawCongestion(link, DramName.NOC_OUT);
+                        drawPipesDirect(svg, DramName.NOC_OUT, validPipes);
                         break;
-                    case DramID.NOC0_NOC2AXI:
-                    case DramID.NOC1_NOC2AXI:
-                        drawCongestion(link, id);
-                        drawPipesDirect(svg, id, validPipes);
+                    case DramName.NOC0_NOC2AXI:
+                    case DramName.NOC1_NOC2AXI:
+                        drawCongestion(link, name);
+                        drawPipesDirect(svg, name, validPipes);
                         break;
-                    case DramID.DRAM_INOUT:
-                    case DramID.DRAM0_INOUT:
-                    case DramID.DRAM1_INOUT:
-                        drawCongestion(link, DramID.DRAM_INOUT);
-                        drawPipesDirect(svg, DramID.DRAM_INOUT, validPipes);
+                    case DramName.DRAM_INOUT:
+                    case DramName.DRAM0_INOUT:
+                    case DramName.DRAM1_INOUT:
+                        drawCongestion(link, DramName.DRAM_INOUT);
+                        drawPipesDirect(svg, DramName.DRAM_INOUT, validPipes);
                         break;
                     default:
                         break;

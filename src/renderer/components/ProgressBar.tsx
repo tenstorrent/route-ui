@@ -4,8 +4,9 @@ interface ProgressBarProps {
     percent: number;
     color?: string;
 }
+
 const ProgressBar: FC<ProgressBarProps> = ({percent, color}) => {
-    let styles: {} = {width: `${percent}%`};
+    let styles: {} = {width: `${Math.min(percent, 100)}%`};
     if (color) {
         styles = {...styles, backgroundColor: color};
     }

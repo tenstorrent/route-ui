@@ -4,33 +4,34 @@ import {Pipe, convertBytes, GenericNOCLink} from '../../data/DataStructures';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import {calculateLinkCongestionColor} from '../../utils/DrawingAPI';
-import {RootState} from '../../data/store';
+import {getLinkData, RootState, selectNodeSelectionById} from '../../data/store';
 
-type LinkComponentProps = {
+type LinkDetailsProps = {
     link: GenericNOCLink;
     index?: number;
     showEmpty?: boolean;
 };
 
-const LinkComponent: React.FC<LinkComponentProps> = ({link, showEmpty, index}) => {
+const LinkDetails: React.FC<LinkDetailsProps> = ({link, showEmpty, index}) => {
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
-    const color: string = calculateLinkCongestionColor(link.linkSaturation, 0, isHighContrast);
+    const linkState = useSelector((state: RootState) => getLinkData(state, link.uid));
+    const color: string = calculateLinkCongestionColor(linkState?.saturation || 0, 0, isHighContrast);
+
     if (!showEmpty) {
         if (link.totalDataBytes === 0) {
             return null;
         }
     }
-    console.log('re-rendering link?');
 
     return (
-        <div key={link.id}>
+        <div key={link.name}>
             <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
                 <span>
-                    {link.id} - {index && index > -1 ? `${index} - ` : ''}
-                    {convertBytes(link.totalDataBytes)} <br /> {convertBytes(link.bpc, 2)} of {convertBytes(link.maxBandwidth)}
-                    <span style={{color}}> {link.linkSaturation.toFixed(2)}%</span>
+                    {link.name} - {index && index > -1 ? `${index} - ` : ''}
+                    {convertBytes(link.totalDataBytes)} <br /> {convertBytes(linkState?.bpc || 0, 2)} of {convertBytes(link.maxBandwidth)}
+                    <span style={{color}}> {linkState?.saturation.toFixed(2)}%</span>
                 </span>
-                {link.totalDataBytes > 0 && <ProgressBar percent={link.linkSaturation} color={color} />}
+                {link.totalDataBytes > 0 && <ProgressBar percent={linkState?.saturation || 0} color={color} />}
             </h5>
             <ul className="node-pipelist">
                 {link.pipes.map((pipe: Pipe) => (
@@ -42,8 +43,8 @@ const LinkComponent: React.FC<LinkComponentProps> = ({link, showEmpty, index}) =
         </div>
     );
 };
-LinkComponent.defaultProps = {
+LinkDetails.defaultProps = {
     showEmpty: true,
     index: -1,
 };
-export default LinkComponent;
+export default LinkDetails;
