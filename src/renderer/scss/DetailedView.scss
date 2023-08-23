@@ -1,10 +1,13 @@
+@import "variables";
+
+
 .detailed-view-card {
     padding: 15px;
     padding-bottom: 20px;
-    background-color: #33333d;
-    color: #fff;
+    background-color: $tt-background;
+    color: $tt-white-text;
     box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);
-    border: 1px solid #808080;
+    border: 1px solid $tt-medium-gray;
     border-radius: 0;
 
     .detailed-view-header {
@@ -21,7 +24,7 @@
 }
 
 .detailed-view-wrap {
-    background-color: #33333d;
+    background-color: $tt-background;
     display: flex;
     flex-direction: row;
     gap: 20px;
@@ -32,7 +35,7 @@
     }
 
     span.label {
-        color: #Fff;
+        color: #fff;
     }
 
     p.label {
@@ -49,15 +52,12 @@
         .subchannel {
             .subchannel-name {
                 margin-bottom: 5px;
-                color: #99c4ff;
+                color: $detailed-vew-light-text;
             }
 
             &.current {
                 .subchannel-name {
-                    color: #99ff00;
-                    //&:after {
-                    //    content: " \2713";
-                    //}
+                    color: $bright-highlight;
                 }
             }
         }
@@ -72,12 +72,11 @@
             display: flex;
             flex-direction: column;
             column-gap: 10px;
-            //background-color: #33333d;
 
             .noc2axi,
             .router {
-                background-color: #a6bce5;
-                color: #1c2127;
+                background-color: $detailed-vew-component;
+                color: $tt-very-dark-gray;
                 width: 120px;
                 text-align: center;
                 padding: 6px;
@@ -87,8 +86,8 @@
     }
 
     .axi {
-        background-color: #a6bce5;
-        color: #1c2127;
+        background-color: $detailed-vew-component;
+        color: $tt-very-dark-gray;
         width: 100%;
         text-align: center;
         padding: 6px;
@@ -105,8 +104,8 @@
             flex-direction: column;
 
             .axi-dram {
-                background-color: #a6bce5;
-                color: #1c2127;
+                background-color: $detailed-vew-component;
+                color: $tt-very-dark-gray;
                 text-align: center;
                 padding: 6px;
             }
@@ -143,7 +142,12 @@
         gap: 5px;
 
         .bp4-button:not([class*=bp4-intent-]):disabled, .bp4-button:not([class*=bp4-intent-]).bp4-disabled {
-            color: #000;
+            color: $tt-very-dark-gray;
         }
+    }
+
+    .detailed-view-data {
+        max-height: 476px;
+        overflow-y: auto;
     }
 }

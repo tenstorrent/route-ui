@@ -1,4 +1,4 @@
-import SVGData, {ComputeNode, DramID, LinkID, NOCLink} from './DataStructures';
+import SVGData, {ComputeNode, DramName, LinkName, NOCLink} from './DataStructures';
 
 export const getLinksForNode = (node: ComputeNode): NOCLink[] => {
     const nocLinks: NOCLink[] = [];
@@ -7,33 +7,33 @@ export const getLinksForNode = (node: ComputeNode): NOCLink[] => {
     });
 
     return nocLinks.sort((a, b) => {
-        const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.id) ?? Infinity;
-        const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.id) ?? Infinity;
+        const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.name) ?? Infinity;
+        const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.name) ?? Infinity;
         return firstKeyOrder - secondKeyOrder;
     });
 };
 export const getInternalLinksForNode = (node: ComputeNode): NOCLink[] => {
     const nocLinks: NOCLink[] = [];
     const internalIds = [
-        LinkID.NOC0_IN,
-        LinkID.NOC1_IN,
-        LinkID.NOC0_OUT,
-        LinkID.NOC1_OUT,
-        DramID.NOC0_NOC2AXI,
-        DramID.NOC1_NOC2AXI,
-        DramID.DRAM_INOUT,
-        DramID.DRAM0_INOUT,
-        DramID.DRAM1_INOUT,
+        LinkName.NOC0_IN,
+        LinkName.NOC1_IN,
+        LinkName.NOC0_OUT,
+        LinkName.NOC1_OUT,
+        DramName.NOC0_NOC2AXI,
+        DramName.NOC1_NOC2AXI,
+        DramName.DRAM_INOUT,
+        DramName.DRAM0_INOUT,
+        DramName.DRAM1_INOUT,
     ];
     node.links.forEach((link) => {
-        if (internalIds.includes(link.id)) {
+        if (internalIds.includes(link.name)) {
             nocLinks.push(link);
         }
     });
 
     return nocLinks.sort((a, b) => {
-        const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.id) ?? Infinity;
-        const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.id) ?? Infinity;
+        const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.name) ?? Infinity;
+        const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.name) ?? Infinity;
         return firstKeyOrder - secondKeyOrder;
     });
 };
@@ -52,12 +52,14 @@ export const getInternalPipeIDsForNode = (node: ComputeNode | undefined): string
     const pipes: string[] = [];
     if (!node) return pipes;
 
-    const internalLinks = [LinkID.NOC0_IN, LinkID.NOC0_OUT, LinkID.NOC1_IN, LinkID.NOC1_OUT];
+    const internalLinks = [LinkName.NOC0_IN, LinkName.NOC0_OUT, LinkName.NOC1_IN, LinkName.NOC1_OUT];
     node.links.forEach((link) => {
-        if (internalLinks.includes(link.id)) {
+        if (internalLinks.includes(link.name)) {
             pipes.push(...link.pipes.map((pipe) => pipe.id));
         }
     });
 
     return pipes;
 };
+
+export const LINK_SATURATION_INITIAIL_VALUE = 75;

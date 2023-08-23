@@ -4,11 +4,11 @@ import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
 import DataSource, {SVGContext} from '../../data/DataSource';
-import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramID, LinkID, NOC, NOCLink} from '../../data/DataStructures';
-import './detailed-view-components/DetailedView.scss';
+import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramName, LinkName, NOC, NOCLink} from '../../data/DataStructures';
+import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 import {getInternalLinksForNode, getInternalPipeIDsForNode} from '../../data/utils';
-import LinkComponent from './LinkComponent';
+import LinkDetails from './LinkDetails';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
@@ -36,7 +36,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
             setNodeList(allNodes || []);
             setDram(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
         }
-    }, [uid, svgData, isOpen]);
+    }, [uid, svgData, isOpen, showLinkSaturation]);
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -73,10 +73,10 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
                                         if (currentNode) {
-                                            noc0links.push(currentNode.links.get(LinkID.NOC0_IN) as NOCLink);
-                                            noc0links.push(currentNode.links.get(LinkID.NOC0_OUT) as NOCLink);
-                                            noc1links.push(currentNode.links.get(LinkID.NOC1_IN) as NOCLink);
-                                            noc1links.push(currentNode.links.get(LinkID.NOC1_OUT) as NOCLink);
+                                            noc0links.push(currentNode.links.get(LinkName.NOC0_IN) as NOCLink);
+                                            noc0links.push(currentNode.links.get(LinkName.NOC0_OUT) as NOCLink);
+                                            noc1links.push(currentNode.links.get(LinkName.NOC1_IN) as NOCLink);
+                                            noc1links.push(currentNode.links.get(LinkName.NOC1_OUT) as NOCLink);
                                         }
                                         const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
                                         return (
@@ -169,7 +169,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                             <div className="axi-dram-wrap">
                                                 <PipeRenderer
                                                     className="centered-svg"
-                                                    links={dram.links.filter((link) => link.id === DramID.DRAM0_INOUT)}
+                                                    links={dram.links.filter((link) => link.name === DramName.DRAM0_INOUT)}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
                                                 />
@@ -180,7 +180,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                             <div className="axi-dram-wrap">
                                                 <PipeRenderer
                                                     className="centered-svg"
-                                                    links={dram.links.filter((link) => link.id === DramID.DRAM1_INOUT)}
+                                                    links={dram.links.filter((link) => link.name === DramName.DRAM1_INOUT)}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
                                                 />
@@ -194,7 +194,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                         <div className="axi-dram-wrap">
                                             <PipeRenderer
                                                 className="centered-svg"
-                                                links={dram.links.filter((link) => link.id === DramID.DRAM_INOUT)}
+                                                links={dram.links.filter((link) => link.name === DramName.DRAM_INOUT)}
                                                 showLinkSaturation={showLinkSaturation}
                                                 linkSaturationTreshold={linkSaturationTreshold}
                                             />
@@ -209,7 +209,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
                                         return getInternalLinksForNode(n).map((link: NOCLink) => {
-                                            return <LinkComponent link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
+                                            return <LinkDetails key={link.name} link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
                                         });
                                     })}
                                     {dram.subchannels
@@ -217,12 +217,12 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                         .map((links) =>
                                             links.map((link) => (
                                                 //
-                                                <LinkComponent link={link} showEmpty={false} />
+                                                <LinkDetails key={link.name} link={link} showEmpty={false} />
                                             ))
                                         )}
                                     {dram.links.map((link) => (
                                         //
-                                        <LinkComponent link={link} showEmpty={false} />
+                                        <LinkDetails key={link.name} link={link} showEmpty={false} />
                                     ))}
                                 </div>
                             </div>

@@ -1,8 +1,8 @@
 import React from 'react';
-import './MainRouteRenderer.scss';
+import './scss/MainRouteRenderer.scss';
 import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
-import SideBar from './SideBar';
+import SideBar from './components/SideBar';
 
 const MainRouteRenderer: React.FC = () => {
     return (

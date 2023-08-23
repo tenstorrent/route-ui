@@ -2,7 +2,7 @@ import {useNavigate} from 'react-router-dom';
 import {Button, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {useDispatch} from 'react-redux';
-import {loadedFilename} from '../data/store';
+import {loadedFilename} from '../../data/store';
 
 export default function SideBar() {
     const navigate = useNavigate();

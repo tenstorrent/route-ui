@@ -1,18 +1,17 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
+import {Button, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
+import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import SVGData, {ComputeNode, ComputeNodeType, convertBytes, LinkID, NOCLink, Pipe} from '../data/DataStructures';
+import {ComputeNode, ComputeNodeType, NOCLink, Pipe} from '../data/DataStructures';
 
 import FilterableComponent from './components/FilterableComponent';
-import {openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
-import {calculateLinkCongestionColor} from '../utils/DrawingAPI';
-import ProgressBar from './components/ProgressBar';
+import {clearAllOperations, clearAllPipes, openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
-import LinkComponent from './components/LinkComponent';
+import LinkDetails from './components/LinkDetails';
 
 export default function PropertiesPanel() {
     const {svgData} = useContext(DataSource);
@@ -29,6 +28,9 @@ export default function PropertiesPanel() {
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
 
     useEffect(() => {
+        if (!svgData) {
+            return;
+        }
         const selected = nodeSelectionState.nodeList.filter((n) => n.selected);
         const selection: ComputeNode[] = svgData.nodes.filter((node: ComputeNode) => {
             return selected.filter((n) => n.id === node.uid).length > 0;
@@ -43,7 +45,33 @@ export default function PropertiesPanel() {
             opList.push(op);
         });
         setOperationsList(opList);
-    }, []);
+    }, [groups]);
+
+    // useEffect(() => {
+    //     console.log(selectedNodes);
+    // }, [selectedNodes]);
+
+    const selectFilteredPipes = () => {
+        if (!svgData) {
+            return;
+        }
+
+        svgData.allUniquePipes.forEach((pipe: Pipe) => {
+            if (pipe.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
+                dispatch(updatePipeSelection({id: pipe.id, selected: true}));
+            }
+        });
+    };
+    const selectFilteredOperations = () => {
+        if (!svgData) {
+            return;
+        }
+        Object.keys(groups).forEach((op) => {
+            if (op.toLowerCase().includes(opsFilter.toLowerCase())) {
+                dispatch(selectGroup({opName: op, selected: true}));
+            }
+        });
+    };
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -54,7 +82,7 @@ export default function PropertiesPanel() {
         dispatch(updateNodeSelection({id: node.uid, selected}));
     };
 
-    const selectNodesByOp = (opName: string, selected: boolean) => {
+    const selectOperationGroup = (opName: string, selected: boolean) => {
         dispatch(selectGroup({opName, selected}));
     };
 
@@ -100,7 +128,7 @@ export default function PropertiesPanel() {
                                                     <SelectableOperation
                                                         opName={node.opName}
                                                         value={nodeSelectionState.groups[node.opName].selected}
-                                                        selectFunc={selectNodesByOp}
+                                                        selectFunc={selectOperationGroup}
                                                         stringFilter=""
                                                     />
                                                 </Tooltip>
@@ -132,7 +160,7 @@ export default function PropertiesPanel() {
                                         <div className="node-links-wrap">
                                             <h4>Links</h4>
                                             {getLinksForNode(node).map((link: NOCLink, index) => (
-                                                <LinkComponent link={link} showEmpty />
+                                                <LinkDetails key={link.name} link={link} showEmpty />
                                             ))}
                                         </div>
                                     </div>
@@ -148,7 +176,30 @@ export default function PropertiesPanel() {
                     panel={
                         <div className="pipe-renderer-panel">
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={pipeFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)} />
+                                <InputGroup
+                                    rightElement={
+                                        pipeFilter ? (
+                                            <Button
+                                                minimal
+                                                onClick={() => {
+                                                    setPipeFilter('');
+                                                }}
+                                                icon={IconNames.CROSS}
+                                            />
+                                        ) : (
+                                            <Icon icon={IconNames.SEARCH} />
+                                        )
+                                    }
+                                    placeholder=""
+                                    value={pipeFilter}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}
+                                />
+                                <Tooltip2 content="Select all filtered pipes" position={PopoverPosition.RIGHT}>
+                                    <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
+                                </Tooltip2>
+                                <Tooltip2 content="Deselect all pipes" position={PopoverPosition.RIGHT}>
+                                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
+                                </Tooltip2>
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
@@ -173,13 +224,37 @@ export default function PropertiesPanel() {
                         </div>
                     }
                 />
+
                 <Tab
                     id="tab3"
                     title="Operations"
                     panel={
                         <div>
                             <div className="search-field">
-                                <InputGroup placeholder="Search..." value={opsFilter} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)} />
+                                <InputGroup
+                                    rightElement={
+                                        opsFilter ? (
+                                            <Button
+                                                minimal
+                                                onClick={() => {
+                                                    setOpsFilter('');
+                                                }}
+                                                icon={IconNames.CROSS}
+                                            />
+                                        ) : (
+                                            <Icon icon={IconNames.SEARCH} />
+                                        )
+                                    }
+                                    placeholder=""
+                                    value={opsFilter}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}
+                                />
+                                <Tooltip2 content="Select all filtered operations" position={PopoverPosition.RIGHT}>
+                                    <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
+                                </Tooltip2>
+                                <Tooltip2 content="Deselect all operations" position={PopoverPosition.RIGHT}>
+                                    <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                                </Tooltip2>
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
@@ -192,7 +267,7 @@ export default function PropertiesPanel() {
                                                 <SelectableOperation
                                                     opName={op}
                                                     value={nodeSelectionState.groups[op].selected}
-                                                    selectFunc={selectNodesByOp}
+                                                    selectFunc={selectOperationGroup}
                                                     stringFilter={opsFilter}
                                                 />
                                             }

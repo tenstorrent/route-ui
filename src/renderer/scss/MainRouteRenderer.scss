@@ -1,34 +1,41 @@
+@import "variables";
+
 .node {
     &:hover {
-        fill: #ececec;
+        fill: $tt-light-gray;
     }
 }
 
 .node-type-d {
-    fill: #7abdcc;
-    background-color: #7abdcc;
+    fill: $c-dram;
+    background-color: $c-dram;
 }
 
 .node-type-c {
-    fill: #a5cc7a;
-    background-color: #a5cc7a;
+    fill: $c-core;
+    background-color: $c-core;
 }
 
 .node-type-r {
-    fill: #d0c079;
-    background-color: #d0c079;
+    fill: $c-router;
+    background-color: $c-router;
 }
 
 .node-type-e {
-    fill: #a794ee;
-    background-color: #a794ee;
+    fill: $c-eth;
+    background-color: $c-eth;
+}
+
+.node-type-p {
+    fill: $c-pcix;
+    background-color: $c-pcix;
 }
 
 .node-type {
     border-bottom: 2px solid transparent;
 
     &.detailed-view {
-        border-bottom: 2px solid #99ff00;
+        border-bottom: 2px solid $bright-highlight;
     }
 }
 
@@ -52,7 +59,7 @@
     hr {
         border: none;
         width: 100%;
-        border-top: 1px solid #676767;
+        border-top: 1px solid $hr;
 
     }
 }
@@ -78,7 +85,7 @@
             width: 100px;
             height: 100px;
             position: relative;
-            border: 1px solid #1c2127;
+            border: 1px solid $tt-very-dark-gray;
 
             .op-color-swatch {
                 width: 20px;
@@ -97,7 +104,7 @@
             &.selected {
                 .node-border {
                     $inset: 4px;
-                    border: 2px solid #ffd500;
+                    border: 2px solid $node-select;
                     position: absolute;
                     top: $inset;
                     left: $inset;
@@ -108,7 +115,7 @@
 
                 &.detailed-view {
                     .node-border {
-                        border: 2px solid #99ff00;
+                        border: 2px solid $bright-highlight;
                     }
                 }
             }
@@ -131,7 +138,7 @@
                 height: 20px;
                 top: 0;
                 right: 0;
-                color: #1c2127;
+                color: $tt-very-dark-gray;
                 font-size: 16px;
                 line-height: 1;
                 display: flex;
@@ -150,24 +157,26 @@
 
 }
 
-.properties-panel__content {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 10px;
 
-
-}
 
 .opname {
     overflow: hidden;
 }
 
 .properties-panel {
-    background-color: #cbcbcb;
+    background-color: $tt-medium-light-gray;
     padding: 10px;
     flex-grow: 1;
     overflow-x: scroll;
     white-space: nowrap;
+
+    .properties-panel__content {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 10px;
+
+
+    }
 }
 
 
@@ -187,12 +196,12 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background-color: #494949;
+        background-color: $tt-off-background;
         padding: 10px;
 
 
         h3 {
-            color: #000000;
+            color: $tt-black;
             padding: 5px;
             display: flex;
             align-items: center;
@@ -210,9 +219,7 @@
 }
 
 .node-links-wrap {
-    background-color: #494949;
-    //padding: 10px;
-    //border: 1px solid;
+    background-color: $tt-off-background; //#494949;
 
     .link-title-details {
         position: relative;
@@ -222,23 +229,18 @@
         align-content: center;
         gap: 10px;
         margin-bottom: 5px;
-        color: #fff;
+        color: $tt-white-text;
 
         span {
-            color: #fff;
+            color: $tt-white-text;
         }
 
-        &.inactive {
-            color: #a5a5a5;
+        &.inactive,
+        &.inactive span {
+            color: $tt-medium-gray;
 
             input {
                 opacity: 0.5;
-            }
-        }
-
-        .progress-bar {
-            .track {
-                //background-color: #a20c0f;
             }
         }
     }
@@ -280,7 +282,7 @@
     .color-swatch {
         width: 10px;
         height: 10px;
-        border: 1px solid #ffffff;
+        border: 1px solid $tt-white-text;
         display: inline-block;
 
         &.transparent {
@@ -303,7 +305,7 @@
 
     li {
         span {
-            color: #1c2127;
+            color: $tt-very-dark-gray;
         }
     }
 }
@@ -318,18 +320,18 @@
     }
 
     .is-selected-pipe {
-        background-color: #fff58a;
+        background-color: $pipe-select;
     }
 }
 
 .properties-tabs {
     .bp4-tab {
-        background-color: #cbcbcb;
-        color: #000000;
+        background-color: $tt-medium-light-gray;
+        color: $tt-black;
         font-size: 16px;
 
         &[aria-selected="true"] {
-            color: #000000;
+            color: $tt-black;
         }
     }
 }
@@ -338,12 +340,26 @@
     display: flex;
     min-width: 250px;
 
+    .bp4-input-group {
+        display: flex;
+        align-items: center;
+
+        .bp4-input-action {
+            top: unset;
+            >.bp4-icon{
+                margin-right:5px;
+                svg{
+                    fill: $tt-dark-gray
+                }
+            }
+        }
+    }
 }
 
 .opname,
 .operations-wrap {
     .op-element {
-        color: #000;
+        color: $tt-black;
         display: flex;
         gap: 5px;
         justify-items: center;
@@ -352,11 +368,10 @@
         .color-swatch {
             width: 10px;
             height: 10px;
-            border: 1px solid #ffffff;
+            border: 1px solid $tt-white-text;
             display: inline-block;
 
             &.transparent {
-                //display: none;
             }
         }
     }
@@ -368,7 +383,7 @@
 
 .opname {
     span {
-        color: #fff;
+        color: $tt-white-text;
     }
 }
 
@@ -383,13 +398,13 @@
 
 .progress-bar {
     width: 100px;
-    background-color: #262626;
+    background-color: $progress-bar-track;
     height: 4px;
     position: absolute;
     bottom: -2px;
 
     span {
-        background-color: #7abdcc;
+        background-color: $progress-bar-fill;
         height: 4px;
         display: block;
     }
@@ -399,28 +414,15 @@
 .link-saturation-slider {
     .bp4-slider-track {
         .bp4-slider-progress {
-            background-color: #2d72d2;
+            background-color: $link-saturation-track;
 
             &.bp4-intent-primary,
             &:first-of-type {
-                background-color: rgba(95, 107, 124, 0.2);
+                background-color: $link-saturation-fill;
             }
         }
-
     }
 }
 
-.detailed-view-card {
-    color: #1c2127;
-}
 
-.detailed-view-wrap {
-    color: #1c2127;
-
-    .detailed-view-svg {
-        rect {
-            fill: #a6bce5;
-        }
-    }
-}
 

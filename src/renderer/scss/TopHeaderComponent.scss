@@ -1,0 +1,12 @@
+@import "variables";
+
+
+.top-header-component {
+    color: $tt-medium-light-gray;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    .bp4-control.bp4-switch{
+        margin-bottom: 0;
+    }
+}
