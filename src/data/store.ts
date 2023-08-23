@@ -1,7 +1,7 @@
 import {createSlice, configureStore, PayloadAction} from '@reduxjs/toolkit';
 import {updateOPCycles} from './DataStructures';
+import {LINK_SATURATION_INITIAIL_VALUE} from './utils';
 
-// TODO: reset methods for saturation
 interface HighContrastState {
     enabled: boolean;
 }
@@ -243,7 +243,7 @@ interface LinkSaturationState {
 }
 
 const linkSaturationState: LinkSaturationState = {
-    linkSaturation: 75, // TODO: MAGIC NUMBER!!!
+    linkSaturation: LINK_SATURATION_INITIAIL_VALUE,
     showLinkSaturation: false,
     links: {},
     totalOps: 0,
@@ -266,6 +266,7 @@ const linkSaturationSlice = createSlice({
             });
         },
         loadLinkData: (state, action: PayloadAction<LinkData[]>) => {
+            state.links = {};
             action.payload.forEach((item) => {
                 state.links[item.id] = item;
             });

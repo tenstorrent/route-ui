@@ -61,3 +61,5 @@ export const getInternalPipeIDsForNode = (node: ComputeNode | undefined): string
 
     return pipes;
 };
+
+export const LINK_SATURATION_INITIAIL_VALUE = 75;

@@ -1,5 +1,4 @@
 // colors have not been finilized yet
-// TODO: we might need a separate color generator for group/ops
 const colorList: string[] = [
     // '#000000', // Black
     '#FFFFFF', // White

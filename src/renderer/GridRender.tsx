@@ -10,6 +10,7 @@ import {clearAllOperations, clearAllPipes, RootState, selectAllPipes, updateLink
 import NodeGridElement from './components/NodeGridElement';
 import {ComputeNode} from '../data/DataStructures';
 import DetailedView from './components/DetailedView';
+import {LINK_SATURATION_INITIAIL_VALUE} from '../data/utils';
 
 export default function GridRender() {
     const {svgData, setSvgData} = useContext<SVGContext>(DataSource);
@@ -19,7 +20,7 @@ export default function GridRender() {
     const [showNodeLocation, setShowNodeLocation] = useState(false);
     const [gridZoom, setGridZoom] = useState(1);
     const [showLinkSaturation, setShowLinkSaturation] = useState(false);
-    const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(75);
+    const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(LINK_SATURATION_INITIAIL_VALUE);
     const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
     const [opCycles, setOpCycles] = useState<number>(0);
 

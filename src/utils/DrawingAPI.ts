@@ -288,7 +288,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
                 p3: `${lineEndX},${lineEndY + arrowOffset}`,
             };
             break;
-        // TODO: needs to be refactored to something more generic
+        // TODO: Dram needs to be refactored to something more generic, will address when doing ethernet, requires data update.
         case DramName.DRAM_INOUT:
         case DramName.NOC0_NOC2AXI:
         case DramName.NOC1_NOC2AXI:
