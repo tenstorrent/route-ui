@@ -4,15 +4,15 @@ import './App.scss';
 import {useState} from 'react';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import DataSource from '../data/DataSource';
-import SVGData from '../data/DataStructures';
+import GridData from '../data/DataStructures';
 import MainRouteRenderer from './MainRouteRenderer';
 import SplashScreen from './SplashScreen';
 import store from '../data/store';
-import {SVGJson} from '../data/JSONDataTypes';
+import {NetlistAnalyzerDataJSON} from '../data/JSONDataTypes';
 import TopHeaderComponent from './components/TopHeaderComponent';
 
 export default function App() {
-    const [svgData, setSvgData] = useState<SVGData>(null);
+    const [gridData, setGridData] = useState<GridData>(null);
 
     return (
         <Provider store={store}>
@@ -20,10 +20,10 @@ export default function App() {
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            <DataSource.Provider value={{svgData, setSvgData}}>
+            <DataSource.Provider value={{gridData, setGridData}}>
                 <Router>
                     <Routes>
-                        <Route path="/" element={<SplashScreen updateData={setSvgData} />} />
+                        <Route path="/" element={<SplashScreen updateData={setGridData} />} />
                         <Route path="/render" element={<MainRouteRenderer />} />
                     </Routes>
                 </Router>

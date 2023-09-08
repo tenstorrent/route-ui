@@ -1,18 +1,18 @@
-import SVGData, {ComputeNode, DramName, LinkName, NOCLink} from './DataStructures';
+import GridData, {ComputeNodeData, DramName, LinkName, NOCLink} from './DataStructures';
 
-export const getLinksForNode = (node: ComputeNode): NOCLink[] => {
+export const getLinksForNode = (node: ComputeNodeData): NOCLink[] => {
     const nocLinks: NOCLink[] = [];
     node.links.forEach((link) => {
         nocLinks.push(link);
     });
 
     return nocLinks.sort((a, b) => {
-        const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.name) ?? Infinity;
-        const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.name) ?? Infinity;
+        const firstKeyOrder = GridData.GET_NOC_ORDER().get(a.name) ?? Infinity;
+        const secondKeyOrder = GridData.GET_NOC_ORDER().get(b.name) ?? Infinity;
         return firstKeyOrder - secondKeyOrder;
     });
 };
-export const getInternalLinksForNode = (node: ComputeNode): NOCLink[] => {
+export const getInternalLinksForNode = (node: ComputeNodeData): NOCLink[] => {
     const nocLinks: NOCLink[] = [];
     const internalIds = [
         LinkName.NOC0_IN,
@@ -32,13 +32,13 @@ export const getInternalLinksForNode = (node: ComputeNode): NOCLink[] => {
     });
 
     return nocLinks.sort((a, b) => {
-        const firstKeyOrder = SVGData.GET_NOC_ORDER().get(a.name) ?? Infinity;
-        const secondKeyOrder = SVGData.GET_NOC_ORDER().get(b.name) ?? Infinity;
+        const firstKeyOrder = GridData.GET_NOC_ORDER().get(a.name) ?? Infinity;
+        const secondKeyOrder = GridData.GET_NOC_ORDER().get(b.name) ?? Infinity;
         return firstKeyOrder - secondKeyOrder;
     });
 };
 
-export const getPipeIdsForNode = (node: ComputeNode): string[] => {
+export const getPipeIdsForNode = (node: ComputeNodeData): string[] => {
     const pipes: string[] = [];
 
     node.links.forEach((link) => {
@@ -48,7 +48,7 @@ export const getPipeIdsForNode = (node: ComputeNode): string[] => {
     return pipes;
 };
 
-export const getInternalPipeIDsForNode = (node: ComputeNode | undefined): string[] => {
+export const getInternalPipeIDsForNode = (node: ComputeNodeData | undefined): string[] => {
     const pipes: string[] = [];
     if (!node) return pipes;
 

@@ -3,8 +3,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
-import DataSource, {SVGContext} from '../../data/DataSource';
-import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramName, LinkName, NOC, NOCLink} from '../../data/DataStructures';
+import DataSource, {GridContext} from '../../data/DataSource';
+import {ARCHITECTURE, ComputeNodeData, ComputeNodeType, DramChannel, DramName, LinkName, NOC, NOCLink} from '../../data/DataStructures';
 import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 import {getInternalLinksForNode, getInternalPipeIDsForNode} from '../../data/utils';
@@ -17,26 +17,26 @@ interface DetailedViewProps {
 }
 
 const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSaturationTreshold, zoom}) => {
-    const {svgData} = useContext<SVGContext>(DataSource);
+    const {gridData} = useContext<GridContext>(DataSource);
     const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);
     const dispatch = useDispatch();
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
-    const [node, setNode] = React.useState<ComputeNode | null>(null);
-    const [nodeList, setNodeList] = React.useState<ComputeNode[]>([]);
+    const [node, setNode] = React.useState<ComputeNodeData | null>(null);
+    const [nodeList, setNodeList] = React.useState<ComputeNodeData[]>([]);
     const [dram, setDram] = React.useState<DramChannel | null>(null);
     useEffect(() => {
-        if (svgData && uid !== null) {
-            const selectedNode = svgData.nodes.find((n) => n.uid === uid);
-            let allNodes: ComputeNode[] | undefined;
+        if (gridData && uid !== null) {
+            const selectedNode = gridData.nodes.find((n) => n.uid === uid);
+            let allNodes: ComputeNodeData[] | undefined;
             if (selectedNode && selectedNode.dramChannel > -1) {
-                allNodes = svgData?.nodes.filter((n) => n.dramChannel === selectedNode?.dramChannel);
+                allNodes = gridData?.nodes.filter((n) => n.dramChannel === selectedNode?.dramChannel);
             }
 
             setNode(selectedNode || null);
             setNodeList(allNodes || []);
-            setDram(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
+            setDram(gridData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
         }
-    }, [uid, svgData, isOpen, showLinkSaturation]);
+    }, [uid, gridData, isOpen, showLinkSaturation]);
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {

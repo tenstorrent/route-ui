@@ -17,6 +17,7 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
 
+    const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const validLinkIds = [
         LinkName.NOC0_IN,
         LinkName.NOC1_IN,
@@ -35,8 +36,9 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
 
         const drawCongestion = (link: GenericNOCLink, id: DramName | LinkName) => {
             if (showLinkSaturation) {
-                if (link.linkSaturation >= linkSaturationTreshold) {
-                    drawLink(svg, id, calculateLinkCongestionColor(link.linkSaturation, 0, isHighContrast), 5);
+                const linkData = linksData[link.uid];
+                if (linkData.saturation >= linkSaturationTreshold) {
+                    drawLink(svg, id, calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast), 5);
                 }
             }
         };

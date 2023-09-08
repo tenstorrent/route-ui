@@ -52,6 +52,12 @@
     width: calc(100% - 100px);
 }
 
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .inner-sidebar {
     display: flex;
     flex-direction: column;
@@ -61,6 +67,12 @@
         width: 100%;
         border-top: 1px solid $hr;
 
+    }
+
+    .bp4-numeric-input {
+        .bp4-input-group {
+            max-width: 150px;
+        }
     }
 }
 
@@ -120,7 +132,33 @@
                 }
             }
 
+            &.core-highlight-input,
+            &.core-highlight-output {
+                .core-highlight {
+                    $inset: 7px;
+                    position: absolute;
+                    top: $inset;
+                    left: $inset;
+                    bottom: $inset;
+                    right: $inset;
+                    z-index: 0;
+                }
+            }
+
+            &.core-highlight-input {
+                .core-highlight {
+                    border: 2px solid $core-highlight-inout;
+                }
+            }
+
+            &.core-highlight-output {
+                .core-highlight {
+                    border: 2px solid $core-highlight-output;
+                }
+            }
+
             .group-border,
+            .operand-wrap,
             .dram-border {
                 width: 100%;
                 height: 100%;
@@ -130,6 +168,24 @@
                 bottom: 0;
                 right: 0;
                 z-index: 0;
+            }
+
+            .operand-wrap {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .operand {
+                width: 20px;
+                height: 20px;
+                opacity: 0.5;
+                //position: absolute;
+                //top: 0;
+                //right: 0;
+                //bottom: 0;
+                //right: 0;
+                //z-index: 0;
             }
 
             .node-type-label {
@@ -147,9 +203,16 @@
                 z-index: 0;
             }
 
+            .node-focus-svg,
             .node-svg {
                 position: absolute;
                 z-index: 1;
+            }
+
+            .node-svg {
+                &.focus-mode {
+                    opacity: 0.15;
+                }
             }
         }
     }
@@ -158,9 +221,8 @@
 }
 
 
-
 .opname {
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .properties-panel {
@@ -189,6 +251,7 @@
     gap: 20px;
     max-height: calc(100vh - 200px);
 
+
     .node-element {
         width: 25%;
         height: 100%;
@@ -206,6 +269,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .io-label {
+            color: $tt-white-text;
+            margin-bottom: 5px;
         }
 
         .node-controls {
@@ -346,9 +414,11 @@
 
         .bp4-input-action {
             top: unset;
-            >.bp4-icon{
-                margin-right:5px;
-                svg{
+
+            > .bp4-icon {
+                margin-right: 5px;
+
+                svg {
                     fill: $tt-dark-gray
                 }
             }
@@ -378,6 +448,20 @@
 
     label {
         margin-bottom: 0;
+    }
+
+    .io-label {
+        margin-left: 12px;
+    }
+
+    .operation-input {
+        margin-bottom: 5px;
+        margin-left: 20px;
+
+        p {
+            margin-bottom: 0;
+            font-size: 12px;
+        }
     }
 }
 
@@ -423,6 +507,7 @@
         }
     }
 }
+
 
 
 

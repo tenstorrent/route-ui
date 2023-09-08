@@ -1,5 +1,6 @@
-import {LinkData, NodeData, PipeSelection} from './store';
-import {SVGJson, NodeJson, NOCLinkJson, DramChannelJson} from './JSONDataTypes';
+import {LinkStateData, NodeData, PipeSelection} from './store';
+import {NetlistAnalyzerDataJSON, NodeDataJSON, NOCLinkJSON, DramChannelJSON} from './JSONDataTypes';
+import DataOps, {CoreOperationData, OperandData, OperationData} from './DataOps';
 
 export enum LinkName {
     NONE = 'none',
@@ -52,22 +53,22 @@ export enum NOC {
     NOC1 = 'noc1',
 }
 
-export default class SVGData {
+export default class GridData {
     private static NOC_ORDER: Map<LinkName, number>;
 
     public static GET_NOC_ORDER(): Map<LinkName, number> {
-        if (!SVGData.NOC_ORDER) {
-            SVGData.NOC_ORDER = new Map(
+        if (!GridData.NOC_ORDER) {
+            GridData.NOC_ORDER = new Map(
                 Object.keys(LinkName)
                     .map((key) => LinkName[key])
                     .map((noc, index) => [noc, index])
             );
         }
 
-        return SVGData.NOC_ORDER;
+        return GridData.NOC_ORDER;
     }
 
-    public nodes: ComputeNode[] = [];
+    public nodes: ComputeNodeData[] = [];
 
     public totalCols: number = 0;
 
@@ -79,21 +80,40 @@ export default class SVGData {
 
     public architecture: ARCHITECTURE = ARCHITECTURE.NONE;
 
-    private uniquePipeList: Pipe[] = [];
+    private uniquePipeList: PipeData[] = [];
 
     public dramChannels: DramChannel[] = [];
 
     public totalOpCycles: number = 0;
 
-    constructor(data?: SVGJson) {
-        SVGData.GET_NOC_ORDER();
+    // augmented data
 
-        if (!data) {
-            return;
-        }
+    public operations: OperationData[] = [];
 
+    public cores: CoreOperationData[] = [];
+
+    public pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
+
+    public pipesPerCore: Map<string, string[]> = new Map<string, string[]>();
+
+    public pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
+
+    public coreGroupsPerOperation: Map<string, string[]> = new Map<string, string[]>();
+
+    public coreGroupsPerOperand: Map<string, string[]> = new Map<string, string[]>();
+
+    public operandsByCore: Map<string, string[]> = new Map<string, string[]>();
+
+    public operationsByCore: Map<string, string[]> = new Map<string, string[]>();
+
+    constructor() {
+        GridData.GET_NOC_ORDER();
+    }
+
+    public loadFromNetlistJSON(data: NetlistAnalyzerDataJSON) {
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
+
         if (data.arch) {
             if (data.arch.includes(ARCHITECTURE.GRAYSKULL)) {
                 this.architecture = ARCHITECTURE.GRAYSKULL;
@@ -106,12 +126,13 @@ export default class SVGData {
         this.totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
 
         this.nodes = data.nodes
-            .map((node, i: number) => {
-                const loc: Loc = {x: node.location[1], y: node.location[0]};
+            .map((nodeJSON) => {
+                const loc: Loc = {x: nodeJSON.location[1], y: nodeJSON.location[0]};
                 this.totalCols = Math.max(loc.y, this.totalCols);
                 this.totalRows = Math.max(loc.x, this.totalRows);
-                // console.log(node.dram_channel, node.dram_subchannel);
-                return new ComputeNode(node, i);
+                const node = new ComputeNodeData(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+                node.fromNetlistJSON(nodeJSON);
+                return node;
             })
             .sort((a, b) => {
                 if (a.loc.y !== b.loc.y) {
@@ -160,7 +181,25 @@ export default class SVGData {
         );
     }
 
-    getAllLinks(): LinkData[] {
+    getPipeInfo(pipeId: string): ComputeNodeDataExtended[] {
+        const list: ComputeNodeDataExtended[] = [];
+        this.nodes.forEach((node) => {
+            let hasPipe = false;
+            node.links.forEach((link) => {
+                if (link.pipes.filter((pipe) => pipe.id === pipeId).length > 0) {
+                    hasPipe = true;
+                }
+            });
+            if (hasPipe) {
+                const extendedNodeData = new ComputeNodeDataExtended(node);
+                extendedNodeData.coreOpertaionData = this.cores.find((core) => core.coreID === node.uid) || null;
+                list.push(extendedNodeData);
+            }
+        });
+        return list;
+    }
+
+    getAllLinks(): LinkStateData[] {
         const links: GenericNOCLink[] = [];
         this.nodes.forEach((node) => {
             node.links.forEach((link) => {
@@ -185,21 +224,21 @@ export default class SVGData {
         }));
     }
 
-    get allUniquePipes(): Pipe[] {
+    get allUniquePipes(): PipeData[] {
         if (!this.uniquePipeList.length) {
             this.uniquePipeList = this.getAllPipes();
         }
         return this.uniquePipeList;
     }
 
-    private getAllPipes(): Pipe[] {
-        let list: Pipe[] = [];
+    private getAllPipes(): PipeData[] {
+        let list: PipeData[] = [];
         this.nodes.forEach((node) => {
             node.links.forEach((link) => {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: {[key: string]: Pipe} = {};
+        const uniquePipeObj: {[key: string]: PipeData} = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -224,7 +263,7 @@ export class DramChannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, json: DramChannelJson) {
+    constructor(id: number, json: DramChannelJSON) {
         this.id = id;
         if (json.subchannels) {
             this.subchannels = json.subchannels.map((subchannel, i) => {
@@ -242,7 +281,7 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, channelId: number, json: {[key: string]: NOCLinkJson}) {
+    constructor(id: number, channelId: number, json: {[key: string]: NOCLinkJSON}) {
         this.subchannelId = id;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(new DramLink(key as DramName, `${channelId}-${id}-${key}`, value));
@@ -261,24 +300,24 @@ export class GenericNOCLink {
 
     public maxBandwidth: number = 0;
 
-    public pipes: Pipe[] = [];
+    public pipes: PipeData[] = [];
 
     public noc: NOC;
 
-    constructor(name: string, uid: string, json: NOCLinkJson) {
+    constructor(name: string, uid: string, json: NOCLinkJSON) {
         this.uid = uid;
         this.numOccupants = json.num_occupants;
         this.totalDataBytes = json.total_data_in_bytes;
         this.maxBandwidth = json.max_link_bw;
         this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
-        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes));
+        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new PipeData(pipe, bandwidth, name, this.totalDataBytes));
     }
 }
 
 export class DramLink extends GenericNOCLink {
     public name: DramName;
 
-    constructor(name: DramName, uid: string, json: NOCLinkJson) {
+    constructor(name: DramName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
         this.name = name as DramName;
 
@@ -291,16 +330,18 @@ export class DramLink extends GenericNOCLink {
 export class NOCLink extends GenericNOCLink {
     public name: LinkName;
 
-    constructor(name: LinkName, uid: string, json: NOCLinkJson) {
+    constructor(name: LinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
         this.name = name;
     }
 }
 
-export class ComputeNode {
-    public uid: number; // TODO: possibly update, we shoudl no longeer be relying on order
+export class ComputeNodeData {
+    static fromNetlistJSON(nodeJSON: NodeDataJSON) {
+        return new ComputeNodeData(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+    }
 
-    public id: string = '';
+    public uid: string;
 
     public type: ComputeNodeType = ComputeNodeType.NONE;
 
@@ -310,17 +351,19 @@ export class ComputeNode {
 
     public opCycles: number = 0;
 
-    public json;
-
-    public links: Map<any, NOCLink>;
+    public links: Map<any, NOCLink> = new Map();
 
     public dramChannel: number = -1;
 
     public dramSubchannel: number = 0;
 
-    constructor(json: NodeJson, uid: number) {
+    constructor(uid: string) {
         this.uid = uid;
-        this.json = json;
+    }
+
+    // this should be static
+    public fromNetlistJSON(json: NodeDataJSON) {
+        // this.uid = uid;
         this.opName = json.op_name;
         this.opCycles = json.op_cycles;
         this.links = new Map();
@@ -331,6 +374,7 @@ export class ComputeNode {
             this.dramSubchannel = json.dram_subchannel || 0;
         }
         this.loc = {x: json.location[0], y: json.location[1]};
+        this.uid = `0-${this.loc.y}-${this.loc.x}`;
 
         const linkId = `${this.loc.x}-${this.loc.y}`;
 
@@ -361,7 +405,16 @@ export class ComputeNode {
     }
 }
 
-export class Pipe {
+export class ComputeNodeDataExtended extends ComputeNodeData {
+    public coreOpertaionData: CoreOperationData | null;
+
+    constructor(data: ComputeNodeData) {
+        super(data.uid);
+        Object.assign(this, data);
+    }
+}
+
+export class PipeData {
     id: string = '';
 
     location: Loc = {x: 0, y: 0};
@@ -394,7 +447,7 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
     return `${(bytes / 1024 ** i).toFixed(numAfterComma)} ${sizes[i]}`;
 };
 
-export const updateOPCycles = (link: LinkData, totalOpCycles: number) => {
+export const updateOPCycles = (link: LinkStateData, totalOpCycles: number) => {
     link.bpc = link.totalDataBytes / totalOpCycles;
     link.saturation = (link.bpc / link.maxBandwidth) * 100;
 };

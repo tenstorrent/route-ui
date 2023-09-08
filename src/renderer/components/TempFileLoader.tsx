@@ -6,28 +6,40 @@ import {useNavigate} from 'react-router-dom';
 import {FC, useContext} from 'react';
 import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
+import path from 'path';
 import DataSource from '../../data/DataSource';
-import SVGData, {ComputeNode} from '../../data/DataStructures';
+import GridData, {ComputeNodeData, DramLink, DramName} from '../../data/DataStructures';
 import yamlValidate from '../../data/DataUtils';
-import {closeDetailedView, loadedFilename, loadNodesData, loadPipeSelection, setArchitecture} from '../../data/store';
-import {NOCLinkJson, SVGJson} from '../../data/JSONDataTypes';
+import {
+    closeDetailedView,
+    loadedFilename,
+    loadIoData,
+    loadIoDataIn,
+    loadIoDataOut,
+    loadLinkData,
+    loadNodesData,
+    loadPipeSelection,
+    setArchitecture,
+    updateTotalOPs
+} from '../../data/store';
+import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import ChipDesign from '../../data/ChipDesign';
+import {parseOpDataFormat} from '../../data/DataParsers';
+import DataOps from '../../data/DataOps';
 
 interface TempFileLoaderProps {
-    updateData: (data: SVGData) => void;
+    updateData: (data: GridData) => void;
 }
 
 /**
- * Temporary file loader for arch.yaml files
+ * Temporary file loader for all files and filetypes
  * @param updateData
  * @constructor
  *
- * @description This component is used to test load arch.yaml files to see data compatibility and pave the way for the new arch.json format
  */
 const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
     const navigate = useNavigate();
-    const {setSvgData} = useContext(DataSource);
-
+    const {gridData, setGridData} = useContext(DataSource);
     const dispatch = useDispatch();
 
     const loadFile = async () => {
@@ -51,19 +63,21 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
-                filelist.forEach((filename) => {
+                filelist.forEach((filepath) => {
+                    const filename = path.basename(filepath);
+                    const ext = path.extname(filepath);
                     try {
                         let parsedFile;
                         let doc;
-                        switch (filename.split('.').pop()) {
-                            case 'yaml':
+                        switch (ext) {
+                            case '.yaml':
                                 doc = parse(data);
-                                console.log(doc);
+                                // console.log(doc);
                                 parsedFile = doc;
                                 // console.log(JSON.stringify(doc));
                                 break;
-                            case 'json':
-                                console.log(data);
+                            case '.json':
+                                // console.log(data);
                                 parsedFile = data;
                                 // console.log(JSON.stringify(data));
                                 break;
@@ -71,29 +85,64 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                                 console.log('unknown file type');
                         }
                         if (filename.includes('arch')) {
-                            const obj = new ChipDesign(parsedFile);
-                            console.log(obj);
-                            const svgData = new SVGData();
-                            svgData.nodes = obj.nodes.map((simpleNode, idx) => {
-                                const nodeData = {
-                                    location: [],
-                                    type: simpleNode.type,
-                                    id: '',
-                                    noc: '',
-                                    op_name: '',
-                                    op_cycles: 0,
-
-                                    links: {},
-                                };
-                                const n = new ComputeNode(nodeData, idx);
+                            const chipDesign = new ChipDesign(parsedFile);
+                            // console.log(chipDesign);
+                            const localGridData = new GridData();
+                            localGridData.nodes = chipDesign.nodes.map((simpleNode) => {
+                                const n = new ComputeNodeData(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
+                                n.type = simpleNode.type;
                                 n.loc = simpleNode.loc;
+                                n.dramChannel = simpleNode.dramChannel;
+                                n.dramSubchannel = simpleNode.dramSubchannel;
                                 return n;
                             });
-                            svgData.totalRows = obj.totalRows;
-                            svgData.totalCols = obj.totalCols;
-                            updateData(svgData);
-                            dispatch(loadNodesData(svgData.getAllNodes()));
-                            navigate('/render');
+                            localGridData.totalRows = chipDesign.totalRows;
+                            localGridData.totalCols = chipDesign.totalCols;
+                            updateData(localGridData);
+                            dispatch(loadNodesData(localGridData.getAllNodes()));
+                            dispatch(setArchitecture(chipDesign.architecture));
+                            // navigate('/render');
+                        }
+                        if (filename.includes('analyzer_output_temporal_epoch')) {
+                            const localGridData = new GridData();
+                            // const start = performance.now();
+                            localGridData.loadFromNetlistJSON(doc as NetlistAnalyzerDataJSON);
+                            updateData(localGridData);
+                            dispatch(closeDetailedView());
+                            dispatch(setArchitecture(localGridData.architecture));
+                            dispatch(loadedFilename(filename));
+                            dispatch(loadPipeSelection(localGridData.getAllPipeIds()));
+                            dispatch(loadNodesData(localGridData.getAllNodes()));
+                            dispatch(loadLinkData(localGridData.getAllLinks()));
+                            dispatch(updateTotalOPs(localGridData.totalOpCycles));
+                        }
+                        if (filename.includes('op_to_pipe')) {
+                            // const json = JSON.parse(parsedFile);
+                            console.log(parsedFile);
+                            const dataOps = new DataOps();
+                            dataOps.fromOpsJSON(parsedFile.ops);
+                            if (gridData) {
+                                gridData.operations = dataOps.operations;
+                                gridData.cores = dataOps.cores;
+                                gridData.pipesPerOp = dataOps.pipesPerOp;
+                                gridData.pipesPerOperand = dataOps.pipesPerOperand;
+                                gridData.pipesPerCore = dataOps.pipesPerCore;
+                                gridData.coreGroupsPerOperation = dataOps.coreGroupsPerOperation;
+                                gridData.coreGroupsPerOperand = dataOps.coreGroupsPerOperand;
+                                gridData.operationsByCore = dataOps.operationsByCore;
+                                gridData.operandsByCore = dataOps.operandsByCore;
+
+                                dispatch(loadIoDataIn(dataOps.operandsByCoreInputs));
+                                dispatch(loadIoDataOut(dataOps.operandsByCoreOutputs));
+
+                                console.log(gridData.operations);
+                                setGridData(gridData);
+                            }
+                            console.log(dataOps);
+                        }
+                        if (filename.includes('sample')) {
+                            const json = JSON.parse(parsedFile);
+                            console.log(JSON.stringify(parseOpDataFormat(json)));
                         }
                     } catch (error) {
                         console.error(error);
@@ -105,7 +154,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
 
     return (
         <div className="">
-            <Button icon={IconNames.UPLOAD} text="Load yaml or json file" onClick={loadFile} />
+            <Button icon={IconNames.UPLOAD} text="Load yaml or json files one at a time, analyzer output first" onClick={loadFile} />
         </div>
     );
 };

@@ -9,9 +9,9 @@ export enum ComputeNodeTypeArch {
     FUNCTIONAL_WORKERS = 'functional_workers',
 }
 
-interface ChipDesignJson {
+export interface ChipDesignJSON {
     arch_name: ComputeNodeTypeArch;
-    grid: { x_size: number; y_size: number };
+    grid: {x_size: number; y_size: number};
     arc: string[];
     dram: [string[]];
     eth: string[];
@@ -29,7 +29,7 @@ export default class ChipDesign {
 
     public nodes: ComputeNodeSimple[] = [];
 
-    constructor(json: ChipDesignJson) {
+    constructor(json: ChipDesignJSON) {
         if (json.arch_name.toLowerCase().includes(ARCHITECTURE.GRAYSKULL)) {
             this.architecture = ARCHITECTURE.GRAYSKULL;
         }
@@ -47,9 +47,17 @@ export default class ChipDesign {
             ...json.functional_workers.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.CORE, loc);
             }),
-            ...json.dram.flat().map((loc) => {
-                return new ComputeNodeSimple(ComputeNodeType.DRAM, loc);
-            }),
+            ...json.dram
+                .map((channel, dramChannel) => {
+                    return channel.map((loc, dramSubChannel) => {
+                        const core = new ComputeNodeSimple(ComputeNodeType.DRAM, loc);
+                        core.dramChannel = dramChannel;
+                        core.dramSubchannel = dramSubChannel;
+                        return core;
+                    });
+                })
+                .flat(),
+
             ...json.eth.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.ETHERNET, loc);
             }),
@@ -73,6 +81,10 @@ export class ComputeNodeSimple {
     public type: ComputeNodeType;
 
     public loc: Loc = {x: 0, y: 0};
+
+    public dramChannel: number = -1;
+
+    public dramSubchannel: number = 0;
 
     constructor(type: ComputeNodeType, location: string) {
         this.type = type;

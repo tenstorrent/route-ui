@@ -4,16 +4,16 @@ import {Button, Classes, Icon, InputGroup, NumericInput, Position, Slider, Switc
 import {Tooltip2} from '@blueprintjs/popover2';
 import {IconNames} from '@blueprintjs/icons';
 import {svg} from 'd3';
-import DataSource, {SVGContext} from '../data/DataSource';
+import DataSource, {GridContext} from '../data/DataSource';
 import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
 import {clearAllOperations, clearAllPipes, RootState, selectAllPipes, updateLinkSatuation, updateShowLinkSaturation, updateTotalOPs} from '../data/store';
 import NodeGridElement from './components/NodeGridElement';
-import {ComputeNode} from '../data/DataStructures';
+import {ComputeNodeData} from '../data/DataStructures';
 import DetailedView from './components/DetailedView';
 import {LINK_SATURATION_INITIAIL_VALUE} from '../data/utils';
 
 export default function GridRender() {
-    const {svgData, setSvgData} = useContext<SVGContext>(DataSource);
+    const {gridData, setGridData} = useContext<GridContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
     const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
@@ -45,10 +45,10 @@ export default function GridRender() {
     };
 
     useEffect(() => {
-        if (svgData) {
-            setOpCycles(svgData.totalOpCycles);
+        if (gridData) {
+            setOpCycles(gridData.totalOpCycles);
         }
-    }, [svgData]);
+    }, [gridData]);
 
     return (
         <>
@@ -142,7 +142,7 @@ export default function GridRender() {
                                 <Button
                                     minimal
                                     onClick={() => {
-                                        const resetValue = svgData?.totalOpCycles || 0;
+                                        const resetValue = gridData?.totalOpCycles || 0;
                                         setOpCycles(resetValue);
                                         dispatch(updateTotalOPs(resetValue));
                                     }}
@@ -154,10 +154,10 @@ export default function GridRender() {
                 </div>
                 <hr />
             </div>
-            {svgData && (
+            {gridData && (
                 <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
-                    <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${svgData.totalCols + 1}, ${NODE_SIZE}px)`}}>
-                        {svgData.nodes.map((node: ComputeNode) => {
+                    <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${gridData.totalCols + 1}, ${NODE_SIZE}px)`}}>
+                        {gridData.nodes.map((node: ComputeNodeData) => {
                             return (
                                 <NodeGridElement
                                     node={node}

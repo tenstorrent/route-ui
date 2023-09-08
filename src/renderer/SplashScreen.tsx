@@ -1,17 +1,24 @@
 import React, {FC} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {IconNames} from '@blueprintjs/icons';
+import {Button} from '@blueprintjs/core';
 import FileLoader from './components/FileLoader';
-import SVGData from '../data/DataStructures';
+import GridData from '../data/DataStructures';
 import TempFileLoader from './components/TempFileLoader';
 
 interface SplashScreenProps {
-    updateData: (data: SVGData) => void;
+    updateData: (data: GridData) => void;
 }
 
 const SplashScreen: FC<SplashScreenProps> = ({updateData}) => {
+    const navigate = useNavigate();
     return (
         <div className="splash-screen">
             <FileLoader updateData={updateData} />
-            {/*<TempFileLoader updateData={updateData} />*/}
+            {/*<div>*/}
+            {/*    <TempFileLoader updateData={updateData} />*/}
+            {/*    <Button icon={IconNames.APPLICATION} text="Render" onClick={() => navigate('/render')} />*/}
+            {/*</div>*/}
         </div>
     );
 };

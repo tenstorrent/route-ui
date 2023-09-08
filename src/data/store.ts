@@ -24,7 +24,7 @@ export const getHighContrastState = (state: RootState) => state.highContrast.ena
 
 interface DetailedViewState {
     isOpen: boolean;
-    uid: number | null;
+    uid: string | null;
 }
 
 const detailedViewInitialState: DetailedViewState = {
@@ -36,7 +36,7 @@ export const detailedViewSlice = createSlice({
     name: 'detailedView',
     initialState: detailedViewInitialState,
     reducers: {
-        openDetailedView: (state, action: PayloadAction<number>) => {
+        openDetailedView: (state, action: PayloadAction<string>) => {
             state.isOpen = true;
             state.uid = action.payload;
         },
@@ -57,11 +57,15 @@ export interface PipeSelection {
 interface PipeSelectionState {
     pipes: Record<string, PipeSelection>;
     pipeIds: string[];
+    focusPipes: Record<string, PipeSelection>;
+    focusMode: boolean;
 }
 
 const pipesInitialState: PipeSelectionState = {
     pipes: {},
     pipeIds: [],
+    focusPipes: {},
+    focusMode: false,
 };
 
 const pipeSelectionSlice = createSlice({
@@ -69,10 +73,21 @@ const pipeSelectionSlice = createSlice({
     initialState: pipesInitialState,
     reducers: {
         loadPipeSelection(state, action: PayloadAction<PipeSelection[]>) {
+            state.pipes = {};
+            state.pipeIds = [];
+            state.focusPipes = {};
             action.payload.forEach((item) => {
                 state.pipes[item.id] = item;
                 state.pipeIds.push(item.id);
+                state.focusPipes[item.id] = item;
             });
+        },
+        updateFocusPipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
+            const {id, selected} = action.payload;
+            if (state.focusPipes[id]) {
+                state.focusPipes[id].selected = selected;
+                state.focusMode = selected;
+            }
         },
         updatePipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
             const {id, selected} = action.payload;
@@ -93,6 +108,8 @@ const pipeSelectionSlice = createSlice({
     },
 });
 export const selectPipeSelectionById = (state: RootState, id: string) => state.pipeSelection.pipes[id];
+export const getFocusModePipe = (state: RootState, id: string) => state.pipeSelection.focusPipes[id];
+export const getFocusModeState = (state: RootState) => state.pipeSelection.focusMode;
 export const getDramGroup = (state: RootState, id: number) => (id > -1 ? state.nodeSelection.dram[id] : null);
 export const {
     //
@@ -100,6 +117,7 @@ export const {
     updatePipeSelection,
     clearAllPipes,
     selectAllPipes,
+    updateFocusPipeSelection,
 } = pipeSelectionSlice.actions;
 
 export interface NodeData extends NodeSelection {
@@ -111,21 +129,37 @@ export interface NodeData extends NodeSelection {
 }
 
 export interface NodeSelection {
-    id: number;
+    id: string;
     selected: boolean;
+}
+
+export enum HighlightType {
+    INPUT = 'input',
+    OUTPUT = 'output',
+    NONE = '',
 }
 
 interface NodeSelectionState {
     groups: Record<string, {data: NodeData[]; selected: boolean}>;
-    nodeList: NodeData[];
+    ioGroupsIn: Record<string, {op: string; selected: boolean}[]>;
+    operandsIn: Record<string, boolean>;
+    ioGroupsOut: Record<string, {op: string; selected: boolean}[]>;
+    operandsOut: Record<string, boolean>;
+    nodeList: Record<string, NodeData>;
+    coreHighlightList: Record<string, HighlightType>;
     filename: string;
     dram: {data: NodeData[]; selected: boolean}[];
     architecture: string;
 }
 
 const nodesInitialState: NodeSelectionState = {
-    nodeList: [],
+    nodeList: {},
+    coreHighlightList: {},
     groups: {},
+    ioGroupsIn: {},
+    operandsIn: {},
+    ioGroupsOut: {},
+    operandsOut: {},
     filename: '',
     dram: [],
     architecture: '',
@@ -159,7 +193,12 @@ const nodeSelectionSlice = createSlice({
         },
         loadNodesData(state, action: PayloadAction<NodeData[]>) {
             state.groups = {};
-            state.nodeList = [];
+            state.coreHighlightList = {};
+            state.ioGroupsIn = {};
+            state.operandsIn = {};
+            state.ioGroupsOut = {};
+            state.operandsOut = {};
+            state.nodeList = {};
             state.dram = [];
             action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
@@ -185,7 +224,7 @@ const nodeSelectionSlice = createSlice({
                 setBorders(dramElement.data);
             });
         },
-        updateNodeSelection(state, action: PayloadAction<{id: number; selected: boolean}>) {
+        updateNodeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
             const {id, selected} = action.payload;
             const node: NodeData | undefined = state.nodeList[id];
 
@@ -199,6 +238,74 @@ const nodeSelectionSlice = createSlice({
                     dramGroup.selected = false;
                 }
             });
+        },
+        updateCoreHighlight(state, action: PayloadAction<{ids: string[]; selected: HighlightType}>) {
+            action.payload.ids.forEach((id) => {
+                state.coreHighlightList[id] = action.payload.selected;
+            });
+        },
+        resetCoreHighlight(state) {
+            state.coreHighlightList = {};
+        },
+        loadIoDataIn(state, action: PayloadAction<Map<string, string[]>>) {
+            action.payload.forEach((ops, uid) => {
+                state.ioGroupsIn[uid] = ops.map((op) => {
+                    state.operandsIn[op] = false;
+                    return {op, selected: false};
+                });
+            });
+        },
+        loadIoDataOut(state, action: PayloadAction<Map<string, string[]>>) {
+            action.payload.forEach((ops, uid) => {
+                state.ioGroupsOut[uid] = ops.map((op) => {
+                    state.operandsOut[op] = false;
+                    return {op, selected: false};
+                });
+            });
+        },
+        selectOperand(state, action: PayloadAction<{op: string; selected: boolean; type?: IoType}>) {
+            const {op, selected} = action.payload;
+            const type = action.payload.type || IoType.ALL;
+            switch (type) {
+                case IoType.ALL:
+                    Object.values(state.ioGroupsIn).forEach((data) => {
+                        data.forEach((operand) => {
+                            if (operand.op === op) {
+                                operand.selected = selected;
+                            }
+                        });
+                    });
+                    Object.values(state.ioGroupsOut).forEach((data) => {
+                        data.forEach((operand) => {
+                            if (operand.op === op) {
+                                operand.selected = selected;
+                            }
+                        });
+                    });
+                    break;
+                case IoType.IN:
+                    state.operandsIn[op] = selected;
+                    Object.values(state.ioGroupsIn).forEach((data) => {
+                        data.forEach((operand) => {
+                            if (operand.op === op) {
+                                operand.selected = selected;
+                            }
+                        });
+                    });
+                    break;
+                case IoType.OUT:
+                    state.operandsOut[op] = selected;
+                    Object.values(state.ioGroupsOut).forEach((data) => {
+                        data.forEach((operand) => {
+                            if (operand.op === op) {
+                                operand.selected = selected;
+                            }
+                        });
+                    });
+                    break;
+                default:
+                    break;
+            }
         },
         selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
             const {opName, selected} = action.payload;
@@ -215,19 +322,31 @@ const nodeSelectionSlice = createSlice({
     },
 });
 
-export const selectNodeSelectionById = (state: RootState, id: number) => state.nodeSelection.nodeList[id];
+export enum IoType {
+    ALL = 'all',
+    IN = 'in',
+    OUT = 'out',
+}
+
+export const selectNodeSelectionById = (state: RootState, id: string) => state.nodeSelection.nodeList[id];
+export const getCoreHighlight = (state: RootState, id: string) => state.nodeSelection.coreHighlightList[id] || HighlightType.NONE;
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
 export const {
     //
     loadNodesData,
+    updateCoreHighlight,
     updateNodeSelection,
     selectGroup,
     clearAllOperations,
     loadedFilename,
     setArchitecture,
+    selectOperand,
+    loadIoDataIn,
+    loadIoDataOut,
+    resetCoreHighlight,
 } = nodeSelectionSlice.actions;
 
-export interface LinkData {
+export interface LinkStateData {
     id: string;
     totalDataBytes: number;
     bpc: number;
@@ -238,7 +357,7 @@ export interface LinkData {
 interface LinkSaturationState {
     linkSaturation: number;
     showLinkSaturation: boolean;
-    links: Record<string, LinkData>;
+    links: Record<string, LinkStateData>;
     totalOps: number;
 }
 
@@ -265,7 +384,7 @@ const linkSaturationSlice = createSlice({
                 updateOPCycles(link, action.payload);
             });
         },
-        loadLinkData: (state, action: PayloadAction<LinkData[]>) => {
+        loadLinkData: (state, action: PayloadAction<LinkStateData[]>) => {
             state.links = {};
             action.payload.forEach((item) => {
                 state.links[item.id] = item;
@@ -281,8 +400,6 @@ export const {
     updateLinkSatuation,
     updateShowLinkSaturation,
 } = linkSaturationSlice.actions;
-// export const selectLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturation;
-// export const selectShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
 
 const store = configureStore({
     reducer: {

@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {ComputeNode, DramName, LinkName} from '../data/DataStructures';
+import {ComputeNodeData, DramName, LinkName} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
 
 export const NODE_SIZE = 100;
@@ -363,7 +363,7 @@ export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown,
     });
 };
 
-export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName, node: ComputeNode, selectedPipeIds: string[]) => {
+export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName, node: ComputeNodeData, selectedPipeIds: string[]) => {
     const nodePipeIds = node.getPipesForDirection(linkID);
     const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
     drawPipesDirect(svg, linkID, pipeIds);
