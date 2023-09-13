@@ -36,40 +36,180 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     linkSaturationTreshold,
     //
 }) => {
-    // TODO: move the below to separate components
-
-    const svgRef = useRef<SVGSVGElement | null>(null);
-    const svgFocusRef = useRef<SVGSVGElement | null>(null);
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
     const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
-    const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
-    const selectedPipeIds = Object.values(allPipes)
-        .filter((pipe: PipeSelection) => pipe.selected)
-        .map((pipe: PipeSelection) => pipe.id);
+    const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
 
+    const triggerSelection = () => {
+        const selectedState = nodeState.selected;
+        if (isOpen && selectedState) {
+            dispatch(openDetailedView(node.uid));
+        } else {
+            dispatch(updateNodeSelection({id: node.uid, selected: !nodeState.selected}));
+        }
+    };
+
+    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
+
+    return (
+        <button
+            type="button"
+            className={`node-item ${highlightClass} ${nodeState.selected ? 'selected' : ''} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}
+            onClick={triggerSelection}
+        >
+            <OperationGroupRender node={node} />
+            <OperandHighlight node={node} />
+            <DramChipBorder node={node} />
+            <div className="node-border" />
+            <div className="core-highlight" />
+            {node.opName !== '' && showOperationColors && <div className="op-color-swatch" style={{backgroundColor: getGroupColor(node.opName)}} />}
+            {showNodeLocation && (
+                <div className="node-location">
+                    {node.loc.x},{node.loc.y}
+                </div>
+            )}
+            <NodeFocusPipeRenderer node={node} />
+            <NodePipeRenderer node={node} showEmptyLinks={showEmptyLinks} showLinkSaturation={showLinkSaturation} linkSaturationTreshold={linkSaturationTreshold} />
+            <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
+        </button>
+    );
+};
+
+export default NodeGridElement;
+
+interface DramChipBorderProps {
+    node: ComputeNodeData;
+}
+
+const DramChipBorder: React.FC<DramChipBorderProps> = ({
+    //
+    node,
+    //
+}) => {
+    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
+    let dramStyles = {};
+    if (node.dramChannel > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
+        const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
+        dramStyles = getDramGroupingStyles(border);
+    }
+
+    return <div className="dram-border" style={dramStyles} />;
+};
+
+interface OperationGroupRenderProps {
+    node: ComputeNodeData;
+}
+
+const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
+    //
+    node,
+    //
+}) => {
+    const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
+    let operationStyles = {};
+    if (node.opName !== '' && selectedGroup.selected) {
+        const color = getGroupColor(node.opName);
+        operationStyles = {borderColor: getGroupColor(node.opName)};
+        const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
+        operationStyles = getNodeOpStyles(operationStyles, color, border);
+    }
+
+    return <div className="group-border" style={operationStyles} />;
+};
+
+interface OperandHighlightProps {
+    node: ComputeNodeData;
+}
+
+const OperandHighlight: React.FC<OperandHighlightProps> = ({
+    //
+    node,
+    //
+}) => {
+    const operandsIn: {op: string; selected: boolean}[] = useSelector((state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || []);
+    const operandsOut: {op: string; selected: boolean}[] = useSelector((state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || []);
+    return (
+        <div className="operand-wrap">
+            {operandsIn
+                .filter((operand) => operand.selected)
+                .map((operand) => {
+                    const styles = {backgroundColor: getGroupColor(operand.op)};
+                    return <div className="operand in" style={styles} />;
+                })}
+            {operandsOut
+                .filter((operand) => operand.selected)
+                .map((operand) => {
+                    const styles = {backgroundColor: getGroupColor(operand.op)};
+                    return <div className="operand out" style={styles} />;
+                })}
+        </div>
+    );
+};
+
+interface NodeFocusPipeRendererProps {
+    node: ComputeNodeData;
+}
+
+const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
+    //
+    node,
+    //
+}) => {
+    const svgRef = useRef<SVGSVGElement | null>(null);
+    const svg = d3.select(svgRef.current);
+    const focusMode = useSelector((state: RootState) => getFocusModeState(state));
     const focusedPipes = useSelector((state: RootState) => state.pipeSelection.focusPipes);
     const focusedPipeIds = Object.values(focusedPipes)
         .filter((pipe: PipeSelection) => pipe.selected)
         .map((pipe: PipeSelection) => pipe.id);
 
-    const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
-    const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
-    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
+    svg.selectAll('*').remove();
+    if (focusMode && focusedPipeIds.length) {
+        drawSelections(svg, LinkName.NOC0_EAST_OUT, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC0_WEST_IN, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC0_SOUTH_OUT, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC0_NORTH_IN, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC0_IN, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC0_OUT, node, focusedPipeIds);
+
+        drawSelections(svg, LinkName.NOC1_NORTH_OUT, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC1_SOUTH_IN, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC1_WEST_OUT, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC1_EAST_IN, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC1_IN, node, focusedPipeIds);
+        drawSelections(svg, LinkName.NOC1_OUT, node, focusedPipeIds);
+    }
+    return <svg className="node-focus-svg" ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
+};
+
+interface NodePipeRendererProps {
+    node: ComputeNodeData;
+    showEmptyLinks: boolean;
+    showLinkSaturation: boolean;
+    linkSaturationTreshold: number;
+}
+
+const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
+    //
+    node,
+    showEmptyLinks,
+    showLinkSaturation,
+    linkSaturationTreshold,
+    //
+}) => {
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
-
-    const operandsIn: {op: string; selected: boolean}[] = useSelector((state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || []);
-    const operandsOut: {op: string; selected: boolean}[] = useSelector((state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || []);
-
     const focusMode = useSelector((state: RootState) => getFocusModeState(state));
+    const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
+    const selectedPipeIds = Object.values(allPipes)
+        .filter((pipe: PipeSelection) => pipe.selected)
+        .map((pipe: PipeSelection) => pipe.id);
 
+    const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
+
     svg.selectAll('*').remove();
-
-    const svgFocus = d3.select(svgFocusRef.current);
-    svgFocus.selectAll('*').remove();
-
     if (showEmptyLinks) {
         drawLink(svg, LinkName.NOC1_NORTH_OUT);
         drawLink(svg, LinkName.NOC0_NORTH_IN);
@@ -117,84 +257,5 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     if (noc1numPipes > 0) {
         drawNOC(svg, NOC_CONFIGURATION.noc1);
     }
-
-    if (focusMode && focusedPipeIds.length) {
-        drawSelections(svgFocus, LinkName.NOC0_EAST_OUT, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC0_WEST_IN, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC0_SOUTH_OUT, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC0_NORTH_IN, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC0_IN, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC0_OUT, node, focusedPipeIds);
-
-        drawSelections(svgFocus, LinkName.NOC1_NORTH_OUT, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC1_SOUTH_IN, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC1_WEST_OUT, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC1_EAST_IN, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC1_IN, node, focusedPipeIds);
-        drawSelections(svgFocus, LinkName.NOC1_OUT, node, focusedPipeIds);
-    }
-
-    const triggerSelection = () => {
-        const selectedState = nodeState.selected;
-        if (isOpen && selectedState) {
-            dispatch(openDetailedView(node.uid));
-        } else {
-            dispatch(updateNodeSelection({id: node.uid, selected: !nodeState.selected}));
-        }
-    };
-
-    let operationStyles = {};
-    if (node.opName !== '' && selectedGroup.selected) {
-        const color = getGroupColor(node.opName);
-        operationStyles = {borderColor: getGroupColor(node.opName)};
-        const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
-        operationStyles = getNodeOpStyles(operationStyles, color, border);
-    }
-    let dramStyles = {};
-    if (node.dramChannel > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
-        const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
-        dramStyles = getDramGroupingStyles(border);
-    }
-
-    // console.log(coreHighlight);
-
-    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
-
-    return (
-        <button
-            type="button"
-            className={`node-item ${highlightClass} ${nodeState.selected ? 'selected' : ''} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}
-            onClick={triggerSelection}
-        >
-            <div className="group-border" style={operationStyles} />
-            <div className="operand-wrap">
-                {operandsIn
-                    .filter((operand) => operand.selected)
-                    .map((operand) => {
-                        const styles = {backgroundColor: getGroupColor(operand.op)};
-                        return <div className="operand in" style={styles} />;
-                    })}
-                {operandsOut
-                    .filter((operand) => operand.selected)
-                    .map((operand) => {
-                        const styles = {backgroundColor: getGroupColor(operand.op)};
-                        return <div className="operand out" style={styles} />;
-                    })}
-            </div>
-            <div className="dram-border" style={dramStyles} />
-            <div className="node-border" />
-            <div className="core-highlight" />
-            {node.opName !== '' && showOperationColors && <div className="op-color-swatch" style={{backgroundColor: getGroupColor(node.opName)}} />}
-            {showNodeLocation && (
-                <div className="node-location">
-                    {node.loc.x},{node.loc.y}
-                </div>
-            )}
-            <svg className="node-focus-svg" ref={svgFocusRef} width={NODE_SIZE} height={NODE_SIZE} />
-            <svg className={`node-svg ${focusMode ? 'focus-mode' : ''}`} ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />
-            <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
-        </button>
-    );
+    return <svg className={`node-svg ${focusMode ? 'focus-mode' : ''}`} ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
 };
-
-export default NodeGridElement;
