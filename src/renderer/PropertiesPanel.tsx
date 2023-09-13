@@ -154,7 +154,7 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className="scrollable-content">
-                                                                    {io.pipes.map((pipe) => {
+                                                                    {io.pipeOperations.map((pipe) => {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
@@ -186,7 +186,7 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className="scrollable-content">
-                                                                    {io.pipes.map((pipe) => {
+                                                                    {io.pipeOperations.map((pipe) => {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
