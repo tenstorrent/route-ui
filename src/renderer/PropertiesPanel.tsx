@@ -25,8 +25,6 @@ export default function PropertiesPanel() {
     const dispatch = useDispatch();
 
     const nodeSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const operandInSelectionState = useSelector((state: RootState) => state.nodeSelection.operandsIn);
-    const operandOutSelectionState = useSelector((state: RootState) => state.nodeSelection.operandsOut);
     const groups = useSelector((state: RootState) => state.nodeSelection.groups);
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
 
@@ -85,16 +83,6 @@ export default function PropertiesPanel() {
 
     const selectOperationGroup = (opName: string, selected: boolean) => {
         dispatch(selectGroup({opName, selected}));
-    };
-
-    const selectOperandGroup = (op: string, selected: boolean) => {
-        dispatch(selectOperand({op, selected}));
-    };
-    const selectOperandGroupIn = (op: string, selected: boolean) => {
-        dispatch(selectOperand({op, selected, type: IoType.IN}));
-    };
-    const selectOperandGroupOut = (op: string, selected: boolean) => {
-        dispatch(selectOperand({op, selected, type: IoType.OUT}));
     };
 
     const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
