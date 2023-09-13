@@ -1,6 +1,6 @@
 import {LinkStateData, NodeData, PipeSelection} from './store';
-import {NetlistAnalyzerDataJSON, NodeDataJSON, NOCLinkJSON, DramChannelJSON} from './JSONDataTypes';
-import DataOps, {CoreOperationData, OperandData, OperationData} from './DataOps';
+import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON} from './JSONDataTypes';
+import {CoreOperationData, OperationData} from './DataOps';
 
 export enum LinkName {
     NONE = 'none',

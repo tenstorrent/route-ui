@@ -70,10 +70,10 @@ export default class DataOps {
             this.pipesPerOperand.get(io.name)?.push(...value);
             this.pipesPerOp.get(operationName)?.push(...value);
 
-            operandData.pipes.push(PipeOperationData.fromOpsJSON(coreID, value));
+            operandData.pipeOperations.push(PipeOperationData.fromOpsJSON(coreID, value));
             const coreOperandData = new OperandData(io.name, io.type as OperandType);
             const pipeOperation = PipeOperationData.fromOpsJSON(coreID, value);
-            coreOperandData.pipes.push(pipeOperation);
+            coreOperandData.pipeOperations.push(pipeOperation);
 
             let core: CoreOperationData = cores[coreID];
             if (!core) {
@@ -152,20 +152,39 @@ export class ioOperationGroup {
     public ids: string[] = [];
 }
 
-export class CoreOperationData {
+/**
+ * Represents the data structure for an operation.
+ * matches operation centric data structure
+ */
+export class OperationData {
+    /** Name of the operation. */
+    public name: string = '';
+
+    /** Array of input operand data. */
+    public inputs: OperandData[] = [];
+
+    /** Array of output operand data. */
+    public outputs: OperandData[] = [];
+}
+
+/**
+ * Represents the data structure for a core specific operation, which extends the operation data.
+ * matches core centric data structure
+ */
+export class CoreOperationData extends OperationData {
     public coreID: string = ''; // location
 
+    /** Represents the x,y coordinates of the core. */
     loc: Loc = {x: 0, y: 0};
 
+    /** label only */
     logicalCoreId: string = '';
 
+    /** Name of the operation. */
     opName: string = '';
 
+    /** label only */
     opType: string = '';
-
-    inputs: OperandData[] = [];
-
-    outputs: OperandData[] = [];
 }
 
 export enum OperandType {
@@ -173,15 +192,20 @@ export enum OperandType {
     OP = 'op',
 }
 
+/**
+ * Represents the data structure for an operand.
+ */
 export class OperandData {
-    // public chipId: number = 0;
-
+    /** Name of the operand. */
     public name: string = '';
 
+    /** Type of the operand (e.g., QUEUE or OP). */
     public type: OperandType;
 
-    public pipes: PipeOperationData[] = [];
+    /** Array of pipe operation data. */
+    public pipeOperations: PipeOperationData[] = [];
 
+    /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
 
     constructor(name: string, type: OperandType) {
@@ -190,24 +214,29 @@ export class OperandData {
     }
 }
 
+/**
+ * Pipe to core to operand relationship
+ */
 export class PipeOperationData {
+    /**
+     * A static method to create a PipeOperationData instance from a JSON structure.
+     * @param {string} key - The key in the JSON.
+     * @param {string[]} pipeList - The list of pipes.
+     * @returns {PipeOperationData} - An instance of PipeOperationData.
+     */
     static fromOpsJSON(key: string, pipeList: string[]) {
         const loc = key.split('-');
-        return new PipeOperationData(
-            //
-            key,
-            {x: parseInt(loc[1], 10), y: parseInt(loc[2], 10)},
-            parseInt(loc[0], 10),
-            pipeList
-        );
+        return new PipeOperationData(key, {x: parseInt(loc[1], 10), y: parseInt(loc[2], 10)}, parseInt(loc[0], 10), pipeList);
     }
 
     public readonly coreID: string;
 
+    /** Identifier for the chip. Specific to multichip */
     public readonly chipId: number;
 
     public readonly loc: Loc;
 
+    /** Array of pipe ids. */
     public readonly pipeIDs: string[];
 
     constructor(coreID: string, loc: Loc, chipId: number, pipes: string[]) {
@@ -221,16 +250,4 @@ export class PipeOperationData {
 export enum OpIoType {
     INPUTS = 'inputs',
     OUTPUTS = 'outputs',
-}
-
-export class OperationData {
-    public name: string = '';
-
-    public inputs: OperandData[] = [];
-
-    public outputs: OperandData[] = [];
-
-    // public loc: Loc = {x: 0, y: 0};
-
-    // public uid: string = '';
 }

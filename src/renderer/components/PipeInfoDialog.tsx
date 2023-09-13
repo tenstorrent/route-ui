@@ -36,7 +36,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                 if (nodeData.coreOpertaionData) {
                     nodeData.coreOpertaionData.inputs.forEach((input) => {
                         let hasPipe = false;
-                        input.pipes.forEach((pipeOpList) => {
+                        input.pipeOperations.forEach((pipeOpList) => {
                             if (pipeOpList.pipeIDs.includes(pipeId)) {
                                 hasPipe = true;
                             }
@@ -51,7 +51,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                     });
                     nodeData.coreOpertaionData.outputs.forEach((output) => {
                         let hasPipe = false;
-                        output.pipes.forEach((pipeOpList) => {
+                        output.pipeOperations.forEach((pipeOpList) => {
                             if (pipeOpList.pipeIDs.includes(pipeId)) {
                                 hasPipe = true;
                             }
@@ -145,7 +145,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
     }, [gridData]);
 
     return (
-        <Tooltip2 content={tooltipContent || <span>Loading...</span>}>
+        <Tooltip2 usePortal={false} content={tooltipContent || <span>Loading...</span>}>
             <div
                 className="pipe-info-dialog"
                 onMouseLeave={() => {
