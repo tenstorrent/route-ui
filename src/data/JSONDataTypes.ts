@@ -14,6 +14,7 @@ export interface NetlistAnalyzerDataJSON {
     slowest_op_cycles: number;
     bw_limited_op_cycles: number;
     arch: string;
+    chip_id: number;
     nodes: NodeDataJSON[];
     dram_channels: DramChannelJSON[];
 }

@@ -68,6 +68,8 @@ export default class GridData {
         return GridData.NOC_ORDER;
     }
 
+    public chipId: number = 0;
+
     public nodes: ComputeNodeData[] = [];
 
     public totalCols: number = 0;
@@ -113,6 +115,7 @@ export default class GridData {
     public loadFromNetlistJSON(data: NetlistAnalyzerDataJSON) {
         this.slowestOpCycles = data.slowest_op_cycles;
         this.bwLimitedOpCycles = data.bw_limited_op_cycles;
+        this.chipId = data.chip_id || 0;
 
         if (data.arch) {
             if (data.arch.includes(ARCHITECTURE.GRAYSKULL)) {
@@ -130,8 +133,8 @@ export default class GridData {
                 const loc: Loc = {x: nodeJSON.location[1], y: nodeJSON.location[0]};
                 this.totalCols = Math.max(loc.y, this.totalCols);
                 this.totalRows = Math.max(loc.x, this.totalRows);
-                const node = new ComputeNodeData(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
-                node.fromNetlistJSON(nodeJSON);
+                const node = new ComputeNodeData(`${this.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+                node.fromNetlistJSON(nodeJSON, this.chipId);
                 return node;
             })
             .sort((a, b) => {
@@ -238,7 +241,7 @@ export default class GridData {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: {[key: string]: PipeData} = {};
+        const uniquePipeObj: { [key: string]: PipeData } = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -281,7 +284,7 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, channelId: number, json: {[key: string]: NOCLinkJSON}) {
+    constructor(id: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = id;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(new DramLink(key as DramName, `${channelId}-${id}-${key}`, value));
@@ -341,6 +344,8 @@ export class ComputeNodeData {
         return new ComputeNodeData(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
     }
 
+    public chipId: number = 0;
+
     public uid: string;
 
     public type: ComputeNodeType = ComputeNodeType.NONE;
@@ -362,11 +367,12 @@ export class ComputeNodeData {
     }
 
     // this should be static
-    public fromNetlistJSON(json: NodeDataJSON) {
+    public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
         // this.uid = uid;
         this.opName = json.op_name;
         this.opCycles = json.op_cycles;
         this.links = new Map();
+        this.chipId = chipId;
 
         this.type = json.type as ComputeNodeType;
         if (json.dram_channel !== undefined && json.dram_channel !== null) {
@@ -374,7 +380,7 @@ export class ComputeNodeData {
             this.dramSubchannel = json.dram_subchannel || 0;
         }
         this.loc = {x: json.location[0], y: json.location[1]};
-        this.uid = `0-${this.loc.y}-${this.loc.x}`;
+        this.uid = `${chipId}-${this.loc.y}-${this.loc.x}`;
 
         const linkId = `${this.loc.x}-${this.loc.y}`;
 

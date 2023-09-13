@@ -14,7 +14,6 @@ import TopHeaderComponent from './components/TopHeaderComponent';
 export default function App() {
     const [gridData, setGridData] = useState<GridData>(null);
 
-
     return (
         <Provider store={store}>
             <div className="header">
