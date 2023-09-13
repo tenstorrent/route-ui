@@ -11,7 +11,7 @@ interface SplashScreenProps {
 }
 
 const SplashScreen: FC<SplashScreenProps> = ({updateData}) => {
-    const navigate = useNavigate();
+
     return (
         <div className="splash-screen">
             <FileLoader updateData={updateData} />

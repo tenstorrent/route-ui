@@ -7,7 +7,7 @@ import remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
 import {parse} from 'yaml';
-import {useContext} from 'react';
+import React, {useContext} from 'react';
 import {closeDetailedView, loadedFilename, loadIoDataIn, loadIoDataOut, loadLinkData, loadNodesData, loadPipeSelection, setArchitecture, updateTotalOPs} from '../../data/store';
 import ChipDesign from '../../data/ChipDesign';
 import GridData, {ComputeNodeData} from '../../data/DataStructures';
@@ -15,11 +15,16 @@ import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import DataOps from '../../data/DataOps';
 import {parseOpDataFormat} from '../../data/DataParsers';
 import DataSource from '../../data/DataSource';
+import {MainRouteRendererProps} from '../MainRouteRenderer';
 
-export default function SideBar() {
+export interface SideBarProps {
+    updateData: (data: GridData) => void;
+}
+
+export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
     const navigate = useNavigate();
 
-    const {gridData, setGridData} = useContext(DataSource);
+    const {gridData} = useContext(DataSource);
     const dispatch = useDispatch();
     const reloadApp = () => {
         dispatch(loadedFilename(''));
@@ -88,7 +93,7 @@ export default function SideBar() {
                                 dispatch(loadIoDataOut(dataOps.operandsByCoreOutputs));
 
                                 // console.log(gridData.operations);
-                                setGridData(gridData);
+                                updateData(gridData);
                             }
                             console.log(dataOps);
                         }
@@ -113,4 +118,4 @@ export default function SideBar() {
             </Tooltip2>
         </div>
     );
-}
+};

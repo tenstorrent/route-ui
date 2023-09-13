@@ -142,6 +142,8 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
 
     useEffect(() => {
         setTooltipContent(null);
+        setShouldRender(true);
+
     }, [gridData]);
 
     return (

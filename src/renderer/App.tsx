@@ -14,17 +14,18 @@ import TopHeaderComponent from './components/TopHeaderComponent';
 export default function App() {
     const [gridData, setGridData] = useState<GridData>(null);
 
+
     return (
         <Provider store={store}>
             <div className="header">
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            <DataSource.Provider value={{gridData, setGridData}}>
+            <DataSource.Provider value={{gridData}}>
                 <Router>
                     <Routes>
                         <Route path="/" element={<SplashScreen updateData={setGridData} />} />
-                        <Route path="/render" element={<MainRouteRenderer />} />
+                        <Route path="/render" element={<MainRouteRenderer updateData={setGridData} />} />
                     </Routes>
                 </Router>
             </DataSource.Provider>
