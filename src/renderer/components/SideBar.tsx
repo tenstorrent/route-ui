@@ -8,9 +8,22 @@ import fs from 'fs';
 import path from 'path';
 import {parse} from 'yaml';
 import React, {useContext} from 'react';
-import {closeDetailedView, loadedFilename, loadIoDataIn, loadIoDataOut, loadLinkData, loadNodesData, loadPipeSelection, setArchitecture, updateTotalOPs} from '../../data/store';
+import {
+    closeDetailedView,
+    LinkStateData,
+    loadedFilename,
+    loadIoDataIn,
+    loadIoDataOut,
+    loadLinkData,
+    loadNodesData,
+    loadPipeSelection,
+    NodeData,
+    PipeSelection,
+    setArchitecture,
+    updateTotalOPs,
+} from '../../data/store';
 import ChipDesign from '../../data/ChipDesign';
-import GridData, {ComputeNodeData} from '../../data/DataStructures';
+import GridData, {ComputeNodeData, ComputeNodeDataExtended, PipeData} from '../../data/DataStructures';
 import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import DataOps from '../../data/DataOps';
 import {parseOpDataFormat} from '../../data/DataParsers';
@@ -79,27 +92,27 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
                             const dataOps = new DataOps();
                             dataOps.fromOpsJSON(parsedFile.ops);
                             if (gridData) {
-                                gridData.operations = dataOps.operations;
-                                gridData.cores = dataOps.cores;
-                                gridData.pipesPerOp = dataOps.pipesPerOp;
-                                gridData.pipesPerOperand = dataOps.pipesPerOperand;
-                                gridData.pipesPerCore = dataOps.pipesPerCore;
-                                gridData.coreGroupsPerOperation = dataOps.coreGroupsPerOperation;
-                                gridData.coreGroupsPerOperand = dataOps.coreGroupsPerOperand;
-                                gridData.operationsByCore = dataOps.operationsByCore;
-                                gridData.operandsByCore = dataOps.operandsByCore;
+                                const augmentedData = new GridData();
+                                Object.assign(augmentedData, gridData);
+                                augmentedData.operations = dataOps.operations;
+                                augmentedData.cores = dataOps.cores;
+                                augmentedData.pipesPerOp = dataOps.pipesPerOp;
+                                augmentedData.pipesPerOperand = dataOps.pipesPerOperand;
+                                augmentedData.pipesPerCore = dataOps.pipesPerCore;
+                                augmentedData.coreGroupsPerOperation = dataOps.coreGroupsPerOperation;
+                                augmentedData.coreGroupsPerOperand = dataOps.coreGroupsPerOperand;
+                                augmentedData.operationsByCore = dataOps.operationsByCore;
+                                augmentedData.operandsByCore = dataOps.operandsByCore;
 
                                 dispatch(loadIoDataIn(dataOps.operandsByCoreInputs));
                                 dispatch(loadIoDataOut(dataOps.operandsByCoreOutputs));
 
-                                // console.log(gridData.operations);
-                                updateData(gridData);
+                                updateData(augmentedData);
                             }
-                            console.log(dataOps);
                         }
                         if (filename.includes('sample')) {
                             const json = JSON.parse(parsedFile);
-                            console.log(JSON.stringify(parseOpDataFormat(json)));
+                            // console.log(JSON.stringify(parseOpDataFormat(json)));
                         }
                     } catch (error) {
                         console.error(error);
