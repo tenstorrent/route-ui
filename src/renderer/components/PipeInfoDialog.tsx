@@ -18,8 +18,7 @@ export interface PipeInfoDialogProps {
  * @description This wrapper component is used to display information about a pipe when the user hovers over it
  */
 const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
-    const [tooltipContent, setTooltipContent] = useState<JSX.Element | null>(null);
-    const [shouldRender, setShouldRender] = useState(false);
+    const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);
     const {gridData} = useContext(DataSource);
     const [nodeHighlightInputs, setNodeHighlightInputs] = useState<string[]>([]);
     const [nodeHighlightOutputs, setNodeHighlightOutputs] = useState<string[]>([]);
@@ -77,7 +76,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                     const io = [...new Set(inputs)];
                     out.push(
                         <div style={{marginBottom: '10px'}}>
-                            <h3>Inputs:</h3>
+                            <h3 style={{color: '#fff'}}>Inputs:</h3>
                             <h2>{opName}</h2>
                             {io.length > 0 && (
                                 <div>
@@ -99,7 +98,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                     const io = [...new Set(outputs)];
                     out.push(
                         <div style={{marginBottom: '10px'}}>
-                            <h3>Outputs:</h3>
+                            <h3 style={{color: '#fff'}}>Outputs:</h3>
                             <h2>{opName}</h2>
                             {io.length > 0 && (
                                 <div>
@@ -135,19 +134,16 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
         dispatch(updateCoreHighlight({ids: nodeHighlightOutputs, selected: HighlightType.OUTPUT}));
     };
 
-    if (shouldRender) {
-        setTooltipContent(setupData());
-        setShouldRender(false);
-    }
-
     useEffect(() => {
-        setTooltipContent(null);
-        setShouldRender(true);
-
+        setTooltipContent(undefined);
+        // setShouldRender(true);
     }, [gridData]);
 
     return (
-        <Tooltip2 usePortal={false} content={tooltipContent || <span>Loading...</span>}>
+        <Tooltip2
+            usePortal={false}
+            content={tooltipContent}
+        >
             <div
                 className="pipe-info-dialog"
                 onMouseLeave={() => {
@@ -156,7 +152,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                 }}
                 onFocus={() => {
                     if (!tooltipContent) {
-                        setShouldRender(true);
+                        setTooltipContent(setupData());
                     } else {
                         highlightCores();
                     }
@@ -164,7 +160,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                 }}
                 onMouseEnter={() => {
                     if (!tooltipContent) {
-                        setShouldRender(true);
+                        setTooltipContent(setupData());
                     } else {
                         highlightCores();
                     }
