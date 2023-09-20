@@ -1,8 +1,8 @@
 import {Loc} from './DataStructures';
 import {OperationDataJSON, OperationIOJSON} from './JSONDataTypes';
 
-export class CoreOperationsList extends Array<CoreOperationData> {
-    constructor(...items: CoreOperationData[]) {
+export class CoreOperationsList extends Array<CoreOperation> {
+    constructor(...items: CoreOperation[]) {
         super(...items);
         Object.setPrototypeOf(this, CoreOperationsList.prototype);
     }
@@ -12,10 +12,10 @@ export class CoreOperationsList extends Array<CoreOperationData> {
     }
 }
 
-export default class DataOps {
-    cores: CoreOperationData[] = [];
+export default class ChipAugmentation {
+    cores: CoreOperation[] = [];
 
-    operations: OperationData[] = [];
+    operations: Operation[] = [];
 
     pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
 
@@ -36,8 +36,8 @@ export default class DataOps {
     operationsByCore: Map<string, string[]> = new Map<string, string[]>();
 
     //TODO: comment this fully
-    private organizeData(io: OperationIOJSON, operationName: string, cores: Record<string, CoreOperationData>, ioType: OpIoType) {
-        const operandData = new OperandData(io.name, io.type as OperandType);
+    private organizeData(io: OperationIOJSON, operationName: string, cores: Record<string, CoreOperation>, ioType: OpIoType) {
+        const operandData = new Operand(io.name, io.type as OperandType);
         if (!this.pipesPerOperand.has(io.name)) {
             this.pipesPerOperand.set(io.name, []);
         }
@@ -71,14 +71,14 @@ export default class DataOps {
             this.pipesPerOperand.get(io.name)?.push(...value);
             this.pipesPerOp.get(operationName)?.push(...value);
 
-            operandData.pipeOperations.push(PipeOperationData.fromOpsJSON(coreID, value));
-            const coreOperandData = new OperandData(io.name, io.type as OperandType);
-            const pipeOperation = PipeOperationData.fromOpsJSON(coreID, value);
+            operandData.pipeOperations.push(PipeOperation.fromOpsJSON(coreID, value));
+            const coreOperandData = new Operand(io.name, io.type as OperandType);
+            const pipeOperation = PipeOperation.fromOpsJSON(coreID, value);
             coreOperandData.pipeOperations.push(pipeOperation);
 
-            let core: CoreOperationData = cores[coreID];
+            let core: CoreOperation = cores[coreID];
             if (!core) {
-                core = new CoreOperationData();
+                core = new CoreOperation();
                 core.coreID = coreID;
                 core.loc = {x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10)};
                 core.opName = operationName;
@@ -100,10 +100,10 @@ export default class DataOps {
     }
 
     fromOpsJSON(json: Record<string, OperationDataJSON>) {
-        const cores: Record<string, CoreOperationData> = {};
+        const cores: Record<string, CoreOperation> = {};
 
         this.operations = Object.entries(json).map(([operationName, op]) => {
-            const operation = new OperationData();
+            const operation = new Operation();
             operation.name = operationName;
             this.pipesPerOp.set(operationName, []);
             this.coreGroupsPerOperation.set(operationName, []);
@@ -134,9 +134,9 @@ export default class DataOps {
         });
     }
 
-    fromCoresJSON(json: Record<string, CoreOperationData>) {
+    fromCoresJSON(json: Record<string, CoreOperation>) {
         this.cores = Object.entries(json).map(([uid, core]) => {
-            const coreOp = new CoreOperationData();
+            const coreOp = new CoreOperation();
             coreOp.coreID = uid;
             coreOp.loc = core.loc;
             coreOp.logicalCoreId = core.logicalCoreId;
@@ -157,22 +157,22 @@ export class ioOperationGroup {
  * Represents the data structure for an operation.
  * matches operation centric data structure
  */
-export class OperationData {
+export class Operation {
     /** Name of the operation. */
     public name: string = '';
 
     /** Array of input operand data. */
-    public inputs: OperandData[] = [];
+    public inputs: Operand[] = [];
 
     /** Array of output operand data. */
-    public outputs: OperandData[] = [];
+    public outputs: Operand[] = [];
 }
 
 /**
  * Represents the data structure for a core specific operation, which extends the operation data.
  * matches core centric data structure
  */
-export class CoreOperationData extends OperationData {
+export class CoreOperation extends Operation {
     public coreID: string = ''; // location
 
     /** Represents the x,y coordinates of the core. */
@@ -196,7 +196,7 @@ export enum OperandType {
 /**
  * Represents the data structure for an operand.
  */
-export class OperandData {
+export class Operand {
     /** Name of the operand. */
     public name: string = '';
 
@@ -204,7 +204,7 @@ export class OperandData {
     public type: OperandType;
 
     /** Array of pipe operation data. */
-    public pipeOperations: PipeOperationData[] = [];
+    public pipeOperations: PipeOperation[] = [];
 
     /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
@@ -218,16 +218,16 @@ export class OperandData {
 /**
  * Pipe to core to operand relationship
  */
-export class PipeOperationData {
+export class PipeOperation {
     /**
      * A static method to create a PipeOperationData instance from a JSON structure.
      * @param {string} key - The key in the JSON.
      * @param {string[]} pipeList - The list of pipes.
-     * @returns {PipeOperationData} - An instance of PipeOperationData.
+     * @returns {PipeOperation} - An instance of PipeOperationData.
      */
     static fromOpsJSON(key: string, pipeList: string[]) {
         const loc = key.split('-');
-        return new PipeOperationData(key, {x: parseInt(loc[1], 10), y: parseInt(loc[2], 10)}, parseInt(loc[0], 10), pipeList);
+        return new PipeOperation(key, {x: parseInt(loc[1], 10), y: parseInt(loc[2], 10)}, parseInt(loc[0], 10), pipeList);
     }
 
     public readonly coreID: string;

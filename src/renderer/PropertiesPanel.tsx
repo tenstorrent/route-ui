@@ -12,7 +12,7 @@ import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
 import LinkDetails from './components/LinkDetails';
-import {CoreOperationData, OperandType} from '../data/DataOps';
+import {CoreOperation, OperandType} from '../data/ChipAugmentation';
 
 export default function PropertiesPanel() {
     const {chip} = useContext(DataSource);
@@ -102,7 +102,7 @@ export default function PropertiesPanel() {
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className="properties-panel-nodes">
                                 {selectedNodes.map((node: ComputeNode) => {
-                                    const coreData = chip?.cores.find((core: CoreOperationData) => core.coreID === node.uid);
+                                    const coreData = chip?.cores.find((core: CoreOperation) => core.coreID === node.uid);
                                     return (
                                         <div className="node-element" key={node.uid}>
                                             <h3 className={`node-type node-type-${node.getNodeLabel()} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}>

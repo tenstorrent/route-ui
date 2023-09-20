@@ -25,7 +25,7 @@ import {
 import ChipDesign from '../../data/ChipDesign';
 import Chip, {ComputeNode, ComputeNodeExtended, Pipe} from '../../data/DataStructures';
 import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
-import DataOps from '../../data/DataOps';
+import ChipAugmentation from '../../data/ChipAugmentation';
 import {parseOpDataFormat} from '../../data/DataParsers';
 import DataSource from '../../data/DataSource';
 import {MainRouteRendererProps} from '../MainRouteRenderer';
@@ -89,23 +89,23 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
                         if (filename.includes('op_to_pipe')) {
                             // const json = JSON.parse(parsedFile);
                             // console.log(parsedFile);
-                            const dataOps = new DataOps();
-                            dataOps.fromOpsJSON(parsedFile.ops);
+                            const chipAugmentation = new ChipAugmentation();
+                            chipAugmentation.fromOpsJSON(parsedFile.ops);
                             if (chip) {
                                 const augmentedData = new Chip();
                                 Object.assign(augmentedData, chip);
-                                augmentedData.operations = dataOps.operations;
-                                augmentedData.cores = dataOps.cores;
-                                augmentedData.pipesPerOp = dataOps.pipesPerOp;
-                                augmentedData.pipesPerOperand = dataOps.pipesPerOperand;
-                                augmentedData.pipesPerCore = dataOps.pipesPerCore;
-                                augmentedData.coreGroupsPerOperation = dataOps.coreGroupsPerOperation;
-                                augmentedData.coreGroupsPerOperand = dataOps.coreGroupsPerOperand;
-                                augmentedData.operationsByCore = dataOps.operationsByCore;
-                                augmentedData.operandsByCore = dataOps.operandsByCore;
+                                augmentedData.operations = chipAugmentation.operations;
+                                augmentedData.cores = chipAugmentation.cores;
+                                augmentedData.pipesPerOp = chipAugmentation.pipesPerOp;
+                                augmentedData.pipesPerOperand = chipAugmentation.pipesPerOperand;
+                                augmentedData.pipesPerCore = chipAugmentation.pipesPerCore;
+                                augmentedData.coreGroupsPerOperation = chipAugmentation.coreGroupsPerOperation;
+                                augmentedData.coreGroupsPerOperand = chipAugmentation.coreGroupsPerOperand;
+                                augmentedData.operationsByCore = chipAugmentation.operationsByCore;
+                                augmentedData.operandsByCore = chipAugmentation.operandsByCore;
 
-                                dispatch(loadIoDataIn(dataOps.operandsByCoreInputs));
-                                dispatch(loadIoDataOut(dataOps.operandsByCoreOutputs));
+                                dispatch(loadIoDataIn(chipAugmentation.operandsByCoreInputs));
+                                dispatch(loadIoDataOut(chipAugmentation.operandsByCoreOutputs));
 
                                 updateData(augmentedData);
                             }

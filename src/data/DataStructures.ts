@@ -1,6 +1,6 @@
 import {LinkStateData, ComputeNodeState, PipeSelection} from './store';
 import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON} from './JSONDataTypes';
-import {CoreOperationData, OperationData} from './DataOps';
+import {CoreOperation, Operation} from './ChipAugmentation';
 
 export enum LinkName {
     NONE = 'none',
@@ -90,9 +90,9 @@ export default class Chip {
 
     // augmented data
 
-    public operations: OperationData[] = [];
+    public operations: Operation[] = [];
 
-    public cores: CoreOperationData[] = [];
+    public cores: CoreOperation[] = [];
 
     public pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
 
@@ -412,7 +412,7 @@ export class ComputeNode {
 }
 
 export class ComputeNodeExtended extends ComputeNode {
-    public coreOperationData: CoreOperationData | null;
+    public coreOperationData: CoreOperation | null;
 
     constructor(data: ComputeNode) {
         super(data.uid);

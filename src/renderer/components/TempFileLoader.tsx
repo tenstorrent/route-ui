@@ -25,7 +25,7 @@ import {
 import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import ChipDesign from '../../data/ChipDesign';
 import {parseOpDataFormat} from '../../data/DataParsers';
-import DataOps from '../../data/DataOps';
+import ChipAugmentation from '../../data/ChipAugmentation';
 
 interface TempFileLoaderProps {
     updateData: (data: Chip) => void;
@@ -119,26 +119,26 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                         if (filename.includes('op_to_pipe')) {
                             // const json = JSON.parse(parsedFile);
                             console.log(parsedFile);
-                            const dataOps = new DataOps();
-                            dataOps.fromOpsJSON(parsedFile.ops);
+                            const chipAugmentation = new ChipAugmentation();
+                            chipAugmentation.fromOpsJSON(parsedFile.ops);
                             if (chip) {
-                                chip.operations = dataOps.operations;
-                                chip.cores = dataOps.cores;
-                                chip.pipesPerOp = dataOps.pipesPerOp;
-                                chip.pipesPerOperand = dataOps.pipesPerOperand;
-                                chip.pipesPerCore = dataOps.pipesPerCore;
-                                chip.coreGroupsPerOperation = dataOps.coreGroupsPerOperation;
-                                chip.coreGroupsPerOperand = dataOps.coreGroupsPerOperand;
-                                chip.operationsByCore = dataOps.operationsByCore;
-                                chip.operandsByCore = dataOps.operandsByCore;
+                                chip.operations = chipAugmentation.operations;
+                                chip.cores = chipAugmentation.cores;
+                                chip.pipesPerOp = chipAugmentation.pipesPerOp;
+                                chip.pipesPerOperand = chipAugmentation.pipesPerOperand;
+                                chip.pipesPerCore = chipAugmentation.pipesPerCore;
+                                chip.coreGroupsPerOperation = chipAugmentation.coreGroupsPerOperation;
+                                chip.coreGroupsPerOperand = chipAugmentation.coreGroupsPerOperand;
+                                chip.operationsByCore = chipAugmentation.operationsByCore;
+                                chip.operandsByCore = chipAugmentation.operandsByCore;
 
-                                dispatch(loadIoDataIn(dataOps.operandsByCoreInputs));
-                                dispatch(loadIoDataOut(dataOps.operandsByCoreOutputs));
+                                dispatch(loadIoDataIn(chipAugmentation.operandsByCoreInputs));
+                                dispatch(loadIoDataOut(chipAugmentation.operandsByCoreOutputs));
 
                                 console.log(chip.operations);
                                 setChip(chip);
                             }
-                            console.log(dataOps);
+                            console.log(chipAugmentation);
                         }
                         if (filename.includes('sample')) {
                             const json = JSON.parse(parsedFile);

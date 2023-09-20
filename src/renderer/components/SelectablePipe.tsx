@@ -8,7 +8,7 @@ import {convertBytes, Pipe} from '../../data/DataStructures';
 import getPipeColor from '../../data/ColorGenerator';
 import ProgressBar from './ProgressBar';
 import DataSource from '../../data/DataSource';
-import {OperandData} from '../../data/DataOps';
+import {Operand} from '../../data/ChipAugmentation';
 import PipeInfoDialog from './PipeInfoDialog';
 
 interface SelectablePipeProps {
