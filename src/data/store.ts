@@ -120,7 +120,7 @@ export const {
     updateFocusPipeSelection,
 } = pipeSelectionSlice.actions;
 
-export interface NodeData extends NodeSelection {
+export interface ComputeNodeState extends NodeSelection {
     loc: {x: number; y: number};
     opName: string;
     border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
@@ -140,15 +140,15 @@ export enum HighlightType {
 }
 
 interface NodeSelectionState {
-    groups: Record<string, {data: NodeData[]; selected: boolean}>;
+    groups: Record<string, {data: ComputeNodeState[]; selected: boolean}>;
     ioGroupsIn: Record<string, {op: string; selected: boolean}[]>;
     operandsIn: Record<string, boolean>;
     ioGroupsOut: Record<string, {op: string; selected: boolean}[]>;
     operandsOut: Record<string, boolean>;
-    nodeList: Record<string, NodeData>;
+    nodeList: Record<string, ComputeNodeState>;
     coreHighlightList: Record<string, HighlightType>;
     filename: string;
-    dram: {data: NodeData[]; selected: boolean}[];
+    dram: {data: ComputeNodeState[]; selected: boolean}[];
     architecture: string;
 }
 
@@ -165,7 +165,7 @@ const nodesInitialState: NodeSelectionState = {
     architecture: '',
 };
 
-const setBorders = (nodes: NodeData[]) => {
+const setBorders = (nodes: ComputeNodeState[]) => {
     const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
     nodes.forEach((node) => {
         const leftLoc = {x: node.loc.x - 1, y: node.loc.y};
@@ -191,7 +191,7 @@ const nodeSelectionSlice = createSlice({
         setArchitecture(state, action: PayloadAction<string>) {
             state.architecture = action.payload;
         },
-        loadNodesData(state, action: PayloadAction<NodeData[]>) {
+        loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
             state.groups = {};
             state.coreHighlightList = {};
             state.ioGroupsIn = {};
@@ -226,7 +226,7 @@ const nodeSelectionSlice = createSlice({
         },
         updateNodeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
             const {id, selected} = action.payload;
-            const node: NodeData | undefined = state.nodeList[id];
+            const node: ComputeNodeState | undefined = state.nodeList[id];
 
             if (node) {
                 node.selected = selected;

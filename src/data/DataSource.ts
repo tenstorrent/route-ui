@@ -1,16 +1,16 @@
 import React, {createContext} from 'react';
-import GridData from './DataStructures';
+import Chip from './DataStructures';
 import {NetlistAnalyzerDataJSON} from './JSONDataTypes';
 
 export interface GridContext {
-    gridData: GridData | null;
-    setGridData: (data: GridData) => void;
+    chip: Chip | null;
+    setChip: (data: Chip) => void;
 }
 
 const DataSource: React.Context<GridContext> = createContext<GridContext>({
     // @ts-ignore
-    gridData: new GridData(<NetlistAnalyzerDataJSON>{nodes: []}),
-    setGridData: () => {
+    chip: new Chip(<NetlistAnalyzerDataJSON>{nodes: []}),
+    setChip: () => {
         throw Error('Not implemented');
     },
 });

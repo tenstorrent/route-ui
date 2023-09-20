@@ -35,6 +35,7 @@ export default class DataOps {
 
     operationsByCore: Map<string, string[]> = new Map<string, string[]>();
 
+    //TODO: comment this fully
     private organizeData(io: OperationIOJSON, operationName: string, cores: Record<string, CoreOperationData>, ioType: OpIoType) {
         const operandData = new OperandData(io.name, io.type as OperandType);
         if (!this.pipesPerOperand.has(io.name)) {

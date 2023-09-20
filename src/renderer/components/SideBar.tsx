@@ -17,13 +17,13 @@ import {
     loadLinkData,
     loadNodesData,
     loadPipeSelection,
-    NodeData,
+    ComputeNodeState,
     PipeSelection,
     setArchitecture,
     updateTotalOPs,
 } from '../../data/store';
 import ChipDesign from '../../data/ChipDesign';
-import GridData, {ComputeNodeData, ComputeNodeDataExtended, PipeData} from '../../data/DataStructures';
+import Chip, {ComputeNode, ComputeNodeExtended, Pipe} from '../../data/DataStructures';
 import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import DataOps from '../../data/DataOps';
 import {parseOpDataFormat} from '../../data/DataParsers';
@@ -31,13 +31,13 @@ import DataSource from '../../data/DataSource';
 import {MainRouteRendererProps} from '../MainRouteRenderer';
 
 export interface SideBarProps {
-    updateData: (data: GridData) => void;
+    updateData: (data: Chip) => void;
 }
 
 export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
     const navigate = useNavigate();
 
-    const {gridData} = useContext(DataSource);
+    const {chip} = useContext(DataSource);
     const dispatch = useDispatch();
     const reloadApp = () => {
         dispatch(loadedFilename(''));
@@ -91,9 +91,9 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
                             // console.log(parsedFile);
                             const dataOps = new DataOps();
                             dataOps.fromOpsJSON(parsedFile.ops);
-                            if (gridData) {
-                                const augmentedData = new GridData();
-                                Object.assign(augmentedData, gridData);
+                            if (chip) {
+                                const augmentedData = new Chip();
+                                Object.assign(augmentedData, chip);
                                 augmentedData.operations = dataOps.operations;
                                 augmentedData.cores = dataOps.cores;
                                 augmentedData.pipesPerOp = dataOps.pipesPerOp;

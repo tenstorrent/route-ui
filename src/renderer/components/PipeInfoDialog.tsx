@@ -19,7 +19,7 @@ export interface PipeInfoDialogProps {
  */
 const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
     const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);
-    const {gridData} = useContext(DataSource);
+    const {chip} = useContext(DataSource);
     const [nodeHighlightInputs, setNodeHighlightInputs] = useState<string[]>([]);
     const [nodeHighlightOutputs, setNodeHighlightOutputs] = useState<string[]>([]);
     const dispatch = useDispatch();
@@ -28,12 +28,12 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
         let outputCores: string[] = [];
         const inputOps: Map<string, string[]> = new Map<string, []>();
         const outputOps: Map<string, string[]> = new Map<string, []>();
-        const data = gridData?.getPipeInfo(pipeId);
-        if (data) {
-            data.forEach((nodeData) => {
+        const computeNodeExtendedData = chip?.getPipeInfo(pipeId);
+        if (computeNodeExtendedData) {
+            computeNodeExtendedData.forEach((nodeData) => {
                 const {opName, uid} = nodeData;
-                if (nodeData.coreOpertaionData) {
-                    nodeData.coreOpertaionData.inputs.forEach((input) => {
+                if (nodeData.coreOperationData) {
+                    nodeData.coreOperationData.inputs.forEach((input) => {
                         let hasPipe = false;
                         input.pipeOperations.forEach((pipeOpList) => {
                             if (pipeOpList.pipeIDs.includes(pipeId)) {
@@ -48,7 +48,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                             outputOps.get(opName)?.push(input.name);
                         }
                     });
-                    nodeData.coreOpertaionData.outputs.forEach((output) => {
+                    nodeData.coreOperationData.outputs.forEach((output) => {
                         let hasPipe = false;
                         output.pipeOperations.forEach((pipeOpList) => {
                             if (pipeOpList.pipeIDs.includes(pipeId)) {
@@ -137,7 +137,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
     useEffect(() => {
         setTooltipContent(undefined);
         // setShouldRender(true);
-    }, [gridData]);
+    }, [chip]);
 
     return (
         <Tooltip2

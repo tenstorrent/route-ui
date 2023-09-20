@@ -4,7 +4,7 @@ import {Button, Checkbox, Dialog} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 import {RootState, selectPipeSelectionById, updatePipeSelection} from '../../data/store';
 import HighlightedText from './HighlightedText';
-import {convertBytes, PipeData} from '../../data/DataStructures';
+import {convertBytes, Pipe} from '../../data/DataStructures';
 import getPipeColor from '../../data/ColorGenerator';
 import ProgressBar from './ProgressBar';
 import DataSource from '../../data/DataSource';
@@ -12,7 +12,7 @@ import {OperandData} from '../../data/DataOps';
 import PipeInfoDialog from './PipeInfoDialog';
 
 interface SelectablePipeProps {
-    pipe: PipeData;
+    pipe: Pipe;
     pipeFilter: string;
     showBandwidthUse?: boolean;
 }

@@ -13,12 +13,12 @@ import {
     selectNodeSelectionById,
     updateNodeSelection,
 } from '../../data/store';
-import {ComputeNodeData, LinkName} from '../../data/DataStructures';
+import {ComputeNode, LinkName} from '../../data/DataStructures';
 import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, getDramGroupingStyles, getNodeOpStyles, NOC_CONFIGURATION, NODE_SIZE} from '../../utils/DrawingAPI';
 import {getGroupColor} from '../../data/ColorGenerator';
 
 interface NodeGridElementProps {
-    node: ComputeNodeData;
+    node: ComputeNode;
     showEmptyLinks: boolean;
     showOperationColors: boolean;
     showNodeLocation: boolean;
@@ -79,7 +79,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 export default NodeGridElement;
 
 interface DramChipBorderProps {
-    node: ComputeNodeData;
+    node: ComputeNode;
 }
 
 const DramChipBorder: React.FC<DramChipBorderProps> = ({
@@ -98,7 +98,7 @@ const DramChipBorder: React.FC<DramChipBorderProps> = ({
 };
 
 interface OperationGroupRenderProps {
-    node: ComputeNodeData;
+    node: ComputeNode;
 }
 
 const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
@@ -119,7 +119,7 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
 };
 
 interface OperandHighlightProps {
-    node: ComputeNodeData;
+    node: ComputeNode;
 }
 
 const OperandHighlight: React.FC<OperandHighlightProps> = ({
@@ -148,7 +148,7 @@ const OperandHighlight: React.FC<OperandHighlightProps> = ({
 };
 
 interface NodeFocusPipeRendererProps {
-    node: ComputeNodeData;
+    node: ComputeNode;
 }
 
 const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
@@ -184,7 +184,7 @@ const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
 };
 
 interface NodePipeRendererProps {
-    node: ComputeNodeData;
+    node: ComputeNode;
     showEmptyLinks: boolean;
     showLinkSaturation: boolean;
     linkSaturationTreshold: number;

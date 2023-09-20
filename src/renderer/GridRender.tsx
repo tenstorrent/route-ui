@@ -8,12 +8,12 @@ import DataSource, {GridContext} from '../data/DataSource';
 import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
 import {clearAllOperations, clearAllPipes, RootState, selectAllPipes, updateLinkSatuation, updateShowLinkSaturation, updateTotalOPs} from '../data/store';
 import NodeGridElement from './components/NodeGridElement';
-import {ComputeNodeData} from '../data/DataStructures';
+import {ComputeNode} from '../data/DataStructures';
 import DetailedView from './components/DetailedView';
 import {LINK_SATURATION_INITIAIL_VALUE} from '../data/utils';
 
 export default function GridRender() {
-    const {gridData, setGridData} = useContext<GridContext>(DataSource);
+    const {chip, setChip} = useContext<GridContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
     const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
@@ -45,10 +45,10 @@ export default function GridRender() {
     };
 
     useEffect(() => {
-        if (gridData) {
-            setOpCycles(gridData.totalOpCycles);
+        if (chip) {
+            setOpCycles(chip.totalOpCycles);
         }
-    }, [gridData]);
+    }, [chip]);
 
     return (
         <>
@@ -142,7 +142,7 @@ export default function GridRender() {
                                 <Button
                                     minimal
                                     onClick={() => {
-                                        const resetValue = gridData?.totalOpCycles || 0;
+                                        const resetValue = chip?.totalOpCycles || 0;
                                         setOpCycles(resetValue);
                                         dispatch(updateTotalOPs(resetValue));
                                     }}
@@ -154,10 +154,10 @@ export default function GridRender() {
                 </div>
                 <hr />
             </div>
-            {gridData && (
+            {chip && (
                 <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
-                    <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${gridData.totalCols + 1}, ${NODE_SIZE}px)`}}>
-                        {gridData.nodes.map((node: ComputeNodeData) => {
+                    <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${chip.totalCols + 1}, ${NODE_SIZE}px)`}}>
+                        {chip.nodes.map((node: ComputeNode) => {
                             return (
                                 <NodeGridElement
                                     node={node}

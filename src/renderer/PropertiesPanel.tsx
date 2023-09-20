@@ -4,7 +4,7 @@ import {Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs} f
 import {IconNames} from '@blueprintjs/icons';
 import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import {ComputeNodeData, ComputeNodeType, NOCLink, PipeData} from '../data/DataStructures';
+import {ComputeNode, ComputeNodeType, NOCLink, Pipe} from '../data/DataStructures';
 
 import FilterableComponent from './components/FilterableComponent';
 import {clearAllOperations, clearAllPipes, IoType, openDetailedView, RootState, selectGroup, selectOperand, updateNodeSelection, updatePipeSelection} from '../data/store';
@@ -15,9 +15,9 @@ import LinkDetails from './components/LinkDetails';
 import {CoreOperationData, OperandType} from '../data/DataOps';
 
 export default function PropertiesPanel() {
-    const {gridData} = useContext(DataSource);
+    const {chip} = useContext(DataSource);
 
-    const [selectedNodes, setSelectedNodes] = useState<ComputeNodeData[]>([]);
+    const [selectedNodes, setSelectedNodes] = useState<ComputeNode[]>([]);
     const [pipeFilter, setPipeFilter] = useState<string>('');
     const [opsFilter, setOpsFilter] = useState<string>('');
 
@@ -29,18 +29,18 @@ export default function PropertiesPanel() {
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
 
     useEffect(() => {
-        if (!gridData) {
+        if (!chip) {
             return;
         }
 
         const selected = Object.values(nodeSelectionState.nodeList).filter((n) => n.selected);
 
-        const selection: ComputeNodeData[] = gridData.nodes.filter((node: ComputeNodeData) => {
+        const selection: ComputeNode[] = chip.nodes.filter((node: ComputeNode) => {
             return selected.filter((n) => n.id === node.uid).length > 0;
         });
 
         setSelectedNodes(selection);
-    }, [gridData, nodeSelectionState]);
+    }, [chip, nodeSelectionState]);
 
     useEffect(() => {
         const opList: string[] = [];
@@ -51,18 +51,18 @@ export default function PropertiesPanel() {
     }, [groups]);
 
     const selectFilteredPipes = () => {
-        if (!gridData) {
+        if (!chip) {
             return;
         }
 
-        gridData.allUniquePipes.forEach((pipe: PipeData) => {
+        chip.allUniquePipes.forEach((pipe: Pipe) => {
             if (pipe.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
                 dispatch(updatePipeSelection({id: pipe.id, selected: true}));
             }
         });
     };
     const selectFilteredOperations = () => {
-        if (!gridData) {
+        if (!chip) {
             return;
         }
         Object.keys(groups).forEach((op) => {
@@ -77,7 +77,7 @@ export default function PropertiesPanel() {
             dispatch(updatePipeSelection({id: pipeId, selected: state}));
         });
     };
-    const selectNode = (node: ComputeNodeData, selected: boolean) => {
+    const selectNode = (node: ComputeNode, selected: boolean) => {
         dispatch(updateNodeSelection({id: node.uid, selected}));
     };
 
@@ -101,8 +101,8 @@ export default function PropertiesPanel() {
                         <>
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className="properties-panel-nodes">
-                                {selectedNodes.map((node: ComputeNodeData) => {
-                                    const coreData = gridData?.cores.find((core: CoreOperationData) => core.coreID === node.uid);
+                                {selectedNodes.map((node: ComputeNode) => {
+                                    const coreData = chip?.cores.find((core: CoreOperationData) => core.coreID === node.uid);
                                     return (
                                         <div className="node-element" key={node.uid}>
                                             <h3 className={`node-type node-type-${node.getNodeLabel()} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}>
@@ -158,7 +158,7 @@ export default function PropertiesPanel() {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
-                                                                                    <SelectablePipe pipe={new PipeData(pipeID, 0)} pipeFilter="" />
+                                                                                    <SelectablePipe pipe={new Pipe(pipeID, 0)} pipeFilter="" />
                                                                                 </li>
                                                                             );
                                                                         });
@@ -190,7 +190,7 @@ export default function PropertiesPanel() {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
-                                                                                    <SelectablePipe pipe={new PipeData(pipeID, 0)} pipeFilter="" />
+                                                                                    <SelectablePipe pipe={new Pipe(pipeID, 0)} pipeFilter="" />
                                                                                 </li>
                                                                             );
                                                                         });
@@ -271,9 +271,9 @@ export default function PropertiesPanel() {
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
-                                    {gridData && (
+                                    {chip && (
                                         <ul className="scrollable-content">
-                                            {gridData.allUniquePipes.map((pipe) => (
+                                            {chip.allUniquePipes.map((pipe) => (
                                                 <FilterableComponent
                                                     key={pipe.id}
                                                     filterableString={pipe.id}
@@ -327,7 +327,7 @@ export default function PropertiesPanel() {
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
                                     {operationsList.map((op) => {
-                                        const operationData = gridData?.operations.find((o) => o.name === op);
+                                        const operationData = chip?.operations.find((o) => o.name === op);
 
                                         return (
                                             <FilterableComponent

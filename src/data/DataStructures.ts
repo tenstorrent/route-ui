@@ -1,4 +1,4 @@
-import {LinkStateData, NodeData, PipeSelection} from './store';
+import {LinkStateData, ComputeNodeState, PipeSelection} from './store';
 import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON} from './JSONDataTypes';
 import {CoreOperationData, OperationData} from './DataOps';
 
@@ -53,24 +53,24 @@ export enum NOC {
     NOC1 = 'noc1',
 }
 
-export default class GridData {
+export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
 
     public static GET_NOC_ORDER(): Map<LinkName, number> {
-        if (!GridData.NOC_ORDER) {
-            GridData.NOC_ORDER = new Map(
+        if (!Chip.NOC_ORDER) {
+            Chip.NOC_ORDER = new Map(
                 Object.keys(LinkName)
                     .map((key) => LinkName[key])
                     .map((noc, index) => [noc, index])
             );
         }
 
-        return GridData.NOC_ORDER;
+        return Chip.NOC_ORDER;
     }
 
     public chipId: number = 0;
 
-    public nodes: ComputeNodeData[] = [];
+    public nodes: ComputeNode[] = [];
 
     public totalCols: number = 0;
 
@@ -82,7 +82,7 @@ export default class GridData {
 
     public architecture: ARCHITECTURE = ARCHITECTURE.NONE;
 
-    private uniquePipeList: PipeData[] = [];
+    private uniquePipeList: Pipe[] = [];
 
     public dramChannels: DramChannel[] = [];
 
@@ -109,7 +109,7 @@ export default class GridData {
     public operationsByCore: Map<string, string[]> = new Map<string, string[]>();
 
     constructor() {
-        GridData.GET_NOC_ORDER();
+        Chip.GET_NOC_ORDER();
     }
 
     public loadFromNetlistJSON(data: NetlistAnalyzerDataJSON) {
@@ -133,7 +133,7 @@ export default class GridData {
                 const loc: Loc = {x: nodeJSON.location[1], y: nodeJSON.location[0]};
                 this.totalCols = Math.max(loc.y, this.totalCols);
                 this.totalRows = Math.max(loc.x, this.totalRows);
-                const node = new ComputeNodeData(`${this.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+                const node = new ComputeNode(`${this.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
                 node.fromNetlistJSON(nodeJSON, this.chipId);
                 return node;
             })
@@ -151,7 +151,7 @@ export default class GridData {
         }
     }
 
-    getAllNodes(): NodeData[] {
+    getAllNodes(): ComputeNodeState[] {
         return this.nodes.map((node) => {
             return {
                 id: node.uid,
@@ -160,7 +160,7 @@ export default class GridData {
                 opName: node.opName,
                 dramChannel: node.dramChannel,
                 dramSubchannel: node.dramSubchannel,
-            } as NodeData;
+            } as ComputeNodeState;
         });
     }
 
@@ -184,8 +184,8 @@ export default class GridData {
         );
     }
 
-    getPipeInfo(pipeId: string): ComputeNodeDataExtended[] {
-        const list: ComputeNodeDataExtended[] = [];
+    getPipeInfo(pipeId: string): ComputeNodeExtended[] {
+        const list: ComputeNodeExtended[] = [];
         this.nodes.forEach((node) => {
             let hasPipe = false;
             node.links.forEach((link) => {
@@ -194,8 +194,8 @@ export default class GridData {
                 }
             });
             if (hasPipe) {
-                const extendedNodeData = new ComputeNodeDataExtended(node);
-                extendedNodeData.coreOpertaionData = this.cores.find((core) => core.coreID === node.uid) || null;
+                const extendedNodeData = new ComputeNodeExtended(node);
+                extendedNodeData.coreOperationData = this.cores.find((core) => core.coreID === node.uid) || null;
                 list.push(extendedNodeData);
             }
         });
@@ -227,21 +227,21 @@ export default class GridData {
         }));
     }
 
-    get allUniquePipes(): PipeData[] {
+    get allUniquePipes(): Pipe[] {
         if (!this.uniquePipeList.length) {
             this.uniquePipeList = this.getAllPipes();
         }
         return this.uniquePipeList;
     }
 
-    private getAllPipes(): PipeData[] {
-        let list: PipeData[] = [];
+    private getAllPipes(): Pipe[] {
+        let list: Pipe[] = [];
         this.nodes.forEach((node) => {
             node.links.forEach((link) => {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: { [key: string]: PipeData } = {};
+        const uniquePipeObj: { [key: string]: Pipe } = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -303,7 +303,7 @@ export class GenericNOCLink {
 
     public maxBandwidth: number = 0;
 
-    public pipes: PipeData[] = [];
+    public pipes: Pipe[] = [];
 
     public noc: NOC;
 
@@ -313,7 +313,7 @@ export class GenericNOCLink {
         this.totalDataBytes = json.total_data_in_bytes;
         this.maxBandwidth = json.max_link_bw;
         this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
-        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new PipeData(pipe, bandwidth, name, this.totalDataBytes));
+        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes));
     }
 }
 
@@ -339,9 +339,9 @@ export class NOCLink extends GenericNOCLink {
     }
 }
 
-export class ComputeNodeData {
+export class ComputeNode {
     static fromNetlistJSON(nodeJSON: NodeDataJSON) {
-        return new ComputeNodeData(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+        return new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
     }
 
     public chipId: number = 0;
@@ -411,16 +411,16 @@ export class ComputeNodeData {
     }
 }
 
-export class ComputeNodeDataExtended extends ComputeNodeData {
-    public coreOpertaionData: CoreOperationData | null;
+export class ComputeNodeExtended extends ComputeNode {
+    public coreOperationData: CoreOperationData | null;
 
-    constructor(data: ComputeNodeData) {
+    constructor(data: ComputeNode) {
         super(data.uid);
         Object.assign(this, data);
     }
 }
 
-export class PipeData {
+export class Pipe {
     id: string = '';
 
     location: Loc = {x: 0, y: 0};

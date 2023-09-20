@@ -7,7 +7,7 @@ import {FC, useContext} from 'react';
 import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
-import GridData, {ComputeNodeData, DramLink, DramName} from '../../data/DataStructures';
+import Chip, {ComputeNode, DramLink, DramName} from '../../data/DataStructures';
 import yamlValidate from '../../data/DataUtils';
 import {closeDetailedView, loadedFilename, loadNodesData, loadPipeSelection, setArchitecture} from '../../data/store';
 import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
@@ -15,7 +15,7 @@ import ChipDesign from '../../data/ChipDesign';
 import {parseOpDataFormat} from '../../data/DataParsers';
 
 interface OpsFileLoaderProps {
-    updateData: (data: GridData) => void;
+    updateData: (data: Chip) => void;
 }
 
 /**
@@ -29,7 +29,7 @@ interface OpsFileLoaderProps {
  */
 const OpsFileLoader: FC<OpsFileLoaderProps> = ({updateData}) => {
     const navigate = useNavigate();
-    const {setGridData} = useContext(DataSource);
+    const {setChip} = useContext(DataSource);
 
     const dispatch = useDispatch();
 

@@ -2,11 +2,11 @@ import React from 'react';
 import './scss/MainRouteRenderer.scss';
 import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
-import GridData from '../data/DataStructures';
+import Chip from '../data/DataStructures';
 import {SideBar} from './components/SideBar';
 
 export interface MainRouteRendererProps {
-    updateData: (data: GridData) => void;
+    updateData: (data: Chip) => void;
 }
 
 const MainRouteRenderer: React.FC<MainRouteRendererProps> = ({updateData}) => {

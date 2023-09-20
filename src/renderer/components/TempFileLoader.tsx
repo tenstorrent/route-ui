@@ -8,7 +8,7 @@ import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import path from 'path';
 import DataSource from '../../data/DataSource';
-import GridData, {ComputeNodeData, DramLink, DramName} from '../../data/DataStructures';
+import Chip, {ComputeNode, DramLink, DramName} from '../../data/DataStructures';
 import yamlValidate from '../../data/DataUtils';
 import {
     closeDetailedView,
@@ -28,7 +28,7 @@ import {parseOpDataFormat} from '../../data/DataParsers';
 import DataOps from '../../data/DataOps';
 
 interface TempFileLoaderProps {
-    updateData: (data: GridData) => void;
+    updateData: (data: Chip) => void;
 }
 
 /**
@@ -39,7 +39,7 @@ interface TempFileLoaderProps {
  */
 const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
     const navigate = useNavigate();
-    const {gridData, setGridData} = useContext(DataSource);
+    const {chip, setChip} = useContext(DataSource);
     const dispatch = useDispatch();
 
     const loadFile = async () => {
@@ -87,9 +87,9 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                         if (filename.includes('arch')) {
                             const chipDesign = new ChipDesign(parsedFile);
                             // console.log(chipDesign);
-                            const localGridData = new GridData();
+                            const localGridData = new Chip();
                             localGridData.nodes = chipDesign.nodes.map((simpleNode) => {
-                                const n = new ComputeNodeData(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
+                                const n = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
                                 n.type = simpleNode.type;
                                 n.loc = simpleNode.loc;
                                 n.dramChannel = simpleNode.dramChannel;
@@ -104,7 +104,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                             // navigate('/render');
                         }
                         if (filename.includes('analyzer_output_temporal_epoch')) {
-                            const localGridData = new GridData();
+                            const localGridData = new Chip();
                             // const start = performance.now();
                             localGridData.loadFromNetlistJSON(doc as NetlistAnalyzerDataJSON);
                             updateData(localGridData);
@@ -121,22 +121,22 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                             console.log(parsedFile);
                             const dataOps = new DataOps();
                             dataOps.fromOpsJSON(parsedFile.ops);
-                            if (gridData) {
-                                gridData.operations = dataOps.operations;
-                                gridData.cores = dataOps.cores;
-                                gridData.pipesPerOp = dataOps.pipesPerOp;
-                                gridData.pipesPerOperand = dataOps.pipesPerOperand;
-                                gridData.pipesPerCore = dataOps.pipesPerCore;
-                                gridData.coreGroupsPerOperation = dataOps.coreGroupsPerOperation;
-                                gridData.coreGroupsPerOperand = dataOps.coreGroupsPerOperand;
-                                gridData.operationsByCore = dataOps.operationsByCore;
-                                gridData.operandsByCore = dataOps.operandsByCore;
+                            if (chip) {
+                                chip.operations = dataOps.operations;
+                                chip.cores = dataOps.cores;
+                                chip.pipesPerOp = dataOps.pipesPerOp;
+                                chip.pipesPerOperand = dataOps.pipesPerOperand;
+                                chip.pipesPerCore = dataOps.pipesPerCore;
+                                chip.coreGroupsPerOperation = dataOps.coreGroupsPerOperation;
+                                chip.coreGroupsPerOperand = dataOps.coreGroupsPerOperand;
+                                chip.operationsByCore = dataOps.operationsByCore;
+                                chip.operandsByCore = dataOps.operandsByCore;
 
                                 dispatch(loadIoDataIn(dataOps.operandsByCoreInputs));
                                 dispatch(loadIoDataOut(dataOps.operandsByCoreOutputs));
 
-                                console.log(gridData.operations);
-                                setGridData(gridData);
+                                console.log(chip.operations);
+                                setChip(chip);
                             }
                             console.log(dataOps);
                         }

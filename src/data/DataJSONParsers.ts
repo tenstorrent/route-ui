@@ -1,9 +1,9 @@
-import GridData, {ComputeNodeData} from './DataStructures';
+import Chip, {ComputeNode} from './DataStructures';
 import {NetlistAnalyzerDataJSON, NodeDataJSON} from './JSONDataTypes';
 import ChipDesign, {ChipDesignJSON} from './ChipDesign';
 
 export default class GridDataGenerator {
-    public static generateGridData(json: NetlistAnalyzerDataJSON): GridData {
+    public static generateGridData(json: NetlistAnalyzerDataJSON): Chip {
         // return new GridData(json);
     }
 
@@ -17,8 +17,8 @@ export class ChipDesignGenerator {
         return new ChipDesign(json);
     }
 
-    public static computeNodeFRomJSON(json: NodeDataJSON, uid: string): ComputeNodeData {
-        const node = new ComputeNodeData(uid);
+    public static computeNodeFRomJSON(json: NodeDataJSON, uid: string): ComputeNode {
+        const node = new ComputeNode(uid);
         node.fromNetlistJSON(json);
         return node;
     }
