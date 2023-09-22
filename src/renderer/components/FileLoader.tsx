@@ -50,8 +50,7 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                     /* TEMPORARY vallidation off */
                     const isValid = true; // yamlValidate(doc);
                     if (isValid) {
-                        const chip = new Chip();
-                        chip.loadFromNetlistJSON(doc as NetlistAnalyzerDataJSON);
+                        const chip = Chip.CREATE_FROM_NETLIST_JSON(doc as NetlistAnalyzerDataJSON);
                         updateData(chip);
                         dispatch(closeDetailedView());
                         dispatch(setArchitecture(chip.architecture));

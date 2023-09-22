@@ -1,6 +1,7 @@
-import {LinkStateData, ComputeNodeState, PipeSelection} from './store';
-import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON} from './JSONDataTypes';
-import {CoreOperation, Operation} from './ChipAugmentation';
+import {LinkStateData, ComputeNodeState, PipeSelection, loadIoDataIn, loadIoDataOut} from './store';
+import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperationDataJSON, OperandJSON} from './JSONDataTypes';
+import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
+import ChipDesign, {ChipDesignJSON} from './ChipDesign';
 
 export enum LinkName {
     NONE = 'none',
@@ -68,73 +69,242 @@ export default class Chip {
         return Chip.NOC_ORDER;
     }
 
-    public chipId: number = 0;
+    private _chipId: number = 0;
 
-    public nodes: ComputeNode[] = [];
+    public get chipId(): number {
+        return this._chipId;
+    }
 
-    public totalCols: number = 0;
+    protected set chipId(value: number) {
+        this._chipId = value;
+    }
 
-    public totalRows: number = 0;
+    private _nodes: ComputeNode[] = [];
 
-    public slowestOpCycles: number = 0;
+    public get nodes(): ComputeNode[] {
+        return this._nodes;
+    }
 
-    public bwLimitedOpCycles: number = 0;
+    protected set nodes(value: ComputeNode[]) {
+        this._nodes = value;
+    }
 
-    public architecture: ARCHITECTURE = ARCHITECTURE.NONE;
+    private _totalCols: number = 0;
+
+    public get totalCols(): number {
+        return this._totalCols;
+    }
+
+    protected set totalCols(value: number) {
+        this._totalCols = value;
+    }
+
+    private _totalRows: number = 0;
+
+    public get totalRows(): number {
+        return this._totalRows;
+    }
+
+    protected set totalRows(value: number) {
+        this._totalRows = value;
+    }
+
+    private _slowestOpCycles: number = 0;
+
+    public get slowestOpCycles(): number {
+        return this._slowestOpCycles;
+    }
+
+    protected set slowestOpCycles(value: number) {
+        this._slowestOpCycles = value;
+    }
+
+    private _bwLimitedOpCycles: number = 0;
+
+    public get bwLimitedOpCycles(): number {
+        return this._bwLimitedOpCycles;
+    }
+
+    protected set bwLimitedOpCycles(value: number) {
+        this._bwLimitedOpCycles = value;
+    }
+
+    private _architecture: ARCHITECTURE = ARCHITECTURE.NONE;
+
+    public get architecture(): ARCHITECTURE {
+        return this._architecture;
+    }
+
+    protected set architecture(value: ARCHITECTURE) {
+        this._architecture = value;
+    }
 
     private uniquePipeList: Pipe[] = [];
 
-    public dramChannels: DramChannel[] = [];
+    private _dramChannels: DramChannel[] = [];
 
-    public totalOpCycles: number = 0;
+    public get dramChannels(): DramChannel[] {
+        return this._dramChannels;
+    }
+
+    protected set dramChannels(value: DramChannel[]) {
+        this._dramChannels = value;
+    }
+
+    private _totalOpCycles: number = 0;
+
+    public get totalOpCycles(): number {
+        return this._totalOpCycles;
+    }
+
+    protected set totalOpCycles(value: number) {
+        this._totalOpCycles = value;
+    }
 
     // augmented data
 
-    public operations: Operation[] = [];
+    private _operations: Operation[] = [];
 
-    public cores: CoreOperation[] = [];
+    /**
+     * Array of operation data.
+     */
+    public get operations(): Operation[] {
+        return this._operations;
+    }
 
-    public pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
+    protected set operations(value: Operation[]) {
+        this._operations = value;
+    }
 
-    public pipesPerCore: Map<string, string[]> = new Map<string, string[]>();
+    private _cores: CoreOperation[] = [];
 
-    public pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
+    /**
+     * Array of core operation data.
+     */
+    public get cores(): CoreOperation[] {
+        return this._cores;
+    }
 
-    public coreGroupsPerOperation: Map<string, string[]> = new Map<string, string[]>();
+    protected set cores(value: CoreOperation[]) {
+        this._cores = value;
+    }
 
-    public coreGroupsPerOperand: Map<string, string[]> = new Map<string, string[]>();
+    private _pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
 
-    public operandsByCore: Map<string, string[]> = new Map<string, string[]>();
+    /**
+     * Map of operation name to pipe IDs.
+     */
+    public get pipesPerOp(): Map<string, string[]> {
+        return this._pipesPerOp;
+    }
 
-    public operationsByCore: Map<string, string[]> = new Map<string, string[]>();
+    protected set pipesPerOp(value: Map<string, string[]>) {
+        this._pipesPerOp = value;
+    }
+
+    private _pipesPerCore: Map<string, string[]> = new Map<string, string[]>();
+
+    public get pipesPerCore(): Map<string, string[]> {
+        return this._pipesPerCore;
+    }
+
+    protected set pipesPerCore(value: Map<string, string[]>) {
+        this._pipesPerCore = value;
+    }
+
+    private _pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
+
+    /**
+     * Map of operand name to pipe IDs.
+     */
+    public get pipesPerOperand(): Map<string, string[]> {
+        return this._pipesPerOperand;
+    }
+
+    protected set pipesPerOperand(value: Map<string, string[]>) {
+        this._pipesPerOperand = value;
+    }
+
+    private _coreGroupsPerOperation: Map<string, string[]> = new Map<string, string[]>();
+
+    /**
+     * Map of operation name to core IDs.
+     */
+    public get coreGroupsPerOperation(): Map<string, string[]> {
+        return this._coreGroupsPerOperation;
+    }
+
+    protected set coreGroupsPerOperation(value: Map<string, string[]>) {
+        this._coreGroupsPerOperation = value;
+    }
+
+    private _coreGroupsPerOperand: Map<string, string[]> = new Map<string, string[]>();
+
+    /**
+     * Map of operand name to core IDs.
+     */
+    public get coreGroupsPerOperand(): Map<string, string[]> {
+        return this._coreGroupsPerOperand;
+    }
+
+    protected set coreGroupsPerOperand(value: Map<string, string[]>) {
+        this._coreGroupsPerOperand = value;
+    }
+
+    private _operandsByCore: Map<string, string[]> = new Map<string, string[]>();
+
+    /**
+     * Map of core ID to operand names.
+     */
+    public get operandsByCore(): Map<string, string[]> {
+        return this._operandsByCore;
+    }
+
+    protected set operandsByCore(value: Map<string, string[]>) {
+        this._operandsByCore = value;
+    }
+
+    private _operationsByCore: Map<string, string[]> = new Map<string, string[]>();
+
+    /**
+     * Map of core ID to operation names.
+     */
+    public get operationsByCore(): Map<string, string[]> {
+        return this._operationsByCore;
+    }
+
+    protected set operationsByCore(value: Map<string, string[]>) {
+        this._operationsByCore = value;
+    }
 
     constructor() {
         Chip.GET_NOC_ORDER();
     }
 
-    public loadFromNetlistJSON(data: NetlistAnalyzerDataJSON) {
-        this.slowestOpCycles = data.slowest_op_cycles;
-        this.bwLimitedOpCycles = data.bw_limited_op_cycles;
-        this.chipId = data.chip_id || 0;
+    public static CREATE_FROM_NETLIST_JSON(data: NetlistAnalyzerDataJSON) {
+        const chip = new Chip();
+        chip.slowestOpCycles = data.slowest_op_cycles;
+        chip.bwLimitedOpCycles = data.bw_limited_op_cycles;
+        chip.chipId = data.chip_id || 0;
 
         if (data.arch) {
             if (data.arch.includes(ARCHITECTURE.GRAYSKULL)) {
-                this.architecture = ARCHITECTURE.GRAYSKULL;
+                chip.architecture = ARCHITECTURE.GRAYSKULL;
             }
             if (data.arch.includes(ARCHITECTURE.WORMHOLE)) {
-                this.architecture = ARCHITECTURE.WORMHOLE;
+                chip.architecture = ARCHITECTURE.WORMHOLE;
             }
         }
 
-        this.totalOpCycles = Math.min(this.slowestOpCycles, this.bwLimitedOpCycles);
+        chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
 
-        this.nodes = data.nodes
+        chip.nodes = data.nodes
             .map((nodeJSON) => {
                 const loc: Loc = {x: nodeJSON.location[1], y: nodeJSON.location[0]};
-                this.totalCols = Math.max(loc.y, this.totalCols);
-                this.totalRows = Math.max(loc.x, this.totalRows);
-                const node = new ComputeNode(`${this.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
-                node.fromNetlistJSON(nodeJSON, this.chipId);
+                chip.totalCols = Math.max(loc.y, chip.totalCols);
+                chip.totalRows = Math.max(loc.x, chip.totalRows);
+                const node = new ComputeNode(`${chip.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+                node.fromNetlistJSON(nodeJSON, chip.chipId);
                 return node;
             })
             .sort((a, b) => {
@@ -145,10 +315,151 @@ export default class Chip {
             });
 
         if (data.dram_channels) {
-            this.dramChannels = data.dram_channels.map((dramChannel) => {
+            chip.dramChannels = data.dram_channels.map((dramChannel) => {
                 return new DramChannel(dramChannel.channel_id, dramChannel);
             });
         }
+
+        return chip;
+    }
+
+    public static AUGMENT_FROM_OPS_JSON(chip: Chip, json: Record<string, OperationDataJSON>): Chip {
+        if (chip) {
+            const augmentedChip = new Chip();
+            Object.assign(augmentedChip, chip);
+
+            const organizeData = (operandJSON: OperandJSON, operationName: string, cores: Record<string, CoreOperation>, ioType: OpIoType) => {
+                const operandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
+                if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
+                    augmentedChip.pipesPerOperand.set(operandJSON.name, []);
+                }
+                if (!augmentedChip.coreGroupsPerOperand.has(operandJSON.name)) {
+                    augmentedChip.coreGroupsPerOperand.set(operandJSON.name, []);
+                }
+                Object.entries(operandJSON.pipes).forEach(([coreID, value]) => {
+                    if (!augmentedChip.operationsByCore.has(coreID)) {
+                        augmentedChip.operationsByCore.set(coreID, []);
+                    }
+                    augmentedChip.operationsByCore.get(coreID)?.push(operationName);
+
+                    if (!augmentedChip.operandsByCore.has(coreID)) {
+                        augmentedChip.operandsByCore.set(coreID, []);
+                    }
+                    augmentedChip.operandsByCore.get(coreID)?.push(operandJSON.name);
+
+                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...value);
+                    augmentedChip.pipesPerOp.get(operationName)?.push(...value);
+
+                    operandData.pipeOperations.push(PipeOperation.fromOpsJSON(coreID, value));
+                    const coreOperandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
+                    const pipeOperation = PipeOperation.fromOpsJSON(coreID, value);
+                    coreOperandData.pipeOperations.push(pipeOperation);
+
+                    let core: CoreOperation = cores[coreID];
+                    if (!core) {
+                        core = new CoreOperation();
+                        core.coreID = coreID;
+                        core.loc = {x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10)};
+                        core.opName = operationName;
+                        cores[coreID] = core;
+                    }
+                    augmentedChip.coreGroupsPerOperation.get(operationName)?.push(coreID);
+
+                    if (!augmentedChip.pipesPerCore.has(coreID)) {
+                        augmentedChip.pipesPerCore.set(coreID, []);
+                    }
+
+                    augmentedChip.pipesPerCore.get(coreID)?.push(...pipeOperation.pipeIDs);
+                    augmentedChip.coreGroupsPerOperand.get(operandJSON.name)?.push(coreID);
+
+                    // @ts-ignore
+                    core[ioType].push(coreOperandData);
+                });
+                return operandData;
+            };
+            const cores: Record<string, CoreOperation> = {};
+
+            augmentedChip.operations = Object.entries(json).map(([operationName, op]) => {
+                const operation = new Operation();
+                operation.name = operationName;
+                augmentedChip.pipesPerOp.set(operationName, []);
+                augmentedChip.coreGroupsPerOperation.set(operationName, []);
+                operation.inputs = op.inputs.map((input) => {
+                    return organizeData(input, operationName, cores, OpIoType.INPUTS);
+                });
+                operation.outputs = op.outputs.map((output) => {
+                    return organizeData(output, operationName, cores, OpIoType.OUTPUTS);
+                });
+                return operation;
+            });
+            augmentedChip.cores = Object.values(cores);
+            // unique values
+            augmentedChip.pipesPerOperand.forEach((value, key) => {
+                augmentedChip.pipesPerOperand.set(key, [...new Set(value)]);
+            });
+            augmentedChip.pipesPerCore.forEach((value, key) => {
+                augmentedChip.pipesPerCore.set(key, [...new Set(value)]);
+            });
+            augmentedChip.pipesPerOp.forEach((value, key) => {
+                augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
+            });
+            augmentedChip.coreGroupsPerOperation.forEach((value, key) => {
+                augmentedChip.coreGroupsPerOperation.set(key, [...new Set(value)]);
+            });
+            augmentedChip.coreGroupsPerOperand.forEach((value, key) => {
+                augmentedChip.coreGroupsPerOperand.set(key, [...new Set(value)]);
+            });
+
+            // augmentedChip.operations = chipAugmentation.operations;
+            // augmentedChip.cores = chipAugmentation.cores;
+            // augmentedChip.pipesPerOp = chipAugmentation.pipesPerOp;
+            // augmentedChip.pipesPerOperand = chipAugmentation.pipesPerOperand;
+            // augmentedChip.pipesPerCore = chipAugmentation.pipesPerCore;
+            // augmentedChip.coreGroupsPerOperation = chipAugmentation.coreGroupsPerOperation;
+            // augmentedChip.coreGroupsPerOperand = chipAugmentation.coreGroupsPerOperand;
+            // augmentedChip.operationsByCore = chipAugmentation.operationsByCore;
+            // augmentedChip.operandsByCore = chipAugmentation.operandsByCore;
+
+            return augmentedChip;
+        }
+        throw new Error('Chip is null');
+    }
+
+    public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON) {
+        const chipDesign = new ChipDesign(json);
+        const chip = new Chip();
+        chip.nodes = chipDesign.nodes.map((simpleNode) => {
+            const node = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
+            node.type = simpleNode.type;
+            node.loc = simpleNode.loc;
+            node.dramChannel = simpleNode.dramChannel;
+            node.dramSubchannel = simpleNode.dramSubchannel;
+            return node;
+        });
+        chip.totalRows = chipDesign.totalRows;
+        chip.totalCols = chipDesign.totalCols;
+        return chip;
+    }
+
+    // TODO: needs a better anme to represent update from perf analyser data
+    public static AUGMENT_FROM_CORES_JSON(chip: Chip, json: Record<string, CoreOperation>): Chip {
+        if (chip) {
+            const augmentedChip = new Chip();
+            Object.assign(augmentedChip, chip);
+
+            augmentedChip.cores = Object.entries(json).map(([uid, core]) => {
+                const coreOp = new CoreOperation();
+                coreOp.coreID = uid;
+                coreOp.loc = core.loc;
+                coreOp.logicalCoreId = core.logicalCoreId;
+                coreOp.opName = core.opName;
+                coreOp.opType = core.opType;
+                return coreOp;
+            });
+
+            return augmentedChip;
+        }
+        throw new Error('Chip is null');
     }
 
     getAllNodes(): ComputeNodeState[] {
@@ -241,7 +552,7 @@ export default class Chip {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: { [key: string]: Pipe } = {};
+        const uniquePipeObj: {[key: string]: Pipe} = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -284,7 +595,7 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
+    constructor(id: number, channelId: number, json: {[key: string]: NOCLinkJSON}) {
         this.subchannelId = id;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(new DramLink(key as DramName, `${channelId}-${id}-${key}`, value));
@@ -344,8 +655,14 @@ export class ComputeNode {
         return new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
     }
 
+    /**
+     * Chip ID in a multichip data scenario. NOT node id.
+     */
     public chipId: number = 0;
 
+    /**
+     * Unique ID for the node.
+     */
     public uid: string;
 
     public type: ComputeNodeType = ComputeNodeType.NONE;
@@ -358,15 +675,20 @@ export class ComputeNode {
 
     public links: Map<any, NOCLink> = new Map();
 
-    public dramChannel: number = -1;
-
+    /**
+     * only relevant for dram nodes
+     */
     public dramSubchannel: number = 0;
+
+    /**
+     * only relevant for dram nodes
+     */
+    public dramChannel: number = -1;
 
     constructor(uid: string) {
         this.uid = uid;
     }
 
-    // this should be static
     public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
         // this.uid = uid;
         this.opName = json.op_name;

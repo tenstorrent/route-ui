@@ -18,6 +18,7 @@ module.exports = {
         'max-classes-per-file': 'off',
         "react/function-component-definition": 0,
         "no-plusplus": 'off',
+        "no-underscore-dangle": 'off',
 
     },
     parserOptions: {

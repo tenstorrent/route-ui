@@ -36,11 +36,11 @@ export interface DramChannelJSON {
 
 export interface OperationDataJSON {
     name: string;
-    inputs: OperationIOJSON[];
-    outputs: OperationIOJSON[];
+    inputs: OperandJSON[];
+    outputs: OperandJSON[];
 }
 
-export interface OperationIOJSON {
+export interface OperandJSON {
     name: string;
     type: string;
     pipes: {[key: string]: string[]};
