@@ -1,5 +1,5 @@
 import {LinkStateData, ComputeNodeState, PipeSelection, loadIoDataIn, loadIoDataOut} from './store';
-import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperationDataJSON, OperationIOJSON} from './JSONDataTypes';
+import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperationDataJSON, OperandJSON} from './JSONDataTypes';
 import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
 import ChipDesign, {ChipDesignJSON} from './ChipDesign';
 
@@ -328,15 +328,15 @@ export default class Chip {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
 
-            const organizeData = (io: OperationIOJSON, operationName: string, cores: Record<string, CoreOperation>, ioType: OpIoType) => {
-                const operandData = new Operand(io.name, io.type as OperandType);
-                if (!augmentedChip.pipesPerOperand.has(io.name)) {
-                    augmentedChip.pipesPerOperand.set(io.name, []);
+            const organizeData = (operandJSON: OperandJSON, operationName: string, cores: Record<string, CoreOperation>, ioType: OpIoType) => {
+                const operandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
+                if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
+                    augmentedChip.pipesPerOperand.set(operandJSON.name, []);
                 }
-                if (!augmentedChip.coreGroupsPerOperand.has(io.name)) {
-                    augmentedChip.coreGroupsPerOperand.set(io.name, []);
+                if (!augmentedChip.coreGroupsPerOperand.has(operandJSON.name)) {
+                    augmentedChip.coreGroupsPerOperand.set(operandJSON.name, []);
                 }
-                Object.entries(io.pipes).forEach(([coreID, value]) => {
+                Object.entries(operandJSON.pipes).forEach(([coreID, value]) => {
                     if (!augmentedChip.operationsByCore.has(coreID)) {
                         augmentedChip.operationsByCore.set(coreID, []);
                     }
@@ -345,13 +345,13 @@ export default class Chip {
                     if (!augmentedChip.operandsByCore.has(coreID)) {
                         augmentedChip.operandsByCore.set(coreID, []);
                     }
-                    augmentedChip.operandsByCore.get(coreID)?.push(io.name);
+                    augmentedChip.operandsByCore.get(coreID)?.push(operandJSON.name);
 
-                    augmentedChip.pipesPerOperand.get(io.name)?.push(...value);
+                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...value);
                     augmentedChip.pipesPerOp.get(operationName)?.push(...value);
 
                     operandData.pipeOperations.push(PipeOperation.fromOpsJSON(coreID, value));
-                    const coreOperandData = new Operand(io.name, io.type as OperandType);
+                    const coreOperandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
                     const pipeOperation = PipeOperation.fromOpsJSON(coreID, value);
                     coreOperandData.pipeOperations.push(pipeOperation);
 
@@ -370,7 +370,7 @@ export default class Chip {
                     }
 
                     augmentedChip.pipesPerCore.get(coreID)?.push(...pipeOperation.pipeIDs);
-                    augmentedChip.coreGroupsPerOperand.get(io.name)?.push(coreID);
+                    augmentedChip.coreGroupsPerOperand.get(operandJSON.name)?.push(coreID);
 
                     // @ts-ignore
                     core[ioType].push(coreOperandData);
