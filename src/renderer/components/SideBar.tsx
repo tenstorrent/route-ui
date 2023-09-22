@@ -69,7 +69,7 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
                         }
                         if (filename.includes('op_to_pipe')) {
                             if (chip) {
-                                const chipAugmentation = Chip.UPDATE_FROM_OPS_JSON(chip, parsedFile.ops);
+                                const chipAugmentation = Chip.AUGMENT_FROM_OPS_JSON(chip, parsedFile.ops);
                                 updateData(chipAugmentation);
                             }
 

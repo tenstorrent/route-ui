@@ -323,7 +323,7 @@ export default class Chip {
         return chip;
     }
 
-    public static UPDATE_FROM_OPS_JSON(chip: Chip, json: Record<string, OperationDataJSON>): Chip {
+    public static AUGMENT_FROM_OPS_JSON(chip: Chip, json: Record<string, OperationDataJSON>): Chip {
         if (chip) {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
@@ -442,7 +442,7 @@ export default class Chip {
     }
 
     // TODO: needs a better anme to represent update from perf analyser data
-    public static UPDATE_FROM_CORES_JSON(chip: Chip, json: Record<string, CoreOperation>): Chip {
+    public static AUGMENT_FROM_CORES_JSON(chip: Chip, json: Record<string, CoreOperation>): Chip {
         if (chip) {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
