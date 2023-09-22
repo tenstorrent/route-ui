@@ -3,32 +3,13 @@ import {Button} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {useDispatch} from 'react-redux';
 import {Tooltip2} from '@blueprintjs/popover2';
-import remote from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
 import {parse} from 'yaml';
 import React, {useContext} from 'react';
-import {
-    closeDetailedView,
-    LinkStateData,
-    loadedFilename,
-    loadIoDataIn,
-    loadIoDataOut,
-    loadLinkData,
-    loadNodesData,
-    loadPipeSelection,
-    ComputeNodeState,
-    PipeSelection,
-    setArchitecture,
-    updateTotalOPs,
-} from '../../data/store';
-import ChipDesign from '../../data/ChipDesign';
-import Chip, {ComputeNode, ComputeNodeExtended, Pipe} from '../../data/DataStructures';
-import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
-import ChipAugmentation from '../../data/ChipAugmentation';
-import {parseOpDataFormat} from '../../data/DataParsers';
+import {loadedFilename} from '../../data/store';
+import Chip from '../../data/DataStructures';
 import DataSource from '../../data/DataSource';
-import {MainRouteRendererProps} from '../MainRouteRenderer';
 
 export interface SideBarProps {
     updateData: (data: Chip) => void;
@@ -87,28 +68,17 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
                                 console.log('unknown file type');
                         }
                         if (filename.includes('op_to_pipe')) {
+                            if (chip) {
+                                const chipAugmentation = Chip.UPDATE_FROM_OPS_JSON(chip, parsedFile.ops);
+                                updateData(chipAugmentation);
+                            }
+
                             // const json = JSON.parse(parsedFile);
                             // console.log(parsedFile);
-                            const chipAugmentation = new ChipAugmentation();
-                            chipAugmentation.fromOpsJSON(parsedFile.ops);
-                            if (chip) {
-                                const augmentedData = new Chip();
-                                Object.assign(augmentedData, chip);
-                                augmentedData.operations = chipAugmentation.operations;
-                                augmentedData.cores = chipAugmentation.cores;
-                                augmentedData.pipesPerOp = chipAugmentation.pipesPerOp;
-                                augmentedData.pipesPerOperand = chipAugmentation.pipesPerOperand;
-                                augmentedData.pipesPerCore = chipAugmentation.pipesPerCore;
-                                augmentedData.coreGroupsPerOperation = chipAugmentation.coreGroupsPerOperation;
-                                augmentedData.coreGroupsPerOperand = chipAugmentation.coreGroupsPerOperand;
-                                augmentedData.operationsByCore = chipAugmentation.operationsByCore;
-                                augmentedData.operandsByCore = chipAugmentation.operandsByCore;
 
-                                dispatch(loadIoDataIn(chipAugmentation.operandsByCoreInputs));
-                                dispatch(loadIoDataOut(chipAugmentation.operandsByCoreOutputs));
-
-                                updateData(augmentedData);
-                            }
+                            // TODO: keeping this for now, to remove later.
+                            // dispatch(loadIoDataIn(chipAugmentation.operandsByCoreInputs));
+                            // dispatch(loadIoDataOut(chipAugmentation.operandsByCoreOutputs));
                         }
                         if (filename.includes('sample')) {
                             const json = JSON.parse(parsedFile);

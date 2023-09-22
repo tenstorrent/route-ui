@@ -20,7 +20,7 @@ import {
     loadNodesData,
     loadPipeSelection,
     setArchitecture,
-    updateTotalOPs
+    updateTotalOPs,
 } from '../../data/store';
 import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import ChipDesign from '../../data/ChipDesign';
@@ -85,28 +85,15 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                                 console.log('unknown file type');
                         }
                         if (filename.includes('arch')) {
-                            const chipDesign = new ChipDesign(parsedFile);
-                            // console.log(chipDesign);
-                            const localGridData = new Chip();
-                            localGridData.nodes = chipDesign.nodes.map((simpleNode) => {
-                                const n = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
-                                n.type = simpleNode.type;
-                                n.loc = simpleNode.loc;
-                                n.dramChannel = simpleNode.dramChannel;
-                                n.dramSubchannel = simpleNode.dramSubchannel;
-                                return n;
-                            });
-                            localGridData.totalRows = chipDesign.totalRows;
-                            localGridData.totalCols = chipDesign.totalCols;
-                            updateData(localGridData);
-                            dispatch(loadNodesData(localGridData.getAllNodes()));
+                            // TODO: embed the json into codebase.
+                            const chipDesign = Chip.CREATE_FROM_CHIP_DESIGN(parsedFile);
+
+                            updateData(chipDesign);
+                            dispatch(loadNodesData(chipDesign.getAllNodes()));
                             dispatch(setArchitecture(chipDesign.architecture));
-                            // navigate('/render');
                         }
                         if (filename.includes('analyzer_output_temporal_epoch')) {
-                            const localGridData = new Chip();
-                            // const start = performance.now();
-                            localGridData.loadFromNetlistJSON(doc as NetlistAnalyzerDataJSON);
+                            const localGridData = Chip.CREATE_FROM_NETLIST_JSON(doc as NetlistAnalyzerDataJSON);
                             updateData(localGridData);
                             dispatch(closeDetailedView());
                             dispatch(setArchitecture(localGridData.architecture));
@@ -116,30 +103,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                             dispatch(loadLinkData(localGridData.getAllLinks()));
                             dispatch(updateTotalOPs(localGridData.totalOpCycles));
                         }
-                        if (filename.includes('op_to_pipe')) {
-                            // const json = JSON.parse(parsedFile);
-                            console.log(parsedFile);
-                            const chipAugmentation = new ChipAugmentation();
-                            chipAugmentation.fromOpsJSON(parsedFile.ops);
-                            if (chip) {
-                                chip.operations = chipAugmentation.operations;
-                                chip.cores = chipAugmentation.cores;
-                                chip.pipesPerOp = chipAugmentation.pipesPerOp;
-                                chip.pipesPerOperand = chipAugmentation.pipesPerOperand;
-                                chip.pipesPerCore = chipAugmentation.pipesPerCore;
-                                chip.coreGroupsPerOperation = chipAugmentation.coreGroupsPerOperation;
-                                chip.coreGroupsPerOperand = chipAugmentation.coreGroupsPerOperand;
-                                chip.operationsByCore = chipAugmentation.operationsByCore;
-                                chip.operandsByCore = chipAugmentation.operandsByCore;
 
-                                dispatch(loadIoDataIn(chipAugmentation.operandsByCoreInputs));
-                                dispatch(loadIoDataOut(chipAugmentation.operandsByCoreOutputs));
-
-                                console.log(chip.operations);
-                                setChip(chip);
-                            }
-                            console.log(chipAugmentation);
-                        }
                         if (filename.includes('sample')) {
                             const json = JSON.parse(parsedFile);
                             console.log(JSON.stringify(parseOpDataFormat(json)));
