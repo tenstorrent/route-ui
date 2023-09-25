@@ -18,7 +18,7 @@ interface FolderPickerProps {
     onSelectFolder: (folderPath: string) => void;
 }
 
-export const FolderPicker = ({onSelectFolder}: FolderPickerProps): React.ReactElement => {
+const FolderPicker = ({onSelectFolder}: FolderPickerProps): React.ReactElement => {
     const [isLoading, setIsLoading] = React.useState(false);
     const selectLocalFolder = async () => {
         const remote = await import('@electron/remote');
@@ -56,3 +56,5 @@ export const FolderPicker = ({onSelectFolder}: FolderPickerProps): React.ReactEl
         </>
     );
 };
+
+export default FolderPicker;
