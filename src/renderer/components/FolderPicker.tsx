@@ -7,18 +7,18 @@ import {ItemRenderer, Select2} from '@blueprintjs/select';
 import Chip from 'data/DataStructures';
 import validateFolder from 'utils/Folder';
 
-export const TempFolderLoaderContext = ({onDataLoad}: {onDataLoad: (data: Chip) => void}): React.ReactElement => {
+export const TempFolderLoadingContext = ({onDataLoad}: {onDataLoad: (data: Chip) => void}): React.ReactElement => {
     const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null);
     const [selectedGraph, setSelectedGraph] = React.useState<string | null>(null);
 
-    return <FolderSelector onSelectFolder={setSelectedFolder} />;
+    return <FolderPicker onSelectFolder={setSelectedFolder} />;
 };
 
-interface FolderLoaderProps {
+interface FolderPickerProps {
     onSelectFolder: (folderPath: string) => void;
 }
 
-export const FolderSelector = ({onSelectFolder}: FolderLoaderProps): React.ReactElement => {
+export const FolderPicker = ({onSelectFolder}: FolderPickerProps): React.ReactElement => {
     const [isLoading, setIsLoading] = React.useState(false);
     const selectLocalFolder = async () => {
         const remote = await import('@electron/remote');
