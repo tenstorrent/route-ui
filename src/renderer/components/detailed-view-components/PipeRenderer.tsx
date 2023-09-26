@@ -37,7 +37,7 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
         const drawCongestion = (link: GenericNOCLink, id: DramName | LinkName) => {
             if (showLinkSaturation) {
                 const linkData = linksData[link.uid];
-                if (linkData.saturation >= linkSaturationTreshold) {
+                if (linkData?.saturation >= linkSaturationTreshold) {
                     drawLink(svg, id, calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast), 5);
                 }
             }

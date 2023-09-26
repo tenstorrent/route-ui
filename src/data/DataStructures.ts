@@ -523,8 +523,10 @@ export default class Chip {
         this.dramChannels.forEach((dramChannel) => {
             dramChannel.links.forEach((link) => {
                 links.push(link);
-                dramChannel.links.forEach((subchannel) => {
-                    links.push(subchannel);
+                dramChannel.subchannels.forEach((subchannel) => {
+                    subchannel.links.forEach((subchannelLink) => {
+                        links.push(subchannelLink);
+                    });
                 });
             });
         });
@@ -595,10 +597,10 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(id: number, channelId: number, json: {[key: string]: NOCLinkJSON}) {
-        this.subchannelId = id;
+    constructor(subchannelId: number, channelId: number, json: {[key: string]: NOCLinkJSON}) {
+        this.subchannelId = subchannelId;
         Object.entries(json).forEach(([key, value]) => {
-            this.links.push(new DramLink(key as DramName, `${channelId}-${id}-${key}`, value));
+            this.links.push(new DramLink(key as DramName, `${channelId}-${subchannelId}-${key}`, value));
         });
     }
 }
