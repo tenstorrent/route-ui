@@ -23,5 +23,13 @@ describe('Folder utilities:', () => {
 
             expect([path.join(dirPath, query)]).toEqual(queryResult);
         });
+        it('finds a directory two levels deep in a directory and returns its absolute path', async () => {
+            const dirPath = 'src/utils/__tests__/testcase_example';
+            const query = 'perf_results';
+
+            const queryResult = await findFile(dirPath, query, {isDir: true, maxDepth: 2});
+
+            expect([path.join(dirPath, 'subdirectory', query)]).toEqual(queryResult);
+        });
     });
 });
