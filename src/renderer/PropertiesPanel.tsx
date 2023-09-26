@@ -5,9 +5,8 @@ import {IconNames} from '@blueprintjs/icons';
 import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
 import {ComputeNode, getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode, NOCLink, Pipe} from '../data/DataStructures';
-
 import FilterableComponent from './components/FilterableComponent';
-import {clearAllOperations, clearAllPipes, IoType, openDetailedView, RootState, selectGroup, selectOperand, updateNodeSelection, updatePipeSelection} from '../data/store';
+import {clearAllOperations, clearAllPipes, openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import LinkDetails from './components/LinkDetails';
@@ -226,7 +225,7 @@ export default function PropertiesPanel() {
 
                                             <div className="node-links-wrap">
                                                 <h4>Links</h4>
-                                                {getLinksForNode(node).map((link: NOCLink, index) => (
+                                                {getLinksForNode(node).map((link: NOCLink) => (
                                                     <LinkDetails key={link.name} link={link} showEmpty />
                                                 ))}
                                             </div>

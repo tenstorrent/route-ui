@@ -1,4 +1,4 @@
-import {MemoryRouter as Router, Routes, Route} from 'react-router-dom';
+import {MemoryRouter as Router, Route, Routes} from 'react-router-dom';
 import {Provider} from 'react-redux';
 import './App.scss';
 import {useState} from 'react';
@@ -8,7 +8,6 @@ import Chip from '../data/DataStructures';
 import MainRouteRenderer from './MainRouteRenderer';
 import SplashScreen from './SplashScreen';
 import store from '../data/store';
-import {NetlistAnalyzerDataJSON} from '../data/JSONDataTypes';
 import TopHeaderComponent from './components/TopHeaderComponent';
 
 export default function App() {
@@ -20,7 +19,7 @@ export default function App() {
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            <DataSource.Provider value={{chip: chip}}>
+            <DataSource.Provider value={{chip}}>
                 <Router>
                     <Routes>
                         <Route path="/" element={<SplashScreen updateData={setChip} />} />
