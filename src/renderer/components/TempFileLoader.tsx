@@ -8,25 +8,18 @@ import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import path from 'path';
 import DataSource from '../../data/DataSource';
-import Chip, {ComputeNode, DramLink} from '../../data/DataStructures';
-import yamlValidate from '../../data/DataUtils';
+import Chip from '../../data/DataStructures';
 import {
     closeDetailedView,
     loadedFilename,
-    loadIoData,
-    loadIoDataIn,
-    loadIoDataOut,
     loadLinkData,
     loadNodesData,
     loadPipeSelection,
     setArchitecture,
-    updateTotalOPs,
+    updateTotalOPs
 } from '../../data/store';
-import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
-import ChipDesign from '../../data/ChipDesign';
+import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import {parseOpDataFormat} from '../../data/DataParsers';
-import ChipAugmentation from '../../data/ChipAugmentation';
-import {DramName} from '../../data/LinkName';
 
 interface TempFileLoaderProps {
     updateData: (data: Chip) => void;
