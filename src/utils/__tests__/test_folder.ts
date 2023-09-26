@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import {readDirEntries, findFile, validatePerfResultsFolder} from '../Folder';
+import {readDirEntries, findFile, validatePerfResultsFolder, getAvailableGraphs} from '../Folder';
 
 const generateRandomKey = () => Math.random().toString(36).substring(2);
 
@@ -15,6 +15,7 @@ describe('Folder utilities:', () => {
     afterAll(() => {
         fs.rmSync(testDirPath, {recursive: true});
     });
+
     describe('readDirEntries', () => {
         const dirPath = path.join(testDirPath, 'readDirEntries');
         beforeAll(() => {
@@ -34,6 +35,7 @@ describe('Folder utilities:', () => {
             expect(actualEntryNames).toEqual(expectedNames);
         });
     });
+
     describe('findFile', () => {
         const dirPath = path.join(testDirPath, 'findFile');
         beforeAll(() => {
@@ -76,6 +78,7 @@ describe('Folder utilities:', () => {
             expect(queryResult).toEqual(expectedPaths);
         });
     });
+
     describe('validatePerfResultsFolder', () => {
         describe('when given a folder that is not named "perf_results"', () => {
             const dirPath = path.join(testDirPath, 'something_else');
@@ -86,6 +89,7 @@ describe('Folder utilities:', () => {
                 expect(errorMessage).toBe('Folder name must be "perf_results"');
             });
         });
+
         describe('when the folder does not exist', () => {
             const perfResultsPath = path.join(testDirPath, 'perf_results');
             beforeAll(() => {
@@ -100,6 +104,7 @@ describe('Folder utilities:', () => {
                 expect(errorMessage).toBe('Folder does not exist');
             });
         });
+
         describe('when given an existing folder that is named "perf_results"', () => {
             const perfResultsPath = path.join(testDirPath, 'perf_results');
             beforeEach(() => {
@@ -118,6 +123,7 @@ describe('Folder utilities:', () => {
                     );
                 });
             });
+
             describe('when the folder contains the required subfolders', () => {
                 beforeEach(() => {
                     fs.mkdirSync(path.join(perfResultsPath, 'analyzer_results'));
@@ -130,6 +136,26 @@ describe('Folder utilities:', () => {
                     expect(errorMessage).toBe(null);
                 });
             });
+        });
+    });
+
+    describe('getAvailableGraphs', () => {
+        const perfResultsPath = path.join(testDirPath, 'perf_results');
+        const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptors');
+        const graphNames = ['fwd_0', 'fwd_1', 'fwd_2'];
+        beforeEach(() => {
+            fs.mkdirSync(graphDescriptorsPath, {recursive: true});
+            graphNames.forEach((graphName) => {
+                fs.mkdirSync(path.join(graphDescriptorsPath, graphName));
+                fs.writeFileSync(path.join(graphDescriptorsPath, graphName, 'graph_descriptor.json'), '');
+            });
+        });
+        afterEach(() => {
+            fs.rmSync(perfResultsPath, {recursive: true});
+        });
+        it('Should list available graphs from a perf_results folder', () => {
+            const actualGraphNames = getAvailableGraphs(perfResultsPath);
+            return expect(actualGraphNames).resolves.toEqual(graphNames);
         });
     });
 });

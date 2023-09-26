@@ -1,20 +1,20 @@
 import fs, {Dirent} from 'fs';
 import path from 'path';
 
-export async function readDirEntries(dirPath: string): Promise<Dirent[]> {
+export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
     return new Promise<Dirent[]>((resolve, reject) => {
         fs.readdir(dirPath, {withFileTypes: true}, (err, files) => {
             if (err) reject(err);
             else resolve(files);
         });
     });
-}
+};
 
-export async function findFile(
+export const findFile = async (
     searchPath: string,
     searchQuery: string,
     options?: {isDir?: boolean; maxDepth?: number},
-): Promise<string[]> {
+): Promise<string[]> => {
     const {isDir = false, maxDepth = 0} = options || {};
     if (maxDepth < 0) throw new Error('maxDepth must be non-negative');
 
@@ -39,14 +39,40 @@ export async function findFile(
         )
     );
     return subfolderResults.flat();
-}
+};
 
-export async function validateFolder(dirPath: string) {
-    const REQUIRED_SUBFOLDERS = ['analyzer_results', 'graph_descriptors'];
-    if (!fs.existsSync(dirPath)) {
-        return false;
+export const validatePerfResultsFolder = async (
+    dirPath: string
+): Promise<[validated: boolean, error: string | null]> => {
+    if (path.basename(dirPath) !== 'perf_results') {
+        return [false, 'Folder name must be "perf_results"'];
     }
-    const directoryContents = await readDirEntries(dirPath);
+    if (!fs.existsSync(dirPath)) {
+        return [false, 'Folder does not exist'];
+    }
 
-    return true;
-}
+    const analyzerFolderExists = (await findFile(dirPath, 'analyzer_results', {isDir: true, maxDepth: 0})).length === 1;
+    const graphFolderExists = (await findFile(dirPath, 'graph_descriptors', {isDir: true, maxDepth: 0})).length === 1;
+
+    if (analyzerFolderExists && graphFolderExists) {
+        return [true, null];
+    }
+    const missingSubfolders: string[] = [];
+    if (!analyzerFolderExists) {
+        missingSubfolders.push('analyzer_folder');
+    }
+    if (!graphFolderExists) {
+        missingSubfolders.push('graph_descriptors');
+    }
+
+    return [false, `Selected folder is missing required subdirectory: ${missingSubfolders.join(', ')}`];
+};
+
+export const getAvailableGraphs = async (perfResultsPath: string): Promise<string[]> => {
+    const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptors');
+    const graphDirEntries = await readDirEntries(graphDescriptorsPath);
+    const graphNames = graphDirEntries
+        .map((graphDirEntry) => graphDirEntry.name)
+        .filter((name) => !name.startsWith('.'));
+    return graphNames;
+};
