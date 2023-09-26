@@ -42,8 +42,10 @@ export const TempFolderLoadingContext = ({onDataLoad}: {onDataLoad: (data: Chip)
             >
                 <FolderPicker onSelectFolder={loadFolder} />
             </Popover2>
-            <p>Selected Folder: {selectedFolder}</p>
-            <p>Selected Graph: {selectedGraph}</p>
+
+            {/* Temporary elements to display success of selection */}
+            {selectedFolder && <p>Selected Folder: {selectedFolder}</p>}
+            {selectedGraph && <p>Selected Graph: {selectedGraph}</p>}
         </div>
     );
 };
