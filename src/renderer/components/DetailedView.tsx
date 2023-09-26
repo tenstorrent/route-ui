@@ -4,11 +4,17 @@ import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
 import DataSource, {GridContext} from '../../data/DataSource';
-import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramName, LinkName, NOC, NOCLink} from '../../data/DataStructures';
+import {
+    ComputeNode,
+    DramChannel,
+    getInternalLinksForNode,
+    getInternalPipeIDsForNode,
+    NOCLink
+} from '../../data/DataStructures';
 import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
-import {getInternalLinksForNode, getInternalPipeIDsForNode} from '../../data/utils';
 import LinkDetails from './LinkDetails';
+import {ARCHITECTURE, ComputeNodeType, DramName, LinkName, NOC} from '../../data/LinkName';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;

@@ -1,6 +1,6 @@
 import Chip, {ComputeNode} from './DataStructures';
-import {NetlistAnalyzerDataJSON, NodeDataJSON} from './JSONDataTypes';
-import ChipDesign, {ChipDesignJSON} from './ChipDesign';
+import {ChipDesignJSON, NetlistAnalyzerDataJSON, NodeDataJSON} from './JSONDataTypes';
+import ChipDesign from './ChipDesign';
 
 export default class GridDataGenerator {
     public static generateGridData(json: NetlistAnalyzerDataJSON): Chip {

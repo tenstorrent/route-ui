@@ -1,24 +1,7 @@
-import {ARCHITECTURE, ComputeNodeType, Loc} from './DataStructures';
 
-export enum ComputeNodeTypeArch {
-    ARC = 'arc',
-    DRAM = 'dram',
-    ETHERNET = 'eth',
-    PCIE = 'pcie',
-    ROUTER = 'router_only',
-    FUNCTIONAL_WORKERS = 'functional_workers',
-}
-
-export interface ChipDesignJSON {
-    arch_name: ComputeNodeTypeArch;
-    grid: {x_size: number; y_size: number};
-    arc: string[];
-    dram: [string[]];
-    eth: string[];
-    pcie: string[];
-    router_only: string[];
-    functional_workers: string[];
-}
+import {ChipDesignJSON} from './JSONDataTypes';
+import {ComputeNodeTypeArch, Loc} from './Definitions';
+import {ARCHITECTURE, ComputeNodeType} from './LinkName';
 
 export default class ChipDesign {
     public totalCols: number = 0;

@@ -4,15 +4,15 @@ import {Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs} f
 import {IconNames} from '@blueprintjs/icons';
 import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import {ComputeNode, ComputeNodeType, NOCLink, Pipe} from '../data/DataStructures';
+import {ComputeNode, getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode, NOCLink, Pipe} from '../data/DataStructures';
 
 import FilterableComponent from './components/FilterableComponent';
 import {clearAllOperations, clearAllPipes, IoType, openDetailedView, RootState, selectGroup, selectOperand, updateNodeSelection, updatePipeSelection} from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
-import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
 import LinkDetails from './components/LinkDetails';
 import {CoreOperation, OperandType} from '../data/ChipAugmentation';
+import {ComputeNodeType} from '../data/LinkName';
 
 export default function PropertiesPanel() {
     const {chip} = useContext(DataSource);

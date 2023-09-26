@@ -3,7 +3,8 @@ import {Tooltip2} from '@blueprintjs/popover2';
 import {JSX} from 'react/jsx-runtime';
 import {useDispatch} from 'react-redux';
 import DataSource from '../../data/DataSource';
-import {HighlightType, resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection} from '../../data/store';
+import {resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection} from '../../data/store';
+import {HighlightType} from '../../data/StoreDefinitions';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;

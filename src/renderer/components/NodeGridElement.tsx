@@ -6,16 +6,16 @@ import {
     getDramGroup,
     getFocusModeState,
     getGroup,
-    HighlightType,
     openDetailedView,
-    PipeSelection,
     RootState,
     selectNodeSelectionById,
     updateNodeSelection,
 } from '../../data/store';
-import {ComputeNode, LinkName} from '../../data/DataStructures';
+import {ComputeNode} from '../../data/DataStructures';
 import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, getDramGroupingStyles, getNodeOpStyles, NOC_CONFIGURATION, NODE_SIZE} from '../../utils/DrawingAPI';
 import {getGroupColor} from '../../data/ColorGenerator';
+import {LinkName} from '../../data/LinkName';
+import {HighlightType, PipeSelection} from '../../data/StoreDefinitions';
 
 interface NodeGridElementProps {
     node: ComputeNode;
