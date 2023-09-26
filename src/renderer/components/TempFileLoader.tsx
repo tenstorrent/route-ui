@@ -8,7 +8,7 @@ import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import path from 'path';
 import DataSource from '../../data/DataSource';
-import Chip from '../../data/DataStructures';
+import Chip from '../../data/Chip';
 import {
     closeDetailedView,
     loadedFilename,

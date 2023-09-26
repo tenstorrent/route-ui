@@ -1,5 +1,5 @@
 import {configureStore, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {updateOPCycles} from './DataStructures';
+import {updateOPCycles} from './Chip';
 import {LINK_SATURATION_INITIAIL_VALUE} from './utils';
 import {
     ComputeNodeState,

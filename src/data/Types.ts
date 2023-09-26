@@ -28,7 +28,7 @@ export enum LinkName {
     NOC1_NORTH_OUT = 'noc1_out_north',
 }
 
-export enum ARCHITECTURE {
+export enum Architecture {
     NONE = '',
     GRAYSKULL = 'grayskull',
     WORMHOLE = 'wormhole',

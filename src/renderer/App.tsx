@@ -4,7 +4,7 @@ import './App.scss';
 import {useState} from 'react';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import DataSource from '../data/DataSource';
-import Chip from '../data/DataStructures';
+import Chip from '../data/Chip';
 import MainRouteRenderer from './MainRouteRenderer';
 import SplashScreen from './SplashScreen';
 import store from '../data/store';

@@ -4,7 +4,7 @@ import {Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs} f
 import {IconNames} from '@blueprintjs/icons';
 import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import {ComputeNode, getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode, NOCLink, Pipe} from '../data/DataStructures';
+import {ComputeNode, getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode, NOCLink, Pipe} from '../data/Chip';
 import FilterableComponent from './components/FilterableComponent';
 import {clearAllOperations, clearAllPipes, openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
 import SelectableOperation from './components/SelectableOperation';

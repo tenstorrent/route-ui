@@ -7,7 +7,7 @@ import {FC, useContext} from 'react';
 import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
-import Chip, {ComputeNode, DramLink} from '../../data/DataStructures';
+import Chip, {ComputeNode, DramLink} from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
 import {closeDetailedView, loadedFilename, loadNodesData, loadPipeSelection, setArchitecture} from '../../data/store';
 import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';

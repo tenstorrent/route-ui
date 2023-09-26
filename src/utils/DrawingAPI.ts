@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import {ComputeNode} from '../data/DataStructures';
+import {ComputeNode} from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
 import {DramName, LinkName} from '../data/Types';
 
@@ -371,7 +371,7 @@ export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, 
     return pipeIds.length;
 };
 
-export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: { x: number; y: number }) => {
+export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: {x: number; y: number}) => {
     svg.append('circle')
         //
         .attr('cx', point.x)
@@ -394,7 +394,7 @@ export const calculateLinkCongestionColor = (value: number, min: number = 0, isH
     return `rgb(${intensity}, ${255 - intensity}, 0)`;
 };
 
-export const getDramGroupingStyles = (border: { left: boolean; right: boolean; top: boolean; bottom: boolean }): {} => {
+export const getDramGroupingStyles = (border: {left: boolean; right: boolean; top: boolean; bottom: boolean}): {} => {
     const color = 'rgba(248,226,112,.25)';
     const gradientColor = 'rgba(248,226,112,0.2)';
     let dramStyles = {};
@@ -417,7 +417,7 @@ export const getDramGroupingStyles = (border: { left: boolean; right: boolean; t
     return {...dramStyles, background: gradient};
 };
 
-export const getNodeOpStyles = (styles: {}, color: string | undefined, border: { left: boolean; right: boolean; top: boolean; bottom: boolean }): {} => {
+export const getNodeOpStyles = (styles: {}, color: string | undefined, border: {left: boolean; right: boolean; top: boolean; bottom: boolean}): {} => {
     const borderSize = 2;
     if (border.left) {
         styles = {...styles, borderLeft: `${borderSize}px solid ${color}`};
@@ -436,4 +436,4 @@ export const getNodeOpStyles = (styles: {}, color: string | undefined, border: {
     const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
 
     return {...styles, background: gradient};
-}
+};

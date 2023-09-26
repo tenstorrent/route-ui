@@ -10,11 +10,11 @@ import {
     getInternalLinksForNode,
     getInternalPipeIDsForNode,
     NOCLink
-} from '../../data/DataStructures';
+} from '../../data/Chip';
 import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 import LinkDetails from './LinkDetails';
-import {ARCHITECTURE, ComputeNodeType, DramName, LinkName, NOC} from '../../data/Types';
+import {Architecture, ComputeNodeType, DramName, LinkName, NOC} from '../../data/Types';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
@@ -166,11 +166,11 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 </div>
                                 <div className="axi">
                                     <p className="label">AXI</p>
-                                    {architecture === ARCHITECTURE.WORMHOLE && <>6:2 XBAR</>}
-                                    {architecture === ARCHITECTURE.GRAYSKULL && <>2:1 XBAR</>}
+                                    {architecture === Architecture.WORMHOLE && <>6:2 XBAR</>}
+                                    {architecture === Architecture.GRAYSKULL && <>2:1 XBAR</>}
                                 </div>
                                 <div className="off-chip">
-                                    {architecture === ARCHITECTURE.WORMHOLE && (
+                                    {architecture === Architecture.WORMHOLE && (
                                         <>
                                             <div className="axi-dram-wrap">
                                                 <PipeRenderer
@@ -196,7 +196,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                             </div>
                                         </>
                                     )}
-                                    {architecture === ARCHITECTURE.GRAYSKULL && (
+                                    {architecture === Architecture.GRAYSKULL && (
                                         <div className="axi-dram-wrap">
                                             <PipeRenderer
                                                 className="centered-svg"

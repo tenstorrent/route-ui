@@ -11,7 +11,7 @@ import {
     selectNodeSelectionById,
     updateNodeSelection,
 } from '../../data/store';
-import {ComputeNode} from '../../data/DataStructures';
+import {ComputeNode} from '../../data/Chip';
 import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, getDramGroupingStyles, getNodeOpStyles, NOC_CONFIGURATION, NODE_SIZE} from '../../utils/DrawingAPI';
 import {getGroupColor} from '../../data/ColorGenerator';
 import {HighlightType, PipeSelection} from '../../data/StateTypes';

@@ -1,22 +1,21 @@
-
 import {ChipDesignJSON} from './JSONDataTypes';
-import {ARCHITECTURE, ComputeNodeType, ComputeNodeTypeArch, Loc} from './Types';
+import {Architecture, ComputeNodeType, ComputeNodeTypeArch, Loc} from './Types';
 
 export default class ChipDesign {
     public totalCols: number = 0;
 
     public totalRows: number = 0;
 
-    public architecture: ARCHITECTURE = ARCHITECTURE.NONE;
+    public architecture: Architecture = Architecture.NONE;
 
     public nodes: ComputeNodeSimple[] = [];
 
     constructor(json: ChipDesignJSON) {
-        if (json.arch_name.toLowerCase().includes(ARCHITECTURE.GRAYSKULL)) {
-            this.architecture = ARCHITECTURE.GRAYSKULL;
+        if (json.arch_name.toLowerCase().includes(Architecture.GRAYSKULL)) {
+            this.architecture = Architecture.GRAYSKULL;
         }
-        if (json.arch_name.toLowerCase().includes(ARCHITECTURE.WORMHOLE)) {
-            this.architecture = ARCHITECTURE.WORMHOLE;
+        if (json.arch_name.toLowerCase().includes(Architecture.WORMHOLE)) {
+            this.architecture = Architecture.WORMHOLE;
         }
 
         this.totalCols = json.grid.x_size - 1;

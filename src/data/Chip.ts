@@ -2,7 +2,7 @@ import {ChipDesignJSON, DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, N
 import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import {ComputeNodeState, LinkStateData, PipeSelection} from './StateTypes';
-import {ARCHITECTURE, ComputeNodeType, DramName, LinkName, Loc, NOC} from './Types';
+import {Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC} from './Types';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -79,13 +79,13 @@ export default class Chip {
         this._bwLimitedOpCycles = value;
     }
 
-    private _architecture: ARCHITECTURE = ARCHITECTURE.NONE;
+    private _architecture: Architecture = Architecture.NONE;
 
-    public get architecture(): ARCHITECTURE {
+    public get architecture(): Architecture {
         return this._architecture;
     }
 
-    protected set architecture(value: ARCHITECTURE) {
+    protected set architecture(value: Architecture) {
         this._architecture = value;
     }
 
@@ -238,11 +238,11 @@ export default class Chip {
         chip.chipId = data.chip_id || 0;
 
         if (data.arch) {
-            if (data.arch.includes(ARCHITECTURE.GRAYSKULL)) {
-                chip.architecture = ARCHITECTURE.GRAYSKULL;
+            if (data.arch.includes(Architecture.GRAYSKULL)) {
+                chip.architecture = Architecture.GRAYSKULL;
             }
-            if (data.arch.includes(ARCHITECTURE.WORMHOLE)) {
-                chip.architecture = ARCHITECTURE.WORMHOLE;
+            if (data.arch.includes(Architecture.WORMHOLE)) {
+                chip.architecture = Architecture.WORMHOLE;
             }
         }
 
