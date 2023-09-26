@@ -1,0 +1,18 @@
+.folder-load-container {
+    text-align: center;
+    .bp4-button {
+        margin: auto;
+        width: 100%;
+    };
+}
+
+.graph-picker {
+    color: black;
+    padding: 2px 10px;
+    height:fit-content;
+    .bp4-menu {
+        overflow-y: scroll;
+        max-height: 400px;
+        height: 100%;
+    }
+}
