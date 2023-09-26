@@ -1,7 +1,6 @@
 
 import {ChipDesignJSON} from './JSONDataTypes';
-import {ComputeNodeTypeArch, Loc} from './Definitions';
-import {ARCHITECTURE, ComputeNodeType} from './LinkName';
+import {ARCHITECTURE, ComputeNodeType, ComputeNodeTypeArch, Loc} from './Types';
 
 export default class ChipDesign {
     public totalCols: number = 0;

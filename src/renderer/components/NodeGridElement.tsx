@@ -14,8 +14,8 @@ import {
 import {ComputeNode} from '../../data/DataStructures';
 import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, getDramGroupingStyles, getNodeOpStyles, NOC_CONFIGURATION, NODE_SIZE} from '../../utils/DrawingAPI';
 import {getGroupColor} from '../../data/ColorGenerator';
-import {LinkName} from '../../data/LinkName';
-import {HighlightType, PipeSelection} from '../../data/StoreDefinitions';
+import {HighlightType, PipeSelection} from '../../data/StateTypes';
+import {LinkName} from '../../data/Types';
 
 interface NodeGridElementProps {
     node: ComputeNode;

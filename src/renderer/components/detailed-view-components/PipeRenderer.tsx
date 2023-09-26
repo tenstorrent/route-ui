@@ -4,8 +4,8 @@ import {useSelector} from 'react-redux';
 import {GenericNOCLink} from '../../../data/DataStructures';
 import {calculateLinkCongestionColor, drawLink, drawPipesDirect} from '../../../utils/DrawingAPI';
 import {RootState} from '../../../data/store';
-import {DramName, LinkName} from '../../../data/LinkName';
-import {PipeSelection} from '../../../data/StoreDefinitions';
+import {PipeSelection} from '../../../data/StateTypes';
+import {DramName, LinkName} from '../../../data/Types';
 
 type PipeRendererProps = {
     links: GenericNOCLink[];

@@ -4,7 +4,7 @@ import {JSX} from 'react/jsx-runtime';
 import {useDispatch} from 'react-redux';
 import DataSource from '../../data/DataSource';
 import {resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection} from '../../data/store';
-import {HighlightType} from '../../data/StoreDefinitions';
+import {HighlightType} from '../../data/StateTypes';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;

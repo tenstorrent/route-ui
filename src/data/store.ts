@@ -11,7 +11,7 @@ import {
     NodeSelectionState,
     PipeSelection,
     PipeSelectionState
-} from './StoreDefinitions';
+} from './StateTypes';
 
 const highContrastInitialState: HighContrastState = {
     enabled: false,

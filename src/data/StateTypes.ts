@@ -20,9 +20,9 @@ export interface PipeSelectionState {
 }
 
 export interface ComputeNodeState extends NodeSelection {
-    loc: { x: number; y: number };
+    loc: {x: number; y: number};
     opName: string;
-    border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
+    border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
     dramChannel: number | -1;
     dramSubchannel: number | -1;
 }
@@ -39,15 +39,15 @@ export enum HighlightType {
 }
 
 export interface NodeSelectionState {
-    groups: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
-    ioGroupsIn: Record<string, { op: string; selected: boolean }[]>;
+    groups: Record<string, {data: ComputeNodeState[]; selected: boolean}>;
+    ioGroupsIn: Record<string, {op: string; selected: boolean}[]>;
     operandsIn: Record<string, boolean>;
-    ioGroupsOut: Record<string, { op: string; selected: boolean }[]>;
+    ioGroupsOut: Record<string, {op: string; selected: boolean}[]>;
     operandsOut: Record<string, boolean>;
     nodeList: Record<string, ComputeNodeState>;
     coreHighlightList: Record<string, HighlightType>;
     filename: string;
-    dram: { data: ComputeNodeState[]; selected: boolean }[];
+    dram: {data: ComputeNodeState[]; selected: boolean}[];
     architecture: string;
 }
 

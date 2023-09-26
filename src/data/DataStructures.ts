@@ -1,9 +1,8 @@
 import {ChipDesignJSON, DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperandJSON, OperationDataJSON} from './JSONDataTypes';
 import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
-import {ARCHITECTURE, ComputeNodeType, DramName, LinkName, NOC} from './LinkName';
-import {ComputeNodeState, LinkStateData, PipeSelection} from './StoreDefinitions';
-import {Loc} from './Definitions';
+import {ComputeNodeState, LinkStateData, PipeSelection} from './StateTypes';
+import {ARCHITECTURE, ComputeNodeType, DramName, LinkName, Loc, NOC} from './Types';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;

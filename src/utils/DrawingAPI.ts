@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import {ComputeNode} from '../data/DataStructures';
 import getPipeColor from '../data/ColorGenerator';
-import {DramName, LinkName} from '../data/LinkName';
+import {DramName, LinkName} from '../data/Types';
 
 export const NODE_SIZE = 100;
 const NOC_CENTER = {x: 30, y: NODE_SIZE - 30};

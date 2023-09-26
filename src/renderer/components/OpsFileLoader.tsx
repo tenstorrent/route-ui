@@ -13,7 +13,8 @@ import {closeDetailedView, loadedFilename, loadNodesData, loadPipeSelection, set
 import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import ChipDesign from '../../data/ChipDesign';
 import {parseOpDataFormat} from '../../data/DataParsers';
-import {DramName} from '../../data/LinkName';
+
+import {DramName} from '../../data/Types';
 
 interface OpsFileLoaderProps {
     updateData: (data: Chip) => void;

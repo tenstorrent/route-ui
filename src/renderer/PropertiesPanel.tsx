@@ -11,7 +11,8 @@ import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import LinkDetails from './components/LinkDetails';
 import {CoreOperation, OperandType} from '../data/ChipAugmentation';
-import {ComputeNodeType} from '../data/LinkName';
+
+import {ComputeNodeType} from '../data/Types';
 
 export default function PropertiesPanel() {
     const {chip} = useContext(DataSource);

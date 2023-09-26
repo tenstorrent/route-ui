@@ -14,7 +14,7 @@ import {
 import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 import LinkDetails from './LinkDetails';
-import {ARCHITECTURE, ComputeNodeType, DramName, LinkName, NOC} from '../../data/LinkName';
+import {ARCHITECTURE, ComputeNodeType, DramName, LinkName, NOC} from '../../data/Types';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;

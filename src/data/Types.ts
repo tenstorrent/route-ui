@@ -1,3 +1,17 @@
+export enum ComputeNodeTypeArch {
+    ARC = 'arc',
+    DRAM = 'dram',
+    ETHERNET = 'eth',
+    PCIE = 'pcie',
+    ROUTER = 'router_only',
+    FUNCTIONAL_WORKERS = 'functional_workers',
+}
+
+export type Loc = {
+    x: number;
+    y: number;
+};
+
 export enum LinkName {
     NONE = 'none',
     NOC0_IN = 'noc0_link_in',

@@ -1,4 +1,4 @@
-import {Loc} from './Definitions';
+import {Loc} from './Types';
 
 export class CoreOperationsList extends Array<CoreOperation> {
     constructor(...items: CoreOperation[]) {

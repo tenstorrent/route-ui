@@ -1,4 +1,4 @@
-import {ComputeNodeTypeArch} from './Definitions';
+import {ComputeNodeTypeArch} from './Types';
 
 export interface NodeDataJSON {
     location: number[];
