@@ -13,25 +13,30 @@ export async function readDirEntries(dirPath: string): Promise<Dirent[]> {
 export async function findFile(
     searchPath: string,
     searchQuery: string,
-    isDir = false,
-    maxDepth = 2
+    options?: {isDir?: boolean; maxDepth?: number},
 ): Promise<string[]> {
-    const files = (await readDirEntries(searchPath)).filter(
-        (file) =>
-            ((isDir && !file.isDirectory()) || (!isDir && file.isFile())) &&
-            file.name === searchQuery
+    const {isDir = false, maxDepth = 0} = options || {};
+    if (maxDepth < 0) throw new Error('maxDepth must be non-negative');
+
+    const allEntries = await readDirEntries(searchPath);
+    const matches = allEntries.filter(
+        (file) => ((isDir && file.isDirectory()) || (!isDir && file.isFile())) && file.name === searchQuery
     );
-    if (files.length > 0) {
-        const results = files.map((dirEntry) => path.join(searchPath, dirEntry.name));
+    if (matches.length > 0) {
+        const results = matches.map((dirEntry) => path.join(searchPath, dirEntry.name));
         return results;
     }
     if (maxDepth === 0) {
         return [];
     }
+    const subdirectories = allEntries.filter((dirEntry) => dirEntry.isDirectory());
     const subfolderResults = await Promise.all(
-        files
-            .filter((dirEntry) => dirEntry.isDirectory())
-            .map((dirEntry) => findFile(dirEntry.path, searchQuery, isDir, maxDepth - 1))
+        subdirectories.map(async (dirEntry) =>
+            findFile(path.join(searchPath, dirEntry.name), searchQuery, {
+                isDir,
+                maxDepth: maxDepth - 1,
+            })
+        )
     );
     return subfolderResults.flat();
 }
