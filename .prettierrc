@@ -3,13 +3,13 @@
     "bracketSpacing": false,
     "jsxBracketSameLine": false,
     "jsxSingleQuote": true,
-    "printWidth": 180,
+    "printWidth": 120,
     "proseWrap": "never",
     "quoteProps": "as-needed",
     "requirePragma": true,
     "semi": true,
     "singleQuote": true,
     "tabWidth": 4,
-    "trailingComma": "all",
+    "trailingComma": "always",
     "useTabs": false
 }
