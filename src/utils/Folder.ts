@@ -68,11 +68,8 @@ export const validatePerfResultsFolder = async (
     return [false, `Selected folder is missing required subdirectory: ${missingSubfolders.join(', ')}`];
 };
 
-export const getAvailableGraphs = async (perfResultsPath: string): Promise<string[]> => {
+export const getAvailableGraphNames = async (perfResultsPath: string): Promise<string[]> => {
     const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptors');
     const graphDirEntries = await readDirEntries(graphDescriptorsPath);
-    const graphNames = graphDirEntries
-        .map((graphDirEntry) => graphDirEntry.name)
-        .filter((name) => !name.startsWith('.'));
-    return graphNames;
+    return graphDirEntries.map((graphDirEntry) => graphDirEntry.name).filter((name) => !name.startsWith('.'));
 };

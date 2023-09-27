@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import {readDirEntries, findFile, validatePerfResultsFolder, getAvailableGraphs} from '../Folder';
+import {readDirEntries, findFile, validatePerfResultsFolder, getAvailableGraphNames} from '../Folder';
 
 const generateRandomKey = () => Math.random().toString(36).substring(2);
 
@@ -154,7 +154,7 @@ describe('Folder utilities:', () => {
             fs.rmSync(perfResultsPath, {recursive: true});
         });
         it('Should list available graphs from a perf_results folder', () => {
-            const actualGraphNames = getAvailableGraphs(perfResultsPath);
+            const actualGraphNames = getAvailableGraphNames(perfResultsPath);
             return expect(actualGraphNames).resolves.toEqual(graphNames);
         });
     });
