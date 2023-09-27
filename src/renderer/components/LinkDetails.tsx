@@ -1,6 +1,6 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Pipe, convertBytes, GenericNOCLink} from '../../data/DataStructures';
+import {Pipe, convertBytes, GenericNOCLink} from '../../data/Chip';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import {calculateLinkCongestionColor} from '../../utils/DrawingAPI';

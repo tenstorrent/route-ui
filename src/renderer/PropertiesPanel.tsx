@@ -1,20 +1,21 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs, Tooltip} from '@blueprintjs/core';
+import {Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import {ComputeNode, ComputeNodeType, NOCLink, Pipe} from '../data/DataStructures';
-
+import {ComputeNode, NOCLink, Pipe} from '../data/Chip';
 import FilterableComponent from './components/FilterableComponent';
 import {clearAllOperations, clearAllPipes, openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
-import {getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode} from '../data/utils';
 import LinkDetails from './components/LinkDetails';
+import {CoreOperation, OperandType} from '../data/ChipAugmentation';
+
+import {ComputeNodeType} from '../data/Types';
 
 export default function PropertiesPanel() {
-    const {svgData} = useContext(DataSource);
+    const {chip} = useContext(DataSource);
 
     const [selectedNodes, setSelectedNodes] = useState<ComputeNode[]>([]);
     const [pipeFilter, setPipeFilter] = useState<string>('');
@@ -28,16 +29,18 @@ export default function PropertiesPanel() {
     const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
 
     useEffect(() => {
-        if (!svgData) {
+        if (!chip) {
             return;
         }
-        const selected = nodeSelectionState.nodeList.filter((n) => n.selected);
-        const selection: ComputeNode[] = svgData.nodes.filter((node: ComputeNode) => {
+
+        const selected = Object.values(nodeSelectionState.nodeList).filter((n) => n.selected);
+
+        const selection: ComputeNode[] = chip.nodes.filter((node: ComputeNode) => {
             return selected.filter((n) => n.id === node.uid).length > 0;
         });
 
         setSelectedNodes(selection);
-    }, [svgData, nodeSelectionState]);
+    }, [chip, nodeSelectionState]);
 
     useEffect(() => {
         const opList: string[] = [];
@@ -47,23 +50,19 @@ export default function PropertiesPanel() {
         setOperationsList(opList);
     }, [groups]);
 
-    // useEffect(() => {
-    //     console.log(selectedNodes);
-    // }, [selectedNodes]);
-
     const selectFilteredPipes = () => {
-        if (!svgData) {
+        if (!chip) {
             return;
         }
 
-        svgData.allUniquePipes.forEach((pipe: Pipe) => {
+        chip.allUniquePipes.forEach((pipe: Pipe) => {
             if (pipe.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
                 dispatch(updatePipeSelection({id: pipe.id, selected: true}));
             }
         });
     };
     const selectFilteredOperations = () => {
-        if (!svgData) {
+        if (!chip) {
             return;
         }
         Object.keys(groups).forEach((op) => {
@@ -102,69 +101,140 @@ export default function PropertiesPanel() {
                         <>
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className="properties-panel-nodes">
-                                {selectedNodes.map((node: ComputeNode) => (
-                                    <div className="node-element" key={node.uid}>
-                                        <h3 className={`node-type node-type-${node.getNodeLabel()} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}>
-                                            {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
-                                            <Tooltip content="Close ComputeNode">
-                                                <Button
-                                                    small
-                                                    icon={IconNames.CROSS}
-                                                    onClick={() => {
-                                                        selectNode(node, false);
-                                                    }}
-                                                />
-                                            </Tooltip>
-                                        </h3>
-                                        {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
-                                        {node.type === ComputeNodeType.DRAM ? (
-                                            <p>
-                                                Channel {node.dramChannel}, Sub {node.dramSubchannel}
-                                            </p>
-                                        ) : null}
-                                        {node.opName !== '' && (
-                                            <div className="opname">
-                                                <Tooltip content={node.opName} position={PopoverPosition.TOP}>
-                                                    <SelectableOperation
-                                                        opName={node.opName}
-                                                        value={nodeSelectionState.groups[node.opName].selected}
-                                                        selectFunc={selectOperationGroup}
-                                                        stringFilter=""
+                                {selectedNodes.map((node: ComputeNode) => {
+                                    const coreData = chip?.cores.find((core: CoreOperation) => core.coreID === node.uid);
+                                    return (
+                                        <div className="node-element" key={node.uid}>
+                                            <h3 className={`node-type node-type-${node.getNodeLabel()} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}>
+                                                {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
+                                                <Tooltip2 content="Close ComputeNode">
+                                                    <Button
+                                                        small
+                                                        icon={IconNames.CROSS}
+                                                        onClick={() => {
+                                                            selectNode(node, false);
+                                                        }}
                                                     />
-                                                </Tooltip>
-                                            </div>
-                                        )}
-                                        <div className="node-controls">
-                                            {node.type === ComputeNodeType.DRAM && (
-                                                <Button
-                                                    small
-                                                    icon={IconNames.PROPERTIES}
-                                                    disabled={node.uid === uid && isOpen}
-                                                    onClick={() => dispatch(openDetailedView(node.uid))}
-                                                >
-                                                    Detailed View
-                                                </Button>
+                                                </Tooltip2>
+                                            </h3>
+                                            {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
+                                            {node.type === ComputeNodeType.DRAM ? (
+                                                <p>
+                                                    Channel {node.dramChannel}, Sub {node.dramSubchannel}
+                                                </p>
+                                            ) : null}
+                                            {node.opName !== '' && (
+                                                <div className="opname">
+                                                    <Tooltip2 content={node.opName} position={PopoverPosition.LEFT}>
+                                                        <SelectableOperation
+                                                            opName={node.opName}
+                                                            value={nodeSelectionState.groups[node.opName].selected}
+                                                            selectFunc={selectOperationGroup}
+                                                            stringFilter=""
+                                                        />
+                                                    </Tooltip2>
+                                                </div>
                                             )}
+                                            <div className="opname">
+                                                {coreData?.inputs.length && <h4 className="io-label">Inputs:</h4>}
+                                                {coreData?.inputs.map((io) => (
+                                                    <ul className="scrollable-content">
+                                                        <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
+                                                            <div key={io.name} style={{fontSize: '12px'}}>
+                                                                {io.type === OperandType.OP ? (
+                                                                    <SelectableOperation
+                                                                        opName={io.name}
+                                                                        value={nodeSelectionState.groups[io.name]?.selected}
+                                                                        selectFunc={selectOperationGroup}
+                                                                        stringFilter=""
+                                                                    />
+                                                                ) : (
+                                                                    <div className="op-element">
+                                                                        <Checkbox checked={false} disabled />
+                                                                        <span>{io.name}</span>
+                                                                    </div>
+                                                                )}
+                                                                <ul className="scrollable-content">
+                                                                    {io.pipeOperations.map((pipe) => {
+                                                                        return pipe.pipeIDs.map((pipeID) => {
+                                                                            return (
+                                                                                <li>
+                                                                                    <SelectablePipe pipe={new Pipe(pipeID, 0)} pipeFilter="" />
+                                                                                </li>
+                                                                            );
+                                                                        });
+                                                                    })}
+                                                                </ul>
+                                                            </div>
+                                                        </Tooltip2>
+                                                    </ul>
+                                                ))}
+                                                {coreData?.outputs.length && <h4 className="io-label">Outputs:</h4>}
+                                                {coreData?.outputs.map((io) => (
+                                                    <ul className="scrollable-content">
+                                                        <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
+                                                            <div key={io.name} style={{fontSize: '12px'}}>
+                                                                {io.type === OperandType.OP ? (
+                                                                    <SelectableOperation
+                                                                        opName={io.name}
+                                                                        value={nodeSelectionState.groups[io.name]?.selected}
+                                                                        selectFunc={selectOperationGroup}
+                                                                        stringFilter=""
+                                                                    />
+                                                                ) : (
+                                                                    <div className="op-element">
+                                                                        <Checkbox checked={false} disabled />
+                                                                        <span>{io.name}</span>
+                                                                    </div>
+                                                                )}
+                                                                <ul className="scrollable-content">
+                                                                    {io.pipeOperations.map((pipe) => {
+                                                                        return pipe.pipeIDs.map((pipeID) => {
+                                                                            return (
+                                                                                <li>
+                                                                                    <SelectablePipe pipe={new Pipe(pipeID, 0)} pipeFilter="" />
+                                                                                </li>
+                                                                            );
+                                                                        });
+                                                                    })}
+                                                                </ul>
+                                                            </div>
+                                                        </Tooltip2>
+                                                    </ul>
+                                                ))}
+                                            </div>
+                                            <div className="node-controls">
+                                                {node.type === ComputeNodeType.DRAM && (
+                                                    <Button
+                                                        small
+                                                        icon={IconNames.PROPERTIES}
+                                                        disabled={node.uid === uid && isOpen}
+                                                        onClick={() => dispatch(openDetailedView(node.uid))}
+                                                    >
+                                                        Detailed View
+                                                    </Button>
+                                                )}
 
-                                            <Button small icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
-                                                Select internal pipes
-                                            </Button>
-                                            <Button small icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(getPipeIdsForNode(node), true)}>
-                                                Select all pipes
-                                            </Button>
-                                            <Button small icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(getPipeIdsForNode(node), false)}>
-                                                Deselect all pipes
-                                            </Button>
-                                        </div>
+                                                <Button small icon={IconNames.FILTER_LIST} onClick={() => changePipeState(node.getInternalPipeIDsForNode(), true)}>
+                                                    Select internal pipes
+                                                </Button>
+                                                <Button small icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(node.getPipeIdsForNode(), true)}>
+                                                    Select all pipes
+                                                </Button>
+                                                <Button small icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(node.getPipeIdsForNode(), false)}>
+                                                    Deselect all pipes
+                                                </Button>
+                                            </div>
 
-                                        <div className="node-links-wrap">
-                                            <h4>Links</h4>
-                                            {getLinksForNode(node).map((link: NOCLink, index) => (
-                                                <LinkDetails key={link.name} link={link} showEmpty />
-                                            ))}
+                                            <div className="node-links-wrap">
+                                                <h4>Links</h4>
+                                                {node.getLinksForNode().map((link: NOCLink) => (
+                                                    <LinkDetails key={link.name} link={link} showEmpty />
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </>
                     }
@@ -203,9 +273,9 @@ export default function PropertiesPanel() {
                             </div>
                             <div className="properties-panel__content">
                                 <div className="pipelist-wrap list-wrap">
-                                    {svgData && (
+                                    {chip && (
                                         <ul className="scrollable-content">
-                                            {svgData.allUniquePipes.map((pipe) => (
+                                            {chip.allUniquePipes.map((pipe) => (
                                                 <FilterableComponent
                                                     key={pipe.id}
                                                     filterableString={pipe.id}
@@ -258,21 +328,43 @@ export default function PropertiesPanel() {
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
-                                    {operationsList.map((op) => (
-                                        <FilterableComponent
-                                            key={op}
-                                            filterableString={op}
-                                            filterQuery={opsFilter}
-                                            component={
-                                                <SelectableOperation
-                                                    opName={op}
-                                                    value={nodeSelectionState.groups[op].selected}
-                                                    selectFunc={selectOperationGroup}
-                                                    stringFilter={opsFilter}
-                                                />
-                                            }
-                                        />
-                                    ))}
+                                    {operationsList.map((op) => {
+                                        const operationData = chip?.operations.find((o) => o.name === op);
+
+                                        return (
+                                            <FilterableComponent
+                                                key={op}
+                                                filterableString={op}
+                                                filterQuery={opsFilter}
+                                                component={
+                                                    <>
+                                                        <SelectableOperation
+                                                            opName={op}
+                                                            value={nodeSelectionState.groups[op].selected}
+                                                            selectFunc={selectOperationGroup}
+                                                            stringFilter={opsFilter}
+                                                        />
+                                                        {operationData && (
+                                                            <div className="operation-details" style={{color: '#000', marginLeft: '20px'}}>
+                                                                {operationData.inputs.length > 0 && <h5 className="io-label">Inputs:</h5>}
+                                                                {operationData.inputs.map((io) => (
+                                                                    <div className="operation-input" key={io.name}>
+                                                                        <p>{io.name}</p>
+                                                                    </div>
+                                                                ))}
+                                                                {operationData.outputs.length > 0 && <h5 className="io-label">Outputs:</h5>}
+                                                                {operationData.outputs.map((io) => (
+                                                                    <div className="operation-input" key={io.name}>
+                                                                        <p>{io.name}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                }
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

@@ -103,14 +103,24 @@ button, .button {
     text-decoration: none;
     transition: color 250ms linear, background-color 250ms linear;
 
-    &:hover {
-        background-color: lighten($tt-medium-blue, 20%);
+    &:not(.node-item) {
+        &:hover {
+            background-color: lighten($tt-medium-blue, 20%);
+        }
+
+        &:focus {
+            outline: none;
+        }
     }
 
-    &:focus {
-        outline: none;
+    &.node-item {
+        background-color: inherit;
+        cursor: default;
+        transition: color 100ms linear, background-color 100ms linear;
+        &:hover {
+            background-color: transparentize($tt-medium-blue, 0.9);
+        }
     }
-
 }
 
 h1, h2, h3, h4, h5 {

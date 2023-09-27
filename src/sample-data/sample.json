@@ -1,16 +1,4 @@
 {
-    "c": {
-        "inputs": [
-            {
-                "name": "inputs",
-                "type": "que"
-            },
-            {
-                "name": "w_in",
-                "type": "que|op"
-            }
-        ]
-    },
     "1-1": {
         "input-idx-0": "inputs",
         "input-idx-1": "w_in",
@@ -18,16 +6,6 @@
         "input-queues": [
             "w_in",
             "inputs"
-        ],
-        "inputs": [
-            {
-                "name": "inputs",
-                "type": "que"
-            },
-            {
-                "name": "w_in",
-                "type": "que|op"
-            }
         ],
         "logical-core-id": "0-0",
         "op-name": "fractured_0_mm0",
@@ -42,18 +20,13 @@
         "input-ops": [
             "fractured_0_mm0"
         ],
-        "inputs": [
-            {
-                "name": "",
-                "type": ""
-            }
-        ],
         "logical-core-id": "1-0",
         "op-name": "fractured_0_gelu",
         "op-type": "gelu",
         "output-ops": [
             "fractured_0_mm1"
         ],
+        "input-queues": [],
         "output-queues": [],
         "pack-dst-format": 5,
         "unpack_src_format_operand_0": 5,

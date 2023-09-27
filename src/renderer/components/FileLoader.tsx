@@ -7,18 +7,18 @@ import {FC, useContext} from 'react';
 import {IconNames} from '@blueprintjs/icons';
 import {Button} from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
-import SVGData from '../../data/DataStructures';
+import Chip from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
 import {closeDetailedView, loadedFilename, loadLinkData, loadNodesData, loadPipeSelection, setArchitecture, updateTotalOPs} from '../../data/store';
-import {SVGJson} from '../../data/JSONDataTypes';
+import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 
 interface FileLoaderProps {
-    updateData: (data: SVGData) => void;
+    updateData: (data: Chip) => void;
 }
 
 const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
     const navigate = useNavigate();
-    const {setSvgData} = useContext(DataSource);
+    const {setChip} = useContext(DataSource);
 
     const dispatch = useDispatch();
 
@@ -50,15 +50,15 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                     /* TEMPORARY vallidation off */
                     const isValid = true; // yamlValidate(doc);
                     if (isValid) {
-                        const svgData = new SVGData(doc as SVGJson);
-                        updateData(svgData);
+                        const chip = Chip.CREATE_FROM_NETLIST_JSON(doc as NetlistAnalyzerDataJSON);
+                        updateData(chip);
                         dispatch(closeDetailedView());
-                        dispatch(setArchitecture(svgData.architecture));
+                        dispatch(setArchitecture(chip.architecture));
                         dispatch(loadedFilename(filename));
-                        dispatch(loadPipeSelection(svgData.getAllPipeIds()));
-                        dispatch(loadNodesData(svgData.getAllNodes()));
-                        dispatch(loadLinkData(svgData.getAllLinks()));
-                        dispatch(updateTotalOPs(svgData.totalOpCycles));
+                        dispatch(loadPipeSelection(chip.getAllPipeIds()));
+                        dispatch(loadNodesData(chip.getAllNodes()));
+                        dispatch(loadLinkData(chip.getAllLinks()));
+                        dispatch(updateTotalOPs(chip.totalOpCycles));
 
                         navigate('/render');
                     } else {
@@ -78,7 +78,7 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
 
     return (
         <div className="">
-            <Button icon={IconNames.UPLOAD} text="Load visualizer output yaml file" onClick={loadFile} />
+            <Button icon={IconNames.UPLOAD} text="Load netlist analyzer output yaml file" onClick={loadFile} />
         </div>
     );
 };

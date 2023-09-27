@@ -1,16 +1,16 @@
 import React, {createContext} from 'react';
-import SVGData from './DataStructures';
-import {SVGJson} from './JSONDataTypes';
+import Chip from './Chip';
+import {NetlistAnalyzerDataJSON} from './JSONDataTypes';
 
-export interface SVGContext {
-    svgData: SVGData | null;
-    setSvgData: (data: SVGData) => void;
+export interface GridContext {
+    chip: Chip | null;
+    setChip: (data: Chip) => void;
 }
 
-const DataSource: React.Context<SVGContext> = createContext<SVGContext>({
+const DataSource: React.Context<GridContext> = createContext<GridContext>({
     // @ts-ignore
-    svgData: new SVGData(<SVGJson>{nodes: []}),
-    setSvgData: () => {
+    chip: new Chip(<NetlistAnalyzerDataJSON>{nodes: []}),
+    setChip: () => {
         throw Error('Not implemented');
     },
 });
