@@ -41,9 +41,7 @@ export const findFiles = async (
     return subfolderResults.flat();
 };
 
-export const validatePerfResultsFolder = async (
-    dirPath: string
-): Promise<[validated: boolean, error: string | null]> => {
+export const validatePerfResultsFolder = async (dirPath: string): Promise<[isValid: boolean, error: string | null]> => {
     if (path.basename(dirPath) !== 'perf_results') {
         return [false, 'Folder name must be "perf_results"'];
     }
