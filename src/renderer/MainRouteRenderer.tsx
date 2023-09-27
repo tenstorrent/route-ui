@@ -2,7 +2,7 @@ import React from 'react';
 import './scss/MainRouteRenderer.scss';
 import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
-import Chip from '../data/DataStructures';
+import Chip from '../data/Chip';
 import {SideBar} from './components/SideBar';
 
 export interface MainRouteRendererProps {

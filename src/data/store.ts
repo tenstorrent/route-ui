@@ -1,10 +1,17 @@
-import {createSlice, configureStore, PayloadAction} from '@reduxjs/toolkit';
-import {updateOPCycles} from './DataStructures';
-import {LINK_SATURATION_INITIAIL_VALUE} from './utils';
-
-interface HighContrastState {
-    enabled: boolean;
-}
+import {configureStore, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {updateOPCycles} from './Chip';
+import {LINK_SATURATION_INITIAIL_VALUE} from './constants';
+import {
+    ComputeNodeState,
+    DetailedViewState,
+    HighContrastState,
+    HighlightType,
+    LinkSaturationState,
+    LinkStateData,
+    NodeSelectionState,
+    PipeSelection,
+    PipeSelectionState
+} from './StateTypes';
 
 const highContrastInitialState: HighContrastState = {
     enabled: false,
@@ -21,11 +28,6 @@ export const highContrastSlice = createSlice({
 });
 export const {setHighContrastState} = highContrastSlice.actions;
 export const getHighContrastState = (state: RootState) => state.highContrast.enabled;
-
-interface DetailedViewState {
-    isOpen: boolean;
-    uid: string | null;
-}
 
 const detailedViewInitialState: DetailedViewState = {
     isOpen: false,
@@ -48,18 +50,6 @@ export const detailedViewSlice = createSlice({
 });
 
 export const {openDetailedView, closeDetailedView} = detailedViewSlice.actions;
-
-export interface PipeSelection {
-    id: string;
-    selected: boolean;
-}
-
-interface PipeSelectionState {
-    pipes: Record<string, PipeSelection>;
-    pipeIds: string[];
-    focusPipes: Record<string, PipeSelection>;
-    focusMode: boolean;
-}
 
 const pipesInitialState: PipeSelectionState = {
     pipes: {},
@@ -119,38 +109,6 @@ export const {
     selectAllPipes,
     updateFocusPipeSelection,
 } = pipeSelectionSlice.actions;
-
-export interface ComputeNodeState extends NodeSelection {
-    loc: {x: number; y: number};
-    opName: string;
-    border: {left: boolean; right: boolean; top: boolean; bottom: boolean};
-    dramChannel: number | -1;
-    dramSubchannel: number | -1;
-}
-
-export interface NodeSelection {
-    id: string;
-    selected: boolean;
-}
-
-export enum HighlightType {
-    INPUT = 'input',
-    OUTPUT = 'output',
-    NONE = '',
-}
-
-interface NodeSelectionState {
-    groups: Record<string, {data: ComputeNodeState[]; selected: boolean}>;
-    ioGroupsIn: Record<string, {op: string; selected: boolean}[]>;
-    operandsIn: Record<string, boolean>;
-    ioGroupsOut: Record<string, {op: string; selected: boolean}[]>;
-    operandsOut: Record<string, boolean>;
-    nodeList: Record<string, ComputeNodeState>;
-    coreHighlightList: Record<string, HighlightType>;
-    filename: string;
-    dram: {data: ComputeNodeState[]; selected: boolean}[];
-    architecture: string;
-}
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
@@ -345,21 +303,6 @@ export const {
     loadIoDataOut,
     resetCoreHighlight,
 } = nodeSelectionSlice.actions;
-
-export interface LinkStateData {
-    id: string;
-    totalDataBytes: number;
-    bpc: number;
-    saturation: number;
-    maxBandwidth: number;
-}
-
-interface LinkSaturationState {
-    linkSaturation: number;
-    showLinkSaturation: boolean;
-    links: Record<string, LinkStateData>;
-    totalOps: number;
-}
 
 const linkSaturationState: LinkSaturationState = {
     linkSaturation: LINK_SATURATION_INITIAIL_VALUE,

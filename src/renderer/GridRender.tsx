@@ -8,9 +8,9 @@ import DataSource, {GridContext} from '../data/DataSource';
 import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
 import {clearAllOperations, clearAllPipes, RootState, selectAllPipes, updateLinkSatuation, updateShowLinkSaturation, updateTotalOPs} from '../data/store';
 import NodeGridElement from './components/NodeGridElement';
-import {ComputeNode} from '../data/DataStructures';
+import {ComputeNode} from '../data/Chip';
 import DetailedView from './components/DetailedView';
-import {LINK_SATURATION_INITIAIL_VALUE} from '../data/utils';
+import {LINK_SATURATION_INITIAIL_VALUE} from '../data/constants';
 
 export default function GridRender() {
     const {chip, setChip} = useContext<GridContext>(DataSource);

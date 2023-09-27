@@ -8,7 +8,7 @@ import path from 'path';
 import {parse} from 'yaml';
 import React, {useContext} from 'react';
 import {loadedFilename} from '../../data/store';
-import Chip from '../../data/DataStructures';
+import Chip from '../../data/Chip';
 import DataSource from '../../data/DataSource';
 
 export interface SideBarProps {

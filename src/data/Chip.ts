@@ -1,58 +1,9 @@
-import {LinkStateData, ComputeNodeState, PipeSelection, loadIoDataIn, loadIoDataOut} from './store';
-import {DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperationDataJSON, OperandJSON} from './JSONDataTypes';
+import {ChipDesignJSON, DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperandJSON, OperationDataJSON} from './JSONDataTypes';
 import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
-import ChipDesign, {ChipDesignJSON} from './ChipDesign';
-
-export enum LinkName {
-    NONE = 'none',
-    NOC0_IN = 'noc0_link_in',
-    NOC0_OUT = 'noc0_link_out',
-    NOC0_NORTH_IN = 'noc0_in_north',
-    NOC0_SOUTH_OUT = 'noc0_out_south',
-    NOC0_WEST_IN = 'noc0_in_west',
-    NOC0_EAST_OUT = 'noc0_out_east',
-    NOC1_IN = 'noc1_link_in',
-    NOC1_OUT = 'noc1_link_out',
-    NOC1_WEST_OUT = 'noc1_out_west',
-    NOC1_EAST_IN = 'noc1_in_east',
-    NOC1_SOUTH_IN = 'noc1_in_south',
-    NOC1_NORTH_OUT = 'noc1_out_north',
-}
-
-export enum ARCHITECTURE {
-    NONE = '',
-    GRAYSKULL = 'grayskull',
-    WORMHOLE = 'wormhole',
-}
-
-export enum DramName {
-    NOC_IN = 'noc_in',
-    NOC_OUT = 'noc_out',
-    NOC0_NOC2AXI = 'noc0_noc2axi',
-    NOC1_NOC2AXI = 'noc1_noc2axi',
-    DRAM_INOUT = 'dram_inout',
-    DRAM0_INOUT = 'dram0_inout',
-    DRAM1_INOUT = 'dram1_inout',
-}
-
-export enum ComputeNodeType {
-    NONE = '',
-    ROUTER = 'router',
-    CORE = 'core',
-    DRAM = 'dram',
-    ETHERNET = 'eth',
-    PCIE = 'pcix',
-}
-
-export type Loc = {
-    x: number;
-    y: number;
-};
-
-export enum NOC {
-    NOC0 = 'noc0',
-    NOC1 = 'noc1',
-}
+import ChipDesign from './ChipDesign';
+import {ComputeNodeState, LinkStateData, PipeSelection} from './StateTypes';
+import {Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC} from './Types';
+import {INTERNAL_LINK_NAMES, NOC_LINK_NAMES} from './constants';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -129,13 +80,13 @@ export default class Chip {
         this._bwLimitedOpCycles = value;
     }
 
-    private _architecture: ARCHITECTURE = ARCHITECTURE.NONE;
+    private _architecture: Architecture = Architecture.NONE;
 
-    public get architecture(): ARCHITECTURE {
+    public get architecture(): Architecture {
         return this._architecture;
     }
 
-    protected set architecture(value: ARCHITECTURE) {
+    protected set architecture(value: Architecture) {
         this._architecture = value;
     }
 
@@ -288,11 +239,11 @@ export default class Chip {
         chip.chipId = data.chip_id || 0;
 
         if (data.arch) {
-            if (data.arch.includes(ARCHITECTURE.GRAYSKULL)) {
-                chip.architecture = ARCHITECTURE.GRAYSKULL;
+            if (data.arch.includes(Architecture.GRAYSKULL)) {
+                chip.architecture = Architecture.GRAYSKULL;
             }
-            if (data.arch.includes(ARCHITECTURE.WORMHOLE)) {
-                chip.architecture = ARCHITECTURE.WORMHOLE;
+            if (data.arch.includes(Architecture.WORMHOLE)) {
+                chip.architecture = Architecture.WORMHOLE;
             }
         }
 
@@ -710,6 +661,47 @@ export class ComputeNode {
 
         this.links = new Map(Object.entries(json.links).map(([link, linkJson], index) => [link, new NOCLink(link as LinkName, `${linkId}-${index}`, linkJson)]));
     }
+
+    public getLinksForNode = (): NOCLink[] => {
+        return [...this.links.values()].sort((a, b) => {
+            const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name) ?? Infinity;
+            const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name) ?? Infinity;
+            return firstKeyOrder - secondKeyOrder;
+        });
+    };
+
+    public getInternalLinksForNode = (): NOCLink[] => {
+        return [...this.links.values()]
+            .filter((link) => {
+                return INTERNAL_LINK_NAMES.includes(link.name);
+            })
+            .sort((a, b) => {
+                const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name) ?? Infinity;
+                const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name) ?? Infinity;
+                return firstKeyOrder - secondKeyOrder;
+            });
+    };
+
+    public getPipeIdsForNode = (): string[] => {
+        const pipes: string[] = [];
+
+        this.links.forEach((link) => {
+            pipes.push(...link.pipes.map((pipe) => pipe.id));
+        });
+
+        return pipes;
+    };
+
+    getInternalPipeIDsForNode = (): string[] => {
+        return [...this.links.values()]
+            .filter((link) => {
+                return NOC_LINK_NAMES.includes(link.name);
+            })
+            .map((link) => {
+                return [...link.pipes.map((pipe) => pipe.id)];
+            })
+            .flat();
+    };
 
     public getPipesForDirection(direction: LinkName): string[] {
         return this.links.get(direction)?.pipes.map((pipe) => pipe.id) || [];

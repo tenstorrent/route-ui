@@ -1,5 +1,5 @@
 import React, {createContext} from 'react';
-import Chip from './DataStructures';
+import Chip from './Chip';
 import {NetlistAnalyzerDataJSON} from './JSONDataTypes';
 
 export interface GridContext {

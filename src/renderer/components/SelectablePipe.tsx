@@ -4,7 +4,7 @@ import {Button, Checkbox, Dialog} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 import {RootState, selectPipeSelectionById, updatePipeSelection} from '../../data/store';
 import HighlightedText from './HighlightedText';
-import {convertBytes, Pipe} from '../../data/DataStructures';
+import {convertBytes, Pipe} from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
 import ProgressBar from './ProgressBar';
 import DataSource from '../../data/DataSource';

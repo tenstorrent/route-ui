@@ -1,9 +1,11 @@
 import React, {useEffect, useRef} from 'react';
 import * as d3 from 'd3';
 import {useSelector} from 'react-redux';
-import {DramName, GenericNOCLink, LinkName} from '../../../data/DataStructures';
+import {GenericNOCLink} from '../../../data/Chip';
 import {calculateLinkCongestionColor, drawLink, drawPipesDirect} from '../../../utils/DrawingAPI';
-import {PipeSelection, RootState} from '../../../data/store';
+import {RootState} from '../../../data/store';
+import {PipeSelection} from '../../../data/StateTypes';
+import {DramName, LinkName} from '../../../data/Types';
 
 type PipeRendererProps = {
     links: GenericNOCLink[];

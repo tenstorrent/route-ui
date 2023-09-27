@@ -4,11 +4,11 @@ import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
 import DataSource, {GridContext} from '../../data/DataSource';
-import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramName, LinkName, NOC, NOCLink} from '../../data/DataStructures';
+import {ComputeNode, DramChannel, NOCLink} from '../../data/Chip';
 import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
-import {getInternalLinksForNode, getInternalPipeIDsForNode} from '../../data/utils';
 import LinkDetails from './LinkDetails';
+import {Architecture, ComputeNodeType, DramName, LinkName, NOC} from '../../data/Types';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
@@ -104,14 +104,14 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                         small
                                                         icon={IconNames.FILTER_LIST}
                                                         disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), true)}
+                                                        onClick={() => changePipeState(currentNode?.getInternalPipeIDsForNode() || [], true)}
                                                     />
                                                     <Button
                                                         className="pipe-selection"
                                                         small
                                                         icon={IconNames.FILTER_REMOVE}
                                                         disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), false)}
+                                                        onClick={() => changePipeState(currentNode?.getInternalPipeIDsForNode() || [], false)}
                                                     />
                                                 </div>
                                                 <div className="dram-subchannel">
@@ -160,11 +160,11 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 </div>
                                 <div className="axi">
                                     <p className="label">AXI</p>
-                                    {architecture === ARCHITECTURE.WORMHOLE && <>6:2 XBAR</>}
-                                    {architecture === ARCHITECTURE.GRAYSKULL && <>2:1 XBAR</>}
+                                    {architecture === Architecture.WORMHOLE && <>6:2 XBAR</>}
+                                    {architecture === Architecture.GRAYSKULL && <>2:1 XBAR</>}
                                 </div>
                                 <div className="off-chip">
-                                    {architecture === ARCHITECTURE.WORMHOLE && (
+                                    {architecture === Architecture.WORMHOLE && (
                                         <>
                                             <div className="axi-dram-wrap">
                                                 <PipeRenderer
@@ -190,7 +190,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                             </div>
                                         </>
                                     )}
-                                    {architecture === ARCHITECTURE.GRAYSKULL && (
+                                    {architecture === Architecture.GRAYSKULL && (
                                         <div className="axi-dram-wrap">
                                             <PipeRenderer
                                                 className="centered-svg"
@@ -208,7 +208,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                             <div className="detailed-view-data">
                                 <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
-                                        return getInternalLinksForNode(n).map((link: NOCLink) => {
+                                        return node.getInternalLinksForNode().map((link: NOCLink) => {
                                             return <LinkDetails key={link.name} link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
                                         });
                                     })}
