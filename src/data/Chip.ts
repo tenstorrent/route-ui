@@ -3,6 +3,7 @@ import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation}
 import ChipDesign from './ChipDesign';
 import {ComputeNodeState, LinkStateData, PipeSelection} from './StateTypes';
 import {Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC} from './Types';
+import {INTERNAL_LINK_NAMES, NOC_LINK_NAMES} from './constants';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -662,12 +663,7 @@ export class ComputeNode {
     }
 
     public getLinksForNode = (): NOCLink[] => {
-        const nocLinks: NOCLink[] = [];
-        this.links.forEach((link) => {
-            nocLinks.push(link);
-        });
-
-        return nocLinks.sort((a, b) => {
+        return [...this.links.values()].sort((a, b) => {
             const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name) ?? Infinity;
             const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name) ?? Infinity;
             return firstKeyOrder - secondKeyOrder;
@@ -675,29 +671,15 @@ export class ComputeNode {
     };
 
     public getInternalLinksForNode = (): NOCLink[] => {
-        const nocLinks: NOCLink[] = [];
-        const internalIds = [
-            LinkName.NOC0_IN,
-            LinkName.NOC1_IN,
-            LinkName.NOC0_OUT,
-            LinkName.NOC1_OUT,
-            DramName.NOC0_NOC2AXI,
-            DramName.NOC1_NOC2AXI,
-            DramName.DRAM_INOUT,
-            DramName.DRAM0_INOUT,
-            DramName.DRAM1_INOUT,
-        ];
-        this.links.forEach((link) => {
-            if (internalIds.includes(link.name)) {
-                nocLinks.push(link);
-            }
-        });
-
-        return nocLinks.sort((a, b) => {
-            const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name) ?? Infinity;
-            const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name) ?? Infinity;
-            return firstKeyOrder - secondKeyOrder;
-        });
+        return [...this.links.values()]
+            .filter((link) => {
+                return INTERNAL_LINK_NAMES.includes(link.name);
+            })
+            .sort((a, b) => {
+                const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name) ?? Infinity;
+                const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name) ?? Infinity;
+                return firstKeyOrder - secondKeyOrder;
+            });
     };
 
     public getPipeIdsForNode = (): string[] => {
@@ -711,16 +693,14 @@ export class ComputeNode {
     };
 
     getInternalPipeIDsForNode = (): string[] => {
-        const pipes: string[] = [];
-
-        const internalLinks = [LinkName.NOC0_IN, LinkName.NOC0_OUT, LinkName.NOC1_IN, LinkName.NOC1_OUT];
-        this.links.forEach((link) => {
-            if (internalLinks.includes(link.name)) {
-                pipes.push(...link.pipes.map((pipe) => pipe.id));
-            }
-        });
-
-        return pipes;
+        return [...this.links.values()]
+            .filter((link) => {
+                return NOC_LINK_NAMES.includes(link.name);
+            })
+            .map((link) => {
+                return [...link.pipes.map((pipe) => pipe.id)];
+            })
+            .flat();
     };
 
     public getPipesForDirection(direction: LinkName): string[] {
