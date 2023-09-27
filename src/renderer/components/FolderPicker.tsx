@@ -5,7 +5,7 @@ import {IconNames} from '@blueprintjs/icons';
 import {Classes, Popover2} from '@blueprintjs/popover2';
 import {ItemRenderer, Select2} from '@blueprintjs/select';
 import Chip from 'data/DataStructures';
-import {getAvailableGraphNames, validatePerfResultsFolder} from 'utils/Folder';
+import {getAvailableGraphNames, validatePerfResultsFolder} from 'utils/Files';
 import GraphPicker from './GraphPicker';
 
 export const TempFolderLoadingContext = ({onDataLoad}: {onDataLoad: (data: Chip) => void}): React.ReactElement => {
