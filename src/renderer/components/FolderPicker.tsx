@@ -4,6 +4,7 @@ import {Button, MenuItem, Spinner} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {Classes, Popover2} from '@blueprintjs/popover2';
 import {ItemRenderer, Select2} from '@blueprintjs/select';
+import '../scss/FolderPicker.scss';
 import Chip from 'data/DataStructures';
 import {getAvailableGraphNames, validatePerfResultsFolder} from 'utils/Files';
 import GraphPicker from './GraphPicker';
