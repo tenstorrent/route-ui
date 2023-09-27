@@ -10,7 +10,7 @@ export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
     });
 };
 
-export const findFile = async (
+export const findFiles = async (
     searchPath: string,
     searchQuery: string,
     options?: {isDir?: boolean; maxDepth?: number},
@@ -32,7 +32,7 @@ export const findFile = async (
     const subdirectories = allEntries.filter((dirEntry) => dirEntry.isDirectory());
     const subfolderResults = await Promise.all(
         subdirectories.map(async (dirEntry) =>
-            findFile(path.join(searchPath, dirEntry.name), searchQuery, {
+            findFiles(path.join(searchPath, dirEntry.name), searchQuery, {
                 isDir,
                 maxDepth: maxDepth - 1,
             })
@@ -51,8 +51,8 @@ export const validatePerfResultsFolder = async (
         return [false, 'Folder does not exist'];
     }
 
-    const analyzerFolderExists = (await findFile(dirPath, 'analyzer_results', {isDir: true, maxDepth: 0})).length === 1;
-    const graphFolderExists = (await findFile(dirPath, 'graph_descriptors', {isDir: true, maxDepth: 0})).length === 1;
+    const analyzerFolderExists = (await findFiles(dirPath, 'analyzer_results', {isDir: true, maxDepth: 0})).length === 1;
+    const graphFolderExists = (await findFiles(dirPath, 'graph_descriptors', {isDir: true, maxDepth: 0})).length === 1;
 
     if (analyzerFolderExists && graphFolderExists) {
         return [true, null];

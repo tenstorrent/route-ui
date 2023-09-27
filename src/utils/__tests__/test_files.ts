@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import {readDirEntries, findFile, validatePerfResultsFolder, getAvailableGraphNames} from '../Files';
+import {readDirEntries, findFiles, validatePerfResultsFolder, getAvailableGraphNames} from '../Files';
 
 const generateRandomKey = () => Math.random().toString(36).substring(2);
 
@@ -54,21 +54,21 @@ describe('Folder utilities:', () => {
         it('finds a file in a directory and returns its absolute path', async () => {
             const query = 'file_1.json';
 
-            const queryResult = await findFile(dirPath, query);
+            const queryResult = await findFiles(dirPath, query);
 
             expect([path.join(dirPath, query)]).toEqual(queryResult);
         });
         it('finds a directory two levels deep in a directory and returns its absolute path', async () => {
             const query = 'path_AA';
 
-            const queryResult = await findFile(dirPath, query, {isDir: true, maxDepth: 1});
+            const queryResult = await findFiles(dirPath, query, {isDir: true, maxDepth: 1});
 
             expect(queryResult).toEqual([path.join(dirPath, 'path_A', query)]);
         });
         it('finds two matching directories at the same depth and returns their absolute paths', async () => {
             const query = 'target';
 
-            const queryResult = await findFile(dirPath, query, {isDir: true, maxDepth: 2});
+            const queryResult = await findFiles(dirPath, query, {isDir: true, maxDepth: 2});
 
             const expectedPaths = [
                 path.join(dirPath, 'path_A/path_AA', query),
