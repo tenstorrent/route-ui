@@ -4,13 +4,7 @@ import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
 import DataSource, {GridContext} from '../../data/DataSource';
-import {
-    ComputeNode,
-    DramChannel,
-    getInternalLinksForNode,
-    getInternalPipeIDsForNode,
-    NOCLink
-} from '../../data/Chip';
+import {ComputeNode, DramChannel, NOCLink} from '../../data/Chip';
 import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 import LinkDetails from './LinkDetails';
@@ -110,14 +104,14 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                         small
                                                         icon={IconNames.FILTER_LIST}
                                                         disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), true)}
+                                                        onClick={() => changePipeState(currentNode?.getInternalPipeIDsForNode() || [], true)}
                                                     />
                                                     <Button
                                                         className="pipe-selection"
                                                         small
                                                         icon={IconNames.FILTER_REMOVE}
                                                         disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), false)}
+                                                        onClick={() => changePipeState(currentNode?.getInternalPipeIDsForNode() || [], false)}
                                                     />
                                                 </div>
                                                 <div className="dram-subchannel">
@@ -214,7 +208,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                             <div className="detailed-view-data">
                                 <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
-                                        return getInternalLinksForNode(n).map((link: NOCLink) => {
+                                        return node.getInternalLinksForNode().map((link: NOCLink) => {
                                             return <LinkDetails key={link.name} link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
                                         });
                                     })}

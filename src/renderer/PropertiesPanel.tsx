@@ -4,7 +4,7 @@ import {Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs} f
 import {IconNames} from '@blueprintjs/icons';
 import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import {ComputeNode, getInternalPipeIDsForNode, getLinksForNode, getPipeIdsForNode, NOCLink, Pipe} from '../data/Chip';
+import {ComputeNode, NOCLink, Pipe} from '../data/Chip';
 import FilterableComponent from './components/FilterableComponent';
 import {clearAllOperations, clearAllPipes, openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
@@ -150,7 +150,8 @@ export default function PropertiesPanel() {
                                                                     />
                                                                 ) : (
                                                                     <div className="op-element">
-                                                                        <Checkbox checked={false} disabled /> <span>{io.name}</span>
+                                                                        <Checkbox checked={false} disabled />
+                                                                        <span>{io.name}</span>
                                                                     </div>
                                                                 )}
                                                                 <ul className="scrollable-content">
@@ -182,7 +183,8 @@ export default function PropertiesPanel() {
                                                                     />
                                                                 ) : (
                                                                     <div className="op-element">
-                                                                        <Checkbox checked={false} disabled /> <span>{io.name}</span>
+                                                                        <Checkbox checked={false} disabled />
+                                                                        <span>{io.name}</span>
                                                                     </div>
                                                                 )}
                                                                 <ul className="scrollable-content">
@@ -213,20 +215,20 @@ export default function PropertiesPanel() {
                                                     </Button>
                                                 )}
 
-                                                <Button small icon={IconNames.FILTER_LIST} onClick={() => changePipeState(getInternalPipeIDsForNode(node), true)}>
+                                                <Button small icon={IconNames.FILTER_LIST} onClick={() => changePipeState(node.getInternalPipeIDsForNode(), true)}>
                                                     Select internal pipes
                                                 </Button>
-                                                <Button small icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(getPipeIdsForNode(node), true)}>
+                                                <Button small icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(node.getPipeIdsForNode(), true)}>
                                                     Select all pipes
                                                 </Button>
-                                                <Button small icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(getPipeIdsForNode(node), false)}>
+                                                <Button small icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(node.getPipeIdsForNode(), false)}>
                                                     Deselect all pipes
                                                 </Button>
                                             </div>
 
                                             <div className="node-links-wrap">
                                                 <h4>Links</h4>
-                                                {getLinksForNode(node).map((link: NOCLink) => (
+                                                {node.getLinksForNode().map((link: NOCLink) => (
                                                     <LinkDetails key={link.name} link={link} showEmpty />
                                                 ))}
                                             </div>

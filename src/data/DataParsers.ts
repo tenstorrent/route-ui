@@ -12,7 +12,7 @@ export const parseOpDataFormat = (json: JSON): {} => {
         const inputValuesArray = Object.keys(obj)
             .filter((key) => inputKeysPattern.test(key))
             .map((key) => obj[key]);
-        inputValuesArray.map((input) => {
+        inputValuesArray.forEach((input) => {
             const inputData = {name: '', type: ''};
             inputData.name = input;
             if (obj['input-queues'].includes(input)) {
