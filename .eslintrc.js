@@ -15,7 +15,7 @@ module.exports = {
         'no-unused-vars': 'off',
         'no-use-before-define': 'off',
         'prefer-const': 'warn',
-        // 'prettier/prettier': 'error',
+        'prettier/prettier': 'off',
         'react/jsx-filename-extension': ['warn', { extensions: ['.tsx'] }],
         'react/react-in-jsx-scope': 'off',
         "no-plusplus": 'off',
