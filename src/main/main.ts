@@ -50,7 +50,7 @@ const installExtensions = async () => {
 
     return installer
         .default(
-            extensions.map(name => installer[name]),
+            extensions.map((name) => installer[name]),
             forceDownload,
         )
         .catch(console.log);
@@ -116,7 +116,7 @@ const createWindow = async () => {
     menuBuilder.buildMenu();
 
     // Open urls in the user's browser
-    mainWindow.webContents.setWindowOpenHandler(edata => {
+    mainWindow.webContents.setWindowOpenHandler((edata) => {
         shell.openExternal(edata.url);
         return { action: 'deny' };
     });
@@ -144,7 +144,9 @@ app.whenReady()
         app.on('activate', () => {
             // On macOS it's common to re-create a window in the app when the
             // dock icon is clicked and there are no other windows open.
-            if (mainWindow === null) createWindow();
+            if (mainWindow === null) {
+                createWindow();
+            }
         });
     })
     .catch(console.log);

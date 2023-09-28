@@ -48,7 +48,7 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
-                filelist.forEach(filename => {
+                filelist.forEach((filename) => {
                     try {
                         const json = JSON.parse(data);
                     } catch (error) {

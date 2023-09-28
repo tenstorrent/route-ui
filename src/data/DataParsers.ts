@@ -4,16 +4,16 @@ export const parseOpDataFormat = (json: JSON): {} => {
     const fileds = ['logical-core-id', 'op-name', 'op-type', 'output-ops', 'output-queues'];
     Object.entries(json).forEach(([id, obj]) => {
         const o = { inputs: [] };
-        fileds.forEach(field => {
+        fileds.forEach((field) => {
             o[field] = obj[field];
         });
         result[id] = o;
 
         const inputKeysPattern = /^input-idx-\d+$/;
         const inputValuesArray = Object.keys(obj)
-            .filter(key => inputKeysPattern.test(key))
-            .map(key => obj[key]);
-        inputValuesArray.forEach(input => {
+            .filter((key) => inputKeysPattern.test(key))
+            .map((key) => obj[key]);
+        inputValuesArray.forEach((input) => {
             const inputData = { name: '', type: '' };
             inputData.name = input;
             if (obj['input-queues'].includes(input)) {

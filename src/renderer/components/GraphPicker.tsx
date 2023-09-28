@@ -13,8 +13,8 @@ const GraphPicker = ({ options, selected, onSelect }: GraphPickerProps): React.R
         <div className='graph-picker'>
             <h3>Select a graph</h3>
             <Menu>
-                {options.map(item => (
-                    <MenuItem key={item} selected={selected === item} onClick={_e => onSelect(item)} text={item} />
+                {options.map((item) => (
+                    <MenuItem key={item} selected={selected === item} onClick={(_e) => onSelect(item)} text={item} />
                 ))}
             </Menu>
         </div>

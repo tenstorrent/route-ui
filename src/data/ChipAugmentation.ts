@@ -7,7 +7,7 @@ export class CoreOperationsList extends Array<CoreOperation> {
     }
 
     public getCoreById(coreId: string) {
-        return this.find(core => core.coreID === coreId);
+        return this.find((core) => core.coreID === coreId);
     }
 }
 
@@ -113,7 +113,7 @@ export class PipeOperation {
         this.coreID = coreID;
         this.loc = loc;
         this.chipId = chipId;
-        this.pipeIDs = pipes.map(pipe => pipe.toString());
+        this.pipeIDs = pipes.map((pipe) => pipe.toString());
     }
 }
 

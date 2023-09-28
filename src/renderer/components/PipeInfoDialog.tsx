@@ -31,12 +31,12 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
         const outputOps: Map<string, string[]> = new Map<string, []>();
         const computeNodeExtendedData = chip?.getPipeInfo(pipeId);
         if (computeNodeExtendedData) {
-            computeNodeExtendedData.forEach(nodeData => {
+            computeNodeExtendedData.forEach((nodeData) => {
                 const { opName, uid } = nodeData;
                 if (nodeData.coreOperationData) {
-                    nodeData.coreOperationData.inputs.forEach(input => {
+                    nodeData.coreOperationData.inputs.forEach((input) => {
                         let hasPipe = false;
-                        input.pipeOperations.forEach(pipeOpList => {
+                        input.pipeOperations.forEach((pipeOpList) => {
                             if (pipeOpList.pipeIDs.includes(pipeId)) {
                                 hasPipe = true;
                             }
@@ -49,9 +49,9 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
                             outputOps.get(opName)?.push(input.name);
                         }
                     });
-                    nodeData.coreOperationData.outputs.forEach(output => {
+                    nodeData.coreOperationData.outputs.forEach((output) => {
                         let hasPipe = false;
-                        output.pipeOperations.forEach(pipeOpList => {
+                        output.pipeOperations.forEach((pipeOpList) => {
                             if (pipeOpList.pipeIDs.includes(pipeId)) {
                                 hasPipe = true;
                             }
@@ -81,7 +81,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
                             <h2>{opName}</h2>
                             {io.length > 0 && (
                                 <div>
-                                    {io.map(input => {
+                                    {io.map((input) => {
                                         return (
                                             <h4 key={input} style={{ marginLeft: '10px' }}>
                                                 {input}
@@ -103,7 +103,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
                             <h2>{opName}</h2>
                             {io.length > 0 && (
                                 <div>
-                                    {io.map(ouput => {
+                                    {io.map((ouput) => {
                                         return (
                                             <h4 key={ouput} style={{ marginLeft: '10px' }}>
                                                 {ouput}

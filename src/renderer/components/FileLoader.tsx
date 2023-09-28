@@ -70,7 +70,7 @@ const FileLoader: FC<FileLoaderProps> = ({ updateData }) => {
 
                         navigate('/render');
                     } else {
-                        const errors = yamlValidate.errors?.map(error => {
+                        const errors = yamlValidate.errors?.map((error) => {
                             return error.message;
                         });
                         console.error(errors);

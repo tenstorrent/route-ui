@@ -7,7 +7,7 @@ if (dependencies) {
     const dependenciesKeys = Object.keys(dependencies);
     const nativeDeps = fs
         .readdirSync('node_modules')
-        .filter(folder => fs.existsSync(`node_modules/${folder}/binding.gyp`));
+        .filter((folder) => fs.existsSync(`node_modules/${folder}/binding.gyp`));
     if (nativeDeps.length === 0) {
         process.exit(0);
     }
@@ -19,7 +19,7 @@ if (dependencies) {
             execSync(`npm ls ${nativeDeps.join(' ')} --json`).toString(),
         );
         const rootDependencies = Object.keys(dependenciesObject);
-        const filteredRootDependencies = rootDependencies.filter(rootDependency =>
+        const filteredRootDependencies = rootDependencies.filter((rootDependency) =>
             dependenciesKeys.includes(rootDependency),
         );
         if (filteredRootDependencies.length > 0) {

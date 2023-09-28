@@ -49,12 +49,12 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({
                 }
             }
         };
-        links.forEach(link => {
+        links.forEach((link) => {
             const selectedPipeIds = Object.values(allPipes)
                 .filter((pipe: PipeSelection) => pipe.selected)
                 .map((pipe: PipeSelection) => pipe.id);
 
-            const validPipes = link.pipes.map(pipe => pipe.id).filter(pipeId => selectedPipeIds.includes(pipeId));
+            const validPipes = link.pipes.map((pipe) => pipe.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
 
             const { name } = link;
             if (name && validLinkIds.includes(name as LinkName | DramName)) {

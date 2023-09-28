@@ -68,7 +68,7 @@ export default function GridRender() {
                     labelStepSize={1}
                     value={detailedViewZoom}
                     onChange={(value: number) => setDetailedViewZoom(value)}
-                    labelRenderer={value => `${value.toFixed(1)}`}
+                    labelRenderer={(value) => `${value.toFixed(1)}`}
                 />
                 Zoom
                 <Slider
@@ -78,14 +78,14 @@ export default function GridRender() {
                     labelStepSize={1}
                     value={gridZoom}
                     onChange={(value: number) => setGridZoom(value)}
-                    labelRenderer={value => `${value.toFixed(1)}`}
+                    labelRenderer={(value) => `${value.toFixed(1)}`}
                 />
                 <hr />
                 <Tooltip2 content='Show pipes' position={Position.RIGHT}>
                     <Switch
                         checked={showPipes}
                         label='pipes'
-                        onChange={event => setShowPipes(event.currentTarget.checked)}
+                        onChange={(event) => setShowPipes(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <hr />
@@ -94,21 +94,21 @@ export default function GridRender() {
                         checked={showEmptyLinks}
                         label='links'
                         disabled={!showPipes}
-                        onChange={event => setShowEmptyLinks(event.currentTarget.checked)}
+                        onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
                     <Switch
                         checked={showOperationColors}
                         label='operations'
-                        onChange={event => setShowOperationColors(event.currentTarget.checked)}
+                        onChange={(event) => setShowOperationColors(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <Tooltip2 content='Show Compute Node locations' position={Position.RIGHT}>
                     <Switch
                         checked={showNodeLocation}
                         label='location'
-                        onChange={event => setShowNodeLocation(event.currentTarget.checked)}
+                        onChange={(event) => setShowNodeLocation(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <hr />
@@ -117,7 +117,7 @@ export default function GridRender() {
                     <Switch
                         checked={showLinkSaturation}
                         label='congestion'
-                        onChange={event => onShowLinkSaturation(event.currentTarget.checked)}
+                        onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <div
@@ -132,7 +132,7 @@ export default function GridRender() {
                     labelStepSize={50}
                     value={linkSaturationTreshold}
                     onChange={onLinkSaturationChange}
-                    labelRenderer={value => `${value.toFixed(0)}`}
+                    labelRenderer={(value) => `${value.toFixed(0)}`}
                 />
                 <hr />
                 <Tooltip2 content='Select all pipes'>
@@ -164,7 +164,7 @@ export default function GridRender() {
                         minorStepSize={100}
                         majorStepSize={100000}
                         min={0}
-                        onValueChange={value => {
+                        onValueChange={(value) => {
                             setOpCycles(value);
                             dispatch(updateTotalOPs(value));
                         }}

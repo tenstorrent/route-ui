@@ -42,7 +42,7 @@ export const detailedViewSlice = createSlice({
             state.isOpen = true;
             state.uid = action.payload;
         },
-        closeDetailedView: state => {
+        closeDetailedView: (state) => {
             state.isOpen = false;
             state.uid = null;
         },
@@ -66,7 +66,7 @@ const pipeSelectionSlice = createSlice({
             state.pipes = {};
             state.pipeIds = [];
             state.focusPipes = {};
-            action.payload.forEach(item => {
+            action.payload.forEach((item) => {
                 state.pipes[item.id] = item;
                 state.pipeIds.push(item.id);
                 state.focusPipes[item.id] = item;
@@ -86,12 +86,12 @@ const pipeSelectionSlice = createSlice({
             }
         },
         clearAllPipes(state) {
-            state.pipeIds.forEach(id => {
+            state.pipeIds.forEach((id) => {
                 state.pipes[id].selected = false;
             });
         },
         selectAllPipes(state) {
-            state.pipeIds.forEach(id => {
+            state.pipeIds.forEach((id) => {
                 state.pipes[id].selected = true;
             });
         },
@@ -124,8 +124,8 @@ const nodesInitialState: NodeSelectionState = {
 };
 
 const setBorders = (nodes: ComputeNodeState[]) => {
-    const locations = new Set(nodes.map(node => JSON.stringify(node.loc)));
-    nodes.forEach(node => {
+    const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
+    nodes.forEach((node) => {
         const leftLoc = { x: node.loc.x - 1, y: node.loc.y };
         const rightLoc = { x: node.loc.x + 1, y: node.loc.y };
         const topLoc = { x: node.loc.x, y: node.loc.y - 1 };
@@ -158,7 +158,7 @@ const nodeSelectionSlice = createSlice({
             state.operandsOut = {};
             state.nodeList = {};
             state.dram = [];
-            action.payload.forEach(item => {
+            action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
                     if (!state.groups[item.opName]) {
@@ -175,10 +175,10 @@ const nodeSelectionSlice = createSlice({
             });
 
             // this only runs one time per file load
-            Object.values(state.groups).forEach(group => {
+            Object.values(state.groups).forEach((group) => {
                 setBorders(group.data);
             });
-            state.dram.forEach(dramElement => {
+            state.dram.forEach((dramElement) => {
                 setBorders(dramElement.data);
             });
         },
@@ -189,8 +189,8 @@ const nodeSelectionSlice = createSlice({
             if (node) {
                 node.selected = selected;
             }
-            state.dram.forEach(dramGroup => {
-                if (dramGroup.data.map(n => n.id).filter(nodeid => state.nodeList[nodeid].selected).length > 0) {
+            state.dram.forEach((dramGroup) => {
+                if (dramGroup.data.map((n) => n.id).filter((nodeid) => state.nodeList[nodeid].selected).length > 0) {
                     dramGroup.selected = true;
                 } else {
                     dramGroup.selected = false;
@@ -198,7 +198,7 @@ const nodeSelectionSlice = createSlice({
             });
         },
         updateCoreHighlight(state, action: PayloadAction<{ ids: string[]; selected: HighlightType }>) {
-            action.payload.ids.forEach(id => {
+            action.payload.ids.forEach((id) => {
                 state.coreHighlightList[id] = action.payload.selected;
             });
         },
@@ -207,7 +207,7 @@ const nodeSelectionSlice = createSlice({
         },
         loadIoDataIn(state, action: PayloadAction<Map<string, string[]>>) {
             action.payload.forEach((ops, uid) => {
-                state.ioGroupsIn[uid] = ops.map(op => {
+                state.ioGroupsIn[uid] = ops.map((op) => {
                     state.operandsIn[op] = false;
                     return { op, selected: false };
                 });
@@ -215,7 +215,7 @@ const nodeSelectionSlice = createSlice({
         },
         loadIoDataOut(state, action: PayloadAction<Map<string, string[]>>) {
             action.payload.forEach((ops, uid) => {
-                state.ioGroupsOut[uid] = ops.map(op => {
+                state.ioGroupsOut[uid] = ops.map((op) => {
                     state.operandsOut[op] = false;
                     return { op, selected: false };
                 });
@@ -226,15 +226,15 @@ const nodeSelectionSlice = createSlice({
             const type = action.payload.type || IoType.ALL;
             switch (type) {
                 case IoType.ALL:
-                    Object.values(state.ioGroupsIn).forEach(data => {
-                        data.forEach(operand => {
+                    Object.values(state.ioGroupsIn).forEach((data) => {
+                        data.forEach((operand) => {
                             if (operand.op === op) {
                                 operand.selected = selected;
                             }
                         });
                     });
-                    Object.values(state.ioGroupsOut).forEach(data => {
-                        data.forEach(operand => {
+                    Object.values(state.ioGroupsOut).forEach((data) => {
+                        data.forEach((operand) => {
                             if (operand.op === op) {
                                 operand.selected = selected;
                             }
@@ -243,8 +243,8 @@ const nodeSelectionSlice = createSlice({
                     break;
                 case IoType.IN:
                     state.operandsIn[op] = selected;
-                    Object.values(state.ioGroupsIn).forEach(data => {
-                        data.forEach(operand => {
+                    Object.values(state.ioGroupsIn).forEach((data) => {
+                        data.forEach((operand) => {
                             if (operand.op === op) {
                                 operand.selected = selected;
                             }
@@ -253,8 +253,8 @@ const nodeSelectionSlice = createSlice({
                     break;
                 case IoType.OUT:
                     state.operandsOut[op] = selected;
-                    Object.values(state.ioGroupsOut).forEach(data => {
-                        data.forEach(operand => {
+                    Object.values(state.ioGroupsOut).forEach((data) => {
+                        data.forEach((operand) => {
                             if (operand.op === op) {
                                 operand.selected = selected;
                             }
@@ -273,7 +273,7 @@ const nodeSelectionSlice = createSlice({
             }
         },
         clearAllOperations(state) {
-            Object.values(state.groups).forEach(group => {
+            Object.values(state.groups).forEach((group) => {
                 group.selected = false;
             });
         },
@@ -324,13 +324,13 @@ const linkSaturationSlice = createSlice({
         },
         updateTotalOPs: (state, action: PayloadAction<number>) => {
             state.totalOps = action.payload;
-            Object.values(state.links).forEach(link => {
+            Object.values(state.links).forEach((link) => {
                 updateOPCycles(link, action.payload);
             });
         },
         loadLinkData: (state, action: PayloadAction<LinkStateData[]>) => {
             state.links = {};
-            action.payload.forEach(item => {
+            action.payload.forEach((item) => {
                 state.links[item.id] = item;
             });
         },

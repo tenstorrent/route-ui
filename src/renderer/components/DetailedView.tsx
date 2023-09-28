@@ -32,20 +32,20 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     const [dram, setDram] = React.useState<DramChannel | null>(null);
     useEffect(() => {
         if (chip && uid !== null) {
-            const selectedNode = chip.nodes.find(n => n.uid === uid);
+            const selectedNode = chip.nodes.find((n) => n.uid === uid);
             let allNodes: ComputeNode[] | undefined;
             if (selectedNode && selectedNode.dramChannel > -1) {
-                allNodes = chip?.nodes.filter(n => n.dramChannel === selectedNode?.dramChannel);
+                allNodes = chip?.nodes.filter((n) => n.dramChannel === selectedNode?.dramChannel);
             }
 
             setNode(selectedNode || null);
             setNodeList(allNodes || []);
-            setDram(chip?.dramChannels.find(d => d.id === selectedNode?.dramChannel) || null);
+            setDram(chip?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
         }
     }, [uid, chip, isOpen, showLinkSaturation]);
 
     const changePipeState = (pipeList: string[], state: boolean) => {
-        pipeList.forEach(pipeId => {
+        pipeList.forEach((pipeId) => {
             dispatch(updatePipeSelection({ id: pipeId, selected: state }));
         });
     };
@@ -74,9 +74,9 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                         <>
                             <div className='detailed-view-chip dram'>
                                 <div className='dram-subchannels'>
-                                    {dram?.subchannels.map(subchannel => {
+                                    {dram?.subchannels.map((subchannel) => {
                                         const currentNode = nodeList.find(
-                                            n => n.dramSubchannel === subchannel.subchannelId,
+                                            (n) => n.dramSubchannel === subchannel.subchannelId,
                                         );
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
@@ -86,7 +86,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                             noc1links.push(currentNode.links.get(LinkName.NOC1_IN) as NOCLink);
                                             noc1links.push(currentNode.links.get(LinkName.NOC1_OUT) as NOCLink);
                                         }
-                                        const numPipes = subchannel.links.map(link => link.pipes).flat().length;
+                                        const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
                                         return (
                                             <div
                                                 key={subchannel.subchannelId}
@@ -163,7 +163,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                         <PipeRenderer
                                                             className='centered-svg'
                                                             links={subchannel.links.filter(
-                                                                link => link.noc === NOC.NOC0,
+                                                                (link) => link.noc === NOC.NOC0,
                                                             )}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
@@ -188,7 +188,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                         <PipeRenderer
                                                             className='centered-svg'
                                                             links={subchannel.links.filter(
-                                                                link => link.noc === NOC.NOC1,
+                                                                (link) => link.noc === NOC.NOC1,
                                                             )}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
@@ -211,7 +211,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                 <PipeRenderer
                                                     className='centered-svg'
                                                     links={dram.links.filter(
-                                                        link => link.name === DramName.DRAM0_INOUT,
+                                                        (link) => link.name === DramName.DRAM0_INOUT,
                                                     )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
@@ -224,7 +224,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                 <PipeRenderer
                                                     className='centered-svg'
                                                     links={dram.links.filter(
-                                                        link => link.name === DramName.DRAM1_INOUT,
+                                                        (link) => link.name === DramName.DRAM1_INOUT,
                                                     )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
@@ -239,7 +239,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         <div className='axi-dram-wrap'>
                                             <PipeRenderer
                                                 className='centered-svg'
-                                                links={dram.links.filter(link => link.name === DramName.DRAM_INOUT)}
+                                                links={dram.links.filter((link) => link.name === DramName.DRAM_INOUT)}
                                                 showLinkSaturation={showLinkSaturation}
                                                 linkSaturationTreshold={linkSaturationTreshold}
                                             />
@@ -265,14 +265,14 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         });
                                     })}
                                     {dram.subchannels
-                                        .map(sub => sub.links)
-                                        .map(links =>
-                                            links.map(link => (
+                                        .map((sub) => sub.links)
+                                        .map((links) =>
+                                            links.map((link) => (
                                                 //
                                                 <LinkDetails key={link.name} link={link} showEmpty={false} />
                                             )),
                                         )}
-                                    {dram.links.map(link => (
+                                    {dram.links.map((link) => (
                                         //
                                         <LinkDetails key={link.name} link={link} showEmpty={false} />
                                     ))}

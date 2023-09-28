@@ -22,10 +22,10 @@ export default class ChipDesign {
         this.totalRows = json.grid.y_size - 1;
 
         this.nodes.push(
-            ...json.arc.map(loc => {
+            ...json.arc.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.CORE, loc);
             }),
-            ...json.functional_workers.map(loc => {
+            ...json.functional_workers.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.CORE, loc);
             }),
             ...json.dram
@@ -39,13 +39,13 @@ export default class ChipDesign {
                 })
                 .flat(),
 
-            ...json.eth.map(loc => {
+            ...json.eth.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.ETHERNET, loc);
             }),
-            ...json.pcie.map(loc => {
+            ...json.pcie.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.PCIE, loc);
             }),
-            ...json.router_only.map(loc => {
+            ...json.router_only.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.ROUTER, loc);
             }),
         );

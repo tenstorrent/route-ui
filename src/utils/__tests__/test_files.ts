@@ -30,7 +30,7 @@ describe('Folder utilities:', () => {
         it('returns directory entries when given a path', async () => {
             const expectedNames = ['file_1.json', 'file_2.json', 'subdirectory'];
 
-            const actualEntryNames = (await readDirEntries(dirPath)).map(entry => entry.name);
+            const actualEntryNames = (await readDirEntries(dirPath)).map((entry) => entry.name);
 
             expect(actualEntryNames).toEqual(expectedNames);
         });
@@ -145,7 +145,7 @@ describe('Folder utilities:', () => {
         const graphNames = ['fwd_0', 'fwd_1', 'fwd_2'];
         beforeEach(() => {
             fs.mkdirSync(graphDescriptorsPath, { recursive: true });
-            graphNames.forEach(graphName => {
+            graphNames.forEach((graphName) => {
                 fs.mkdirSync(path.join(graphDescriptorsPath, graphName));
                 fs.writeFileSync(path.join(graphDescriptorsPath, graphName, 'graph_descriptor.json'), '');
             });

@@ -41,10 +41,10 @@ export default function PropertiesPanel() {
             return;
         }
 
-        const selected = Object.values(nodeSelectionState.nodeList).filter(n => n.selected);
+        const selected = Object.values(nodeSelectionState.nodeList).filter((n) => n.selected);
 
         const selection: ComputeNode[] = chip.nodes.filter((node: ComputeNode) => {
-            return selected.filter(n => n.id === node.uid).length > 0;
+            return selected.filter((n) => n.id === node.uid).length > 0;
         });
 
         setSelectedNodes(selection);
@@ -52,7 +52,7 @@ export default function PropertiesPanel() {
 
     useEffect(() => {
         const opList: string[] = [];
-        Object.keys(groups).forEach(op => {
+        Object.keys(groups).forEach((op) => {
             opList.push(op);
         });
         setOperationsList(opList);
@@ -73,7 +73,7 @@ export default function PropertiesPanel() {
         if (!chip) {
             return;
         }
-        Object.keys(groups).forEach(op => {
+        Object.keys(groups).forEach((op) => {
             if (op.toLowerCase().includes(opsFilter.toLowerCase())) {
                 dispatch(selectGroup({ opName: op, selected: true }));
             }
@@ -81,7 +81,7 @@ export default function PropertiesPanel() {
     };
 
     const changePipeState = (pipeList: string[], state: boolean) => {
-        pipeList.forEach(pipeId => {
+        pipeList.forEach((pipeId) => {
             dispatch(updatePipeSelection({ id: pipeId, selected: state }));
         });
     };
@@ -151,7 +151,7 @@ export default function PropertiesPanel() {
                                             )}
                                             <div className='opname'>
                                                 {coreData?.inputs.length && <h4 className='io-label'>Inputs:</h4>}
-                                                {coreData?.inputs.map(io => (
+                                                {coreData?.inputs.map((io) => (
                                                     <ul className='scrollable-content'>
                                                         <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                                             <div key={io.name} style={{ fontSize: '12px' }}>
@@ -171,8 +171,8 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.pipeOperations.map(pipe => {
-                                                                        return pipe.pipeIDs.map(pipeID => {
+                                                                    {io.pipeOperations.map((pipe) => {
+                                                                        return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
                                                                                     <SelectablePipe
@@ -189,7 +189,7 @@ export default function PropertiesPanel() {
                                                     </ul>
                                                 ))}
                                                 {coreData?.outputs.length && <h4 className='io-label'>Outputs:</h4>}
-                                                {coreData?.outputs.map(io => (
+                                                {coreData?.outputs.map((io) => (
                                                     <ul className='scrollable-content'>
                                                         <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                                             <div key={io.name} style={{ fontSize: '12px' }}>
@@ -209,8 +209,8 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.pipeOperations.map(pipe => {
-                                                                        return pipe.pipeIDs.map(pipeID => {
+                                                                    {io.pipeOperations.map((pipe) => {
+                                                                        return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
                                                                                     <SelectablePipe
@@ -313,7 +313,7 @@ export default function PropertiesPanel() {
                                 <div className='pipelist-wrap list-wrap'>
                                     {chip && (
                                         <ul className='scrollable-content'>
-                                            {chip.allUniquePipes.map(pipe => (
+                                            {chip.allUniquePipes.map((pipe) => (
                                                 <FilterableComponent
                                                     key={pipe.id}
                                                     filterableString={pipe.id}
@@ -369,8 +369,8 @@ export default function PropertiesPanel() {
                             </div>
                             <div className='operations-wrap list-wrap'>
                                 <div className='scrollable-content'>
-                                    {operationsList.map(op => {
-                                        const operationData = chip?.operations.find(o => o.name === op);
+                                    {operationsList.map((op) => {
+                                        const operationData = chip?.operations.find((o) => o.name === op);
 
                                         return (
                                             <FilterableComponent
@@ -393,7 +393,7 @@ export default function PropertiesPanel() {
                                                                 {operationData.inputs.length > 0 && (
                                                                     <h5 className='io-label'>Inputs:</h5>
                                                                 )}
-                                                                {operationData.inputs.map(io => (
+                                                                {operationData.inputs.map((io) => (
                                                                     <div className='operation-input' key={io.name}>
                                                                         <p>{io.name}</p>
                                                                     </div>
@@ -401,7 +401,7 @@ export default function PropertiesPanel() {
                                                                 {operationData.outputs.length > 0 && (
                                                                     <h5 className='io-label'>Outputs:</h5>
                                                                 )}
-                                                                {operationData.outputs.map(io => (
+                                                                {operationData.outputs.map((io) => (
                                                                     <div className='operation-input' key={io.name}>
                                                                         <p>{io.name}</p>
                                                                     </div>

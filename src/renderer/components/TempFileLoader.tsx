@@ -57,7 +57,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
-                filelist.forEach(filepath => {
+                filelist.forEach((filepath) => {
                     const filename = path.basename(filepath);
                     const ext = path.extname(filepath);
                     try {

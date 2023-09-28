@@ -108,7 +108,7 @@ const DramChipBorder: React.FC<DramChipBorderProps> = ({
     const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
     let dramStyles = {};
     if (node.dramChannel > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
-        const border = dramAllocation.data.filter(n => n.id === node.uid)[0]?.border;
+        const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
         dramStyles = getDramGroupingStyles(border);
     }
 
@@ -129,7 +129,7 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
     if (node.opName !== '' && selectedGroup.selected) {
         const color = getGroupColor(node.opName);
         operationStyles = { borderColor: getGroupColor(node.opName) };
-        const border = selectedGroup.data.filter(n => n.id === node.uid)[0]?.border;
+        const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
         operationStyles = getNodeOpStyles(operationStyles, color, border);
     }
 
@@ -154,14 +154,14 @@ const OperandHighlight: React.FC<OperandHighlightProps> = ({
     return (
         <div className='operand-wrap'>
             {operandsIn
-                .filter(operand => operand.selected)
-                .map(operand => {
+                .filter((operand) => operand.selected)
+                .map((operand) => {
                     const styles = { backgroundColor: getGroupColor(operand.op) };
                     return <div className='operand in' style={styles} />;
                 })}
             {operandsOut
-                .filter(operand => operand.selected)
-                .map(operand => {
+                .filter((operand) => operand.selected)
+                .map((operand) => {
                     const styles = { backgroundColor: getGroupColor(operand.op) };
                     return <div className='operand out' style={styles} />;
                 })}
@@ -248,7 +248,7 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     }
 
     if (showLinkSaturation) {
-        node.links.forEach(link => {
+        node.links.forEach((link) => {
             const linkData = linksData[link.uid];
             if (linkData.saturation >= linkSaturationTreshold) {
                 const color = calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast);

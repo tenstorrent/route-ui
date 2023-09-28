@@ -23,7 +23,7 @@ const TopHeaderComponent: React.FC = () => {
             <Switch
                 checked={isHighContrast}
                 label='Enable high contrast'
-                onChange={event => dispatch(setHighContrastState(event.currentTarget.checked))}
+                onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
             />
             <div className='text-content'>
                 {architecture ? ` Architecture: ${architecture}` : ''} |{' '}

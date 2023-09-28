@@ -4,8 +4,11 @@ import path from 'path';
 export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
     return new Promise<Dirent[]>((resolve, reject) => {
         fs.readdir(dirPath, { withFileTypes: true }, (err, files) => {
-            if (err) reject(err);
-            else resolve(files);
+            if (err) {
+                reject(err);
+            } else {
+                resolve(files);
+            }
         });
     });
 };
@@ -16,22 +19,24 @@ export const findFiles = async (
     options?: { isDir?: boolean; maxDepth?: number },
 ): Promise<string[]> => {
     const { isDir = false, maxDepth = 0 } = options || {};
-    if (maxDepth < 0) throw new Error('maxDepth must be non-negative');
+    if (maxDepth < 0) {
+        throw new Error('maxDepth must be non-negative');
+    }
 
     const allEntries = await readDirEntries(searchPath);
     const matches = allEntries.filter(
-        file => ((isDir && file.isDirectory()) || (!isDir && file.isFile())) && file.name === searchQuery,
+        (file) => ((isDir && file.isDirectory()) || (!isDir && file.isFile())) && file.name === searchQuery,
     );
     if (matches.length > 0) {
-        const results = matches.map(dirEntry => path.join(searchPath, dirEntry.name));
+        const results = matches.map((dirEntry) => path.join(searchPath, dirEntry.name));
         return results;
     }
     if (maxDepth === 0) {
         return [];
     }
-    const subdirectories = allEntries.filter(dirEntry => dirEntry.isDirectory());
+    const subdirectories = allEntries.filter((dirEntry) => dirEntry.isDirectory());
     const subfolderResults = await Promise.all(
-        subdirectories.map(async dirEntry =>
+        subdirectories.map(async (dirEntry) =>
             findFiles(path.join(searchPath, dirEntry.name), searchQuery, {
                 isDir,
                 maxDepth: maxDepth - 1,
@@ -71,7 +76,5 @@ export const validatePerfResultsFolder = async (dirPath: string): Promise<[isVal
 export const getAvailableGraphNames = async (perfResultsPath: string): Promise<string[]> => {
     const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptors');
     const graphDirEntries = await readDirEntries(graphDescriptorsPath);
-    return graphDirEntries.map(graphDirEntry => graphDirEntry.name).filter(name => !name.startsWith('.'));
+    return graphDirEntries.map((graphDirEntry) => graphDirEntry.name).filter((name) => !name.startsWith('.'));
 };
-
-const fn = x => x + 1;

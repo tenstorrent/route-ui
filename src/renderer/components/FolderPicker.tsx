@@ -31,7 +31,7 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                     <GraphPicker
                         options={graphOptions}
                         selected={selectedGraph}
-                        onSelect={graphName => {
+                        onSelect={(graphName) => {
                             setSelectedGraph(graphName);
                             setShowGraphSelect(false);
                         }}

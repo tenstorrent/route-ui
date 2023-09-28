@@ -390,7 +390,7 @@ export const drawSelections = (
     selectedPipeIds: string[],
 ) => {
     const nodePipeIds = node.getPipesForDirection(linkID);
-    const pipeIds = nodePipeIds.filter(pipeId => selectedPipeIds.includes(pipeId));
+    const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
     drawPipesDirect(svg, linkID, pipeIds);
     return pipeIds.length;
 };
