@@ -1,13 +1,13 @@
 import React from 'react';
 
-import {Button, MenuItem, Spinner} from '@blueprintjs/core';
+import {Button} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
 import {Classes, Popover2} from '@blueprintjs/popover2';
-import {ItemRenderer, Select2} from '@blueprintjs/select';
 import '../scss/FolderPicker.scss';
-import Chip from 'data/DataStructures';
+
 import {getAvailableGraphNames, validatePerfResultsFolder} from 'utils/Files';
 import GraphPicker from './GraphPicker';
+import Chip from '../../data/Chip';
 
 export const TempFolderLoadingContext = ({onDataLoad}: {onDataLoad: (data: Chip) => void}): React.ReactElement => {
     const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null);
