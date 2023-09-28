@@ -1,12 +1,12 @@
 module.exports = {
-    extends: ['prettier', 'erb'],
-    plugins: ['prettier', '@typescript-eslint'],
+    extends: ['erb'],
+    plugins: ['@typescript-eslint'],
     rules: {
         // A temporary hack related to IDE not resolving correct package.json
         'import/no-extraneous-dependencies': 'off',
         '@typescript-eslint/no-shadow': 'error',
         '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-        'comma-dangle': ['error', 'always-multiline'],
+        // 'comma-dangle': ['error', 'always-multiline'],  // May conflict with prettier
         'import/extensions': ['warn', 'never', { css: 'always', scss: 'always', json: 'always' }],
         'import/no-import-module-exports': 'off',
         'import/no-unresolved': 'error',
@@ -15,13 +15,13 @@ module.exports = {
         'no-unused-vars': 'off',
         'no-use-before-define': 'off',
         'prefer-const': 'warn',
-        'prettier/prettier': 'error',
+        // 'prettier/prettier': 'error',
         'react/jsx-filename-extension': ['warn', { extensions: ['.tsx'] }],
         'react/react-in-jsx-scope': 'off',
         "no-plusplus": 'off',
         "no-underscore-dangle": 'off',
         "react/function-component-definition": 0,
-        "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }],
+        // "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }],  // May conflict with prettier
     },
     parserOptions: {
         ecmaVersion: 2020,
