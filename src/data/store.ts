@@ -10,7 +10,7 @@ import {
     LinkStateData,
     NodeSelectionState,
     PipeSelection,
-    PipeSelectionState
+    PipeSelectionState,
 } from './StateTypes';
 
 const highContrastInitialState: HighContrastState = {
@@ -287,7 +287,8 @@ export enum IoType {
 }
 
 export const selectNodeSelectionById = (state: RootState, id: string) => state.nodeSelection.nodeList[id];
-export const getCoreHighlight = (state: RootState, id: string) => state.nodeSelection.coreHighlightList[id] || HighlightType.NONE;
+export const getCoreHighlight = (state: RootState, id: string) =>
+    state.nodeSelection.coreHighlightList[id] || HighlightType.NONE;
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
 export const {
     //

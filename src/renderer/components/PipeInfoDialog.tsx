@@ -90,7 +90,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                                     })}
                                 </div>
                             )}
-                        </div>
+                        </div>,
                     );
                 });
             }
@@ -112,7 +112,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                                     })}
                                 </div>
                             )}
-                        </div>
+                        </div>,
                     );
                 });
             }
@@ -141,10 +141,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
     }, [chip]);
 
     return (
-        <Tooltip2
-            usePortal={false}
-            content={tooltipContent}
-        >
+        <Tooltip2 usePortal={false} content={tooltipContent}>
             <div
                 className="pipe-info-dialog"
                 onMouseLeave={() => {

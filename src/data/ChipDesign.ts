@@ -47,7 +47,7 @@ export default class ChipDesign {
             }),
             ...json.router_only.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.ROUTER, loc);
-            })
+            }),
         );
         this.nodes = this.nodes.sort((a, b) => {
             if (a.loc.y !== b.loc.y) {

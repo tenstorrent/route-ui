@@ -6,7 +6,15 @@ import {IconNames} from '@blueprintjs/icons';
 import {svg} from 'd3';
 import DataSource, {GridContext} from '../data/DataSource';
 import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
-import {clearAllOperations, clearAllPipes, RootState, selectAllPipes, updateLinkSatuation, updateShowLinkSaturation, updateTotalOPs} from '../data/store';
+import {
+    clearAllOperations,
+    clearAllPipes,
+    RootState,
+    selectAllPipes,
+    updateLinkSatuation,
+    updateShowLinkSaturation,
+    updateTotalOPs,
+} from '../data/store';
 import NodeGridElement from './components/NodeGridElement';
 import {ComputeNode} from '../data/Chip';
 import DetailedView from './components/DetailedView';
@@ -37,11 +45,11 @@ export default function GridRender() {
     };
 
     const congestionLegendStyle = {
-        background: `linear-gradient(to right, ${calculateLinkCongestionColor(0, 0, isHC)}, ${calculateLinkCongestionColor(50, 0, isHC)}, ${calculateLinkCongestionColor(
-            120,
+        background: `linear-gradient(to right, ${calculateLinkCongestionColor(
             0,
-            isHC
-        )})`,
+            0,
+            isHC,
+        )}, ${calculateLinkCongestionColor(50, 0, isHC)}, ${calculateLinkCongestionColor(120, 0, isHC)})`,
     };
 
     useEffect(() => {
@@ -75,24 +83,48 @@ export default function GridRender() {
                 />
                 <hr />
                 <Tooltip2 content="Show pipes" position={Position.RIGHT}>
-                    <Switch checked={showPipes} label="pipes" onChange={(event) => setShowPipes(event.currentTarget.checked)} />
+                    <Switch
+                        checked={showPipes}
+                        label="pipes"
+                        onChange={(event) => setShowPipes(event.currentTarget.checked)}
+                    />
                 </Tooltip2>
                 <hr />
                 <Tooltip2 content="Show all links overlay" position={Position.RIGHT}>
-                    <Switch checked={showEmptyLinks} label="links" disabled={!showPipes} onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)} />
+                    <Switch
+                        checked={showEmptyLinks}
+                        label="links"
+                        disabled={!showPipes}
+                        onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
+                    />
                 </Tooltip2>
                 <Tooltip2 content="Show all operations colors" position={Position.RIGHT}>
-                    <Switch checked={showOperationColors} label="operations" onChange={(event) => setShowOperationColors(event.currentTarget.checked)} />
+                    <Switch
+                        checked={showOperationColors}
+                        label="operations"
+                        onChange={(event) => setShowOperationColors(event.currentTarget.checked)}
+                    />
                 </Tooltip2>
                 <Tooltip2 content="Show Compute Node locations" position={Position.RIGHT}>
-                    <Switch checked={showNodeLocation} label="location" onChange={(event) => setShowNodeLocation(event.currentTarget.checked)} />
+                    <Switch
+                        checked={showNodeLocation}
+                        label="location"
+                        onChange={(event) => setShowNodeLocation(event.currentTarget.checked)}
+                    />
                 </Tooltip2>
                 <hr />
                 {/* Link saturation */}
                 <Tooltip2 content="Show link congestion" position={Position.RIGHT}>
-                    <Switch checked={showLinkSaturation} label="congestion" onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)} />
+                    <Switch
+                        checked={showLinkSaturation}
+                        label="congestion"
+                        onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
+                    />
                 </Tooltip2>
-                <div className="congestion-legend" style={{...(showLinkSaturation ? congestionLegendStyle : null), width: '100%', height: '3px'}} />
+                <div
+                    className="congestion-legend"
+                    style={{...(showLinkSaturation ? congestionLegendStyle : null), width: '100%', height: '3px'}}
+                />
                 <Slider
                     className="link-saturation-slider"
                     min={0}
@@ -156,7 +188,13 @@ export default function GridRender() {
             </div>
             {chip && (
                 <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
-                    <div className="node-container" style={{zoom: `${gridZoom}`, gridTemplateColumns: `repeat(${chip.totalCols + 1}, ${NODE_SIZE}px)`}}>
+                    <div
+                        className="node-container"
+                        style={{
+                            zoom: `${gridZoom}`,
+                            gridTemplateColumns: `repeat(${chip.totalCols + 1}, ${NODE_SIZE}px)`,
+                        }}
+                    >
                         {chip.nodes.map((node: ComputeNode) => {
                             return (
                                 <NodeGridElement
@@ -173,7 +211,11 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
-            <DetailedView showLinkSaturation={showLinkSaturation} zoom={detailedViewZoom} linkSaturationTreshold={linkSaturationTreshold} />
+            <DetailedView
+                showLinkSaturation={showLinkSaturation}
+                zoom={detailedViewZoom}
+                linkSaturationTreshold={linkSaturationTreshold}
+            />
         </>
     );
 }

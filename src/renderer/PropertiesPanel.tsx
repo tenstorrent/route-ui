@@ -6,7 +6,15 @@ import {Tooltip2} from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
 import {ComputeNode, NOCLink, Pipe} from '../data/Chip';
 import FilterableComponent from './components/FilterableComponent';
-import {clearAllOperations, clearAllPipes, openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection} from '../data/store';
+import {
+    clearAllOperations,
+    clearAllPipes,
+    openDetailedView,
+    RootState,
+    selectGroup,
+    updateNodeSelection,
+    updatePipeSelection,
+} from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import LinkDetails from './components/LinkDetails';
@@ -102,10 +110,16 @@ export default function PropertiesPanel() {
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className="properties-panel-nodes">
                                 {selectedNodes.map((node: ComputeNode) => {
-                                    const coreData = chip?.cores.find((core: CoreOperation) => core.coreID === node.uid);
+                                    const coreData = chip?.cores.find(
+                                        (core: CoreOperation) => core.coreID === node.uid,
+                                    );
                                     return (
                                         <div className="node-element" key={node.uid}>
-                                            <h3 className={`node-type node-type-${node.getNodeLabel()} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}>
+                                            <h3
+                                                className={`node-type node-type-${node.getNodeLabel()} ${
+                                                    node.uid === uid && isOpen ? 'detailed-view' : ''
+                                                }`}
+                                            >
                                                 {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
                                                 <Tooltip2 content="Close ComputeNode">
                                                     <Button
@@ -144,7 +158,9 @@ export default function PropertiesPanel() {
                                                                 {io.type === OperandType.OP ? (
                                                                     <SelectableOperation
                                                                         opName={io.name}
-                                                                        value={nodeSelectionState.groups[io.name]?.selected}
+                                                                        value={
+                                                                            nodeSelectionState.groups[io.name]?.selected
+                                                                        }
                                                                         selectFunc={selectOperationGroup}
                                                                         stringFilter=""
                                                                     />
@@ -159,7 +175,10 @@ export default function PropertiesPanel() {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
-                                                                                    <SelectablePipe pipe={new Pipe(pipeID, 0)} pipeFilter="" />
+                                                                                    <SelectablePipe
+                                                                                        pipe={new Pipe(pipeID, 0)}
+                                                                                        pipeFilter=""
+                                                                                    />
                                                                                 </li>
                                                                             );
                                                                         });
@@ -177,7 +196,9 @@ export default function PropertiesPanel() {
                                                                 {io.type === OperandType.OP ? (
                                                                     <SelectableOperation
                                                                         opName={io.name}
-                                                                        value={nodeSelectionState.groups[io.name]?.selected}
+                                                                        value={
+                                                                            nodeSelectionState.groups[io.name]?.selected
+                                                                        }
                                                                         selectFunc={selectOperationGroup}
                                                                         stringFilter=""
                                                                     />
@@ -192,7 +213,10 @@ export default function PropertiesPanel() {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
-                                                                                    <SelectablePipe pipe={new Pipe(pipeID, 0)} pipeFilter="" />
+                                                                                    <SelectablePipe
+                                                                                        pipe={new Pipe(pipeID, 0)}
+                                                                                        pipeFilter=""
+                                                                                    />
                                                                                 </li>
                                                                             );
                                                                         });
@@ -215,13 +239,27 @@ export default function PropertiesPanel() {
                                                     </Button>
                                                 )}
 
-                                                <Button small icon={IconNames.FILTER_LIST} onClick={() => changePipeState(node.getInternalPipeIDsForNode(), true)}>
+                                                <Button
+                                                    small
+                                                    icon={IconNames.FILTER_LIST}
+                                                    onClick={() =>
+                                                        changePipeState(node.getInternalPipeIDsForNode(), true)
+                                                    }
+                                                >
                                                     Select internal pipes
                                                 </Button>
-                                                <Button small icon={IconNames.FILTER_KEEP} onClick={() => changePipeState(node.getPipeIdsForNode(), true)}>
+                                                <Button
+                                                    small
+                                                    icon={IconNames.FILTER_KEEP}
+                                                    onClick={() => changePipeState(node.getPipeIdsForNode(), true)}
+                                                >
                                                     Select all pipes
                                                 </Button>
-                                                <Button small icon={IconNames.FILTER_REMOVE} onClick={() => changePipeState(node.getPipeIdsForNode(), false)}>
+                                                <Button
+                                                    small
+                                                    icon={IconNames.FILTER_REMOVE}
+                                                    onClick={() => changePipeState(node.getPipeIdsForNode(), false)}
+                                                >
                                                     Deselect all pipes
                                                 </Button>
                                             </div>
@@ -323,7 +361,10 @@ export default function PropertiesPanel() {
                                     <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                                 </Tooltip2>
                                 <Tooltip2 content="Deselect all operations" position={PopoverPosition.RIGHT}>
-                                    <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                                    <Button
+                                        icon={IconNames.CUBE_REMOVE}
+                                        onClick={() => dispatch(clearAllOperations())}
+                                    />
                                 </Tooltip2>
                             </div>
                             <div className="operations-wrap list-wrap">
@@ -345,14 +386,21 @@ export default function PropertiesPanel() {
                                                             stringFilter={opsFilter}
                                                         />
                                                         {operationData && (
-                                                            <div className="operation-details" style={{color: '#000', marginLeft: '20px'}}>
-                                                                {operationData.inputs.length > 0 && <h5 className="io-label">Inputs:</h5>}
+                                                            <div
+                                                                className="operation-details"
+                                                                style={{color: '#000', marginLeft: '20px'}}
+                                                            >
+                                                                {operationData.inputs.length > 0 && (
+                                                                    <h5 className="io-label">Inputs:</h5>
+                                                                )}
                                                                 {operationData.inputs.map((io) => (
                                                                     <div className="operation-input" key={io.name}>
                                                                         <p>{io.name}</p>
                                                                     </div>
                                                                 ))}
-                                                                {operationData.outputs.length > 0 && <h5 className="io-label">Outputs:</h5>}
+                                                                {operationData.outputs.length > 0 && (
+                                                                    <h5 className="io-label">Outputs:</h5>
+                                                                )}
                                                                 {operationData.outputs.map((io) => (
                                                                     <div className="operation-input" key={io.name}>
                                                                         <p>{io.name}</p>

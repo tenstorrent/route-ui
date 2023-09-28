@@ -2,7 +2,13 @@ import React, {useContext, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Card, Overlay} from '@blueprintjs/core';
 import {IconNames} from '@blueprintjs/icons';
-import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
+import {
+    closeDetailedView,
+    openDetailedView,
+    RootState,
+    updateNodeSelection,
+    updatePipeSelection,
+} from '../../data/store';
 import DataSource, {GridContext} from '../../data/DataSource';
 import {ComputeNode, DramChannel, NOCLink} from '../../data/Chip';
 import '../scss/DetailedView.scss';
@@ -69,7 +75,9 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                             <div className="detailed-view-chip dram">
                                 <div className="dram-subchannels">
                                     {dram?.subchannels.map((subchannel) => {
-                                        const currentNode = nodeList.find((n) => n.dramSubchannel === subchannel.subchannelId);
+                                        const currentNode = nodeList.find(
+                                            (n) => n.dramSubchannel === subchannel.subchannelId,
+                                        );
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
                                         if (currentNode) {
@@ -80,7 +88,12 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                         }
                                         const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
                                         return (
-                                            <div key={subchannel.subchannelId} className={`${node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''} subchannel`}>
+                                            <div
+                                                key={subchannel.subchannelId}
+                                                className={`${
+                                                    node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''
+                                                } subchannel`}
+                                            >
                                                 {dram?.subchannels.length > 1 && (
                                                     <h3 className="subchannel-name">
                                                         {currentNode && (
@@ -90,12 +103,18 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                                 disabled={currentNode.uid === node.uid}
                                                                 icon={IconNames.PROPERTIES}
                                                                 onClick={() => {
-                                                                    dispatch(updateNodeSelection({id: currentNode.uid, selected: true}));
+                                                                    dispatch(
+                                                                        updateNodeSelection({
+                                                                            id: currentNode.uid,
+                                                                            selected: true,
+                                                                        }),
+                                                                    );
                                                                     dispatch(openDetailedView(currentNode.uid));
                                                                 }}
                                                             />
                                                         )}
-                                                        Sub {subchannel.subchannelId} [{currentNode?.loc.x},{currentNode?.loc.y}]
+                                                        Sub {subchannel.subchannelId} [{currentNode?.loc.x},
+                                                        {currentNode?.loc.y}]
                                                     </h3>
                                                 )}
                                                 <div className="controls-wrap">
@@ -104,14 +123,24 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                         small
                                                         icon={IconNames.FILTER_LIST}
                                                         disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(currentNode?.getInternalPipeIDsForNode() || [], true)}
+                                                        onClick={() =>
+                                                            changePipeState(
+                                                                currentNode?.getInternalPipeIDsForNode() || [],
+                                                                true,
+                                                            )
+                                                        }
                                                     />
                                                     <Button
                                                         className="pipe-selection"
                                                         small
                                                         icon={IconNames.FILTER_REMOVE}
                                                         disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(currentNode?.getInternalPipeIDsForNode() || [], false)}
+                                                        onClick={() =>
+                                                            changePipeState(
+                                                                currentNode?.getInternalPipeIDsForNode() || [],
+                                                                false,
+                                                            )
+                                                        }
                                                     />
                                                 </div>
                                                 <div className="dram-subchannel">
@@ -123,13 +152,19 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                                 Router
                                                             </p>
                                                         </div>
-                                                        <PipeRenderer links={noc0links} showLinkSaturation={showLinkSaturation} linkSaturationTreshold={linkSaturationTreshold} />
+                                                        <PipeRenderer
+                                                            links={noc0links}
+                                                            showLinkSaturation={showLinkSaturation}
+                                                            linkSaturationTreshold={linkSaturationTreshold}
+                                                        />
                                                         <div className="noc2axi">
                                                             <p className="label">NOC2AXI</p>
                                                         </div>
                                                         <PipeRenderer
                                                             className="centered-svg"
-                                                            links={subchannel.links.filter((link) => link.noc === NOC.NOC0)}
+                                                            links={subchannel.links.filter(
+                                                                (link) => link.noc === NOC.NOC0,
+                                                            )}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
                                                         />
@@ -142,13 +177,19 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                                                 Router
                                                             </p>
                                                         </div>
-                                                        <PipeRenderer links={noc1links} showLinkSaturation={showLinkSaturation} linkSaturationTreshold={linkSaturationTreshold} />
+                                                        <PipeRenderer
+                                                            links={noc1links}
+                                                            showLinkSaturation={showLinkSaturation}
+                                                            linkSaturationTreshold={linkSaturationTreshold}
+                                                        />
                                                         <div className="noc2axi">
                                                             <p className="label">NOC2AXI</p>
                                                         </div>
                                                         <PipeRenderer
                                                             className="centered-svg"
-                                                            links={subchannel.links.filter((link) => link.noc === NOC.NOC1)}
+                                                            links={subchannel.links.filter(
+                                                                (link) => link.noc === NOC.NOC1,
+                                                            )}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
                                                         />
@@ -169,7 +210,9 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                             <div className="axi-dram-wrap">
                                                 <PipeRenderer
                                                     className="centered-svg"
-                                                    links={dram.links.filter((link) => link.name === DramName.DRAM0_INOUT)}
+                                                    links={dram.links.filter(
+                                                        (link) => link.name === DramName.DRAM0_INOUT,
+                                                    )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
                                                 />
@@ -180,7 +223,9 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                             <div className="axi-dram-wrap">
                                                 <PipeRenderer
                                                     className="centered-svg"
-                                                    links={dram.links.filter((link) => link.name === DramName.DRAM1_INOUT)}
+                                                    links={dram.links.filter(
+                                                        (link) => link.name === DramName.DRAM1_INOUT,
+                                                    )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
                                                 />
@@ -209,7 +254,14 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
                                         return node.getInternalLinksForNode().map((link: NOCLink) => {
-                                            return <LinkDetails key={link.name} link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
+                                            return (
+                                                <LinkDetails
+                                                    key={link.name}
+                                                    link={link}
+                                                    index={nodeList.length > 1 ? index : -1}
+                                                    showEmpty={false}
+                                                />
+                                            );
                                         });
                                     })}
                                     {dram.subchannels
@@ -218,7 +270,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                             links.map((link) => (
                                                 //
                                                 <LinkDetails key={link.name} link={link} showEmpty={false} />
-                                            ))
+                                            )),
                                         )}
                                     {dram.links.map((link) => (
                                         //

@@ -119,7 +119,7 @@ describe('Folder utilities:', () => {
 
                     expect(isValid).toBe(false);
                     expect(errorMessage).toBe(
-                        'Selected folder is missing required subdirectory: analyzer_folder, graph_descriptors'
+                        'Selected folder is missing required subdirectory: analyzer_folder, graph_descriptors',
                     );
                 });
             });

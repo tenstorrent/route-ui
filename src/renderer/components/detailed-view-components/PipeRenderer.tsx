@@ -92,7 +92,15 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
             {/*        ))} */}
             {/*    </div> */}
             {/* ))} */}
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className={`svg ${className}`} ref={svgRef} />
+            <svg
+                width="80"
+                height="80"
+                viewBox="0 0 80 80"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className={`svg ${className}`}
+                ref={svgRef}
+            />
         </div>
     );
 };

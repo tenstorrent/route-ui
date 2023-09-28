@@ -20,9 +20,14 @@ const TopHeaderComponent: React.FC = () => {
 
     return (
         <div className="top-header-component">
-            <Switch checked={isHighContrast} label="Enable high contrast" onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))} />
+            <Switch
+                checked={isHighContrast}
+                label="Enable high contrast"
+                onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
+            />
             <div className="text-content">
-                {architecture ? ` Architecture: ${architecture}` : ''} | {fileName ? `Loaded ${path.basename(fileName[0])}` : ''}
+                {architecture ? ` Architecture: ${architecture}` : ''} |{' '}
+                {fileName ? `Loaded ${path.basename(fileName[0])}` : ''}
             </div>
         </div>
     );

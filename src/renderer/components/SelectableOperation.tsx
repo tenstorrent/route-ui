@@ -20,7 +20,10 @@ const SelectableOperation: FC<SelectableOperationProps> = ({opName, selectFunc, 
                 }}
             />
             <HighlightedText text={opName} filter={stringFilter} />
-            <span className={`color-swatch ${value ? '' : 'transparent'}`} style={{backgroundColor: getGroupColor(opName)}} />
+            <span
+                className={`color-swatch ${value ? '' : 'transparent'}`}
+                style={{backgroundColor: getGroupColor(opName)}}
+            />
         </div>
     );
 };

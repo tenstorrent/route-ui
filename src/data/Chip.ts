@@ -1,4 +1,12 @@
-import {ChipDesignJSON, DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperandJSON, OperationDataJSON} from './JSONDataTypes';
+import {
+    ChipDesignJSON,
+    DramChannelJSON,
+    NetlistAnalyzerDataJSON,
+    NOCLinkJSON,
+    NodeDataJSON,
+    OperandJSON,
+    OperationDataJSON,
+} from './JSONDataTypes';
 import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import {ComputeNodeState, LinkStateData, PipeSelection} from './StateTypes';
@@ -13,7 +21,7 @@ export default class Chip {
             Chip.NOC_ORDER = new Map(
                 Object.keys(LinkName)
                     .map((key) => LinkName[key])
-                    .map((noc, index) => [noc, index])
+                    .map((noc, index) => [noc, index]),
             );
         }
 
@@ -279,7 +287,12 @@ export default class Chip {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
 
-            const organizeData = (operandJSON: OperandJSON, operationName: string, cores: Record<string, CoreOperation>, ioType: OpIoType) => {
+            const organizeData = (
+                operandJSON: OperandJSON,
+                operationName: string,
+                cores: Record<string, CoreOperation>,
+                ioType: OpIoType,
+            ) => {
                 const operandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
                 if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
                     augmentedChip.pipesPerOperand.set(operandJSON.name, []);
@@ -441,8 +454,8 @@ export default class Chip {
             new Set(
                 allPipes.map((pipeSelection) => {
                     return {id: pipeSelection.id, selected: false};
-                })
-            )
+                }),
+            ),
         );
     }
 
@@ -536,9 +549,12 @@ export class DramChannel {
             this.subchannels = json.subchannels.map((subchannel, i) => {
                 return new DramSubchannel(i, id, subchannel);
             });
-            if (json.dram_inout) this.links.push(new DramLink(DramName.DRAM_INOUT, `${id}-${DramName.DRAM_INOUT}`, json.dram_inout));
-            if (json.dram0_inout) this.links.push(new DramLink(DramName.DRAM0_INOUT, `${id}-${DramName.DRAM0_INOUT}`, json.dram0_inout));
-            if (json.dram1_inout) this.links.push(new DramLink(DramName.DRAM1_INOUT, `${id}-${DramName.DRAM1_INOUT}`, json.dram1_inout));
+            if (json.dram_inout)
+                this.links.push(new DramLink(DramName.DRAM_INOUT, `${id}-${DramName.DRAM_INOUT}`, json.dram_inout));
+            if (json.dram0_inout)
+                this.links.push(new DramLink(DramName.DRAM0_INOUT, `${id}-${DramName.DRAM0_INOUT}`, json.dram0_inout));
+            if (json.dram1_inout)
+                this.links.push(new DramLink(DramName.DRAM1_INOUT, `${id}-${DramName.DRAM1_INOUT}`, json.dram1_inout));
         }
     }
 }
@@ -577,7 +593,9 @@ export class GenericNOCLink {
         this.totalDataBytes = json.total_data_in_bytes;
         this.maxBandwidth = json.max_link_bw;
         this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
-        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes));
+        this.pipes = Object.entries(json.mapped_pipes).map(
+            ([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes),
+        );
     }
 }
 
@@ -659,7 +677,12 @@ export class ComputeNode {
 
         const linkId = `${this.loc.x}-${this.loc.y}`;
 
-        this.links = new Map(Object.entries(json.links).map(([link, linkJson], index) => [link, new NOCLink(link as LinkName, `${linkId}-${index}`, linkJson)]));
+        this.links = new Map(
+            Object.entries(json.links).map(([link, linkJson], index) => [
+                link,
+                new NOCLink(link as LinkName, `${linkId}-${index}`, linkJson),
+            ]),
+        );
     }
 
     public getLinksForNode = (): NOCLink[] => {

@@ -11,7 +11,6 @@ export class CoreOperationsList extends Array<CoreOperation> {
     }
 }
 
-
 export class ioOperationGroup {
     public name: string = '';
 
@@ -92,7 +91,12 @@ export class PipeOperation {
      */
     static fromOpsJSON(key: string, pipeList: string[]) {
         const loc = key.split('-');
-        return new PipeOperation(key, {x: parseInt(loc[1], 10), y: parseInt(loc[2], 10)}, parseInt(loc[0], 10), pipeList);
+        return new PipeOperation(
+            key,
+            {x: parseInt(loc[1], 10), y: parseInt(loc[2], 10)},
+            parseInt(loc[0], 10),
+            pipeList,
+        );
     }
 
     public readonly coreID: string;

@@ -33,11 +33,17 @@ const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter, showBandwidt
                     <span className="label">
                         {pipeState && (
                             <>
-                                <HighlightedText text={pipeState.id} filter={pipeFilter} /> {pipe.bandwidth !== null ? convertBytes(pipe.bandwidth) : ''}
+                                <HighlightedText text={pipeState.id} filter={pipeFilter} />{' '}
+                                {pipe.bandwidth !== null ? convertBytes(pipe.bandwidth) : ''}
                                 {showBandwidthUse && <span>{pipe.bandwidthUse.toFixed(0)}%</span>}
-                                <span className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}} />
+                                <span
+                                    className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`}
+                                    style={{backgroundColor: getPipeColor(pipeState.id)}}
+                                />
                                 <br />
-                                {showBandwidthUse && pipe.bandwidthUse !== null && <ProgressBar percent={pipe.bandwidthUse} />}
+                                {showBandwidthUse && pipe.bandwidthUse !== null && (
+                                    <ProgressBar percent={pipe.bandwidthUse} />
+                                )}
                             </>
                         )}
                     </span>

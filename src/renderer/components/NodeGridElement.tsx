@@ -12,7 +12,16 @@ import {
     updateNodeSelection,
 } from '../../data/store';
 import {ComputeNode} from '../../data/Chip';
-import {calculateLinkCongestionColor, drawLink, drawNOC, drawSelections, getDramGroupingStyles, getNodeOpStyles, NOC_CONFIGURATION, NODE_SIZE} from '../../utils/DrawingAPI';
+import {
+    calculateLinkCongestionColor,
+    drawLink,
+    drawNOC,
+    drawSelections,
+    getDramGroupingStyles,
+    getNodeOpStyles,
+    NOC_CONFIGURATION,
+    NODE_SIZE,
+} from '../../utils/DrawingAPI';
 import {getGroupColor} from '../../data/ColorGenerator';
 import {HighlightType, PipeSelection} from '../../data/StateTypes';
 import {LinkName} from '../../data/Types';
@@ -55,7 +64,9 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     return (
         <button
             type="button"
-            className={`node-item ${highlightClass} ${nodeState.selected ? 'selected' : ''} ${node.uid === uid && isOpen ? 'detailed-view' : ''}`}
+            className={`node-item ${highlightClass} ${nodeState.selected ? 'selected' : ''} ${
+                node.uid === uid && isOpen ? 'detailed-view' : ''
+            }`}
             onClick={triggerSelection}
         >
             <OperationGroupRender node={node} />
@@ -63,14 +74,21 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             <DramChipBorder node={node} />
             <div className="node-border" />
             <div className="core-highlight" />
-            {node.opName !== '' && showOperationColors && <div className="op-color-swatch" style={{backgroundColor: getGroupColor(node.opName)}} />}
+            {node.opName !== '' && showOperationColors && (
+                <div className="op-color-swatch" style={{backgroundColor: getGroupColor(node.opName)}} />
+            )}
             {showNodeLocation && (
                 <div className="node-location">
                     {node.loc.x},{node.loc.y}
                 </div>
             )}
             <NodeFocusPipeRenderer node={node} />
-            <NodePipeRenderer node={node} showEmptyLinks={showEmptyLinks} showLinkSaturation={showLinkSaturation} linkSaturationTreshold={linkSaturationTreshold} />
+            <NodePipeRenderer
+                node={node}
+                showEmptyLinks={showEmptyLinks}
+                showLinkSaturation={showLinkSaturation}
+                linkSaturationTreshold={linkSaturationTreshold}
+            />
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
         </button>
     );
@@ -127,8 +145,12 @@ const OperandHighlight: React.FC<OperandHighlightProps> = ({
     node,
     //
 }) => {
-    const operandsIn: {op: string; selected: boolean}[] = useSelector((state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || []);
-    const operandsOut: {op: string; selected: boolean}[] = useSelector((state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || []);
+    const operandsIn: {op: string; selected: boolean}[] = useSelector(
+        (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
+    );
+    const operandsOut: {op: string; selected: boolean}[] = useSelector(
+        (state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || [],
+    );
     return (
         <div className="operand-wrap">
             {operandsIn
@@ -257,5 +279,12 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     if (noc1numPipes > 0) {
         drawNOC(svg, NOC_CONFIGURATION.noc1);
     }
-    return <svg className={`node-svg ${focusMode ? 'focus-mode' : ''}`} ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
+    return (
+        <svg
+            className={`node-svg ${focusMode ? 'focus-mode' : ''}`}
+            ref={svgRef}
+            width={NODE_SIZE}
+            height={NODE_SIZE}
+        />
+    );
 };

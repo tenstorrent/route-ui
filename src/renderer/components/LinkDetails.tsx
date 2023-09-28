@@ -28,7 +28,8 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({link, showEmpty, index}) => {
             <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
                 <span>
                     {link.name} - {index && index > -1 ? `${index} - ` : ''}
-                    {convertBytes(link.totalDataBytes)} <br /> {convertBytes(linkState?.bpc || 0, 2)} of {convertBytes(link.maxBandwidth)}
+                    {convertBytes(link.totalDataBytes)} <br /> {convertBytes(linkState?.bpc || 0, 2)} of{' '}
+                    {convertBytes(link.maxBandwidth)}
                     <span style={{color}}> {linkState?.saturation.toFixed(2)}%</span>
                 </span>
                 {link.totalDataBytes > 0 && <ProgressBar percent={linkState?.saturation || 0} color={color} />}

@@ -16,7 +16,7 @@ import {
     loadNodesData,
     loadPipeSelection,
     setArchitecture,
-    updateTotalOPs
+    updateTotalOPs,
 } from '../../data/store';
 import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
 import {parseOpDataFormat} from '../../data/DataParsers';
@@ -112,7 +112,11 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
 
     return (
         <div className="">
-            <Button icon={IconNames.UPLOAD} text="Load yaml or json files one at a time, analyzer output first" onClick={loadFile} />
+            <Button
+                icon={IconNames.UPLOAD}
+                text="Load yaml or json files one at a time, analyzer output first"
+                onClick={loadFile}
+            />
         </div>
     );
 };

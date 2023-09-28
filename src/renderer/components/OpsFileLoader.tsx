@@ -59,7 +59,6 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({updateData}) => {
                 filelist.forEach((filename) => {
                     try {
                         const json = JSON.parse(data);
-
                     } catch (error) {
                         console.error(error);
                     }

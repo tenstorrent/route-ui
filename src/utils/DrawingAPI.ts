@@ -19,7 +19,12 @@ export const NOC_CONFIGURATION = {
     core: {x: CORE_CENTER.x, y: CORE_CENTER.y},
 };
 
-export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName | DramName, color?: string, stroke: number = 1) => {
+export const drawLink = (
+    selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    linkID: LinkName | DramName,
+    color?: string,
+    stroke: number = 1,
+) => {
     const {
         //
         lineEndX,
@@ -53,7 +58,12 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
         .attr('stroke', color || '#4d4d4d');
 
     // arrowhead
-    if (linkID !== LinkName.NOC1_SOUTH_IN && linkID !== LinkName.NOC0_WEST_IN && linkID !== LinkName.NOC0_SOUTH_OUT && linkID !== LinkName.NOC1_WEST_OUT) {
+    if (
+        linkID !== LinkName.NOC1_SOUTH_IN &&
+        linkID !== LinkName.NOC0_WEST_IN &&
+        linkID !== LinkName.NOC0_SOUTH_OUT &&
+        linkID !== LinkName.NOC1_WEST_OUT
+    ) {
         selector
             // keeping this here for the prettier
             .append('polygon')
@@ -317,7 +327,11 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
     return {lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform};
 };
 
-export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName | DramName, pipeIds: string[]) => {
+export const drawPipesDirect = (
+    svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    linkID: LinkName | DramName,
+    pipeIds: string[],
+) => {
     const {
         //
         lineEndX,
@@ -332,7 +346,12 @@ export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown,
     const strokeLength = 5;
 
     if (pipeIds.length) {
-        if (linkID !== LinkName.NOC1_SOUTH_IN && linkID !== LinkName.NOC0_WEST_IN && linkID !== LinkName.NOC0_SOUTH_OUT && linkID !== LinkName.NOC1_WEST_OUT) {
+        if (
+            linkID !== LinkName.NOC1_SOUTH_IN &&
+            linkID !== LinkName.NOC0_WEST_IN &&
+            linkID !== LinkName.NOC0_SOUTH_OUT &&
+            linkID !== LinkName.NOC1_WEST_OUT
+        ) {
             svg
                 // only draw arrows for long links
                 .append('polygon')
@@ -364,14 +383,22 @@ export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown,
     });
 };
 
-export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName, node: ComputeNode, selectedPipeIds: string[]) => {
+export const drawSelections = (
+    svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    linkID: LinkName,
+    node: ComputeNode,
+    selectedPipeIds: string[],
+) => {
     const nodePipeIds = node.getPipesForDirection(linkID);
     const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
     drawPipesDirect(svg, linkID, pipeIds);
     return pipeIds.length;
 };
 
-export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: {x: number; y: number}) => {
+export const drawNOC = (
+    svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    point: {x: number; y: number},
+) => {
     svg.append('circle')
         //
         .attr('cx', point.x)
@@ -413,11 +440,17 @@ export const getDramGroupingStyles = (border: {left: boolean; right: boolean; to
         dramStyles = {...dramStyles, borderBottom: `${borderSize}px solid ${color}`};
     }
     const gradientSize = 6;
-    const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${gradientSize * 2}px)`;
+    const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${
+        gradientSize * 2
+    }px)`;
     return {...dramStyles, background: gradient};
 };
 
-export const getNodeOpStyles = (styles: {}, color: string | undefined, border: {left: boolean; right: boolean; top: boolean; bottom: boolean}): {} => {
+export const getNodeOpStyles = (
+    styles: {},
+    color: string | undefined,
+    border: {left: boolean; right: boolean; top: boolean; bottom: boolean},
+): {} => {
     const borderSize = 2;
     if (border.left) {
         styles = {...styles, borderLeft: `${borderSize}px solid ${color}`};
