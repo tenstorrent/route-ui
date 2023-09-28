@@ -1,14 +1,11 @@
-import React, {ChangeEvent, FC, useContext, useState} from 'react';
+import React, {ChangeEvent, FC} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Checkbox, Dialog} from '@blueprintjs/core';
-import {Tooltip2} from '@blueprintjs/popover2';
+import {Checkbox} from '@blueprintjs/core';
 import {RootState, selectPipeSelectionById, updatePipeSelection} from '../../data/store';
 import HighlightedText from './HighlightedText';
 import {convertBytes, Pipe} from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
 import ProgressBar from './ProgressBar';
-import DataSource from '../../data/DataSource';
-import {Operand} from '../../data/ChipAugmentation';
 import PipeInfoDialog from './PipeInfoDialog';
 
 interface SelectablePipeProps {
