@@ -1,14 +1,11 @@
-import React, {ChangeEvent, FC, useContext, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {Button, Checkbox, Dialog} from '@blueprintjs/core';
-import {Tooltip2} from '@blueprintjs/popover2';
-import {RootState, selectPipeSelectionById, updatePipeSelection} from '../../data/store';
+import React, { ChangeEvent, FC } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Checkbox } from '@blueprintjs/core';
+import { RootState, selectPipeSelectionById, updatePipeSelection } from '../../data/store';
 import HighlightedText from './HighlightedText';
-import {convertBytes, Pipe} from '../../data/Chip';
+import { convertBytes, Pipe } from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
 import ProgressBar from './ProgressBar';
-import DataSource from '../../data/DataSource';
-import {Operand} from '../../data/ChipAugmentation';
 import PipeInfoDialog from './PipeInfoDialog';
 
 interface SelectablePipeProps {
@@ -17,11 +14,11 @@ interface SelectablePipeProps {
     showBandwidthUse?: boolean;
 }
 
-const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter, showBandwidthUse = false}) => {
+const SelectablePipe: FC<SelectablePipeProps> = ({ pipe, pipeFilter, showBandwidthUse = false }) => {
     const dispatch = useDispatch();
     const pipeState = useSelector((state: RootState) => selectPipeSelectionById(state, pipe.id));
     const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-        dispatch(updatePipeSelection({id: pipeState.id, selected: e.target.checked}));
+        dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
     };
 
     return (
@@ -30,14 +27,20 @@ const SelectablePipe: FC<SelectablePipeProps> = ({pipe, pipeFilter, showBandwidt
             <PipeInfoDialog
                 pipeId={pipe.id}
                 contents={
-                    <span className="label">
+                    <span className='label'>
                         {pipeState && (
                             <>
-                                <HighlightedText text={pipeState.id} filter={pipeFilter} /> {pipe.bandwidth !== null ? convertBytes(pipe.bandwidth) : ''}
+                                <HighlightedText text={pipeState.id} filter={pipeFilter} />{' '}
+                                {pipe.bandwidth !== null ? convertBytes(pipe.bandwidth) : ''}
                                 {showBandwidthUse && <span>{pipe.bandwidthUse.toFixed(0)}%</span>}
-                                <span className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`} style={{backgroundColor: getPipeColor(pipeState.id)}} />
+                                <span
+                                    className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`}
+                                    style={{ backgroundColor: getPipeColor(pipeState.id) }}
+                                />
                                 <br />
-                                {showBandwidthUse && pipe.bandwidthUse !== null && <ProgressBar percent={pipe.bandwidthUse} />}
+                                {showBandwidthUse && pipe.bandwidthUse !== null && (
+                                    <ProgressBar percent={pipe.bandwidthUse} />
+                                )}
                             </>
                         )}
                     </span>

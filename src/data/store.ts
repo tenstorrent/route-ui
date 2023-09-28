@@ -1,6 +1,6 @@
-import {configureStore, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {updateOPCycles} from './Chip';
-import {LINK_SATURATION_INITIAIL_VALUE} from './constants';
+import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { updateOPCycles } from './Chip';
+import { LINK_SATURATION_INITIAIL_VALUE } from './constants';
 import {
     ComputeNodeState,
     DetailedViewState,
@@ -10,7 +10,7 @@ import {
     LinkStateData,
     NodeSelectionState,
     PipeSelection,
-    PipeSelectionState
+    PipeSelectionState,
 } from './StateTypes';
 
 const highContrastInitialState: HighContrastState = {
@@ -26,7 +26,7 @@ export const highContrastSlice = createSlice({
         },
     },
 });
-export const {setHighContrastState} = highContrastSlice.actions;
+export const { setHighContrastState } = highContrastSlice.actions;
 export const getHighContrastState = (state: RootState) => state.highContrast.enabled;
 
 const detailedViewInitialState: DetailedViewState = {
@@ -49,7 +49,7 @@ export const detailedViewSlice = createSlice({
     },
 });
 
-export const {openDetailedView, closeDetailedView} = detailedViewSlice.actions;
+export const { openDetailedView, closeDetailedView } = detailedViewSlice.actions;
 
 const pipesInitialState: PipeSelectionState = {
     pipes: {},
@@ -72,15 +72,15 @@ const pipeSelectionSlice = createSlice({
                 state.focusPipes[item.id] = item;
             });
         },
-        updateFocusPipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
-            const {id, selected} = action.payload;
+        updateFocusPipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
+            const { id, selected } = action.payload;
             if (state.focusPipes[id]) {
                 state.focusPipes[id].selected = selected;
                 state.focusMode = selected;
             }
         },
-        updatePipeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
-            const {id, selected} = action.payload;
+        updatePipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
+            const { id, selected } = action.payload;
             if (state.pipes[id]) {
                 state.pipes[id].selected = selected;
             }
@@ -126,10 +126,10 @@ const nodesInitialState: NodeSelectionState = {
 const setBorders = (nodes: ComputeNodeState[]) => {
     const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
     nodes.forEach((node) => {
-        const leftLoc = {x: node.loc.x - 1, y: node.loc.y};
-        const rightLoc = {x: node.loc.x + 1, y: node.loc.y};
-        const topLoc = {x: node.loc.x, y: node.loc.y - 1};
-        const bottomLoc = {x: node.loc.x, y: node.loc.y + 1};
+        const leftLoc = { x: node.loc.x - 1, y: node.loc.y };
+        const rightLoc = { x: node.loc.x + 1, y: node.loc.y };
+        const topLoc = { x: node.loc.x, y: node.loc.y - 1 };
+        const bottomLoc = { x: node.loc.x, y: node.loc.y + 1 };
         node.border = {
             left: !locations.has(JSON.stringify(leftLoc)),
             right: !locations.has(JSON.stringify(rightLoc)),
@@ -162,13 +162,13 @@ const nodeSelectionSlice = createSlice({
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
                     if (!state.groups[item.opName]) {
-                        state.groups[item.opName] = {data: [], selected: false};
+                        state.groups[item.opName] = { data: [], selected: false };
                     }
                     state.groups[item.opName].data.push(item);
                 }
                 if (item.dramChannel !== -1) {
                     if (!state.dram[item.dramChannel]) {
-                        state.dram[item.dramChannel] = {data: [], selected: false};
+                        state.dram[item.dramChannel] = { data: [], selected: false };
                     }
                     state.dram[item.dramChannel].data.push(item);
                 }
@@ -182,8 +182,8 @@ const nodeSelectionSlice = createSlice({
                 setBorders(dramElement.data);
             });
         },
-        updateNodeSelection(state, action: PayloadAction<{id: string; selected: boolean}>) {
-            const {id, selected} = action.payload;
+        updateNodeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
+            const { id, selected } = action.payload;
             const node: ComputeNodeState | undefined = state.nodeList[id];
 
             if (node) {
@@ -197,7 +197,7 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        updateCoreHighlight(state, action: PayloadAction<{ids: string[]; selected: HighlightType}>) {
+        updateCoreHighlight(state, action: PayloadAction<{ ids: string[]; selected: HighlightType }>) {
             action.payload.ids.forEach((id) => {
                 state.coreHighlightList[id] = action.payload.selected;
             });
@@ -209,7 +209,7 @@ const nodeSelectionSlice = createSlice({
             action.payload.forEach((ops, uid) => {
                 state.ioGroupsIn[uid] = ops.map((op) => {
                     state.operandsIn[op] = false;
-                    return {op, selected: false};
+                    return { op, selected: false };
                 });
             });
         },
@@ -217,12 +217,12 @@ const nodeSelectionSlice = createSlice({
             action.payload.forEach((ops, uid) => {
                 state.ioGroupsOut[uid] = ops.map((op) => {
                     state.operandsOut[op] = false;
-                    return {op, selected: false};
+                    return { op, selected: false };
                 });
             });
         },
-        selectOperand(state, action: PayloadAction<{op: string; selected: boolean; type?: IoType}>) {
-            const {op, selected} = action.payload;
+        selectOperand(state, action: PayloadAction<{ op: string; selected: boolean; type?: IoType }>) {
+            const { op, selected } = action.payload;
             const type = action.payload.type || IoType.ALL;
             switch (type) {
                 case IoType.ALL:
@@ -265,8 +265,8 @@ const nodeSelectionSlice = createSlice({
                     break;
             }
         },
-        selectGroup(state, action: PayloadAction<{opName: string; selected: boolean}>) {
-            const {opName, selected} = action.payload;
+        selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
+            const { opName, selected } = action.payload;
             const group = state.groups[opName];
             if (group) {
                 group.selected = selected;
@@ -287,7 +287,8 @@ export enum IoType {
 }
 
 export const selectNodeSelectionById = (state: RootState, id: string) => state.nodeSelection.nodeList[id];
-export const getCoreHighlight = (state: RootState, id: string) => state.nodeSelection.coreHighlightList[id] || HighlightType.NONE;
+export const getCoreHighlight = (state: RootState, id: string) =>
+    state.nodeSelection.coreHighlightList[id] || HighlightType.NONE;
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
 export const {
     //

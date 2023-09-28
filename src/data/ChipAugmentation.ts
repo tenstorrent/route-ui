@@ -1,4 +1,4 @@
-import {Loc} from './Types';
+import { Loc } from './Types';
 
 export class CoreOperationsList extends Array<CoreOperation> {
     constructor(...items: CoreOperation[]) {
@@ -10,7 +10,6 @@ export class CoreOperationsList extends Array<CoreOperation> {
         return this.find((core) => core.coreID === coreId);
     }
 }
-
 
 export class ioOperationGroup {
     public name: string = '';
@@ -41,7 +40,7 @@ export class CoreOperation extends Operation {
     public coreID: string = ''; // location
 
     /** Represents the x,y coordinates of the core. */
-    loc: Loc = {x: 0, y: 0};
+    loc: Loc = { x: 0, y: 0 };
 
     /** label only */
     logicalCoreId: string = '';
@@ -92,7 +91,12 @@ export class PipeOperation {
      */
     static fromOpsJSON(key: string, pipeList: string[]) {
         const loc = key.split('-');
-        return new PipeOperation(key, {x: parseInt(loc[1], 10), y: parseInt(loc[2], 10)}, parseInt(loc[0], 10), pipeList);
+        return new PipeOperation(
+            key,
+            { x: parseInt(loc[1], 10), y: parseInt(loc[2], 10) },
+            parseInt(loc[0], 10),
+            pipeList,
+        );
     }
 
     public readonly coreID: string;

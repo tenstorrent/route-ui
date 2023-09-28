@@ -1,25 +1,30 @@
 import * as d3 from 'd3';
-import {ComputeNode} from '../data/Chip';
+import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
-import {DramName, LinkName} from '../data/Types';
+import { DramName, LinkName } from '../data/Types';
 
 export const NODE_SIZE = 100;
-const NOC_CENTER = {x: 30, y: NODE_SIZE - 30};
+const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
 const CENTER_DISPERSION = 10; // dispersion from the starting point
 const NOC_0_X_OFFSET = -CENTER_DISPERSION;
 const NOC_0_Y_OFFSET = -CENTER_DISPERSION;
 const NOC_1_X_OFFSET = CENTER_DISPERSION;
 const NOC_1_Y_OFFSET = CENTER_DISPERSION;
-const CORE_CENTER = {x: NODE_SIZE - 20, y: 20};
+const CORE_CENTER = { x: NODE_SIZE - 20, y: 20 };
 const CORE_DISPERSION = 2;
 
 export const NOC_CONFIGURATION = {
-    noc0: {x: NOC_CENTER.x + NOC_0_X_OFFSET, y: NOC_CENTER.y + NOC_0_Y_OFFSET},
-    noc1: {x: NOC_CENTER.x + NOC_1_X_OFFSET, y: NOC_CENTER.y + NOC_1_Y_OFFSET},
-    core: {x: CORE_CENTER.x, y: CORE_CENTER.y},
+    noc0: { x: NOC_CENTER.x + NOC_0_X_OFFSET, y: NOC_CENTER.y + NOC_0_Y_OFFSET },
+    noc1: { x: NOC_CENTER.x + NOC_1_X_OFFSET, y: NOC_CENTER.y + NOC_1_Y_OFFSET },
+    core: { x: CORE_CENTER.x, y: CORE_CENTER.y },
 };
 
-export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName | DramName, color?: string, stroke: number = 1) => {
+export const drawLink = (
+    selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    linkID: LinkName | DramName,
+    color?: string,
+    stroke: number = 1,
+) => {
     const {
         //
         lineEndX,
@@ -53,7 +58,12 @@ export const drawLink = (selector: d3.Selection<SVGSVGElement | null, unknown, n
         .attr('stroke', color || '#4d4d4d');
 
     // arrowhead
-    if (linkID !== LinkName.NOC1_SOUTH_IN && linkID !== LinkName.NOC0_WEST_IN && linkID !== LinkName.NOC0_SOUTH_OUT && linkID !== LinkName.NOC1_WEST_OUT) {
+    if (
+        linkID !== LinkName.NOC1_SOUTH_IN &&
+        linkID !== LinkName.NOC0_WEST_IN &&
+        linkID !== LinkName.NOC0_SOUTH_OUT &&
+        linkID !== LinkName.NOC1_WEST_OUT
+    ) {
         selector
             // keeping this here for the prettier
             .append('polygon')
@@ -83,8 +93,8 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
     let transform = '';
     let angle = 0;
 
-    let arrow = {p1: '', p2: '', p3: ''};
-    let arrowSecondary = {p1: '', p2: '', p3: ''};
+    let arrow = { p1: '', p2: '', p3: '' };
+    let arrowSecondary = { p1: '', p2: '', p3: '' };
 
     switch (linkID) {
         case LinkName.NOC1_NORTH_OUT:
@@ -314,10 +324,14 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
         default:
             break;
     }
-    return {lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform};
+    return { lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform };
 };
 
-export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName | DramName, pipeIds: string[]) => {
+export const drawPipesDirect = (
+    svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    linkID: LinkName | DramName,
+    pipeIds: string[],
+) => {
     const {
         //
         lineEndX,
@@ -332,7 +346,12 @@ export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown,
     const strokeLength = 5;
 
     if (pipeIds.length) {
-        if (linkID !== LinkName.NOC1_SOUTH_IN && linkID !== LinkName.NOC0_WEST_IN && linkID !== LinkName.NOC0_SOUTH_OUT && linkID !== LinkName.NOC1_WEST_OUT) {
+        if (
+            linkID !== LinkName.NOC1_SOUTH_IN &&
+            linkID !== LinkName.NOC0_WEST_IN &&
+            linkID !== LinkName.NOC0_SOUTH_OUT &&
+            linkID !== LinkName.NOC1_WEST_OUT
+        ) {
             svg
                 // only draw arrows for long links
                 .append('polygon')
@@ -364,14 +383,22 @@ export const drawPipesDirect = (svg: d3.Selection<SVGSVGElement | null, unknown,
     });
 };
 
-export const drawSelections = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, linkID: LinkName, node: ComputeNode, selectedPipeIds: string[]) => {
+export const drawSelections = (
+    svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    linkID: LinkName,
+    node: ComputeNode,
+    selectedPipeIds: string[],
+) => {
     const nodePipeIds = node.getPipesForDirection(linkID);
     const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
     drawPipesDirect(svg, linkID, pipeIds);
     return pipeIds.length;
 };
 
-export const drawNOC = (svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>, point: {x: number; y: number}) => {
+export const drawNOC = (
+    svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
+    point: { x: number; y: number },
+) => {
     svg.append('circle')
         //
         .attr('cx', point.x)
@@ -394,46 +421,52 @@ export const calculateLinkCongestionColor = (value: number, min: number = 0, isH
     return `rgb(${intensity}, ${255 - intensity}, 0)`;
 };
 
-export const getDramGroupingStyles = (border: {left: boolean; right: boolean; top: boolean; bottom: boolean}): {} => {
+export const getDramGroupingStyles = (border: { left: boolean; right: boolean; top: boolean; bottom: boolean }): {} => {
     const color = 'rgba(248,226,112,.25)';
     const gradientColor = 'rgba(248,226,112,0.2)';
     let dramStyles = {};
-    dramStyles = {borderColor: color};
+    dramStyles = { borderColor: color };
     const borderSize = 2;
     if (border.left) {
-        dramStyles = {...dramStyles, borderLeft: `${borderSize}px solid ${color}`};
+        dramStyles = { ...dramStyles, borderLeft: `${borderSize}px solid ${color}` };
     }
     if (border.right) {
-        dramStyles = {...dramStyles, borderRight: `${borderSize}px solid ${color}`};
+        dramStyles = { ...dramStyles, borderRight: `${borderSize}px solid ${color}` };
     }
     if (border.top) {
-        dramStyles = {...dramStyles, borderTop: `${borderSize}px solid ${color}`};
+        dramStyles = { ...dramStyles, borderTop: `${borderSize}px solid ${color}` };
     }
     if (border.bottom) {
-        dramStyles = {...dramStyles, borderBottom: `${borderSize}px solid ${color}`};
+        dramStyles = { ...dramStyles, borderBottom: `${borderSize}px solid ${color}` };
     }
     const gradientSize = 6;
-    const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${gradientSize * 2}px)`;
-    return {...dramStyles, background: gradient};
+    const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${
+        gradientSize * 2
+    }px)`;
+    return { ...dramStyles, background: gradient };
 };
 
-export const getNodeOpStyles = (styles: {}, color: string | undefined, border: {left: boolean; right: boolean; top: boolean; bottom: boolean}): {} => {
+export const getNodeOpStyles = (
+    styles: {},
+    color: string | undefined,
+    border: { left: boolean; right: boolean; top: boolean; bottom: boolean },
+): {} => {
     const borderSize = 2;
     if (border.left) {
-        styles = {...styles, borderLeft: `${borderSize}px solid ${color}`};
+        styles = { ...styles, borderLeft: `${borderSize}px solid ${color}` };
     }
     if (border.right) {
-        styles = {...styles, borderRight: `${borderSize}px solid ${color}`};
+        styles = { ...styles, borderRight: `${borderSize}px solid ${color}` };
     }
     if (border.top) {
-        styles = {...styles, borderTop: `${borderSize}px solid ${color}`};
+        styles = { ...styles, borderTop: `${borderSize}px solid ${color}` };
     }
     if (border.bottom) {
-        styles = {...styles, borderBottom: `${borderSize}px solid ${color}`};
+        styles = { ...styles, borderBottom: `${borderSize}px solid ${color}` };
     }
 
     const gradientColor = color?.replace(')', ', 0.25)').replace('rgb', 'rgba');
     const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
 
-    return {...styles, background: gradient};
+    return { ...styles, background: gradient };
 };

@@ -1,5 +1,5 @@
-import {ChipDesignJSON} from './JSONDataTypes';
-import {Architecture, ComputeNodeType, ComputeNodeTypeArch, Loc} from './Types';
+import { ChipDesignJSON } from './JSONDataTypes';
+import { Architecture, ComputeNodeType, ComputeNodeTypeArch, Loc } from './Types';
 
 export default class ChipDesign {
     public totalCols: number = 0;
@@ -47,7 +47,7 @@ export default class ChipDesign {
             }),
             ...json.router_only.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.ROUTER, loc);
-            })
+            }),
         );
         this.nodes = this.nodes.sort((a, b) => {
             if (a.loc.y !== b.loc.y) {
@@ -61,7 +61,7 @@ export default class ChipDesign {
 export class ComputeNodeSimple {
     public type: ComputeNodeType;
 
-    public loc: Loc = {x: 0, y: 0};
+    public loc: Loc = { x: 0, y: 0 };
 
     public dramChannel: number = -1;
 
@@ -69,7 +69,7 @@ export class ComputeNodeSimple {
 
     constructor(type: ComputeNodeType, location: string) {
         this.type = type;
-        this.loc = {x: parseInt(location.split('-')[0], 10), y: parseInt(location.split('-')[1], 10)};
+        this.loc = { x: parseInt(location.split('-')[0], 10), y: parseInt(location.split('-')[1], 10) };
     }
 }
 

@@ -1,4 +1,4 @@
-import Ajv, {ValidateFunction} from 'ajv';
+import Ajv, { ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import draft06 from 'ajv/lib/refs/json-schema-draft-06.json';
 
@@ -166,5 +166,3 @@ addFormats(ajv);
 
 const yamlValidate: ValidateFunction<any> = ajv.compile(ymlSchema);
 export default yamlValidate;
-
-

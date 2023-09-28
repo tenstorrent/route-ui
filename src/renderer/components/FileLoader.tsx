@@ -1,36 +1,44 @@
 // import yaml from 'js-yaml';
-import {useDispatch} from 'react-redux';
-import {parse} from 'yaml';
+import { useDispatch } from 'react-redux';
+import { parse } from 'yaml';
 import fs from 'fs';
-import {useNavigate} from 'react-router-dom';
-import {FC, useContext} from 'react';
-import {IconNames} from '@blueprintjs/icons';
-import {Button} from '@blueprintjs/core';
+import { useNavigate } from 'react-router-dom';
+import { FC, useContext } from 'react';
+import { IconNames } from '@blueprintjs/icons';
+import { Button } from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
 import Chip from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
-import {closeDetailedView, loadedFilename, loadLinkData, loadNodesData, loadPipeSelection, setArchitecture, updateTotalOPs} from '../../data/store';
-import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
+import {
+    closeDetailedView,
+    loadedFilename,
+    loadLinkData,
+    loadNodesData,
+    loadPipeSelection,
+    setArchitecture,
+    updateTotalOPs,
+} from '../../data/store';
+import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
 
 interface FileLoaderProps {
     updateData: (data: Chip) => void;
 }
 
-const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
+const FileLoader: FC<FileLoaderProps> = ({ updateData }) => {
     const navigate = useNavigate();
-    const {setChip} = useContext(DataSource);
+    const { setChip } = useContext(DataSource);
 
     const dispatch = useDispatch();
 
     const loadFile = async () => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
-        const {dialog} = remote;
+        const { dialog } = remote;
 
         await (async () => {
             const filename = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: [{name: 'file', extensions: ['yaml']}],
+                filters: [{ name: 'file', extensions: ['yaml'] }],
             });
 
             if (!filename) {
@@ -77,8 +85,8 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
     };
 
     return (
-        <div className="">
-            <Button icon={IconNames.UPLOAD} text="Load netlist analyzer output yaml file" onClick={loadFile} />
+        <div className=''>
+            <Button icon={IconNames.UPLOAD} text='Load netlist analyzer output yaml file' onClick={loadFile} />
         </div>
     );
 };

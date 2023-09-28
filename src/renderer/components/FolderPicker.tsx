@@ -1,15 +1,15 @@
 import React from 'react';
 
-import {Button} from '@blueprintjs/core';
-import {IconNames} from '@blueprintjs/icons';
-import {Classes, Popover2} from '@blueprintjs/popover2';
+import { Button } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { Classes, Popover2 } from '@blueprintjs/popover2';
 import '../scss/FolderPicker.scss';
 
-import {getAvailableGraphNames, validatePerfResultsFolder} from 'utils/Files';
+import { getAvailableGraphNames, validatePerfResultsFolder } from 'utils/Files';
 import GraphPicker from './GraphPicker';
 import Chip from '../../data/Chip';
 
-export const TempFolderLoadingContext = ({onDataLoad}: {onDataLoad: (data: Chip) => void}): React.ReactElement => {
+export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Chip) => void }): React.ReactElement => {
     const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null);
     const [selectedGraph, setSelectedGraph] = React.useState<string | null>(null);
     const [graphOptions, setGraphOptions] = React.useState<string[]>([]);
@@ -25,7 +25,7 @@ export const TempFolderLoadingContext = ({onDataLoad}: {onDataLoad: (data: Chip)
     };
 
     return (
-        <div className="folder-load-container">
+        <div className='folder-load-container'>
             <Popover2
                 content={
                     <GraphPicker
@@ -39,7 +39,7 @@ export const TempFolderLoadingContext = ({onDataLoad}: {onDataLoad: (data: Chip)
                 }
                 disabled={!showGraphSelect}
                 isOpen={showGraphSelect}
-                placement="right"
+                placement='right'
             >
                 <FolderPicker onSelectFolder={loadFolder} />
             </Popover2>
@@ -55,7 +55,7 @@ interface FolderPickerProps {
     onSelectFolder: (folderPath: string) => void;
 }
 
-const FolderPicker = ({onSelectFolder}: FolderPickerProps): React.ReactElement => {
+const FolderPicker = ({ onSelectFolder }: FolderPickerProps): React.ReactElement => {
     const selectLocalFolder = async () => {
         const remote = await import('@electron/remote');
         const openDialogResult = await remote.dialog.showOpenDialog({
@@ -79,17 +79,17 @@ const FolderPicker = ({onSelectFolder}: FolderPickerProps): React.ReactElement =
         onSelectFolder(folderPath);
     };
     return (
-        <div className="folder-picker">
+        <div className='folder-picker'>
             <Popover2
-                position="top"
+                position='top'
                 content={
                     <div className={Classes.POPOVER2_DISMISS}>
-                        <Button icon={IconNames.FOLDER_OPEN} text="Local" onClick={() => selectLocalFolder()} />
-                        <Button icon={IconNames.CLOUD_DOWNLOAD} text="Remote" disabled />
+                        <Button icon={IconNames.FOLDER_OPEN} text='Local' onClick={() => selectLocalFolder()} />
+                        <Button icon={IconNames.CLOUD_DOWNLOAD} text='Remote' disabled />
                     </div>
                 }
             >
-                <Button className="load-folder-button" icon={IconNames.GRAPH} text="Load Perf Analyzer Folder" />
+                <Button className='load-folder-button' icon={IconNames.GRAPH} text='Load Perf Analyzer Folder' />
             </Popover2>
         </div>
     );

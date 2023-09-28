@@ -1,20 +1,12 @@
 // import yaml from 'js-yaml';
-import {useDispatch} from 'react-redux';
-import {parse} from 'yaml';
+import { useDispatch } from 'react-redux';
 import fs from 'fs';
-import {useNavigate} from 'react-router-dom';
-import {FC, useContext} from 'react';
-import {IconNames} from '@blueprintjs/icons';
-import {Button} from '@blueprintjs/core';
+import { useNavigate } from 'react-router-dom';
+import { FC, useContext } from 'react';
+import { IconNames } from '@blueprintjs/icons';
+import { Button } from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
-import Chip, {ComputeNode, DramLink} from '../../data/Chip';
-import yamlValidate from '../../data/DataUtils';
-import {closeDetailedView, loadedFilename, loadNodesData, loadPipeSelection, setArchitecture} from '../../data/store';
-import {NOCLinkJSON, NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
-import ChipDesign from '../../data/ChipDesign';
-import {parseOpDataFormat} from '../../data/DataParsers';
-
-import {DramName} from '../../data/Types';
+import Chip from '../../data/Chip';
 
 interface OpsFileLoaderProps {
     updateData: (data: Chip) => void;
@@ -29,21 +21,21 @@ interface OpsFileLoaderProps {
  * UPDATE: should be replaced with baked in json arch files
  *
  */
-const OpsFileLoader: FC<OpsFileLoaderProps> = ({updateData}) => {
+const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
     const navigate = useNavigate();
-    const {setChip} = useContext(DataSource);
+    const { setChip } = useContext(DataSource);
 
     const dispatch = useDispatch();
 
     const loadFile = async () => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
-        const {dialog} = remote;
+        const { dialog } = remote;
 
         await (async () => {
             const filelist: string[] = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: [{name: 'file', extensions: ['yaml', 'json']}],
+                filters: [{ name: 'file', extensions: ['yaml', 'json'] }],
             });
 
             if (!filelist) {
@@ -59,7 +51,6 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({updateData}) => {
                 filelist.forEach((filename) => {
                     try {
                         const json = JSON.parse(data);
-
                     } catch (error) {
                         console.error(error);
                     }
@@ -69,8 +60,8 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({updateData}) => {
     };
 
     return (
-        <div className="">
-            <Button icon={IconNames.UPLOAD} text="Load OPs file" onClick={loadFile} />
+        <div className=''>
+            <Button icon={IconNames.UPLOAD} text='Load OPs file' onClick={loadFile} />
         </div>
     );
 };
