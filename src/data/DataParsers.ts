@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 export const parseOpDataFormat = (json: JSON): {} => {
     const result = {};
     const fileds = ['logical-core-id', 'op-name', 'op-type', 'output-ops', 'output-queues'];

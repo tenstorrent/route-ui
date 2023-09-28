@@ -4,7 +4,7 @@ import {Pipe, convertBytes, GenericNOCLink} from '../../data/Chip';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import {calculateLinkCongestionColor} from '../../utils/DrawingAPI';
-import {getLinkData, RootState, selectNodeSelectionById} from '../../data/store';
+import {getLinkData, RootState} from '../../data/store';
 
 type LinkDetailsProps = {
     link: GenericNOCLink;

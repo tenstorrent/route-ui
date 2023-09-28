@@ -1,9 +1,8 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Classes, Icon, InputGroup, NumericInput, Position, Slider, Switch} from '@blueprintjs/core';
+import {Button, Classes, NumericInput, Position, Slider, Switch} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 import {IconNames} from '@blueprintjs/icons';
-import {svg} from 'd3';
 import DataSource, {GridContext} from '../data/DataSource';
 import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
 import {
