@@ -9,12 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import {app, BrowserWindow, shell, ipcMain, nativeImage} from 'electron';
-import {autoUpdater} from 'electron-updater';
+import { app, BrowserWindow, shell, ipcMain, nativeImage } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 // import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
-import {resolveHtmlPath} from './util';
+import { resolveHtmlPath } from './util';
 
 class AppUpdater {
     constructor() {
@@ -50,7 +50,7 @@ const installExtensions = async () => {
 
     return installer
         .default(
-            extensions.map((name) => installer[name]),
+            extensions.map(name => installer[name]),
             forceDownload,
         )
         .catch(console.log);
@@ -116,9 +116,9 @@ const createWindow = async () => {
     menuBuilder.buildMenu();
 
     // Open urls in the user's browser
-    mainWindow.webContents.setWindowOpenHandler((edata) => {
+    mainWindow.webContents.setWindowOpenHandler(edata => {
         shell.openExternal(edata.url);
-        return {action: 'deny'};
+        return { action: 'deny' };
     });
 
     // Remove this if your app does not use auto updates

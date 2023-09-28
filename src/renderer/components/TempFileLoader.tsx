@@ -1,11 +1,11 @@
 // import yaml from 'js-yaml';
-import {useDispatch} from 'react-redux';
-import {parse} from 'yaml';
+import { useDispatch } from 'react-redux';
+import { parse } from 'yaml';
 import fs from 'fs';
-import {useNavigate} from 'react-router-dom';
-import {FC, useContext} from 'react';
-import {IconNames} from '@blueprintjs/icons';
-import {Button} from '@blueprintjs/core';
+import { useNavigate } from 'react-router-dom';
+import { FC, useContext } from 'react';
+import { IconNames } from '@blueprintjs/icons';
+import { Button } from '@blueprintjs/core';
 import path from 'path';
 import DataSource from '../../data/DataSource';
 import Chip from '../../data/Chip';
@@ -18,8 +18,8 @@ import {
     setArchitecture,
     updateTotalOPs,
 } from '../../data/store';
-import {NetlistAnalyzerDataJSON} from '../../data/JSONDataTypes';
-import {parseOpDataFormat} from '../../data/DataParsers';
+import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
+import { parseOpDataFormat } from '../../data/DataParsers';
 
 interface TempFileLoaderProps {
     updateData: (data: Chip) => void;
@@ -31,20 +31,20 @@ interface TempFileLoaderProps {
  * @constructor
  *
  */
-const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
+const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
     const navigate = useNavigate();
-    const {chip, setChip} = useContext(DataSource);
+    const { chip, setChip } = useContext(DataSource);
     const dispatch = useDispatch();
 
     const loadFile = async () => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
-        const {dialog} = remote;
+        const { dialog } = remote;
 
         await (async () => {
             const filelist: string[] = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: [{name: 'file', extensions: ['yaml', 'json']}],
+                filters: [{ name: 'file', extensions: ['yaml', 'json'] }],
             });
 
             if (!filelist) {
@@ -57,7 +57,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
-                filelist.forEach((filepath) => {
+                filelist.forEach(filepath => {
                     const filename = path.basename(filepath);
                     const ext = path.extname(filepath);
                     try {
@@ -111,10 +111,10 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({updateData}) => {
     };
 
     return (
-        <div className="">
+        <div className=''>
             <Button
                 icon={IconNames.UPLOAD}
-                text="Load yaml or json files one at a time, analyzer output first"
+                text='Load yaml or json files one at a time, analyzer output first'
                 onClick={loadFile}
             />
         </div>

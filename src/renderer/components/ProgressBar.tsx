@@ -1,18 +1,18 @@
-import React, {FC} from 'react';
+import React, { FC } from 'react';
 
 interface ProgressBarProps {
     percent: number;
     color?: string;
 }
 
-const ProgressBar: FC<ProgressBarProps> = ({percent, color}) => {
-    let styles: {} = {width: `${Math.min(percent, 100)}%`};
+const ProgressBar: FC<ProgressBarProps> = ({ percent, color }) => {
+    let styles: {} = { width: `${Math.min(percent, 100)}%` };
     if (color) {
-        styles = {...styles, backgroundColor: color};
+        styles = { ...styles, backgroundColor: color };
     }
     return (
-        <span className="progress-bar">
-            <span className="track" style={styles} />
+        <span className='progress-bar'>
+            <span className='track' style={styles} />
         </span>
     );
 };

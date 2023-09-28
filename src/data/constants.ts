@@ -1,4 +1,4 @@
-import {DramName, LinkName} from './Types';
+import { DramName, LinkName } from './Types';
 
 export const LINK_SATURATION_INITIAIL_VALUE = 75;
 

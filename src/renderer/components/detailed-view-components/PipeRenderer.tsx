@@ -1,11 +1,11 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import {useSelector} from 'react-redux';
-import {GenericNOCLink} from '../../../data/Chip';
-import {calculateLinkCongestionColor, drawLink, drawPipesDirect} from '../../../utils/DrawingAPI';
-import {RootState} from '../../../data/store';
-import {PipeSelection} from '../../../data/StateTypes';
-import {DramName, LinkName} from '../../../data/Types';
+import { useSelector } from 'react-redux';
+import { GenericNOCLink } from '../../../data/Chip';
+import { calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
+import { RootState } from '../../../data/store';
+import { PipeSelection } from '../../../data/StateTypes';
+import { DramName, LinkName } from '../../../data/Types';
 
 type PipeRendererProps = {
     links: GenericNOCLink[];
@@ -14,7 +14,12 @@ type PipeRendererProps = {
     linkSaturationTreshold: number;
 };
 
-const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, linkSaturationTreshold, className}) => {
+const PipeRenderer: React.FC<PipeRendererProps> = ({
+    links,
+    showLinkSaturation,
+    linkSaturationTreshold,
+    className,
+}) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
@@ -44,14 +49,14 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
                 }
             }
         };
-        links.forEach((link) => {
+        links.forEach(link => {
             const selectedPipeIds = Object.values(allPipes)
                 .filter((pipe: PipeSelection) => pipe.selected)
                 .map((pipe: PipeSelection) => pipe.id);
 
-            const validPipes = link.pipes.map((pipe) => pipe.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
+            const validPipes = link.pipes.map(pipe => pipe.id).filter(pipeId => selectedPipeIds.includes(pipeId));
 
-            const {name} = link;
+            const { name } = link;
             if (name && validLinkIds.includes(name as LinkName | DramName)) {
                 switch (name) {
                     case LinkName.NOC0_IN:
@@ -82,7 +87,7 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
         });
     }, [svgRef, links, allPipes, isHighContrast]);
     return (
-        <div className="pipe-renderer">
+        <div className='pipe-renderer'>
             {/* DEBUGGING CODE BELOW */}
             {/* {links.map((link) => ( */}
             {/*    <div style={{color: '#fff'}} key={link.id}> */}
@@ -93,11 +98,11 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({links, showLinkSaturation, l
             {/*    </div> */}
             {/* ))} */}
             <svg
-                width="80"
-                height="80"
-                viewBox="0 0 80 80"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+                width='80'
+                height='80'
+                viewBox='0 0 80 80'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
                 className={`svg ${className}`}
                 ref={svgRef}
             />

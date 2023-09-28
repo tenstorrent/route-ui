@@ -1,10 +1,10 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {Button, Classes, NumericInput, Position, Slider, Switch} from '@blueprintjs/core';
-import {Tooltip2} from '@blueprintjs/popover2';
-import {IconNames} from '@blueprintjs/icons';
-import DataSource, {GridContext} from '../data/DataSource';
-import {calculateLinkCongestionColor, NODE_SIZE} from '../utils/DrawingAPI';
+import React, { useContext, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button, Classes, NumericInput, Position, Slider, Switch } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { IconNames } from '@blueprintjs/icons';
+import DataSource, { GridContext } from '../data/DataSource';
+import { calculateLinkCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
 import {
     clearAllOperations,
     clearAllPipes,
@@ -15,12 +15,12 @@ import {
     updateTotalOPs,
 } from '../data/store';
 import NodeGridElement from './components/NodeGridElement';
-import {ComputeNode} from '../data/Chip';
+import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
-import {LINK_SATURATION_INITIAIL_VALUE} from '../data/constants';
+import { LINK_SATURATION_INITIAIL_VALUE } from '../data/constants';
 
 export default function GridRender() {
-    const {chip, setChip} = useContext<GridContext>(DataSource);
+    const { chip, setChip } = useContext<GridContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
     const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
@@ -59,7 +59,7 @@ export default function GridRender() {
 
     return (
         <>
-            <div className="inner-sidebar">
+            <div className='inner-sidebar'>
                 Detailed view zoom
                 <Slider
                     min={0.5}
@@ -68,7 +68,7 @@ export default function GridRender() {
                     labelStepSize={1}
                     value={detailedViewZoom}
                     onChange={(value: number) => setDetailedViewZoom(value)}
-                    labelRenderer={(value) => `${value.toFixed(1)}`}
+                    labelRenderer={value => `${value.toFixed(1)}`}
                 />
                 Zoom
                 <Slider
@@ -78,98 +78,98 @@ export default function GridRender() {
                     labelStepSize={1}
                     value={gridZoom}
                     onChange={(value: number) => setGridZoom(value)}
-                    labelRenderer={(value) => `${value.toFixed(1)}`}
+                    labelRenderer={value => `${value.toFixed(1)}`}
                 />
                 <hr />
-                <Tooltip2 content="Show pipes" position={Position.RIGHT}>
+                <Tooltip2 content='Show pipes' position={Position.RIGHT}>
                     <Switch
                         checked={showPipes}
-                        label="pipes"
-                        onChange={(event) => setShowPipes(event.currentTarget.checked)}
+                        label='pipes'
+                        onChange={event => setShowPipes(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <hr />
-                <Tooltip2 content="Show all links overlay" position={Position.RIGHT}>
+                <Tooltip2 content='Show all links overlay' position={Position.RIGHT}>
                     <Switch
                         checked={showEmptyLinks}
-                        label="links"
+                        label='links'
                         disabled={!showPipes}
-                        onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
+                        onChange={event => setShowEmptyLinks(event.currentTarget.checked)}
                     />
                 </Tooltip2>
-                <Tooltip2 content="Show all operations colors" position={Position.RIGHT}>
+                <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
                     <Switch
                         checked={showOperationColors}
-                        label="operations"
-                        onChange={(event) => setShowOperationColors(event.currentTarget.checked)}
+                        label='operations'
+                        onChange={event => setShowOperationColors(event.currentTarget.checked)}
                     />
                 </Tooltip2>
-                <Tooltip2 content="Show Compute Node locations" position={Position.RIGHT}>
+                <Tooltip2 content='Show Compute Node locations' position={Position.RIGHT}>
                     <Switch
                         checked={showNodeLocation}
-                        label="location"
-                        onChange={(event) => setShowNodeLocation(event.currentTarget.checked)}
+                        label='location'
+                        onChange={event => setShowNodeLocation(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <hr />
                 {/* Link saturation */}
-                <Tooltip2 content="Show link congestion" position={Position.RIGHT}>
+                <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
                     <Switch
                         checked={showLinkSaturation}
-                        label="congestion"
-                        onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
+                        label='congestion'
+                        onChange={event => onShowLinkSaturation(event.currentTarget.checked)}
                     />
                 </Tooltip2>
                 <div
-                    className="congestion-legend"
-                    style={{...(showLinkSaturation ? congestionLegendStyle : null), width: '100%', height: '3px'}}
+                    className='congestion-legend'
+                    style={{ ...(showLinkSaturation ? congestionLegendStyle : null), width: '100%', height: '3px' }}
                 />
                 <Slider
-                    className="link-saturation-slider"
+                    className='link-saturation-slider'
                     min={0}
                     max={125}
                     disabled={!showLinkSaturation}
                     labelStepSize={50}
                     value={linkSaturationTreshold}
                     onChange={onLinkSaturationChange}
-                    labelRenderer={(value) => `${value.toFixed(0)}`}
+                    labelRenderer={value => `${value.toFixed(0)}`}
                 />
                 <hr />
-                <Tooltip2 content="Select all pipes">
+                <Tooltip2 content='Select all pipes'>
                     <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())}>
                         Select all pipes
                     </Button>
                 </Tooltip2>
-                <Tooltip2 content="Clear all pipes selection">
+                <Tooltip2 content='Clear all pipes selection'>
                     <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}>
                         Deselect pipes
                     </Button>
                 </Tooltip2>
                 <hr />
-                <Tooltip2 content="Clear all operation selection">
+                <Tooltip2 content='Clear all operation selection'>
                     <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
                         Deselect ops
                     </Button>
                 </Tooltip2>
                 <hr />
                 <div>
-                    <label className={Classes.LABEL} htmlFor="opCyclesInput" style={{marginBottom: '5px'}}>
+                    <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
                         Update Total OP Cycles
                     </label>
                     <NumericInput
                         //
-                        id="opCyclesInput"
+                        id='opCyclesInput'
                         value={opCycles}
                         stepSize={10000}
                         minorStepSize={100}
                         majorStepSize={100000}
                         min={0}
-                        onValueChange={(value) => {
+                        onValueChange={value => {
                             setOpCycles(value);
                             dispatch(updateTotalOPs(value));
                         }}
                         rightElement={
-                            <Tooltip2 content="Reset Total OP Cycles">
+                            <Tooltip2 content='Reset Total OP Cycles'>
                                 <Button
                                     minimal
                                     onClick={() => {
@@ -188,7 +188,7 @@ export default function GridRender() {
             {chip && (
                 <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
                     <div
-                        className="node-container"
+                        className='node-container'
                         style={{
                             zoom: `${gridZoom}`,
                             gridTemplateColumns: `repeat(${chip.totalCols + 1}, ${NODE_SIZE}px)`,

@@ -1,13 +1,13 @@
-import {useNavigate} from 'react-router-dom';
-import {Button} from '@blueprintjs/core';
-import {IconNames} from '@blueprintjs/icons';
-import {useDispatch} from 'react-redux';
-import {Tooltip2} from '@blueprintjs/popover2';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { useDispatch } from 'react-redux';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import fs from 'fs';
 import path from 'path';
-import {parse} from 'yaml';
-import React, {useContext} from 'react';
-import {loadedFilename} from '../../data/store';
+import { parse } from 'yaml';
+import React, { useContext } from 'react';
+import { loadedFilename } from '../../data/store';
 import Chip from '../../data/Chip';
 import DataSource from '../../data/DataSource';
 
@@ -15,10 +15,10 @@ export interface SideBarProps {
     updateData: (data: Chip) => void;
 }
 
-export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
+export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
     const navigate = useNavigate();
 
-    const {chip} = useContext(DataSource);
+    const { chip } = useContext(DataSource);
     const dispatch = useDispatch();
     const reloadApp = () => {
         dispatch(loadedFilename(''));
@@ -28,12 +28,12 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
     const loadOpsToPipes = async () => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
-        const {dialog} = remote;
+        const { dialog } = remote;
 
         await (async () => {
             const filelist: string[] = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: [{name: 'file', extensions: ['yaml', 'json']}],
+                filters: [{ name: 'file', extensions: ['yaml', 'json'] }],
             });
 
             if (!filelist) {
@@ -46,7 +46,7 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
-                filelist.forEach((filepath) => {
+                filelist.forEach(filepath => {
                     const filename = path.basename(filepath);
                     const ext = path.extname(filepath);
                     try {
@@ -92,12 +92,12 @@ export const SideBar: React.FC<SideBarProps> = ({updateData}) => {
         })();
     };
     return (
-        <div className="sidebar">
-            <Tooltip2 content="Load new netlist analyzer output .yaml file">
-                <Button icon={IconNames.REFRESH} text="" onClick={reloadApp} />
+        <div className='sidebar'>
+            <Tooltip2 content='Load new netlist analyzer output .yaml file'>
+                <Button icon={IconNames.REFRESH} text='' onClick={reloadApp} />
             </Tooltip2>
-            <Tooltip2 content="Load ops to pipes mapping">
-                <Button icon={IconNames.IMPORT} text="" onClick={loadOpsToPipes} />
+            <Tooltip2 content='Load ops to pipes mapping'>
+                <Button icon={IconNames.IMPORT} text='' onClick={loadOpsToPipes} />
             </Tooltip2>
         </div>
     );

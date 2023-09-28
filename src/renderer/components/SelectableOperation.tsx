@@ -1,7 +1,7 @@
-import React, {ChangeEvent, FC} from 'react';
-import {Checkbox} from '@blueprintjs/core';
+import React, { ChangeEvent, FC } from 'react';
+import { Checkbox } from '@blueprintjs/core';
 import HighlightedText from './HighlightedText';
-import {getGroupColor} from '../../data/ColorGenerator';
+import { getGroupColor } from '../../data/ColorGenerator';
 
 interface SelectableOperationProps {
     opName: string;
@@ -10,9 +10,9 @@ interface SelectableOperationProps {
     stringFilter: string;
 }
 
-const SelectableOperation: FC<SelectableOperationProps> = ({opName, selectFunc, value, stringFilter}) => {
+const SelectableOperation: FC<SelectableOperationProps> = ({ opName, selectFunc, value, stringFilter }) => {
     return (
-        <div className="op-element">
+        <div className='op-element'>
             <Checkbox
                 checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +22,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({opName, selectFunc, 
             <HighlightedText text={opName} filter={stringFilter} />
             <span
                 className={`color-swatch ${value ? '' : 'transparent'}`}
-                style={{backgroundColor: getGroupColor(opName)}}
+                style={{ backgroundColor: getGroupColor(opName) }}
             />
         </div>
     );

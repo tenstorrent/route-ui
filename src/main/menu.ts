@@ -1,4 +1,4 @@
-import {app, Menu, shell, BrowserWindow, MenuItemConstructorOptions} from 'electron';
+import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
     selector?: string;
@@ -27,7 +27,7 @@ export default class MenuBuilder {
 
     setupDevelopmentEnvironment(): void {
         this.mainWindow.webContents.on('context-menu', (_, props) => {
-            const {x, y} = props;
+            const { x, y } = props;
 
             Menu.buildFromTemplate([
                 {
@@ -36,7 +36,7 @@ export default class MenuBuilder {
                         this.mainWindow.webContents.inspectElement(x, y);
                     },
                 },
-            ]).popup({window: this.mainWindow});
+            ]).popup({ window: this.mainWindow });
         });
     }
 
@@ -48,9 +48,9 @@ export default class MenuBuilder {
                     label: 'About',
                     selector: 'orderFrontStandardAboutPanel:',
                 },
-                {type: 'separator'},
-                {label: 'Services', submenu: []},
-                {type: 'separator'},
+                { type: 'separator' },
+                { label: 'Services', submenu: [] },
+                { type: 'separator' },
                 {
                     label: 'Hide ElectronReact',
                     accelerator: 'Command+H',
@@ -61,8 +61,8 @@ export default class MenuBuilder {
                     accelerator: 'Command+Shift+H',
                     selector: 'hideOtherApplications:',
                 },
-                {label: 'Show All', selector: 'unhideAllApplications:'},
-                {type: 'separator'},
+                { label: 'Show All', selector: 'unhideAllApplications:' },
+                { type: 'separator' },
                 {
                     label: 'Quit',
                     accelerator: 'Command+Q',
@@ -75,15 +75,15 @@ export default class MenuBuilder {
         const subMenuEdit: DarwinMenuItemConstructorOptions = {
             label: 'Edit',
             submenu: [
-                {label: 'Undo', accelerator: 'Command+Z', selector: 'undo:'},
+                { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
                 {
                     label: 'Redo',
                     accelerator: 'Shift+Command+Z',
                     selector: 'redo:',
                 },
-                {type: 'separator'},
-                {label: 'Cut', accelerator: 'Command+X', selector: 'cut:'},
-                {label: 'Copy', accelerator: 'Command+C', selector: 'copy:'},
+                { type: 'separator' },
+                { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
+                { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
                 {
                     label: 'Paste',
                     accelerator: 'Command+V',
@@ -147,8 +147,8 @@ export default class MenuBuilder {
                     accelerator: 'Command+W',
                     selector: 'performClose:',
                 },
-                {type: 'separator'},
-                {label: 'Bring All to Front', selector: 'arrangeInFront:'},
+                { type: 'separator' },
+                { label: 'Bring All to Front', selector: 'arrangeInFront:' },
             ],
         };
         const subMenuHelp: MenuItemConstructorOptions = {

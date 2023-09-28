@@ -1,5 +1,5 @@
-import React, {useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import {
     getCoreHighlight,
@@ -11,7 +11,7 @@ import {
     selectNodeSelectionById,
     updateNodeSelection,
 } from '../../data/store';
-import {ComputeNode} from '../../data/Chip';
+import { ComputeNode } from '../../data/Chip';
 import {
     calculateLinkCongestionColor,
     drawLink,
@@ -22,9 +22,9 @@ import {
     NOC_CONFIGURATION,
     NODE_SIZE,
 } from '../../utils/DrawingAPI';
-import {getGroupColor} from '../../data/ColorGenerator';
-import {HighlightType, PipeSelection} from '../../data/StateTypes';
-import {LinkName} from '../../data/Types';
+import { getGroupColor } from '../../data/ColorGenerator';
+import { HighlightType, PipeSelection } from '../../data/StateTypes';
+import { LinkName } from '../../data/Types';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -48,14 +48,14 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
     const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
-    const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
+    const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
 
     const triggerSelection = () => {
         const selectedState = nodeState.selected;
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));
         } else {
-            dispatch(updateNodeSelection({id: node.uid, selected: !nodeState.selected}));
+            dispatch(updateNodeSelection({ id: node.uid, selected: !nodeState.selected }));
         }
     };
 
@@ -63,7 +63,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 
     return (
         <button
-            type="button"
+            type='button'
             className={`node-item ${highlightClass} ${nodeState.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
             }`}
@@ -72,13 +72,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             <OperationGroupRender node={node} />
             <OperandHighlight node={node} />
             <DramChipBorder node={node} />
-            <div className="node-border" />
-            <div className="core-highlight" />
+            <div className='node-border' />
+            <div className='core-highlight' />
             {node.opName !== '' && showOperationColors && (
-                <div className="op-color-swatch" style={{backgroundColor: getGroupColor(node.opName)}} />
+                <div className='op-color-swatch' style={{ backgroundColor: getGroupColor(node.opName) }} />
             )}
             {showNodeLocation && (
-                <div className="node-location">
+                <div className='node-location'>
                     {node.loc.x},{node.loc.y}
                 </div>
             )}
@@ -108,11 +108,11 @@ const DramChipBorder: React.FC<DramChipBorderProps> = ({
     const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
     let dramStyles = {};
     if (node.dramChannel > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
-        const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
+        const border = dramAllocation.data.filter(n => n.id === node.uid)[0]?.border;
         dramStyles = getDramGroupingStyles(border);
     }
 
-    return <div className="dram-border" style={dramStyles} />;
+    return <div className='dram-border' style={dramStyles} />;
 };
 
 interface OperationGroupRenderProps {
@@ -128,12 +128,12 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
     let operationStyles = {};
     if (node.opName !== '' && selectedGroup.selected) {
         const color = getGroupColor(node.opName);
-        operationStyles = {borderColor: getGroupColor(node.opName)};
-        const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
+        operationStyles = { borderColor: getGroupColor(node.opName) };
+        const border = selectedGroup.data.filter(n => n.id === node.uid)[0]?.border;
         operationStyles = getNodeOpStyles(operationStyles, color, border);
     }
 
-    return <div className="group-border" style={operationStyles} />;
+    return <div className='group-border' style={operationStyles} />;
 };
 
 interface OperandHighlightProps {
@@ -145,25 +145,25 @@ const OperandHighlight: React.FC<OperandHighlightProps> = ({
     node,
     //
 }) => {
-    const operandsIn: {op: string; selected: boolean}[] = useSelector(
+    const operandsIn: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
     );
-    const operandsOut: {op: string; selected: boolean}[] = useSelector(
+    const operandsOut: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || [],
     );
     return (
-        <div className="operand-wrap">
+        <div className='operand-wrap'>
             {operandsIn
-                .filter((operand) => operand.selected)
-                .map((operand) => {
-                    const styles = {backgroundColor: getGroupColor(operand.op)};
-                    return <div className="operand in" style={styles} />;
+                .filter(operand => operand.selected)
+                .map(operand => {
+                    const styles = { backgroundColor: getGroupColor(operand.op) };
+                    return <div className='operand in' style={styles} />;
                 })}
             {operandsOut
-                .filter((operand) => operand.selected)
-                .map((operand) => {
-                    const styles = {backgroundColor: getGroupColor(operand.op)};
-                    return <div className="operand out" style={styles} />;
+                .filter(operand => operand.selected)
+                .map(operand => {
+                    const styles = { backgroundColor: getGroupColor(operand.op) };
+                    return <div className='operand out' style={styles} />;
                 })}
         </div>
     );
@@ -202,7 +202,7 @@ const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
         drawSelections(svg, LinkName.NOC1_IN, node, focusedPipeIds);
         drawSelections(svg, LinkName.NOC1_OUT, node, focusedPipeIds);
     }
-    return <svg className="node-focus-svg" ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
+    return <svg className='node-focus-svg' ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
 };
 
 interface NodePipeRendererProps {
@@ -248,7 +248,7 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     }
 
     if (showLinkSaturation) {
-        node.links.forEach((link) => {
+        node.links.forEach(link => {
             const linkData = linksData[link.uid];
             if (linkData.saturation >= linkSaturationTreshold) {
                 const color = calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast);

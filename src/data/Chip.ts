@@ -7,11 +7,11 @@ import {
     OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
+import { CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
-import {ComputeNodeState, LinkStateData, PipeSelection} from './StateTypes';
-import {Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC} from './Types';
-import {INTERNAL_LINK_NAMES, NOC_LINK_NAMES} from './constants';
+import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
+import { Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC } from './Types';
+import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -20,7 +20,7 @@ export default class Chip {
         if (!Chip.NOC_ORDER) {
             Chip.NOC_ORDER = new Map(
                 Object.keys(LinkName)
-                    .map((key) => LinkName[key])
+                    .map(key => LinkName[key])
                     .map((noc, index) => [noc, index]),
             );
         }
@@ -258,8 +258,8 @@ export default class Chip {
         chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
 
         chip.nodes = data.nodes
-            .map((nodeJSON) => {
-                const loc: Loc = {x: nodeJSON.location[1], y: nodeJSON.location[0]};
+            .map(nodeJSON => {
+                const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
                 chip.totalCols = Math.max(loc.y, chip.totalCols);
                 chip.totalRows = Math.max(loc.x, chip.totalRows);
                 const node = new ComputeNode(`${chip.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
@@ -274,7 +274,7 @@ export default class Chip {
             });
 
         if (data.dram_channels) {
-            chip.dramChannels = data.dram_channels.map((dramChannel) => {
+            chip.dramChannels = data.dram_channels.map(dramChannel => {
                 return new DramChannel(dramChannel.channel_id, dramChannel);
             });
         }
@@ -323,7 +323,7 @@ export default class Chip {
                     if (!core) {
                         core = new CoreOperation();
                         core.coreID = coreID;
-                        core.loc = {x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10)};
+                        core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         core.opName = operationName;
                         cores[coreID] = core;
                     }
@@ -348,10 +348,10 @@ export default class Chip {
                 operation.name = operationName;
                 augmentedChip.pipesPerOp.set(operationName, []);
                 augmentedChip.coreGroupsPerOperation.set(operationName, []);
-                operation.inputs = op.inputs.map((input) => {
+                operation.inputs = op.inputs.map(input => {
                     return organizeData(input, operationName, cores, OpIoType.INPUTS);
                 });
-                operation.outputs = op.outputs.map((output) => {
+                operation.outputs = op.outputs.map(output => {
                     return organizeData(output, operationName, cores, OpIoType.OUTPUTS);
                 });
                 return operation;
@@ -392,7 +392,7 @@ export default class Chip {
     public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON) {
         const chipDesign = new ChipDesign(json);
         const chip = new Chip();
-        chip.nodes = chipDesign.nodes.map((simpleNode) => {
+        chip.nodes = chipDesign.nodes.map(simpleNode => {
             const node = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
             node.type = simpleNode.type;
             node.loc = simpleNode.loc;
@@ -427,7 +427,7 @@ export default class Chip {
     }
 
     getAllNodes(): ComputeNodeState[] {
-        return this.nodes.map((node) => {
+        return this.nodes.map(node => {
             return {
                 id: node.uid,
                 selected: false,
@@ -441,10 +441,10 @@ export default class Chip {
 
     getAllPipeIds(): PipeSelection[] {
         const allPipes: PipeSelection[] = [];
-        this.nodes.forEach((node) => {
-            node.links.forEach((link) => {
-                const pipes = link.pipes.map((pipe) => {
-                    return {id: pipe.id, selected: false};
+        this.nodes.forEach(node => {
+            node.links.forEach(link => {
+                const pipes = link.pipes.map(pipe => {
+                    return { id: pipe.id, selected: false };
                 });
                 allPipes.push(...pipes);
             });
@@ -452,8 +452,8 @@ export default class Chip {
 
         return Array.from(
             new Set(
-                allPipes.map((pipeSelection) => {
-                    return {id: pipeSelection.id, selected: false};
+                allPipes.map(pipeSelection => {
+                    return { id: pipeSelection.id, selected: false };
                 }),
             ),
         );
@@ -461,16 +461,16 @@ export default class Chip {
 
     getPipeInfo(pipeId: string): ComputeNodeExtended[] {
         const list: ComputeNodeExtended[] = [];
-        this.nodes.forEach((node) => {
+        this.nodes.forEach(node => {
             let hasPipe = false;
-            node.links.forEach((link) => {
-                if (link.pipes.filter((pipe) => pipe.id === pipeId).length > 0) {
+            node.links.forEach(link => {
+                if (link.pipes.filter(pipe => pipe.id === pipeId).length > 0) {
                     hasPipe = true;
                 }
             });
             if (hasPipe) {
                 const extendedNodeData = new ComputeNodeExtended(node);
-                extendedNodeData.coreOperationData = this.cores.find((core) => core.coreID === node.uid) || null;
+                extendedNodeData.coreOperationData = this.cores.find(core => core.coreID === node.uid) || null;
                 list.push(extendedNodeData);
             }
         });
@@ -479,23 +479,23 @@ export default class Chip {
 
     getAllLinks(): LinkStateData[] {
         const links: GenericNOCLink[] = [];
-        this.nodes.forEach((node) => {
-            node.links.forEach((link) => {
+        this.nodes.forEach(node => {
+            node.links.forEach(link => {
                 links.push(link);
             });
         });
-        this.dramChannels.forEach((dramChannel) => {
-            dramChannel.links.forEach((link) => {
+        this.dramChannels.forEach(dramChannel => {
+            dramChannel.links.forEach(link => {
                 links.push(link);
-                dramChannel.subchannels.forEach((subchannel) => {
-                    subchannel.links.forEach((subchannelLink) => {
+                dramChannel.subchannels.forEach(subchannel => {
+                    subchannel.links.forEach(subchannelLink => {
                         links.push(subchannelLink);
                     });
                 });
             });
         });
 
-        return links.map((link) => ({
+        return links.map(link => ({
             id: link.uid,
             totalDataBytes: link.totalDataBytes,
             bpc: 0,
@@ -513,12 +513,12 @@ export default class Chip {
 
     private getAllPipes(): Pipe[] {
         let list: Pipe[] = [];
-        this.nodes.forEach((node) => {
-            node.links.forEach((link) => {
+        this.nodes.forEach(node => {
+            node.links.forEach(link => {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: {[key: string]: Pipe} = {};
+        const uniquePipeObj: { [key: string]: Pipe } = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -564,7 +564,7 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(subchannelId: number, channelId: number, json: {[key: string]: NOCLinkJSON}) {
+    constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(new DramLink(key as DramName, `${channelId}-${subchannelId}-${key}`, value));
@@ -638,7 +638,7 @@ export class ComputeNode {
 
     public type: ComputeNodeType = ComputeNodeType.NONE;
 
-    public loc: Loc = {x: 0, y: 0};
+    public loc: Loc = { x: 0, y: 0 };
 
     public opName: string = '';
 
@@ -672,7 +672,7 @@ export class ComputeNode {
             this.dramChannel = json.dram_channel;
             this.dramSubchannel = json.dram_subchannel || 0;
         }
-        this.loc = {x: json.location[0], y: json.location[1]};
+        this.loc = { x: json.location[0], y: json.location[1] };
         this.uid = `${chipId}-${this.loc.y}-${this.loc.x}`;
 
         const linkId = `${this.loc.x}-${this.loc.y}`;
@@ -695,7 +695,7 @@ export class ComputeNode {
 
     public getInternalLinksForNode = (): NOCLink[] => {
         return [...this.links.values()]
-            .filter((link) => {
+            .filter(link => {
                 return INTERNAL_LINK_NAMES.includes(link.name);
             })
             .sort((a, b) => {
@@ -708,8 +708,8 @@ export class ComputeNode {
     public getPipeIdsForNode = (): string[] => {
         const pipes: string[] = [];
 
-        this.links.forEach((link) => {
-            pipes.push(...link.pipes.map((pipe) => pipe.id));
+        this.links.forEach(link => {
+            pipes.push(...link.pipes.map(pipe => pipe.id));
         });
 
         return pipes;
@@ -717,17 +717,17 @@ export class ComputeNode {
 
     getInternalPipeIDsForNode = (): string[] => {
         return [...this.links.values()]
-            .filter((link) => {
+            .filter(link => {
                 return NOC_LINK_NAMES.includes(link.name);
             })
-            .map((link) => {
-                return [...link.pipes.map((pipe) => pipe.id)];
+            .map(link => {
+                return [...link.pipes.map(pipe => pipe.id)];
             })
             .flat();
     };
 
     public getPipesForDirection(direction: LinkName): string[] {
-        return this.links.get(direction)?.pipes.map((pipe) => pipe.id) || [];
+        return this.links.get(direction)?.pipes.map(pipe => pipe.id) || [];
     }
 
     public getNodeLabel(): string {
@@ -762,7 +762,7 @@ export class ComputeNodeExtended extends ComputeNode {
 export class Pipe {
     id: string = '';
 
-    location: Loc = {x: 0, y: 0};
+    location: Loc = { x: 0, y: 0 };
 
     bandwidth: number = 0;
 
