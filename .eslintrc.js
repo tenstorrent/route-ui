@@ -7,6 +7,7 @@ module.exports = {
         '@typescript-eslint/no-shadow': 'error',
         '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
         // 'comma-dangle': ['error', 'always-multiline'],  // May conflict with prettier
+        'curly': ['error', 'all'],
         'import/extensions': ['warn', 'never', { css: 'always', scss: 'always', json: 'always' }],
         'import/no-import-module-exports': 'off',
         'import/no-unresolved': 'error',

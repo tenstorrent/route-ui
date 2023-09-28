@@ -1,5 +1,4 @@
 {
-    "arrowParens": "avoid",
     "bracketSpacing": true,
     "jsxSingleQuote": true,
     "printWidth": 120,
