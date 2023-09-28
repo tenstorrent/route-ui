@@ -1,9 +1,9 @@
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import path from 'path';
+import {Switch} from '@blueprintjs/core';
 import {RootState, setHighContrastState} from '../../data/store';
 import '../scss/TopHeaderComponent.scss';
-import {Switch} from '@blueprintjs/core';
 
 const TopHeaderComponent: React.FC = () => {
     const dispatch = useDispatch();
