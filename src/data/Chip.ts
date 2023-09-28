@@ -765,8 +765,9 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
         return `${bytes.toFixed(numAfterComma)} B`;
     }
 
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${(bytes / 1024 ** i).toFixed(numAfterComma)} ${sizes[i]}`;
+    const denominationIndex = Math.floor(Math.log(bytes) / Math.log(1024));
+    const fractionDigits = denominationIndex > 1 ? 2 : numAfterComma; // MB and up always requires decimals
+    return `${(bytes / 1024 ** denominationIndex).toFixed(fractionDigits)} ${sizes[denominationIndex]}`;
 };
 
 export const updateOPCycles = (link: LinkStateData, totalOpCycles: number) => {
