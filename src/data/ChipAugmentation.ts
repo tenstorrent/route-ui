@@ -1,4 +1,7 @@
 import { Loc } from './Types';
+import type { OpGraphNode, GraphName, OperationName, OperandName } from './GraphTypes';
+import { OpGraphNodeType } from './GraphTypes';
+import type { ComputeNode } from './Chip';
 
 export class CoreOperationsList extends Array<CoreOperation> {
     constructor(...items: CoreOperation[]) {
@@ -15,15 +18,60 @@ export class CoreOperationsList extends Array<CoreOperation> {
  * Represents the data structure for an operation.
  * matches operation centric data structure
  */
-export class Operation {
+export class Operation implements OpGraphNode {
     /** Name of the operation. */
-    public name: string = '';
+    readonly name: OperationName;
 
-    /** Array of input operand data. */
-    public inputs: Operand[] = [];
+    readonly nodeType = OpGraphNodeType.OPERATION;
 
-    /** Array of output operand data. */
-    public outputs: Operand[] = [];
+    /** Parent reference */
+    readonly graphName: GraphName | null;
+
+    // To be implemented as replacement for inputs/outputs:
+    protected inputOperands: Map<OperandName, Operand>;
+
+    protected outputOperands: Map<OperandName, Operand>;
+
+    protected inputsArray: Operand[];
+
+    protected outputsArray: Operand[];
+
+    /** The cores mapped to this Operation.
+     * Value is currently unused -- will eventually replace usage of convenience maps on Chip object. */
+    protected cores: ComputeNode[];
+
+    constructor(
+        name: string,
+        graphName: string,
+        cores: ComputeNode[],
+        inputOperands: Operand[],
+        outputOperands: Operand[],
+    ) {
+        this.name = name;
+        this.graphName = graphName;
+        this.cores = cores;
+        this.inputsArray = inputOperands;
+        this.outputsArray = outputOperands;
+        // Not sure if there's a good reason to store as a map, but shouldn't cause a performance loss due to memoization on access methods
+        this.inputOperands = new Map(inputOperands.map((operand) => [operand.name, operand]));
+        this.outputOperands = new Map(outputOperands.map((operand) => [operand.name, operand]));
+    }
+
+    /** Array of all input operands */
+    get inputs(): Operand[] {
+        if (!this.inputsArray) {
+            this.inputsArray = [...this.inputOperands.values()];
+        }
+        return this.inputsArray;
+    }
+
+    /** Array of all output operands */
+    get outputs(): Operand[] {
+        if (!this.outputsArray) {
+            this.outputsArray = [...this.outputOperands.values()];
+        }
+        return this.outputsArray;
+    }
 }
 
 /**
@@ -39,16 +87,8 @@ export class CoreOperation extends Operation {
     /** label only */
     logicalCoreId: string = '';
 
-    /** Name of the operation. */
-    opName: string = '';
-
     /** label only */
     opType: string = '';
-}
-
-export enum OperandType {
-    QUEUE = 'queue',
-    OP = 'op',
 }
 
 /**
@@ -56,17 +96,17 @@ export enum OperandType {
  */
 export class Operand {
     /** Name of the operand. */
-    public name: string = '';
+    public name: OperandName;
 
     /** Type of the operand (e.g., QUEUE or OP). */
-    public type: OperandType;
+    public type: OpGraphNodeType;
 
     public pipeIdsByCore: Map<string, string[]> = new Map<string, string[]>();
 
     /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
 
-    constructor(name: string, type: OperandType) {
+    constructor(name: string, type: OpGraphNodeType) {
         this.name = name;
         this.type = type;
     }
@@ -75,7 +115,7 @@ export class Operand {
         return this.pipeIdsByCore.get(coreId) || [];
     }
 
-    public getAllPipeIds(){
+    public getAllPipeIds() {
         return this.pipeIdsByCore.values();
     }
 }

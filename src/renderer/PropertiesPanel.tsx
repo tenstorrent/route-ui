@@ -18,9 +18,10 @@ import {
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import LinkDetails from './components/LinkDetails';
-import { CoreOperation, OperandType } from '../data/ChipAugmentation';
+import { CoreOperation } from '../data/ChipAugmentation';
 
 import { ComputeNodeType } from '../data/Types';
+import { OpGraphNodeType } from '../data/GraphTypes';
 
 export default function PropertiesPanel() {
     const { chip } = useContext(DataSource);
@@ -155,7 +156,7 @@ export default function PropertiesPanel() {
                                                     <ul className='scrollable-content'>
                                                         <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                                             <div key={io.name} style={{ fontSize: '12px' }}>
-                                                                {io.type === OperandType.OP ? (
+                                                                {io.type === OpGraphNodeType.OPERATION ? (
                                                                     <SelectableOperation
                                                                         opName={io.name}
                                                                         value={
@@ -189,7 +190,7 @@ export default function PropertiesPanel() {
                                                     <ul className='scrollable-content'>
                                                         <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                                             <div key={io.name} style={{ fontSize: '12px' }}>
-                                                                {io.type === OperandType.OP ? (
+                                                                {io.type === OpGraphNodeType.OPERATION ? (
                                                                     <SelectableOperation
                                                                         opName={io.name}
                                                                         value={

@@ -7,11 +7,12 @@ import {
     OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { CoreOperation, Operand, OperandType, Operation, OpIoType } from './ChipAugmentation';
+import { CoreOperation, Operand, Operation, OpIoType } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import { Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
+import { OpGraphNodeType } from './GraphTypes';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -283,7 +284,7 @@ export default class Chip {
                 cores: Record<string, CoreOperation>,
                 ioType: OpIoType,
             ) => {
-                const operandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
+                const operandData = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
                 if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
                     augmentedChip.pipesPerOperand.set(operandJSON.name, []);
                 }
@@ -306,15 +307,14 @@ export default class Chip {
                     augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipelist);
                     augmentedChip.pipesPerOp.get(operationName)?.push(...pipelist);
 
-                    const operand = new Operand(operandJSON.name, operandJSON.type as OperandType);
+                    const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
                     operand.pipeIdsByCore.set(coreID, pipelist);
 
                     let core: CoreOperation = cores[coreID];
                     if (!core) {
-                        core = new CoreOperation();
+                        core = new CoreOperation(operationName, '', [], [], []);
                         core.coreID = coreID;
                         core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
-                        core.opName = operationName;
                         cores[coreID] = core;
                     }
                     augmentedChip.coreGroupsPerOperation.get(operationName)?.push(coreID);
@@ -328,17 +328,17 @@ export default class Chip {
             const cores: Record<string, CoreOperation> = {};
 
             augmentedChip.operations = Object.entries(json).map(([operationName, op]) => {
-                const operation = new Operation();
-                operation.name = operationName;
                 augmentedChip.pipesPerOp.set(operationName, []);
                 augmentedChip.coreGroupsPerOperation.set(operationName, []);
-                operation.inputs = op.inputs.map((input) => {
+
+                const inputs = op.inputs.map((input) => {
                     return organizeData(input, operationName, cores, OpIoType.INPUTS);
                 });
-                operation.outputs = op.outputs.map((output) => {
+                const outputs = op.outputs.map((output) => {
                     return organizeData(output, operationName, cores, OpIoType.OUTPUTS);
                 });
-                return operation;
+
+                return new Operation(operationName, '', [], inputs, outputs);
             });
             augmentedChip.cores = Object.values(cores);
             // unique values
@@ -383,11 +383,10 @@ export default class Chip {
             Object.assign(augmentedChip, chip);
 
             augmentedChip.cores = Object.entries(json).map(([uid, core]) => {
-                const coreOp = new CoreOperation();
+                const coreOp = new CoreOperation(core.name, '', [], [], []);
                 coreOp.coreID = uid;
                 coreOp.loc = core.loc;
                 coreOp.logicalCoreId = core.logicalCoreId;
-                coreOp.opName = core.opName;
                 coreOp.opType = core.opType;
                 return coreOp;
             });
