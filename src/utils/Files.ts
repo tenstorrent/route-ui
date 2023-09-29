@@ -1,11 +1,14 @@
-import fs, {Dirent} from 'fs';
+import fs, { Dirent } from 'fs';
 import path from 'path';
 
 export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
     return new Promise<Dirent[]>((resolve, reject) => {
-        fs.readdir(dirPath, {withFileTypes: true}, (err, files) => {
-            if (err) reject(err);
-            else resolve(files);
+        fs.readdir(dirPath, { withFileTypes: true }, (err, files) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(files);
+            }
         });
     });
 };
@@ -13,14 +16,16 @@ export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
 export const findFiles = async (
     searchPath: string,
     searchQuery: string,
-    options?: {isDir?: boolean; maxDepth?: number},
+    options?: { isDir?: boolean; maxDepth?: number },
 ): Promise<string[]> => {
-    const {isDir = false, maxDepth = 0} = options || {};
-    if (maxDepth < 0) throw new Error('maxDepth must be non-negative');
+    const { isDir = false, maxDepth = 0 } = options || {};
+    if (maxDepth < 0) {
+        throw new Error('maxDepth must be non-negative');
+    }
 
     const allEntries = await readDirEntries(searchPath);
     const matches = allEntries.filter(
-        (file) => ((isDir && file.isDirectory()) || (!isDir && file.isFile())) && file.name === searchQuery
+        (file) => ((isDir && file.isDirectory()) || (!isDir && file.isFile())) && file.name === searchQuery,
     );
     if (matches.length > 0) {
         const results = matches.map((dirEntry) => path.join(searchPath, dirEntry.name));
@@ -35,8 +40,8 @@ export const findFiles = async (
             findFiles(path.join(searchPath, dirEntry.name), searchQuery, {
                 isDir,
                 maxDepth: maxDepth - 1,
-            })
-        )
+            }),
+        ),
     );
     return subfolderResults.flat();
 };
@@ -49,8 +54,10 @@ export const validatePerfResultsFolder = async (dirPath: string): Promise<[isVal
         return [false, 'Folder does not exist'];
     }
 
-    const analyzerFolderExists = (await findFiles(dirPath, 'analyzer_results', {isDir: true, maxDepth: 0})).length === 1;
-    const graphFolderExists = (await findFiles(dirPath, 'graph_descriptors', {isDir: true, maxDepth: 0})).length === 1;
+    const analyzerFolderExists =
+        (await findFiles(dirPath, 'analyzer_results', { isDir: true, maxDepth: 0 })).length === 1;
+    const graphFolderExists =
+        (await findFiles(dirPath, 'graph_descriptors', { isDir: true, maxDepth: 0 })).length === 1;
 
     if (analyzerFolderExists && graphFolderExists) {
         return [true, null];

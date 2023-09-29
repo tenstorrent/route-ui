@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Menu, MenuItem} from '@blueprintjs/core';
+import { Menu, MenuItem } from '@blueprintjs/core';
 
 interface GraphPickerProps {
     options: string[];
@@ -8,9 +8,9 @@ interface GraphPickerProps {
     onSelect: (graphId: string) => void;
 }
 
-const GraphPicker = ({options, selected, onSelect}: GraphPickerProps): React.ReactElement => {
+const GraphPicker = ({ options, selected, onSelect }: GraphPickerProps): React.ReactElement => {
     return (
-        <div className="graph-picker">
+        <div className='graph-picker'>
             <h3>Select a graph</h3>
             <Menu>
                 {options.map((item) => (

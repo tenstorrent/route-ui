@@ -9,12 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import {app, BrowserWindow, shell, ipcMain, nativeImage} from 'electron';
-import {autoUpdater} from 'electron-updater';
+import { app, BrowserWindow, shell, ipcMain, nativeImage } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 // import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
-import {resolveHtmlPath} from './util';
+import { resolveHtmlPath } from './util';
 
 class AppUpdater {
     constructor() {
@@ -51,7 +51,7 @@ const installExtensions = async () => {
     return installer
         .default(
             extensions.map((name) => installer[name]),
-            forceDownload
+            forceDownload,
         )
         .catch(console.log);
 };
@@ -61,7 +61,9 @@ const createWindow = async () => {
         await installExtensions();
     }
 
-    const RESOURCES_PATH = app.isPackaged ? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
+    const RESOURCES_PATH = app.isPackaged
+        ? path.join(process.resourcesPath, 'assets')
+        : path.join(__dirname, '../../assets');
 
     const getAssetPath = (...paths: string[]): string => {
         return path.join(RESOURCES_PATH, ...paths);
@@ -116,7 +118,7 @@ const createWindow = async () => {
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
         shell.openExternal(edata.url);
-        return {action: 'deny'};
+        return { action: 'deny' };
     });
 
     // Remove this if your app does not use auto updates
@@ -142,7 +144,9 @@ app.whenReady()
         app.on('activate', () => {
             // On macOS it's common to re-create a window in the app when the
             // dock icon is clicked and there are no other windows open.
-            if (mainWindow === null) createWindow();
+            if (mainWindow === null) {
+                createWindow();
+            }
         });
     })
     .catch(console.log);

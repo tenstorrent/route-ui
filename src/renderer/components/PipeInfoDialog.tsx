@@ -1,10 +1,10 @@
-import React, {FC, useContext, useEffect, useState} from 'react';
-import {Tooltip2} from '@blueprintjs/popover2';
-import {JSX} from 'react/jsx-runtime';
-import {useDispatch} from 'react-redux';
+import React, { FC, useContext, useEffect, useState } from 'react';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { JSX } from 'react/jsx-runtime';
+import { useDispatch } from 'react-redux';
 import DataSource from '../../data/DataSource';
-import {resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection} from '../../data/store';
-import {HighlightType} from '../../data/StateTypes';
+import { resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection } from '../../data/store';
+import { HighlightType } from '../../data/StateTypes';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;
@@ -18,9 +18,9 @@ export interface PipeInfoDialogProps {
  * @constructor
  * @description This wrapper component is used to display information about a pipe when the user hovers over it
  */
-const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
+const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
     const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);
-    const {chip} = useContext(DataSource);
+    const { chip } = useContext(DataSource);
     const [nodeHighlightInputs, setNodeHighlightInputs] = useState<string[]>([]);
     const [nodeHighlightOutputs, setNodeHighlightOutputs] = useState<string[]>([]);
     const dispatch = useDispatch();
@@ -32,7 +32,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
         const computeNodeExtendedData = chip?.getPipeInfo(pipeId);
         if (computeNodeExtendedData) {
             computeNodeExtendedData.forEach((nodeData) => {
-                const {opName, uid} = nodeData;
+                const { opName, uid } = nodeData;
                 if (nodeData.coreOperationData) {
                     nodeData.coreOperationData.inputs.forEach((input) => {
                         let hasPipe = false;
@@ -76,21 +76,21 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                 inputOps.forEach((inputs, opName) => {
                     const io = [...new Set(inputs)];
                     out.push(
-                        <div style={{marginBottom: '10px'}}>
-                            <h3 style={{color: '#fff'}}>Inputs:</h3>
+                        <div style={{ marginBottom: '10px' }}>
+                            <h3 style={{ color: '#fff' }}>Inputs:</h3>
                             <h2>{opName}</h2>
                             {io.length > 0 && (
                                 <div>
                                     {io.map((input) => {
                                         return (
-                                            <h4 key={input} style={{marginLeft: '10px'}}>
+                                            <h4 key={input} style={{ marginLeft: '10px' }}>
                                                 {input}
                                             </h4>
                                         );
                                     })}
                                 </div>
                             )}
-                        </div>
+                        </div>,
                     );
                 });
             }
@@ -98,27 +98,27 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                 outputOps.forEach((outputs, opName) => {
                     const io = [...new Set(outputs)];
                     out.push(
-                        <div style={{marginBottom: '10px'}}>
-                            <h3 style={{color: '#fff'}}>Outputs:</h3>
+                        <div style={{ marginBottom: '10px' }}>
+                            <h3 style={{ color: '#fff' }}>Outputs:</h3>
                             <h2>{opName}</h2>
                             {io.length > 0 && (
                                 <div>
                                     {io.map((ouput) => {
                                         return (
-                                            <h4 key={ouput} style={{marginLeft: '10px'}}>
+                                            <h4 key={ouput} style={{ marginLeft: '10px' }}>
                                                 {ouput}
                                             </h4>
                                         );
                                     })}
                                 </div>
                             )}
-                        </div>
+                        </div>,
                     );
                 });
             }
             dispatch(resetCoreHighlight());
-            dispatch(updateCoreHighlight({ids: inputCores, selected: HighlightType.INPUT}));
-            dispatch(updateCoreHighlight({ids: outputCores, selected: HighlightType.OUTPUT}));
+            dispatch(updateCoreHighlight({ ids: inputCores, selected: HighlightType.INPUT }));
+            dispatch(updateCoreHighlight({ ids: outputCores, selected: HighlightType.OUTPUT }));
 
             setNodeHighlightInputs(inputCores);
             setNodeHighlightOutputs(outputCores);
@@ -131,8 +131,8 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
     const highlightCores = () => {
         dispatch(resetCoreHighlight());
 
-        dispatch(updateCoreHighlight({ids: nodeHighlightInputs, selected: HighlightType.INPUT}));
-        dispatch(updateCoreHighlight({ids: nodeHighlightOutputs, selected: HighlightType.OUTPUT}));
+        dispatch(updateCoreHighlight({ ids: nodeHighlightInputs, selected: HighlightType.INPUT }));
+        dispatch(updateCoreHighlight({ ids: nodeHighlightOutputs, selected: HighlightType.OUTPUT }));
     };
 
     useEffect(() => {
@@ -141,14 +141,11 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
     }, [chip]);
 
     return (
-        <Tooltip2
-            usePortal={false}
-            content={tooltipContent}
-        >
+        <Tooltip2 usePortal={false} content={tooltipContent}>
             <div
-                className="pipe-info-dialog"
+                className='pipe-info-dialog'
                 onMouseLeave={() => {
-                    dispatch(updateFocusPipeSelection({id: pipeId, selected: false}));
+                    dispatch(updateFocusPipeSelection({ id: pipeId, selected: false }));
                     dispatch(resetCoreHighlight());
                 }}
                 onFocus={() => {
@@ -157,7 +154,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                     } else {
                         highlightCores();
                     }
-                    dispatch(updateFocusPipeSelection({id: pipeId, selected: true}));
+                    dispatch(updateFocusPipeSelection({ id: pipeId, selected: true }));
                 }}
                 onMouseEnter={() => {
                     if (!tooltipContent) {
@@ -165,7 +162,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({contents, pipeId}) => {
                     } else {
                         highlightCores();
                     }
-                    dispatch(updateFocusPipeSelection({id: pipeId, selected: true}));
+                    dispatch(updateFocusPipeSelection({ id: pipeId, selected: true }));
                 }}
             >
                 {contents}

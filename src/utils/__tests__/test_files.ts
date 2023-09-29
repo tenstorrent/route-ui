@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import {readDirEntries, findFiles, validatePerfResultsFolder, getAvailableGraphNames} from '../Files';
+import { readDirEntries, findFiles, validatePerfResultsFolder, getAvailableGraphNames } from '../Files';
 
 const generateRandomKey = () => Math.random().toString(36).substring(2);
 
@@ -9,11 +9,11 @@ const testDirPath = path.join(os.tmpdir(), 'route-ui-test', generateRandomKey())
 
 describe('Folder utilities:', () => {
     beforeAll(() => {
-        fs.mkdirSync(testDirPath, {recursive: true});
+        fs.mkdirSync(testDirPath, { recursive: true });
     });
 
     afterAll(() => {
-        fs.rmSync(testDirPath, {recursive: true});
+        fs.rmSync(testDirPath, { recursive: true });
     });
 
     describe('readDirEntries', () => {
@@ -25,7 +25,7 @@ describe('Folder utilities:', () => {
             fs.mkdirSync(path.join(dirPath, 'subdirectory'));
         });
         afterAll(() => {
-            fs.rmSync(dirPath, {recursive: true});
+            fs.rmSync(dirPath, { recursive: true });
         });
         it('returns directory entries when given a path', async () => {
             const expectedNames = ['file_1.json', 'file_2.json', 'subdirectory'];
@@ -49,7 +49,7 @@ describe('Folder utilities:', () => {
             fs.mkdirSync(path.join(dirPath, 'path_A/path_AB/target'));
         });
         afterAll(() => {
-            fs.rmSync(dirPath, {recursive: true});
+            fs.rmSync(dirPath, { recursive: true });
         });
         it('finds a file in a directory and returns its absolute path', async () => {
             const query = 'file_1.json';
@@ -61,14 +61,14 @@ describe('Folder utilities:', () => {
         it('finds a directory two levels deep in a directory and returns its absolute path', async () => {
             const query = 'path_AA';
 
-            const queryResult = await findFiles(dirPath, query, {isDir: true, maxDepth: 1});
+            const queryResult = await findFiles(dirPath, query, { isDir: true, maxDepth: 1 });
 
             expect(queryResult).toEqual([path.join(dirPath, 'path_A', query)]);
         });
         it('finds two matching directories at the same depth and returns their absolute paths', async () => {
             const query = 'target';
 
-            const queryResult = await findFiles(dirPath, query, {isDir: true, maxDepth: 2});
+            const queryResult = await findFiles(dirPath, query, { isDir: true, maxDepth: 2 });
 
             const expectedPaths = [
                 path.join(dirPath, 'path_A/path_AA', query),
@@ -94,7 +94,7 @@ describe('Folder utilities:', () => {
             const perfResultsPath = path.join(testDirPath, 'perf_results');
             beforeAll(() => {
                 if (fs.existsSync(perfResultsPath)) {
-                    fs.rmSync(perfResultsPath, {recursive: true});
+                    fs.rmSync(perfResultsPath, { recursive: true });
                 }
             });
             it('returns false, with an error message', async () => {
@@ -111,7 +111,7 @@ describe('Folder utilities:', () => {
                 fs.mkdirSync(perfResultsPath);
             });
             afterEach(() => {
-                fs.rmSync(perfResultsPath, {recursive: true});
+                fs.rmSync(perfResultsPath, { recursive: true });
             });
             describe('when the folder does not contain required subfolders', () => {
                 it('returns false, with an error message', async () => {
@@ -119,7 +119,7 @@ describe('Folder utilities:', () => {
 
                     expect(isValid).toBe(false);
                     expect(errorMessage).toBe(
-                        'Selected folder is missing required subdirectory: analyzer_folder, graph_descriptors'
+                        'Selected folder is missing required subdirectory: analyzer_folder, graph_descriptors',
                     );
                 });
             });
@@ -144,14 +144,14 @@ describe('Folder utilities:', () => {
         const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptors');
         const graphNames = ['fwd_0', 'fwd_1', 'fwd_2'];
         beforeEach(() => {
-            fs.mkdirSync(graphDescriptorsPath, {recursive: true});
+            fs.mkdirSync(graphDescriptorsPath, { recursive: true });
             graphNames.forEach((graphName) => {
                 fs.mkdirSync(path.join(graphDescriptorsPath, graphName));
                 fs.writeFileSync(path.join(graphDescriptorsPath, graphName, 'graph_descriptor.json'), '');
             });
         });
         afterEach(() => {
-            fs.rmSync(perfResultsPath, {recursive: true});
+            fs.rmSync(perfResultsPath, { recursive: true });
         });
         it('Should list available graphs from a perf_results folder', () => {
             const actualGraphNames = getAvailableGraphNames(perfResultsPath);

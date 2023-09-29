@@ -1,4 +1,4 @@
-import {ComputeNodeTypeArch} from './Types';
+import { ComputeNodeTypeArch } from './Types';
 
 export interface NodeDataJSON {
     location: number[];
@@ -9,7 +9,7 @@ export interface NodeDataJSON {
     op_cycles: number;
     dram_channel?: number;
     dram_subchannel?: number;
-    links: {[key: string]: NOCLinkJSON};
+    links: { [key: string]: NOCLinkJSON };
 }
 
 export interface NetlistAnalyzerDataJSON {
@@ -25,12 +25,12 @@ export interface NOCLinkJSON {
     num_occupants: number;
     total_data_in_bytes: number;
     max_link_bw: number;
-    mapped_pipes: {[key: string]: number};
+    mapped_pipes: { [key: string]: number };
 }
 
 export interface DramChannelJSON {
     channel_id: number;
-    subchannels: [{[key: string]: NOCLinkJSON}];
+    subchannels: [{ [key: string]: NOCLinkJSON }];
     dram_inout: NOCLinkJSON | null;
     dram0_inout: NOCLinkJSON | null;
     dram1_inout: NOCLinkJSON | null;
@@ -45,19 +45,19 @@ export interface OperationDataJSON {
 export interface OperandJSON {
     name: string;
     type: string;
-    pipes: {[key: string]: string[]};
+    pipes: { [key: string]: string[] };
 }
 
 export interface OperandDataJSON {
     name: string;
     type: string;
-    pipes?: {[key: string]: string[]};
+    pipes?: { [key: string]: string[] };
     bw?: number;
 }
 
 export interface ChipDesignJSON {
     arch_name: ComputeNodeTypeArch;
-    grid: {x_size: number; y_size: number};
+    grid: { x_size: number; y_size: number };
     arc: string[];
     dram: [string[]];
     eth: string[];

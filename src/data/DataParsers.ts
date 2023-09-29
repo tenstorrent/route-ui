@@ -1,8 +1,9 @@
+/* eslint-disable import/prefer-default-export */
 export const parseOpDataFormat = (json: JSON): {} => {
     const result = {};
     const fileds = ['logical-core-id', 'op-name', 'op-type', 'output-ops', 'output-queues'];
     Object.entries(json).forEach(([id, obj]) => {
-        const o = {inputs: []};
+        const o = { inputs: [] };
         fileds.forEach((field) => {
             o[field] = obj[field];
         });
@@ -13,7 +14,7 @@ export const parseOpDataFormat = (json: JSON): {} => {
             .filter((key) => inputKeysPattern.test(key))
             .map((key) => obj[key]);
         inputValuesArray.forEach((input) => {
-            const inputData = {name: '', type: ''};
+            const inputData = { name: '', type: '' };
             inputData.name = input;
             if (obj['input-queues'].includes(input)) {
                 inputData.type = 'que';

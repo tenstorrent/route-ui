@@ -1,9 +1,17 @@
-import {ChipDesignJSON, DramChannelJSON, NetlistAnalyzerDataJSON, NOCLinkJSON, NodeDataJSON, OperandJSON, OperationDataJSON} from './JSONDataTypes';
-import {CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation} from './ChipAugmentation';
+import {
+    ChipDesignJSON,
+    DramChannelJSON,
+    NetlistAnalyzerDataJSON,
+    NOCLinkJSON,
+    NodeDataJSON,
+    OperandJSON,
+    OperationDataJSON,
+} from './JSONDataTypes';
+import { CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
-import {ComputeNodeState, LinkStateData, PipeSelection} from './StateTypes';
-import {Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC} from './Types';
-import {INTERNAL_LINK_NAMES, NOC_LINK_NAMES} from './constants';
+import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
+import { Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC } from './Types';
+import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -13,7 +21,7 @@ export default class Chip {
             Chip.NOC_ORDER = new Map(
                 Object.keys(LinkName)
                     .map((key) => LinkName[key])
-                    .map((noc, index) => [noc, index])
+                    .map((noc, index) => [noc, index]),
             );
         }
 
@@ -251,7 +259,7 @@ export default class Chip {
 
         chip.nodes = data.nodes
             .map((nodeJSON) => {
-                const loc: Loc = {x: nodeJSON.location[1], y: nodeJSON.location[0]};
+                const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
                 chip.totalCols = Math.max(loc.y, chip.totalCols);
                 chip.totalRows = Math.max(loc.x, chip.totalRows);
                 const node = new ComputeNode(`${chip.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
@@ -279,7 +287,12 @@ export default class Chip {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
 
-            const organizeData = (operandJSON: OperandJSON, operationName: string, cores: Record<string, CoreOperation>, ioType: OpIoType) => {
+            const organizeData = (
+                operandJSON: OperandJSON,
+                operationName: string,
+                cores: Record<string, CoreOperation>,
+                ioType: OpIoType,
+            ) => {
                 const operandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
                 if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
                     augmentedChip.pipesPerOperand.set(operandJSON.name, []);
@@ -310,7 +323,7 @@ export default class Chip {
                     if (!core) {
                         core = new CoreOperation();
                         core.coreID = coreID;
-                        core.loc = {x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10)};
+                        core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         core.opName = operationName;
                         cores[coreID] = core;
                     }
@@ -431,7 +444,7 @@ export default class Chip {
         this.nodes.forEach((node) => {
             node.links.forEach((link) => {
                 const pipes = link.pipes.map((pipe) => {
-                    return {id: pipe.id, selected: false};
+                    return { id: pipe.id, selected: false };
                 });
                 allPipes.push(...pipes);
             });
@@ -440,9 +453,9 @@ export default class Chip {
         return Array.from(
             new Set(
                 allPipes.map((pipeSelection) => {
-                    return {id: pipeSelection.id, selected: false};
-                })
-            )
+                    return { id: pipeSelection.id, selected: false };
+                }),
+            ),
         );
     }
 
@@ -505,7 +518,7 @@ export default class Chip {
                 list.push(...link.pipes);
             });
         });
-        const uniquePipeObj: {[key: string]: Pipe} = {};
+        const uniquePipeObj: { [key: string]: Pipe } = {};
         for (let i = 0; i < list.length; i++) {
             uniquePipeObj[list[i].id] = list[i];
         }
@@ -536,9 +549,15 @@ export class DramChannel {
             this.subchannels = json.subchannels.map((subchannel, i) => {
                 return new DramSubchannel(i, id, subchannel);
             });
-            if (json.dram_inout) this.links.push(new DramLink(DramName.DRAM_INOUT, `${id}-${DramName.DRAM_INOUT}`, json.dram_inout));
-            if (json.dram0_inout) this.links.push(new DramLink(DramName.DRAM0_INOUT, `${id}-${DramName.DRAM0_INOUT}`, json.dram0_inout));
-            if (json.dram1_inout) this.links.push(new DramLink(DramName.DRAM1_INOUT, `${id}-${DramName.DRAM1_INOUT}`, json.dram1_inout));
+            if (json.dram_inout) {
+                this.links.push(new DramLink(DramName.DRAM_INOUT, `${id}-${DramName.DRAM_INOUT}`, json.dram_inout));
+            }
+            if (json.dram0_inout) {
+                this.links.push(new DramLink(DramName.DRAM0_INOUT, `${id}-${DramName.DRAM0_INOUT}`, json.dram0_inout));
+            }
+            if (json.dram1_inout) {
+                this.links.push(new DramLink(DramName.DRAM1_INOUT, `${id}-${DramName.DRAM1_INOUT}`, json.dram1_inout));
+            }
         }
     }
 }
@@ -548,7 +567,7 @@ export class DramSubchannel {
 
     public links: DramLink[] = [];
 
-    constructor(subchannelId: number, channelId: number, json: {[key: string]: NOCLinkJSON}) {
+    constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(new DramLink(key as DramName, `${channelId}-${subchannelId}-${key}`, value));
@@ -577,7 +596,9 @@ export class GenericNOCLink {
         this.totalDataBytes = json.total_data_in_bytes;
         this.maxBandwidth = json.max_link_bw;
         this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
-        this.pipes = Object.entries(json.mapped_pipes).map(([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes));
+        this.pipes = Object.entries(json.mapped_pipes).map(
+            ([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes),
+        );
     }
 }
 
@@ -620,7 +641,7 @@ export class ComputeNode {
 
     public type: ComputeNodeType = ComputeNodeType.NONE;
 
-    public loc: Loc = {x: 0, y: 0};
+    public loc: Loc = { x: 0, y: 0 };
 
     public opName: string = '';
 
@@ -654,12 +675,17 @@ export class ComputeNode {
             this.dramChannel = json.dram_channel;
             this.dramSubchannel = json.dram_subchannel || 0;
         }
-        this.loc = {x: json.location[0], y: json.location[1]};
+        this.loc = { x: json.location[0], y: json.location[1] };
         this.uid = `${chipId}-${this.loc.y}-${this.loc.x}`;
 
         const linkId = `${this.loc.x}-${this.loc.y}`;
 
-        this.links = new Map(Object.entries(json.links).map(([link, linkJson], index) => [link, new NOCLink(link as LinkName, `${linkId}-${index}`, linkJson)]));
+        this.links = new Map(
+            Object.entries(json.links).map(([link, linkJson], index) => [
+                link,
+                new NOCLink(link as LinkName, `${linkId}-${index}`, linkJson),
+            ]),
+        );
     }
 
     public getLinksForNode = (): NOCLink[] => {
@@ -739,7 +765,7 @@ export class ComputeNodeExtended extends ComputeNode {
 export class Pipe {
     id: string = '';
 
-    location: Loc = {x: 0, y: 0};
+    location: Loc = { x: 0, y: 0 };
 
     bandwidth: number = 0;
 
