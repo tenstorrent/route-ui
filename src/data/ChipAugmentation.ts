@@ -68,7 +68,9 @@ export class Operand {
     public type: OperandType;
 
     /** Array of pipe operation data. */
-    public pipeOperations: PipeOperation[] = [];
+    // public pipeOperations: PipeOperation[] = [];
+
+    public pipes: Map<string, string[]> = new Map<string, string[]>();
 
     /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
@@ -77,45 +79,49 @@ export class Operand {
         this.name = name;
         this.type = type;
     }
-}
 
-/**
- * Pipe to core to operand relationship
- */
-export class PipeOperation {
-    /**
-     * A static method to create a PipeOperationData instance from a JSON structure.
-     * @param {string} key - The key in the JSON.
-     * @param {string[]} pipeList - The list of pipes.
-     * @returns {PipeOperation} - An instance of PipeOperationData.
-     */
-    static fromOpsJSON(key: string, pipeList: string[]) {
-        const loc = key.split('-');
-        return new PipeOperation(
-            key,
-            { x: parseInt(loc[1], 10), y: parseInt(loc[2], 10) },
-            parseInt(loc[0], 10),
-            pipeList,
-        );
-    }
-
-    public readonly coreID: string;
-
-    /** Identifier for the chip. Specific to multichip */
-    public readonly chipId: number;
-
-    public readonly loc: Loc;
-
-    /** Array of pipe ids. */
-    public readonly pipeIDs: string[];
-
-    constructor(coreID: string, loc: Loc, chipId: number, pipes: string[]) {
-        this.coreID = coreID;
-        this.loc = loc;
-        this.chipId = chipId;
-        this.pipeIDs = pipes.map((pipe) => pipe.toString());
+    public getPipesForCore(coreId: string): string[] {
+        return this.pipes.get(coreId) || [];
     }
 }
+
+// /**
+//  * Pipe to core to operand relationship
+//  */
+// export class PipeOperation {
+//     /**
+//      * A static method to create a PipeOperationData instance from a JSON structure.
+//      * @param {string} key - The key in the JSON.
+//      * @param {string[]} pipeList - The list of pipes.
+//      * @returns {PipeOperation} - An instance of PipeOperationData.
+//      */
+//     static fromOpsJSON(key: string, pipeList: string[]) {
+//         const loc = key.split('-');
+//         return new PipeOperation(
+//             key,
+//             { x: parseInt(loc[1], 10), y: parseInt(loc[2], 10) },
+//             parseInt(loc[0], 10),
+//             pipeList,
+//         );
+//     }
+//
+//     public readonly coreID: string;
+//
+//     /** Identifier for the chip. Specific to multichip */
+//     public readonly chipId: number;
+//
+//     public readonly loc: Loc;
+//
+//     /** Array of pipe ids. */
+//     public readonly pipeIDs: string[];
+//
+//     constructor(coreID: string, loc: Loc, chipId: number, pipes: string[]) {
+//         this.coreID = coreID;
+//         this.loc = loc;
+//         this.chipId = chipId;
+//         this.pipeIDs = pipes.map((pipe) => pipe.toString());
+//     }
+// }
 
 export enum OpIoType {
     INPUTS = 'inputs',

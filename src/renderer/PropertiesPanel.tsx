@@ -171,18 +171,14 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.pipeOperations.map((pipe) => {
-                                                                        return pipe.pipeIDs.map((pipeID) => {
-                                                                            return (
-                                                                                <li>
-                                                                                    <SelectablePipe
-                                                                                        pipe={new Pipe(pipeID, 0)}
-                                                                                        pipeFilter=''
-                                                                                    />
-                                                                                </li>
-                                                                            );
-                                                                        });
-                                                                    })}
+                                                                    {io.getPipesForCore(coreData.coreID).map((pipe) => (
+                                                                        <li>
+                                                                            <SelectablePipe
+                                                                                pipe={new Pipe(pipe, 0)}
+                                                                                pipeFilter=''
+                                                                            />
+                                                                        </li>
+                                                                    ))}
                                                                 </ul>
                                                             </div>
                                                         </Tooltip2>
@@ -209,18 +205,14 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.pipeOperations.map((pipe) => {
-                                                                        return pipe.pipeIDs.map((pipeID) => {
-                                                                            return (
-                                                                                <li>
-                                                                                    <SelectablePipe
-                                                                                        pipe={new Pipe(pipeID, 0)}
-                                                                                        pipeFilter=''
-                                                                                    />
-                                                                                </li>
-                                                                            );
-                                                                        });
-                                                                    })}
+                                                                    {io.getPipesForCore(coreData.coreID).map((pipe) => (
+                                                                        <li>
+                                                                            <SelectablePipe
+                                                                                pipe={new Pipe(pipe, 0)}
+                                                                                pipeFilter=''
+                                                                            />
+                                                                        </li>
+                                                                    ))}
                                                                 </ul>
                                                             </div>
                                                         </Tooltip2>

@@ -20,7 +20,7 @@ export default function App() {
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            <DataSource.Provider value={memoizedChip}>
+            <DataSource.Provider value={{ chip }}>
                 <Router>
                     <Routes>
                         <Route path='/' element={<SplashScreen updateData={setChip} />} />

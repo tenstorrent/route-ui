@@ -161,15 +161,15 @@ export default class Chip {
         this._pipesPerOp = value;
     }
 
-    private _pipesPerCore: Map<string, string[]> = new Map<string, string[]>();
-
-    public get pipesPerCore(): Map<string, string[]> {
-        return this._pipesPerCore;
-    }
-
-    protected set pipesPerCore(value: Map<string, string[]>) {
-        this._pipesPerCore = value;
-    }
+    // private _pipesPerCore: Map<string, string[]> = new Map<string, string[]>();
+    //
+    // public get pipesPerCore(): Map<string, string[]> {
+    //     return this._pipesPerCore;
+    // }
+    //
+    // protected set pipesPerCore(value: Map<string, string[]>) {
+    //     this._pipesPerCore = value;
+    // }
 
     private _pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
 
@@ -300,7 +300,10 @@ export default class Chip {
                 if (!augmentedChip.coreGroupsPerOperand.has(operandJSON.name)) {
                     augmentedChip.coreGroupsPerOperand.set(operandJSON.name, []);
                 }
-                Object.entries(operandJSON.pipes).forEach(([coreID, value]) => {
+                Object.entries(operandJSON.pipes).forEach(([coreID, pipelist]) => {
+                    console.log('operandJSON.pipes');
+                    console.log(operandJSON.pipes);
+
                     if (!augmentedChip.operationsByCore.has(coreID)) {
                         augmentedChip.operationsByCore.set(coreID, []);
                     }
@@ -311,13 +314,15 @@ export default class Chip {
                     }
                     augmentedChip.operandsByCore.get(coreID)?.push(operandJSON.name);
 
-                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...value);
-                    augmentedChip.pipesPerOp.get(operationName)?.push(...value);
+                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipelist);
+                    augmentedChip.pipesPerOp.get(operationName)?.push(...pipelist);
 
-                    operandData.pipeOperations.push(PipeOperation.fromOpsJSON(coreID, value));
-                    const coreOperandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
-                    const pipeOperation = PipeOperation.fromOpsJSON(coreID, value);
-                    coreOperandData.pipeOperations.push(pipeOperation);
+                    // operandData.pipeOperations.push(PipeOperation.fromOpsJSON(coreID, pipelist));
+                    const operand = new Operand(operandJSON.name, operandJSON.type as OperandType);
+                    operand.pipes.set(coreID, pipelist);
+
+                    // const pipeOperation = PipeOperation.fromOpsJSON(coreID, pipelist);
+                    // coreOperandData.pipeOperations.push(pipeOperation);
 
                     let core: CoreOperation = cores[coreID];
                     if (!core) {
@@ -329,15 +334,15 @@ export default class Chip {
                     }
                     augmentedChip.coreGroupsPerOperation.get(operationName)?.push(coreID);
 
-                    if (!augmentedChip.pipesPerCore.has(coreID)) {
-                        augmentedChip.pipesPerCore.set(coreID, []);
-                    }
-
-                    augmentedChip.pipesPerCore.get(coreID)?.push(...pipeOperation.pipeIDs);
+                    // if (!augmentedChip.pipesPerCore.has(coreID)) {
+                    //     augmentedChip.pipesPerCore.set(coreID, []);
+                    // }
+                    //
+                    // augmentedChip.pipesPerCore.get(coreID)?.push(...pipeOperation.pipeIDs);
                     augmentedChip.coreGroupsPerOperand.get(operandJSON.name)?.push(coreID);
 
                     // @ts-ignore
-                    core[ioType].push(coreOperandData);
+                    core[ioType].push(operand);
                 });
                 return operandData;
             };
@@ -361,9 +366,9 @@ export default class Chip {
             augmentedChip.pipesPerOperand.forEach((value, key) => {
                 augmentedChip.pipesPerOperand.set(key, [...new Set(value)]);
             });
-            augmentedChip.pipesPerCore.forEach((value, key) => {
-                augmentedChip.pipesPerCore.set(key, [...new Set(value)]);
-            });
+            // augmentedChip.pipesPerCore.forEach((value, key) => {
+            //     augmentedChip.pipesPerCore.set(key, [...new Set(value)]);
+            // });
             augmentedChip.pipesPerOp.forEach((value, key) => {
                 augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
             });
