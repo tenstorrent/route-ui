@@ -13,7 +13,7 @@ import {
     RootState,
     selectGroup,
     updateNodeSelection,
-    updatePipeSelection
+    updatePipeSelection,
 } from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
@@ -100,28 +100,28 @@ export default function PropertiesPanel() {
     };
 
     return (
-        <div className="properties-panel">
-            <Tabs id="my-tabs" selectedTabId={selectedTab} onChange={handleTabChange} className="properties-tabs">
+        <div className='properties-panel'>
+            <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={handleTabChange} className='properties-tabs'>
                 <Tab
-                    id="tab1"
-                    title="Compute Node"
+                    id='tab1'
+                    title='Compute Node'
                     panel={
                         <>
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
-                            <div className="properties-panel-nodes">
+                            <div className='properties-panel-nodes'>
                                 {selectedNodes.map((node: ComputeNode) => {
                                     const coreData = chip?.cores.find(
-                                        (core: CoreOperation) => core.coreID === node.uid
+                                        (core: CoreOperation) => core.coreID === node.uid,
                                     );
                                     return (
-                                        <div className="node-element" key={node.uid}>
+                                        <div className='node-element' key={node.uid}>
                                             <h3
                                                 className={`node-type node-type-${node.getNodeLabel()} ${
                                                     node.uid === uid && isOpen ? 'detailed-view' : ''
                                                 }`}
                                             >
                                                 {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
-                                                <Tooltip2 content="Close ComputeNode">
+                                                <Tooltip2 content='Close ComputeNode'>
                                                     <Button
                                                         small
                                                         icon={IconNames.CROSS}
@@ -138,21 +138,21 @@ export default function PropertiesPanel() {
                                                 </p>
                                             ) : null}
                                             {node.opName !== '' && (
-                                                <div className="opname">
+                                                <div className='opname'>
                                                     <Tooltip2 content={node.opName} position={PopoverPosition.LEFT}>
                                                         <SelectableOperation
                                                             opName={node.opName}
                                                             value={nodeSelectionState.groups[node.opName].selected}
                                                             selectFunc={selectOperationGroup}
-                                                            stringFilter=""
+                                                            stringFilter=''
                                                         />
                                                     </Tooltip2>
                                                 </div>
                                             )}
-                                            <div className="opname">
-                                                {coreData?.inputs.length && <h4 className="io-label">Inputs:</h4>}
+                                            <div className='opname'>
+                                                {coreData?.inputs.length && <h4 className='io-label'>Inputs:</h4>}
                                                 {coreData?.inputs.map((io) => (
-                                                    <ul className="scrollable-content">
+                                                    <ul className='scrollable-content'>
                                                         <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                                             <div key={io.name} style={{ fontSize: '12px' }}>
                                                                 {io.type === OperandType.OP ? (
@@ -162,22 +162,22 @@ export default function PropertiesPanel() {
                                                                             nodeSelectionState.groups[io.name]?.selected
                                                                         }
                                                                         selectFunc={selectOperationGroup}
-                                                                        stringFilter=""
+                                                                        stringFilter=''
                                                                     />
                                                                 ) : (
-                                                                    <div className="op-element">
+                                                                    <div className='op-element'>
                                                                         <Checkbox checked={false} disabled />
                                                                         <span>{io.name}</span>
                                                                     </div>
                                                                 )}
-                                                                <ul className="scrollable-content">
+                                                                <ul className='scrollable-content'>
                                                                     {io.pipeOperations.map((pipe) => {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
                                                                                     <SelectablePipe
                                                                                         pipe={new Pipe(pipeID, 0)}
-                                                                                        pipeFilter=""
+                                                                                        pipeFilter=''
                                                                                     />
                                                                                 </li>
                                                                             );
@@ -188,9 +188,9 @@ export default function PropertiesPanel() {
                                                         </Tooltip2>
                                                     </ul>
                                                 ))}
-                                                {coreData?.outputs.length && <h4 className="io-label">Outputs:</h4>}
+                                                {coreData?.outputs.length && <h4 className='io-label'>Outputs:</h4>}
                                                 {coreData?.outputs.map((io) => (
-                                                    <ul className="scrollable-content">
+                                                    <ul className='scrollable-content'>
                                                         <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                                             <div key={io.name} style={{ fontSize: '12px' }}>
                                                                 {io.type === OperandType.OP ? (
@@ -200,22 +200,22 @@ export default function PropertiesPanel() {
                                                                             nodeSelectionState.groups[io.name]?.selected
                                                                         }
                                                                         selectFunc={selectOperationGroup}
-                                                                        stringFilter=""
+                                                                        stringFilter=''
                                                                     />
                                                                 ) : (
-                                                                    <div className="op-element">
+                                                                    <div className='op-element'>
                                                                         <Checkbox checked={false} disabled />
                                                                         <span>{io.name}</span>
                                                                     </div>
                                                                 )}
-                                                                <ul className="scrollable-content">
+                                                                <ul className='scrollable-content'>
                                                                     {io.pipeOperations.map((pipe) => {
                                                                         return pipe.pipeIDs.map((pipeID) => {
                                                                             return (
                                                                                 <li>
                                                                                     <SelectablePipe
                                                                                         pipe={new Pipe(pipeID, 0)}
-                                                                                        pipeFilter=""
+                                                                                        pipeFilter=''
                                                                                     />
                                                                                 </li>
                                                                             );
@@ -227,7 +227,7 @@ export default function PropertiesPanel() {
                                                     </ul>
                                                 ))}
                                             </div>
-                                            <div className="node-controls">
+                                            <div className='node-controls'>
                                                 {node.type === ComputeNodeType.DRAM && (
                                                     <Button
                                                         small
@@ -264,7 +264,7 @@ export default function PropertiesPanel() {
                                                 </Button>
                                             </div>
 
-                                            <div className="node-links-wrap">
+                                            <div className='node-links-wrap'>
                                                 <h4>Links</h4>
                                                 {node.getLinksForNode().map((link: NOCLink) => (
                                                     <LinkDetails key={link.name} link={link} showEmpty />
@@ -279,11 +279,11 @@ export default function PropertiesPanel() {
                 />
 
                 <Tab
-                    id="tab2"
-                    title="All pipes"
+                    id='tab2'
+                    title='All pipes'
                     panel={
-                        <div className="pipe-renderer-panel">
-                            <div className="search-field">
+                        <div className='pipe-renderer-panel'>
+                            <div className='search-field'>
                                 <InputGroup
                                     rightElement={
                                         pipeFilter ? (
@@ -298,21 +298,21 @@ export default function PropertiesPanel() {
                                             <Icon icon={IconNames.SEARCH} />
                                         )
                                     }
-                                    placeholder=""
+                                    placeholder=''
                                     value={pipeFilter}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}
                                 />
-                                <Tooltip2 content="Select all filtered pipes" position={PopoverPosition.RIGHT}>
+                                <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT}>
                                     <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
                                 </Tooltip2>
-                                <Tooltip2 content="Deselect all pipes" position={PopoverPosition.RIGHT}>
+                                <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT}>
                                     <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
                                 </Tooltip2>
                             </div>
-                            <div className="properties-panel__content">
-                                <div className="pipelist-wrap list-wrap">
+                            <div className='properties-panel__content'>
+                                <div className='pipelist-wrap list-wrap'>
                                     {chip && (
-                                        <ul className="scrollable-content">
+                                        <ul className='scrollable-content'>
                                             {chip.allUniquePipes.map((pipe) => (
                                                 <FilterableComponent
                                                     key={pipe.id}
@@ -334,11 +334,11 @@ export default function PropertiesPanel() {
                 />
 
                 <Tab
-                    id="tab3"
-                    title="Operations"
+                    id='tab3'
+                    title='Operations'
                     panel={
                         <div>
-                            <div className="search-field">
+                            <div className='search-field'>
                                 <InputGroup
                                     rightElement={
                                         opsFilter ? (
@@ -353,22 +353,22 @@ export default function PropertiesPanel() {
                                             <Icon icon={IconNames.SEARCH} />
                                         )
                                     }
-                                    placeholder=""
+                                    placeholder=''
                                     value={opsFilter}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}
                                 />
-                                <Tooltip2 content="Select all filtered operations" position={PopoverPosition.RIGHT}>
+                                <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT}>
                                     <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                                 </Tooltip2>
-                                <Tooltip2 content="Deselect all operations" position={PopoverPosition.RIGHT}>
+                                <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT}>
                                     <Button
                                         icon={IconNames.CUBE_REMOVE}
                                         onClick={() => dispatch(clearAllOperations())}
                                     />
                                 </Tooltip2>
                             </div>
-                            <div className="operations-wrap list-wrap">
-                                <div className="scrollable-content">
+                            <div className='operations-wrap list-wrap'>
+                                <div className='scrollable-content'>
                                     {operationsList.map((operationName) => {
                                         const operation = chip?.operations.find((o) => o.name === operationName);
 
@@ -386,19 +386,23 @@ export default function PropertiesPanel() {
                                                             stringFilter={opsFilter}
                                                         />
                                                         {operation && (
-                                                            <div className="operation-details"
-                                                                 style={{ color: '#000', marginLeft: '20px' }}>
-                                                                {operation.inputs.length > 0 &&
-                                                                    <h5 className="io-label">Inputs:</h5>}
+                                                            <div
+                                                                className='operation-details'
+                                                                style={{ color: '#000', marginLeft: '20px' }}
+                                                            >
+                                                                {operation.inputs.length > 0 && (
+                                                                    <h5 className='io-label'>Inputs:</h5>
+                                                                )}
                                                                 {operation.inputs.map((io) => (
-                                                                    <div className="operation-input" key={io.name}>
+                                                                    <div className='operation-input' key={io.name}>
                                                                         <p>{io.name}</p>
                                                                     </div>
                                                                 ))}
-                                                                {operation.outputs.length > 0 &&
-                                                                    <h5 className="io-label">Outputs:</h5>}
+                                                                {operation.outputs.length > 0 && (
+                                                                    <h5 className='io-label'>Outputs:</h5>
+                                                                )}
                                                                 {operation.outputs.map((io) => (
-                                                                    <div className="operation-input" key={io.name}>
+                                                                    <div className='operation-input' key={io.name}>
                                                                         <p>{io.name}</p>
                                                                     </div>
                                                                 ))}
