@@ -209,17 +209,19 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                                 <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
                                         return node.getInternalLinksForNode().map((link: NOCLink) => {
-                                            return <LinkDetails key={link.name} link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
+                                            return <LinkDetails key={link.name} link={link}
+                                                                index={nodeList.length > 1 ? index : -1}
+                                                                showEmpty={false} />;
                                         });
                                     })}
-                                    {dram.subchannels
-                                        .map((sub) => sub.links)
-                                        .map((links) =>
-                                            links.map((link) => (
-                                                //
-                                                <LinkDetails key={link.name} link={link} showEmpty={false} />
-                                            ))
-                                        )}
+                                    {dram.subchannels.map((sub) =>
+                                        sub.links.map((link) => (
+                                            //
+                                            <LinkDetails key={link.name}
+                                                         index={nodeList.length > 1 ? sub.subchannelId : -1} link={link}
+                                                         showEmpty={false} />
+                                        ))
+                                    )}
                                     {dram.links.map((link) => (
                                         //
                                         <LinkDetails key={link.name} link={link} showEmpty={false} />

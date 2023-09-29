@@ -328,32 +328,35 @@ export default function PropertiesPanel() {
                             </div>
                             <div className="operations-wrap list-wrap">
                                 <div className="scrollable-content">
-                                    {operationsList.map((op) => {
-                                        const operationData = chip?.operations.find((o) => o.name === op);
+                                    {operationsList.map((operationName) => {
+                                        const operation = chip?.operations.find((o) => o.name === operationName);
 
                                         return (
                                             <FilterableComponent
-                                                key={op}
-                                                filterableString={op}
+                                                key={operationName}
+                                                filterableString={operationName}
                                                 filterQuery={opsFilter}
                                                 component={
                                                     <>
                                                         <SelectableOperation
-                                                            opName={op}
-                                                            value={nodeSelectionState.groups[op].selected}
+                                                            opName={operationName}
+                                                            value={nodeSelectionState.groups[operationName].selected}
                                                             selectFunc={selectOperationGroup}
                                                             stringFilter={opsFilter}
                                                         />
-                                                        {operationData && (
-                                                            <div className="operation-details" style={{color: '#000', marginLeft: '20px'}}>
-                                                                {operationData.inputs.length > 0 && <h5 className="io-label">Inputs:</h5>}
-                                                                {operationData.inputs.map((io) => (
+                                                        {operation && (
+                                                            <div className="operation-details"
+                                                                 style={{ color: '#000', marginLeft: '20px' }}>
+                                                                {operation.inputs.length > 0 &&
+                                                                    <h5 className="io-label">Inputs:</h5>}
+                                                                {operation.inputs.map((io) => (
                                                                     <div className="operation-input" key={io.name}>
                                                                         <p>{io.name}</p>
                                                                     </div>
                                                                 ))}
-                                                                {operationData.outputs.length > 0 && <h5 className="io-label">Outputs:</h5>}
-                                                                {operationData.outputs.map((io) => (
+                                                                {operation.outputs.length > 0 &&
+                                                                    <h5 className="io-label">Outputs:</h5>}
+                                                                {operation.outputs.map((io) => (
                                                                     <div className="operation-input" key={io.name}>
                                                                         <p>{io.name}</p>
                                                                     </div>

@@ -39,6 +39,7 @@ export enum DramName {
     NOC_OUT = 'noc_out',
     NOC0_NOC2AXI = 'noc0_noc2axi',
     NOC1_NOC2AXI = 'noc1_noc2axi',
+
     DRAM_INOUT = 'dram_inout',
     DRAM0_INOUT = 'dram0_inout',
     DRAM1_INOUT = 'dram1_inout',
