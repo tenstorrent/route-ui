@@ -171,10 +171,10 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.getPipesForCore(coreData.coreID).map((pipe) => (
+                                                                    {io.getPipeIdsForCore(coreData.coreID).map((pipeId) => (
                                                                         <li>
                                                                             <SelectablePipe
-                                                                                pipe={new Pipe(pipe, 0)}
+                                                                                pipe={new Pipe(pipeId, 0)}
                                                                                 pipeFilter=''
                                                                             />
                                                                         </li>
@@ -205,10 +205,10 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.getPipesForCore(coreData.coreID).map((pipe) => (
+                                                                    {io.getPipeIdsForCore(coreData.coreID).map((pipeId) => (
                                                                         <li>
                                                                             <SelectablePipe
-                                                                                pipe={new Pipe(pipe, 0)}
+                                                                                pipe={new Pipe(pipeId, 0)}
                                                                                 pipeFilter=''
                                                                             />
                                                                         </li>

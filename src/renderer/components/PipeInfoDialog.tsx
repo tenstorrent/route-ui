@@ -31,16 +31,13 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
         const outputOps: Map<string, string[]> = new Map<string, []>();
         const computeNodeExtendedData = chip?.getPipeInfo(pipeId);
         if (computeNodeExtendedData) {
-            // console.log(computeNodeExtendedData);
             computeNodeExtendedData.forEach((nodeData) => {
                 const { opName, uid } = nodeData;
                 if (nodeData.coreOperationData) {
-                    console.log(nodeData.coreOperationData);
                     nodeData.coreOperationData.inputs.forEach((input) => {
                         let hasPipe = false;
-                        console.log([...input.pipes.values()]);
-                        [...input.pipes.values()].forEach((pipes) => {
-                            if (pipes.includes(pipeId)) {
+                        [...input.getAllPipeIds()].forEach((pipeIds) => {
+                            if (pipeIds.includes(pipeId)) {
                                 hasPipe = true;
                             }
                         });
@@ -54,8 +51,8 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
                     });
                     nodeData.coreOperationData.outputs.forEach((output) => {
                         let hasPipe = false;
-                        [...output.pipes.values()].forEach((pipes) => {
-                            if (pipes.includes(pipeId)) {
+                        [...output.getAllPipeIds()].forEach((pipeIds) => {
+                            if (pipeIds.includes(pipeId)) {
                                 hasPipe = true;
                             }
                         });
@@ -69,8 +66,6 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
                     });
                 }
             });
-        } else {
-            console.log('no extended data');
         }
 
         inputCores = [...new Set(inputCores)];
