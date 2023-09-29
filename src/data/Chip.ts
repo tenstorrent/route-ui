@@ -312,7 +312,7 @@ export default class Chip {
 
                     let core: CoreOperation = cores[coreID];
                     if (!core) {
-                        core = new CoreOperation(operationName, '', [], [], []);
+                        core = new CoreOperation(operationName, [], []);
                         core.coreID = coreID;
                         core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         cores[coreID] = core;
@@ -338,7 +338,7 @@ export default class Chip {
                     return organizeData(output, operationName, cores, OpIoType.OUTPUTS);
                 });
 
-                return new Operation(operationName, '', [], inputs, outputs);
+                return new Operation(operationName, inputs, outputs);
             });
             augmentedChip.cores = Object.values(cores);
             // unique values
@@ -383,7 +383,7 @@ export default class Chip {
             Object.assign(augmentedChip, chip);
 
             augmentedChip.cores = Object.entries(json).map(([uid, core]) => {
-                const coreOp = new CoreOperation(core.name, '', [], [], []);
+                const coreOp = new CoreOperation(core.name, [], []);
                 coreOp.coreID = uid;
                 coreOp.loc = core.loc;
                 coreOp.logicalCoreId = core.logicalCoreId;

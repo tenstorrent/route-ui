@@ -1,7 +1,6 @@
 import { Loc } from './Types';
-import type { OpGraphNode, GraphName, OperationName, OperandName } from './GraphTypes';
+import type { OpGraphNode, OperationName, OperandName } from './GraphTypes';
 import { OpGraphNodeType } from './GraphTypes';
-import type { ComputeNode } from './Chip';
 
 export class CoreOperationsList extends Array<CoreOperation> {
     constructor(...items: CoreOperation[]) {
@@ -24,9 +23,6 @@ export class Operation implements OpGraphNode {
 
     readonly nodeType = OpGraphNodeType.OPERATION;
 
-    /** Parent reference */
-    readonly graphName: GraphName | null;
-
     // To be implemented as replacement for inputs/outputs:
     protected inputOperands: Map<OperandName, Operand>;
 
@@ -36,20 +32,8 @@ export class Operation implements OpGraphNode {
 
     protected outputsArray: Operand[];
 
-    /** The cores mapped to this Operation.
-     * Value is currently unused -- will eventually replace usage of convenience maps on Chip object. */
-    protected cores: ComputeNode[];
-
-    constructor(
-        name: string,
-        graphName: string,
-        cores: ComputeNode[],
-        inputOperands: Operand[],
-        outputOperands: Operand[],
-    ) {
+    constructor(name: string, inputOperands: Operand[], outputOperands: Operand[]) {
         this.name = name;
-        this.graphName = graphName;
-        this.cores = cores;
         this.inputsArray = inputOperands;
         this.outputsArray = outputOperands;
         // Not sure if there's a good reason to store as a map, but shouldn't cause a performance loss due to memoization on access methods

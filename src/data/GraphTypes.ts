@@ -1,5 +1,3 @@
-export type GraphName = string;
-
 export type OperationName = string;
 export type QueueName = string;
 export type OpGraphNodeId = OperationName | QueueName
