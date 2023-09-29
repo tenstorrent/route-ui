@@ -7,7 +7,7 @@ import {
     openDetailedView,
     RootState,
     updateNodeSelection,
-    updatePipeSelection,
+    updatePipeSelection
 } from '../../data/store';
 import DataSource, { GridContext } from '../../data/DataSource';
 import { ComputeNode, DramChannel, NOCLink } from '../../data/Chip';
@@ -53,15 +53,15 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false}>
             <Card
-                className='detailed-view-card'
+                className="detailed-view-card"
                 style={{
                     bottom: '10px',
                     left: '10px',
                     zIndex: 100,
-                    zoom,
+                    zoom
                 }}
             >
-                <div className='detailed-view-header'>
+                <div className="detailed-view-header">
                     {node && (
                         <h3>
                             {node.type} {node.loc.x},{node.loc.y}
@@ -72,11 +72,11 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                 <div className={`detailed-view-wrap arch-${architecture} type-${node?.type}`}>
                     {node?.type === ComputeNodeType.DRAM && dram && (
                         <>
-                            <div className='detailed-view-chip dram'>
-                                <div className='dram-subchannels'>
+                            <div className="detailed-view-chip dram">
+                                <div className="dram-subchannels">
                                     {dram?.subchannels.map((subchannel) => {
                                         const currentNode = nodeList.find(
-                                            (n) => n.dramSubchannel === subchannel.subchannelId,
+                                            (n) => n.dramSubchannel === subchannel.subchannelId
                                         );
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
@@ -95,7 +95,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                 } subchannel`}
                                             >
                                                 {dram?.subchannels.length > 1 && (
-                                                    <h3 className='subchannel-name'>
+                                                    <h3 className="subchannel-name">
                                                         {currentNode && (
                                                             <Button
                                                                 style={{ marginRight: '5px' }}
@@ -106,8 +106,8 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                                     dispatch(
                                                                         updateNodeSelection({
                                                                             id: currentNode.uid,
-                                                                            selected: true,
-                                                                        }),
+                                                                            selected: true
+                                                                        })
                                                                     );
                                                                     dispatch(openDetailedView(currentNode.uid));
                                                                 }}
@@ -117,36 +117,36 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                         {currentNode?.loc.y}]
                                                     </h3>
                                                 )}
-                                                <div className='controls-wrap'>
+                                                <div className="controls-wrap">
                                                     <Button
-                                                        className='pipe-selection'
+                                                        className="pipe-selection"
                                                         small
                                                         icon={IconNames.FILTER_LIST}
                                                         disabled={numPipes === 0}
                                                         onClick={() =>
                                                             changePipeState(
                                                                 currentNode?.getInternalPipeIDsForNode() || [],
-                                                                true,
+                                                                true
                                                             )
                                                         }
                                                     />
                                                     <Button
-                                                        className='pipe-selection'
+                                                        className="pipe-selection"
                                                         small
                                                         icon={IconNames.FILTER_REMOVE}
                                                         disabled={numPipes === 0}
                                                         onClick={() =>
                                                             changePipeState(
                                                                 currentNode?.getInternalPipeIDsForNode() || [],
-                                                                false,
+                                                                false
                                                             )
                                                         }
                                                     />
                                                 </div>
-                                                <div className='dram-subchannel'>
-                                                    <div className='noc noc0'>
-                                                        <div className=' router'>
-                                                            <p className='label'>
+                                                <div className="dram-subchannel">
+                                                    <div className="noc noc0">
+                                                        <div className=" router">
+                                                            <p className="label">
                                                                 NOC0
                                                                 <br />
                                                                 Router
@@ -157,21 +157,21 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
                                                         />
-                                                        <div className='noc2axi'>
-                                                            <p className='label'>NOC2AXI</p>
+                                                        <div className="noc2axi">
+                                                            <p className="label">NOC2AXI</p>
                                                         </div>
                                                         <PipeRenderer
-                                                            className='centered-svg'
+                                                            className="centered-svg"
                                                             links={subchannel.links.filter(
-                                                                (link) => link.noc === NOC.NOC0,
+                                                                (link) => link.noc === NOC.NOC0
                                                             )}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
                                                         />
                                                     </div>
-                                                    <div className='noc noc1'>
-                                                        <div className='router'>
-                                                            <p className='label'>
+                                                    <div className="noc noc1">
+                                                        <div className="router">
+                                                            <p className="label">
                                                                 NOC1
                                                                 <br />
                                                                 Router
@@ -182,13 +182,13 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
                                                         />
-                                                        <div className='noc2axi'>
-                                                            <p className='label'>NOC2AXI</p>
+                                                        <div className="noc2axi">
+                                                            <p className="label">NOC2AXI</p>
                                                         </div>
                                                         <PipeRenderer
-                                                            className='centered-svg'
+                                                            className="centered-svg"
                                                             links={subchannel.links.filter(
-                                                                (link) => link.noc === NOC.NOC1,
+                                                                (link) => link.noc === NOC.NOC1
                                                             )}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
@@ -199,59 +199,59 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         );
                                     })}
                                 </div>
-                                <div className='axi'>
-                                    <p className='label'>AXI</p>
+                                <div className="axi">
+                                    <p className="label">AXI</p>
                                     {architecture === Architecture.WORMHOLE && <>6:2 XBAR</>}
                                     {architecture === Architecture.GRAYSKULL && <>2:1 XBAR</>}
                                 </div>
-                                <div className='off-chip'>
+                                <div className="off-chip">
                                     {architecture === Architecture.WORMHOLE && (
                                         <>
-                                            <div className='axi-dram-wrap'>
+                                            <div className="axi-dram-wrap">
                                                 <PipeRenderer
-                                                    className='centered-svg'
+                                                    className="centered-svg"
                                                     links={dram.links.filter(
-                                                        (link) => link.name === DramName.DRAM0_INOUT,
+                                                        (link) => link.name === DramName.DRAM0_INOUT
                                                     )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
                                                 />
-                                                <div className='axi-dram'>
-                                                    <p className='label'>AXI DRAM0</p>
+                                                <div className="axi-dram">
+                                                    <p className="label">AXI DRAM0</p>
                                                 </div>
                                             </div>
-                                            <div className='axi-dram-wrap'>
+                                            <div className="axi-dram-wrap">
                                                 <PipeRenderer
-                                                    className='centered-svg'
+                                                    className="centered-svg"
                                                     links={dram.links.filter(
-                                                        (link) => link.name === DramName.DRAM1_INOUT,
+                                                        (link) => link.name === DramName.DRAM1_INOUT
                                                     )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
                                                 />
-                                                <div className='axi-dram'>
-                                                    <p className='label'>AXI DRAM1</p>
+                                                <div className="axi-dram">
+                                                    <p className="label">AXI DRAM1</p>
                                                 </div>
                                             </div>
                                         </>
                                     )}
                                     {architecture === Architecture.GRAYSKULL && (
-                                        <div className='axi-dram-wrap'>
+                                        <div className="axi-dram-wrap">
                                             <PipeRenderer
-                                                className='centered-svg'
+                                                className="centered-svg"
                                                 links={dram.links.filter((link) => link.name === DramName.DRAM_INOUT)}
                                                 showLinkSaturation={showLinkSaturation}
                                                 linkSaturationTreshold={linkSaturationTreshold}
                                             />
-                                            <div className='axi-dram'>
-                                                <p className='label'>Off-chip DRAM</p>
+                                            <div className="axi-dram">
+                                                <p className="label">Off-chip DRAM</p>
                                             </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            <div className='detailed-view-data'>
-                                <div className='node-links-wrap'>
+                            <div className="detailed-view-data">
+                                <div className="node-links-wrap">
                                     {nodeList.map((n, index) => {
                                         return node.getInternalLinksForNode().map((link: NOCLink) => {
                                             return <LinkDetails key={link.name} link={link}
