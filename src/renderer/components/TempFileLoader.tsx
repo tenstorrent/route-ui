@@ -83,7 +83,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                             const chipDesign = Chip.CREATE_FROM_CHIP_DESIGN(parsedFile);
 
                             updateData(chipDesign);
-                            dispatch(loadNodesData(chipDesign.getAllNodes()));
+                            dispatch(loadNodesData(chipDesign.nodes.map((node) => node.generateInitialState())));
                             dispatch(setArchitecture(chipDesign.architecture));
                         }
                         if (filename.includes('analyzer_output_temporal_epoch')) {
@@ -92,9 +92,20 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                             dispatch(closeDetailedView());
                             dispatch(setArchitecture(localGridData.architecture));
                             dispatch(loadedFilename(filename));
-                            dispatch(loadPipeSelection(localGridData.getAllPipeIds()));
-                            dispatch(loadNodesData(localGridData.getAllNodes()));
-                            dispatch(loadLinkData(localGridData.getAllLinks()));
+                            dispatch(loadPipeSelection(localGridData.generateInitialPipesSelectionState()));
+                            dispatch(
+                                //
+                                loadNodesData(
+                                    //
+                                    localGridData.nodes.map((node) => node.generateInitialState()),
+                                ),
+                            );
+                            dispatch(
+                                loadLinkData(
+                                    //
+                                    localGridData.getAllLinks().map((link) => link.getInitalLinkState()),
+                                ),
+                            );
                             dispatch(updateTotalOPs(localGridData.totalOpCycles));
                         }
 

@@ -397,37 +397,10 @@ export default class Chip {
         throw new Error('Chip is null');
     }
 
-    getAllNodes(): ComputeNodeState[] {
-        return this.nodes.map((node) => {
-            return {
-                id: node.uid,
-                selected: false,
-                loc: node.loc,
-                opName: node.opName,
-                dramChannel: node.dramChannel,
-                dramSubchannel: node.dramSubchannel,
-            } as ComputeNodeState;
+    generateInitialPipesSelectionState(): PipeSelection[] {
+        return this.allUniquePipes.map((pipe) => {
+            return { id: pipe.id, selected: false } as PipeSelection;
         });
-    }
-
-    getAllPipeIds(): PipeSelection[] {
-        const allPipes: PipeSelection[] = [];
-        this.nodes.forEach((node) => {
-            node.links.forEach((link) => {
-                const pipes = link.pipes.map((pipe) => {
-                    return { id: pipe.id, selected: false };
-                });
-                allPipes.push(...pipes);
-            });
-        });
-
-        return Array.from(
-            new Set(
-                allPipes.map((pipeSelection) => {
-                    return { id: pipeSelection.id, selected: false };
-                }),
-            ),
-        );
     }
 
     getPipeInfo(pipeId: string): ComputeNodeExtended[] {
@@ -448,7 +421,7 @@ export default class Chip {
         return list;
     }
 
-    getAllLinks(): LinkStateData[] {
+    getAllLinks(): GenericNOCLink[] {
         const links: GenericNOCLink[] = [];
         this.nodes.forEach((node) => {
             node.links.forEach((link) => {
@@ -465,14 +438,7 @@ export default class Chip {
                 });
             });
         });
-
-        return links.map((link) => ({
-            id: link.uid,
-            totalDataBytes: link.totalDataBytes,
-            bpc: 0,
-            saturation: 0,
-            maxBandwidth: link.maxBandwidth,
-        }));
+        return links;
     }
 
     get allUniquePipes(): Pipe[] {
@@ -547,19 +513,19 @@ export class DramSubchannel {
 }
 
 export class GenericNOCLink {
-    public uid: string;
+    readonly uid: string;
 
     public name?: string;
 
-    public numOccupants: number = 0;
+    readonly numOccupants: number = 0;
 
-    public totalDataBytes: number = 0;
+    readonly totalDataBytes: number = 0;
 
-    public maxBandwidth: number = 0;
+    readonly maxBandwidth: number = 0;
 
     public pipes: Pipe[] = [];
 
-    public noc: NOC;
+    readonly noc: NOC;
 
     constructor(name: string, uid: string, json: NOCLinkJSON) {
         this.uid = uid;
@@ -570,6 +536,16 @@ export class GenericNOCLink {
         this.pipes = Object.entries(json.mapped_pipes).map(
             ([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes),
         );
+    }
+
+    getInitalLinkState(): LinkStateData {
+        return {
+            id: this.uid,
+            totalDataBytes: this.totalDataBytes,
+            bpc: 0,
+            saturation: 0,
+            maxBandwidth: this.maxBandwidth,
+        } as LinkStateData;
     }
 }
 
@@ -657,6 +633,17 @@ export class ComputeNode {
                 new NOCLink(link as LinkName, `${linkId}-${index}`, linkJson),
             ]),
         );
+    }
+
+    public generateInitialState(): ComputeNodeState {
+        return {
+            id: this.uid,
+            selected: false,
+            loc: this.loc,
+            opName: this.opName,
+            dramChannel: this.dramChannel,
+            dramSubchannel: this.dramSubchannel,
+        } as ComputeNodeState;
     }
 
     public getLinksForNode = (): NOCLink[] => {
