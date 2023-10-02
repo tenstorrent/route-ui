@@ -34,34 +34,24 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
             computeNodeExtendedData.forEach((nodeData) => {
                 const { opName, uid } = nodeData;
                 if (nodeData.coreOperationData) {
-                    nodeData.coreOperationData.inputs.forEach((input) => {
-                        let hasPipe = false;
-                        [...input.getAllPipeIds()].forEach((pipeIds) => {
-                            if (pipeIds.includes(pipeId)) {
-                                hasPipe = true;
-                            }
-                        });
+                    nodeData.coreOperationData.inputs.forEach((operand) => {
+                        const hasPipe = [...operand.getAllPipeIds()].some((pipeIds) => pipeIds.includes(pipeId));
                         if (hasPipe) {
                             if (!outputOps.has(opName)) {
                                 outputOps.set(opName, []);
                             }
                             outputCores.push(uid);
-                            outputOps.get(opName)?.push(input.name);
+                            outputOps.get(opName)?.push(operand.name);
                         }
                     });
-                    nodeData.coreOperationData.outputs.forEach((output) => {
-                        let hasPipe = false;
-                        [...output.getAllPipeIds()].forEach((pipeIds) => {
-                            if (pipeIds.includes(pipeId)) {
-                                hasPipe = true;
-                            }
-                        });
+                    nodeData.coreOperationData.outputs.forEach((operand) => {
+                        const hasPipe = [...operand.getAllPipeIds()].some((pipeIds) => pipeIds.includes(pipeId));
                         if (hasPipe) {
                             if (!inputOps.has(opName)) {
                                 inputOps.set(opName, []);
                             }
                             inputCores.push(uid);
-                            inputOps.get(opName)?.push(output.name);
+                            inputOps.get(opName)?.push(operand.name);
                         }
                     });
                 }
