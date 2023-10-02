@@ -23,38 +23,24 @@ export class Operation implements OpGraphNode {
 
     readonly nodeType = OpGraphNodeType.OPERATION;
 
-    // To be implemented as replacement for inputs/outputs:
-    protected inputOperands: Map<OperandName, Operand>;
+    protected inputOperands: Operand[];
 
-    protected outputOperands: Map<OperandName, Operand>;
-
-    protected inputsArray: Operand[];
-
-    protected outputsArray: Operand[];
+    protected outputOperands: Operand[];
 
     constructor(name: string, inputOperands: Operand[], outputOperands: Operand[]) {
         this.name = name;
-        this.inputsArray = inputOperands;
-        this.outputsArray = outputOperands;
-        // Not sure if there's a good reason to store as a map, but shouldn't cause a performance loss due to memoization on access methods
-        this.inputOperands = new Map(inputOperands.map((operand) => [operand.name, operand]));
-        this.outputOperands = new Map(outputOperands.map((operand) => [operand.name, operand]));
+        this.inputOperands = inputOperands;
+        this.outputOperands = outputOperands;
     }
 
-    /** Array of all input operands */
+    /** All input operands */
     get inputs(): Operand[] {
-        if (!this.inputsArray) {
-            this.inputsArray = [...this.inputOperands.values()];
-        }
-        return this.inputsArray;
+        return this.inputOperands;
     }
 
-    /** Array of all output operands */
+    /** All output operands */
     get outputs(): Operand[] {
-        if (!this.outputsArray) {
-            this.outputsArray = [...this.outputOperands.values()];
-        }
-        return this.outputsArray;
+        return this.outputOperands;
     }
 }
 
