@@ -12,7 +12,6 @@ import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import { Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import { loadPipeSelection, setArchitecture } from './store';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -611,13 +610,6 @@ export class ComputeNode {
         this.uid = uid;
     }
 
-    resetState(dispatch: Dispatch) {
-        dispatch(setArchitecture(this.architecture));
-        dispatch(loadPipeSelection(this.generateInitialPipesSelectionState());
-        dispatch(loadNodesData(this.nodes.map((node) => node.generateInitialState())));
-        dispatch(loadLinkData(this.getAllLinks().map((link) => link.getInitalLinkState())));
-        dispatch(updateTotalOPs(this.totalOpCycles));
-    }
 
 
     public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
