@@ -65,7 +65,7 @@ const FileLoader: FC<FileLoaderProps> = ({ updateData }) => {
                         dispatch(loadedFilename(filename));
                         dispatch(loadPipeSelection(chip.generateInitialPipesSelectionState()));
                         dispatch(loadNodesData(chip.nodes.map((node) => node.generateInitialState())));
-                        dispatch(loadLinkData(chip.getAllLinks().map((link) => link.getInitalLinkState())));
+                        dispatch(loadLinkData(chip.getAllLinks().map((link) => link.generateInitialState())));
                         dispatch(updateTotalOPs(chip.totalOpCycles));
 
                         navigate('/render');

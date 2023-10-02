@@ -103,7 +103,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                             dispatch(
                                 loadLinkData(
                                     //
-                                    localGridData.getAllLinks().map((link) => link.getInitalLinkState()),
+                                    localGridData.getAllLinks().map((link) => link.generateInitialState()),
                                 ),
                             );
                             dispatch(updateTotalOPs(localGridData.totalOpCycles));

@@ -7,11 +7,12 @@ import {
     OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { CoreOperation, Operand, OperandType, Operation, OpIoType, PipeOperation } from './ChipAugmentation';
+import { CoreOperation, Operand, OperandType, Operation, OpIoType } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import { Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
+import { loadPipeSelection, setArchitecture } from './store';
 
 export default class Chip {
     private static NOC_ORDER: Map<LinkName, number>;
@@ -397,7 +398,7 @@ export default class Chip {
         throw new Error('Chip is null');
     }
 
-    generateInitialPipesSelectionState(): PipeSelection[] {
+    public generateInitialPipesSelectionState(): PipeSelection[] {
         return this.allUniquePipes.map((pipe) => {
             return { id: pipe.id, selected: false } as PipeSelection;
         });
@@ -538,7 +539,7 @@ export class GenericNOCLink {
         );
     }
 
-    getInitalLinkState(): LinkStateData {
+    public generateInitialState(): LinkStateData {
         return {
             id: this.uid,
             totalDataBytes: this.totalDataBytes,
@@ -609,6 +610,15 @@ export class ComputeNode {
     constructor(uid: string) {
         this.uid = uid;
     }
+
+    resetState(dispatch: Dispatch) {
+        dispatch(setArchitecture(this.architecture));
+        dispatch(loadPipeSelection(this.generateInitialPipesSelectionState());
+        dispatch(loadNodesData(this.nodes.map((node) => node.generateInitialState())));
+        dispatch(loadLinkData(this.getAllLinks().map((link) => link.getInitalLinkState())));
+        dispatch(updateTotalOPs(this.totalOpCycles));
+    }
+
 
     public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
         // this.uid = uid;
