@@ -161,16 +161,6 @@ export default class Chip {
         this._pipesPerOp = value;
     }
 
-    private _pipesPerCore: Map<string, string[]> = new Map<string, string[]>();
-
-    public get pipesPerCore(): Map<string, string[]> {
-        return this._pipesPerCore;
-    }
-
-    protected set pipesPerCore(value: Map<string, string[]>) {
-        this._pipesPerCore = value;
-    }
-
     private _pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
 
     /**
@@ -300,7 +290,9 @@ export default class Chip {
                 if (!augmentedChip.coreGroupsPerOperand.has(operandJSON.name)) {
                     augmentedChip.coreGroupsPerOperand.set(operandJSON.name, []);
                 }
-                Object.entries(operandJSON.pipes).forEach(([coreID, value]) => {
+                Object.entries(operandJSON.pipes).forEach(([coreID, pipes]) => {
+                    const pipelist: string[] = pipes.map((el) => el.toString());
+
                     if (!augmentedChip.operationsByCore.has(coreID)) {
                         augmentedChip.operationsByCore.set(coreID, []);
                     }
@@ -311,13 +303,11 @@ export default class Chip {
                     }
                     augmentedChip.operandsByCore.get(coreID)?.push(operandJSON.name);
 
-                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...value);
-                    augmentedChip.pipesPerOp.get(operationName)?.push(...value);
+                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipelist);
+                    augmentedChip.pipesPerOp.get(operationName)?.push(...pipelist);
 
-                    operandData.pipeOperations.push(PipeOperation.fromOpsJSON(coreID, value));
-                    const coreOperandData = new Operand(operandJSON.name, operandJSON.type as OperandType);
-                    const pipeOperation = PipeOperation.fromOpsJSON(coreID, value);
-                    coreOperandData.pipeOperations.push(pipeOperation);
+                    const operand = new Operand(operandJSON.name, operandJSON.type as OperandType);
+                    operand.pipeIdsByCore.set(coreID, pipelist);
 
                     let core: CoreOperation = cores[coreID];
                     if (!core) {
@@ -328,16 +318,10 @@ export default class Chip {
                         cores[coreID] = core;
                     }
                     augmentedChip.coreGroupsPerOperation.get(operationName)?.push(coreID);
-
-                    if (!augmentedChip.pipesPerCore.has(coreID)) {
-                        augmentedChip.pipesPerCore.set(coreID, []);
-                    }
-
-                    augmentedChip.pipesPerCore.get(coreID)?.push(...pipeOperation.pipeIDs);
                     augmentedChip.coreGroupsPerOperand.get(operandJSON.name)?.push(coreID);
 
                     // @ts-ignore
-                    core[ioType].push(coreOperandData);
+                    core[ioType].push(operand);
                 });
                 return operandData;
             };
@@ -361,9 +345,6 @@ export default class Chip {
             augmentedChip.pipesPerOperand.forEach((value, key) => {
                 augmentedChip.pipesPerOperand.set(key, [...new Set(value)]);
             });
-            augmentedChip.pipesPerCore.forEach((value, key) => {
-                augmentedChip.pipesPerCore.set(key, [...new Set(value)]);
-            });
             augmentedChip.pipesPerOp.forEach((value, key) => {
                 augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
             });
@@ -373,16 +354,6 @@ export default class Chip {
             augmentedChip.coreGroupsPerOperand.forEach((value, key) => {
                 augmentedChip.coreGroupsPerOperand.set(key, [...new Set(value)]);
             });
-
-            // augmentedChip.operations = chipAugmentation.operations;
-            // augmentedChip.cores = chipAugmentation.cores;
-            // augmentedChip.pipesPerOp = chipAugmentation.pipesPerOp;
-            // augmentedChip.pipesPerOperand = chipAugmentation.pipesPerOperand;
-            // augmentedChip.pipesPerCore = chipAugmentation.pipesPerCore;
-            // augmentedChip.coreGroupsPerOperation = chipAugmentation.coreGroupsPerOperation;
-            // augmentedChip.coreGroupsPerOperand = chipAugmentation.coreGroupsPerOperand;
-            // augmentedChip.operationsByCore = chipAugmentation.operationsByCore;
-            // augmentedChip.operandsByCore = chipAugmentation.operandsByCore;
 
             return augmentedChip;
         }
