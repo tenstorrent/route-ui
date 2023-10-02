@@ -1,4 +1,6 @@
 import { Loc } from './Types';
+import type { OpGraphNode, OperationName, OperandName } from './GraphTypes';
+import { OpGraphNodeType } from './GraphTypes';
 
 export class CoreOperationsList extends Array<CoreOperation> {
     constructor(...items: CoreOperation[]) {
@@ -15,15 +17,31 @@ export class CoreOperationsList extends Array<CoreOperation> {
  * Represents the data structure for an operation.
  * matches operation centric data structure
  */
-export class Operation {
+export class Operation implements OpGraphNode {
     /** Name of the operation. */
-    public name: string = '';
+    readonly name: OperationName;
 
-    /** Array of input operand data. */
-    public inputs: Operand[] = [];
+    readonly nodeType = OpGraphNodeType.OPERATION;
 
-    /** Array of output operand data. */
-    public outputs: Operand[] = [];
+    protected inputOperands: Operand[];
+
+    protected outputOperands: Operand[];
+
+    constructor(name: string, inputOperands: Operand[], outputOperands: Operand[]) {
+        this.name = name;
+        this.inputOperands = inputOperands;
+        this.outputOperands = outputOperands;
+    }
+
+    /** All input operands */
+    get inputs(): Operand[] {
+        return this.inputOperands;
+    }
+
+    /** All output operands */
+    get outputs(): Operand[] {
+        return this.outputOperands;
+    }
 }
 
 /**
@@ -39,16 +57,8 @@ export class CoreOperation extends Operation {
     /** label only */
     logicalCoreId: string = '';
 
-    /** Name of the operation. */
-    opName: string = '';
-
     /** label only */
     opType: string = '';
-}
-
-export enum OperandType {
-    QUEUE = 'queue',
-    OP = 'op',
 }
 
 /**
@@ -56,17 +66,17 @@ export enum OperandType {
  */
 export class Operand {
     /** Name of the operand. */
-    public name: string = '';
+    public name: OperandName;
 
     /** Type of the operand (e.g., QUEUE or OP). */
-    public type: OperandType;
+    public type: OpGraphNodeType;
 
     public pipeIdsByCore: Map<string, string[]> = new Map<string, string[]>();
 
     /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
 
-    constructor(name: string, type: OperandType) {
+    constructor(name: string, type: OpGraphNodeType) {
         this.name = name;
         this.type = type;
     }
@@ -75,7 +85,7 @@ export class Operand {
         return this.pipeIdsByCore.get(coreId) || [];
     }
 
-    public getAllPipeIds(){
+    public getAllPipeIds() {
         return this.pipeIdsByCore.values();
     }
 }
