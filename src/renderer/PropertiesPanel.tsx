@@ -21,7 +21,37 @@ import LinkDetails from './components/LinkDetails';
 import { CoreOperation } from '../data/ChipAugmentation';
 
 import { ComputeNodeType } from '../data/Types';
-import { OpGraphNodeType } from '../data/GraphTypes';
+import { Operation, OpGraphNodeType } from '../data/GraphTypes';
+
+function OperationDetails(props: { operation: Operation }) {
+    const { operation } = props;
+    const inputs = [...operation.inputs];
+    const outputs = [...operation.outputs];
+
+    return (
+        <div
+            className='operation-details'
+            style={{ color: '#000', marginLeft: '20px' }}
+        >
+            {inputs.length > 0 && (
+                <h5 className='io-label'>Inputs:</h5>
+            )}
+            {inputs.map((io) => (
+                <div className='operation-input' key={io.name}>
+                    <p>{io.name}</p>
+                </div>
+            ))}
+            {outputs.length > 0 && (
+                <h5 className='io-label'>Outputs:</h5>
+            )}
+            {outputs.map((io) => (
+                <div className='operation-input' key={io.name}>
+                    <p>{io.name}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
 
 export default function PropertiesPanel() {
     const { chip } = useContext(DataSource);
@@ -172,14 +202,16 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.getPipeIdsForCore(coreData.coreID).map((pipeId) => (
-                                                                        <li>
-                                                                            <SelectablePipe
-                                                                                pipe={new Pipe(pipeId, 0)}
-                                                                                pipeFilter=''
-                                                                            />
-                                                                        </li>
-                                                                    ))}
+                                                                    {io
+                                                                        .getPipeIdsForCore(coreData.coreID)
+                                                                        .map((pipeId) => (
+                                                                            <li>
+                                                                                <SelectablePipe
+                                                                                    pipe={new Pipe(pipeId, 0)}
+                                                                                    pipeFilter=''
+                                                                                />
+                                                                            </li>
+                                                                        ))}
                                                                 </ul>
                                                             </div>
                                                         </Tooltip2>
@@ -206,14 +238,16 @@ export default function PropertiesPanel() {
                                                                     </div>
                                                                 )}
                                                                 <ul className='scrollable-content'>
-                                                                    {io.getPipeIdsForCore(coreData.coreID).map((pipeId) => (
-                                                                        <li>
-                                                                            <SelectablePipe
-                                                                                pipe={new Pipe(pipeId, 0)}
-                                                                                pipeFilter=''
-                                                                            />
-                                                                        </li>
-                                                                    ))}
+                                                                    {io
+                                                                        .getPipeIdsForCore(coreData.coreID)
+                                                                        .map((pipeId) => (
+                                                                            <li>
+                                                                                <SelectablePipe
+                                                                                    pipe={new Pipe(pipeId, 0)}
+                                                                                    pipeFilter=''
+                                                                                />
+                                                                            </li>
+                                                                        ))}
                                                                 </ul>
                                                             </div>
                                                         </Tooltip2>
@@ -378,29 +412,7 @@ export default function PropertiesPanel() {
                                                             selectFunc={selectOperationGroup}
                                                             stringFilter={opsFilter}
                                                         />
-                                                        {operation && (
-                                                            <div
-                                                                className='operation-details'
-                                                                style={{ color: '#000', marginLeft: '20px' }}
-                                                            >
-                                                                {operation.inputs.length > 0 && (
-                                                                    <h5 className='io-label'>Inputs:</h5>
-                                                                )}
-                                                                {operation.inputs.map((io) => (
-                                                                    <div className='operation-input' key={io.name}>
-                                                                        <p>{io.name}</p>
-                                                                    </div>
-                                                                ))}
-                                                                {operation.outputs.length > 0 && (
-                                                                    <h5 className='io-label'>Outputs:</h5>
-                                                                )}
-                                                                {operation.outputs.map((io) => (
-                                                                    <div className='operation-input' key={io.name}>
-                                                                        <p>{io.name}</p>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
+                                                        {operation && <OperationDetails operation={operation} />}
                                                     </>
                                                 }
                                             />

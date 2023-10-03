@@ -7,7 +7,7 @@ import {
     OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { CoreOperation, Operand, Operation, OpIoType } from './ChipAugmentation';
+import { CoreOperation, Operand, OperationBuilder, OpIoType } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import {
@@ -22,7 +22,7 @@ import {
     NOCLinkName
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import { OperationName, OpGraphNodeType } from './GraphTypes';
+import type { Operation, OperationName, OpGraphNodeType } from './GraphTypes';
 import { reduceIterable } from "../utils/IterableHelpers";
 
 export default class Chip {
@@ -132,7 +132,7 @@ export default class Chip {
         this._totalOpCycles = value;
     }
 
-    // augmented data
+    private operationsByName: Map<OperationName, Operation>;
 
     /**
      * Iterates over all operations.
@@ -148,8 +148,6 @@ export default class Chip {
             (opMap, currentOp) => opMap.set(currentOp.name, currentOp),
         );
     }
-
-    private operationsByName: Map<OperationName, Operation>;
 
     public getOperation(name: OperationName) {
         return this.operationsByName.get(name);
@@ -213,8 +211,10 @@ export default class Chip {
                 const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
                 chip.totalCols = Math.max(loc.y, chip.totalCols);
                 chip.totalRows = Math.max(loc.x, chip.totalRows);
-                const node = new ComputeNode(`${chip.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
-                node.fromNetlistJSON(nodeJSON, chip.chipId);
+                const node = ComputeNode.fromNetlistJSON(nodeJSON, chip.chipId, (name: OperationName) => chip.getOperation(name));
+                if (node.operation) {
+                    chip.addOperation(node.operation);
+                }
                 return node;
             })
             .sort((a, b) => {
@@ -260,7 +260,7 @@ export default class Chip {
 
                     let coreOp: CoreOperation = coreOps[coreID];
                     if (!coreOp) {
-                        coreOp = new CoreOperation(operationName, [], []);
+                        coreOp = new CoreOperation(operationName, [], [], []);
                         coreOp.coreID = coreID;
                         coreOp.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         coreOps[coreID] = coreOp;
@@ -276,7 +276,9 @@ export default class Chip {
             };
             const cores: Record<string, CoreOperation> = {};
 
-            augmentedChip.operations = Object.entries(operationsJson).map(([operationName, opJson]) => {
+            let errors: Error[] = [];
+
+            Object.entries(operationsJson).map(([operationName, opJson]) => {
                 augmentedChip.pipesPerOp.set(operationName, []);
 
                 const inputs = opJson.inputs.map((input) => {
@@ -286,7 +288,16 @@ export default class Chip {
                     return organizeData(output, operationName, cores, OpIoType.OUTPUTS);
                 });
 
-                return new Operation(operationName, inputs, outputs);
+                let operation = augmentedChip.operationsByName.get(operationName);
+                if (!operation) {
+                    operation = new OperationBuilder(operationName, [], inputs, outputs);
+                    errors.push(
+                        new Error(
+                            `Operation ${operationName} was found in the file but is not present in existing data; no core mapping available.`,
+                        ),
+                    );
+                }
+                return operation;
             });
             augmentedChip.coreOps = Object.values(cores);
             // unique values
@@ -325,7 +336,7 @@ export default class Chip {
             Object.assign(augmentedChip, chip);
 
             augmentedChip.coreOps = Object.entries(json).map(([uid, core]) => {
-                const coreOp = new CoreOperation(core.name, [], []);
+                const coreOp = new CoreOperation(core.name, [], [], []);
                 coreOp.coreID = uid;
                 coreOp.loc = core.loc;
                 coreOp.logicalCoreId = core.logicalCoreId;
@@ -564,8 +575,61 @@ export class DramBankLink extends NetworkLink {
 }
 
 export class ComputeNode {
-    static fromNetlistJSON(nodeJSON: NodeDataJSON) {
-        return new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+    /** Creates a ComputeNode from a Node JSON object in a Netlist Analyzer output file.
+     *
+     * The constructed object will include a reference to an Operation, if an operation is
+     * specified in the JSON file.
+     *   - A new operation will be created if `getOperation` does not return a match for the operation name
+     *   - The referenced operation will gain a back-reference to the new core
+     *
+     */
+    static fromNetlistJSON(
+        nodeJSON: NodeDataJSON,
+        chipId: number,
+        getOperation: (name: OperationName) => Operation | undefined,
+    ) {
+        const node = new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+        node.opCycles = nodeJSON.op_cycles;
+        node.links = new Map();
+        node.chipId = chipId;
+
+        node.type = nodeJSON.type as ComputeNodeType;
+        if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
+            node.dramChannel = nodeJSON.dram_channel;
+            node.dramSubchannel = nodeJSON.dram_subchannel || 0;
+        }
+        node.loc = { x: nodeJSON.location[0], y: nodeJSON.location[1] };
+        node.uid = `${node.chipId}-${node.loc.y}-${node.loc.x}`;
+
+        const linkId = `${node.loc.x}-${node.loc.y}`;
+
+        node.links = new Map(
+            Object.entries(nodeJSON.links).map(([link, linkJson], index) => [
+                link,
+                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson),
+            ]),
+        );
+
+        // Associate with operation
+        const opName: OperationName = nodeJSON.op_name;
+        if (opName) {
+            let operation = getOperation(opName);
+            if (operation) {
+                // This is a little hacky, but avoids cluttering the Chip with OperationBuilder references (for now)
+                // Later, we may want to move the Chip's mutation capabilities to a ChipBuilder subclass, which would have references to OperationBuilders
+                if (!('assignCore' in operation)) {
+                    throw new Error(
+                        `Core ${node.uid} cannot be assigned to operation ${opName}: unable to cast to OperationBuilder.`,
+                    );
+                } else {
+                    (operation as OperationBuilder).assignCore(node);
+                }
+            } else {
+                operation = new OperationBuilder(opName, [node]);
+            }
+            node.operation = operation;
+        }
+        return node;
     }
 
     /**
@@ -582,8 +646,6 @@ export class ComputeNode {
 
     public loc: Loc = { x: 0, y: 0 };
 
-    public opName: string = '';
-
     public opCycles: number = 0;
 
     public links: Map<any, NOCLink> = new Map();
@@ -598,33 +660,18 @@ export class ComputeNode {
      */
     public dramChannel: number = -1;
 
-    constructor(uid: string) {
+    public operation?: Operation;
+
+    constructor(uid: string, operation?: Operation) {
         this.uid = uid;
+        this.operation = operation;
     }
 
-    public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
-        // this.uid = uid;
-        this.opName = json.op_name;
-        this.opCycles = json.op_cycles;
-        this.links = new Map();
-        this.chipId = chipId;
-
-        this.type = json.type as ComputeNodeType;
-        if (json.dram_channel !== undefined && json.dram_channel !== null) {
-            this.dramChannel = json.dram_channel;
-            this.dramSubchannel = json.dram_subchannel || 0;
-        }
-        this.loc = { x: json.location[0], y: json.location[1] };
-        this.uid = `${chipId}-${this.loc.y}-${this.loc.x}`;
-
-        const linkId = `${this.loc.x}-${this.loc.y}`;
-
-        this.links = new Map(
-            Object.entries(json.links).map(([link, linkJson], index) => [
-                link,
-                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson),
-            ]),
-        );
+    /** @Deprecated
+     * Superceded by `this.operation.name`
+     */
+    get opName(): string {
+        return this.operation?.name || '';
     }
 
     public generateInitialState(): ComputeNodeState {

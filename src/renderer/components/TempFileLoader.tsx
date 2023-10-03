@@ -19,7 +19,6 @@ import {
     updateTotalOPs,
 } from '../../data/store';
 import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
-import { parseOpDataFormat } from '../../data/DataParsers';
 
 interface TempFileLoaderProps {
     updateData: (data: Chip) => void;
@@ -107,11 +106,6 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                                 ),
                             );
                             dispatch(updateTotalOPs(localGridData.totalOpCycles));
-                        }
-
-                        if (filename.includes('sample')) {
-                            const json = JSON.parse(parsedFile);
-                            console.log(JSON.stringify(parseOpDataFormat(json)));
                         }
                     } catch (error) {
                         console.error(error);
