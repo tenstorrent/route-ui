@@ -12,7 +12,7 @@ export type Loc = {
     y: number;
 };
 
-export enum LinkName {
+export enum NOCLinkName {
     NONE = 'none',
     NOC0_IN = 'noc0_link_in',
     NOC0_OUT = 'noc0_link_out',
@@ -34,16 +34,21 @@ export enum Architecture {
     WORMHOLE = 'wormhole',
 }
 
-export enum DramName {
+export enum DramNOCLinkName {
     NOC_IN = 'noc_in',
     NOC_OUT = 'noc_out',
     NOC0_NOC2AXI = 'noc0_noc2axi',
     NOC1_NOC2AXI = 'noc1_noc2axi',
+}
 
+export enum DramBankLinkName {
     DRAM_INOUT = 'dram_inout',
     DRAM0_INOUT = 'dram0_inout',
     DRAM1_INOUT = 'dram1_inout',
 }
+
+export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName;
+
 
 export enum ComputeNodeType {
     NONE = '',
@@ -57,4 +62,10 @@ export enum ComputeNodeType {
 export enum NOC {
     NOC0 = 'noc0',
     NOC1 = 'noc1',
+}
+
+export enum DRAMBank {
+    NONE = 'none',
+    BANK0 = 'bank0',
+    BANK1 = 'bank1',
 }

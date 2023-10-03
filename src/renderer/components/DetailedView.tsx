@@ -14,7 +14,14 @@ import { ComputeNode, DramChannel, NOCLink } from '../../data/Chip';
 import '../scss/DetailedView.scss';
 import PipeRenderer from './detailed-view-components/PipeRenderer';
 import LinkDetails from './LinkDetails';
-import { Architecture, ComputeNodeType, DramName, LinkName, NOC } from '../../data/Types';
+import {
+    Architecture,
+    ComputeNodeType,
+    DramNOCLinkName,
+    NOCLinkName,
+    NOC,
+    DramBankLinkName
+} from '../../data/Types';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
@@ -81,10 +88,10 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
                                         if (currentNode) {
-                                            noc0links.push(currentNode.links.get(LinkName.NOC0_IN) as NOCLink);
-                                            noc0links.push(currentNode.links.get(LinkName.NOC0_OUT) as NOCLink);
-                                            noc1links.push(currentNode.links.get(LinkName.NOC1_IN) as NOCLink);
-                                            noc1links.push(currentNode.links.get(LinkName.NOC1_OUT) as NOCLink);
+                                            noc0links.push(currentNode.links.get(NOCLinkName.NOC0_IN) as NOCLink);
+                                            noc0links.push(currentNode.links.get(NOCLinkName.NOC0_OUT) as NOCLink);
+                                            noc1links.push(currentNode.links.get(NOCLinkName.NOC1_IN) as NOCLink);
+                                            noc1links.push(currentNode.links.get(NOCLinkName.NOC1_OUT) as NOCLink);
                                         }
                                         const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
                                         return (
@@ -211,7 +218,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                 <PipeRenderer
                                                     className='centered-svg'
                                                     links={dram.links.filter(
-                                                        (link) => link.name === DramName.DRAM0_INOUT,
+                                                        (link) => link.name === DramBankLinkName.DRAM0_INOUT,
                                                     )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
@@ -224,7 +231,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                 <PipeRenderer
                                                     className='centered-svg'
                                                     links={dram.links.filter(
-                                                        (link) => link.name === DramName.DRAM1_INOUT,
+                                                        (link) => link.name === DramBankLinkName.DRAM1_INOUT,
                                                     )}
                                                     showLinkSaturation={showLinkSaturation}
                                                     linkSaturationTreshold={linkSaturationTreshold}
@@ -239,7 +246,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         <div className='axi-dram-wrap'>
                                             <PipeRenderer
                                                 className='centered-svg'
-                                                links={dram.links.filter((link) => link.name === DramName.DRAM_INOUT)}
+                                                links={dram.links.filter((link) => link.name === DramBankLinkName.DRAM_INOUT)}
                                                 showLinkSaturation={showLinkSaturation}
                                                 linkSaturationTreshold={linkSaturationTreshold}
                                             />
