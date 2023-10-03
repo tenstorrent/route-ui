@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
-import { DramName, LinkName } from '../data/Types';
+import { DramBankLinkName, DramNOCLinkName, NetworkLinkName, NOCLinkName } from '../data/Types';
 
 export const NODE_SIZE = 100;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
@@ -21,7 +21,7 @@ export const NOC_CONFIGURATION = {
 
 export const drawLink = (
     selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
-    linkID: LinkName | DramName,
+    linkName: NetworkLinkName,
     color?: string,
     stroke: number = 1,
 ) => {
@@ -34,9 +34,9 @@ export const drawLink = (
         arrow,
         arrowSecondary,
         transform,
-    } = getLinkPoints(linkID);
+    } = getLinkPoints(linkName);
 
-    /** TEMP DEBUGGING COLOR FUNCTION */
+    /** DEBUGGING FOR COLOR FUNCTION */
     // const getColor = () => {
     //     if (direction.includes('noc0')) {
     //         return direction.includes('_in') ? '#ff0000' : '#ff6600';
@@ -59,10 +59,10 @@ export const drawLink = (
 
     // arrowhead
     if (
-        linkID !== LinkName.NOC1_SOUTH_IN &&
-        linkID !== LinkName.NOC0_WEST_IN &&
-        linkID !== LinkName.NOC0_SOUTH_OUT &&
-        linkID !== LinkName.NOC1_WEST_OUT
+        linkName !== NOCLinkName.NOC1_SOUTH_IN &&
+        linkName !== NOCLinkName.NOC0_WEST_IN &&
+        linkName !== NOCLinkName.NOC0_SOUTH_OUT &&
+        linkName !== NOCLinkName.NOC1_WEST_OUT
     ) {
         selector
             // keeping this here for the prettier
@@ -71,7 +71,7 @@ export const drawLink = (
             .attr('transform', transform)
             .attr('fill', color || '#7e7e7e');
     }
-    if (linkID === DramName.NOC0_NOC2AXI || DramName.NOC1_NOC2AXI || DramName.DRAM_INOUT) {
+    if (linkName === DramNOCLinkName.NOC0_NOC2AXI || DramNOCLinkName.NOC1_NOC2AXI || DramBankLinkName.DRAM_INOUT) {
         selector
             //
             .append('polygon')
@@ -80,7 +80,7 @@ export const drawLink = (
             .attr('fill', color || '#7e7e7e');
     }
 };
-export const getLinkPoints = (linkID: LinkName | DramName | string) => {
+export const getLinkPoints = (linkName: NetworkLinkName) => {
     let lineStartX: number = 0;
     let lineEndX: number = 0;
     let lineStartY: number = 0;
@@ -96,8 +96,8 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
     let arrow = { p1: '', p2: '', p3: '' };
     let arrowSecondary = { p1: '', p2: '', p3: '' };
 
-    switch (linkID) {
-        case LinkName.NOC1_NORTH_OUT:
+    switch (linkName) {
+        case NOCLinkName.NOC1_NORTH_OUT:
             // up out
             arrowOffset = 5;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
@@ -110,7 +110,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
                 p3: `${lineEndX},${lineEndY + arrowOffset}`,
             };
             break;
-        case LinkName.NOC1_SOUTH_IN:
+        case NOCLinkName.NOC1_SOUTH_IN:
             // up in
             arrowOffset = 5;
 
@@ -127,7 +127,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             break;
 
-        case LinkName.NOC1_EAST_IN:
+        case NOCLinkName.NOC1_EAST_IN:
             // left in
 
             arrowOffset = 10;
@@ -142,7 +142,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
             };
 
             break;
-        case LinkName.NOC1_WEST_OUT:
+        case NOCLinkName.NOC1_WEST_OUT:
             // left out
             arrowOffset = 0;
 
@@ -158,7 +158,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             break;
 
-        case LinkName.NOC0_NORTH_IN:
+        case NOCLinkName.NOC0_NORTH_IN:
             // down in
 
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET;
@@ -172,7 +172,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
             };
 
             break;
-        case LinkName.NOC0_SOUTH_OUT:
+        case NOCLinkName.NOC0_SOUTH_OUT:
             // down out
             //
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET;
@@ -187,7 +187,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             break;
         //
-        case LinkName.NOC0_EAST_OUT:
+        case NOCLinkName.NOC0_EAST_OUT:
             // right out
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET;
             lineEndX = NODE_SIZE;
@@ -199,7 +199,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
                 p3: `${lineEndX - arrowOffset},${lineEndY}`,
             };
             break;
-        case LinkName.NOC0_WEST_IN:
+        case NOCLinkName.NOC0_WEST_IN:
             // right in
             lineStartX = 0;
             lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET;
@@ -212,7 +212,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
             };
             break;
 
-        case LinkName.NOC0_IN:
+        case NOCLinkName.NOC0_IN:
             arrowOffset = -10;
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
             lineEndX = CORE_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
@@ -227,7 +227,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
             break;
-        case LinkName.NOC0_OUT:
+        case NOCLinkName.NOC0_OUT:
             arrowOffset = -10;
             lineStartX = CORE_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
             lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
@@ -243,7 +243,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
             break;
 
-        case LinkName.NOC1_IN:
+        case NOCLinkName.NOC1_IN:
             arrowOffset = -10;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
             lineEndX = CORE_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
@@ -258,7 +258,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
             break;
-        case LinkName.NOC1_OUT:
+        case NOCLinkName.NOC1_OUT:
             arrowOffset = -10;
 
             lineStartX = CORE_CENTER.x + NOC_1_X_OFFSET + CORE_DISPERSION;
@@ -274,7 +274,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
             break;
-        case DramName.NOC_IN:
+        case DramNOCLinkName.NOC_IN:
             lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
             lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
             lineStartY = 0;
@@ -287,7 +287,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             break;
 
-        case DramName.NOC_OUT:
+        case DramNOCLinkName.NOC_OUT:
             arrowOffset = 5;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
             lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
@@ -300,9 +300,9 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
             };
             break;
         // TODO: Dram needs to be refactored to something more generic, will address when doing ethernet, requires data update.
-        case DramName.DRAM_INOUT:
-        case DramName.NOC0_NOC2AXI:
-        case DramName.NOC1_NOC2AXI:
+        case DramBankLinkName.DRAM_INOUT:
+        case DramNOCLinkName.NOC0_NOC2AXI:
+        case DramNOCLinkName.NOC1_NOC2AXI:
             arrowOffset = 5;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
             lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
@@ -322,6 +322,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
             break;
         default:
+            console.info('Unknown link type', linkName);
             break;
     }
     return { lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform };
@@ -329,7 +330,7 @@ export const getLinkPoints = (linkID: LinkName | DramName | string) => {
 
 export const drawPipesDirect = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
-    linkID: LinkName | DramName,
+    linkName: NetworkLinkName,
     pipeIds: string[],
 ) => {
     const {
@@ -341,16 +342,16 @@ export const drawPipesDirect = (
         arrow,
         arrowSecondary,
         transform,
-    } = getLinkPoints(linkID);
+    } = getLinkPoints(linkName);
 
     const strokeLength = 5;
 
     if (pipeIds.length) {
         if (
-            linkID !== LinkName.NOC1_SOUTH_IN &&
-            linkID !== LinkName.NOC0_WEST_IN &&
-            linkID !== LinkName.NOC0_SOUTH_OUT &&
-            linkID !== LinkName.NOC1_WEST_OUT
+            linkName !== NOCLinkName.NOC1_SOUTH_IN &&
+            linkName !== NOCLinkName.NOC0_WEST_IN &&
+            linkName !== NOCLinkName.NOC0_SOUTH_OUT &&
+            linkName !== NOCLinkName.NOC1_WEST_OUT
         ) {
             svg
                 // only draw arrows for long links
@@ -359,7 +360,11 @@ export const drawPipesDirect = (
                 .attr('transform', transform)
                 .attr('fill', '#9e9e9e');
         }
-        if (linkID === DramName.NOC0_NOC2AXI || DramName.NOC1_NOC2AXI || DramName.DRAM_INOUT) {
+        if (
+            linkName === DramNOCLinkName.NOC0_NOC2AXI ||
+            DramNOCLinkName.NOC1_NOC2AXI ||
+            DramBankLinkName.DRAM_INOUT
+        ) {
             svg
                 //
                 .append('polygon')
@@ -385,13 +390,13 @@ export const drawPipesDirect = (
 
 export const drawSelections = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
-    linkID: LinkName,
+    nocLinkName: NOCLinkName,
     node: ComputeNode,
     selectedPipeIds: string[],
 ) => {
-    const nodePipeIds = node.getPipesForDirection(linkID);
+    const nodePipeIds = node.getPipesForDirection(nocLinkName);
     const pipeIds = nodePipeIds.filter((pipeId) => selectedPipeIds.includes(pipeId));
-    drawPipesDirect(svg, linkID, pipeIds);
+    drawPipesDirect(svg, nocLinkName, pipeIds);
     return pipeIds.length;
 };
 

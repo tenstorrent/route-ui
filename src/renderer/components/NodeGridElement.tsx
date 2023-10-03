@@ -24,7 +24,7 @@ import {
 } from '../../utils/DrawingAPI';
 import { getGroupColor } from '../../data/ColorGenerator';
 import { HighlightType, PipeSelection } from '../../data/StateTypes';
-import { LinkName } from '../../data/Types';
+import { NOCLinkName } from '../../data/Types';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -188,19 +188,19 @@ const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
 
     svg.selectAll('*').remove();
     if (focusMode && focusedPipeIds.length) {
-        drawSelections(svg, LinkName.NOC0_EAST_OUT, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC0_WEST_IN, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC0_SOUTH_OUT, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC0_NORTH_IN, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC0_IN, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC0_OUT, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC0_EAST_OUT, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC0_WEST_IN, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC0_SOUTH_OUT, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC0_NORTH_IN, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC0_IN, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC0_OUT, node, focusedPipeIds);
 
-        drawSelections(svg, LinkName.NOC1_NORTH_OUT, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC1_SOUTH_IN, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC1_WEST_OUT, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC1_EAST_IN, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC1_IN, node, focusedPipeIds);
-        drawSelections(svg, LinkName.NOC1_OUT, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC1_NORTH_OUT, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC1_SOUTH_IN, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC1_WEST_OUT, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC1_EAST_IN, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC1_IN, node, focusedPipeIds);
+        drawSelections(svg, NOCLinkName.NOC1_OUT, node, focusedPipeIds);
     }
     return <svg className='node-focus-svg' ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
 };
@@ -233,18 +233,18 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
 
     svg.selectAll('*').remove();
     if (showEmptyLinks) {
-        drawLink(svg, LinkName.NOC1_NORTH_OUT);
-        drawLink(svg, LinkName.NOC0_NORTH_IN);
-        drawLink(svg, LinkName.NOC1_SOUTH_IN);
-        drawLink(svg, LinkName.NOC0_SOUTH_OUT);
-        drawLink(svg, LinkName.NOC1_EAST_IN);
-        drawLink(svg, LinkName.NOC0_EAST_OUT);
-        drawLink(svg, LinkName.NOC0_WEST_IN);
-        drawLink(svg, LinkName.NOC1_WEST_OUT);
-        drawLink(svg, LinkName.NOC1_OUT);
-        drawLink(svg, LinkName.NOC0_OUT);
-        drawLink(svg, LinkName.NOC0_IN);
-        drawLink(svg, LinkName.NOC1_IN);
+        drawLink(svg, NOCLinkName.NOC1_NORTH_OUT);
+        drawLink(svg, NOCLinkName.NOC0_NORTH_IN);
+        drawLink(svg, NOCLinkName.NOC1_SOUTH_IN);
+        drawLink(svg, NOCLinkName.NOC0_SOUTH_OUT);
+        drawLink(svg, NOCLinkName.NOC1_EAST_IN);
+        drawLink(svg, NOCLinkName.NOC0_EAST_OUT);
+        drawLink(svg, NOCLinkName.NOC0_WEST_IN);
+        drawLink(svg, NOCLinkName.NOC1_WEST_OUT);
+        drawLink(svg, NOCLinkName.NOC1_OUT);
+        drawLink(svg, NOCLinkName.NOC0_OUT);
+        drawLink(svg, NOCLinkName.NOC0_IN);
+        drawLink(svg, NOCLinkName.NOC1_IN);
     }
 
     if (showLinkSaturation) {
@@ -259,19 +259,19 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
 
     let noc0numPipes = 0;
     let noc1numPipes = 0;
-    noc0numPipes += drawSelections(svg, LinkName.NOC0_EAST_OUT, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, LinkName.NOC0_WEST_IN, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, LinkName.NOC0_SOUTH_OUT, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, LinkName.NOC0_NORTH_IN, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, LinkName.NOC0_IN, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, LinkName.NOC0_OUT, node, selectedPipeIds);
+    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_EAST_OUT, node, selectedPipeIds);
+    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_WEST_IN, node, selectedPipeIds);
+    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_SOUTH_OUT, node, selectedPipeIds);
+    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_NORTH_IN, node, selectedPipeIds);
+    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_IN, node, selectedPipeIds);
+    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_OUT, node, selectedPipeIds);
 
-    noc1numPipes += drawSelections(svg, LinkName.NOC1_NORTH_OUT, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, LinkName.NOC1_SOUTH_IN, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, LinkName.NOC1_WEST_OUT, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, LinkName.NOC1_EAST_IN, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, LinkName.NOC1_IN, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, LinkName.NOC1_OUT, node, selectedPipeIds);
+    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_NORTH_OUT, node, selectedPipeIds);
+    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_SOUTH_IN, node, selectedPipeIds);
+    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_WEST_OUT, node, selectedPipeIds);
+    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_EAST_IN, node, selectedPipeIds);
+    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_IN, node, selectedPipeIds);
+    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_OUT, node, selectedPipeIds);
 
     if (noc0numPipes > 0) {
         drawNOC(svg, NOC_CONFIGURATION.noc0);

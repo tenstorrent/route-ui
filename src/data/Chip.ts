@@ -10,18 +10,28 @@ import {
 import { CoreOperation, Operand, Operation, OpIoType } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
-import { Architecture, ComputeNodeType, DramName, LinkName, Loc, NOC } from './Types';
+import {
+    Architecture,
+    ComputeNodeType,
+    DRAMBank,
+    DramBankLinkName,
+    DramNOCLinkName,
+    Loc,
+    NetworkLinkName,
+    NOC,
+    NOCLinkName
+} from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 import { OpGraphNodeType } from './GraphTypes';
 
 export default class Chip {
-    private static NOC_ORDER: Map<LinkName, number>;
+    private static NOC_ORDER: Map<NOCLinkName, number>;
 
-    public static GET_NOC_ORDER(): Map<LinkName, number> {
+    public static GET_NOC_ORDER(): Map<NOCLinkName, number> {
         if (!Chip.NOC_ORDER) {
             Chip.NOC_ORDER = new Map(
-                Object.keys(LinkName)
-                    .map((key) => LinkName[key])
+                Object.keys(NOCLinkName)
+                    .map((key) => NOCLinkName[key])
                     .map((noc, index) => [noc, index]),
             );
         }
@@ -420,8 +430,8 @@ export default class Chip {
         return list;
     }
 
-    getAllLinks(): GenericNOCLink[] {
-        const links: GenericNOCLink[] = [];
+    getAllLinks(): NetworkLink[] {
+        const links: NetworkLink[] = [];
         this.nodes.forEach((node) => {
             node.links.forEach((link) => {
                 links.push(link);
@@ -477,7 +487,7 @@ export class DramChannel {
 
     public subchannels: DramSubchannel[] = [];
 
-    public links: DramLink[] = [];
+    public links: DramBankLink[] = [];
 
     constructor(id: number, json: DramChannelJSON) {
         this.id = id;
@@ -486,13 +496,31 @@ export class DramChannel {
                 return new DramSubchannel(i, id, subchannel);
             });
             if (json.dram_inout) {
-                this.links.push(new DramLink(DramName.DRAM_INOUT, `${id}-${DramName.DRAM_INOUT}`, json.dram_inout));
+                this.links.push(
+                    new DramBankLink(
+                        DramBankLinkName.DRAM_INOUT,
+                        `${id}-${DramBankLinkName.DRAM_INOUT}`,
+                        json.dram_inout,
+                    ),
+                );
             }
             if (json.dram0_inout) {
-                this.links.push(new DramLink(DramName.DRAM0_INOUT, `${id}-${DramName.DRAM0_INOUT}`, json.dram0_inout));
+                this.links.push(
+                    new DramBankLink(
+                        DramBankLinkName.DRAM0_INOUT,
+                        `${id}-${DramBankLinkName.DRAM0_INOUT}`,
+                        json.dram0_inout,
+                    ),
+                );
             }
             if (json.dram1_inout) {
-                this.links.push(new DramLink(DramName.DRAM1_INOUT, `${id}-${DramName.DRAM1_INOUT}`, json.dram1_inout));
+                this.links.push(
+                    new DramBankLink(
+                        DramBankLinkName.DRAM1_INOUT,
+                        `${id}-${DramBankLinkName.DRAM1_INOUT}`,
+                        json.dram1_inout,
+                    ),
+                );
             }
         }
     }
@@ -501,20 +529,20 @@ export class DramChannel {
 export class DramSubchannel {
     public subchannelId: number;
 
-    public links: DramLink[] = [];
+    public links: DramNOCLink[] = [];
 
     constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
         Object.entries(json).forEach(([key, value]) => {
-            this.links.push(new DramLink(key as DramName, `${channelId}-${subchannelId}-${key}`, value));
+            this.links.push(NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink);
         });
     }
 }
 
-export class GenericNOCLink {
+export class NetworkLink {
     readonly uid: string;
 
-    public name?: string;
+    public readonly name: NetworkLinkName;
 
     readonly numOccupants: number = 0;
 
@@ -524,16 +552,31 @@ export class GenericNOCLink {
 
     public pipes: Pipe[] = [];
 
-    readonly noc: NOC;
+    public static CREATE(name: NetworkLinkName, uid: string, json: NOCLinkJSON): NetworkLink {
+        if (Object.values(NOCLinkName).includes(name as NOCLinkName)) {
+            return new NOCLink(name as NOCLinkName, uid, json);
+        }
+        if (Object.values(DramNOCLinkName).includes(name as DramNOCLinkName)) {
+            return new DramNOCLink(name as DramNOCLinkName, uid, json);
+        }
+        if (Object.values(DramBankLinkName).includes(name as DramBankLinkName)) {
+            return new DramBankLink(name as DramBankLinkName, uid, json);
+        }
 
-    constructor(name: string, uid: string, json: NOCLinkJSON) {
+        throw new Error('Invalid network link name');
+    }
+
+    // readonly noc: NOC;
+
+    constructor(name: NetworkLinkName, uid: string, json: NOCLinkJSON) {
         this.uid = uid;
         this.numOccupants = json.num_occupants;
         this.totalDataBytes = json.total_data_in_bytes;
         this.maxBandwidth = json.max_link_bw;
-        this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
+        this.name = name;
+
         this.pipes = Object.entries(json.mapped_pipes).map(
-            ([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes),
+            ([pipeId, bandwidth]) => new Pipe(pipeId, bandwidth, name, this.totalDataBytes),
         );
     }
 
@@ -548,25 +591,36 @@ export class GenericNOCLink {
     }
 }
 
-export class DramLink extends GenericNOCLink {
-    public name: DramName;
+export class NOCLink extends NetworkLink {
+    // public name: NOCLinkName;
 
-    constructor(name: DramName, uid: string, json: NOCLinkJSON) {
+    public readonly noc: NOC;
+
+    constructor(name: NOCLinkName | DramNOCLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
-        this.name = name as DramName;
-
-        if (name.includes('dram')) {
-            this.noc = name.includes('dram0') ? NOC.NOC0 : NOC.NOC1;
-        }
+        this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
+        // this.name = name;
     }
 }
 
-export class NOCLink extends GenericNOCLink {
-    public name: LinkName;
-
-    constructor(name: LinkName, uid: string, json: NOCLinkJSON) {
+export class DramNOCLink extends NOCLink {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(name: DramNOCLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
-        this.name = name;
+    }
+}
+
+export class DramBankLink extends NetworkLink {
+    public readonly bank: DRAMBank = DRAMBank.NONE;
+
+    constructor(name: DramBankLinkName, uid: string, json: NOCLinkJSON) {
+        super(name, uid, json);
+
+        if (name.includes('dram0')) {
+            this.bank = DRAMBank.BANK0;
+        } else {
+            this.bank = DRAMBank.BANK1;
+        }
     }
 }
 
@@ -609,8 +663,6 @@ export class ComputeNode {
         this.uid = uid;
     }
 
-
-
     public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
         // this.uid = uid;
         this.opName = json.op_name;
@@ -631,7 +683,7 @@ export class ComputeNode {
         this.links = new Map(
             Object.entries(json.links).map(([link, linkJson], index) => [
                 link,
-                new NOCLink(link as LinkName, `${linkId}-${index}`, linkJson),
+                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson),
             ]),
         );
     }
@@ -649,8 +701,8 @@ export class ComputeNode {
 
     public getLinksForNode = (): NOCLink[] => {
         return [...this.links.values()].sort((a, b) => {
-            const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name) ?? Infinity;
-            const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name) ?? Infinity;
+            const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
+            const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
             return firstKeyOrder - secondKeyOrder;
         });
     };
@@ -661,8 +713,8 @@ export class ComputeNode {
                 return INTERNAL_LINK_NAMES.includes(link.name);
             })
             .sort((a, b) => {
-                const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name) ?? Infinity;
-                const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name) ?? Infinity;
+                const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
+                const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
                 return firstKeyOrder - secondKeyOrder;
             });
     };
@@ -680,7 +732,7 @@ export class ComputeNode {
     getInternalPipeIDsForNode = (): string[] => {
         return [...this.links.values()]
             .filter((link) => {
-                return NOC_LINK_NAMES.includes(link.name);
+                return NOC_LINK_NAMES.includes(link.name as NOCLinkName);
             })
             .map((link) => {
                 return [...link.pipes.map((pipe) => pipe.id)];
@@ -688,7 +740,7 @@ export class ComputeNode {
             .flat();
     };
 
-    public getPipesForDirection(direction: LinkName): string[] {
+    public getPipesForDirection(direction: NOCLinkName): string[] {
         return this.links.get(direction)?.pipes.map((pipe) => pipe.id) || [];
     }
 

@@ -1,13 +1,13 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Pipe, convertBytes, GenericNOCLink } from '../../data/Chip';
+import { Pipe, convertBytes, NetworkLink } from '../../data/Chip';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';
 import { getLinkData, RootState } from '../../data/store';
 
 type LinkDetailsProps = {
-    link: GenericNOCLink;
+    link: NetworkLink;
     index?: number;
     showEmpty?: boolean;
 };
