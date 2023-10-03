@@ -12,6 +12,7 @@ import {
     PipeSelection,
     PipeSelectionState,
 } from './StateTypes';
+import { NOC } from './Types';
 
 const highContrastInitialState: HighContrastState = {
     enabled: false,
@@ -308,6 +309,8 @@ export const {
 const linkSaturationState: LinkSaturationState = {
     linkSaturation: LINK_SATURATION_INITIAIL_VALUE,
     showLinkSaturation: false,
+    showNOC0: true,
+    showNOC1: true,
     links: {},
     totalOps: 0,
 };
@@ -316,11 +319,19 @@ const linkSaturationSlice = createSlice({
     name: 'linkSaturation',
     initialState: linkSaturationState,
     reducers: {
-        updateLinkSatuation: (state, action: PayloadAction<number>) => {
+        updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturation = action.payload;
         },
         updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
             state.showLinkSaturation = action.payload;
+        },
+        updateShowLinkSaturationForNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
+            if (action.payload.noc === NOC.NOC0) {
+                state.showNOC0 = action.payload.selected;
+            }
+            if (action.payload.noc === NOC.NOC1) {
+                state.showNOC1 = action.payload.selected;
+            }
         },
         updateTotalOPs: (state, action: PayloadAction<number>) => {
             state.totalOps = action.payload;
@@ -341,7 +352,7 @@ export const {
     //
     loadLinkData,
     updateTotalOPs,
-    updateLinkSatuation,
+    updateLinkSaturation,
     updateShowLinkSaturation,
 } = linkSaturationSlice.actions;
 

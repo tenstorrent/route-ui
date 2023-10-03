@@ -10,7 +10,7 @@ import {
     clearAllPipes,
     RootState,
     selectAllPipes,
-    updateLinkSatuation,
+    updateLinkSaturation,
     updateShowLinkSaturation,
     updateTotalOPs,
 } from '../data/store';
@@ -36,7 +36,7 @@ export default function GridRender() {
 
     const onLinkSaturationChange = (value: number) => {
         setLinkSaturationTreshold(value);
-        dispatch(updateLinkSatuation(value));
+        dispatch(updateLinkSaturation(value));
     };
     const onShowLinkSaturation = (value: boolean) => {
         setShowLinkSaturation(value);

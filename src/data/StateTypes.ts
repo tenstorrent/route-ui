@@ -62,6 +62,8 @@ export interface LinkStateData {
 export interface LinkSaturationState {
     linkSaturation: number;
     showLinkSaturation: boolean;
+    showNOC0: boolean;
+    showNOC1: boolean;
     links: Record<string, LinkStateData>;
     totalOps: number;
 }
