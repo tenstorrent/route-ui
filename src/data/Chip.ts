@@ -539,22 +539,6 @@ export class DramSubchannel {
     }
 }
 
-// class NetworkLink{
-//
-// }
-//
-//
-// class NocLink extends NetworkLink{
-//
-// }
-//
-//
-// class DramBankLink extends NetworkLink{
-//
-// }
-
-export class NetworkLinkGenerator {}
-
 export class NetworkLink {
     readonly uid: string;
 
@@ -592,7 +576,7 @@ export class NetworkLink {
         this.name = name;
 
         this.pipes = Object.entries(json.mapped_pipes).map(
-            ([pipe, bandwidth]) => new Pipe(pipe, bandwidth, name, this.totalDataBytes),
+            ([pipeId, bandwidth]) => new Pipe(pipeId, bandwidth, name, this.totalDataBytes),
         );
     }
 
