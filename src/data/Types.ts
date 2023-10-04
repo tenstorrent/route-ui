@@ -49,10 +49,10 @@ export enum DramBankLinkName {
 
 export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName;
 
-/** this might possibly split into detailed view for specific node types */
+
 export enum LinkRenderType {
     GRID = 'grid_view',
-    DETAILED_VIEW = 'detailed_view',
+    DETAILED_VIEW = 'detailed_view', // this might possibly split into detailed view for specific node types
 }
 
 export enum ComputeNodeType {
