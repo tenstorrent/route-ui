@@ -35,8 +35,6 @@ export enum Architecture {
 }
 
 export enum DramNOCLinkName {
-    NOC_IN = 'noc_in',
-    NOC_OUT = 'noc_out',
     NOC0_NOC2AXI = 'noc0_noc2axi',
     NOC1_NOC2AXI = 'noc1_noc2axi',
 }

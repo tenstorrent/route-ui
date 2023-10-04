@@ -19,11 +19,17 @@ export const NOC_CONFIGURATION = {
     core: { x: CORE_CENTER.x, y: CORE_CENTER.y },
 };
 
+export enum LinkRenderType {
+    GRID = 'grid_view',
+    DETAILED_VIEW = 'detailed_view', // this might possibly split into detailed view for specific node types
+}
+
 export const drawLink = (
     selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
     linkName: NetworkLinkName,
     color?: string,
     stroke: number = 1,
+    rendererType: LinkRenderType = LinkRenderType.GRID,
 ) => {
     const {
         //
@@ -34,7 +40,7 @@ export const drawLink = (
         arrow,
         arrowSecondary,
         transform,
-    } = getLinkPoints(linkName);
+    } = getLinkPoints(linkName, rendererType);
 
     /** DEBUGGING FOR COLOR FUNCTION */
     // const getColor = () => {
@@ -80,7 +86,7 @@ export const drawLink = (
             .attr('fill', color || '#7e7e7e');
     }
 };
-export const getLinkPoints = (linkName: NetworkLinkName) => {
+export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderType = LinkRenderType.GRID) => {
     let lineStartX: number = 0;
     let lineEndX: number = 0;
     let lineStartY: number = 0;
@@ -213,94 +219,123 @@ export const getLinkPoints = (linkName: NetworkLinkName) => {
             break;
 
         case NOCLinkName.NOC0_IN:
-            arrowOffset = -10;
-            lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
-            lineEndX = CORE_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
-            lineStartY = NOC_CENTER.y + NOC_0_Y_OFFSET - CORE_DISPERSION;
-            lineEndY = CORE_CENTER.y + NOC_0_Y_OFFSET - CORE_DISPERSION;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p3: `${lineEndX},${lineEndY - arrowOffset}`,
-            };
-            angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
+            if (renderType === LinkRenderType.GRID) {
+                arrowOffset = -10;
+                lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
+                lineEndX = CORE_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
+                lineStartY = NOC_CENTER.y + NOC_0_Y_OFFSET - CORE_DISPERSION;
+                lineEndY = CORE_CENTER.y + NOC_0_Y_OFFSET - CORE_DISPERSION;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY - arrowOffset}`,
+                };
+                angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
 
-            transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+                transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+            } else {
+                lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
+                lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
+                lineStartY = 0;
+                lineEndY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY - arrowOffset}`,
+                };
+
+            }
             break;
         case NOCLinkName.NOC0_OUT:
-            arrowOffset = -10;
-            lineStartX = CORE_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
-            lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
-            lineEndY = NOC_CENTER.y + NOC_0_Y_OFFSET + CORE_DISPERSION;
-            lineStartY = CORE_CENTER.y + NOC_0_Y_OFFSET + CORE_DISPERSION;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p3: `${lineEndX},${lineEndY - arrowOffset}`,
-            };
-            angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
+            if (renderType === LinkRenderType.GRID) {
+                arrowOffset = -10;
+                lineStartX = CORE_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
+                lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
+                lineEndY = NOC_CENTER.y + NOC_0_Y_OFFSET + CORE_DISPERSION;
+                lineStartY = CORE_CENTER.y + NOC_0_Y_OFFSET + CORE_DISPERSION;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY - arrowOffset}`,
+                };
+                angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
 
-            transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+                transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+            } else {
+                arrowOffset = 5;
+                lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
+                lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+                lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
+                lineEndY = 0;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY + arrowOffset}`,
+                };
+            }
             break;
 
         case NOCLinkName.NOC1_IN:
-            arrowOffset = -10;
-            lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
-            lineEndX = CORE_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
-            lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET - CORE_DISPERSION;
-            lineEndY = CORE_CENTER.y + NOC_1_Y_OFFSET - CORE_DISPERSION;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p3: `${lineEndX},${lineEndY - arrowOffset}`,
-            };
-            angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
+            if (renderType === LinkRenderType.GRID) {
+                arrowOffset = -10;
+                lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
+                lineEndX = CORE_CENTER.x + NOC_1_X_OFFSET - CORE_DISPERSION;
+                lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET - CORE_DISPERSION;
+                lineEndY = CORE_CENTER.y + NOC_1_Y_OFFSET - CORE_DISPERSION;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY - arrowOffset}`,
+                };
+                angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
 
-            transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+                transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+            } else {
+                lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
+                lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
+                lineStartY = 0;
+                lineEndY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY - arrowOffset}`,
+                };
+
+            }
             break;
         case NOCLinkName.NOC1_OUT:
-            arrowOffset = -10;
+            if (renderType === LinkRenderType.GRID) {
+                arrowOffset = -10;
 
-            lineStartX = CORE_CENTER.x + NOC_1_X_OFFSET + CORE_DISPERSION;
-            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET + CORE_DISPERSION;
-            lineEndY = NOC_CENTER.y + NOC_1_Y_OFFSET + CORE_DISPERSION;
-            lineStartY = CORE_CENTER.y + NOC_1_Y_OFFSET + CORE_DISPERSION;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
-                p3: `${lineEndX},${lineEndY - arrowOffset}`,
-            };
-            angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
+                lineStartX = CORE_CENTER.x + NOC_1_X_OFFSET + CORE_DISPERSION;
+                lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET + CORE_DISPERSION;
+                lineEndY = NOC_CENTER.y + NOC_1_Y_OFFSET + CORE_DISPERSION;
+                lineStartY = CORE_CENTER.y + NOC_1_Y_OFFSET + CORE_DISPERSION;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY - arrowOffset}`,
+                };
+                angle = (Math.atan2(lineEndY - lineStartY, lineEndX - lineStartX) * 180) / Math.PI + 90;
 
-            transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+                transform = `rotate(${angle} ${lineEndX} ${lineEndY})`;
+            } else {
+                arrowOffset = 5;
+                lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
+                lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+                lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
+                lineEndY = 0;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY + arrowOffset}`,
+                };
+            }
             break;
-        case DramNOCLinkName.NOC_IN:
-            lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
-            lineEndX = NOC_CENTER.x + NOC_0_X_OFFSET * 2;
-            lineStartY = 0;
-            lineEndY = NOC_CENTER.y + NOC_1_Y_OFFSET;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
-                p3: `${lineEndX},${lineEndY - arrowOffset}`,
-            };
 
-            break;
-
-        case DramNOCLinkName.NOC_OUT:
-            arrowOffset = 5;
-            lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
-            lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
-            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET * 2;
-            lineEndY = 0;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-                p3: `${lineEndX},${lineEndY + arrowOffset}`,
-            };
-            break;
-        // TODO: Dram needs to be refactored to something more generic, will address when doing ethernet, requires data update.
         case DramBankLinkName.DRAM_INOUT:
+        case DramBankLinkName.DRAM0_INOUT:
+        case DramBankLinkName.DRAM1_INOUT:
         case DramNOCLinkName.NOC0_NOC2AXI:
         case DramNOCLinkName.NOC1_NOC2AXI:
             arrowOffset = 5;
@@ -322,7 +357,7 @@ export const getLinkPoints = (linkName: NetworkLinkName) => {
 
             break;
         default:
-            console.info('Unknown link type', linkName);
+            // console.info('Unknown link type', linkName);
             break;
     }
     return { lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform };
@@ -332,6 +367,7 @@ export const drawPipesDirect = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
     linkName: NetworkLinkName,
     pipeIds: string[],
+    rendererType: LinkRenderType = LinkRenderType.GRID,
 ) => {
     const {
         //
@@ -342,7 +378,7 @@ export const drawPipesDirect = (
         arrow,
         arrowSecondary,
         transform,
-    } = getLinkPoints(linkName);
+    } = getLinkPoints(linkName, rendererType);
 
     const strokeLength = 5;
 
@@ -360,11 +396,7 @@ export const drawPipesDirect = (
                 .attr('transform', transform)
                 .attr('fill', '#9e9e9e');
         }
-        if (
-            linkName === DramNOCLinkName.NOC0_NOC2AXI ||
-            DramNOCLinkName.NOC1_NOC2AXI ||
-            DramBankLinkName.DRAM_INOUT
-        ) {
+        if (linkName === DramNOCLinkName.NOC0_NOC2AXI || DramNOCLinkName.NOC1_NOC2AXI || DramBankLinkName.DRAM_INOUT) {
             svg
                 //
                 .append('polygon')
