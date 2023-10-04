@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
-import { DramBankLinkName, DramNOCLinkName, LinkRenderType, NetworkLinkName, NOCLinkName } from '../data/Types';
+import { DramBankLinkName, DramNOCLinkName, NetworkLinkName, NOCLinkName } from '../data/Types';
 
 export const NODE_SIZE = 100;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
@@ -18,6 +18,11 @@ export const NOC_CONFIGURATION = {
     noc1: { x: NOC_CENTER.x + NOC_1_X_OFFSET, y: NOC_CENTER.y + NOC_1_Y_OFFSET },
     core: { x: CORE_CENTER.x, y: CORE_CENTER.y },
 };
+
+export enum LinkRenderType {
+    GRID = 'grid_view',
+    DETAILED_VIEW = 'detailed_view', // this might possibly split into detailed view for specific node types
+}
 
 export const drawLink = (
     selector: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,

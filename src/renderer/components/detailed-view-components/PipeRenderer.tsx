@@ -2,13 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { useSelector } from 'react-redux';
 import { NetworkLink, NOCLink } from '../../../data/Chip';
-import { calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
+import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
 import { RootState } from '../../../data/store';
 import { PipeSelection } from '../../../data/StateTypes';
 import {
     DramBankLinkName,
     DramNOCLinkName,
-    LinkRenderType,
     NetworkLinkName,
     NOC,
     NOCLinkName,
