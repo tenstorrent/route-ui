@@ -354,6 +354,7 @@ export const {
     updateTotalOPs,
     updateLinkSaturation,
     updateShowLinkSaturation,
+    updateShowLinkSaturationForNOC,
 } = linkSaturationSlice.actions;
 
 const store = configureStore({

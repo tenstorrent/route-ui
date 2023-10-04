@@ -1,3 +1,5 @@
+import { NetworkLink } from './Chip';
+
 export enum ComputeNodeTypeArch {
     ARC = 'arc',
     DRAM = 'dram',
@@ -35,8 +37,6 @@ export enum Architecture {
 }
 
 export enum DramNOCLinkName {
-    NOC_IN = 'noc_in',
-    NOC_OUT = 'noc_out',
     NOC0_NOC2AXI = 'noc0_noc2axi',
     NOC1_NOC2AXI = 'noc1_noc2axi',
 }
@@ -49,6 +49,11 @@ export enum DramBankLinkName {
 
 export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName;
 
+/** this might possibly split into detailed view for specific node types */
+export enum LinkRenderType {
+    GRID = 'grid_view',
+    DETAILED_VIEW = 'detailed_view',
+}
 
 export enum ComputeNodeType {
     NONE = '',

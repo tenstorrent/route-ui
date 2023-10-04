@@ -24,7 +24,7 @@ import {
 } from '../../utils/DrawingAPI';
 import { getGroupColor } from '../../data/ColorGenerator';
 import { HighlightType, PipeSelection } from '../../data/StateTypes';
-import { NOCLinkName } from '../../data/Types';
+import { NOC, NOCLinkName } from '../../data/Types';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -231,6 +231,9 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
 
+    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
+    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
+
     svg.selectAll('*').remove();
     if (showEmptyLinks) {
         drawLink(svg, NOCLinkName.NOC1_NORTH_OUT);
@@ -248,11 +251,14 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     }
 
     if (showLinkSaturation) {
+        console.log('showing link saturation', noc0Saturation, noc1Saturation);
         node.links.forEach((link) => {
-            const linkData = linksData[link.uid];
-            if (linkData.saturation >= linkSaturationTreshold) {
-                const color = calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast);
-                drawLink(svg, link.name, color, 5);
+            if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
+                const linkStateData = linksData[link.uid];
+                if (linkStateData.saturation >= linkSaturationTreshold) {
+                    const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
+                    drawLink(svg, link.name, color, 5);
+                }
             }
         });
     }

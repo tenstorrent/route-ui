@@ -1,11 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { useSelector } from 'react-redux';
-import { NetworkLink } from '../../../data/Chip';
+import { NetworkLink, NOCLink } from '../../../data/Chip';
 import { calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
 import { RootState } from '../../../data/store';
 import { PipeSelection } from '../../../data/StateTypes';
-import { DramBankLinkName, DramNOCLinkName, NetworkLinkName, NOCLinkName } from '../../../data/Types';
+import {
+    DramBankLinkName,
+    DramNOCLinkName,
+    LinkRenderType,
+    NetworkLinkName,
+    NOC,
+    NOCLinkName,
+} from '../../../data/Types';
 
 type PipeRendererProps = {
     links: NetworkLink[];
@@ -23,7 +30,6 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({
     const svgRef = useRef<SVGSVGElement | null>(null);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
-
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const validLinkIds = [
         NOCLinkName.NOC0_IN,
@@ -37,18 +43,50 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({
         DramBankLinkName.DRAM1_INOUT,
     ];
 
+    const linksNOCType: NetworkLinkName[] = [
+        NOCLinkName.NOC0_IN,
+        NOCLinkName.NOC1_IN,
+        NOCLinkName.NOC0_OUT,
+        NOCLinkName.NOC1_OUT,
+        DramNOCLinkName.NOC0_NOC2AXI,
+        DramNOCLinkName.NOC1_NOC2AXI,
+    ];
+
+    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
+    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
+
     useEffect(() => {
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
 
-        const drawCongestion = (link: NetworkLink, id: NetworkLinkName) => {
+        const drawCongestion = (link: NetworkLink, linkName: NetworkLinkName) => {
             if (showLinkSaturation) {
-                const linkData = linksData[link.uid];
-                if (linkData?.saturation >= linkSaturationTreshold) {
-                    drawLink(svg, id, calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast), 5);
+                let renderCongestion: boolean = false;
+                if (!linksNOCType.includes(linkName)) {
+                    renderCongestion = true;
+                } else if (linksNOCType.includes(linkName)) {
+                    if ((link as NOCLink).noc === NOC.NOC0 && noc0Saturation) {
+                        renderCongestion = true;
+                    }
+                    if ((link as NOCLink).noc === NOC.NOC1 && noc1Saturation) {
+                        renderCongestion = true;
+                    }
+                }
+                if (renderCongestion) {
+                    const linkData = linksData[link.uid];
+                    if (linkData?.saturation >= linkSaturationTreshold) {
+                        drawLink(
+                            svg,
+                            linkName,
+                            calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast),
+                            5,
+                            LinkRenderType.DETAILED_VIEW,
+                        );
+                    }
                 }
             }
         };
+
         links.forEach((link) => {
             const selectedPipeIds = Object.values(allPipes)
                 .filter((pipe: PipeSelection) => pipe.selected)
@@ -58,44 +96,21 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({
 
             const { name } = link;
             if (name && validLinkIds.includes(name as NOCLinkName | DramNOCLinkName)) {
-                switch (name) {
-                    case NOCLinkName.NOC0_IN:
-                    case NOCLinkName.NOC1_IN:
-                        drawCongestion(link, DramNOCLinkName.NOC_IN);
-                        drawPipesDirect(svg, DramNOCLinkName.NOC_IN, validPipes);
-                        break;
-                    case NOCLinkName.NOC0_OUT:
-                    case NOCLinkName.NOC1_OUT:
-                        drawCongestion(link, DramNOCLinkName.NOC_OUT);
-                        drawPipesDirect(svg, DramNOCLinkName.NOC_OUT, validPipes);
-                        break;
-                    case DramNOCLinkName.NOC0_NOC2AXI:
-                    case DramNOCLinkName.NOC1_NOC2AXI:
-                        drawCongestion(link, name);
-                        drawPipesDirect(svg, name, validPipes);
-                        break;
-                    case DramBankLinkName.DRAM_INOUT:
-                    case DramBankLinkName.DRAM0_INOUT:
-                    case DramBankLinkName.DRAM1_INOUT:
-                        drawCongestion(link, DramBankLinkName.DRAM_INOUT);
-                        drawPipesDirect(svg, DramBankLinkName.DRAM_INOUT, validPipes);
-                        break;
-                    default:
-                        break;
-                }
+                drawCongestion(link, link.name);
+                drawPipesDirect(svg, link.name, validPipes, LinkRenderType.DETAILED_VIEW);
             }
         });
-    }, [svgRef, links, allPipes, isHighContrast]);
+    }, [svgRef, links, allPipes, isHighContrast, noc0Saturation, noc1Saturation]);
     return (
         <div className='pipe-renderer'>
             {/* DEBUGGING CODE BELOW */}
             {/* {links.map((link) => ( */}
-            {/*    <div style={{color: '#fff'}} key={link.id}> */}
-            {/*        {link.id} - {link.numOccupants} */}
-            {/*        {link.pipes.map((pipe) => ( */}
-            {/*            <div key={pipe.id}>{pipe.id}</div> */}
-            {/*        ))} */}
-            {/*    </div> */}
+            {/*   <div style={{color: '#fff'}} key={link.name}> */}
+            {/*       {link.name} - {link.numOccupants} */}
+            {/*       {link.pipes.map((pipe) => ( */}
+            {/*           <div key={pipe.id}>{pipe.id}</div> */}
+            {/*       ))} */}
+            {/*   </div> */}
             {/* ))} */}
             <svg
                 width='80'

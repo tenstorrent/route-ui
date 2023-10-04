@@ -12,21 +12,25 @@ import {
     selectAllPipes,
     updateLinkSaturation,
     updateShowLinkSaturation,
+    updateShowLinkSaturationForNOC,
     updateTotalOPs,
 } from '../data/store';
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
 import { LINK_SATURATION_INITIAIL_VALUE } from '../data/constants';
+import { NOC } from '../data/Types';
 
 export default function GridRender() {
-    const { chip, setChip } = useContext<GridContext>(DataSource);
+    const { chip } = useContext<GridContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
     const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
     const [showNodeLocation, setShowNodeLocation] = useState(false);
     const [gridZoom, setGridZoom] = useState(1);
     const [showLinkSaturation, setShowLinkSaturation] = useState(false);
+    const [showLinkSaturationNOC0, setShowLinkSaturationNOC0] = useState(true);
+    const [showLinkSaturationNOC1, setShowLinkSaturationNOC1] = useState(true);
     const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(LINK_SATURATION_INITIAIL_VALUE);
     const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
     const [opCycles, setOpCycles] = useState<number>(0);
@@ -41,6 +45,15 @@ export default function GridRender() {
     const onShowLinkSaturation = (value: boolean) => {
         setShowLinkSaturation(value);
         dispatch(updateShowLinkSaturation(value));
+    };
+    const onShowLinkSaturationForNOC = (noc: NOC, selected: boolean) => {
+        dispatch(updateShowLinkSaturationForNOC({ noc, selected }));
+        if (noc === NOC.NOC0) {
+            setShowLinkSaturationNOC0(selected);
+        }
+        if (noc === NOC.NOC1) {
+            setShowLinkSaturationNOC1(selected);
+        }
     };
 
     const congestionLegendStyle = {
@@ -116,10 +129,22 @@ export default function GridRender() {
                 <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
                     <Switch
                         checked={showLinkSaturation}
-                        label='congestion'
+                        label='link congestion'
                         onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
                     />
                 </Tooltip2>
+                <Switch
+                    disabled={!showLinkSaturation}
+                    checked={showLinkSaturationNOC0}
+                    label='noc0'
+                    onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC0, event.currentTarget.checked)}
+                />
+                <Switch
+                    disabled={!showLinkSaturation}
+                    checked={showLinkSaturationNOC1}
+                    label='noc1'
+                    onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC1, event.currentTarget.checked)}
+                />
                 <div
                     className='congestion-legend'
                     style={{ ...(showLinkSaturation ? congestionLegendStyle : null), width: '100%', height: '3px' }}
