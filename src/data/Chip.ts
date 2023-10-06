@@ -187,17 +187,6 @@ export default class Chip {
 
     private _coreGroupsPerOperation: Map<string, string[]> = new Map<string, string[]>();
 
-    /**
-     * Map of operation name to core IDs.
-     */
-    public get coreGroupsPerOperation(): Map<string, string[]> {
-        return this._coreGroupsPerOperation;
-    }
-
-    protected set coreGroupsPerOperation(value: Map<string, string[]>) {
-        this._coreGroupsPerOperation = value;
-    }
-
     private _coreGroupsPerOperand: Map<string, string[]> = new Map<string, string[]>();
 
     /**
@@ -287,7 +276,6 @@ export default class Chip {
                         core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         cores[coreID] = core;
                     }
-                    augmentedChip.coreGroupsPerOperation.get(operationName)?.push(coreID);
                     augmentedChip.coreGroupsPerOperand.get(operandJSON.name)?.push(coreID);
 
                     // @ts-ignore
@@ -299,7 +287,6 @@ export default class Chip {
 
             augmentedChip.operations = Object.entries(json).map(([operationName, op]) => {
                 augmentedChip.pipesPerOp.set(operationName, []);
-                augmentedChip.coreGroupsPerOperation.set(operationName, []);
 
                 const inputs = op.inputs.map((input) => {
                     return organizeData(input, operationName, cores, OpIoType.INPUTS);
@@ -317,9 +304,6 @@ export default class Chip {
             });
             augmentedChip.pipesPerOp.forEach((value, key) => {
                 augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
-            });
-            augmentedChip.coreGroupsPerOperation.forEach((value, key) => {
-                augmentedChip.coreGroupsPerOperation.set(key, [...new Set(value)]);
             });
             augmentedChip.coreGroupsPerOperand.forEach((value, key) => {
                 augmentedChip.coreGroupsPerOperand.set(key, [...new Set(value)]);
