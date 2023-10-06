@@ -111,7 +111,7 @@ export default function PropertiesPanel() {
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className='properties-panel-nodes'>
                                 {selectedNodes.map((node: ComputeNode) => {
-                                    const coreData = chip?.cores.find(
+                                    const coreData = chip?.coreOps.find(
                                         (core: CoreOperation) => core.coreID === node.uid,
                                     );
                                     return (
