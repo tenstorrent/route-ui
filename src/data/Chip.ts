@@ -23,7 +23,7 @@ import {
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName, OpGraphNodeType, Queue, QueueName } from './GraphTypes';
-import { forEach, mapIterable, reduceIterable } from '../utils/IterableHelpers';
+import { forEach, mapIterable } from '../utils/IterableHelpers';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -161,7 +161,6 @@ export default class Chip {
         return this.queuesByName.values();
     }
 
-    /** @Deprecated */
     private _coreOps: CoreOperation[] = [];
 
     /**
@@ -186,6 +185,8 @@ export default class Chip {
 
     /**
      * Map of operation name to pipe IDs.
+     * @Deprecated
+     * Use `(Operation.inputs | Operation.outputs) -> Operand.getAllPipes`
      */
     public get pipesPerOp(): Map<string, string[]> {
         return this._pipesPerOp;
@@ -195,6 +196,8 @@ export default class Chip {
 
     /**
      * Map of operand name to pipe IDs.
+     * @Deprecated
+     * Use `Operand.getAllPipes`
      */
     public get pipesPerOperand(): Map<string, string[]> {
         return this._pipesPerOperand;
