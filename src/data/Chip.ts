@@ -168,10 +168,6 @@ export default class Chip {
         return this._pipesPerOp;
     }
 
-    protected set pipesPerOp(value: Map<string, string[]>) {
-        this._pipesPerOp = value;
-    }
-
     private _pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
 
     /**
@@ -179,21 +175,6 @@ export default class Chip {
      */
     public get pipesPerOperand(): Map<string, string[]> {
         return this._pipesPerOperand;
-    }
-
-    protected set pipesPerOperand(value: Map<string, string[]>) {
-        this._pipesPerOperand = value;
-    }
-
-    private _coreGroupsPerOperation: Map<string, string[]> = new Map<string, string[]>();
-
-    private _coreGroupsPerOperand: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of operand name to core IDs.
-     */
-    public get coreGroupsPerOperand(): Map<string, string[]> {
-        return this._coreGroupsPerOperand;
     }
 
     constructor() {
@@ -257,9 +238,6 @@ export default class Chip {
                 if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
                     augmentedChip.pipesPerOperand.set(operandJSON.name, []);
                 }
-                if (!augmentedChip.coreGroupsPerOperand.has(operandJSON.name)) {
-                    augmentedChip.coreGroupsPerOperand.set(operandJSON.name, []);
-                }
                 Object.entries(operandJSON.pipes).forEach(([coreID, pipes]) => {
                     const pipelist: string[] = pipes.map((el) => el.toString());
 
@@ -276,7 +254,6 @@ export default class Chip {
                         core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         cores[coreID] = core;
                     }
-                    augmentedChip.coreGroupsPerOperand.get(operandJSON.name)?.push(coreID);
 
                     // @ts-ignore
                     core[ioType].push(operand);
@@ -304,9 +281,6 @@ export default class Chip {
             });
             augmentedChip.pipesPerOp.forEach((value, key) => {
                 augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
-            });
-            augmentedChip.coreGroupsPerOperand.forEach((value, key) => {
-                augmentedChip.coreGroupsPerOperand.set(key, [...new Set(value)]);
             });
 
             return augmentedChip;
