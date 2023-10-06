@@ -363,7 +363,7 @@ export default function PropertiesPanel() {
                             <div className='operations-wrap list-wrap'>
                                 <div className='scrollable-content'>
                                     {operationsList.map((operationName) => {
-                                        const operation = chip?.operations.find((o) => o.name === operationName);
+                                        const operation = chip?.getOperation(operationName);
 
                                         return (
                                             <FilterableComponent
