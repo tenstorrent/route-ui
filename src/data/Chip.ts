@@ -282,23 +282,15 @@ export default class Chip {
                     }
                     const pipeList: string[] = pipes.map((pipeId) => pipeId.toString());
 
+
+                    // Operand is *core-specific* here. This creates unnecessary duplicate operands.
+                    // Only one operand connects two graph nodes (operations or queues). That operand can be implemented with multiple *pipes*.
+                    // To associate groups of an operand's pipes to different core IDs, can just attach the existing `[coreID, pipes]` mappings to the same operand.
                     const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
                     operand.pipeIdsByCore.set(coreID, pipeList);
 
-                    // Old: use Chip to store associations
                     augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipeList);
                     augmentedChip.pipesPerOp.get(operation.name)?.push(...pipeList);
-
-                    // New:
-                    // - associate Operand with Operation
-                    // - use Operand to store pipes
-                    // TODO: implement
-
-                    // CoreOperation usage (deprecated)
-                    // - Uses a CoreOperation to associate a core's UID with a single operation's name
-                    // - If the CoreOperation association doesn't exist, create it
-                    // - Separately modifies a mapping on the Chip from operation names to an array of core UIDs ("coreGroup")
-                    // - Separately modifies a mapping on the Chip from operand names to another (but identical?) array of core UIDs ("coreGroup")
 
                     let coreOp: CoreOperation = cores[coreID];
                     if (!core) {
@@ -312,13 +304,6 @@ export default class Chip {
                     } else if (ioType === OpIoType.OUTPUTS) {
                         coreOp.outputs.push(operand);
                     }
-
-                    // Core & Operation usage (new)
-                    // - Operation is already passed into this fn (don't need to get/create it)
-                    // - Make sure the existing operation is associated with the coreID of this pipe mapping
-                    // - Associate the operand with the operation
-                    // - Associate these pipes with the operand
-                    // TODO: Implement
                 });
                 return operandData;
             };
