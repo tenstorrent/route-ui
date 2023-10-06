@@ -22,6 +22,7 @@ import { CoreOperation } from '../data/ChipAugmentation';
 
 import { ComputeNodeType } from '../data/Types';
 import { Operation, OpGraphNodeType } from '../data/GraphTypes';
+import { filterIterable } from "../utils/IterableHelpers";
 
 function OperationDetails(props: { operation: Operation }) {
     const { operation } = props;
@@ -74,11 +75,11 @@ export default function PropertiesPanel() {
 
         const selected = Object.values(nodeSelectionState.nodeList).filter((n) => n.selected);
 
-        const selection: ComputeNode[] = chip.nodes.filter((node: ComputeNode) => {
+        const selection = filterIterable(chip.nodes, (node: ComputeNode) => {
             return selected.filter((n) => n.id === node.uid).length > 0;
         });
 
-        setSelectedNodes(selection);
+        setSelectedNodes([...selection]);
     }, [chip, nodeSelectionState]);
 
     useEffect(() => {

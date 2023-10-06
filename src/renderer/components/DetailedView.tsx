@@ -22,6 +22,7 @@ import {
     NOC,
     DramBankLinkName
 } from '../../data/Types';
+import { filterIterable } from "../../utils/IterableHelpers";
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
@@ -39,10 +40,10 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     const [dram, setDram] = React.useState<DramChannel | null>(null);
     useEffect(() => {
         if (chip && uid !== null) {
-            const selectedNode = chip.nodes.find((n) => n.uid === uid);
+            const selectedNode = chip.getCore(uid);
             let allNodes: ComputeNode[] | undefined;
             if (selectedNode && selectedNode.dramChannel > -1) {
-                allNodes = chip?.nodes.filter((n) => n.dramChannel === selectedNode?.dramChannel);
+                allNodes = [...filterIterable(chip.nodes, (n) => n.dramChannel === selectedNode?.dramChannel)];
             }
 
             setNode(selectedNode || null);

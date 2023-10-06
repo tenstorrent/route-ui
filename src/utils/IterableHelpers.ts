@@ -5,7 +5,7 @@ export const isIterable = (value: unknown): value is Iterable<unknown> => (
     typeof value[Symbol.iterator] === 'function'
 );
 
-export function* mapIterable<T, U>(f: (val: T) => U, iterable: Iterable<T>): Iterable<U> {
+export function* mapIterable<T, U>(iterable: Iterable<T>, f: (val: T) => U): Iterable<U> {
     // eslint-disable-next-line no-restricted-syntax
     for (const item of iterable) {
         yield f(item);

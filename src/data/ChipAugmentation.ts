@@ -55,6 +55,14 @@ export class OperationBuilder extends AbstractOpGraphNode implements Operation {
         this._cores.push(core);
     }
 
+    assignInputs(inputs: Operand[]) {
+        this.inputs.push(...inputs);
+    }
+
+    assignOutputs(outputs: Operand[]) {
+        this.outputs.push(...outputs);
+    }
+
     get cores() {
         return this._cores.values();
     }
