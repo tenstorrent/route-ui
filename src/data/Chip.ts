@@ -168,10 +168,6 @@ export default class Chip {
         return this._pipesPerOp;
     }
 
-    protected set pipesPerOp(value: Map<string, string[]>) {
-        this._pipesPerOp = value;
-    }
-
     private _pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
 
     /**
@@ -179,62 +175,6 @@ export default class Chip {
      */
     public get pipesPerOperand(): Map<string, string[]> {
         return this._pipesPerOperand;
-    }
-
-    protected set pipesPerOperand(value: Map<string, string[]>) {
-        this._pipesPerOperand = value;
-    }
-
-    private _coreGroupsPerOperation: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of operation name to core IDs.
-     */
-    public get coreGroupsPerOperation(): Map<string, string[]> {
-        return this._coreGroupsPerOperation;
-    }
-
-    protected set coreGroupsPerOperation(value: Map<string, string[]>) {
-        this._coreGroupsPerOperation = value;
-    }
-
-    private _coreGroupsPerOperand: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of operand name to core IDs.
-     */
-    public get coreGroupsPerOperand(): Map<string, string[]> {
-        return this._coreGroupsPerOperand;
-    }
-
-    protected set coreGroupsPerOperand(value: Map<string, string[]>) {
-        this._coreGroupsPerOperand = value;
-    }
-
-    private _operandsByCore: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of core ID to operand names.
-     */
-    public get operandsByCore(): Map<string, string[]> {
-        return this._operandsByCore;
-    }
-
-    protected set operandsByCore(value: Map<string, string[]>) {
-        this._operandsByCore = value;
-    }
-
-    private _operationsByCore: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of core ID to operation names.
-     */
-    public get operationsByCore(): Map<string, string[]> {
-        return this._operationsByCore;
-    }
-
-    protected set operationsByCore(value: Map<string, string[]>) {
-        this._operationsByCore = value;
     }
 
     constructor() {
@@ -298,21 +238,8 @@ export default class Chip {
                 if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
                     augmentedChip.pipesPerOperand.set(operandJSON.name, []);
                 }
-                if (!augmentedChip.coreGroupsPerOperand.has(operandJSON.name)) {
-                    augmentedChip.coreGroupsPerOperand.set(operandJSON.name, []);
-                }
                 Object.entries(operandJSON.pipes).forEach(([coreID, pipes]) => {
                     const pipelist: string[] = pipes.map((el) => el.toString());
-
-                    if (!augmentedChip.operationsByCore.has(coreID)) {
-                        augmentedChip.operationsByCore.set(coreID, []);
-                    }
-                    augmentedChip.operationsByCore.get(coreID)?.push(operationName);
-
-                    if (!augmentedChip.operandsByCore.has(coreID)) {
-                        augmentedChip.operandsByCore.set(coreID, []);
-                    }
-                    augmentedChip.operandsByCore.get(coreID)?.push(operandJSON.name);
 
                     augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipelist);
                     augmentedChip.pipesPerOp.get(operationName)?.push(...pipelist);
@@ -327,8 +254,6 @@ export default class Chip {
                         core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         cores[coreID] = core;
                     }
-                    augmentedChip.coreGroupsPerOperation.get(operationName)?.push(coreID);
-                    augmentedChip.coreGroupsPerOperand.get(operandJSON.name)?.push(coreID);
 
                     // @ts-ignore
                     core[ioType].push(operand);
@@ -339,7 +264,6 @@ export default class Chip {
 
             augmentedChip.operations = Object.entries(json).map(([operationName, op]) => {
                 augmentedChip.pipesPerOp.set(operationName, []);
-                augmentedChip.coreGroupsPerOperation.set(operationName, []);
 
                 const inputs = op.inputs.map((input) => {
                     return organizeData(input, operationName, cores, OpIoType.INPUTS);
@@ -357,12 +281,6 @@ export default class Chip {
             });
             augmentedChip.pipesPerOp.forEach((value, key) => {
                 augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
-            });
-            augmentedChip.coreGroupsPerOperation.forEach((value, key) => {
-                augmentedChip.coreGroupsPerOperation.set(key, [...new Set(value)]);
-            });
-            augmentedChip.coreGroupsPerOperand.forEach((value, key) => {
-                augmentedChip.coreGroupsPerOperand.set(key, [...new Set(value)]);
             });
 
             return augmentedChip;
