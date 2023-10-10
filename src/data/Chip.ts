@@ -22,7 +22,8 @@ import {
     NOCLinkName
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import { OpGraphNodeType } from './GraphTypes';
+import { OperationName, OpGraphNodeType } from './GraphTypes';
+import { reduceIterable } from "../utils/IterableHelpers";
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -133,17 +134,25 @@ export default class Chip {
 
     // augmented data
 
-    private _operations: Operation[] = [];
-
     /**
-     * Array of operation data.
+     * Iterates over all operations.
      */
-    public get operations(): Operation[] {
-        return this._operations;
+    public get operations(): Iterable<Operation> {
+        return this.operationsByName.values();
     }
 
-    protected set operations(value: Operation[]) {
-        this._operations = value;
+    protected set operations(value: Iterable<Operation>) {
+        this.operationsByName = reduceIterable(
+            value,
+            new Map<OperationName, Operation>(),
+            (opMap, currentOp) => opMap.set(currentOp.name, currentOp),
+        );
+    }
+
+    private operationsByName: Map<OperationName, Operation>;
+
+    public getOperation(name: OperationName) {
+        return this.operationsByName.get(name);
     }
 
     private _cores: CoreOperation[] = [];
@@ -178,6 +187,7 @@ export default class Chip {
     }
 
     constructor() {
+        this.operationsByName = new Map();
         Chip.GET_NOC_ORDER();
     }
 
@@ -255,8 +265,11 @@ export default class Chip {
                         cores[coreID] = core;
                     }
 
-                    // @ts-ignore
-                    core[ioType].push(operand);
+                    if (ioType === OpIoType.INPUTS) {
+                        core.inputs.push(operand);
+                    } else if (ioType === OpIoType.OUTPUTS) {
+                        core.outputs.push(operand);
+                    }
                 });
                 return operandData;
             };
@@ -397,6 +410,13 @@ export default class Chip {
         });
 
         return list;
+    }
+
+    private addOperation(operation: Operation) {
+        if (!this.getOperation(operation.name)) {
+            this.operationsByName.set(operation.name, operation);
+        }
+
     }
 }
 
