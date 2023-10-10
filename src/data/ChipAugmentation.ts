@@ -31,14 +31,15 @@ export abstract class AbstractOpGraphNode {
     }
 }
 
-export class QueueBuilder extends AbstractOpGraphNode implements Queue {
+export class BuildableQueue extends AbstractOpGraphNode implements Queue {
     readonly nodeType = OpGraphNodeType.QUEUE;
 }
 
 /**
- * Builds the operation data structure.
+ * A concrete implementation of the Operation interface which has methods to support incremental
+ * additions to the data structure.
  */
-export class OperationBuilder extends AbstractOpGraphNode implements Operation {
+export class BuildableOperation extends AbstractOpGraphNode implements Operation {
     readonly nodeType = OpGraphNodeType.OPERATION;
 
     protected _cores: ComputeNode[];
@@ -69,6 +70,17 @@ export class OperationBuilder extends AbstractOpGraphNode implements Operation {
 }
 
 /**
+ * Intended as a workaround, if BuildableOperation methods are needed from an Operation object.
+ *
+ * @Deprecated
+ * Will be removed in a future version.
+ */
+export const isBuildable = (operation: Operation): operation is BuildableOperation => (
+    BuildableOperation.prototype.assignInputs.name in operation &&
+    BuildableOperation.prototype.assignOutputs.name in operation
+);
+
+/**
  * Represents the data structure for a core specific operation, which extends the operation data.
  * matches core centric data structure
  *
@@ -76,7 +88,7 @@ export class OperationBuilder extends AbstractOpGraphNode implements Operation {
  * The base Operation object now supports references to cores.
  * Cores will also provide an interface to get their operation.
  */
-export class CoreOperation extends OperationBuilder {
+export class CoreOperation extends BuildableOperation {
     public coreID: string = ''; // location
 
     /** Represents the x,y coordinates of the core. */

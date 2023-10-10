@@ -7,7 +7,7 @@ import {
     OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { CoreOperation, Operand, OperationBuilder, OpIoType } from './ChipAugmentation';
+import { CoreOperation, Operand, BuildableOperation, OpIoType, isBuildable } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import {
@@ -323,7 +323,7 @@ export default class Chip {
                     console.error(
                         `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
                     );
-                    operation = new OperationBuilder(operationName, [], [], []);
+                    operation = new BuildableOperation(operationName, [], [], []);
                     chip.addOperation(operation);
                 }
 
@@ -334,10 +334,10 @@ export default class Chip {
                     return organizeData(output, operation!, cores, OpIoType.OUTPUTS);
                 });
 
-                if ("assignInputs" in operation! && "assignOutputs" in operation) {
+                if (isBuildable(operation)) {
                     // Hacky once again...
-                    (operation as OperationBuilder).assignInputs(inputs);
-                    (operation as OperationBuilder).assignOutputs(outputs);
+                    operation.assignInputs(inputs);
+                    operation.assignOutputs(outputs);
                 } else {
                     throw new Error(`Can't modify the operands for op ${operation?.name}: builder methods missing.`);
                 }
@@ -666,10 +666,10 @@ export class ComputeNode {
                         `Core ${node.uid} cannot be assigned to operation ${opName}: unable to cast to OperationBuilder.`,
                     );
                 } else {
-                    (operation as OperationBuilder).assignCore(node);
+                    (operation as BuildableOperation).assignCore(node);
                 }
             } else {
-                operation = new OperationBuilder(opName, [node]);
+                operation = new BuildableOperation(opName, [node]);
             }
             node.operation = operation;
         }
