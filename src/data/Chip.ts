@@ -283,21 +283,27 @@ export default class Chip {
                     const pipeList: string[] = pipes.map((pipeId) => pipeId.toString());
 
 
-                    // Operand is *core-specific* here. This creates unnecessary duplicate operands.
-                    // Only one operand connects two graph nodes (operations or queues). That operand can be implemented with multiple *pipes*.
-                    // To associate groups of an operand's pipes to different core IDs, can just attach the existing `[coreID, pipes]` mappings to the same operand.
+                    /* The operand created here is *core-specific*. This creates unnecessary duplicate operands, and doesn't map onto the
+                     * actual meaning of "Operand" in the domain context.
+                     *
+                     * In the domain context, only one operand connects two graph nodes (operations or queues). That operand can be implemented with multiple *pipes*, between multiple pairs of cores.
+                     *
+                     * To associate groups of an operand's pipes to different core IDs, we can just attach the existing `[coreID, pipes]` mappings to the same operand.
+                     */
                     const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
+
+                    // Since we just created a new operand, this `pipeIdsByCore` Map will only ever contain one key-value pair.
                     operand.pipeIdsByCore.set(coreID, pipeList);
 
                     augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipeList);
                     augmentedChip.pipesPerOp.get(operation.name)?.push(...pipeList);
 
-                    let coreOp: CoreOperation = cores[coreID];
+                    let coreOp: CoreOperation = coreOps[coreID];
                     if (!coreOp) {
                         coreOp = new CoreOperation(operation.name, [], [], []);
                         coreOp.coreID = coreID;
                         coreOp.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
-                        cores[coreID] = coreOp;
+                        coreOps[coreID] = coreOp;
                     }
                     if (ioType === OpIoType.INPUTS) {
                         coreOp.inputs.push(operand);
@@ -308,8 +314,6 @@ export default class Chip {
                 return operandData;
             };
             const cores: Record<string, CoreOperation> = {};
-
-            let errors: Error[] = [];
 
             Object.entries(operationsJson).map(([operationName, opJson]) => {
                 augmentedChip.pipesPerOp.set(operationName, []);
