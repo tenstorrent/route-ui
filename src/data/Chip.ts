@@ -293,7 +293,7 @@ export default class Chip {
                     augmentedChip.pipesPerOp.get(operation.name)?.push(...pipeList);
 
                     let coreOp: CoreOperation = cores[coreID];
-                    if (!core) {
+                    if (!coreOp) {
                         coreOp = new CoreOperation(operation.name, [], [], []);
                         coreOp.coreID = coreID;
                         coreOp.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
