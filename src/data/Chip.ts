@@ -155,17 +155,17 @@ export default class Chip {
         return this.operationsByName.get(name);
     }
 
-    private _cores: CoreOperation[] = [];
+    private _coreOps: CoreOperation[] = [];
 
     /**
      * Array of core operation data.
      */
-    public get cores(): CoreOperation[] {
-        return this._cores;
+    public get coreOps(): CoreOperation[] {
+        return this._coreOps;
     }
 
-    protected set cores(value: CoreOperation[]) {
-        this._cores = value;
+    protected set coreOps(value: CoreOperation[]) {
+        this._coreOps = value;
     }
 
     private _pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
@@ -233,7 +233,7 @@ export default class Chip {
         return chip;
     }
 
-    public static AUGMENT_FROM_OPS_JSON(chip: Chip, json: Record<string, OperationDataJSON>): Chip {
+    public static AUGMENT_FROM_OPS_JSON(chip: Chip, operationsJson: Record<string, OperationDataJSON>): Chip {
         if (chip) {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
@@ -241,53 +241,54 @@ export default class Chip {
             const organizeData = (
                 operandJSON: OperandJSON,
                 operationName: string,
-                cores: Record<string, CoreOperation>,
+                coreOps: Record<string, CoreOperation>,
                 ioType: OpIoType,
             ) => {
                 const operandData = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
                 if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
                     augmentedChip.pipesPerOperand.set(operandJSON.name, []);
                 }
-                Object.entries(operandJSON.pipes).forEach(([coreID, pipes]) => {
-                    const pipelist: string[] = pipes.map((el) => el.toString());
 
-                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipelist);
-                    augmentedChip.pipesPerOp.get(operationName)?.push(...pipelist);
+                Object.entries(operandJSON.pipes).forEach(([coreID, pipes]) => {
+                    const pipeList: string[] = pipes.map((pipeId) => pipeId.toString());
+
+                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipeList);
+                    augmentedChip.pipesPerOp.get(operationName)?.push(...pipeList);
 
                     const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
-                    operand.pipeIdsByCore.set(coreID, pipelist);
+                    operand.pipeIdsByCore.set(coreID, pipeList);
 
-                    let core: CoreOperation = cores[coreID];
-                    if (!core) {
-                        core = new CoreOperation(operationName, [], []);
-                        core.coreID = coreID;
-                        core.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
-                        cores[coreID] = core;
+                    let coreOp: CoreOperation = coreOps[coreID];
+                    if (!coreOp) {
+                        coreOp = new CoreOperation(operationName, [], []);
+                        coreOp.coreID = coreID;
+                        coreOp.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
+                        coreOps[coreID] = coreOp;
                     }
 
                     if (ioType === OpIoType.INPUTS) {
-                        core.inputs.push(operand);
+                        coreOp.inputs.push(operand);
                     } else if (ioType === OpIoType.OUTPUTS) {
-                        core.outputs.push(operand);
+                        coreOp.outputs.push(operand);
                     }
                 });
                 return operandData;
             };
             const cores: Record<string, CoreOperation> = {};
 
-            augmentedChip.operations = Object.entries(json).map(([operationName, op]) => {
+            augmentedChip.operations = Object.entries(operationsJson).map(([operationName, opJson]) => {
                 augmentedChip.pipesPerOp.set(operationName, []);
 
-                const inputs = op.inputs.map((input) => {
+                const inputs = opJson.inputs.map((input) => {
                     return organizeData(input, operationName, cores, OpIoType.INPUTS);
                 });
-                const outputs = op.outputs.map((output) => {
+                const outputs = opJson.outputs.map((output) => {
                     return organizeData(output, operationName, cores, OpIoType.OUTPUTS);
                 });
 
                 return new Operation(operationName, inputs, outputs);
             });
-            augmentedChip.cores = Object.values(cores);
+            augmentedChip.coreOps = Object.values(cores);
             // unique values
             augmentedChip.pipesPerOperand.forEach((value, key) => {
                 augmentedChip.pipesPerOperand.set(key, [...new Set(value)]);
@@ -323,7 +324,7 @@ export default class Chip {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
 
-            augmentedChip.cores = Object.entries(json).map(([uid, core]) => {
+            augmentedChip.coreOps = Object.entries(json).map(([uid, core]) => {
                 const coreOp = new CoreOperation(core.name, [], []);
                 coreOp.coreID = uid;
                 coreOp.loc = core.loc;
@@ -354,7 +355,7 @@ export default class Chip {
             });
             if (hasPipe) {
                 const extendedNodeData = new ComputeNodeExtended(node);
-                extendedNodeData.coreOperationData = this.cores.find((core) => core.coreID === node.uid) || null;
+                extendedNodeData.coreOperationData = this.coreOps.find((core) => core.coreID === node.uid) || null;
                 list.push(extendedNodeData);
             }
         });

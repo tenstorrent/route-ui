@@ -45,7 +45,7 @@ export interface OperationDataJSON {
 export interface OperandJSON {
     name: string;
     type: string;
-    pipes: { [key: string]: string[] };
+    pipes: { [coreId: string]: string[] };
 }
 
 export interface OperandDataJSON {
