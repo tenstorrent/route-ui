@@ -70,38 +70,6 @@ export class BuildableOperation extends AbstractOpGraphNode implements Operation
 }
 
 /**
- * Intended as a workaround, if BuildableOperation methods are needed from an Operation object.
- *
- * @Deprecated
- * Will be removed in a future version.
- */
-export const isBuildable = (operation: Operation): operation is BuildableOperation => (
-    BuildableOperation.prototype.assignInputs.name in operation &&
-    BuildableOperation.prototype.assignOutputs.name in operation
-);
-
-/**
- * Represents the data structure for a core specific operation, which extends the operation data.
- * matches core centric data structure
- *
- * @Deprecated
- * The base Operation object now supports references to cores.
- * Cores will also provide an interface to get their operation.
- */
-export class CoreOperation extends BuildableOperation {
-    public coreID: string = ''; // location
-
-    /** Represents the x,y coordinates of the core. */
-    loc: Loc = { x: 0, y: 0 };
-
-    /** label only */
-    logicalCoreId: string = '';
-
-    /** label only */
-    opType: string = '';
-}
-
-/**
  * Represents the data structure for an operand.
  */
 export class Operand {

@@ -4,10 +4,9 @@ import {
     NetlistAnalyzerDataJSON,
     NOCLinkJSON,
     NodeDataJSON,
-    OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { BuildableOperation, BuildableQueue, CoreOperation, isBuildable, Operand, OpIoType } from './ChipAugmentation';
+import { BuildableOperation, Operand } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import {
@@ -22,7 +21,7 @@ import {
     NOCLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
+import type { Operation, OperationName } from './GraphTypes';
 import { OpGraphNodeType } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 
@@ -658,15 +657,6 @@ export class ComputeNode {
             return 'p';
         }
         return '';
-    }
-}
-
-export class ComputeNodeExtended extends ComputeNode {
-    public coreOperationData: CoreOperation | null;
-
-    constructor(data: ComputeNode) {
-        super(data.uid);
-        Object.assign(this, data);
     }
 }
 
