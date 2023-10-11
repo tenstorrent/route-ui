@@ -156,22 +156,6 @@ export default class Chip {
         }
     }
 
-    protected queuesByName: Map<QueueName, BuildableQueue>;
-
-    public getQueue(name: QueueName): Queue | undefined {
-        return this.queuesByName.get(name);
-    }
-
-    public addQueue(queue: BuildableQueue) {
-        if (!this.getQueue(queue.name)) {
-            this.queuesByName.set(queue.name, queue);
-        }
-    }
-
-    public get queues(): Iterable<Queue> {
-        return this.queuesByName.values();
-    }
-
     private _coreOps: CoreOperation[] = [];
 
     /**
@@ -193,7 +177,6 @@ export default class Chip {
     }
 
     constructor() {
-        this.queuesByName = new Map();
         this.operationsByName = new Map();
         Chip.GET_NOC_ORDER();
     }
@@ -307,19 +290,10 @@ export default class Chip {
                 }
 
                 const inputs = opJson.inputs.map((input) => {
-                    const operand = organizeData(input, operation!, cores, OpIoType.INPUTS);
-                    if (operand.type === OpGraphNodeType.QUEUE) {
-                        const queue = new BuildableQueue(operand.name, [], []);
-                        chip.addQueue(queue);
-                    }
-                    return operand;
+                    return organizeData(input, operation!, cores, OpIoType.INPUTS);
                 });
                 const outputs = opJson.outputs.map((output) => {
-                    const operand = organizeData(output, operation!, cores, OpIoType.OUTPUTS);
-                    if (operand.type === OpGraphNodeType.QUEUE) {
-                        chip.addQueue(new BuildableQueue(operand.name, [], []));
-                    }
-                    return operand;
+                    return organizeData(output, operation!, cores, OpIoType.OUTPUTS);
                 });
 
                 operation.assignInputs(inputs);
