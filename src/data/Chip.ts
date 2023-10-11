@@ -7,7 +7,7 @@ import {
     OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { CoreOperation, Operand, Operation, OpIoType } from './ChipAugmentation';
+import { BuildableOperation, BuildableQueue, CoreOperation, isBuildable, Operand, OpIoType } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import {
@@ -19,11 +19,12 @@ import {
     Loc,
     NetworkLinkName,
     NOC,
-    NOCLinkName
+    NOCLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import { OperationName, OpGraphNodeType } from './GraphTypes';
-import { reduceIterable } from "../utils/IterableHelpers";
+import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
+import { OpGraphNodeType } from './GraphTypes';
+import { forEach, mapIterable } from '../utils/IterableHelpers';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -50,14 +51,18 @@ export default class Chip {
         this._chipId = value;
     }
 
-    private _nodes: ComputeNode[] = [];
+    private nodesById: Map<string, ComputeNode> = new Map();
 
-    public get nodes(): ComputeNode[] {
-        return this._nodes;
+    public get nodes(): Iterable<ComputeNode> {
+        return this.nodesById.values();
     }
 
-    protected set nodes(value: ComputeNode[]) {
-        this._nodes = value;
+    protected set nodes(value: Iterable<ComputeNode>) {
+        this.nodesById = new Map(mapIterable(value, (node: ComputeNode) => [node.uid, node]));
+    }
+
+    public getNode(nodeUID: string): ComputeNode | undefined {
+        return this.nodesById.get(nodeUID);
     }
 
     private _totalCols: number = 0;
@@ -132,8 +137,6 @@ export default class Chip {
         this._totalOpCycles = value;
     }
 
-    // augmented data
-
     /**
      * Iterates over all operations.
      */
@@ -141,49 +144,36 @@ export default class Chip {
         return this.operationsByName.values();
     }
 
-    protected set operations(value: Iterable<Operation>) {
-        this.operationsByName = reduceIterable(
-            value,
-            new Map<OperationName, Operation>(),
-            (opMap, currentOp) => opMap.set(currentOp.name, currentOp),
-        );
-    }
-
-    private operationsByName: Map<OperationName, Operation>;
+    private operationsByName: Map<OperationName, BuildableOperation>;
 
     public getOperation(name: OperationName) {
         return this.operationsByName.get(name);
+    }
+
+    protected addOperation(operation: BuildableOperation) {
+        if (!this.getOperation(operation.name)) {
+            this.operationsByName.set(operation.name, operation);
+        }
     }
 
     private _coreOps: CoreOperation[] = [];
 
     /**
      * Array of core operation data.
+     *
+     * @Deprecated
+     * Use `ComputeNode` and `Operation` interfaces to access these mappings.
      */
     public get coreOps(): CoreOperation[] {
         return this._coreOps;
     }
 
+    /** @Deprecated
+     *
+     * Use `ComputeNode` and `Operation` interfaces to set these mappings.
+     */
     protected set coreOps(value: CoreOperation[]) {
         this._coreOps = value;
-    }
-
-    private _pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of operation name to pipe IDs.
-     */
-    public get pipesPerOp(): Map<string, string[]> {
-        return this._pipesPerOp;
-    }
-
-    private _pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of operand name to pipe IDs.
-     */
-    public get pipesPerOperand(): Map<string, string[]> {
-        return this._pipesPerOperand;
     }
 
     constructor() {
@@ -213,8 +203,13 @@ export default class Chip {
                 const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
                 chip.totalCols = Math.max(loc.y, chip.totalCols);
                 chip.totalRows = Math.max(loc.x, chip.totalRows);
-                const node = new ComputeNode(`${chip.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
-                node.fromNetlistJSON(nodeJSON, chip.chipId);
+                const [node, newOperation] = ComputeNode.fromNetlistJSON(nodeJSON, chip.chipId, (name: OperationName) =>
+                    chip.operationsByName.get(name)
+                );
+                if (newOperation) {
+                    console.log('Adding operation: ', newOperation.name);
+                    chip.addOperation(newOperation);
+                }
                 return node;
             })
             .sort((a, b) => {
@@ -240,62 +235,73 @@ export default class Chip {
 
             const organizeData = (
                 operandJSON: OperandJSON,
-                operationName: string,
+                operation: Operation,
                 coreOps: Record<string, CoreOperation>,
                 ioType: OpIoType,
             ) => {
-                const operandData = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
-                if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
-                    augmentedChip.pipesPerOperand.set(operandJSON.name, []);
-                }
+                const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
 
                 Object.entries(operandJSON.pipes).forEach(([coreID, pipes]) => {
+                    const core = chip.getNode(coreID);
+                    if (core === undefined) {
+                        throw new Error(
+                            `Core ${coreID} was referenced in operand ${operandJSON.name}, but is not present in loaded chip data.`,
+                        );
+                    }
                     const pipeList: string[] = pipes.map((pipeId) => pipeId.toString());
 
-                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipeList);
-                    augmentedChip.pipesPerOp.get(operationName)?.push(...pipeList);
+                    /* The operand created here is *core-specific*. This creates unnecessary duplicate operands, and doesn't map onto the
+                     * actual meaning of "Operand" in the domain context.
+                     *
+                     * In the domain context, only one operand connects two graph nodes (operations or queues). That operand can be implemented with multiple *pipes*, between multiple pairs of cores.
+                     *
+                     * To associate groups of an operand's pipes to different core IDs, we can just attach the existing `[coreID, pipes]` mappings to the same operand.
+                     */
+                    const coreOperand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
 
-                    const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
-                    operand.pipeIdsByCore.set(coreID, pipeList);
+                    // Since we just created a new operand, this `pipeIdsByCore` Map will only ever contain one key-value pair.
+                    coreOperand.pipeIdsByCore.set(coreID, pipeList);
 
                     let coreOp: CoreOperation = coreOps[coreID];
                     if (!coreOp) {
-                        coreOp = new CoreOperation(operationName, [], []);
+                        coreOp = new CoreOperation(operation.name, [], [], []);
                         coreOp.coreID = coreID;
                         coreOp.loc = { x: parseInt(coreID.split('-')[1], 10), y: parseInt(coreID.split('-')[2], 10) };
                         coreOps[coreID] = coreOp;
                     }
-
                     if (ioType === OpIoType.INPUTS) {
-                        coreOp.inputs.push(operand);
+                        coreOp.inputs.push(coreOperand);
                     } else if (ioType === OpIoType.OUTPUTS) {
-                        coreOp.outputs.push(operand);
+                        coreOp.outputs.push(coreOperand);
                     }
                 });
-                return operandData;
+                return operand;
             };
             const cores: Record<string, CoreOperation> = {};
 
-            augmentedChip.operations = Object.entries(operationsJson).map(([operationName, opJson]) => {
-                augmentedChip.pipesPerOp.set(operationName, []);
+            Object.entries(operationsJson).map(([operationName, opJson]) => {
+                let operation = augmentedChip.operationsByName.get(operationName);
+                if (!operation) {
+                    console.error(
+                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
+                    );
+                    operation = new BuildableOperation(operationName, [], [], []);
+                    chip.addOperation(operation);
+                }
 
                 const inputs = opJson.inputs.map((input) => {
-                    return organizeData(input, operationName, cores, OpIoType.INPUTS);
+                    return organizeData(input, operation!, cores, OpIoType.INPUTS);
                 });
                 const outputs = opJson.outputs.map((output) => {
-                    return organizeData(output, operationName, cores, OpIoType.OUTPUTS);
+                    return organizeData(output, operation!, cores, OpIoType.OUTPUTS);
                 });
 
-                return new Operation(operationName, inputs, outputs);
+                operation.assignInputs(inputs);
+                operation.assignOutputs(outputs);
+
+                return operation;
             });
             augmentedChip.coreOps = Object.values(cores);
-            // unique values
-            augmentedChip.pipesPerOperand.forEach((value, key) => {
-                augmentedChip.pipesPerOperand.set(key, [...new Set(value)]);
-            });
-            augmentedChip.pipesPerOp.forEach((value, key) => {
-                augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
-            });
 
             return augmentedChip;
         }
@@ -318,14 +324,14 @@ export default class Chip {
         return chip;
     }
 
-    // TODO: needs a better anme to represent update from perf analyser data
+    // TODO: needs a better name to represent update from perf analyser data
     public static AUGMENT_FROM_CORES_JSON(chip: Chip, json: Record<string, CoreOperation>): Chip {
         if (chip) {
             const augmentedChip = new Chip();
             Object.assign(augmentedChip, chip);
 
             augmentedChip.coreOps = Object.entries(json).map(([uid, core]) => {
-                const coreOp = new CoreOperation(core.name, [], []);
+                const coreOp = new CoreOperation(core.name, [], [], []);
                 coreOp.coreID = uid;
                 coreOp.loc = core.loc;
                 coreOp.logicalCoreId = core.logicalCoreId;
@@ -346,7 +352,7 @@ export default class Chip {
 
     getPipeInfo(pipeId: string): ComputeNodeExtended[] {
         const list: ComputeNodeExtended[] = [];
-        this.nodes.forEach((node) => {
+        forEach(this.nodes, (node) => {
             let hasPipe = false;
             node.links.forEach((link) => {
                 if (link.pipes.filter((pipe) => pipe.id === pipeId).length > 0) {
@@ -364,7 +370,7 @@ export default class Chip {
 
     getAllLinks(): NetworkLink[] {
         const links: NetworkLink[] = [];
-        this.nodes.forEach((node) => {
+        forEach(this.nodes, (node) => {
             node.links.forEach((link) => {
                 links.push(link);
             });
@@ -391,7 +397,7 @@ export default class Chip {
 
     private getAllPipes(): Pipe[] {
         let list: Pipe[] = [];
-        this.nodes.forEach((node) => {
+        forEach(this.nodes, (node) => {
             node.links.forEach((link) => {
                 list.push(...link.pipes);
             });
@@ -411,13 +417,6 @@ export default class Chip {
         });
 
         return list;
-    }
-
-    private addOperation(operation: Operation) {
-        if (!this.getOperation(operation.name)) {
-            this.operationsByName.set(operation.name, operation);
-        }
-
     }
 }
 
@@ -473,7 +472,9 @@ export class DramSubchannel {
     constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
         Object.entries(json).forEach(([key, value]) => {
-            this.links.push(NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink);
+            this.links.push(
+                NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink,
+            );
         });
     }
 }
@@ -564,8 +565,54 @@ export class DramBankLink extends NetworkLink {
 }
 
 export class ComputeNode {
-    static fromNetlistJSON(nodeJSON: NodeDataJSON) {
-        return new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+    /** Creates a ComputeNode from a Node JSON object in a Netlist Analyzer output file.
+     *
+     * The constructed object will include a reference to an Operation, if an operation is
+     * specified in the JSON file.
+     *   - A new operation will be created if `getOperation` does not return a match for the operation name
+     *   - The referenced operation will gain a back-reference to the new core
+     *   - If a new operation is created, it will be returned as the second value of the returned tuple
+     */
+    static fromNetlistJSON(        nodeJSON: NodeDataJSON,
+        chipId: number,
+        getOperation: (name: OperationName) => BuildableOperation | undefined,
+    ): [node: ComputeNode, createdOperation?: BuildableOperation] {
+        const node = new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+        node.opCycles = nodeJSON.op_cycles;
+        node.links = new Map();
+        node.chipId = chipId;
+
+        node.type = nodeJSON.type as ComputeNodeType;
+        if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
+            node.dramChannel = nodeJSON.dram_channel;
+            node.dramSubchannel = nodeJSON.dram_subchannel || 0;
+        }
+        node.loc = { x: nodeJSON.location[0], y: nodeJSON.location[1] };
+        node.uid = `${node.chipId}-${node.loc.y}-${node.loc.x}`;
+
+        const linkId = `${node.loc.x}-${node.loc.y}`;
+
+        node.links = new Map(
+            Object.entries(nodeJSON.links).map(([link, linkJson], index) => [
+                link,
+                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson),
+            ]),
+        );
+
+        // Associate with operation
+        const opName: OperationName = nodeJSON.op_name;
+        if (opName) {
+            let operation = getOperation(opName);
+            if (operation) {
+                operation.assignCore(node);
+                node.operation = operation;
+            } else {
+                operation = new BuildableOperation(opName, [node]);
+                node.operation = operation;
+                return [node, operation];
+            }
+        }
+        return [node];
     }
 
     /**
@@ -582,8 +629,6 @@ export class ComputeNode {
 
     public loc: Loc = { x: 0, y: 0 };
 
-    public opName: string = '';
-
     public opCycles: number = 0;
 
     public links: Map<any, NOCLink> = new Map();
@@ -598,33 +643,18 @@ export class ComputeNode {
      */
     public dramChannel: number = -1;
 
-    constructor(uid: string) {
+    public operation?: Operation;
+
+    constructor(uid: string, operation?: Operation) {
         this.uid = uid;
+        this.operation = operation;
     }
 
-    public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
-        // this.uid = uid;
-        this.opName = json.op_name;
-        this.opCycles = json.op_cycles;
-        this.links = new Map();
-        this.chipId = chipId;
-
-        this.type = json.type as ComputeNodeType;
-        if (json.dram_channel !== undefined && json.dram_channel !== null) {
-            this.dramChannel = json.dram_channel;
-            this.dramSubchannel = json.dram_subchannel || 0;
-        }
-        this.loc = { x: json.location[0], y: json.location[1] };
-        this.uid = `${chipId}-${this.loc.y}-${this.loc.x}`;
-
-        const linkId = `${this.loc.x}-${this.loc.y}`;
-
-        this.links = new Map(
-            Object.entries(json.links).map(([link, linkJson], index) => [
-                link,
-                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson),
-            ]),
-        );
+    /** @Deprecated
+     * Superceded by `this.operation.name`
+     */
+    get opName(): string {
+        return this.operation?.name || '';
     }
 
     public generateInitialState(): ComputeNodeState {

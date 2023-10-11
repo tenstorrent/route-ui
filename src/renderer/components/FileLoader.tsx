@@ -19,6 +19,7 @@ import {
     updateTotalOPs,
 } from '../../data/store';
 import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
+import { mapIterable } from "../../utils/IterableHelpers";
 
 interface FileLoaderProps {
     updateData: (data: Chip) => void;
@@ -64,7 +65,7 @@ const FileLoader: FC<FileLoaderProps> = ({ updateData }) => {
                         dispatch(setArchitecture(chip.architecture));
                         dispatch(loadedFilename(filename));
                         dispatch(loadPipeSelection(chip.generateInitialPipesSelectionState()));
-                        dispatch(loadNodesData(chip.nodes.map((node) => node.generateInitialState())));
+                        dispatch(loadNodesData([...mapIterable(chip.nodes, (node) => node.generateInitialState())]));
                         dispatch(loadLinkData(chip.getAllLinks().map((link) => link.generateInitialState())));
                         dispatch(updateTotalOPs(chip.totalOpCycles));
 

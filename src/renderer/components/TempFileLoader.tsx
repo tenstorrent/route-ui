@@ -19,7 +19,7 @@ import {
     updateTotalOPs,
 } from '../../data/store';
 import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
-import { parseOpDataFormat } from '../../data/DataParsers';
+import { mapIterable } from "../../utils/IterableHelpers";
 
 interface TempFileLoaderProps {
     updateData: (data: Chip) => void;
@@ -83,7 +83,7 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                             const chipDesign = Chip.CREATE_FROM_CHIP_DESIGN(parsedFile);
 
                             updateData(chipDesign);
-                            dispatch(loadNodesData(chipDesign.nodes.map((node) => node.generateInitialState())));
+                            dispatch(loadNodesData([...mapIterable(chipDesign.nodes, (node) => node.generateInitialState())]));
                             dispatch(setArchitecture(chipDesign.architecture));
                         }
                         if (filename.includes('analyzer_output_temporal_epoch')) {
@@ -94,11 +94,9 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                             dispatch(loadedFilename(filename));
                             dispatch(loadPipeSelection(localGridData.generateInitialPipesSelectionState()));
                             dispatch(
-                                //
-                                loadNodesData(
-                                    //
-                                    localGridData.nodes.map((node) => node.generateInitialState()),
-                                ),
+                                loadNodesData([
+                                    ...mapIterable(localGridData.nodes, (node) => node.generateInitialState()),
+                                ]),
                             );
                             dispatch(
                                 loadLinkData(
@@ -107,11 +105,6 @@ const TempFileLoader: FC<TempFileLoaderProps> = ({ updateData }) => {
                                 ),
                             );
                             dispatch(updateTotalOPs(localGridData.totalOpCycles));
-                        }
-
-                        if (filename.includes('sample')) {
-                            const json = JSON.parse(parsedFile);
-                            console.log(JSON.stringify(parseOpDataFormat(json)));
                         }
                     } catch (error) {
                         console.error(error);

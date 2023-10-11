@@ -20,6 +20,7 @@ import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
 import { LINK_SATURATION_INITIAIL_VALUE } from '../data/constants';
 import { NOC } from '../data/Types';
+import { mapIterable } from "../utils/IterableHelpers";
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -219,19 +220,21 @@ export default function GridRender() {
                             gridTemplateColumns: `repeat(${chip.totalCols + 1}, ${NODE_SIZE}px)`,
                         }}
                     >
-                        {chip.nodes.map((node: ComputeNode) => {
-                            return (
-                                <NodeGridElement
-                                    node={node}
-                                    showEmptyLinks={showEmptyLinks}
-                                    showNodeLocation={showNodeLocation}
-                                    showOperationColors={showOperationColors}
-                                    showLinkSaturation={showLinkSaturation}
-                                    linkSaturationTreshold={linkSaturationTreshold}
-                                    key={node.uid}
-                                />
-                            );
-                        })}
+                        {[
+                            ...mapIterable(chip.nodes, (node: ComputeNode) => {
+                                return (
+                                    <NodeGridElement
+                                        node={node}
+                                        showEmptyLinks={showEmptyLinks}
+                                        showNodeLocation={showNodeLocation}
+                                        showOperationColors={showOperationColors}
+                                        showLinkSaturation={showLinkSaturation}
+                                        linkSaturationTreshold={linkSaturationTreshold}
+                                        key={node.uid}
+                                    />
+                                );
+                            }),
+                        ]}
                     </div>
                 </div>
             )}

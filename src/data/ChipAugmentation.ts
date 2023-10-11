@@ -1,36 +1,23 @@
-import { Loc } from './Types';
-import type { OpGraphNode, OperationName, OperandName } from './GraphTypes';
+import { ComputeNodeType, Loc } from './Types';
+import type { OperandName, Operation, OperationName, OpGraphNode, OpGraphNodeId, Queue } from './GraphTypes';
 import { OpGraphNodeType } from './GraphTypes';
+import type { ComputeNode } from './Chip';
 
-export class CoreOperationsList extends Array<CoreOperation> {
-    constructor(...items: CoreOperation[]) {
-        super(...items);
-        Object.setPrototypeOf(this, CoreOperationsList.prototype);
-    }
+/** Provides common functionality for Graph Nodes.
+ * Intended to be extended once for each value of OpGraphNodeType. */
+export abstract class AbstractOpGraphNode {
+    readonly name: OpGraphNodeId;
 
-    public getCoreById(coreId: string) {
-        return this.find((core) => core.coreID === coreId);
-    }
-}
-
-/**
- * Represents the data structure for an operation.
- * matches operation centric data structure
- */
-export class Operation implements OpGraphNode {
-    /** Name of the operation. */
-    readonly name: OperationName;
-
-    readonly nodeType = OpGraphNodeType.OPERATION;
+    abstract readonly nodeType: OpGraphNodeType;
 
     protected inputOperands: Operand[];
 
     protected outputOperands: Operand[];
 
-    constructor(name: string, inputOperands: Operand[], outputOperands: Operand[]) {
+    constructor(name: string, inputOperands?: Operand[], outputOperands?: Operand[]) {
         this.name = name;
-        this.inputOperands = inputOperands;
-        this.outputOperands = outputOperands;
+        this.inputOperands = inputOperands || [];
+        this.outputOperands = outputOperands || [];
     }
 
     /** All input operands */
@@ -44,11 +31,64 @@ export class Operation implements OpGraphNode {
     }
 }
 
+export class BuildableQueue extends AbstractOpGraphNode implements Queue {
+    readonly nodeType = OpGraphNodeType.QUEUE;
+}
+
+/**
+ * A concrete implementation of the Operation interface which has methods to support incremental
+ * additions to the data structure.
+ */
+export class BuildableOperation extends AbstractOpGraphNode implements Operation {
+    readonly nodeType = OpGraphNodeType.OPERATION;
+
+    protected _cores: ComputeNode[];
+
+    constructor(name: OperationName, cores: ComputeNode[], inputOperands?: Operand[], outputOperands?: Operand[]) {
+        super(name, inputOperands, outputOperands);
+        this._cores = cores;
+    }
+
+    assignCore(core: ComputeNode) {
+        if (core.type !== ComputeNodeType.CORE) {
+            throw new Error(`Can't assign the non-core ${core.uid} to an operation (${this.name})`);
+        }
+        this._cores.push(core);
+    }
+
+    assignInputs(inputs: Operand[]) {
+        this.inputs.push(...inputs);
+    }
+
+    assignOutputs(outputs: Operand[]) {
+        this.outputs.push(...outputs);
+    }
+
+    get cores() {
+        return this._cores.values();
+    }
+}
+
+/**
+ * Intended as a workaround, if BuildableOperation methods are needed from an Operation object.
+ *
+ * @Deprecated
+ * Will be removed in a future version.
+ */
+export const isBuildable = (operation: Operation): operation is BuildableOperation => (
+    BuildableOperation.prototype.assignInputs.name in operation &&
+    BuildableOperation.prototype.assignOutputs.name in operation
+);
+
 /**
  * Represents the data structure for a core specific operation, which extends the operation data.
  * matches core centric data structure
+ *
+ * @Deprecated
+ * The base Operation object now supports references to cores.
+ * Cores will also provide an interface to get their operation.
  */
-export class CoreOperation extends Operation {
+export class CoreOperation extends BuildableOperation {
     public coreID: string = ''; // location
 
     /** Represents the x,y coordinates of the core. */
@@ -66,19 +106,43 @@ export class CoreOperation extends Operation {
  */
 export class Operand {
     /** Name of the operand. */
-    public name: OperandName;
+    readonly name: OperandName;
 
     /** Type of the operand (e.g., QUEUE or OP). */
-    public type: OpGraphNodeType;
+    readonly type: OpGraphNodeType;
 
     public pipeIdsByCore: Map<string, string[]> = new Map<string, string[]>();
 
     /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
 
-    constructor(name: string, type: OpGraphNodeType) {
+    readonly from?: OpGraphNode;
+
+    readonly to?: OpGraphNode;
+
+    readonly perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
+
+    constructor(
+        name: string,
+        type: OpGraphNodeType,
+        from?: OpGraphNode,
+        to?: OpGraphNode,
+        coreMappings?: [ComputeNode, ComputeNode][],
+    ) {
         this.name = name;
         this.type = type;
+
+        if (!!from !== !!to) {
+            throw new Error('A connected operand must have both "from" and "to" values');
+        }
+        this.from = from;
+        this.to = to;
+
+        this.perCoreMapping = coreMappings;
+    }
+
+    isConnected(): boolean {
+        return !!(this.from && this.to);
     }
 
     public getPipeIdsForCore(coreId: string): string[] {
