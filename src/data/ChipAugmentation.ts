@@ -111,7 +111,7 @@ export class Operand {
     /** Type of the operand (e.g., QUEUE or OP). */
     readonly type: OpGraphNodeType;
 
-    public pipeIdsByCore: Map<string, string[]> = new Map<string, string[]>();
+    public pipeIdsByCore: Map<string, string[]>;
 
     /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
@@ -125,20 +125,20 @@ export class Operand {
     constructor(
         name: string,
         type: OpGraphNodeType,
+        pipesByCore?: Map<string, string[]>,
         from?: OpGraphNode,
         to?: OpGraphNode,
-        coreMappings?: [ComputeNode, ComputeNode][],
     ) {
         this.name = name;
         this.type = type;
+
+        this.pipeIdsByCore = pipesByCore || new Map();
 
         if (!!from !== !!to) {
             throw new Error('A connected operand must have both "from" and "to" values');
         }
         this.from = from;
         this.to = to;
-
-        this.perCoreMapping = coreMappings;
     }
 
     isConnected(): boolean {
