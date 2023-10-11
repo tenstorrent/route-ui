@@ -31,7 +31,6 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
         const inputOps: Map<string, string[]> = new Map<string, []>();
         const outputOps: Map<string, string[]> = new Map<string, []>();
         const computeNodes = chip?.getNodesForPipe(pipeId);
-        console.log(`#### PIPE ${pipeId} | computeNodes: `, computeNodes);
         if (computeNodes) {
             computeNodes.forEach((nodeData) => {
                 const { operation, uid: nodeUID } = nodeData;
