@@ -192,17 +192,6 @@ export default class Chip {
         this._coreOps = value;
     }
 
-    private _pipesPerOp: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of operation name to pipe IDs.
-     * @Deprecated
-     * Use `(Operation.inputs | Operation.outputs) -> Operand.getAllPipes`
-     */
-    public get pipesPerOp(): Map<string, string[]> {
-        return this._pipesPerOp;
-    }
-
     constructor() {
         this.queuesByName = new Map();
         this.operationsByName = new Map();
@@ -290,8 +279,6 @@ export default class Chip {
                     // Since we just created a new operand, this `pipeIdsByCore` Map will only ever contain one key-value pair.
                     coreOperand.pipeIdsByCore.set(coreID, pipeList);
 
-                    augmentedChip.pipesPerOp.get(operation.name)?.push(...pipeList);
-
                     let coreOp: CoreOperation = coreOps[coreID];
                     if (!coreOp) {
                         coreOp = new CoreOperation(operation.name, [], [], []);
@@ -310,8 +297,6 @@ export default class Chip {
             const cores: Record<string, CoreOperation> = {};
 
             Object.entries(operationsJson).map(([operationName, opJson]) => {
-                augmentedChip.pipesPerOp.set(operationName, []);
-
                 let operation = augmentedChip.operationsByName.get(operationName);
                 if (!operation) {
                     console.error(
@@ -343,9 +328,6 @@ export default class Chip {
                 return operation;
             });
             augmentedChip.coreOps = Object.values(cores);
-            augmentedChip.pipesPerOp.forEach((value, key) => {
-                augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
-            });
 
             return augmentedChip;
         }
