@@ -12,7 +12,7 @@ import {
 import DataSource, { GridContext } from '../../data/DataSource';
 import { ComputeNode, DramChannel, NOCLink } from '../../data/Chip';
 import '../scss/DetailedView.scss';
-import PipeRenderer from './detailed-view-components/PipeRenderer';
+import DetailedViewPipeRenderer from './detailed-view-components/DetailedViewPipeRenderer';
 import LinkDetails from './LinkDetails';
 import {
     Architecture,
@@ -159,7 +159,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                                 Router
                                                             </p>
                                                         </div>
-                                                        <PipeRenderer
+                                                        <DetailedViewPipeRenderer
                                                             links={noc0links}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
@@ -167,7 +167,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                         <div className='noc2axi'>
                                                             <p className='label'>NOC2AXI</p>
                                                         </div>
-                                                        <PipeRenderer
+                                                        <DetailedViewPipeRenderer
                                                             className='centered-svg'
                                                             links={subchannel.links.filter(
                                                                 (link) => link.noc === NOC.NOC0,
@@ -184,7 +184,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                                 Router
                                                             </p>
                                                         </div>
-                                                        <PipeRenderer
+                                                        <DetailedViewPipeRenderer
                                                             links={noc1links}
                                                             showLinkSaturation={showLinkSaturation}
                                                             linkSaturationTreshold={linkSaturationTreshold}
@@ -192,7 +192,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                         <div className='noc2axi'>
                                                             <p className='label'>NOC2AXI</p>
                                                         </div>
-                                                        <PipeRenderer
+                                                        <DetailedViewPipeRenderer
                                                             className='centered-svg'
                                                             links={subchannel.links.filter(
                                                                 (link) => link.noc === NOC.NOC1,
@@ -215,7 +215,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                     {architecture === Architecture.WORMHOLE && (
                                         <>
                                             <div className='axi-dram-wrap'>
-                                                <PipeRenderer
+                                                <DetailedViewPipeRenderer
                                                     className='centered-svg'
                                                     links={dram.links.filter(
                                                         (link) => link.name === DramBankLinkName.DRAM0_INOUT,
@@ -228,7 +228,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                                 </div>
                                             </div>
                                             <div className='axi-dram-wrap'>
-                                                <PipeRenderer
+                                                <DetailedViewPipeRenderer
                                                     className='centered-svg'
                                                     links={dram.links.filter(
                                                         (link) => link.name === DramBankLinkName.DRAM1_INOUT,
@@ -244,7 +244,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                     )}
                                     {architecture === Architecture.GRAYSKULL && (
                                         <div className='axi-dram-wrap'>
-                                            <PipeRenderer
+                                            <DetailedViewPipeRenderer
                                                 className='centered-svg'
                                                 links={dram.links.filter((link) => link.name === DramBankLinkName.DRAM_INOUT)}
                                                 showLinkSaturation={showLinkSaturation}
