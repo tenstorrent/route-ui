@@ -4,7 +4,7 @@ import { Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs }
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import { ComputeNode, NOCLink, Pipe } from '../data/Chip';
+import Chip, { ComputeNode, NOCLink, Pipe } from '../data/Chip';
 import FilterableComponent from './components/FilterableComponent';
 import {
     clearAllOperations,
@@ -18,11 +18,11 @@ import {
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 import LinkDetails from './components/LinkDetails';
-import { CoreOperation } from '../data/ChipAugmentation';
 
 import { ComputeNodeType } from '../data/Types';
 import { Operation, OpGraphNodeType } from '../data/GraphTypes';
 import { filterIterable } from "../utils/IterableHelpers";
+import { NodeSelectionState } from "../data/StateTypes";
 
 function OperationDetails(props: { operation: Operation }) {
     const { operation } = props;
@@ -54,6 +54,187 @@ function OperationDetails(props: { operation: Operation }) {
     );
 }
 
+interface ComputeNodeProps {
+    node: ComputeNode
+    nodesSelectionState: NodeSelectionState;
+    setOperationGroupSelection: (opGroupName: string, selected: boolean) => void;
+}
+
+function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSelection }: ComputeNodeProps): React.ReactElement {
+    const dispatch = useDispatch();
+    const detailedViewState = useSelector((state: RootState) => state.detailedView);
+
+    const updatePipesState = (pipeList: string[], state: boolean) => {
+        pipeList.forEach((pipeId) => {
+            dispatch(updatePipeSelection({ id: pipeId, selected: state }));
+        });
+    };
+    const setSelectionState = (selected: boolean) => {
+        dispatch(updateNodeSelection({ id: node.uid, selected }));
+    };
+
+    const inputs = node.operation && [...node.operation.inputs];
+    const outputs = node.operation && [...node.operation.outputs];
+
+    return (
+        <div className='node-element' key={node.uid}>
+            <h3
+                className={`node-type node-type-${node.getNodeLabel()} ${
+                    node.uid === detailedViewState.uid && detailedViewState.isOpen ? 'detailed-view' : ''
+                }`}
+            >
+                {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
+                <Tooltip2 content='Close ComputeNode'>
+                    <Button
+                        small
+                        icon={IconNames.CROSS}
+                        onClick={() => {
+                            setSelectionState(false);
+                        }}
+                    />
+                </Tooltip2>
+            </h3>
+            {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
+            {node.type === ComputeNodeType.DRAM ? (
+                <p>
+                    Channel {node.dramChannel}, Sub {node.dramSubchannel}
+                </p>
+            ) : null}
+            {node.operation && (
+                <div className='opname'>
+                    <Tooltip2 content={node.operation.name} position={PopoverPosition.LEFT}>
+                        <SelectableOperation
+                            opName={node.operation.name}
+                            value={nodesSelectionState.groups[node.operation.name].selected}
+                            selectFunc={setOperationGroupSelection}
+                            stringFilter=''
+                        />
+                    </Tooltip2>
+                </div>
+            )}
+            {node.operation && (
+                <div className='opname'>
+                    {inputs && inputs.length && <h4 className='io-label'>Inputs:</h4>}
+                    {inputs && inputs.map((io) => (
+                        <ul className='scrollable-content'>
+                            <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
+                                <div key={io.name} style={{ fontSize: '12px' }}>
+                                    {io.type === OpGraphNodeType.OPERATION ? (
+                                        <SelectableOperation
+                                            opName={io.name}
+                                            value={
+                                                nodesSelectionState.groups[io.name]?.selected
+                                            }
+                                            selectFunc={setOperationGroupSelection}
+                                            stringFilter=''
+                                        />
+                                    ) : (
+                                        <div className='op-element'>
+                                            <Checkbox checked={false} disabled />
+                                            <span>{io.name}</span>
+                                        </div>
+                                    )}
+                                    <ul className='scrollable-content'>
+                                        {io
+                                            .getPipeIdsForCore(node.uid)
+                                            .map((pipeId) => (
+                                                <li>
+                                                    <SelectablePipe
+                                                        pipe={new Pipe(pipeId, 0)}
+                                                        pipeFilter=''
+                                                    />
+                                                </li>
+                                            ))}
+                                    </ul>
+                                </div>
+                            </Tooltip2>
+                        </ul>
+                    ))}
+                    {outputs && outputs.length && <h4 className='io-label'>Outputs:</h4>}
+                    {outputs && outputs.map((io) => (
+                        <ul className='scrollable-content'>
+                            <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
+                                <div key={io.name} style={{ fontSize: '12px' }}>
+                                    {io.type === OpGraphNodeType.OPERATION ? (
+                                        <SelectableOperation
+                                            opName={io.name}
+                                            value={
+                                                nodesSelectionState.groups[io.name]?.selected
+                                            }
+                                            selectFunc={setOperationGroupSelection}
+                                            stringFilter=''
+                                        />
+                                    ) : (
+                                        <div className='op-element'>
+                                            <Checkbox checked={false} disabled />
+                                            <span>{io.name}</span>
+                                        </div>
+                                    )}
+                                    <ul className='scrollable-content'>
+                                        {io
+                                            .getPipeIdsForCore(node.uid)
+                                            .map((pipeId) => (
+                                                <li>
+                                                    <SelectablePipe
+                                                        pipe={new Pipe(pipeId, 0)}
+                                                        pipeFilter=''
+                                                    />
+                                                </li>
+                                            ))}
+                                    </ul>
+                                </div>
+                            </Tooltip2>
+                        </ul>
+                    ))}
+                </div>
+            )}
+            <div className='node-controls'>
+                {node.type === ComputeNodeType.DRAM && (
+                    <Button
+                        small
+                        icon={IconNames.PROPERTIES}
+                        disabled={node.uid === detailedViewState.uid && detailedViewState.isOpen}
+                        onClick={() => dispatch(openDetailedView(node.uid))}
+                    >
+                        Detailed View
+                    </Button>
+                )}
+
+                <Button
+                    small
+                    icon={IconNames.FILTER_LIST}
+                    onClick={() =>
+                        updatePipesState(node.getInternalPipeIDsForNode(), true)
+                    }
+                >
+                    Select internal pipes
+                </Button>
+                <Button
+                    small
+                    icon={IconNames.FILTER_KEEP}
+                    onClick={() => updatePipesState(node.getPipeIdsForNode(), true)}
+                >
+                    Select all pipes
+                </Button>
+                <Button
+                    small
+                    icon={IconNames.FILTER_REMOVE}
+                    onClick={() => updatePipesState(node.getPipeIdsForNode(), false)}
+                >
+                    Deselect all pipes
+                </Button>
+            </div>
+
+            <div className='node-links-wrap'>
+                <h4>Links</h4>
+                {node.getLinksForNode().map((link: NOCLink) => (
+                    <LinkDetails key={link.name} link={link} showEmpty />
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default function PropertiesPanel() {
     const { chip } = useContext(DataSource);
 
@@ -64,23 +245,22 @@ export default function PropertiesPanel() {
     const [operationsList, setOperationsList] = useState<string[]>([]);
     const dispatch = useDispatch();
 
-    const nodeSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const groups = useSelector((state: RootState) => state.nodeSelection.groups);
-    const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
 
     useEffect(() => {
         if (!chip) {
             return;
         }
 
-        const selected = Object.values(nodeSelectionState.nodeList).filter((n) => n.selected);
+        const selected = Object.values(nodesSelectionState.nodeList).filter((n) => n.selected);
 
         const selection = filterIterable(chip.nodes, (node: ComputeNode) => {
             return selected.filter((n) => n.id === node.uid).length > 0;
         });
 
         setSelectedNodes([...selection]);
-    }, [chip, nodeSelectionState]);
+    }, [chip, nodesSelectionState]);
 
     useEffect(() => {
         const opList: string[] = [];
@@ -112,15 +292,6 @@ export default function PropertiesPanel() {
         });
     };
 
-    const changePipeState = (pipeList: string[], state: boolean) => {
-        pipeList.forEach((pipeId) => {
-            dispatch(updatePipeSelection({ id: pipeId, selected: state }));
-        });
-    };
-    const selectNode = (node: ComputeNode, selected: boolean) => {
-        dispatch(updateNodeSelection({ id: node.uid, selected }));
-    };
-
     const selectOperationGroup = (opName: string, selected: boolean) => {
         dispatch(selectGroup({ opName, selected }));
     };
@@ -141,166 +312,9 @@ export default function PropertiesPanel() {
                         <>
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className='properties-panel-nodes'>
-                                {selectedNodes.map((node: ComputeNode) => {
-                                    const coreData = chip?.coreOps.find(
-                                        (core: CoreOperation) => core.coreID === node.uid,
-                                    );
-                                    return (
-                                        <div className='node-element' key={node.uid}>
-                                            <h3
-                                                className={`node-type node-type-${node.getNodeLabel()} ${
-                                                    node.uid === uid && isOpen ? 'detailed-view' : ''
-                                                }`}
-                                            >
-                                                {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
-                                                <Tooltip2 content='Close ComputeNode'>
-                                                    <Button
-                                                        small
-                                                        icon={IconNames.CROSS}
-                                                        onClick={() => {
-                                                            selectNode(node, false);
-                                                        }}
-                                                    />
-                                                </Tooltip2>
-                                            </h3>
-                                            {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
-                                            {node.type === ComputeNodeType.DRAM ? (
-                                                <p>
-                                                    Channel {node.dramChannel}, Sub {node.dramSubchannel}
-                                                </p>
-                                            ) : null}
-                                            {node.opName !== '' && (
-                                                <div className='opname'>
-                                                    <Tooltip2 content={node.opName} position={PopoverPosition.LEFT}>
-                                                        <SelectableOperation
-                                                            opName={node.opName}
-                                                            value={nodeSelectionState.groups[node.opName].selected}
-                                                            selectFunc={selectOperationGroup}
-                                                            stringFilter=''
-                                                        />
-                                                    </Tooltip2>
-                                                </div>
-                                            )}
-                                            <div className='opname'>
-                                                {coreData?.inputs.length && <h4 className='io-label'>Inputs:</h4>}
-                                                {coreData?.inputs.map((io) => (
-                                                    <ul className='scrollable-content'>
-                                                        <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
-                                                            <div key={io.name} style={{ fontSize: '12px' }}>
-                                                                {io.type === OpGraphNodeType.OPERATION ? (
-                                                                    <SelectableOperation
-                                                                        opName={io.name}
-                                                                        value={
-                                                                            nodeSelectionState.groups[io.name]?.selected
-                                                                        }
-                                                                        selectFunc={selectOperationGroup}
-                                                                        stringFilter=''
-                                                                    />
-                                                                ) : (
-                                                                    <div className='op-element'>
-                                                                        <Checkbox checked={false} disabled />
-                                                                        <span>{io.name}</span>
-                                                                    </div>
-                                                                )}
-                                                                <ul className='scrollable-content'>
-                                                                    {io
-                                                                        .getPipeIdsForCore(coreData.coreID)
-                                                                        .map((pipeId) => (
-                                                                            <li>
-                                                                                <SelectablePipe
-                                                                                    pipe={new Pipe(pipeId, 0)}
-                                                                                    pipeFilter=''
-                                                                                />
-                                                                            </li>
-                                                                        ))}
-                                                                </ul>
-                                                            </div>
-                                                        </Tooltip2>
-                                                    </ul>
-                                                ))}
-                                                {coreData?.outputs.length && <h4 className='io-label'>Outputs:</h4>}
-                                                {coreData?.outputs.map((io) => (
-                                                    <ul className='scrollable-content'>
-                                                        <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
-                                                            <div key={io.name} style={{ fontSize: '12px' }}>
-                                                                {io.type === OpGraphNodeType.OPERATION ? (
-                                                                    <SelectableOperation
-                                                                        opName={io.name}
-                                                                        value={
-                                                                            nodeSelectionState.groups[io.name]?.selected
-                                                                        }
-                                                                        selectFunc={selectOperationGroup}
-                                                                        stringFilter=''
-                                                                    />
-                                                                ) : (
-                                                                    <div className='op-element'>
-                                                                        <Checkbox checked={false} disabled />
-                                                                        <span>{io.name}</span>
-                                                                    </div>
-                                                                )}
-                                                                <ul className='scrollable-content'>
-                                                                    {io
-                                                                        .getPipeIdsForCore(coreData.coreID)
-                                                                        .map((pipeId) => (
-                                                                            <li>
-                                                                                <SelectablePipe
-                                                                                    pipe={new Pipe(pipeId, 0)}
-                                                                                    pipeFilter=''
-                                                                                />
-                                                                            </li>
-                                                                        ))}
-                                                                </ul>
-                                                            </div>
-                                                        </Tooltip2>
-                                                    </ul>
-                                                ))}
-                                            </div>
-                                            <div className='node-controls'>
-                                                {node.type === ComputeNodeType.DRAM && (
-                                                    <Button
-                                                        small
-                                                        icon={IconNames.PROPERTIES}
-                                                        disabled={node.uid === uid && isOpen}
-                                                        onClick={() => dispatch(openDetailedView(node.uid))}
-                                                    >
-                                                        Detailed View
-                                                    </Button>
-                                                )}
-
-                                                <Button
-                                                    small
-                                                    icon={IconNames.FILTER_LIST}
-                                                    onClick={() =>
-                                                        changePipeState(node.getInternalPipeIDsForNode(), true)
-                                                    }
-                                                >
-                                                    Select internal pipes
-                                                </Button>
-                                                <Button
-                                                    small
-                                                    icon={IconNames.FILTER_KEEP}
-                                                    onClick={() => changePipeState(node.getPipeIdsForNode(), true)}
-                                                >
-                                                    Select all pipes
-                                                </Button>
-                                                <Button
-                                                    small
-                                                    icon={IconNames.FILTER_REMOVE}
-                                                    onClick={() => changePipeState(node.getPipeIdsForNode(), false)}
-                                                >
-                                                    Deselect all pipes
-                                                </Button>
-                                            </div>
-
-                                            <div className='node-links-wrap'>
-                                                <h4>Links</h4>
-                                                {node.getLinksForNode().map((link: NOCLink) => (
-                                                    <LinkDetails key={link.name} link={link} showEmpty />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                {selectedNodes.map((node: ComputeNode) => (
+                                    <ComputeNodeProperties node={node} nodesSelectionState={nodesSelectionState} setOperationGroupSelection={selectOperationGroup}  />
+                                ))}
                             </div>
                         </>
                     }
@@ -409,7 +423,7 @@ export default function PropertiesPanel() {
                                                     <>
                                                         <SelectableOperation
                                                             opName={operationName}
-                                                            value={nodeSelectionState.groups[operationName].selected}
+                                                            value={nodesSelectionState.groups[operationName].selected}
                                                             selectFunc={selectOperationGroup}
                                                             stringFilter={opsFilter}
                                                         />
