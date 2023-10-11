@@ -40,7 +40,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     const [dram, setDram] = React.useState<DramChannel | null>(null);
     useEffect(() => {
         if (chip && uid !== null) {
-            const selectedNode = chip.getCore(uid);
+            const selectedNode = chip.getNode(uid);
             let allNodes: ComputeNode[] | undefined;
             if (selectedNode && selectedNode.dramChannel > -1) {
                 allNodes = [...filterIterable(chip.nodes, (n) => n.dramChannel === selectedNode?.dramChannel)];

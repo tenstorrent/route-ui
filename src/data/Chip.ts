@@ -7,7 +7,7 @@ import {
     OperandJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { CoreOperation, Operand, BuildableOperation, OpIoType, isBuildable } from './ChipAugmentation';
+import { BuildableOperation, BuildableQueue, CoreOperation, isBuildable, Operand, OpIoType } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
 import {
@@ -22,7 +22,8 @@ import {
     NOCLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import type { Operation, OperationName, OpGraphNodeType, Queue, QueueName } from './GraphTypes';
+import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
+import { OpGraphNodeType } from './GraphTypes';
 import { forEach, mapIterable } from '../utils/IterableHelpers';
 
 export default class Chip {
@@ -58,6 +59,10 @@ export default class Chip {
 
     protected set nodes(value: Iterable<ComputeNode>) {
         this.nodesById = new Map(mapIterable(value, (node: ComputeNode) => [node.uid, node]));
+    }
+
+    public getNode(nodeUID: string): ComputeNode | undefined {
+        return this.nodesById.get(nodeUID);
     }
 
     private _totalCols: number = 0;
@@ -139,22 +144,28 @@ export default class Chip {
         return this.operationsByName.values();
     }
 
-    private operationsByName: Map<OperationName, Operation>;
+    private operationsByName: Map<OperationName, BuildableOperation>;
 
     public getOperation(name: OperationName) {
         return this.operationsByName.get(name);
     }
 
-    protected addOperation(operation: Operation) {
+    protected addOperation(operation: BuildableOperation) {
         if (!this.getOperation(operation.name)) {
             this.operationsByName.set(operation.name, operation);
         }
     }
 
-    protected queuesByName: Map<QueueName, Queue>;
+    protected queuesByName: Map<QueueName, BuildableQueue>;
 
-    public getQueue(name: QueueName) {
+    public getQueue(name: QueueName): Queue | undefined {
         return this.queuesByName.get(name);
+    }
+
+    public addQueue(queue: BuildableQueue) {
+        if (!this.getQueue(queue.name)) {
+            this.queuesByName.set(queue.name, queue);
+        }
     }
 
     public get queues(): Iterable<Queue> {
@@ -192,17 +203,6 @@ export default class Chip {
         return this._pipesPerOp;
     }
 
-    private _pipesPerOperand: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * Map of operand name to pipe IDs.
-     * @Deprecated
-     * Use `Operand.getAllPipes`
-     */
-    public get pipesPerOperand(): Map<string, string[]> {
-        return this._pipesPerOperand;
-    }
-
     constructor() {
         this.queuesByName = new Map();
         this.operationsByName = new Map();
@@ -231,12 +231,12 @@ export default class Chip {
                 const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
                 chip.totalCols = Math.max(loc.y, chip.totalCols);
                 chip.totalRows = Math.max(loc.x, chip.totalRows);
-                const node = ComputeNode.fromNetlistJSON(nodeJSON, chip.chipId, (name: OperationName) =>
-                    chip.getOperation(name),
+                const [node, newOperation] = ComputeNode.fromNetlistJSON(nodeJSON, chip.chipId, (name: OperationName) =>
+                    chip.operationsByName.get(name)
                 );
-                if (node.operation && !chip.getOperation(node.operation.name)) {
-                    console.log('Adding operation: ', node.operation.name);
-                    chip.addOperation(node.operation);
+                if (newOperation) {
+                    console.log('Adding operation: ', newOperation.name);
+                    chip.addOperation(newOperation);
                 }
                 return node;
             })
@@ -267,21 +267,16 @@ export default class Chip {
                 coreOps: Record<string, CoreOperation>,
                 ioType: OpIoType,
             ) => {
-                console.log(`ORGANIZE DATA: operand ${operandJSON.name} for operation ${operation.name}`);
-                const operandData = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
-                if (!augmentedChip.pipesPerOperand.has(operandJSON.name)) {
-                    augmentedChip.pipesPerOperand.set(operandJSON.name, []);
-                }
+                const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
 
                 Object.entries(operandJSON.pipes).forEach(([coreID, pipes]) => {
-                    const core = chip.getCore(coreID);
+                    const core = chip.getNode(coreID);
                     if (core === undefined) {
                         throw new Error(
                             `Core ${coreID} was referenced in operand ${operandJSON.name}, but is not present in loaded chip data.`,
                         );
                     }
                     const pipeList: string[] = pipes.map((pipeId) => pipeId.toString());
-
 
                     /* The operand created here is *core-specific*. This creates unnecessary duplicate operands, and doesn't map onto the
                      * actual meaning of "Operand" in the domain context.
@@ -290,12 +285,11 @@ export default class Chip {
                      *
                      * To associate groups of an operand's pipes to different core IDs, we can just attach the existing `[coreID, pipes]` mappings to the same operand.
                      */
-                    const operand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
+                    const coreOperand = new Operand(operandJSON.name, operandJSON.type as OpGraphNodeType);
 
                     // Since we just created a new operand, this `pipeIdsByCore` Map will only ever contain one key-value pair.
-                    operand.pipeIdsByCore.set(coreID, pipeList);
+                    coreOperand.pipeIdsByCore.set(coreID, pipeList);
 
-                    augmentedChip.pipesPerOperand.get(operandJSON.name)?.push(...pipeList);
                     augmentedChip.pipesPerOp.get(operation.name)?.push(...pipeList);
 
                     let coreOp: CoreOperation = coreOps[coreID];
@@ -306,19 +300,19 @@ export default class Chip {
                         coreOps[coreID] = coreOp;
                     }
                     if (ioType === OpIoType.INPUTS) {
-                        coreOp.inputs.push(operand);
+                        coreOp.inputs.push(coreOperand);
                     } else if (ioType === OpIoType.OUTPUTS) {
-                        coreOp.outputs.push(operand);
+                        coreOp.outputs.push(coreOperand);
                     }
                 });
-                return operandData;
+                return operand;
             };
             const cores: Record<string, CoreOperation> = {};
 
             Object.entries(operationsJson).map(([operationName, opJson]) => {
                 augmentedChip.pipesPerOp.set(operationName, []);
 
-                let operation = augmentedChip.getOperation(operationName);
+                let operation = augmentedChip.operationsByName.get(operationName);
                 if (!operation) {
                     console.error(
                         `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
@@ -328,27 +322,27 @@ export default class Chip {
                 }
 
                 const inputs = opJson.inputs.map((input) => {
-                    return organizeData(input, operation!, cores, OpIoType.INPUTS);
+                    const operand = organizeData(input, operation!, cores, OpIoType.INPUTS);
+                    if (operand.type === OpGraphNodeType.QUEUE) {
+                        const queue = new BuildableQueue(operand.name, [], []);
+                        chip.addQueue(queue);
+                    }
+                    return operand;
                 });
                 const outputs = opJson.outputs.map((output) => {
-                    return organizeData(output, operation!, cores, OpIoType.OUTPUTS);
+                    const operand = organizeData(output, operation!, cores, OpIoType.OUTPUTS);
+                    if (operand.type === OpGraphNodeType.QUEUE) {
+                        chip.addQueue(new BuildableQueue(operand.name, [], []));
+                    }
+                    return operand;
                 });
 
-                if (isBuildable(operation)) {
-                    // Hacky once again...
-                    operation.assignInputs(inputs);
-                    operation.assignOutputs(outputs);
-                } else {
-                    throw new Error(`Can't modify the operands for op ${operation?.name}: builder methods missing.`);
-                }
+                operation.assignInputs(inputs);
+                operation.assignOutputs(outputs);
 
                 return operation;
             });
             augmentedChip.coreOps = Object.values(cores);
-            // unique values
-            augmentedChip.pipesPerOperand.forEach((value, key) => {
-                augmentedChip.pipesPerOperand.set(key, [...new Set(value)]);
-            });
             augmentedChip.pipesPerOp.forEach((value, key) => {
                 augmentedChip.pipesPerOp.set(key, [...new Set(value)]);
             });
@@ -467,10 +461,6 @@ export default class Chip {
         });
 
         return list;
-    }
-
-    public getCore(coreID: string): ComputeNode | undefined {
-        return this.nodesById.get(coreID);
     }
 }
 
@@ -625,13 +615,12 @@ export class ComputeNode {
      * specified in the JSON file.
      *   - A new operation will be created if `getOperation` does not return a match for the operation name
      *   - The referenced operation will gain a back-reference to the new core
-     *
+     *   - If a new operation is created, it will be returned as the second value of the returned tuple
      */
-    static fromNetlistJSON(
-        nodeJSON: NodeDataJSON,
+    static fromNetlistJSON(        nodeJSON: NodeDataJSON,
         chipId: number,
-        getOperation: (name: OperationName) => Operation | undefined,
-    ) {
+        getOperation: (name: OperationName) => BuildableOperation | undefined,
+    ): [node: ComputeNode, createdOperation?: BuildableOperation] {
         const node = new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
         node.opCycles = nodeJSON.op_cycles;
         node.links = new Map();
@@ -659,21 +648,15 @@ export class ComputeNode {
         if (opName) {
             let operation = getOperation(opName);
             if (operation) {
-                // This is a little hacky, but avoids cluttering the Chip with OperationBuilder references (for now)
-                // Later, we may want to move the Chip's mutation capabilities to a ChipBuilder subclass, which would have references to OperationBuilders
-                if (!('assignCore' in operation)) {
-                    throw new Error(
-                        `Core ${node.uid} cannot be assigned to operation ${opName}: unable to cast to OperationBuilder.`,
-                    );
-                } else {
-                    (operation as BuildableOperation).assignCore(node);
-                }
+                operation.assignCore(node);
+                node.operation = operation;
             } else {
                 operation = new BuildableOperation(opName, [node]);
+                node.operation = operation;
+                return [node, operation];
             }
-            node.operation = operation;
         }
-        return node;
+        return [node];
     }
 
     /**
