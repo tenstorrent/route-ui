@@ -1,6 +1,22 @@
 import fs, { Dirent } from 'fs';
 import path from 'path';
 
+export const readFile = async (filename: string): Promise<string> =>
+    new Promise((resolve, reject) => {
+        fs.readFile(filename, 'utf-8', (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+
+export const loadJsonFile = async (filePath: string): Promise<unknown> => {
+    const file = await readFile(filePath);
+    return JSON.parse(file);
+};
+
 export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
     return new Promise<Dirent[]>((resolve, reject) => {
         fs.readdir(dirPath, { withFileTypes: true }, (err, files) => {
@@ -56,8 +72,7 @@ export const validatePerfResultsFolder = async (dirPath: string): Promise<[isVal
 
     const analyzerFolderExists =
         (await findFiles(dirPath, 'analyzer_results', { isDir: true, maxDepth: 0 })).length === 1;
-    const graphFolderExists =
-        (await findFiles(dirPath, 'graph_descriptors', { isDir: true, maxDepth: 0 })).length === 1;
+    const graphFolderExists = (await findFiles(dirPath, 'graph_descriptor', { isDir: true, maxDepth: 0 })).length === 1;
 
     if (analyzerFolderExists && graphFolderExists) {
         return [true, null];
@@ -67,14 +82,14 @@ export const validatePerfResultsFolder = async (dirPath: string): Promise<[isVal
         missingSubfolders.push('analyzer_folder');
     }
     if (!graphFolderExists) {
-        missingSubfolders.push('graph_descriptors');
+        missingSubfolders.push('graph_descriptor');
     }
 
     return [false, `Selected folder is missing required subdirectory: ${missingSubfolders.join(', ')}`];
 };
 
 export const getAvailableGraphNames = async (perfResultsPath: string): Promise<string[]> => {
-    const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptors');
+    const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptor');
     const graphDirEntries = await readDirEntries(graphDescriptorsPath);
     return graphDirEntries.map((graphDirEntry) => graphDirEntry.name).filter((name) => !name.startsWith('.'));
 };
