@@ -1,17 +1,37 @@
 import React from 'react';
 
-import { Button } from '@blueprintjs/core';
+import path from 'path';
+
+import { Button, ButtonGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Classes, Popover2 } from '@blueprintjs/popover2';
 import '../scss/FolderPicker.scss';
 
-import { getAvailableGraphNames, validatePerfResultsFolder } from 'utils/Files';
+import { getAvailableGraphNames, loadJsonFile, readFile, validatePerfResultsFolder } from 'utils/Files';
 import GraphPicker from './GraphPicker';
 import Chip from '../../data/Chip';
+import { Architecture } from '../../data/Types';
+import { ChipDesignJSON } from '../../data/JSONDataTypes';
+import { GraphDescriptorJSON } from "../../data/sources/GraphDescriptorReader";
+
+const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
+    if (architecture === Architecture.NONE) {
+        throw new Error('No architecture provided.');
+    }
+    const remote = await import('@electron/remote');
+    const architecturesPath = path.join(remote.app.getAppPath(), 'assets', 'architectures');
+    const architectureFilename = {
+        [Architecture.GRAYSKULL]: path.join(architecturesPath, 'arch-grayskull.json'),
+        [Architecture.WORMHOLE]: path.join(architecturesPath, 'arch-wormhole.json'),
+    }[architecture];
+    const architectureJson = await loadJsonFile(architectureFilename);
+    return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
+};
 
 export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Chip) => void }): React.ReactElement => {
     const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null);
     const [selectedGraph, setSelectedGraph] = React.useState<string | null>(null);
+    const [selectedArchitecture, setSelectedArchitecture] = React.useState<Architecture>(Architecture.NONE);
     const [graphOptions, setGraphOptions] = React.useState<string[]>([]);
     const [showGraphSelect, setShowGraphSelect] = React.useState(false);
 
@@ -24,6 +44,18 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
         setShowGraphSelect(true);
     };
 
+    const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture) => {
+        const chip = await loadChipFromArchitecture(architecture);
+        const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
+        const graphDescriptorJson = await loadJsonFile(graphPath);
+
+        // TODO: Load graph
+
+        return chip;
+        // const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
+        // const analyzerResultsJson = await loadJsonFile(analyzerResultsPath)
+    };
+
     return (
         <div className='folder-load-container'>
             <Popover2
@@ -34,6 +66,11 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                         onSelect={(graphName) => {
                             setSelectedGraph(graphName);
                             setShowGraphSelect(false);
+                            if (selectedFolder) {
+                                loadGraph(selectedFolder, graphName, selectedArchitecture)
+                                    .then((chip) => onDataLoad(chip))
+                                    .catch((err) => console.log(err));
+                            }
                         }}
                     />
                 }
@@ -43,8 +80,29 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
             >
                 <FolderPicker onSelectFolder={loadFolder} />
             </Popover2>
+            <div>
+                <ButtonGroup className='architecture-button-group'>
+                    <Button
+                        icon='person'
+                        active={selectedArchitecture === Architecture.GRAYSKULL}
+                        onClick={() => setSelectedArchitecture(Architecture.GRAYSKULL)}
+                        className='architecture-button'
+                    >
+                        Grayskull
+                    </Button>
+                    <Button
+                        icon='globe-network'
+                        active={selectedArchitecture === Architecture.WORMHOLE}
+                        onClick={() => setSelectedArchitecture(Architecture.WORMHOLE)}
+                        className='architecture-button'
+                    >
+                        Wormhole
+                    </Button>
+                </ButtonGroup>
+            </div>
 
             {/* Temporary elements to display success of selection */}
+            {selectedArchitecture && <p>Selected Architecture: {selectedArchitecture}</p>}
             {selectedFolder && <p>Selected Folder: {selectedFolder}</p>}
             {selectedGraph && <p>Selected Graph: {selectedGraph}</p>}
         </div>

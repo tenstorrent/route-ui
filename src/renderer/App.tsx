@@ -23,7 +23,7 @@ export default function App() {
             <DataSource.Provider value={memoizedChip}>
                 <Router>
                     <Routes>
-                        <Route path='/' element={<SplashScreen updateData={setChip} />} />
+                        <Route path='/' element={<SplashScreen updateChip={setChip} />} />
                         <Route path='/render' element={<MainRouteRenderer updateData={setChip} />} />
                     </Routes>
                 </Router>
