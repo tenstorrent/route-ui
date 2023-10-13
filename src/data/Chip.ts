@@ -15,7 +15,7 @@ import {
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    DramNOCLinkName,
+    DramNOCLinkName, LinkType,
     Loc,
     NetworkLinkName,
     NOC,
@@ -478,7 +478,10 @@ export class DramSubchannel {
     }
 }
 
-export class NetworkLink {
+export abstract class NetworkLink {
+
+    abstract type: LinkType;
+
     readonly uid: string;
 
     public readonly name: NetworkLinkName;
@@ -526,12 +529,15 @@ export class NetworkLink {
             bpc: 0,
             saturation: 0,
             maxBandwidth: this.maxBandwidth,
+            type: this.type,
         } as LinkStateData;
     }
 }
 
 export class NOCLink extends NetworkLink {
     // public name: NOCLinkName;
+
+    public readonly type: LinkType = LinkType.NOC;
 
     public readonly noc: NOC;
 
@@ -551,6 +557,8 @@ export class DramNOCLink extends NOCLink {
 
 export class DramBankLink extends NetworkLink {
     public readonly bank: DRAMBank = DRAMBank.NONE;
+
+    public readonly type: LinkType = LinkType.DRAM;
 
     constructor(name: DramBankLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
@@ -746,7 +754,8 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
     return `${(bytes / 1024 ** denominationIndex).toFixed(fractionDigits)} ${sizes[denominationIndex]}`;
 };
 
-export const updateOPCycles = (link: LinkStateData, totalOpCycles: number) => {
+
+export const recalculateLinkSaturation = (link: LinkStateData, totalOpCycles: number) => {
     link.bpc = link.totalDataBytes / totalOpCycles;
     link.saturation = (link.bpc / link.maxBandwidth) * 100;
 };

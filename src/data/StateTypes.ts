@@ -1,3 +1,5 @@
+import { LinkType } from './Types';
+
 export interface HighContrastState {
     enabled: boolean;
 }
@@ -57,6 +59,7 @@ export interface LinkStateData {
     bpc: number;
     saturation: number;
     maxBandwidth: number;
+    type: LinkType;
 }
 
 export interface LinkSaturationState {
@@ -66,4 +69,6 @@ export interface LinkSaturationState {
     showNOC1: boolean;
     links: Record<string, LinkStateData>;
     totalOps: number;
+    CLKMHz: number;
+    DRAMBandwidthGBs: number;
 }
