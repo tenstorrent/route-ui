@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -242,11 +242,12 @@ export default function PropertiesPanel() {
     const [pipeFilter, setPipeFilter] = useState<string>('');
     const [opsFilter, setOpsFilter] = useState<string>('');
 
-    const [operationsList, setOperationsList] = useState<string[]>([]);
     const dispatch = useDispatch();
 
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const groups = useSelector((state: RootState) => state.nodeSelection.groups);
+
+    const operationsList = useMemo(() => chip ? [...chip.operations] : [], [chip]);
 
     useEffect(() => {
         if (!chip) {
@@ -262,13 +263,13 @@ export default function PropertiesPanel() {
         setSelectedNodes([...selection]);
     }, [chip, nodesSelectionState]);
 
-    useEffect(() => {
-        const opList: string[] = [];
-        Object.keys(groups).forEach((op) => {
-            opList.push(op);
-        });
-        setOperationsList(opList);
-    }, [groups]);
+    // useEffect(() => {
+    //     const opList: string[] = [];
+    //     Object.keys(groups).forEach((op) => {
+    //         opList.push(op);
+    //     });
+    //     setOperationsList(opList);
+    // }, [groups]);
 
     const selectFilteredPipes = () => {
         if (!chip) {
@@ -411,19 +412,17 @@ export default function PropertiesPanel() {
                             </div>
                             <div className='operations-wrap list-wrap'>
                                 <div className='scrollable-content'>
-                                    {operationsList.map((operationName) => {
-                                        const operation = chip?.getOperation(operationName);
-
+                                    {operationsList.map((operation) => {
                                         return (
                                             <FilterableComponent
-                                                key={operationName}
-                                                filterableString={operationName}
+                                                key={operation.name}
+                                                filterableString={operation.name}
                                                 filterQuery={opsFilter}
                                                 component={
                                                     <>
                                                         <SelectableOperation
-                                                            opName={operationName}
-                                                            value={nodesSelectionState.groups[operationName].selected}
+                                                            opName={operation.name}
+                                                            value={nodesSelectionState.groups[operation.name]?.selected}
                                                             selectFunc={selectOperationGroup}
                                                             stringFilter={opsFilter}
                                                         />
