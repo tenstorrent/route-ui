@@ -9,12 +9,13 @@ import {
     clearAllOperations,
     clearAllPipes,
     RootState,
-    selectAllPipes, updateCLK,
+    selectAllPipes,
+    updateCLK,
     updateDRAMBandwidth,
     updateLinkSaturation,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
-    updateTotalOPs
+    updateTotalOPs,
 } from '../data/store';
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
@@ -35,8 +36,6 @@ export default function GridRender() {
     const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(LINK_SATURATION_INITIAIL_PERCENT);
     const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
     const [opCycles, setOpCycles] = useState<number>(0);
-    const [DRAMBandwidth, setDRAMBandwidth] = useState<number>(DRAM_BANDWIDTH_INITIAL_GBS);
-    const [clkMHz, setClkMHz] = useState<number>(AICLK_INITIAL_MHZ);
 
     const isHC = useSelector((state: RootState) => state.highContrast.enabled);
     const dispatch = useDispatch();
@@ -49,7 +48,6 @@ export default function GridRender() {
         setShowLinkSaturation(value);
         dispatch(updateShowLinkSaturation(value));
     };
-
 
     const onShowLinkSaturationForNOC = (noc: NOC, selected: boolean) => {
         dispatch(updateShowLinkSaturationForNOC({ noc, selected }));
@@ -214,61 +212,7 @@ export default function GridRender() {
                     />
                 </div>
                 <hr />
-                <div>
-                    <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
-                        DRAM channel BW (GB/s)
-                    </label>
-                    <NumericInput
-                        //
-                        id='dramBandwidthInput'
-                        value={DRAMBandwidth}
-                        stepSize={.5}
-                        minorStepSize={0.1}
-                        majorStepSize={10}
-                        min={0}
-                        onValueChange={(value) => {
-                            setDRAMBandwidth(value);
-                            dispatch(updateDRAMBandwidth(value));
-                        }}
-                        rightElement={
-                            <Button
-                                minimal
-                                onClick={() => {
-                                    setDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS);
-                                    dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
-                                }}
-                                icon={IconNames.RESET}
-                            />
-                        }
-                    />
-                    <br />
-                    <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
-                        AICLK (MHz)
-                    </label>
-                    <NumericInput
-                        //
-                        id='clkMHzInput'
-                        value={clkMHz}
-                        stepSize={10}
-                        minorStepSize={1}
-                        majorStepSize={100}
-                        min={1}
-                        onValueChange={(value) => {
-                            setClkMHz(value);
-                            dispatch(updateCLK(value));
-                        }}
-                        rightElement={
-                            <Button
-                                minimal
-                                onClick={() => {
-                                    setClkMHz(AICLK_INITIAL_MHZ);
-                                    dispatch(updateCLK(AICLK_INITIAL_MHZ));
-                                }}
-                                icon={IconNames.RESET}
-                            />
-                        }
-                    />
-                </div>
+                <DRAMBandwidthControls />
             </div>
             {chip && (
                 <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
@@ -303,3 +247,64 @@ export default function GridRender() {
         </>
     );
 }
+
+interface DRAMBandwidthControlsProps {}
+
+const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
+    const dispatch = useDispatch();
+    const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
+    const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
+    return (
+        <>
+            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
+                DRAM channel BW (GB/s)
+            </label>
+            <NumericInput
+                //
+                id='dramBandwidthInput'
+                value={dramBandwidth}
+                stepSize={0.5}
+                minorStepSize={0.1}
+                majorStepSize={10}
+                min={0}
+                onValueChange={(value) => {
+                    dispatch(updateDRAMBandwidth(value));
+                }}
+                rightElement={
+                    <Button
+                        minimal
+                        onClick={() => {
+                            dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
+                        }}
+                        icon={IconNames.RESET}
+                    />
+                }
+            />
+            <br />
+            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
+                AICLK (MHz)
+            </label>
+            <NumericInput
+                //
+                id='clkMHzInput'
+                value={clkMHz}
+                stepSize={10}
+                minorStepSize={1}
+                majorStepSize={100}
+                min={1}
+                onValueChange={(value) => {
+                    dispatch(updateCLK(value));
+                }}
+                rightElement={
+                    <Button
+                        minimal
+                        onClick={() => {
+                            dispatch(updateCLK(AICLK_INITIAL_MHZ));
+                        }}
+                        icon={IconNames.RESET}
+                    />
+                }
+            />
+        </>
+    );
+};
