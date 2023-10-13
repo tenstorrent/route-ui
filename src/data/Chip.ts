@@ -9,7 +9,7 @@ import {
 } from './JSONDataTypes';
 import { CoreOperation, Operand, Operation, OpIoType } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
-import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
+import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -522,7 +522,7 @@ export abstract class NetworkLink {
         );
     }
 
-    public generateInitialState(): LinkStateData {
+    public generateInitialState(): LinkState {
         return {
             id: this.uid,
             totalDataBytes: this.totalDataBytes,
@@ -530,7 +530,7 @@ export abstract class NetworkLink {
             saturation: 0,
             maxBandwidth: this.maxBandwidth,
             type: this.type,
-        } as LinkStateData;
+        } as LinkState;
     }
 }
 
@@ -755,7 +755,7 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
 };
 
 
-export const recalculateLinkSaturation = (link: LinkStateData, totalOpCycles: number) => {
+export const recalculateLinkSaturation = (link: LinkState, totalOpCycles: number) => {
     link.bpc = link.totalDataBytes / totalOpCycles;
     link.saturation = (link.bpc / link.maxBandwidth) * 100;
 };

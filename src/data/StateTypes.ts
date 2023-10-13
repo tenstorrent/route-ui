@@ -53,7 +53,7 @@ export interface NodeSelectionState {
     architecture: string;
 }
 
-export interface LinkStateData {
+export interface LinkState {
     id: string;
     totalDataBytes: number;
     bpc: number;
@@ -62,12 +62,12 @@ export interface LinkStateData {
     type: LinkType;
 }
 
-export interface LinkSaturationState {
+export interface NetworkCongestionState {
     linkSaturation: number;
     showLinkSaturation: boolean;
     showNOC0: boolean;
     showNOC1: boolean;
-    links: Record<string, LinkStateData>;
+    links: Record<string, LinkState>;
     totalOps: number;
     CLKMHz: number;
     DRAMBandwidthGBs: number;

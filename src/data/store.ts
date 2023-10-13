@@ -6,8 +6,8 @@ import {
     DetailedViewState,
     HighContrastState,
     HighlightType,
-    LinkSaturationState,
-    LinkStateData,
+    NetworkCongestionState,
+    LinkState,
     NodeSelectionState,
     PipeSelection,
     PipeSelectionState,
@@ -307,7 +307,7 @@ export const {
     resetCoreHighlight,
 } = nodeSelectionSlice.actions;
 
-const linkSaturationState: LinkSaturationState = {
+const networkCongestionInitialState: NetworkCongestionState = {
     linkSaturation: LINK_SATURATION_INITIAIL_PERCENT,
     showLinkSaturation: false,
     showNOC0: true,
@@ -320,7 +320,7 @@ const linkSaturationState: LinkSaturationState = {
 
 const linkSaturationSlice = createSlice({
     name: 'linkSaturation',
-    initialState: linkSaturationState,
+    initialState: networkCongestionInitialState,
     reducers: {
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturation = action.payload;
@@ -338,11 +338,11 @@ const linkSaturationSlice = createSlice({
         },
         updateTotalOPs: (state, action: PayloadAction<number>) => {
             state.totalOps = action.payload;
-            Object.values(state.links).forEach((link) => {
-                recalculateLinkSaturation(link, action.payload);
+            Object.values(state.links).forEach((linkState) => {
+                recalculateLinkSaturation(linkState, action.payload);
             });
         },
-        loadLinkData: (state, action: PayloadAction<LinkStateData[]>) => {
+        loadLinkData: (state, action: PayloadAction<LinkState[]>) => {
             state.links = {};
             action.payload.forEach((item) => {
                 state.links[item.id] = item;
@@ -360,13 +360,13 @@ const linkSaturationSlice = createSlice({
     },
 });
 
-const updateDRAMLinks = (state: LinkSaturationState) => {
+const updateDRAMLinks = (state: NetworkCongestionState) => {
     const DRAMBandwidthBytes = state.DRAMBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
     const CLKHz = state.CLKMHz * 1000 * 1000;
-    Object.values(state.links).forEach((link) => {
-        if (link.type === LinkType.DRAM) {
-            link.maxBandwidth = DRAMBandwidthBytes / CLKHz;
-            recalculateLinkSaturation(link, state.totalOps);
+    Object.values(state.links).forEach((linkState) => {
+        if (linkState.type === LinkType.DRAM) {
+            linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
+            recalculateLinkSaturation(linkState, state.totalOps);
         }
     });
 };

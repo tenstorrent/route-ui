@@ -184,7 +184,7 @@ export default function GridRender() {
                 <hr />
                 <div>
                     <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
-                        AICLK cycles/inputs
+                        AICLK cycles/input
                     </label>
                     <NumericInput
                         //
@@ -216,7 +216,7 @@ export default function GridRender() {
                 <hr />
                 <div>
                     <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
-                        DRAM channel bw (GB/s)
+                        DRAM channel BW (GB/s)
                     </label>
                     <NumericInput
                         //
