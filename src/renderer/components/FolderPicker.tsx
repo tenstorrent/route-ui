@@ -12,7 +12,7 @@ import GraphPicker from './GraphPicker';
 import Chip from '../../data/Chip';
 import { Architecture } from '../../data/Types';
 import { ChipDesignJSON } from '../../data/JSONDataTypes';
-import { GraphDescriptorJSON } from "../../data/sources/GraphDescriptorReader";
+import { GraphDescriptorJSON } from "../../data/sources/GraphDescriptor";
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
     if (architecture === Architecture.NONE) {
@@ -44,16 +44,16 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
         setShowGraphSelect(true);
     };
 
-    const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture) => {
+    const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
         const chip = await loadChipFromArchitecture(architecture);
         const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
         const graphDescriptorJson = await loadJsonFile(graphPath);
 
-        // TODO: Load graph
+        const newChip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
 
-        return chip;
         // const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
         // const analyzerResultsJson = await loadJsonFile(analyzerResultsPath)
+        return newChip;
     };
 
     return (

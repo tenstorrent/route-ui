@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
-import { Button } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import FileLoader from './components/FileLoader';
 import Chip from '../data/Chip';
-import TempFileLoader from './components/TempFileLoader';
 import { TempFolderLoadingContext } from './components/FolderPicker';
-import { useNavigate } from 'react-router-dom';
 import {
     closeDetailedView,
     loadedFilename,
@@ -16,7 +15,6 @@ import {
     updateTotalOPs,
 } from '../data/store';
 import { mapIterable } from '../utils/IterableHelpers';
-import { useDispatch } from 'react-redux';
 
 interface SplashScreenProps {
     updateChip: (data: Chip) => void;

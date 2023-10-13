@@ -46,12 +46,18 @@ export class BuildableOperation extends AbstractOpGraphNode implements Operation
 
     constructor(name: OperationName, cores: ComputeNode[], inputOperands?: Operand[], outputOperands?: Operand[]) {
         super(name, inputOperands, outputOperands);
-        this._cores = cores;
+        this._cores = [];
+        cores.forEach((core) => this.assignCore(core));
     }
 
     assignCore(core: ComputeNode) {
         if (core.type !== ComputeNodeType.CORE) {
             throw new Error(`Can't assign the non-core ${core.uid} to an operation (${this.name})`);
+        }
+        if (!core.operation) {
+            core.operation = this;
+        } else if (core.operation !== this) {
+            throw new Error("Core already has an operation assignment. Can't reassign core to this operation.");
         }
         this._cores.push(core);
     }

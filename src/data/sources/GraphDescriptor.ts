@@ -1,6 +1,9 @@
 import type { OperationName, QueueName, OpGraphNodeType, OpGraphNodeId } from '../GraphTypes';
-import { Operand, Operation, OpGraph, OpGraphBuilder, OpGraphNode } from '../ChipAugmentation';
+import { BuildableOperand, BuildableOperation, BuildableQueue } from '../ChipAugmentation';
 import type Chip from "../Chip";
+import type { ComputeNode } from "../Chip";
+
+export type CoreID = string;
 
 interface OperationOperandJSON {
     index: number;
@@ -16,7 +19,7 @@ interface QueueOperandJSON {
 
 export type OperandJSON = OperationOperandJSON | QueueOperandJSON;
 
-interface NewCoreOperationMappingJSON {
+export interface CoreOperationMappingJSON {
     'logical-core-id': string;
     'op-name': OperationName;
     'op-type': string;
@@ -25,54 +28,43 @@ interface NewCoreOperationMappingJSON {
 }
 
 export interface GraphDescriptorJSON {
-    [coreId: string]: NewCoreOperationMappingJSON;
+    [coreId: CoreID]: CoreOperationMappingJSON;
 }
 
-interface OperationDetails {
+export interface OperationDetails {
     name: OperationName;
     type: string;
-    cores: string[];
-    inputsByCore: Map<string, OperandJSON[]>;
-    outputsByCore: Map<string, OperandJSON[]>;
+    cores: CoreDetails[];
+    inputs: OperandJSON[];
+    outputs: OperandJSON[];
 }
 
-const aggregateCoresByOperation = (json: GraphDescriptorJSON): Map<string, OperationDetails> => {
-    return Object.entries<NewCoreOperationMappingJSON>(json).reduce(
-        (opsMap: Map<string, OperationDetails>, [coreId, opMapping]) => {
+export interface CoreDetails {
+    id: CoreID;
+    logicalId: string;
+}
+
+export const aggregateCoresByOperation = (json: GraphDescriptorJSON): Map<string, OperationDetails> => {
+    return Object.entries<CoreOperationMappingJSON>(json).reduce(
+        (opsMap: Map<OperationName, OperationDetails>, [coreId, opMapping]) => {
             const opName: OperationName = opMapping['op-name'];
             if (!opsMap.has(opName)) {
                 opsMap.set(opName, {
                     name: opName,
                     type: opMapping['op-type'],
                     cores: [],
-                    inputsByCore: new Map(),
-                    outputsByCore: new Map(),
+                    inputs: opMapping.inputs,
+                    outputs: opMapping.outputs,
                 });
             }
             const op = opsMap.get(opName)!;
-            op.cores.push(coreId);
-            op.inputsByCore.set(coreId, opMapping.inputs);
-            op.outputsByCore.set(coreId, opMapping.outputs);
+            op.cores.push({ id: coreId, logicalId: opMapping["logical-core-id"] });
             return opsMap;
         },
         new Map(),
     );
 };
 
-export const parseOperations = (graphName: string, json: GraphDescriptorJSON, chip: Chip) => {
-    const ops: Map<OperationName, OperationDetails> = aggregateCoresByOperation(json);
-    const graphNodes: Map<OpGraphNodeId, OpGraphNode> = new Map();
-
-    // eslint-disable-next-line no-restricted-syntax
-    [...ops.entries()].forEach(([opName, opDetails]) => {
-        const newOp: Operation = new Operation(opDetails.name, [], [], []);
-        graphNodes.set(newOp.name, newOp);
-        const inputOperands: Operand[] = [...opDetails.inputsByCore.values()].flat().map((operand)=> {
-            if (!graphNodes.has(operand.name)) {
-
-            }
-            new Operand(operand.name, operand.type, newOp, otherOp)
-        });
-    });
+export const loadGraphDescriptor = (graphName: string, graphDescriptorJSON: GraphDescriptorJSON, chip: Chip) => {
 
 };
