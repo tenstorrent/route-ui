@@ -53,8 +53,12 @@ export default class Chip {
         this.nodesById = new Map(mapIterable(value, (node: ComputeNode) => [node.uid, node]));
     }
 
-    public getNode(nodeUID: string): ComputeNode | undefined {
-        return this.nodesById.get(nodeUID);
+    public getNode(nodeUID: string): ComputeNode {
+        const node = this.nodesById.get(nodeUID);
+        if (!node) {
+            throw new Error(`Node ${nodeUID} does not exist on chip ${this.chipId}`);
+        }
+        return node;
     }
 
     private _totalCols: number = 0;
@@ -277,8 +281,8 @@ export default class Chip {
         // eslint-disable-next-line no-restricted-syntax
         const operations = mapIterable(opMap.entries(), ([opName, opDetails]) => {
             const cores: ComputeNode[] = opDetails.cores
-                .map((core) => newChip.getNode(core.id))
-                .filter((maybeCore): maybeCore is ComputeNode => maybeCore !== undefined);
+                // `core.id` is only an x-y location and doesn't include Chip ID
+                .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`))
             const inputs = opDetails.inputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
             const outputs = opDetails.outputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
             return new BuildableOperation(opName, cores, inputs, outputs);

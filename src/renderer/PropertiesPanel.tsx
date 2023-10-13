@@ -21,8 +21,8 @@ import LinkDetails from './components/LinkDetails';
 
 import { ComputeNodeType } from '../data/Types';
 import { Operation, OpGraphNodeType } from '../data/GraphTypes';
-import { filterIterable } from "../utils/IterableHelpers";
-import { NodeSelectionState } from "../data/StateTypes";
+import { filterIterable, mapIterable } from '../utils/IterableHelpers';
+import { ComputeNodeState, NodeSelectionState } from '../data/StateTypes';
 
 function OperationDetails(props: { operation: Operation }) {
     const { operation } = props;
@@ -30,21 +30,14 @@ function OperationDetails(props: { operation: Operation }) {
     const outputs = [...operation.outputs];
 
     return (
-        <div
-            className='operation-details'
-            style={{ color: '#000', marginLeft: '20px' }}
-        >
-            {inputs.length > 0 && (
-                <h5 className='io-label'>Inputs:</h5>
-            )}
+        <div className='operation-details' style={{ color: '#000', marginLeft: '20px' }}>
+            {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((io) => (
                 <div className='operation-input' key={io.name}>
                     <p>{io.name}</p>
                 </div>
             ))}
-            {outputs.length > 0 && (
-                <h5 className='io-label'>Outputs:</h5>
-            )}
+            {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
             {outputs.map((io) => (
                 <div className='operation-input' key={io.name}>
                     <p>{io.name}</p>
@@ -55,12 +48,16 @@ function OperationDetails(props: { operation: Operation }) {
 }
 
 interface ComputeNodeProps {
-    node: ComputeNode
+    node: ComputeNode;
     nodesSelectionState: NodeSelectionState;
     setOperationGroupSelection: (opGroupName: string, selected: boolean) => void;
 }
 
-function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSelection }: ComputeNodeProps): React.ReactElement {
+function ComputeNodeProperties({
+    node,
+    nodesSelectionState,
+    setOperationGroupSelection,
+}: ComputeNodeProps): React.ReactElement {
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
 
@@ -75,6 +72,8 @@ function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSel
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
+
+    console.log(`RENDERED NODE ${node.uid} WITH OPERATION`, node.operation);
 
     return (
         <div className='node-element' key={node.uid}>
@@ -105,7 +104,7 @@ function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSel
                     <Tooltip2 content={node.operation.name} position={PopoverPosition.LEFT}>
                         <SelectableOperation
                             opName={node.operation.name}
-                            value={nodesSelectionState.groups[node.operation.name].selected}
+                            value={nodesSelectionState.groups[node.operation.name]?.selected}
                             selectFunc={setOperationGroupSelection}
                             stringFilter=''
                         />
@@ -115,77 +114,65 @@ function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSel
             {node.operation && (
                 <div className='opname'>
                     {inputs && inputs.length && <h4 className='io-label'>Inputs:</h4>}
-                    {inputs && inputs.map((io) => (
-                        <ul className='scrollable-content'>
-                            <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
-                                <div key={io.name} style={{ fontSize: '12px' }}>
-                                    {io.type === OpGraphNodeType.OPERATION ? (
-                                        <SelectableOperation
-                                            opName={io.name}
-                                            value={
-                                                nodesSelectionState.groups[io.name]?.selected
-                                            }
-                                            selectFunc={setOperationGroupSelection}
-                                            stringFilter=''
-                                        />
-                                    ) : (
-                                        <div className='op-element'>
-                                            <Checkbox checked={false} disabled />
-                                            <span>{io.name}</span>
-                                        </div>
-                                    )}
-                                    <ul className='scrollable-content'>
-                                        {io
-                                            .getPipeIdsForCore(node.uid)
-                                            .map((pipeId) => (
+                    {inputs &&
+                        inputs.map((io) => (
+                            <ul className='scrollable-content'>
+                                <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
+                                    <div key={io.name} style={{ fontSize: '12px' }}>
+                                        {io.type === OpGraphNodeType.OPERATION ? (
+                                            <SelectableOperation
+                                                opName={io.name}
+                                                value={nodesSelectionState.groups[io.name]?.selected}
+                                                selectFunc={setOperationGroupSelection}
+                                                stringFilter=''
+                                            />
+                                        ) : (
+                                            <div className='op-element'>
+                                                <Checkbox checked={false} disabled />
+                                                <span>{io.name}</span>
+                                            </div>
+                                        )}
+                                        <ul className='scrollable-content'>
+                                            {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
-                                                    <SelectablePipe
-                                                        pipe={new Pipe(pipeId, 0)}
-                                                        pipeFilter=''
-                                                    />
+                                                    <SelectablePipe pipe={new Pipe(pipeId, 0)} pipeFilter='' />
                                                 </li>
                                             ))}
-                                    </ul>
-                                </div>
-                            </Tooltip2>
-                        </ul>
-                    ))}
+                                        </ul>
+                                    </div>
+                                </Tooltip2>
+                            </ul>
+                        ))}
                     {outputs && outputs.length && <h4 className='io-label'>Outputs:</h4>}
-                    {outputs && outputs.map((io) => (
-                        <ul className='scrollable-content'>
-                            <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
-                                <div key={io.name} style={{ fontSize: '12px' }}>
-                                    {io.type === OpGraphNodeType.OPERATION ? (
-                                        <SelectableOperation
-                                            opName={io.name}
-                                            value={
-                                                nodesSelectionState.groups[io.name]?.selected
-                                            }
-                                            selectFunc={setOperationGroupSelection}
-                                            stringFilter=''
-                                        />
-                                    ) : (
-                                        <div className='op-element'>
-                                            <Checkbox checked={false} disabled />
-                                            <span>{io.name}</span>
-                                        </div>
-                                    )}
-                                    <ul className='scrollable-content'>
-                                        {io
-                                            .getPipeIdsForCore(node.uid)
-                                            .map((pipeId) => (
+                    {outputs &&
+                        outputs.map((io) => (
+                            <ul className='scrollable-content'>
+                                <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
+                                    <div key={io.name} style={{ fontSize: '12px' }}>
+                                        {io.type === OpGraphNodeType.OPERATION ? (
+                                            <SelectableOperation
+                                                opName={io.name}
+                                                value={nodesSelectionState.groups[io.name]?.selected}
+                                                selectFunc={setOperationGroupSelection}
+                                                stringFilter=''
+                                            />
+                                        ) : (
+                                            <div className='op-element'>
+                                                <Checkbox checked={false} disabled />
+                                                <span>{io.name}</span>
+                                            </div>
+                                        )}
+                                        <ul className='scrollable-content'>
+                                            {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
-                                                    <SelectablePipe
-                                                        pipe={new Pipe(pipeId, 0)}
-                                                        pipeFilter=''
-                                                    />
+                                                    <SelectablePipe pipe={new Pipe(pipeId, 0)} pipeFilter='' />
                                                 </li>
                                             ))}
-                                    </ul>
-                                </div>
-                            </Tooltip2>
-                        </ul>
-                    ))}
+                                        </ul>
+                                    </div>
+                                </Tooltip2>
+                            </ul>
+                        ))}
                 </div>
             )}
             <div className='node-controls'>
@@ -203,9 +190,7 @@ function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSel
                 <Button
                     small
                     icon={IconNames.FILTER_LIST}
-                    onClick={() =>
-                        updatePipesState(node.getInternalPipeIDsForNode(), true)
-                    }
+                    onClick={() => updatePipesState(node.getInternalPipeIDsForNode(), true)}
                 >
                     Select internal pipes
                 </Button>
@@ -235,10 +220,16 @@ function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSel
     );
 }
 
+function getSelectedNodes(nodeStateList: ComputeNodeState[], chip: Chip): Iterable<ComputeNode> {
+    return mapIterable(
+        filterIterable(nodeStateList, (n) => n.selected),
+        (nodeState) => chip.getNode(nodeState.id),
+    );
+}
+
 export default function PropertiesPanel() {
     const { chip } = useContext(DataSource);
 
-    const [selectedNodes, setSelectedNodes] = useState<ComputeNode[]>([]);
     const [pipeFilter, setPipeFilter] = useState<string>('');
     const [opsFilter, setOpsFilter] = useState<string>('');
 
@@ -247,29 +238,14 @@ export default function PropertiesPanel() {
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const groups = useSelector((state: RootState) => state.nodeSelection.groups);
 
-    const operationsList = useMemo(() => chip ? [...chip.operations] : [], [chip]);
+    const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
 
-    useEffect(() => {
+    const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!chip) {
-            return;
+            return [];
         }
-
-        const selected = Object.values(nodesSelectionState.nodeList).filter((n) => n.selected);
-
-        const selection = filterIterable(chip.nodes, (node: ComputeNode) => {
-            return selected.filter((n) => n.id === node.uid).length > 0;
-        });
-
-        setSelectedNodes([...selection]);
+        return [...getSelectedNodes(Object.values(nodesSelectionState.nodeList), chip)];
     }, [chip, nodesSelectionState]);
-
-    // useEffect(() => {
-    //     const opList: string[] = [];
-    //     Object.keys(groups).forEach((op) => {
-    //         opList.push(op);
-    //     });
-    //     setOperationsList(opList);
-    // }, [groups]);
 
     const selectFilteredPipes = () => {
         if (!chip) {
@@ -314,7 +290,11 @@ export default function PropertiesPanel() {
                             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
                             <div className='properties-panel-nodes'>
                                 {selectedNodes.map((node: ComputeNode) => (
-                                    <ComputeNodeProperties node={node} nodesSelectionState={nodesSelectionState} setOperationGroupSelection={selectOperationGroup}  />
+                                    <ComputeNodeProperties
+                                        node={node}
+                                        nodesSelectionState={nodesSelectionState}
+                                        setOperationGroupSelection={selectOperationGroup}
+                                    />
                                 ))}
                             </div>
                         </>
