@@ -24,7 +24,7 @@ import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName } from './GraphTypes';
 import { OpGraphNodeType } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
-import { aggregateCoresByOperation, GraphDescriptorJSON, OperationDetails } from "./sources/GraphDescriptor";
+import { aggregateCoresByOperation, GraphDescriptorJSON, OperationDetails } from './sources/GraphDescriptor';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -282,7 +282,7 @@ export default class Chip {
         const operations = mapIterable(opMap.entries(), ([opName, opDetails]) => {
             const cores: ComputeNode[] = opDetails.cores
                 // `core.id` is only an x-y location and doesn't include Chip ID
-                .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`))
+                .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`));
             const inputs = opDetails.inputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
             const outputs = opDetails.outputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
             return new BuildableOperation(opName, cores, inputs, outputs);

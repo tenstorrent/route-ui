@@ -1,7 +1,7 @@
 import type { OperationName, QueueName, OpGraphNodeType, OpGraphNodeId } from '../GraphTypes';
 import { BuildableOperand, BuildableOperation, BuildableQueue } from '../ChipAugmentation';
-import type Chip from "../Chip";
-import type { ComputeNode } from "../Chip";
+import type Chip from '../Chip';
+import type { ComputeNode } from '../Chip';
 
 export type CoreID = string;
 
@@ -65,7 +65,7 @@ export const aggregateCoresByOperation = (json: GraphDescriptorJSON): Map<string
                 });
             }
             const op = opsMap.get(opName)!;
-            op.cores.push({ id: coreId, logicalId: opMapping["logical-core-id"] });
+            op.cores.push({ id: coreId, logicalId: opMapping['logical-core-id'] });
             return opsMap;
         },
         new Map(),

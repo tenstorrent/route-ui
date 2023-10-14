@@ -12,7 +12,7 @@ import GraphPicker from './GraphPicker';
 import Chip from '../../data/Chip';
 import { Architecture } from '../../data/Types';
 import { ChipDesignJSON } from '../../data/JSONDataTypes';
-import { GraphDescriptorJSON } from "../../data/sources/GraphDescriptor";
+import { GraphDescriptorJSON } from '../../data/sources/GraphDescriptor';
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
     if (architecture === Architecture.NONE) {
