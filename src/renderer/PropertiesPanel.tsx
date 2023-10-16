@@ -96,7 +96,7 @@ function ComputeNodeProperties({
             {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
             {node.type === ComputeNodeType.DRAM ? (
                 <p>
-                    Channel {node.dramChannelIdId}, Sub {node.dramSubchannelId}
+                    Channel {node.dramChannelId}, Sub {node.dramSubchannelId}
                 </p>
             ) : null}
             {node.operation && (
