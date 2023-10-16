@@ -24,7 +24,8 @@ import {
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName } from './GraphTypes';
 import { OpGraphNodeType } from './GraphTypes';
-import { filterIterable, forEach, mapIterable, reduceIterable } from '../utils/IterableHelpers';
+import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
+import { aggregateCoresByOperation, GraphDescriptorJSON, OperationDetails } from './sources/GraphDescriptor';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -41,15 +42,7 @@ export default class Chip {
         return Chip.NOC_ORDER;
     }
 
-    private _chipId: number = 0;
-
-    public get chipId(): number {
-        return this._chipId;
-    }
-
-    protected set chipId(value: number) {
-        this._chipId = value;
-    }
+    readonly chipId: number;
 
     private nodesById: Map<string, ComputeNode> = new Map();
 
@@ -61,8 +54,12 @@ export default class Chip {
         this.nodesById = new Map(mapIterable(value, (node: ComputeNode) => [node.uid, node]));
     }
 
-    public getNode(nodeUID: string): ComputeNode | undefined {
-        return this.nodesById.get(nodeUID);
+    public getNode(nodeUID: string): ComputeNode {
+        const node = this.nodesById.get(nodeUID);
+        if (!node) {
+            throw new Error(`Node ${nodeUID} does not exist on chip ${this.chipId}`);
+        }
+        return node;
     }
 
     private _totalCols: number = 0;
@@ -156,16 +153,16 @@ export default class Chip {
         }
     }
 
-    constructor() {
+    constructor(chipId: number) {
+        this.chipId = chipId;
         this.operationsByName = new Map();
         Chip.GET_NOC_ORDER();
     }
 
     public static CREATE_FROM_NETLIST_JSON(data: NetlistAnalyzerDataJSON) {
-        const chip = new Chip();
+        const chip = new Chip(data.chip_id || 0);
         chip.slowestOpCycles = data.slowest_op_cycles;
         chip.bwLimitedOpCycles = data.bw_limited_op_cycles;
-        chip.chipId = data.chip_id || 0;
 
         if (data.arch) {
             if (data.arch.includes(Architecture.GRAYSKULL)) {
@@ -213,7 +210,7 @@ export default class Chip {
 
     public static AUGMENT_FROM_OPS_JSON(chip: Chip, operationsJson: Record<string, OperationDataJSON>): Chip {
         if (chip) {
-            const augmentedChip = new Chip();
+            const augmentedChip = new Chip(chip.chipId);
             Object.assign(augmentedChip, chip);
 
             const pipesAsMap = (coresToPipes: Record<string, string[]>) => {
@@ -265,7 +262,7 @@ export default class Chip {
 
     public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON) {
         const chipDesign = new ChipDesign(json);
-        const chip = new Chip();
+        const chip = new Chip(0);
         chip.nodes = chipDesign.nodes.map((simpleNode) => {
             const node = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
             node.type = simpleNode.type;
@@ -277,6 +274,25 @@ export default class Chip {
         chip.totalRows = chipDesign.totalRows;
         chip.totalCols = chipDesign.totalCols;
         return chip;
+    }
+
+    static AUGMENT_FROM_GRAPH_DESCRIPTOR(chip: Chip, graphDescriptorJson: GraphDescriptorJSON) {
+        const newChip = new Chip(chip.chipId);
+        Object.assign(newChip, chip);
+
+        const opMap: Map<OperationName, OperationDetails> = aggregateCoresByOperation(graphDescriptorJson);
+
+        // eslint-disable-next-line no-restricted-syntax
+        const operations = mapIterable(opMap.entries(), ([opName, opDetails]) => {
+            const cores: ComputeNode[] = opDetails.cores
+                // `core.id` is only an x-y location and doesn't include Chip ID
+                .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`));
+            const inputs = opDetails.inputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
+            const outputs = opDetails.outputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
+            return new BuildableOperation(opName, cores, inputs, outputs);
+        });
+        forEach(operations, (operation) => newChip.addOperation(operation));
+        return newChip;
     }
 
     public generateInitialPipesSelectionState(): PipeSelection[] {

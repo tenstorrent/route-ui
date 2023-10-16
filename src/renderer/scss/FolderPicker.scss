@@ -1,9 +1,15 @@
 .folder-load-container {
     text-align: center;
-    .bp4-button {
-        margin: auto;
-        width: 100%;
-    };
+
+    .architecture-button-group {
+        margin: 0.5em;
+    }
+    .folder-picker {
+        .bp4-button {
+            margin: auto;
+            width: 100%;
+        }
+    }
 }
 
 .graph-picker {

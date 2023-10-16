@@ -1,34 +1,20 @@
 // import yaml from 'js-yaml';
-import { useDispatch } from 'react-redux';
 import { parse } from 'yaml';
 import fs from 'fs';
-import { useNavigate } from 'react-router-dom';
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { IconNames } from '@blueprintjs/icons';
 import { Button } from '@blueprintjs/core';
-import DataSource from '../../data/DataSource';
 import Chip from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
-import {
-    closeDetailedView,
-    loadedFilename,
-    loadLinkData,
-    loadNodesData,
-    loadPipeSelection,
-    setArchitecture,
-    updateTotalOPs,
-} from '../../data/store';
 import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
-import { mapIterable } from "../../utils/IterableHelpers";
+import { loadedFilename } from '../../data/store';
+import { useDispatch } from 'react-redux';
 
 interface FileLoaderProps {
-    updateData: (data: Chip) => void;
+    onChipLoaded: (data: Chip) => void;
 }
 
-const FileLoader: FC<FileLoaderProps> = ({ updateData }) => {
-    const navigate = useNavigate();
-    const { setChip } = useContext(DataSource);
-
+const FileLoader: FC<FileLoaderProps> = ({ onChipLoaded }) => {
     const dispatch = useDispatch();
 
     const loadFile = async () => {
@@ -60,22 +46,13 @@ const FileLoader: FC<FileLoaderProps> = ({ updateData }) => {
                     const isValid = true; // yamlValidate(doc);
                     if (isValid) {
                         const chip = Chip.CREATE_FROM_NETLIST_JSON(doc as NetlistAnalyzerDataJSON);
-                        updateData(chip);
-                        dispatch(closeDetailedView());
-                        dispatch(setArchitecture(chip.architecture));
+                        onChipLoaded(chip);
                         dispatch(loadedFilename(filename));
-                        dispatch(loadPipeSelection(chip.generateInitialPipesSelectionState()));
-                        dispatch(loadNodesData([...mapIterable(chip.nodes, (node) => node.generateInitialState())]));
-                        dispatch(loadLinkData(chip.getAllLinks().map((link) => link.generateInitialState())));
-                        dispatch(updateTotalOPs(chip.totalOpCycles));
-
-                        navigate('/render');
                     } else {
                         const errors = yamlValidate.errors?.map((error) => {
                             return error.message;
                         });
                         console.error(errors);
-                        console.error(errors?.join('\n'));
                         alert(`An error occurred parsing the file: ${errors?.join('\n')}`);
                     }
                 } catch (error) {
