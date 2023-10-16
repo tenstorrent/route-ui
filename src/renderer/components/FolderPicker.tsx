@@ -4,10 +4,10 @@ import path from 'path';
 
 import { Button, ButtonGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Classes, Popover2 } from '@blueprintjs/popover2';
+import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
 import '../scss/FolderPicker.scss';
 
-import { getAvailableGraphNames, loadJsonFile, readFile, validatePerfResultsFolder } from 'utils/Files';
+import { getAvailableGraphNames, loadJsonFile, validatePerfResultsFolder } from 'utils/Files';
 import GraphPicker from './GraphPicker';
 import Chip from '../../data/Chip';
 import { Architecture } from '../../data/Types';
@@ -58,28 +58,6 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
 
     return (
         <div className='folder-load-container'>
-            <Popover2
-                content={
-                    <GraphPicker
-                        options={graphOptions}
-                        selected={selectedGraph}
-                        onSelect={(graphName) => {
-                            setSelectedGraph(graphName);
-                            setShowGraphSelect(false);
-                            if (selectedFolder) {
-                                loadGraph(selectedFolder, graphName, selectedArchitecture)
-                                    .then((chip) => onDataLoad(chip))
-                                    .catch((err) => console.log(err));
-                            }
-                        }}
-                    />
-                }
-                disabled={!showGraphSelect}
-                isOpen={showGraphSelect}
-                placement='right'
-            >
-                <FolderPicker onSelectFolder={loadFolder} />
-            </Popover2>
             <div>
                 <ButtonGroup className='architecture-button-group'>
                     <Button
@@ -100,6 +78,28 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                     </Button>
                 </ButtonGroup>
             </div>
+            <Popover2
+                content={
+                    <GraphPicker
+                        options={graphOptions}
+                        selected={selectedGraph}
+                        onSelect={(graphName) => {
+                            setSelectedGraph(graphName);
+                            setShowGraphSelect(false);
+                            if (selectedFolder) {
+                                loadGraph(selectedFolder, graphName, selectedArchitecture)
+                                    .then((chip) => onDataLoad(chip))
+                                    .catch((err) => console.log(err));
+                            }
+                        }}
+                    />
+                }
+                disabled={!showGraphSelect}
+                isOpen={showGraphSelect}
+                placement='right'
+            >
+                <FolderPicker disabled={selectedArchitecture === Architecture.NONE} onSelectFolder={loadFolder} disabledText="Select Architecture Before Loading Graph" />
+            </Popover2>
 
             {/* Temporary elements to display success of selection */}
             {selectedArchitecture && <p>Selected Architecture: {selectedArchitecture}</p>}
@@ -110,10 +110,11 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
 };
 
 interface FolderPickerProps {
+    disabled: boolean;
     onSelectFolder: (folderPath: string) => void;
 }
 
-const FolderPicker = ({ onSelectFolder }: FolderPickerProps): React.ReactElement => {
+const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerProps): React.ReactElement => {
     const selectLocalFolder = async () => {
         const remote = await import('@electron/remote');
         const openDialogResult = await remote.dialog.showOpenDialog({
@@ -146,8 +147,11 @@ const FolderPicker = ({ onSelectFolder }: FolderPickerProps): React.ReactElement
                         <Button icon={IconNames.CLOUD_DOWNLOAD} text='Remote' disabled />
                     </div>
                 }
+                disabled={disabled}
             >
-                <Button className='load-folder-button' icon={IconNames.GRAPH} text='Load Perf Analyzer Folder' />
+                <Tooltip2 disabled={!disabled} content={disabledText} placement="bottom">
+                    <Button className='load-folder-button' disabled={disabled} icon={IconNames.GRAPH} text='Load Perf Analyzer Folder' />
+                </Tooltip2>
             </Popover2>
         </div>
     );
