@@ -97,7 +97,7 @@ function ComputeNodeProperties({ node, nodesSelectionState, setOperationGroupSel
             {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
             {node.type === ComputeNodeType.DRAM ? (
                 <p>
-                    Channel {node.dramChannel}, Sub {node.dramSubchannel}
+                    Channel {node.dramChannelIdId}, Sub {node.dramSubchannelId}
                 </p>
             ) : null}
             {node.operation && (

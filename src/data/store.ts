@@ -168,11 +168,11 @@ const nodeSelectionSlice = createSlice({
                     }
                     state.groups[item.opName].data.push(item);
                 }
-                if (item.dramChannel !== -1) {
-                    if (!state.dram[item.dramChannel]) {
-                        state.dram[item.dramChannel] = { data: [], selected: false };
+                if (item.dramChannelId !== -1) {
+                    if (!state.dram[item.dramChannelId]) {
+                        state.dram[item.dramChannelId] = { data: [], selected: false };
                     }
-                    state.dram[item.dramChannel].data.push(item);
+                    state.dram[item.dramChannelId].data.push(item);
                 }
             });
 

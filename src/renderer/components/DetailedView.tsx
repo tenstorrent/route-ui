@@ -17,7 +17,6 @@ import LinkDetails from './LinkDetails';
 import {
     Architecture,
     ComputeNodeType,
-    DramNOCLinkName,
     NOCLinkName,
     NOC,
     DramBankLinkName
@@ -46,13 +45,13 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
         if (chip && uid !== null) {
             const selectedNode = chip.getNode(uid);
             let allNodes: ComputeNode[] | undefined;
-            if (selectedNode && selectedNode.dramChannel > -1) {
-                allNodes = [...filterIterable(chip.nodes, (n) => n.dramChannel === selectedNode?.dramChannel)];
+            if (selectedNode && selectedNode.dramChannelId > -1) {
+                allNodes = [...filterIterable(chip.nodes, (n) => n.dramChannelId === selectedNode?.dramChannelId)];
             }
 
             setNode(selectedNode || null);
             setNodeList(allNodes || []);
-            setDram(chip?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
+            setDram(chip?.dramChannels.find((d) => d.id === selectedNode?.dramChannelId) || null);
         }
     }, [uid, chip, isOpen, showLinkSaturation]);
 
