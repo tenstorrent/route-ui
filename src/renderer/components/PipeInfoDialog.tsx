@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import DataSource from '../../data/DataSource';
 import { resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection } from '../../data/store';
 import { HighlightType } from '../../data/StateTypes';
+import { forEach } from "../../utils/IterableHelpers";
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;
@@ -29,29 +30,29 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
         let outputCores: string[] = [];
         const inputOps: Map<string, string[]> = new Map<string, []>();
         const outputOps: Map<string, string[]> = new Map<string, []>();
-        const computeNodeExtendedData = chip?.getPipeInfo(pipeId);
-        if (computeNodeExtendedData) {
-            computeNodeExtendedData.forEach((nodeData) => {
-                const { opName, uid } = nodeData;
-                if (nodeData.coreOperationData) {
-                    nodeData.coreOperationData.inputs.forEach((operand) => {
+        const computeNodes = chip?.getNodesForPipe(pipeId);
+        if (computeNodes) {
+            computeNodes.forEach((nodeData) => {
+                const { operation, uid: nodeUID } = nodeData;
+                if (operation) {
+                    forEach(operation.inputs, (operand) => {
                         const hasPipe = [...operand.getAllPipeIds()].some((pipeIds) => pipeIds.includes(pipeId));
                         if (hasPipe) {
-                            if (!outputOps.has(opName)) {
-                                outputOps.set(opName, []);
+                            if (!outputOps.has(operation.name)) {
+                                outputOps.set(operation.name, []);
                             }
-                            outputCores.push(uid);
-                            outputOps.get(opName)?.push(operand.name);
+                            outputCores.push(nodeUID);
+                            outputOps.get(operation.name)?.push(operand.name);
                         }
                     });
-                    nodeData.coreOperationData.outputs.forEach((operand) => {
+                    forEach(operation.outputs, (operand) => {
                         const hasPipe = [...operand.getAllPipeIds()].some((pipeIds) => pipeIds.includes(pipeId));
                         if (hasPipe) {
-                            if (!inputOps.has(opName)) {
-                                inputOps.set(opName, []);
+                            if (!inputOps.has(operation.name)) {
+                                inputOps.set(operation.name, []);
                             }
-                            inputCores.push(uid);
-                            inputOps.get(opName)?.push(operand.name);
+                            inputCores.push(nodeUID);
+                            inputOps.get(operation.name)?.push(operand.name);
                         }
                     });
                 }
