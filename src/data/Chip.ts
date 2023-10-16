@@ -15,15 +15,16 @@ import {
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    DramNOCLinkName, LinkType,
+    DramNOCLinkName,
+    LinkType,
     Loc,
     NetworkLinkName,
     NOC,
-    NOCLinkName
+    NOCLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 import { OperationName, OpGraphNodeType } from './GraphTypes';
-import { reduceIterable } from "../utils/IterableHelpers";
+import { reduceIterable } from '../utils/IterableHelpers';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -142,10 +143,8 @@ export default class Chip {
     }
 
     protected set operations(value: Iterable<Operation>) {
-        this.operationsByName = reduceIterable(
-            value,
-            new Map<OperationName, Operation>(),
-            (opMap, currentOp) => opMap.set(currentOp.name, currentOp),
+        this.operationsByName = reduceIterable(value, new Map<OperationName, Operation>(), (opMap, currentOp) =>
+            opMap.set(currentOp.name, currentOp),
         );
     }
 
@@ -208,6 +207,12 @@ export default class Chip {
 
         chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
 
+        if (data.dram_channels) {
+            chip.dramChannels = data.dram_channels.map((dramChannel) => {
+                return new DramChannel(dramChannel.channel_id, dramChannel);
+            });
+        }
+
         chip.nodes = data.nodes
             .map((nodeJSON) => {
                 const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
@@ -215,6 +220,9 @@ export default class Chip {
                 chip.totalRows = Math.max(loc.x, chip.totalRows);
                 const node = new ComputeNode(`${chip.chipId}-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
                 node.fromNetlistJSON(nodeJSON, chip.chipId);
+                if (node.dramChannelId !== -1 && chip.dramChannels) {
+                    node.dramChannel = chip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
+                }
                 return node;
             })
             .sort((a, b) => {
@@ -223,12 +231,6 @@ export default class Chip {
                 }
                 return a.loc.x - b.loc.x;
             });
-
-        if (data.dram_channels) {
-            chip.dramChannels = data.dram_channels.map((dramChannel) => {
-                return new DramChannel(dramChannel.channel_id, dramChannel);
-            });
-        }
 
         return chip;
     }
@@ -309,8 +311,8 @@ export default class Chip {
             const node = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
             node.type = simpleNode.type;
             node.loc = simpleNode.loc;
-            node.dramChannel = simpleNode.dramChannel;
-            node.dramSubchannel = simpleNode.dramSubchannel;
+            node.dramChannelId = simpleNode.dramChannelId;
+            node.dramSubchannelId = simpleNode.dramSubchannelId;
             return node;
         });
         chip.totalRows = chipDesign.totalRows;
@@ -417,7 +419,6 @@ export default class Chip {
         if (!this.getOperation(operation.name)) {
             this.operationsByName.set(operation.name, operation);
         }
-
     }
 }
 
@@ -473,13 +474,14 @@ export class DramSubchannel {
     constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
         Object.entries(json).forEach(([key, value]) => {
-            this.links.push(NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink);
+            this.links.push(
+                NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink,
+            );
         });
     }
 }
 
 export abstract class NetworkLink {
-
     abstract type: LinkType;
 
     readonly uid: string;
@@ -596,15 +598,17 @@ export class ComputeNode {
 
     public links: Map<any, NOCLink> = new Map();
 
-    /**
-     * only relevant for dram nodes
-     */
-    public dramSubchannel: number = 0;
+    public dramChannel: DramChannel | null = null;
 
     /**
      * only relevant for dram nodes
      */
-    public dramChannel: number = -1;
+    public dramSubchannelId: number = 0;
+
+    /**
+     * only relevant for dram nodes
+     */
+    public dramChannelId: number = -1;
 
     constructor(uid: string) {
         this.uid = uid;
@@ -619,8 +623,8 @@ export class ComputeNode {
 
         this.type = json.type as ComputeNodeType;
         if (json.dram_channel !== undefined && json.dram_channel !== null) {
-            this.dramChannel = json.dram_channel;
-            this.dramSubchannel = json.dram_subchannel || 0;
+            this.dramChannelId = json.dram_channel;
+            this.dramSubchannelId = json.dram_subchannel || 0;
         }
         this.loc = { x: json.location[0], y: json.location[1] };
         this.uid = `${chipId}-${this.loc.y}-${this.loc.x}`;
@@ -641,8 +645,8 @@ export class ComputeNode {
             selected: false,
             loc: this.loc,
             opName: this.opName,
-            dramChannel: this.dramChannel,
-            dramSubchannel: this.dramSubchannel,
+            dramChannelId: this.dramChannelId,
+            dramSubchannelId: this.dramSubchannelId,
         } as ComputeNodeState;
     }
 
@@ -753,7 +757,6 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
     const fractionDigits = denominationIndex > 1 ? 2 : numAfterComma; // MB and up always requires decimals
     return `${(bytes / 1024 ** denominationIndex).toFixed(fractionDigits)} ${sizes[denominationIndex]}`;
 };
-
 
 export const recalculateLinkSaturation = (link: LinkState, totalOpCycles: number) => {
     link.bpc = link.totalDataBytes / totalOpCycles;

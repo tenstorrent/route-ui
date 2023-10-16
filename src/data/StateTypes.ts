@@ -25,8 +25,8 @@ export interface ComputeNodeState extends NodeSelection {
     loc: { x: number; y: number };
     opName: string;
     border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
-    dramChannel: number | -1;
-    dramSubchannel: number | -1;
+    dramChannelId: number | -1;
+    dramSubchannelId: number | -1;
 }
 
 export interface NodeSelection {

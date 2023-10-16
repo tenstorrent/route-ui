@@ -105,9 +105,9 @@ const DramChipBorder: React.FC<DramChipBorderProps> = ({
     node,
     //
 }) => {
-    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
+    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannelId));
     let dramStyles = {};
-    if (node.dramChannel > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
+    if (node.dramChannelId > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
         const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
         dramStyles = getDramGroupingStyles(border);
     }

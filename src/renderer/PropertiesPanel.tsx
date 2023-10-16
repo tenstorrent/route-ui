@@ -135,7 +135,7 @@ export default function PropertiesPanel() {
                                             {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
                                             {node.type === ComputeNodeType.DRAM ? (
                                                 <p>
-                                                    Channel {node.dramChannel}, Sub {node.dramSubchannel}
+                                                    Channel {node.dramChannelId}, Sub {node.dramSubchannelId}
                                                 </p>
                                             ) : null}
                                             {node.opName !== '' && (
