@@ -152,7 +152,7 @@ export default class Chip {
         }
     }
 
-    constructor(chipId: number = 0) {
+    constructor(chipId: number) {
         this.chipId = chipId;
         this.operationsByName = new Map();
         Chip.GET_NOC_ORDER();
