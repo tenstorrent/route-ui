@@ -13,14 +13,14 @@ import {
     NOCLinkName,
 } from '../../../data/Types';
 
-type PipeRendererProps = {
+type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
     className?: string;
     showLinkSaturation: boolean;
     linkSaturationTreshold: number;
 };
 
-const PipeRenderer: React.FC<PipeRendererProps> = ({
+const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     links,
     showLinkSaturation,
     linkSaturationTreshold,
@@ -123,7 +123,7 @@ const PipeRenderer: React.FC<PipeRendererProps> = ({
         </div>
     );
 };
-PipeRenderer.defaultProps = {
+DetailedViewPipeRenderer.defaultProps = {
     className: '',
 };
-export default PipeRenderer;
+export default DetailedViewPipeRenderer;

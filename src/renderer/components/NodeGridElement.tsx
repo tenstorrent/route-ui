@@ -105,9 +105,9 @@ const DramChipBorder: React.FC<DramChipBorderProps> = ({
     node,
     //
 }) => {
-    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannel));
+    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannelId));
     let dramStyles = {};
-    if (node.dramChannel > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
+    if (node.dramChannelId > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
         const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
         dramStyles = getDramGroupingStyles(border);
     }
@@ -251,7 +251,6 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     }
 
     if (showLinkSaturation) {
-        console.log('showing link saturation', noc0Saturation, noc1Saturation);
         node.links.forEach((link) => {
             if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
                 const linkStateData = linksData[link.uid];

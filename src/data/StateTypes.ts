@@ -1,3 +1,5 @@
+import { LinkType } from './Types';
+
 export interface HighContrastState {
     enabled: boolean;
 }
@@ -23,8 +25,8 @@ export interface ComputeNodeState extends NodeSelection {
     loc: { x: number; y: number };
     opName: string;
     border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
-    dramChannel: number | -1;
-    dramSubchannel: number | -1;
+    dramChannelId: number | -1;
+    dramSubchannelId: number | -1;
 }
 
 export interface NodeSelection {
@@ -51,19 +53,22 @@ export interface NodeSelectionState {
     architecture: string;
 }
 
-export interface LinkStateData {
+export interface LinkState {
     id: string;
     totalDataBytes: number;
     bpc: number;
     saturation: number;
     maxBandwidth: number;
+    type: LinkType;
 }
 
-export interface LinkSaturationState {
+export interface NetworkCongestionState {
     linkSaturation: number;
     showLinkSaturation: boolean;
     showNOC0: boolean;
     showNOC1: boolean;
-    links: Record<string, LinkStateData>;
+    links: Record<string, LinkState>;
     totalOps: number;
+    CLKMHz: number;
+    DRAMBandwidthGBs: number;
 }

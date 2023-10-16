@@ -29,7 +29,7 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, showEmpty, index }) => 
                 <span>
                     {link.name} - {index && index > -1 ? `${index} - ` : ''}
                     {convertBytes(link.totalDataBytes)} <br /> {convertBytes(linkState?.bpc || 0, 2)} of{' '}
-                    {convertBytes(link.maxBandwidth)}
+                    {convertBytes(linkState?.maxBandwidth)}
                     <span style={{ color }}> {linkState?.saturation.toFixed(2)}%</span>
                 </span>
                 {link.totalDataBytes > 0 && <ProgressBar percent={linkState?.saturation || 0} color={color} />}

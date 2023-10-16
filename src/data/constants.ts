@@ -1,6 +1,10 @@
 import { DramBankLinkName, DramNOCLinkName, NOCLinkName } from './Types';
 
-export const LINK_SATURATION_INITIAIL_VALUE = 75;
+export const LINK_SATURATION_INITIAIL_PERCENT = 75;
+
+export const DRAM_BANDWIDTH_INITIAL_GBS = 21.5;
+
+export const AICLK_INITIAL_MHZ = 1000;
 
 export const INTERNAL_LINK_NAMES = [
     NOCLinkName.NOC0_IN,

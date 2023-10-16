@@ -29,11 +29,11 @@ export default class ChipDesign {
                 return new ComputeNodeSimple(ComputeNodeType.CORE, loc);
             }),
             ...json.dram
-                .map((channel, dramChannel) => {
-                    return channel.map((loc, dramSubChannel) => {
+                .map((channel, dramChannelId) => {
+                    return channel.map((loc, dramSubChannelId) => {
                         const core = new ComputeNodeSimple(ComputeNodeType.DRAM, loc);
-                        core.dramChannel = dramChannel;
-                        core.dramSubchannel = dramSubChannel;
+                        core.dramChannelId = dramChannelId;
+                        core.dramSubchannelId = dramSubChannelId;
                         return core;
                     });
                 })
@@ -63,9 +63,9 @@ export class ComputeNodeSimple {
 
     public loc: Loc = { x: 0, y: 0 };
 
-    public dramChannel: number = -1;
+    public dramChannelId: number = -1;
 
-    public dramSubchannel: number = 0;
+    public dramSubchannelId: number = 0;
 
     constructor(type: ComputeNodeType, location: string) {
         this.type = type;
