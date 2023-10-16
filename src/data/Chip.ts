@@ -8,13 +8,13 @@ import {
 } from './JSONDataTypes';
 import { BuildableOperation, Operand } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
-import { ComputeNodeState, LinkStateData, PipeSelection } from './StateTypes';
+import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    DramNOCLinkName,
+    DramNOCLinkName, LinkType,
     Loc,
     NetworkLinkName,
     NOC,
@@ -405,7 +405,10 @@ export class DramSubchannel {
     }
 }
 
-export class NetworkLink {
+export abstract class NetworkLink {
+
+    abstract type: LinkType;
+
     readonly uid: string;
 
     public readonly name: NetworkLinkName;
@@ -446,19 +449,22 @@ export class NetworkLink {
         );
     }
 
-    public generateInitialState(): LinkStateData {
+    public generateInitialState(): LinkState {
         return {
             id: this.uid,
             totalDataBytes: this.totalDataBytes,
             bpc: 0,
             saturation: 0,
             maxBandwidth: this.maxBandwidth,
-        } as LinkStateData;
+            type: this.type,
+        } as LinkState;
     }
 }
 
 export class NOCLink extends NetworkLink {
     // public name: NOCLinkName;
+
+    public readonly type: LinkType = LinkType.NOC;
 
     public readonly noc: NOC;
 
@@ -478,6 +484,8 @@ export class DramNOCLink extends NOCLink {
 
 export class DramBankLink extends NetworkLink {
     public readonly bank: DRAMBank = DRAMBank.NONE;
+
+    public readonly type: LinkType = LinkType.DRAM;
 
     constructor(name: DramBankLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
@@ -694,7 +702,8 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
     return `${(bytes / 1024 ** denominationIndex).toFixed(fractionDigits)} ${sizes[denominationIndex]}`;
 };
 
-export const updateOPCycles = (link: LinkStateData, totalOpCycles: number) => {
+
+export const recalculateLinkSaturation = (link: LinkState, totalOpCycles: number) => {
     link.bpc = link.totalDataBytes / totalOpCycles;
     link.saturation = (link.bpc / link.maxBandwidth) * 100;
 };

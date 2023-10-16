@@ -251,7 +251,6 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     }
 
     if (showLinkSaturation) {
-        console.log('showing link saturation', noc0Saturation, noc1Saturation);
         node.links.forEach((link) => {
             if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
                 const linkStateData = linksData[link.uid];

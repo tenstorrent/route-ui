@@ -45,6 +45,12 @@ export enum DramBankLinkName {
     DRAM1_INOUT = 'dram1_inout',
 }
 
+export enum LinkType {
+    NONE = '',
+    NOC = 'noc',
+    DRAM = 'dram',
+}
+
 export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName;
 
 

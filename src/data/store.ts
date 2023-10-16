@@ -1,18 +1,19 @@
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { updateOPCycles } from './Chip';
-import { LINK_SATURATION_INITIAIL_VALUE } from './constants';
+import { recalculateLinkSaturation } from './Chip';
+
 import {
     ComputeNodeState,
     DetailedViewState,
     HighContrastState,
     HighlightType,
-    LinkSaturationState,
-    LinkStateData,
+    NetworkCongestionState,
+    LinkState,
     NodeSelectionState,
     PipeSelection,
     PipeSelectionState,
 } from './StateTypes';
-import { NOC } from './Types';
+import { LinkType, NOC } from './Types';
+import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, LINK_SATURATION_INITIAIL_PERCENT } from './constants';
 
 const highContrastInitialState: HighContrastState = {
     enabled: false,
@@ -306,18 +307,20 @@ export const {
     resetCoreHighlight,
 } = nodeSelectionSlice.actions;
 
-const linkSaturationState: LinkSaturationState = {
-    linkSaturation: LINK_SATURATION_INITIAIL_VALUE,
+const networkCongestionInitialState: NetworkCongestionState = {
+    linkSaturation: LINK_SATURATION_INITIAIL_PERCENT,
     showLinkSaturation: false,
     showNOC0: true,
     showNOC1: true,
     links: {},
     totalOps: 0,
+    CLKMHz: AICLK_INITIAL_MHZ,
+    DRAMBandwidthGBs: DRAM_BANDWIDTH_INITIAL_GBS,
 };
 
 const linkSaturationSlice = createSlice({
     name: 'linkSaturation',
-    initialState: linkSaturationState,
+    initialState: networkCongestionInitialState,
     reducers: {
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturation = action.payload;
@@ -335,18 +338,38 @@ const linkSaturationSlice = createSlice({
         },
         updateTotalOPs: (state, action: PayloadAction<number>) => {
             state.totalOps = action.payload;
-            Object.values(state.links).forEach((link) => {
-                updateOPCycles(link, action.payload);
+            Object.values(state.links).forEach((linkState) => {
+                recalculateLinkSaturation(linkState, action.payload);
             });
         },
-        loadLinkData: (state, action: PayloadAction<LinkStateData[]>) => {
+        loadLinkData: (state, action: PayloadAction<LinkState[]>) => {
             state.links = {};
             action.payload.forEach((item) => {
                 state.links[item.id] = item;
             });
+            updateDRAMLinks(state);
+        },
+        updateCLK: (state, action: PayloadAction<number>) => {
+            state.CLKMHz = action.payload;
+            updateDRAMLinks(state);
+        },
+        updateDRAMBandwidth: (state, action: PayloadAction<number>) => {
+            state.DRAMBandwidthGBs = action.payload;
+            updateDRAMLinks(state);
         },
     },
 });
+
+const updateDRAMLinks = (state: NetworkCongestionState) => {
+    const DRAMBandwidthBytes = state.DRAMBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
+    const CLKHz = state.CLKMHz * 1000 * 1000;
+    Object.values(state.links).forEach((linkState) => {
+        if (linkState.type === LinkType.DRAM) {
+            linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
+            recalculateLinkSaturation(linkState, state.totalOps);
+        }
+    });
+};
 export const getLinkData = (state: RootState, id: string) => state.linkSaturation.links[id];
 export const {
     //
@@ -355,6 +378,8 @@ export const {
     updateLinkSaturation,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
+    updateCLK,
+    updateDRAMBandwidth,
 } = linkSaturationSlice.actions;
 
 const store = configureStore({

@@ -10,6 +10,8 @@ import {
     clearAllPipes,
     RootState,
     selectAllPipes,
+    updateCLK,
+    updateDRAMBandwidth,
     updateLinkSaturation,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
@@ -18,7 +20,7 @@ import {
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
-import { LINK_SATURATION_INITIAIL_VALUE } from '../data/constants';
+import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, LINK_SATURATION_INITIAIL_PERCENT } from '../data/constants';
 import { NOC } from '../data/Types';
 import { mapIterable } from "../utils/IterableHelpers";
 
@@ -32,7 +34,7 @@ export default function GridRender() {
     const [showLinkSaturation, setShowLinkSaturation] = useState(false);
     const [showLinkSaturationNOC0, setShowLinkSaturationNOC0] = useState(true);
     const [showLinkSaturationNOC1, setShowLinkSaturationNOC1] = useState(true);
-    const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(LINK_SATURATION_INITIAIL_VALUE);
+    const [linkSaturationTreshold, setLinkSaturationTreshold] = useState<number>(LINK_SATURATION_INITIAIL_PERCENT);
     const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
     const [opCycles, setOpCycles] = useState<number>(0);
 
@@ -47,6 +49,7 @@ export default function GridRender() {
         setShowLinkSaturation(value);
         dispatch(updateShowLinkSaturation(value));
     };
+
     const onShowLinkSaturationForNOC = (noc: NOC, selected: boolean) => {
         dispatch(updateShowLinkSaturationForNOC({ noc, selected }));
         if (noc === NOC.NOC0) {
@@ -180,7 +183,7 @@ export default function GridRender() {
                 <hr />
                 <div>
                     <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
-                        Update Total OP Cycles
+                        AICLK cycles/input
                     </label>
                     <NumericInput
                         //
@@ -189,7 +192,7 @@ export default function GridRender() {
                         stepSize={10000}
                         minorStepSize={100}
                         majorStepSize={100000}
-                        min={0}
+                        min={1}
                         onValueChange={(value) => {
                             setOpCycles(value);
                             dispatch(updateTotalOPs(value));
@@ -210,6 +213,7 @@ export default function GridRender() {
                     />
                 </div>
                 <hr />
+                <DRAMBandwidthControls />
             </div>
             {chip && (
                 <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
@@ -246,3 +250,64 @@ export default function GridRender() {
         </>
     );
 }
+
+interface DRAMBandwidthControlsProps {}
+
+const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
+    const dispatch = useDispatch();
+    const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
+    const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
+    return (
+        <>
+            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
+                DRAM channel BW (GB/s)
+            </label>
+            <NumericInput
+                //
+                id='dramBandwidthInput'
+                value={dramBandwidth}
+                stepSize={0.5}
+                minorStepSize={0.1}
+                majorStepSize={10}
+                min={0}
+                onValueChange={(value) => {
+                    dispatch(updateDRAMBandwidth(value));
+                }}
+                rightElement={
+                    <Button
+                        minimal
+                        onClick={() => {
+                            dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
+                        }}
+                        icon={IconNames.RESET}
+                    />
+                }
+            />
+            <br />
+            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
+                AICLK (MHz)
+            </label>
+            <NumericInput
+                //
+                id='clkMHzInput'
+                value={clkMHz}
+                stepSize={10}
+                minorStepSize={1}
+                majorStepSize={100}
+                min={1}
+                onValueChange={(value) => {
+                    dispatch(updateCLK(value));
+                }}
+                rightElement={
+                    <Button
+                        minimal
+                        onClick={() => {
+                            dispatch(updateCLK(AICLK_INITIAL_MHZ));
+                        }}
+                        icon={IconNames.RESET}
+                    />
+                }
+            />
+        </>
+    );
+};
