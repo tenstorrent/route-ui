@@ -522,11 +522,16 @@ export class ComputeNode {
 
         node.type = nodeJSON.type as ComputeNodeType;
         if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
-            node.dramChannel = nodeJSON.dram_channel;
-            node.dramSubchannel = nodeJSON.dram_subchannel || 0;
+            node.dramChannelId = nodeJSON.dram_channel;
+            node.dramSubchannelId = nodeJSON.dram_subchannel || 0;
         }
         node.loc = { x: nodeJSON.location[0], y: nodeJSON.location[1] };
         node.uid = `${node.chipId}-${node.loc.y}-${node.loc.x}`;
+
+        if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
+            node.dramChannelId = nodeJSON.dram_channel;
+            node.dramSubchannelId = nodeJSON.dram_subchannel || 0;
+        }
 
         const linkId = `${node.loc.x}-${node.loc.y}`;
 
@@ -592,21 +597,6 @@ export class ComputeNode {
 
 
     // TODO: this doesnt look like it shoudl still be here, keeping to retain code changes
-    public fromNetlistJSON(json: NodeDataJSON, chipId: number = 0) {
-        // this.uid = uid;
-
-        this.opCycles = json.op_cycles;
-        this.links = new Map();
-        this.chipId = chipId;
-
-        this.type = json.type as ComputeNodeType;
-        if (json.dram_channel !== undefined && json.dram_channel !== null) {
-            this.dramChannelId = json.dram_channel;
-            this.dramSubchannelId = json.dram_subchannel || 0;
-        }
-        this.loc = { x: json.location[0], y: json.location[1] };
-        this.uid = `${chipId}-${this.loc.y}-${this.loc.x}`;
-    }
 
     /** @Deprecated
      * Superceded by `this.operation.name`
