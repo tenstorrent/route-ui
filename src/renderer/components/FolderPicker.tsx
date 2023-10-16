@@ -111,6 +111,7 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
 
 interface FolderPickerProps {
     disabled: boolean;
+    disabledText: string;
     onSelectFolder: (folderPath: string) => void;
 }
 

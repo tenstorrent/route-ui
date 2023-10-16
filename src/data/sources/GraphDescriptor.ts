@@ -1,7 +1,4 @@
-import type { OperationName, QueueName, OpGraphNodeType, OpGraphNodeId } from '../GraphTypes';
-import { BuildableOperand, BuildableOperation, BuildableQueue } from '../ChipAugmentation';
-import type Chip from '../Chip';
-import type { ComputeNode } from '../Chip';
+import type { OperationName, QueueName, OpGraphNodeType } from '../GraphTypes';
 
 export type CoreID = string;
 

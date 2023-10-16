@@ -206,7 +206,7 @@ export default class Chip {
 
     public static AUGMENT_FROM_OPS_JSON(chip: Chip, operationsJson: Record<string, OperationDataJSON>): Chip {
         if (chip) {
-            const augmentedChip = new Chip();
+            const augmentedChip = new Chip(chip.chipId);
             Object.assign(augmentedChip, chip);
 
             const pipesAsMap = (coresToPipes: Record<string, string[]>) => {
@@ -258,7 +258,7 @@ export default class Chip {
 
     public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON) {
         const chipDesign = new ChipDesign(json);
-        const chip = new Chip();
+        const chip = new Chip(0);
         chip.nodes = chipDesign.nodes.map((simpleNode) => {
             const node = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
             node.type = simpleNode.type;
@@ -273,7 +273,7 @@ export default class Chip {
     }
 
     static AUGMENT_FROM_GRAPH_DESCRIPTOR(chip: Chip, graphDescriptorJson: GraphDescriptorJSON) {
-        const newChip = new Chip();
+        const newChip = new Chip(chip.chipId);
         Object.assign(newChip, chip);
 
         const opMap: Map<OperationName, OperationDetails> = aggregateCoresByOperation(graphDescriptorJson);
