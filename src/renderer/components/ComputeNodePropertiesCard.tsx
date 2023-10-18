@@ -5,7 +5,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
-import { openDetailedView, RootState, updateNodeSelection, updatePipeSelection } from '../../data/store';
+import { openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection } from '../../data/store';
 import { ComputeNodeType } from '../../data/Types';
 import { NodeSelectionState } from '../../data/StateTypes';
 import { ComputeNode, NOCLink, Pipe } from '../../data/Chip';
@@ -17,13 +17,11 @@ import LinkDetails from './LinkDetails';
 interface ComputeNodeProps {
     node: ComputeNode;
     nodesSelectionState: NodeSelectionState;
-    setOperationGroupSelection: (opGroupName: string, selected: boolean) => void;
 }
 
-export default function ComputeNodeProperties({
+export default function ComputeNodePropertiesCard({
     node,
     nodesSelectionState,
-    setOperationGroupSelection,
 }: ComputeNodeProps): React.ReactElement {
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
@@ -37,13 +35,21 @@ export default function ComputeNodeProperties({
         dispatch(updateNodeSelection({ id: node.uid, selected }));
     };
 
+    const setOperationSelectionState = (opName: string, selected: boolean) =>
+        dispatch(
+            selectGroup({
+                opName,
+                selected,
+            }),
+        );
+
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
 
     console.log(`RENDERED NODE ${node.uid} WITH OPERATION`, node.operation);
 
     return (
-        <Card className='node-element' key={node.uid}>
+        <Card className='node-element'>
             <h3
                 className={`node-type node-type-${node.getNodeLabel()} ${
                     node.uid === detailedViewState.uid && detailedViewState.isOpen ? 'detailed-view' : ''
@@ -72,7 +78,7 @@ export default function ComputeNodeProperties({
                         <SelectableOperation
                             opName={node.operation.name}
                             value={nodesSelectionState.groups[node.operation.name]?.selected}
-                            selectFunc={setOperationGroupSelection}
+                            selectFunc={setOperationSelectionState}
                             stringFilter=''
                         />
                     </Tooltip2>
@@ -90,7 +96,7 @@ export default function ComputeNodeProperties({
                                             <SelectableOperation
                                                 opName={io.name}
                                                 value={nodesSelectionState.groups[io.name]?.selected}
-                                                selectFunc={setOperationGroupSelection}
+                                                selectFunc={setOperationSelectionState}
                                                 stringFilter=''
                                             />
                                         ) : (
@@ -120,7 +126,7 @@ export default function ComputeNodeProperties({
                                             <SelectableOperation
                                                 opName={io.name}
                                                 value={nodesSelectionState.groups[io.name]?.selected}
-                                                selectFunc={setOperationGroupSelection}
+                                                selectFunc={setOperationSelectionState}
                                                 stringFilter=''
                                             />
                                         ) : (

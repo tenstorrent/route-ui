@@ -6,20 +6,14 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
 import Chip, { ComputeNode, Pipe } from '../data/Chip';
 import FilterableComponent from './components/FilterableComponent';
-import {
-    clearAllOperations,
-    clearAllPipes,
-    RootState,
-    selectGroup,
-    updatePipeSelection,
-} from '../data/store';
+import { clearAllOperations, clearAllPipes, RootState, selectGroup, updatePipeSelection } from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
 
 import { Operation } from '../data/GraphTypes';
 import { filterIterable, mapIterable } from '../utils/IterableHelpers';
 import { ComputeNodeState } from '../data/StateTypes';
-import ComputeNodePropertiesCard from "./components/ComputeNodeProperties";
+import ComputeNodePropertiesCard from './components/ComputeNodePropertiesCard';
 
 function OperationDetails(props: { operation: Operation }) {
     const { operation } = props;
@@ -44,32 +38,98 @@ function OperationDetails(props: { operation: Operation }) {
     );
 }
 
-function getSelectedNodes(nodeStateList: ComputeNodeState[], chip: Chip): Iterable<ComputeNode> {
-    return mapIterable(
-        filterIterable(nodeStateList, (n) => n.selected),
-        (nodeState) => chip.getNode(nodeState.id),
-    );
-}
-
-export default function PropertiesPanel() {
-    const { chip } = useContext(DataSource);
-
-    const [pipeFilter, setPipeFilter] = useState<string>('');
-    const [opsFilter, setOpsFilter] = useState<string>('');
-
+const OperationsPropertiesTab = () => {
     const dispatch = useDispatch();
 
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const groups = useSelector((state: RootState) => state.nodeSelection.groups);
+    const { chip } = useContext(DataSource);
+
+    const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.groups);
+
+    const [opsFilter, setOpsFilter] = useState<string>('');
 
     const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
 
-    const selectedNodes: ComputeNode[] = useMemo(() => {
+    const selectFilteredOperations = () => {
         if (!chip) {
-            return [];
+            return;
         }
-        return [...getSelectedNodes(Object.values(nodesSelectionState.nodeList), chip)];
-    }, [chip, nodesSelectionState]);
+        Object.keys(groupsSelectionState).forEach((op) => {
+            if (op.toLowerCase().includes(opsFilter.toLowerCase())) {
+                dispatch(selectGroup({ opName: op, selected: true }));
+            }
+        });
+    };
+
+    const setOperationSelectionState = (opName: string, selected: boolean) =>
+        dispatch(
+            selectGroup({
+                opName,
+                selected,
+            }),
+        );
+
+    return (
+        <div>
+            <div className='search-field'>
+                <InputGroup
+                    rightElement={
+                        opsFilter ? (
+                            <Button
+                                minimal
+                                onClick={() => {
+                                    setOpsFilter('');
+                                }}
+                                icon={IconNames.CROSS}
+                            />
+                        ) : (
+                            <Icon icon={IconNames.SEARCH} />
+                        )
+                    }
+                    placeholder=''
+                    value={opsFilter}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}
+                />
+                <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT}>
+                    <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
+                </Tooltip2>
+                <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT}>
+                    <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                </Tooltip2>
+            </div>
+            <div className='operations-wrap list-wrap'>
+                <div className='scrollable-content'>
+                    {operationsList.map((operation) => {
+                        return (
+                            <FilterableComponent
+                                key={operation.name}
+                                filterableString={operation.name}
+                                filterQuery={opsFilter}
+                                component={
+                                    <>
+                                        <SelectableOperation
+                                            opName={operation.name}
+                                            value={groupsSelectionState[operation.name]?.selected}
+                                            selectFunc={setOperationSelectionState}
+                                            stringFilter={opsFilter}
+                                        />
+                                        {operation && <OperationDetails operation={operation} />}
+                                    </>
+                                }
+                            />
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const PipesPropertiesTab = () => {
+    const dispatch = useDispatch();
+
+    const { chip } = useContext(DataSource);
+
+    const [pipeFilter, setPipeFilter] = useState<string>('');
 
     const selectFilteredPipes = () => {
         if (!chip) {
@@ -82,165 +142,96 @@ export default function PropertiesPanel() {
             }
         });
     };
-    const selectFilteredOperations = () => {
+
+    return (
+        <div className='pipe-renderer-panel'>
+            <div className='search-field'>
+                <InputGroup
+                    rightElement={
+                        pipeFilter ? (
+                            <Button
+                                minimal
+                                onClick={() => {
+                                    setPipeFilter('');
+                                }}
+                                icon={IconNames.CROSS}
+                            />
+                        ) : (
+                            <Icon icon={IconNames.SEARCH} />
+                        )
+                    }
+                    placeholder=''
+                    value={pipeFilter}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}
+                />
+                <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT}>
+                    <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
+                </Tooltip2>
+                <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT}>
+                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
+                </Tooltip2>
+            </div>
+            <div className='properties-panel__content'>
+                <div className='pipelist-wrap list-wrap'>
+                    {chip && (
+                        <ul className='scrollable-content'>
+                            {chip.allUniquePipes.map((pipe) => (
+                                <FilterableComponent
+                                    key={pipe.id}
+                                    filterableString={pipe.id}
+                                    filterQuery={pipeFilter}
+                                    component={
+                                        <li>
+                                            <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
+                                        </li>
+                                    }
+                                />
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+function ComputeNodesPropertiesTab() {
+    const { chip } = useContext(DataSource);
+
+    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+
+    const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!chip) {
-            return;
+            return [];
         }
-        Object.keys(groups).forEach((op) => {
-            if (op.toLowerCase().includes(opsFilter.toLowerCase())) {
-                dispatch(selectGroup({ opName: op, selected: true }));
-            }
-        });
-    };
+        return Object.values(nodesSelectionState.nodeList)
+            .filter((n) => n.selected)
+            .map((nodeState) => chip.getNode(nodeState.id));
+    }, [chip, nodesSelectionState]);
 
-    const selectOperationGroup = (opName: string, selected: boolean) => {
-        dispatch(selectGroup({ opName, selected }));
-    };
+    return (
+        <>
+            {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
+            <div className='properties-panel-nodes'>
+                {selectedNodes.map((node: ComputeNode) => (
+                    <ComputeNodePropertiesCard key={node.uid} node={node} nodesSelectionState={nodesSelectionState} />
+                ))}
+            </div>
+        </>
+    );
+}
 
+export default function PropertiesPanel() {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
-
-    const handleTabChange = (newTabId: TabId) => {
-        setSelectedTab(newTabId);
-    };
 
     return (
         <div className='properties-panel'>
-            <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={handleTabChange} className='properties-tabs'>
-                <Tab
-                    id='tab1'
-                    title='Compute Node'
-                    panel={
-                        <>
-                            {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
-                            <div className='properties-panel-nodes'>
-                                {selectedNodes.map((node: ComputeNode) => (
-                                    <ComputeNodePropertiesCard
-                                        node={node}
-                                        nodesSelectionState={nodesSelectionState}
-                                        setOperationGroupSelection={selectOperationGroup}
-                                    />
-                                ))}
-                            </div>
-                        </>
-                    }
-                />
+            <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
+                <Tab id='tab1' title='Compute Node' panel={<ComputeNodesPropertiesTab />} />
 
-                <Tab
-                    id='tab2'
-                    title='All pipes'
-                    panel={
-                        <div className='pipe-renderer-panel'>
-                            <div className='search-field'>
-                                <InputGroup
-                                    rightElement={
-                                        pipeFilter ? (
-                                            <Button
-                                                minimal
-                                                onClick={() => {
-                                                    setPipeFilter('');
-                                                }}
-                                                icon={IconNames.CROSS}
-                                            />
-                                        ) : (
-                                            <Icon icon={IconNames.SEARCH} />
-                                        )
-                                    }
-                                    placeholder=''
-                                    value={pipeFilter}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}
-                                />
-                                <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT}>
-                                    <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
-                                </Tooltip2>
-                                <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT}>
-                                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
-                                </Tooltip2>
-                            </div>
-                            <div className='properties-panel__content'>
-                                <div className='pipelist-wrap list-wrap'>
-                                    {chip && (
-                                        <ul className='scrollable-content'>
-                                            {chip.allUniquePipes.map((pipe) => (
-                                                <FilterableComponent
-                                                    key={pipe.id}
-                                                    filterableString={pipe.id}
-                                                    filterQuery={pipeFilter}
-                                                    component={
-                                                        <li>
-                                                            <SelectablePipe pipe={pipe} pipeFilter={pipeFilter} />
-                                                        </li>
-                                                    }
-                                                />
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    }
-                />
+                <Tab id='tab2' title='All pipes' panel={<PipesPropertiesTab />} />
 
-                <Tab
-                    id='tab3'
-                    title='Operations'
-                    panel={
-                        <div>
-                            <div className='search-field'>
-                                <InputGroup
-                                    rightElement={
-                                        opsFilter ? (
-                                            <Button
-                                                minimal
-                                                onClick={() => {
-                                                    setOpsFilter('');
-                                                }}
-                                                icon={IconNames.CROSS}
-                                            />
-                                        ) : (
-                                            <Icon icon={IconNames.SEARCH} />
-                                        )
-                                    }
-                                    placeholder=''
-                                    value={opsFilter}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}
-                                />
-                                <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT}>
-                                    <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
-                                </Tooltip2>
-                                <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT}>
-                                    <Button
-                                        icon={IconNames.CUBE_REMOVE}
-                                        onClick={() => dispatch(clearAllOperations())}
-                                    />
-                                </Tooltip2>
-                            </div>
-                            <div className='operations-wrap list-wrap'>
-                                <div className='scrollable-content'>
-                                    {operationsList.map((operation) => {
-                                        return (
-                                            <FilterableComponent
-                                                key={operation.name}
-                                                filterableString={operation.name}
-                                                filterQuery={opsFilter}
-                                                component={
-                                                    <>
-                                                        <SelectableOperation
-                                                            opName={operation.name}
-                                                            value={nodesSelectionState.groups[operation.name]?.selected}
-                                                            selectFunc={selectOperationGroup}
-                                                            stringFilter={opsFilter}
-                                                        />
-                                                        {operation && <OperationDetails operation={operation} />}
-                                                    </>
-                                                }
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                    }
-                />
+                <Tab id='tab3' title='Operations' panel={<OperationsPropertiesTab />} />
             </Tabs>
         </div>
     );
