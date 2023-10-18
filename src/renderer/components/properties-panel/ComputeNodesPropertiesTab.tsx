@@ -1,28 +1,30 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
+import DataSource from '../../../data/DataSource';
 import { useDispatch, useSelector } from 'react-redux';
-
-import { Tooltip2 } from '@blueprintjs/popover2';
+import {
+    openDetailedView,
+    RootState,
+    selectGroup,
+    updateNodeSelection,
+    updatePipeSelection,
+} from '../../../data/store';
+import { ComputeNode, NOCLink, Pipe } from '../../../data/Chip';
+import { NodeSelectionState } from '../../../data/StateTypes';
 import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
-
-import { openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection } from '../../data/store';
-import { ComputeNodeType } from '../../data/Types';
-import { NodeSelectionState } from '../../data/StateTypes';
-import { ComputeNode, NOCLink, Pipe } from '../../data/Chip';
-import SelectableOperation from './SelectableOperation';
-import { OpGraphNodeType } from '../../data/GraphTypes';
-import SelectablePipe from './SelectablePipe';
-import LinkDetails from './LinkDetails';
+import { ComputeNodeType } from '../../../data/Types';
+import SelectableOperation from '../SelectableOperation';
+import { OpGraphNodeType } from '../../../data/GraphTypes';
+import SelectablePipe from '../SelectablePipe';
+import LinkDetails from '../LinkDetails';
 
 interface ComputeNodeProps {
     node: ComputeNode;
     nodesSelectionState: NodeSelectionState;
 }
 
-export default function ComputeNodePropertiesCard({
-    node,
-    nodesSelectionState,
-}: ComputeNodeProps): React.ReactElement {
+const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
 
@@ -192,3 +194,31 @@ export default function ComputeNodePropertiesCard({
         </Card>
     );
 }
+
+const ComputeNodesPropertiesTab = (): React.ReactElement => {
+    const { chip } = useContext(DataSource);
+
+    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+
+    const selectedNodes: ComputeNode[] = useMemo(() => {
+        if (!chip) {
+            return [];
+        }
+        return Object.values(nodesSelectionState.nodeList)
+            .filter((n) => n.selected)
+            .map((nodeState) => chip.getNode(nodeState.id));
+    }, [chip, nodesSelectionState]);
+
+    return (
+        <>
+            {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
+            <div className='properties-panel-nodes'>
+                {selectedNodes.map((node: ComputeNode) => (
+                    <ComputeNodePropertiesCard key={node.uid} node={node} nodesSelectionState={nodesSelectionState} />
+                ))}
+            </div>
+        </>
+    );
+}
+
+export default ComputeNodesPropertiesTab;
