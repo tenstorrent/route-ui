@@ -22,7 +22,7 @@ import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, LINK_SATURATION_INITIAIL_PERCENT } from '../data/constants';
 import { NOC } from '../data/Types';
-import { mapIterable } from "../utils/IterableHelpers";
+import { mapIterable } from '../utils/IterableHelpers';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -260,31 +260,6 @@ const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
     return (
         <>
             <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
-                DRAM channel BW (GB/s)
-            </label>
-            <NumericInput
-                //
-                id='dramBandwidthInput'
-                value={dramBandwidth}
-                stepSize={0.5}
-                minorStepSize={0.1}
-                majorStepSize={10}
-                min={0}
-                onValueChange={(value) => {
-                    dispatch(updateDRAMBandwidth(value));
-                }}
-                rightElement={
-                    <Button
-                        minimal
-                        onClick={() => {
-                            dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
-                        }}
-                        icon={IconNames.RESET}
-                    />
-                }
-            />
-            <br />
-            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
                 AICLK (MHz)
             </label>
             <NumericInput
@@ -303,6 +278,31 @@ const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
                         minimal
                         onClick={() => {
                             dispatch(updateCLK(AICLK_INITIAL_MHZ));
+                        }}
+                        icon={IconNames.RESET}
+                    />
+                }
+            />
+            <br />
+            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
+                DRAM channel BW (GB/s)
+            </label>
+            <NumericInput
+                //
+                id='dramBandwidthInput'
+                value={dramBandwidth}
+                stepSize={0.5}
+                minorStepSize={0.1}
+                majorStepSize={10}
+                min={0}
+                onValueChange={(value) => {
+                    dispatch(updateDRAMBandwidth(value));
+                }}
+                rightElement={
+                    <Button
+                        minimal
+                        onClick={() => {
+                            dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
                         }}
                         icon={IconNames.RESET}
                     />

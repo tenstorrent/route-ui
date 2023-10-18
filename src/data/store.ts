@@ -102,7 +102,8 @@ const pipeSelectionSlice = createSlice({
 export const selectPipeSelectionById = (state: RootState, id: string) => state.pipeSelection.pipes[id];
 export const getFocusModePipe = (state: RootState, id: string) => state.pipeSelection.focusPipes[id];
 export const getFocusModeState = (state: RootState) => state.pipeSelection.focusMode;
-export const getDramGroup = (state: RootState, id: number) => (id > -1 ? state.nodeSelection.dram[id] : null);
+export const getDramGroup = (state: RootState, id: number | undefined) =>
+    id !== undefined && id > -1 ? state.nodeSelection.dram[id] : null;
 export const {
     //
     loadPipeSelection,

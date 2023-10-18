@@ -4,7 +4,7 @@ import {
     NetlistAnalyzerDataJSON,
     NOCLinkJSON,
     NodeDataJSON,
-    OperationDataJSON
+    OperationDataJSON,
 } from './JSONDataTypes';
 import { BuildableOperation, Operand } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
@@ -19,7 +19,7 @@ import {
     Loc,
     NetworkLinkName,
     NOC,
-    NOCLinkName
+    NOCLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName } from './GraphTypes';
@@ -190,11 +190,23 @@ export default class Chip {
                     chip.operationsByName.get(name),
                 );
                 if (newOperation) {
-                    console.log('Adding operation: ', newOperation.name);
+                    // console.log('Adding operation: ', newOperation.name);
                     chip.addOperation(newOperation);
                 }
                 if (node.dramChannelId !== -1 && chip.dramChannels) {
-                    node.dramChannel = chip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
+                    const dramChannel = chip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
+                    if (dramChannel === null) {
+                        console.error(`Node ${node.uid} has a missing dram channel ${node.dramChannelId}`);
+                    }
+                    const dramSubchannel =
+                        dramChannel?.subchannels.find(
+                            (subchannel) => subchannel.subchannelId === node.dramSubchannelId,
+                        ) || null;
+                    if (dramSubchannel === null) {
+                        console.error(`Node ${node.uid} has a missing dram subchannel id ${node.dramSubchannelId}`);
+                    }
+                    node.dramChannel = dramChannel;
+                    node.dramSubchannel = dramSubchannel;
                 }
                 return node;
             })
@@ -594,14 +606,18 @@ export class ComputeNode {
 
     public dramChannel: DramChannel | null = null;
 
+    public dramSubchannel: DramSubchannel | null = null;
+
     /**
      * only relevant for dram nodes
      */
+    /** @Deprecated */
     public dramSubchannelId: number = 0;
 
     /**
      * only relevant for dram nodes
      */
+    /** @Deprecated */
     public dramChannelId: number = -1;
 
     public operation?: Operation;
@@ -610,7 +626,6 @@ export class ComputeNode {
         this.uid = uid;
         this.operation = operation;
     }
-
 
     // TODO: this doesnt look like it shoudl still be here, keeping to retain code changes
 

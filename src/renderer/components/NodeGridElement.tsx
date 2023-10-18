@@ -17,14 +17,16 @@ import {
     drawLink,
     drawNOC,
     drawSelections,
+    getOffChipCongestionStyles,
     getDramGroupingStyles,
     getNodeOpStyles,
     NOC_CONFIGURATION,
     NODE_SIZE,
+    toRGBA,
 } from '../../utils/DrawingAPI';
 import { getGroupColor } from '../../data/ColorGenerator';
 import { HighlightType, PipeSelection } from '../../data/StateTypes';
-import { NOC, NOCLinkName } from '../../data/Types';
+import { ComputeNodeType, NOC, NOCLinkName } from '../../data/Types';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -71,7 +73,12 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
         >
             <OperationGroupRender node={node} />
             <OperandHighlight node={node} />
-            <DramChipBorder node={node} />
+            <DramModuleBorder node={node} />
+            <OffChipNodeLinkCongestionLayer
+                node={node}
+                showLinkSaturation={showLinkSaturation}
+                linkSaturationTreshold={linkSaturationTreshold}
+            />
             <div className='node-border' />
             <div className='core-highlight' />
             {node.opName !== '' && showOperationColors && (
@@ -96,24 +103,77 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 
 export default NodeGridElement;
 
-interface DramChipBorderProps {
+interface DramModuleBorderProps {
     node: ComputeNode;
 }
-
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
-const DramChipBorder: React.FC<DramChipBorderProps> = ({
-    //
-    node,
-    //
-}) => {
-    const dramAllocation = useSelector((state: RootState) => getDramGroup(state, node.dramChannelId));
+const DramModuleBorder: React.FC<DramModuleBorderProps> = ({ node }) => {
+    const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannel?.id));
     let dramStyles = {};
-    if (node.dramChannelId > -1 && dramAllocation && dramAllocation.selected && dramAllocation.data.length > 1) {
-        const border = dramAllocation.data.filter((n) => n.id === node.uid)[0]?.border;
+
+    if (node.dramChannel && dramSelectionState && dramSelectionState.selected) {
+        const border = dramSelectionState.data.filter((n) => n.id === node.uid)[0]?.border;
         dramStyles = getDramGroupingStyles(border);
     }
 
     return <div className='dram-border' style={dramStyles} />;
+};
+
+interface OffChipNodeLinkCongestionLayerProps {
+    node: ComputeNode;
+    showLinkSaturation: boolean;
+    linkSaturationTreshold: number;
+}
+
+/**
+ * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
+ * @param node
+ * @param showLinkSaturation
+ * @param linkSaturationTreshold
+ * @constructor
+ */
+const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerProps> = ({
+    //
+    node,
+    showLinkSaturation,
+    linkSaturationTreshold,
+}) => {
+    const linksData = useSelector((state: RootState) => state.linkSaturation.links);
+    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
+    if (!showLinkSaturation) {
+        return null;
+    }
+    let congestionStyle = {};
+    const { type } = node;
+    let offChipLinkIds: string[] = [];
+    switch (type) {
+        case ComputeNodeType.DRAM:
+            offChipLinkIds =
+                node.dramChannel?.links.map((link) => {
+                    return link.uid;
+                }) || [];
+            break;
+        case ComputeNodeType.ETHERNET:
+            // TODO: but we will be rendering congestion for these in the future
+            break;
+
+        case ComputeNodeType.PCIE:
+            // TODO: but we will be rendering congestion for these in the future
+            break;
+        default:
+            return null;
+    }
+
+    const saturationValues = offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
+    const saturation = Math.max(...saturationValues) || 0;
+    if (saturation < linkSaturationTreshold) {
+        return null;
+    }
+    const congestionColor = calculateLinkCongestionColor(saturation, 0, isHighContrast);
+    const saturationBg = toRGBA(congestionColor, 0.5);
+    congestionStyle = getOffChipCongestionStyles(saturationBg);
+
+    return <div className='off-chip-congestion' style={congestionStyle} />;
 };
 
 interface OperationGroupRenderProps {

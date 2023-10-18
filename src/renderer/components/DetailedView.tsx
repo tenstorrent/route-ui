@@ -14,14 +14,8 @@ import { ComputeNode, DramChannel, NOCLink } from '../../data/Chip';
 import '../scss/DetailedView.scss';
 import DetailedViewPipeRenderer from './detailed-view-components/DetailedViewPipeRenderer';
 import LinkDetails from './LinkDetails';
-import {
-    Architecture,
-    ComputeNodeType,
-    NOCLinkName,
-    NOC,
-    DramBankLinkName
-} from '../../data/Types';
-import { filterIterable } from "../../utils/IterableHelpers";
+import { Architecture, ComputeNodeType, NOCLinkName, NOC, DramBankLinkName } from '../../data/Types';
+import { filterIterable } from '../../utils/IterableHelpers';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
@@ -29,9 +23,7 @@ interface DetailedViewProps {
     zoom: number;
 }
 
-const HighlightBorder = () => {
-
-};
+const HighlightBorder = () => {};
 
 const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSaturationTreshold, zoom }) => {
     const { chip } = useContext<GridContext>(DataSource);
@@ -51,7 +43,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
 
             setNode(selectedNode || null);
             setNodeList(allNodes || []);
-            setDram(chip?.dramChannels.find((d) => d.id === selectedNode?.dramChannelId) || null);
+            setDram(selectedNode?.dramChannel || null);
         }
     }, [uid, chip, isOpen, showLinkSaturation]);
 
@@ -87,7 +79,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                 <div className='dram-subchannels'>
                                     {dram?.subchannels.map((subchannel) => {
                                         const currentNode = nodeList.find(
-                                            (n) => n.dramSubchannel === subchannel.subchannelId,
+                                            (n) => n.dramSubchannelId === subchannel.subchannelId,
                                         );
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
@@ -101,9 +93,8 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         return (
                                             <div
                                                 key={subchannel.subchannelId}
-                                                className={`${
-                                                    node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''
-                                                } subchannel`}
+                                                // prettier-ignore
+                                                className={`subchannel ${node?.dramSubchannelId === subchannel.subchannelId ? 'current' : ''}`}
                                             >
                                                 {dram?.subchannels.length > 1 && (
                                                     <h3 className='subchannel-name'>
@@ -250,7 +241,9 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         <div className='axi-dram-wrap'>
                                             <DetailedViewPipeRenderer
                                                 className='centered-svg'
-                                                links={dram.links.filter((link) => link.name === DramBankLinkName.DRAM_INOUT)}
+                                                links={dram.links.filter(
+                                                    (link) => link.name === DramBankLinkName.DRAM_INOUT,
+                                                )}
                                                 showLinkSaturation={showLinkSaturation}
                                                 linkSaturationTreshold={linkSaturationTreshold}
                                             />
