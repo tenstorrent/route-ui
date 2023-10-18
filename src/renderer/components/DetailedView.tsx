@@ -51,7 +51,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
 
             setNode(selectedNode || null);
             setNodeList(allNodes || []);
-            setDram(chip?.dramChannels.find((d) => d.id === selectedNode?.dramChannelId) || null);
+            setDram(selectedNode?.dramChannel || null);
         }
     }, [uid, chip, isOpen, showLinkSaturation]);
 
@@ -87,7 +87,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                 <div className='dram-subchannels'>
                                     {dram?.subchannels.map((subchannel) => {
                                         const currentNode = nodeList.find(
-                                            (n) => n.dramSubchannel === subchannel.subchannelId,
+                                            (n) => n.dramSubchannelId === subchannel.subchannelId,
                                         );
                                         const noc0links: NOCLink[] = [];
                                         const noc1links: NOCLink[] = [];
@@ -102,7 +102,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                             <div
                                                 key={subchannel.subchannelId}
                                                 className={`${
-                                                    node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''
+                                                    node?.dramSubchannelId === subchannel.subchannelId ? 'current' : ''
                                                 } subchannel`}
                                             >
                                                 {dram?.subchannels.length > 1 && (

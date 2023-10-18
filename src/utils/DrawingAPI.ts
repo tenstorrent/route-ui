@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
 import { DramBankLinkName, DramNOCLinkName, NetworkLinkName, NOCLinkName } from '../data/Types';
+import { MAX_CONGESTION_VALUE } from '../data/constants';
 
 export const NODE_SIZE = 100;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
@@ -243,7 +244,6 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
                     p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
                     p3: `${lineEndX},${lineEndY - arrowOffset}`,
                 };
-
             }
             break;
         case NOCLinkName.NOC0_OUT:
@@ -300,7 +300,6 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
                     p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
                     p3: `${lineEndX},${lineEndY - arrowOffset}`,
                 };
-
             }
             break;
         case NOCLinkName.NOC1_OUT:
@@ -447,7 +446,7 @@ export const drawNOC = (
 };
 
 export const calculateLinkCongestionColor = (value: number, min: number = 0, isHC: boolean = false): string => {
-    const max = 120;
+    const max = MAX_CONGESTION_VALUE;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
     const intensity = Math.round(ratio * 255);
@@ -458,9 +457,28 @@ export const calculateLinkCongestionColor = (value: number, min: number = 0, isH
     return `rgb(${intensity}, ${255 - intensity}, 0)`;
 };
 
-export const getDramGroupingStyles = (border: { left: boolean; right: boolean; top: boolean; bottom: boolean }): {} => {
+export const toRGBA = (rgb: string, alpha: number = 1): string => {
+    const regex = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/i;
+    const match = rgb.match(regex);
+
+    if (!match) {
+        return 'rgba(0,0,0,0)';
+    }
+    const [_, red, green, blue] = match.map(Number);
+    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+};
+
+export const getDramGroupingStyles = (
+    border: {
+        left: boolean;
+        right: boolean;
+        top: boolean;
+        bottom: boolean;
+    },
+    colorOverride: string | undefined = undefined,
+): {} => {
     const color = 'rgba(248,226,112,.25)';
-    const gradientColor = 'rgba(248,226,112,0.2)';
+    const gradientColor = colorOverride || 'rgba(248,226,112,0.2)';
     let dramStyles = {};
     dramStyles = { borderColor: color };
     const borderSize = 2;
@@ -481,6 +499,14 @@ export const getDramGroupingStyles = (border: { left: boolean; right: boolean; t
         gradientSize * 2
     }px)`;
     return { ...dramStyles, background: gradient };
+};
+export const getOffChipCongestionStyles = (color: string): {} => {
+    const gradientColor = color;
+    const gradientSize = 6;
+    const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${
+        gradientSize * 2
+    }px)`;
+    return { background: gradient };
 };
 
 export const getNodeOpStyles = (

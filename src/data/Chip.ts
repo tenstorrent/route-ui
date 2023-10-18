@@ -195,6 +195,7 @@ export default class Chip {
                 }
                 if (node.dramChannelId !== -1 && chip.dramChannels) {
                     node.dramChannel = chip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
+                    node.dramSubchannel = node.dramChannel?.subchannels.find(subchannel => subchannel.subchannelId === node.dramSubchannelId) || null;
                 }
                 return node;
             })
@@ -594,14 +595,18 @@ export class ComputeNode {
 
     public dramChannel: DramChannel | null = null;
 
+    public dramSubchannel: DramSubchannel | null = null;
+
     /**
      * only relevant for dram nodes
      */
+    /** @Deprecated */
     public dramSubchannelId: number = 0;
 
     /**
      * only relevant for dram nodes
      */
+    /** @Deprecated */
     public dramChannelId: number = -1;
 
     public operation?: Operation;

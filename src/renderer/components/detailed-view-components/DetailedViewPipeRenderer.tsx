@@ -1,17 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import * as d3 from 'd3';
 import { useSelector } from 'react-redux';
 import { NetworkLink, NOCLink } from '../../../data/Chip';
 import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
 import { RootState } from '../../../data/store';
 import { PipeSelection } from '../../../data/StateTypes';
-import {
-    DramBankLinkName,
-    DramNOCLinkName,
-    NetworkLinkName,
-    NOC,
-    NOCLinkName,
-} from '../../../data/Types';
+import { DramBankLinkName, DramNOCLinkName, NetworkLinkName, NOC, NOCLinkName } from '../../../data/Types';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
@@ -54,52 +48,50 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
     const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
 
-    useEffect(() => {
-        const svg = d3.select(svgRef.current);
-        svg.selectAll('*').remove();
+    const svg = d3.select(svgRef.current);
+    svg.selectAll('*').remove();
 
-        const drawCongestion = (link: NetworkLink, linkName: NetworkLinkName) => {
-            if (showLinkSaturation) {
-                let renderCongestion: boolean = false;
-                if (!linksNOCType.includes(linkName)) {
+    const drawCongestion = (link: NetworkLink, linkName: NetworkLinkName) => {
+        if (showLinkSaturation) {
+            let renderCongestion: boolean = false;
+            if (!linksNOCType.includes(linkName)) {
+                renderCongestion = true;
+            } else if (linksNOCType.includes(linkName)) {
+                if ((link as NOCLink).noc === NOC.NOC0 && noc0Saturation) {
                     renderCongestion = true;
-                } else if (linksNOCType.includes(linkName)) {
-                    if ((link as NOCLink).noc === NOC.NOC0 && noc0Saturation) {
-                        renderCongestion = true;
-                    }
-                    if ((link as NOCLink).noc === NOC.NOC1 && noc1Saturation) {
-                        renderCongestion = true;
-                    }
                 }
-                if (renderCongestion) {
-                    const linkData = linksData[link.uid];
-                    if (linkData?.saturation >= linkSaturationTreshold) {
-                        drawLink(
-                            svg,
-                            linkName,
-                            calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast),
-                            5,
-                            LinkRenderType.DETAILED_VIEW,
-                        );
-                    }
+                if ((link as NOCLink).noc === NOC.NOC1 && noc1Saturation) {
+                    renderCongestion = true;
                 }
             }
-        };
-
-        links.forEach((link) => {
-            const selectedPipeIds = Object.values(allPipes)
-                .filter((pipe: PipeSelection) => pipe.selected)
-                .map((pipe: PipeSelection) => pipe.id);
-
-            const validPipes = link.pipes.map((pipe) => pipe.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
-
-            const { name } = link;
-            if (name && validLinkIds.includes(name as NOCLinkName | DramNOCLinkName)) {
-                drawCongestion(link, link.name);
-                drawPipesDirect(svg, link.name, validPipes, LinkRenderType.DETAILED_VIEW);
+            if (renderCongestion) {
+                const linkData = linksData[link.uid];
+                if (linkData?.saturation >= linkSaturationTreshold) {
+                    drawLink(
+                        svg,
+                        linkName,
+                        calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast),
+                        5,
+                        LinkRenderType.DETAILED_VIEW,
+                    );
+                }
             }
-        });
-    }, [svgRef, links, allPipes, isHighContrast, noc0Saturation, noc1Saturation]);
+        }
+    };
+
+    links.forEach((link) => {
+        const selectedPipeIds = Object.values(allPipes)
+            .filter((pipe: PipeSelection) => pipe.selected)
+            .map((pipe: PipeSelection) => pipe.id);
+
+        const validPipes = link.pipes.map((pipe) => pipe.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
+
+        const { name } = link;
+        if (name && validLinkIds.includes(name as NOCLinkName | DramNOCLinkName)) {
+            drawCongestion(link, link.name);
+            drawPipesDirect(svg, link.name, validPipes, LinkRenderType.DETAILED_VIEW);
+        }
+    });
     return (
         <div className='pipe-renderer'>
             {/* DEBUGGING CODE BELOW */}
