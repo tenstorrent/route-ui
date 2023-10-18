@@ -125,6 +125,13 @@ interface OffChipNodeLinkCongestionLayerProps {
     linkSaturationTreshold: number;
 }
 
+/**
+ * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
+ * @param node
+ * @param showLinkSaturation
+ * @param linkSaturationTreshold
+ * @constructor
+ */
 const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerProps> = ({
     //
     node,
