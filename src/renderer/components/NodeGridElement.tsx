@@ -106,7 +106,7 @@ export default NodeGridElement;
 interface DramModuleBorderProps {
     node: ComputeNode;
 }
-
+/** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
 const DramModuleBorder: React.FC<DramModuleBorderProps> = ({ node }) => {
     const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannel?.id));
     let dramStyles = {};
@@ -173,6 +173,7 @@ interface OperationGroupRenderProps {
     node: ComputeNode;
 }
 
+/** Adds a highlight layer to a Core node element when the core's operation ("operation group") is selected. */
 const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
     //
     node,
@@ -194,6 +195,7 @@ interface OperandHighlightProps {
     node: ComputeNode;
 }
 
+/** Highlight a ComputeNode when it is an input or output for a focused pipe. */
 const OperandHighlight: React.FC<OperandHighlightProps> = ({
     //
     node,
