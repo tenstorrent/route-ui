@@ -9,7 +9,7 @@ exports.default = async function notarizeMacos(context) {
 
     if (process.env.CI !== 'true') {
         console.warn('Skipping notarizing step. Packaging is not running in CI');
-        return;
+        // return;
     }
 
     if (!('APPLE_ID' in process.env && 'APPLE_ID_PASS' in process.env)) {
