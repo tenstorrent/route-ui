@@ -14,14 +14,8 @@ import { ComputeNode, DramChannel, NOCLink } from '../../data/Chip';
 import '../scss/DetailedView.scss';
 import DetailedViewPipeRenderer from './detailed-view-components/DetailedViewPipeRenderer';
 import LinkDetails from './LinkDetails';
-import {
-    Architecture,
-    ComputeNodeType,
-    NOCLinkName,
-    NOC,
-    DramBankLinkName
-} from '../../data/Types';
-import { filterIterable } from "../../utils/IterableHelpers";
+import { Architecture, ComputeNodeType, NOCLinkName, NOC, DramBankLinkName } from '../../data/Types';
+import { filterIterable } from '../../utils/IterableHelpers';
 
 interface DetailedViewProps {
     showLinkSaturation: boolean;
@@ -29,9 +23,7 @@ interface DetailedViewProps {
     zoom: number;
 }
 
-const HighlightBorder = () => {
-
-};
+const HighlightBorder = () => {};
 
 const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSaturationTreshold, zoom }) => {
     const { chip } = useContext<GridContext>(DataSource);
@@ -101,9 +93,9 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         return (
                                             <div
                                                 key={subchannel.subchannelId}
-                                                className={`${
+                                                className={`subchannel ${
                                                     node?.dramSubchannelId === subchannel.subchannelId ? 'current' : ''
-                                                } subchannel`}
+                                                }`}
                                             >
                                                 {dram?.subchannels.length > 1 && (
                                                     <h3 className='subchannel-name'>
@@ -250,7 +242,9 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         <div className='axi-dram-wrap'>
                                             <DetailedViewPipeRenderer
                                                 className='centered-svg'
-                                                links={dram.links.filter((link) => link.name === DramBankLinkName.DRAM_INOUT)}
+                                                links={dram.links.filter(
+                                                    (link) => link.name === DramBankLinkName.DRAM_INOUT,
+                                                )}
                                                 showLinkSaturation={showLinkSaturation}
                                                 linkSaturationTreshold={linkSaturationTreshold}
                                             />
