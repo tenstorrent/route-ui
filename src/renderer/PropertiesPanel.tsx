@@ -1,28 +1,24 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Checkbox, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs } from '@blueprintjs/core';
+import { Button, Icon, InputGroup, PopoverPosition, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import DataSource from '../data/DataSource';
-import Chip, { ComputeNode, NOCLink, Pipe } from '../data/Chip';
+import Chip, { ComputeNode, Pipe } from '../data/Chip';
 import FilterableComponent from './components/FilterableComponent';
 import {
     clearAllOperations,
     clearAllPipes,
-    openDetailedView,
     RootState,
     selectGroup,
-    updateNodeSelection,
     updatePipeSelection,
 } from '../data/store';
 import SelectableOperation from './components/SelectableOperation';
 import SelectablePipe from './components/SelectablePipe';
-import LinkDetails from './components/LinkDetails';
 
-import { ComputeNodeType } from '../data/Types';
-import { Operation, OpGraphNodeType } from '../data/GraphTypes';
+import { Operation } from '../data/GraphTypes';
 import { filterIterable, mapIterable } from '../utils/IterableHelpers';
-import { ComputeNodeState, NodeSelectionState } from '../data/StateTypes';
+import { ComputeNodeState } from '../data/StateTypes';
 import ComputeNodePropertiesCard from "./components/ComputeNodeProperties";
 
 function OperationDetails(props: { operation: Operation }) {
