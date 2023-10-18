@@ -93,9 +93,8 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
                                         return (
                                             <div
                                                 key={subchannel.subchannelId}
-                                                className={`subchannel ${
-                                                    node?.dramSubchannelId === subchannel.subchannelId ? 'current' : ''
-                                                }`}
+                                                // prettier-ignore
+                                                className={`subchannel ${node?.dramSubchannelId === subchannel.subchannelId ? 'current' : ''}`}
                                             >
                                                 {dram?.subchannels.length > 1 && (
                                                     <h3 className='subchannel-name'>
