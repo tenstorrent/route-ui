@@ -74,7 +74,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             <OperationGroupRender node={node} />
             <OperandHighlight node={node} />
             <DramModuleBorder node={node} />
-            <OffChipCongestion
+            <OffChipNodeLinkCongestionLayer
                 node={node}
                 showLinkSaturation={showLinkSaturation}
                 linkSaturationTreshold={linkSaturationTreshold}
@@ -119,13 +119,13 @@ const DramModuleBorder: React.FC<DramModuleBorderProps> = ({ node }) => {
     return <div className='dram-border' style={dramStyles} />;
 };
 
-interface OffChipCongestionProps {
+interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;
     showLinkSaturation: boolean;
     linkSaturationTreshold: number;
 }
 
-const OffChipCongestion: React.FC<OffChipCongestionProps> = ({
+const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerProps> = ({
     //
     node,
     showLinkSaturation,
