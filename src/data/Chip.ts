@@ -735,7 +735,7 @@ export class ComputeNode {
 }
 
 export class Pipe {
-    readonly id: string = '';
+    readonly id: string;
 
     locations: Loc[] = [];
 
@@ -753,7 +753,7 @@ export class Pipe {
 }
 
 export class PipeSegment {
-    id: string = '';
+    readonly id: string;
 
     location: Loc = { x: 0, y: 0 };
 
