@@ -364,21 +364,21 @@ export default class Chip {
         return this.uniquePipeSegmentList;
     }
 
-    private _pipes: Map<string, Pipe>;
+    private pipesById: Map<string, Pipe>;
 
     get pipes(): Map<string, Pipe> {
-        if (!this._pipes) {
-            this._pipes = new Map();
+        if (!this.pipesById) {
+            this.pipesById = new Map();
 
             forEach(this.nodes, (node) => {
                 node.links.forEach((link) => {
                     link.pipes.forEach((pipeSegment) => {
                         let pipe: Pipe;
-                        if (!this._pipes.has(pipeSegment.id)) {
+                        if (!this.pipesById.has(pipeSegment.id)) {
                             pipe = new Pipe(pipeSegment.id);
-                            this._pipes.set(pipe.id, pipe);
+                            this.pipesById.set(pipe.id, pipe);
                         } else {
-                            pipe = this._pipes.get(pipeSegment.id) as Pipe;
+                            pipe = this.pipesById.get(pipeSegment.id) as Pipe;
                         }
                         pipe.nodeIdList.push(node.uid);
                         pipe.nodes.push(node);
@@ -394,7 +394,7 @@ export default class Chip {
             });
         }
 
-        return this._pipes;
+        return this.pipesById;
     }
 }
 
