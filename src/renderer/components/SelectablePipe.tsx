@@ -24,9 +24,9 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
     return (
         <>
             <Checkbox checked={pipeState?.selected} onChange={handleCheckboxChange} />
-            <PipeInfoDialog
-                pipeId={pipeSegment.id}
-                contents={
+            {/*<PipeInfoDialog*/}
+            {/*    pipeId={pipeSegment.id}*/}
+            {/*    contents={*/}
                     <span className='label'>
                         {pipeState && (
                             <>
@@ -44,8 +44,8 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                             </>
                         )}
                     </span>
-                }
-            />
+            {/*    }*/}
+            {/*/>*/}
         </>
     );
 };

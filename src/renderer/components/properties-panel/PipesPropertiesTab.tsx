@@ -30,7 +30,7 @@ const PipesPropertiesTab = () => {
     };
 
     return (
-        <div className='pipeSegment-renderer-panel'>
+        <div className='pipe-renderer-panel'>
             <div className='search-field'>
                 <InputGroup
                     rightElement={

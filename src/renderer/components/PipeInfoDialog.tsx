@@ -134,7 +134,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
     return (
         <Tooltip2 usePortal={false} content={tooltipContent}>
             <div
-                className='pipeSegment-info-dialog'
+                className='pipe-info-dialog'
                 onMouseLeave={() => {
                     dispatch(updateFocusPipeSelection({ id: pipeId, selected: false }));
                     dispatch(resetCoreHighlight());
