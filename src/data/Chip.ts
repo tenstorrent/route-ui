@@ -153,6 +153,39 @@ export default class Chip {
         }
     }
 
+    private pipesById: Map<string, Pipe>;
+
+    get pipes(): Map<string, Pipe> {
+        if (!this.pipesById) {
+            this.pipesById = new Map();
+
+            forEach(this.nodes, (node) => {
+                node.links.forEach((link) => {
+                    link.pipes.forEach((pipeSegment) => {
+                        let pipe: Pipe;
+                        if (!this.pipesById.has(pipeSegment.id)) {
+                            pipe = new Pipe(pipeSegment.id);
+                            this.pipesById.set(pipe.id, pipe);
+                        } else {
+                            pipe = this.pipesById.get(pipeSegment.id) as Pipe;
+                        }
+                        pipe.nodeIdList.push(node.uid);
+                        pipe.nodes.push(node);
+                        pipe.locations.push(node.loc);
+                        pipe.segments.push(pipeSegment);
+
+                        // const inputs = [...node.operation?.inputs].map((input) => input.pipes);
+                        // const outputs = [...node.operation?.outputs];
+
+                        // pipeSegment.operand = node.operation?.inputs.   // ?.getOperandForPipe(pipeSegment.id) || null;
+                    });
+                });
+            });
+        }
+
+        return this.pipesById;
+    }
+
     constructor(chipId: number) {
         this.chipId = chipId;
         this.operationsByName = new Map();
@@ -364,38 +397,7 @@ export default class Chip {
         return this.uniquePipeSegmentList;
     }
 
-    private pipesById: Map<string, Pipe>;
 
-    get pipes(): Map<string, Pipe> {
-        if (!this.pipesById) {
-            this.pipesById = new Map();
-
-            forEach(this.nodes, (node) => {
-                node.links.forEach((link) => {
-                    link.pipes.forEach((pipeSegment) => {
-                        let pipe: Pipe;
-                        if (!this.pipesById.has(pipeSegment.id)) {
-                            pipe = new Pipe(pipeSegment.id);
-                            this.pipesById.set(pipe.id, pipe);
-                        } else {
-                            pipe = this.pipesById.get(pipeSegment.id) as Pipe;
-                        }
-                        pipe.nodeIdList.push(node.uid);
-                        pipe.nodes.push(node);
-                        pipe.locations.push(node.loc);
-                        pipe.segments.push(pipeSegment);
-
-                        // const inputs = [...node.operation?.inputs].map((input) => input.pipes);
-                        // const outputs = [...node.operation?.outputs];
-
-                        // pipeSegment.operand = node.operation?.inputs.   // ?.getOperandForPipe(pipeSegment.id) || null;
-                    });
-                });
-            });
-        }
-
-        return this.pipesById;
-    }
 }
 
 export class DramChannel {
