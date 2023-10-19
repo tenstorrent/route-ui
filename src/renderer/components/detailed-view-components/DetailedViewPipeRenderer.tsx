@@ -93,7 +93,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
         }
     });
     return (
-        <div className='pipeSegment-renderer'>
+        <div className='pipe-renderer'>
             {/* DEBUGGING CODE BELOW */}
             {/* {links.map((link) => ( */}
             {/*   <div style={{color: '#fff'}} key={link.name}> */}
