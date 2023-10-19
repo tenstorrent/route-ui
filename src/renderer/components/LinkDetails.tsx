@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Pipe, convertBytes, NetworkLink } from '../../data/Chip';
+import { PipeSegment, convertBytes, NetworkLink } from '../../data/Chip';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';
@@ -35,9 +35,9 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, showEmpty, index }) => 
                 {link.totalDataBytes > 0 && <ProgressBar percent={linkState?.saturation || 0} color={color} />}
             </h5>
             <ul className='node-pipelist'>
-                {link.pipes.map((pipe: Pipe) => (
-                    <li key={pipe.id}>
-                        <SelectablePipe pipe={pipe} pipeFilter='' showBandwidthUse />
+                {link.pipes.map((pipeSegment: PipeSegment) => (
+                    <li key={pipeSegment.id}>
+                        <SelectablePipe pipeSegment={pipeSegment} pipeFilter='' showBandwidthUse />
                     </li>
                 ))}
             </ul>

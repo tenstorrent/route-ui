@@ -112,7 +112,7 @@ export default class Chip {
         this._architecture = value;
     }
 
-    private uniquePipeList: Pipe[] = [];
+    private uniquePipeSegmentList: PipeSegment[] = [];
 
     private _dramChannels: DramChannel[] = [];
 
@@ -297,7 +297,7 @@ export default class Chip {
         // eslint-disable-next-line no-restricted-syntax
         const operations = mapIterable(opMap.entries(), ([opName, opDetails]) => {
             const cores: ComputeNode[] = opDetails.cores
-                // `core.id` is only an x-y location and doesn't include Chip ID
+                // `core.id` is only an x-y locations and doesn't include Chip ID
                 .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`));
             const inputs = opDetails.inputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
             const outputs = opDetails.outputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
@@ -346,35 +346,55 @@ export default class Chip {
         return links;
     }
 
-    get allUniquePipes(): Pipe[] {
-        if (!this.uniquePipeList.length) {
-            this.uniquePipeList = this.getAllPipes();
+    get allUniquePipes(): PipeSegment[] {
+        if (!this.uniquePipeSegmentList.length) {
+            [...this.pipes.values()]
+                .map((pipe) => pipe.segments[0])
+                .sort((a, b) => {
+                    if (a.id < b.id) {
+                        return -1;
+                    }
+                    if (a.id > b.id) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            // this.uniquePipeSegmentList = this.getAllPipes();
         }
-        return this.uniquePipeList;
+        return this.uniquePipeSegmentList;
     }
 
-    private getAllPipes(): Pipe[] {
-        let list: Pipe[] = [];
-        forEach(this.nodes, (node) => {
-            node.links.forEach((link) => {
-                list.push(...link.pipes);
-            });
-        });
-        const uniquePipeObj: { [key: string]: Pipe } = {};
-        for (let i = 0; i < list.length; i++) {
-            uniquePipeObj[list[i].id] = list[i];
-        }
-        list = Object.values(uniquePipeObj).sort((a, b) => {
-            if (a.id < b.id) {
-                return -1;
-            }
-            if (a.id > b.id) {
-                return 1;
-            }
-            return 0;
-        });
+    private _pipes: Map<string, Pipe>;
 
-        return list;
+    get pipes(): Map<string, Pipe> {
+        if (!this._pipes) {
+            this._pipes = new Map();
+
+            forEach(this.nodes, (node) => {
+                node.links.forEach((link) => {
+                    link.pipes.forEach((pipeSegment) => {
+                        let pipe: Pipe;
+                        if (!this._pipes.has(pipeSegment.id)) {
+                            pipe = new Pipe(pipeSegment.id);
+                            this._pipes.set(pipe.id, pipe);
+                        } else {
+                            pipe = this._pipes.get(pipeSegment.id) as Pipe;
+                        }
+                        pipe.nodeIdList.push(node.uid);
+                        pipe.nodes.push(node);
+                        pipe.locations.push(node.loc);
+                        pipe.segments.push(pipeSegment);
+
+                        // const inputs = [...node.operation?.inputs].map((input) => input.pipes);
+                        // const outputs = [...node.operation?.outputs];
+
+                        // pipeSegment.operand = node.operation?.inputs.   // ?.getOperandForPipe(pipeSegment.id) || null;
+                    });
+                });
+            });
+        }
+
+        return this._pipes;
     }
 }
 
@@ -450,7 +470,7 @@ export abstract class NetworkLink {
 
     readonly maxBandwidth: number = 0;
 
-    public pipes: Pipe[] = [];
+    public pipes: PipeSegment[] = [];
 
     public static CREATE(name: NetworkLinkName, uid: string, json: NOCLinkJSON): NetworkLink {
         if (Object.values(NOCLinkName).includes(name as NOCLinkName)) {
@@ -476,7 +496,7 @@ export abstract class NetworkLink {
         this.name = name;
 
         this.pipes = Object.entries(json.mapped_pipes).map(
-            ([pipeId, bandwidth]) => new Pipe(pipeId, bandwidth, name, this.totalDataBytes),
+            ([pipeId, bandwidth]) => new PipeSegment(pipeId, bandwidth, name, this.totalDataBytes),
         );
     }
 
@@ -713,19 +733,37 @@ export class ComputeNode {
 }
 
 export class Pipe {
+    readonly id: string = '';
+
+    locations: Loc[] = [];
+
+    nodeIdList: string[] = [];
+
+    nodes: ComputeNode[] = [];
+
+    operand: Operand | null = null;
+
+    segments: PipeSegment[] = [];
+
+    constructor(id: string) {
+        this.id = id;
+    }
+}
+
+export class PipeSegment {
     id: string = '';
 
     location: Loc = { x: 0, y: 0 };
 
     bandwidth: number = 0;
 
-    nocId: string = '';
+    linkName: NetworkLinkName;
 
     bandwidthUse: number = 0;
 
     constructor(id: string, bandwidth: number, nocId: string = '', linkTotalData: number = 0) {
         this.id = id;
-        this.nocId = nocId;
+        this.linkName = nocId as NetworkLinkName;
         this.bandwidth = bandwidth;
         this.bandwidthUse = (this.bandwidth / linkTotalData) * 100;
     }
