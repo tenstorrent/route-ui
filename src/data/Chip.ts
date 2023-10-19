@@ -153,34 +153,9 @@ export default class Chip {
         }
     }
 
-    private pipesById: Map<string, Pipe>;
+    private pipesById: Map<string, Pipe> = new Map();
 
     get pipes(): Map<string, Pipe> {
-        if (!this.pipesById) {
-            this.pipesById = new Map();
-
-            forEach(this.nodes, (node) => {
-                node.links.forEach((link) => {
-                    link.pipes.forEach((pipeSegment) => {
-                        let pipe: Pipe;
-                        if (!this.pipesById.has(pipeSegment.id)) {
-                            pipe = new Pipe(pipeSegment.id);
-                            this.pipesById.set(pipe.id, pipe);
-                        } else {
-                            pipe = this.pipesById.get(pipeSegment.id) as Pipe;
-                        }
-                        pipe.nodes.push(node);
-                        pipe.segments.push(pipeSegment);
-
-                        // const inputs = [...node.operation?.inputs].map((input) => input.pipes);
-                        // const outputs = [...node.operation?.outputs];
-
-                        // pipeSegment.operand = node.operation?.inputs.   // ?.getOperandForPipe(pipeSegment.id) || null;
-                    });
-                });
-            });
-        }
-
         return this.pipesById;
     }
 
@@ -239,6 +214,30 @@ export default class Chip {
                     node.dramChannel = dramChannel;
                     node.dramSubchannel = dramSubchannel;
                 }
+
+
+
+
+
+                node.links.forEach((link) => {
+                    link.pipes.forEach((pipeSegment) => {
+                        let pipe: Pipe;
+                        if (!chip.pipesById.has(pipeSegment.id)) {
+                            pipe = new Pipe(pipeSegment.id);
+                            chip.pipesById.set(pipe.id, pipe);
+                        } else {
+                            pipe = chip.pipesById.get(pipeSegment.id) as Pipe;
+                        }
+                        pipe.nodes.push(node);
+                        pipe.segments.push(pipeSegment);
+
+                        // const inputs = [...node.operation?.inputs].map((input) => input.pipes);
+                        // const outputs = [...node.operation?.outputs];
+
+                        // pipeSegment.operand = node.operation?.inputs.   // ?.getOperandForPipe(pipeSegment.id) || null;
+                    });
+                });
+
                 return node;
             })
             .sort((a, b) => {
@@ -339,8 +338,8 @@ export default class Chip {
     }
 
     public generateInitialPipesSelectionState(): PipeSelection[] {
-        return this.allUniquePipes.map((pipe) => {
-            return { id: pipe.id, selected: false } as PipeSelection;
+        return this.allUniquePipes.map((pipeSegment) => {
+            return { id: pipeSegment.id, selected: false } as PipeSelection;
         });
     }
 
@@ -379,7 +378,7 @@ export default class Chip {
 
     get allUniquePipes(): PipeSegment[] {
         if (!this.uniquePipeSegmentList.length) {
-            [...this.pipes.values()]
+            this.uniquePipeSegmentList = [...this.pipes.values()]
                 .map((pipe) => pipe.segments[0])
                 .sort((a, b) => {
                     if (a.id < b.id) {
@@ -390,7 +389,6 @@ export default class Chip {
                     }
                     return 0;
                 });
-            // this.uniquePipeSegmentList = this.getAllPipes();
         }
         return this.uniquePipeSegmentList;
     }

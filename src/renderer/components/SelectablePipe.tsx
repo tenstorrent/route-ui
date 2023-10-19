@@ -20,13 +20,12 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
     const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
         dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
     };
-
     return (
         <>
             <Checkbox checked={pipeState?.selected} onChange={handleCheckboxChange} />
-            {/*<PipeInfoDialog*/}
-            {/*    pipeId={pipeSegment.id}*/}
-            {/*    contents={*/}
+            <PipeInfoDialog
+                pipeId={pipeSegment.id}
+                contents={
                     <span className='label'>
                         {pipeState && (
                             <>
@@ -44,8 +43,8 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                             </>
                         )}
                     </span>
-            {/*    }*/}
-            {/*/>*/}
+                }
+            />
         </>
     );
 };
