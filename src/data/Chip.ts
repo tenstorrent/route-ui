@@ -746,7 +746,7 @@ export class Pipe {
     }
 
     get locations(): Loc[]{
-        return this.segments.map(pipeSegment => pipeSegment.location);
+        return this.nodes.map(node => node.loc);
     }
 
     constructor(id: string) {
