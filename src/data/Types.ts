@@ -60,7 +60,7 @@ export enum ComputeNodeType {
     CORE = 'core',
     DRAM = 'dram',
     ETHERNET = 'eth',
-    PCIE = 'pcix',
+    PCIE = 'pcie',
 }
 
 export enum NOC {
