@@ -81,10 +81,10 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
 
     links.forEach((link) => {
         const selectedPipeIds = Object.values(allPipes)
-            .filter((pipe: PipeSelection) => pipe.selected)
-            .map((pipe: PipeSelection) => pipe.id);
+            .filter((pipeSegment: PipeSelection) => pipeSegment.selected)
+            .map((pipeSegment: PipeSelection) => pipeSegment.id);
 
-        const validPipes = link.pipes.map((pipe) => pipe.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
+        const validPipes = link.pipes.map((pipeSegment) => pipeSegment.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
 
         const { name } = link;
         if (name && validLinkIds.includes(name as NOCLinkName | DramNOCLinkName)) {
@@ -98,8 +98,8 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
             {/* {links.map((link) => ( */}
             {/*   <div style={{color: '#fff'}} key={link.name}> */}
             {/*       {link.name} - {link.numOccupants} */}
-            {/*       {link.pipes.map((pipe) => ( */}
-            {/*           <div key={pipe.id}>{pipe.id}</div> */}
+            {/*       {link.pipes.map((pipeSegment) => ( */}
+            {/*           <div key={pipeSegment.id}>{pipeSegment.id}</div> */}
             {/*       ))} */}
             {/*   </div> */}
             {/* ))} */}

@@ -17,7 +17,7 @@ export interface PipeInfoDialogProps {
  * @param contents
  * @param pipeId
  * @constructor
- * @description This wrapper component is used to display information about a pipe when the user hovers over it
+ * @description This wrapper component is used to display information about a pipeSegment when the user hovers over it
  */
 const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
     const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);

@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
-import DataSource from '../../../data/DataSource';
 import { useDispatch, useSelector } from 'react-redux';
+import DataSource from '../../../data/DataSource';
 import {
     openDetailedView,
     RootState,
@@ -8,7 +8,7 @@ import {
     updateNodeSelection,
     updatePipeSelection,
 } from '../../../data/store';
-import { ComputeNode, NOCLink, Pipe } from '../../../data/Chip';
+import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
 import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
@@ -48,7 +48,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
 
-    console.log(`RENDERED NODE ${node.uid} WITH OPERATION`, node.operation);
+    // console.log(`RENDERED NODE ${node.uid} WITH OPERATION`, node.operation);
 
     return (
         <Card className='node-element'>
@@ -110,7 +110,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                         <ul className='scrollable-content'>
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
-                                                    <SelectablePipe pipe={new Pipe(pipeId, 0)} pipeFilter='' />
+                                                    <SelectablePipe pipeSegment={new PipeSegment(pipeId, 0)} pipeFilter='' />
                                                 </li>
                                             ))}
                                         </ul>
@@ -140,7 +140,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                         <ul className='scrollable-content'>
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
-                                                    <SelectablePipe pipe={new Pipe(pipeId, 0)} pipeFilter='' />
+                                                    <SelectablePipe pipeSegment={new PipeSegment(pipeId, 0)} pipeFilter='' />
                                                 </li>
                                             ))}
                                         </ul>

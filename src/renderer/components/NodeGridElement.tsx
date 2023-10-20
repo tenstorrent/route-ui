@@ -202,7 +202,7 @@ interface OperandHighlightProps {
     node: ComputeNode;
 }
 
-/** Highlight a ComputeNode when it is an input or output for a focused pipe. */
+/** Highlight a ComputeNode when it is an input or output for a focused pipeSegment. */
 const OperandHighlight: React.FC<OperandHighlightProps> = ({
     //
     node,

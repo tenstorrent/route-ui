@@ -23,8 +23,6 @@ interface DetailedViewProps {
     zoom: number;
 }
 
-const HighlightBorder = () => {};
-
 const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSaturationTreshold, zoom }) => {
     const { chip } = useContext<GridContext>(DataSource);
     const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);

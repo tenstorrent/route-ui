@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import DataSource from '../../../data/DataSource';
-import { Pipe } from '../../../data/Chip';
+import { PipeSegment } from '../../../data/Chip';
 import { clearAllPipes, updatePipeSelection } from '../../../data/store';
 import FilterableComponent from '../FilterableComponent';
 import SelectablePipe from '../SelectablePipe';
@@ -22,9 +22,9 @@ const PipesPropertiesTab = () => {
             return;
         }
 
-        chip.allUniquePipes.forEach((pipe: Pipe) => {
-            if (pipe.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
-                dispatch(updatePipeSelection({ id: pipe.id, selected: true }));
+        chip.allUniquePipes.forEach((pipeSegment: PipeSegment) => {
+            if (pipeSegment.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
+                dispatch(updatePipeSelection({ id: pipeSegment.id, selected: true }));
             }
         });
     };
@@ -61,14 +61,14 @@ const PipesPropertiesTab = () => {
                 <div className='pipelist-wrap list-wrap'>
                     {chip && (
                         <ul className='scrollable-content'>
-                            {chip.allUniquePipes.map((pipe) => (
+                            {chip.allUniquePipes.map((pipeSegment) => (
                                 <FilterableComponent
-                                    key={pipe.id}
-                                    filterableString={pipe.id}
+                                    key={pipeSegment.id}
+                                    filterableString={pipeSegment.id}
                                     filterQuery={pipeFilter}
                                     component={
                                         <li>
-                                            <SelectablePipe pipe={pipe} pipeFilter={pipeFilter}/>
+                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter}/>
                                         </li>
                                     }
                                 />
