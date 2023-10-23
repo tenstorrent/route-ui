@@ -766,8 +766,10 @@ export class Pipe {
 
     nodes: ComputeNode[] = [];
 
+    // TODO: rename for an accurate representation
     input: Operand | null = null;
 
+    // TODO: rename for an accurate representation
     output: Operand | null = null;
 
     inputCores: string[] = [];
