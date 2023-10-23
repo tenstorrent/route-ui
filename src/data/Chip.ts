@@ -304,7 +304,7 @@ export default class Chip {
                                     pipe.inputCores.push(core);
                                 }
                             } else {
-                                console.info('Pipe exists in op-to-pipe but not found', pipeId);
+                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
                             }
                         });
                     });
@@ -321,7 +321,7 @@ export default class Chip {
                                     pipe.outputCores.push(core);
                                 }
                             } else {
-                                console.info('Pipe exists in op-to-pipe but not found', pipeId);
+                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
                             }
                         });
                     });
