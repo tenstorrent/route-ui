@@ -766,13 +766,16 @@ export class Pipe {
 
     nodes: ComputeNode[] = [];
 
-    // TODo: this is wildley inaccurate and needs to be fixed
+    // TODO: this is wildley inaccurate and needs to be fixed
     // operation: Operation | undefined = undefined;
 
-    // TODO: rename for an accurate representation
+
+    /** we should be using pipe producer/consumer terminology */
+
+    // TODO: rename for an accurate representation - producerCoreOutputOperand
     input: Operand | null = null;
 
-    // TODO: rename for an accurate representation
+    // TODO: rename for an accurate representation - consumerCoreInputOperand
     output: Operand | null = null;
 
     inputCores: string[] = [];
