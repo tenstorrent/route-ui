@@ -37,12 +37,6 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
             // TODO: this is highly incorrect and needs to be fixed
             inputCores = pipe.producerCores;
             outputCores = pipe.consumerCores;
-            if (pipe.input?.name) {
-                // inputOps.set(pipe.operation?.name as string, pipe.input?.name ? [pipe.input?.name] : []);
-            }
-            if (pipe.output?.name) {
-                // outputOps.set(pipe.operation?.name as string, pipe.output?.name ? [] : []);
-            }
         }
 
         inputCores = [...new Set(inputCores)];
