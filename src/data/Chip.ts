@@ -297,7 +297,7 @@ export default class Chip {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
-                                pipe.operation = operation;
+                                // pipe.operation = operation;
                                 pipe.input = operand;
 
                                 if (!pipe.inputCores.includes(core)) {
@@ -315,7 +315,7 @@ export default class Chip {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
-                                pipe.operation = operation;
+                                // pipe.operation = operation;
                                 pipe.output = operand;
                                 if (!pipe.outputCores.includes(core)) {
                                     pipe.outputCores.push(core);
@@ -766,6 +766,9 @@ export class Pipe {
 
     nodes: ComputeNode[] = [];
 
+    // TODo: this is wildley inaccurate and needs to be fixed
+    // operation: Operation | undefined = undefined;
+
     // TODO: rename for an accurate representation
     input: Operand | null = null;
 
@@ -775,8 +778,6 @@ export class Pipe {
     inputCores: string[] = [];
 
     outputCores: string[] = [];
-
-    operation: Operation | undefined = undefined;
 
     segments: PipeSegment[] = [];
 

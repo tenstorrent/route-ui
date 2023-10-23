@@ -38,10 +38,10 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
             inputCores = pipe.inputCores;
             outputCores = pipe.outputCores;
             if (pipe.input?.name) {
-                inputOps.set(pipe.operation?.name as string, pipe.input?.name ? [pipe.input?.name] : []);
+                // inputOps.set(pipe.operation?.name as string, pipe.input?.name ? [pipe.input?.name] : []);
             }
             if (pipe.output?.name) {
-                outputOps.set(pipe.operation?.name as string, pipe.output?.name ? [] : []);
+                // outputOps.set(pipe.operation?.name as string, pipe.output?.name ? [] : []);
             }
         }
 
