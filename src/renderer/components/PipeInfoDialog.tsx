@@ -34,13 +34,10 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
         const computeNodes = chip?.getNodesForPipe(pipeId);
         const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
         if (pipe) {
-            // TODO: this is highly incorrect and needs to be fixed
             inputCores = pipe.producerCores;
             outputCores = pipe.consumerCores;
         }
-
-        inputCores = [...new Set(inputCores)];
-        outputCores = [...new Set(outputCores)];
+        
         const out: JSX.Element[] = [];
         if (inputCores.length > 0 || outputCores.length > 0) {
             if (inputOps.size > 0) {
