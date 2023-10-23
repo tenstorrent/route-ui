@@ -7,7 +7,7 @@ import {
     NodeDataJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { BuildableOperation, Operand } from './ChipAugmentation';
+import { BuildableOperation, BuildableQueue, Operand } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
@@ -23,10 +23,15 @@ import {
     NOCLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import type { Operation, OperationName } from './GraphTypes';
+import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
 import { OpGraphNodeType } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
-import { aggregateCoresByOperation, GraphDescriptorJSON, OperationDetails } from './sources/GraphDescriptor';
+import {
+    aggregateCoresByOperation,
+    GraphDescriptorJSON,
+    OperandJSON,
+    OperationDetails,
+} from './sources/GraphDescriptor';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -154,6 +159,22 @@ export default class Chip {
         }
     }
 
+    private queuesByName: Map<QueueName, BuildableQueue>;
+
+    public get queues(): Iterable<Queue> {
+        return this.queuesByName.values();
+    }
+
+    public getQueue(name: QueueName) {
+        return this.queuesByName.get(name);
+    }
+
+    protected addQueue(queue: BuildableQueue) {
+        if (!this.getQueue(queue.name)) {
+            this.queuesByName.set(queue.name, queue);
+        }
+    }
+
     private pipesById: Map<string, Pipe> = new Map();
 
     get pipes(): Map<string, Pipe> {
@@ -163,6 +184,7 @@ export default class Chip {
     constructor(chipId: number) {
         this.chipId = chipId;
         this.operationsByName = new Map();
+        this.queuesByName = new Map();
         Chip.GET_NOC_ORDER();
     }
 
@@ -293,6 +315,9 @@ export default class Chip {
                         ),
                 );
 
+                inputs.forEach(BuildableQueue.FromOperandFactory(chip, operationName, 'input'));
+                outputs.forEach(BuildableQueue.FromOperandFactory(chip, operationName, 'output'));
+
                 operation.assignInputs(inputs);
                 operation.assignOutputs(outputs);
 
@@ -377,7 +402,13 @@ export default class Chip {
                 // `core.id` is only an x-y locations and doesn't include Chip ID
                 .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`));
             const inputs = opDetails.inputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
-            const outputs = opDetails.outputs.map((operandJson) => new Operand(operandJson.name, operandJson.type));
+            const outputs = opDetails.outputs.map(
+                (operandJson: OperandJSON) => new Operand(operandJson.name, operandJson.type),
+            );
+
+            inputs.forEach(BuildableQueue.FromOperandFactory(chip, opName, 'input'));
+            outputs.forEach(BuildableQueue.FromOperandFactory(chip, opName, 'output'));
+
             return new BuildableOperation(opName, cores, inputs, outputs);
         });
         forEach(operations, (operation) => newChip.addOperation(operation));
