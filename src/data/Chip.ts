@@ -300,8 +300,8 @@ export default class Chip {
                                 // pipe.operation = operation;
                                 pipe.input = operand;
 
-                                if (!pipe.inputCores.includes(core)) {
-                                    pipe.inputCores.push(core);
+                                if (!pipe.producerCores.includes(core)) {
+                                    pipe.producerCores.push(core);
                                 }
                             } else {
                                 console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
@@ -317,8 +317,8 @@ export default class Chip {
                             if (pipe) {
                                 // pipe.operation = operation;
                                 pipe.output = operand;
-                                if (!pipe.outputCores.includes(core)) {
-                                    pipe.outputCores.push(core);
+                                if (!pipe.consumerCores.includes(core)) {
+                                    pipe.consumerCores.push(core);
                                 }
                             } else {
                                 console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
@@ -778,9 +778,9 @@ export class Pipe {
     // TODO: rename for an accurate representation - consumerCoreInputOperand
     output: Operand | null = null;
 
-    inputCores: string[] = [];
+    producerCores: string[] = [];
 
-    outputCores: string[] = [];
+    consumerCores: string[] = [];
 
     segments: PipeSegment[] = [];
 

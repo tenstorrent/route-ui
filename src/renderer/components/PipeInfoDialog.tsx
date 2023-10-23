@@ -35,8 +35,8 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
         const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
         if (pipe) {
             // TODO: this is highly incorrect and needs to be fixed
-            inputCores = pipe.inputCores;
-            outputCores = pipe.outputCores;
+            inputCores = pipe.producerCores;
+            outputCores = pipe.consumerCores;
             if (pipe.input?.name) {
                 // inputOps.set(pipe.operation?.name as string, pipe.input?.name ? [pipe.input?.name] : []);
             }
