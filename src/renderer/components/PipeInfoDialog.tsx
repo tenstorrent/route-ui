@@ -5,7 +5,8 @@ import { useDispatch } from 'react-redux';
 import DataSource from '../../data/DataSource';
 import { resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection } from '../../data/store';
 import { HighlightType } from '../../data/StateTypes';
-import { forEach } from "../../utils/IterableHelpers";
+import { forEach } from '../../utils/IterableHelpers';
+import { Pipe } from '../../data/Chip';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;
@@ -31,32 +32,17 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
         const inputOps: Map<string, string[]> = new Map<string, []>();
         const outputOps: Map<string, string[]> = new Map<string, []>();
         const computeNodes = chip?.getNodesForPipe(pipeId);
-        if (computeNodes) {
-            computeNodes.forEach((nodeData) => {
-                const { operation, uid: nodeUID } = nodeData;
-                if (operation) {
-                    forEach(operation.inputs, (operand) => {
-                        const hasPipe = [...operand.getAllPipeIds()].some((pipeIds) => pipeIds.includes(pipeId));
-                        if (hasPipe) {
-                            if (!outputOps.has(operation.name)) {
-                                outputOps.set(operation.name, []);
-                            }
-                            outputCores.push(nodeUID);
-                            outputOps.get(operation.name)?.push(operand.name);
-                        }
-                    });
-                    forEach(operation.outputs, (operand) => {
-                        const hasPipe = [...operand.getAllPipeIds()].some((pipeIds) => pipeIds.includes(pipeId));
-                        if (hasPipe) {
-                            if (!inputOps.has(operation.name)) {
-                                inputOps.set(operation.name, []);
-                            }
-                            inputCores.push(nodeUID);
-                            inputOps.get(operation.name)?.push(operand.name);
-                        }
-                    });
-                }
-            });
+        const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
+        if (pipe) {
+            // TODO: this is highly incorrect and needs to be fixed
+            inputCores = pipe.inputCores;
+            outputCores = pipe.outputCores;
+            if (pipe.input?.name) {
+                inputOps.set(pipe.operation?.name as string, pipe.input?.name ? [pipe.input?.name] : []);
+            }
+            if (pipe.output?.name) {
+                outputOps.set(pipe.operation?.name as string, pipe.output?.name ? [] : []);
+            }
         }
 
         inputCores = [...new Set(inputCores)];
@@ -81,7 +67,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
                                     })}
                                 </div>
                             )}
-                        </div>,
+                        </div>
                     );
                 });
             }
@@ -103,7 +89,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
                                     })}
                                 </div>
                             )}
-                        </div>,
+                        </div>
                     );
                 });
             }
@@ -134,7 +120,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
     return (
         <Tooltip2 usePortal={false} content={tooltipContent}>
             <div
-                className='pipe-info-dialog'
+                className="pipe-info-dialog"
                 onMouseLeave={() => {
                     dispatch(updateFocusPipeSelection({ id: pipeId, selected: false }));
                     dispatch(resetCoreHighlight());
