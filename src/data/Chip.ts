@@ -292,16 +292,16 @@ export default class Chip {
                 operation.assignOutputs(outputs);
 
                 outputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, core) => {
+                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
                                 // pipe.operation = operation;
                                 pipe.input = operand;
 
-                                if (!pipe.producerCores.includes(core)) {
-                                    pipe.producerCores.push(core);
-                                    const node = chip.getNode(`${core}`);
+                                if (!pipe.producerCores.includes(nodeId)) {
+                                    pipe.producerCores.push(nodeId);
+                                    const node = chip.getNode(nodeId);
                                     if (node) {
                                         if (!node.producerPipes.includes(pipe)) {
                                             node.producerPipes.push(pipe);
@@ -316,15 +316,15 @@ export default class Chip {
                 });
 
                 inputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, core) => {
+                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
                                 // pipe.operation = operation;
                                 pipe.output = operand;
-                                if (!pipe.consumerCores.includes(core)) {
-                                    pipe.consumerCores.push(core);
-                                    const node = chip.getNode(`${core}`);
+                                if (!pipe.consumerCores.includes(nodeId)) {
+                                    pipe.consumerCores.push(nodeId);
+                                    const node = chip.getNode(nodeId);
                                     if (node) {
                                         if (!node.consumerPipes.includes(pipe)) {
                                             node.consumerPipes.push(pipe);
@@ -672,15 +672,7 @@ export class ComputeNode {
 
     public producerPipes: Pipe[] = [];
 
-    private _pipes: Pipe[] = [];
-
-    public get pipes(): Pipe[] {
-        return this._pipes;
-    }
-
-    protected set pipes(value: Pipe[]) {
-        this._pipes = value;
-    }
+    public pipes: Pipe[] = [];
 
     /**
      * only relevant for dram nodes
