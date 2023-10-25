@@ -1,7 +1,13 @@
 import React, { ChangeEvent, FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Checkbox } from '@blueprintjs/core';
-import { RootState, selectPipeSelectionById, updatePipeSelection } from '../../data/store';
+import {
+    RootState,
+    selectPipeSelectionById,
+    updateFocusPipe,
+    updateFocusPipeSelection,
+    updatePipeSelection
+} from '../../data/store';
 import HighlightedText from './HighlightedText';
 import { convertBytes, PipeSegment } from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
@@ -17,6 +23,7 @@ interface SelectablePipeProps {
 const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, showBandwidthUse = false }) => {
     const dispatch = useDispatch();
     const pipeState = useSelector((state: RootState) => selectPipeSelectionById(state, pipeSegment.id));
+    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
     const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
         dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
     };
@@ -25,8 +32,17 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
             <Checkbox checked={pipeState?.selected} onChange={handleCheckboxChange} />
             <PipeInfoDialog
                 pipeId={pipeSegment.id}
+                hide={focusPipe !== pipeSegment.id}
                 contents={
-                    <span className='label'>
+                    <span className='label'
+                          onMouseLeave={() => {
+                              dispatch(updateFocusPipe(null));
+                          }}
+                          onMouseEnter={() => {
+                              dispatch(updateFocusPipe(pipeSegment.id));
+                          }}
+                    >
+
                         {pipeState && (
                             <>
                                 <HighlightedText text={pipeState.id} filter={pipeFilter} />{' '}

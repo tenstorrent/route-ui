@@ -240,8 +240,6 @@
         display: inline-flex;
         flex-wrap: wrap;
         gap: 10px;
-
-
     }
 }
 
@@ -286,6 +284,24 @@
             align-items: flex-start;
             gap: 10px;
             margin-bottom: 10px;
+        }
+    }
+
+    .producer-consumer {
+        margin-bottom: 10px;
+        margin-left: 1px;
+
+        h3 {
+            margin-left: -10px;
+            color: $tt-white-text;
+        }
+
+        h2 {
+            max-width: 50vw;
+            display: inline-block;
+            text-wrap: wrap;
+            word-break: break-word;
+            color: $tt-white-text;
         }
     }
 }

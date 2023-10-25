@@ -49,8 +49,22 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
-    const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
+    // const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
+    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+
+    let coreHighlight = HighlightType.NONE;
+    const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
+    const isProducer = node.producerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
+    if(isConsumer) {
+        coreHighlight = HighlightType.OUTPUT;
+    }
+    if(isProducer) {
+        coreHighlight = HighlightType.INPUT;
+    }
+    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
+
+
 
     const triggerSelection = () => {
         const selectedState = nodeState.selected;
@@ -61,7 +75,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
         }
     };
 
-    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
+
 
     return (
         <button
@@ -202,7 +216,7 @@ interface OperandHighlightProps {
     node: ComputeNode;
 }
 
-/** Highlight a ComputeNode when it is an input or output for a focused pipeSegment. */
+/** no idea what this does and if it does anything. verify and delete  */
 const OperandHighlight: React.FC<OperandHighlightProps> = ({
     //
     node,
@@ -211,6 +225,7 @@ const OperandHighlight: React.FC<OperandHighlightProps> = ({
     const operandsIn: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
     );
+
     const operandsOut: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || [],
     );
@@ -245,12 +260,11 @@ const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
     const svg = d3.select(svgRef.current);
     const focusMode = useSelector((state: RootState) => getFocusModeState(state));
     const focusedPipes = useSelector((state: RootState) => state.pipeSelection.focusPipes);
-    const focusedPipeIds = Object.values(focusedPipes)
-        .filter((pipe: PipeSelection) => pipe.selected)
-        .map((pipe: PipeSelection) => pipe.id);
-
+    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    // const focusedPipes = useSelector((state: RootState) => state.pipeSelection.focusPipes);
+    const focusedPipeIds = [focusPipe || ''];
     svg.selectAll('*').remove();
-    if (focusMode && focusedPipeIds.length) {
+    if (focusMode && focusPipe) {
         drawSelections(svg, NOCLinkName.NOC0_EAST_OUT, node, focusedPipeIds);
         drawSelections(svg, NOCLinkName.NOC0_WEST_IN, node, focusedPipeIds);
         drawSelections(svg, NOCLinkName.NOC0_SOUTH_OUT, node, focusedPipeIds);

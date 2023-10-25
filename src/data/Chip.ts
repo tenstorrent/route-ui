@@ -4,7 +4,7 @@ import {
     NetlistAnalyzerDataJSON,
     NOCLinkJSON,
     NodeDataJSON,
-    OperationDataJSON,
+    OperationDataJSON
 } from './JSONDataTypes';
 import { BuildableOperation, Operand } from './ChipAugmentation';
 import ChipDesign from './ChipDesign';
@@ -19,7 +19,7 @@ import {
     Loc,
     NetworkLinkName,
     NOC,
-    NOCLinkName,
+    NOCLinkName
 } from './Types';
 import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName } from './GraphTypes';
@@ -35,7 +35,7 @@ export default class Chip {
             Chip.NOC_ORDER = new Map(
                 Object.keys(NOCLinkName)
                     .map((key) => NOCLinkName[key])
-                    .map((noc, index) => [noc, index]),
+                    .map((noc, index) => [noc, index])
             );
         }
 
@@ -193,7 +193,7 @@ export default class Chip {
                 chip.totalCols = Math.max(loc.y, chip.totalCols);
                 chip.totalRows = Math.max(loc.x, chip.totalRows);
                 const [node, newOperation] = ComputeNode.fromNetlistJSON(nodeJSON, chip.chipId, (name: OperationName) =>
-                    chip.operationsByName.get(name),
+                    chip.operationsByName.get(name)
                 );
                 if (newOperation) {
                     // console.log('Adding operation: ', newOperation.name);
@@ -206,7 +206,7 @@ export default class Chip {
                     }
                     const dramSubchannel =
                         dramChannel?.subchannels.find(
-                            (subchannel) => subchannel.subchannelId === node.dramSubchannelId,
+                            (subchannel) => subchannel.subchannelId === node.dramSubchannelId
                         ) || null;
                     if (dramSubchannel === null) {
                         console.error(`Node ${node.uid} has a missing dram subchannel id ${node.dramSubchannelId}`);
@@ -257,8 +257,8 @@ export default class Chip {
                 return new Map(
                     Object.entries(coresToPipes).map(([coreID, pipes]) => [
                         coreID,
-                        pipes.map((pipeId) => pipeId.toString()),
-                    ]),
+                        pipes.map((pipeId) => pipeId.toString())
+                    ])
                 );
             };
 
@@ -266,7 +266,7 @@ export default class Chip {
                 let operation = augmentedChip.operationsByName.get(operationName);
                 if (!operation) {
                     console.error(
-                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
+                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`
                     );
                     operation = new BuildableOperation(operationName, [], [], []);
                     chip.addOperation(operation);
@@ -277,16 +277,16 @@ export default class Chip {
                         new Operand(
                             operandJson.name,
                             operandJson.type as OpGraphNodeType,
-                            pipesAsMap(operandJson.pipes),
-                        ),
+                            pipesAsMap(operandJson.pipes)
+                        )
                 );
                 const outputs = opJson.outputs.map(
                     (operandJson) =>
                         new Operand(
                             operandJson.name,
                             operandJson.type as OpGraphNodeType,
-                            pipesAsMap(operandJson.pipes),
-                        ),
+                            pipesAsMap(operandJson.pipes)
+                        )
                 );
 
                 operation.assignInputs(inputs);
@@ -302,6 +302,12 @@ export default class Chip {
 
                                 if (!pipe.producerCores.includes(core)) {
                                     pipe.producerCores.push(core);
+                                    const node = chip.getNode(`${core}`);
+                                    if (node) {
+                                        if (!node.producerPipes.includes(pipe)) {
+                                            node.producerPipes.push(pipe);
+                                        }
+                                    }
                                 }
                             } else {
                                 console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
@@ -319,6 +325,12 @@ export default class Chip {
                                 pipe.output = operand;
                                 if (!pipe.consumerCores.includes(core)) {
                                     pipe.consumerCores.push(core);
+                                    const node = chip.getNode(`${core}`);
+                                    if (node) {
+                                        if (!node.consumerPipes.includes(pipe)) {
+                                            node.consumerPipes.push(pipe);
+                                        }
+                                    }
                                 }
                             } else {
                                 console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
@@ -445,8 +457,8 @@ export class DramChannel {
                     new DramBankLink(
                         DramBankLinkName.DRAM_INOUT,
                         `${id}-${DramBankLinkName.DRAM_INOUT}`,
-                        json.dram_inout,
-                    ),
+                        json.dram_inout
+                    )
                 );
             }
             if (json.dram0_inout) {
@@ -454,8 +466,8 @@ export class DramChannel {
                     new DramBankLink(
                         DramBankLinkName.DRAM0_INOUT,
                         `${id}-${DramBankLinkName.DRAM0_INOUT}`,
-                        json.dram0_inout,
-                    ),
+                        json.dram0_inout
+                    )
                 );
             }
             if (json.dram1_inout) {
@@ -463,8 +475,8 @@ export class DramChannel {
                     new DramBankLink(
                         DramBankLinkName.DRAM1_INOUT,
                         `${id}-${DramBankLinkName.DRAM1_INOUT}`,
-                        json.dram1_inout,
-                    ),
+                        json.dram1_inout
+                    )
                 );
             }
         }
@@ -480,7 +492,7 @@ export class DramSubchannel {
         this.subchannelId = subchannelId;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(
-                NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink,
+                NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink
             );
         });
     }
@@ -525,7 +537,7 @@ export abstract class NetworkLink {
         this.name = name;
 
         this.pipes = Object.entries(json.mapped_pipes).map(
-            ([pipeId, bandwidth]) => new PipeSegment(pipeId, bandwidth, name, this.totalDataBytes),
+            ([pipeId, bandwidth]) => new PipeSegment(pipeId, bandwidth, name, this.totalDataBytes)
         );
     }
 
@@ -536,7 +548,7 @@ export abstract class NetworkLink {
             bpc: 0,
             saturation: 0,
             maxBandwidth: this.maxBandwidth,
-            type: this.type,
+            type: this.type
         } as LinkState;
     }
 }
@@ -590,7 +602,7 @@ export class ComputeNode {
     static fromNetlistJSON(
         nodeJSON: NodeDataJSON,
         chipId: number,
-        getOperation: (name: OperationName) => BuildableOperation | undefined,
+        getOperation: (name: OperationName) => BuildableOperation | undefined
     ): [node: ComputeNode, createdOperation?: BuildableOperation] {
         const node = new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
         node.opCycles = nodeJSON.op_cycles;
@@ -615,8 +627,8 @@ export class ComputeNode {
         node.links = new Map(
             Object.entries(nodeJSON.links).map(([link, linkJson], index) => [
                 link,
-                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson),
-            ]),
+                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson)
+            ])
         );
 
         // Associate with operation
@@ -657,6 +669,20 @@ export class ComputeNode {
 
     public dramSubchannel: DramSubchannel | null = null;
 
+    public consumerPipes: Pipe[] = [];
+
+    public producerPipes: Pipe[] = [];
+
+    private _pipes: Pipe[] = [];
+
+    public get pipes(): Pipe[] {
+        return this._pipes;
+    }
+
+    protected set pipes(value: Pipe[]) {
+        this._pipes = value;
+    }
+
     /**
      * only relevant for dram nodes
      */
@@ -692,7 +718,7 @@ export class ComputeNode {
             loc: this.loc,
             opName: this.opName,
             dramChannelId: this.dramChannelId,
-            dramSubchannelId: this.dramSubchannelId,
+            dramSubchannelId: this.dramSubchannelId
         } as ComputeNodeState;
     }
 
@@ -772,7 +798,7 @@ export class Pipe {
 
     /** we should be using pipe producer/consumer terminology */
 
-    // TODO: rename for an accurate representation - producerCoreOutputOperand
+        // TODO: rename for an accurate representation - producerCoreOutputOperand
     input: Operand | null = null;
 
     // TODO: rename for an accurate representation - consumerCoreInputOperand

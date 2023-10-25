@@ -19,6 +19,7 @@ export interface PipeSelectionState {
     pipeIds: string[];
     focusPipes: Record<string, PipeSelection>;
     focusMode: boolean;
+    focusPipe: string | null;
 }
 
 export interface ComputeNodeState extends NodeSelection {
