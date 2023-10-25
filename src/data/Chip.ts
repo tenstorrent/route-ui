@@ -296,8 +296,7 @@ export default class Chip {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
-                                // pipe.operation = operation;
-                                pipe.input = operand;
+                                pipe.producerCoreOutputOperand = operand;
 
                                 if (!pipe.producerCores.includes(nodeId)) {
                                     pipe.producerCores.push(nodeId);
@@ -309,7 +308,7 @@ export default class Chip {
                                     }
                                 }
                             } else {
-                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
+                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`);
                             }
                         });
                     });
@@ -320,8 +319,7 @@ export default class Chip {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
-                                // pipe.operation = operation;
-                                pipe.output = operand;
+                                pipe.consumerCoreInputOperand = operand;
                                 if (!pipe.consumerCores.includes(nodeId)) {
                                     pipe.consumerCores.push(nodeId);
                                     const node = chip.getNode(nodeId);
@@ -332,7 +330,7 @@ export default class Chip {
                                     }
                                 }
                             } else {
-                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
+                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`);
                             }
                         });
                     });
@@ -783,16 +781,9 @@ export class Pipe {
 
     nodes: ComputeNode[] = [];
 
-    // TODO: this is wildley inaccurate and needs to be fixed
-    // operation: Operation | undefined = undefined;
+    producerCoreOutputOperand: Operand | null = null;
 
-    /** we should be using pipe producer/consumer terminology */
-
-    // TODO: rename for an accurate representation - producerCoreOutputOperand
-    input: Operand | null = null;
-
-    // TODO: rename for an accurate representation - consumerCoreInputOperand
-    output: Operand | null = null;
+    consumerCoreInputOperand: Operand | null = null;
 
     producerCores: string[] = [];
 
