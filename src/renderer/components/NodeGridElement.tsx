@@ -2,9 +2,7 @@ import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import {
-    getCoreHighlight,
     getDramGroup,
-    getFocusModeState,
     getGroup,
     openDetailedView,
     RootState,
@@ -17,9 +15,9 @@ import {
     drawLink,
     drawNOC,
     drawSelections,
-    getOffChipCongestionStyles,
     getDramGroupingStyles,
     getNodeOpStyles,
+    getOffChipCongestionStyles,
     NOC_CONFIGURATION,
     NODE_SIZE,
     toRGBA,
@@ -49,8 +47,20 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
-    const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
+    // const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
+    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+
+    let coreHighlight = HighlightType.NONE;
+    const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
+    const isProducer = node.producerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
+    if (isConsumer) {
+        coreHighlight = HighlightType.OUTPUT;
+    }
+    if (isProducer) {
+        coreHighlight = HighlightType.INPUT;
+    }
+    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
     const triggerSelection = () => {
         const selectedState = nodeState.selected;
@@ -60,8 +70,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             dispatch(updateNodeSelection({ id: node.uid, selected: !nodeState.selected }));
         }
     };
-
-    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
     return (
         <button
@@ -106,6 +114,7 @@ export default NodeGridElement;
 interface DramModuleBorderProps {
     node: ComputeNode;
 }
+
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
 const DramModuleBorder: React.FC<DramModuleBorderProps> = ({ node }) => {
     const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannel?.id));
@@ -202,7 +211,7 @@ interface OperandHighlightProps {
     node: ComputeNode;
 }
 
-/** Highlight a ComputeNode when it is an input or output for a focused pipeSegment. */
+/** no idea what this does and if it does anything. verify and delete  */
 const OperandHighlight: React.FC<OperandHighlightProps> = ({
     //
     node,
@@ -211,6 +220,7 @@ const OperandHighlight: React.FC<OperandHighlightProps> = ({
     const operandsIn: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
     );
+
     const operandsOut: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || [],
     );
@@ -243,14 +253,11 @@ const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
 }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
-    const focusMode = useSelector((state: RootState) => getFocusModeState(state));
-    const focusedPipes = useSelector((state: RootState) => state.pipeSelection.focusPipes);
-    const focusedPipeIds = Object.values(focusedPipes)
-        .filter((pipe: PipeSelection) => pipe.selected)
-        .map((pipe: PipeSelection) => pipe.id);
+    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    const focusedPipeIds = [focusPipe || ''];
 
     svg.selectAll('*').remove();
-    if (focusMode && focusedPipeIds.length) {
+    if (focusPipe && node.pipes.filter((pipe) => pipe.id === focusPipe).length > 0) {
         drawSelections(svg, NOCLinkName.NOC0_EAST_OUT, node, focusedPipeIds);
         drawSelections(svg, NOCLinkName.NOC0_WEST_IN, node, focusedPipeIds);
         drawSelections(svg, NOCLinkName.NOC0_SOUTH_OUT, node, focusedPipeIds);
@@ -285,7 +292,7 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
 }) => {
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
-    const focusMode = useSelector((state: RootState) => getFocusModeState(state));
+    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const selectedPipeIds = Object.values(allPipes)
         .filter((pipe: PipeSelection) => pipe.selected)
@@ -349,7 +356,7 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     }
     return (
         <svg
-            className={`node-svg ${focusMode ? 'focus-mode' : ''}`}
+            className={`node-svg ${focusPipe !== null ? 'focus-mode' : ''}`}
             ref={svgRef}
             width={NODE_SIZE}
             height={NODE_SIZE}

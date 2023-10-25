@@ -229,10 +229,9 @@ export default class Chip {
                         }
                         pipe.segments.push(pipeSegment);
 
-                        // const inputs = [...node.operation?.inputs].map((input) => input.pipes);
-                        // const outputs = [...node.operation?.outputs];
-
-                        // pipeSegment.operand = node.operation?.inputs.   // ?.getOperandForPipe(pipeSegment.id) || null;
+                        if (!node.pipes.includes(pipe)) {
+                            node.pipes.push(pipe);
+                        }
                     });
                 });
 
@@ -293,35 +292,45 @@ export default class Chip {
                 operation.assignOutputs(outputs);
 
                 outputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, core) => {
+                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
-                                // pipe.operation = operation;
-                                pipe.input = operand;
+                                pipe.producerCoreOutputOperand = operand;
 
-                                if (!pipe.producerCores.includes(core)) {
-                                    pipe.producerCores.push(core);
+                                if (!pipe.producerCores.includes(nodeId)) {
+                                    pipe.producerCores.push(nodeId);
+                                    const node = chip.getNode(nodeId);
+                                    if (node) {
+                                        if (!node.producerPipes.includes(pipe)) {
+                                            node.producerPipes.push(pipe);
+                                        }
+                                    }
                                 }
                             } else {
-                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
+                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`);
                             }
                         });
                     });
                 });
 
                 inputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, core) => {
+                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = chip.pipes.get(pipeId);
                             if (pipe) {
-                                // pipe.operation = operation;
-                                pipe.output = operand;
-                                if (!pipe.consumerCores.includes(core)) {
-                                    pipe.consumerCores.push(core);
+                                pipe.consumerCoreInputOperand = operand;
+                                if (!pipe.consumerCores.includes(nodeId)) {
+                                    pipe.consumerCores.push(nodeId);
+                                    const node = chip.getNode(nodeId);
+                                    if (node) {
+                                        if (!node.consumerPipes.includes(pipe)) {
+                                            node.consumerPipes.push(pipe);
+                                        }
+                                    }
                                 }
                             } else {
-                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on ${chip.chipId}`);
+                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`);
                             }
                         });
                     });
@@ -657,6 +666,12 @@ export class ComputeNode {
 
     public dramSubchannel: DramSubchannel | null = null;
 
+    public consumerPipes: Pipe[] = [];
+
+    public producerPipes: Pipe[] = [];
+
+    public pipes: Pipe[] = [];
+
     /**
      * only relevant for dram nodes
      */
@@ -766,17 +781,9 @@ export class Pipe {
 
     nodes: ComputeNode[] = [];
 
-    // TODO: this is wildley inaccurate and needs to be fixed
-    // operation: Operation | undefined = undefined;
+    producerCoreOutputOperand: Operand | null = null;
 
-
-    /** we should be using pipe producer/consumer terminology */
-
-    // TODO: rename for an accurate representation - producerCoreOutputOperand
-    input: Operand | null = null;
-
-    // TODO: rename for an accurate representation - consumerCoreInputOperand
-    output: Operand | null = null;
+    consumerCoreInputOperand: Operand | null = null;
 
     producerCores: string[] = [];
 

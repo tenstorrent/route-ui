@@ -1,16 +1,14 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
+import { Position } from '@blueprintjs/core';
 import { JSX } from 'react/jsx-runtime';
-import { useDispatch } from 'react-redux';
 import DataSource from '../../data/DataSource';
-import { resetCoreHighlight, updateCoreHighlight, updateFocusPipeSelection } from '../../data/store';
-import { HighlightType } from '../../data/StateTypes';
-import { forEach } from '../../utils/IterableHelpers';
 import { Pipe } from '../../data/Chip';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;
     pipeId: string;
+    hide?: boolean;
 }
 
 /**
@@ -20,123 +18,72 @@ export interface PipeInfoDialogProps {
  * @constructor
  * @description This wrapper component is used to display information about a pipeSegment when the user hovers over it
  */
-const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId }) => {
+const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => {
     const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);
     const { chip } = useContext(DataSource);
-    const [nodeHighlightInputs, setNodeHighlightInputs] = useState<string[]>([]);
-    const [nodeHighlightOutputs, setNodeHighlightOutputs] = useState<string[]>([]);
-    const dispatch = useDispatch();
     const setupData = () => {
-        let inputCores: string[] = [];
-        let outputCores: string[] = [];
-        const inputOps: Map<string, string[]> = new Map<string, []>();
-        const outputOps: Map<string, string[]> = new Map<string, []>();
-        const computeNodes = chip?.getNodesForPipe(pipeId);
         const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
-        if (pipe) {
-            inputCores = pipe.producerCores;
-            outputCores = pipe.consumerCores;
-        }
-        
         const out: JSX.Element[] = [];
-        if (inputCores.length > 0 || outputCores.length > 0) {
-            if (inputOps.size > 0) {
-                inputOps.forEach((inputs, opName) => {
-                    const io = [...new Set(inputs)];
-                    out.push(
-                        <div style={{ marginBottom: '10px' }}>
-                            <h3 style={{ color: '#fff' }}>Inputs:</h3>
-                            <h2>{opName}</h2>
-                            {io.length > 0 && (
-                                <div>
-                                    {io.map((input) => {
-                                        return (
-                                            <h4 key={input} style={{ marginLeft: '10px' }}>
-                                                {input}
-                                            </h4>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    );
-                });
+        if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
+            if (pipe.producerCores.length > 0) {
+                out.push(
+                    <div className={'producer-consumer'}>
+                        <h3>Producer:</h3>
+                        <h2>{[...new Set(pipe.producerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
+                    </div>,
+                );
             }
-            if (outputOps.size > 0) {
-                outputOps.forEach((outputs, opName) => {
-                    const io = [...new Set(outputs)];
-                    out.push(
-                        <div style={{ marginBottom: '10px' }}>
-                            <h3 style={{ color: '#fff' }}>Outputs:</h3>
-                            <h2>{opName}</h2>
-                            {io.length > 0 && (
-                                <div>
-                                    {io.map((ouput) => {
-                                        return (
-                                            <h4 key={ouput} style={{ marginLeft: '10px' }}>
-                                                {ouput}
-                                            </h4>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    );
-                });
+            if (pipe.consumerCores.length > 0) {
+                out.push(
+                    <div className={'producer-consumer'}>
+                        <h3>Consumer:</h3>
+                        <h2>{[...new Set(pipe.consumerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
+                    </div>,
+                );
             }
-            dispatch(resetCoreHighlight());
-            dispatch(updateCoreHighlight({ ids: inputCores, selected: HighlightType.INPUT }));
-            dispatch(updateCoreHighlight({ ids: outputCores, selected: HighlightType.OUTPUT }));
-
-            setNodeHighlightInputs(inputCores);
-            setNodeHighlightOutputs(outputCores);
+        } else {
+            return undefined;
         }
 
+        // becuase this is a useful fragment
         // eslint-disable-next-line react/jsx-no-useless-fragment
         return <>{out}</>;
     };
 
-    const highlightCores = () => {
-        dispatch(resetCoreHighlight());
-
-        dispatch(updateCoreHighlight({ ids: nodeHighlightInputs, selected: HighlightType.INPUT }));
-        dispatch(updateCoreHighlight({ ids: nodeHighlightOutputs, selected: HighlightType.OUTPUT }));
-    };
-
     useEffect(() => {
         setTooltipContent(undefined);
-        // setShouldRender(true);
     }, [chip]);
 
+    if (hide) {
+        // becuase this is a useful fragment too
+        // eslint-disable-next-line react/jsx-no-useless-fragment
+        return <>{contents}</>;
+    }
+
     return (
-        <Tooltip2 usePortal={false} content={tooltipContent}>
+        <Tooltip2
+            //
+            usePortal={false}
+            content={tooltipContent}
+            position={Position.BOTTOM_RIGHT}
+            hoverOpenDelay={150}
+        >
             <div
-                className="pipe-info-dialog"
-                onMouseLeave={() => {
-                    dispatch(updateFocusPipeSelection({ id: pipeId, selected: false }));
-                    dispatch(resetCoreHighlight());
-                }}
-                onFocus={() => {
-                    if (!tooltipContent) {
-                        setTooltipContent(setupData());
-                    } else {
-                        highlightCores();
-                    }
-                    dispatch(updateFocusPipeSelection({ id: pipeId, selected: true }));
-                }}
+                className='pipe-info-dialog'
                 onMouseEnter={() => {
                     if (!tooltipContent) {
                         setTooltipContent(setupData());
-                    } else {
-                        highlightCores();
                     }
-                    dispatch(updateFocusPipeSelection({ id: pipeId, selected: true }));
                 }}
             >
                 {contents}
             </div>
         </Tooltip2>
     );
+};
+
+PipeInfoDialog.defaultProps = {
+    hide: false,
 };
 
 export default PipeInfoDialog;

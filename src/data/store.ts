@@ -6,8 +6,8 @@ import {
     DetailedViewState,
     HighContrastState,
     HighlightType,
-    NetworkCongestionState,
     LinkState,
+    NetworkCongestionState,
     NodeSelectionState,
     PipeSelection,
     PipeSelectionState,
@@ -56,8 +56,7 @@ export const { openDetailedView, closeDetailedView } = detailedViewSlice.actions
 const pipesInitialState: PipeSelectionState = {
     pipes: {},
     pipeIds: [],
-    focusPipes: {},
-    focusMode: false,
+    focusPipe: null,
 };
 
 const pipeSelectionSlice = createSlice({
@@ -67,19 +66,13 @@ const pipeSelectionSlice = createSlice({
         loadPipeSelection(state, action: PayloadAction<PipeSelection[]>) {
             state.pipes = {};
             state.pipeIds = [];
-            state.focusPipes = {};
             action.payload.forEach((item) => {
                 state.pipes[item.id] = item;
                 state.pipeIds.push(item.id);
-                state.focusPipes[item.id] = item;
             });
         },
-        updateFocusPipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
-            const { id, selected } = action.payload;
-            if (state.focusPipes[id]) {
-                state.focusPipes[id].selected = selected;
-                state.focusMode = selected;
-            }
+        updateFocusPipe(state, action: PayloadAction<string | null>) {
+            state.focusPipe = action.payload;
         },
         updatePipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
             const { id, selected } = action.payload;
@@ -100,8 +93,7 @@ const pipeSelectionSlice = createSlice({
     },
 });
 export const selectPipeSelectionById = (state: RootState, id: string) => state.pipeSelection.pipes[id];
-export const getFocusModePipe = (state: RootState, id: string) => state.pipeSelection.focusPipes[id];
-export const getFocusModeState = (state: RootState) => state.pipeSelection.focusMode;
+export const getFocusPipe = (state: RootState) => state.pipeSelection.focusPipe;
 export const getDramGroup = (state: RootState, id: number | undefined) =>
     id !== undefined && id > -1 ? state.nodeSelection.dram[id] : null;
 export const {
@@ -110,7 +102,7 @@ export const {
     updatePipeSelection,
     clearAllPipes,
     selectAllPipes,
-    updateFocusPipeSelection,
+    updateFocusPipe,
 } = pipeSelectionSlice.actions;
 
 const nodesInitialState: NodeSelectionState = {
