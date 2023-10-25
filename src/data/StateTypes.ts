@@ -17,8 +17,6 @@ export interface PipeSelection {
 export interface PipeSelectionState {
     pipes: Record<string, PipeSelection>;
     pipeIds: string[];
-    focusPipes: Record<string, PipeSelection>;
-    focusMode: boolean;
     focusPipe: string | null;
 }
 

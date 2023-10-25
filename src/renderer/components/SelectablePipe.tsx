@@ -1,13 +1,7 @@
 import React, { ChangeEvent, FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Checkbox } from '@blueprintjs/core';
-import {
-    RootState,
-    selectPipeSelectionById,
-    updateFocusPipe,
-    updateFocusPipeSelection,
-    updatePipeSelection
-} from '../../data/store';
+import { RootState, selectPipeSelectionById, updateFocusPipe, updatePipeSelection } from '../../data/store';
 import HighlightedText from './HighlightedText';
 import { convertBytes, PipeSegment } from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
