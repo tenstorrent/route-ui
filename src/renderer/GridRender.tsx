@@ -98,14 +98,18 @@ export default function GridRender() {
                     labelRenderer={(value) => `${value.toFixed(1)}`}
                 />
                 <hr />
-                <Tooltip2 content='Show pipes' position={Position.RIGHT}>
-                    <Switch
-                        checked={showPipes}
-                        label='pipes'
-                        onChange={(event) => setShowPipes(event.currentTarget.checked)}
-                    />
-                </Tooltip2>
-                <hr />
+                {chip?.pipes.size > 0 && (
+                    <>
+                        <Tooltip2 content='Show pipes' position={Position.RIGHT}>
+                            <Switch
+                                checked={showPipes}
+                                label='pipes'
+                                onChange={(event) => setShowPipes(event.currentTarget.checked)}
+                            />
+                        </Tooltip2>
+                        <hr />
+                    </>
+                )}
                 <Tooltip2 content='Show all links overlay' position={Position.RIGHT}>
                     <Switch
                         checked={showEmptyLinks}
@@ -129,92 +133,106 @@ export default function GridRender() {
                     />
                 </Tooltip2>
                 <hr />
-                {/* Link saturation */}
-                <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
-                    <Switch
-                        checked={showLinkSaturation}
-                        label='link congestion'
-                        onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
-                    />
-                </Tooltip2>
-                <Switch
-                    disabled={!showLinkSaturation}
-                    checked={showLinkSaturationNOC0}
-                    label='noc0'
-                    onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC0, event.currentTarget.checked)}
-                />
-                <Switch
-                    disabled={!showLinkSaturation}
-                    checked={showLinkSaturationNOC1}
-                    label='noc1'
-                    onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC1, event.currentTarget.checked)}
-                />
-                <div
-                    className='congestion-legend'
-                    style={{ ...(showLinkSaturation ? congestionLegendStyle : null), width: '100%', height: '3px' }}
-                />
-                <Slider
-                    className='link-saturation-slider'
-                    min={0}
-                    max={125}
-                    disabled={!showLinkSaturation}
-                    labelStepSize={50}
-                    value={linkSaturationTreshold}
-                    onChange={onLinkSaturationChange}
-                    labelRenderer={(value) => `${value.toFixed(0)}`}
-                />
-                <hr />
-                <Tooltip2 content='Select all pipes'>
-                    <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())}>
-                        Select all pipes
-                    </Button>
-                </Tooltip2>
-                <Tooltip2 content='Clear all pipes selection'>
-                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}>
-                        Deselect pipes
-                    </Button>
-                </Tooltip2>
-                <hr />
-                <Tooltip2 content='Clear all operation selection'>
-                    <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
-                        Deselect ops
-                    </Button>
-                </Tooltip2>
-                <hr />
-                <div>
-                    <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
-                        AICLK cycles/input
-                    </label>
-                    <NumericInput
-                        //
-                        id='opCyclesInput'
-                        value={opCycles}
-                        stepSize={10000}
-                        minorStepSize={100}
-                        majorStepSize={100000}
-                        min={1}
-                        onValueChange={(value) => {
-                            setOpCycles(value);
-                            dispatch(updateTotalOPs(value));
-                        }}
-                        rightElement={
-                            <Tooltip2 content='Reset Total OP Cycles'>
-                                <Button
-                                    minimal
-                                    onClick={() => {
-                                        const resetValue = chip?.totalOpCycles || 0;
-                                        setOpCycles(resetValue);
-                                        dispatch(updateTotalOPs(resetValue));
-                                    }}
-                                    icon={IconNames.RESET}
-                                />
-                            </Tooltip2>
-                        }
-                    />
-                </div>
-                <hr />
+                {chip?.pipes.size > 0 && (
+                    <>
+                        {/* Link saturation */}
+                        <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
+                            <Switch
+                                checked={showLinkSaturation}
+                                label='link congestion'
+                                onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
+                            />
+                        </Tooltip2>
+                        <Switch
+                            disabled={!showLinkSaturation}
+                            checked={showLinkSaturationNOC0}
+                            label='noc0'
+                            onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC0, event.currentTarget.checked)}
+                        />
+                        <Switch
+                            disabled={!showLinkSaturation}
+                            checked={showLinkSaturationNOC1}
+                            label='noc1'
+                            onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC1, event.currentTarget.checked)}
+                        />
+                        <div
+                            className='congestion-legend'
+                            style={{
+                                ...(showLinkSaturation ? congestionLegendStyle : null),
+                                width: '100%',
+                                height: '3px',
+                            }}
+                        />
+                        <Slider
+                            className='link-saturation-slider'
+                            min={0}
+                            max={125}
+                            disabled={!showLinkSaturation}
+                            labelStepSize={50}
+                            value={linkSaturationTreshold}
+                            onChange={onLinkSaturationChange}
+                            labelRenderer={(value) => `${value.toFixed(0)}`}
+                        />
+                        <hr />
+
+                        <Tooltip2 content='Select all pipes'>
+                            <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())}>
+                                Select all pipes
+                            </Button>
+                        </Tooltip2>
+                        <Tooltip2 content='Clear all pipes selection'>
+                            <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}>
+                                Deselect pipes
+                            </Button>
+                        </Tooltip2>
+                        <hr />
+                        <Tooltip2 content='Clear all operation selection'>
+                            <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
+                                Deselect ops
+                            </Button>
+                        </Tooltip2>
+                        <hr />
+                    </>
+                )}
+                {opCycles !== 0 && (
+                    <>
+                        <div>
+                            <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
+                                AICLK cycles/input
+                            </label>
+                            <NumericInput
+                                //
+                                id='opCyclesInput'
+                                value={opCycles}
+                                stepSize={10000}
+                                minorStepSize={100}
+                                majorStepSize={100000}
+                                min={1}
+                                onValueChange={(value) => {
+                                    setOpCycles(value);
+                                    dispatch(updateTotalOPs(value));
+                                }}
+                                rightElement={
+                                    <Tooltip2 content='Reset Total OP Cycles'>
+                                        <Button
+                                            minimal
+                                            onClick={() => {
+                                                const resetValue = chip?.totalOpCycles || 0;
+                                                setOpCycles(resetValue);
+                                                dispatch(updateTotalOPs(resetValue));
+                                            }}
+                                            icon={IconNames.RESET}
+                                        />
+                                    </Tooltip2>
+                                }
+                            />
+                        </div>
+                        <hr />
+                    </>
+                )}
                 <DRAMBandwidthControls />
             </div>
+
             {chip && (
                 <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
                     <div
