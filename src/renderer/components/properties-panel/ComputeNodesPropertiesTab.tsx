@@ -110,7 +110,10 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                         <ul className='scrollable-content'>
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
-                                                    <SelectablePipe pipeSegment={new PipeSegment(pipeId, 0)} pipeFilter='' />
+                                                    <SelectablePipe
+                                                        pipeSegment={new PipeSegment(pipeId, 0)}
+                                                        pipeFilter=''
+                                                    />
                                                 </li>
                                             ))}
                                         </ul>
@@ -140,7 +143,10 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                         <ul className='scrollable-content'>
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
-                                                    <SelectablePipe pipeSegment={new PipeSegment(pipeId, 0)} pipeFilter='' />
+                                                    <SelectablePipe
+                                                        pipeSegment={new PipeSegment(pipeId, 0)}
+                                                        pipeFilter=''
+                                                    />
                                                 </li>
                                             ))}
                                         </ul>
@@ -161,39 +167,46 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                         Detailed View
                     </Button>
                 )}
-
-                <Button
-                    small
-                    icon={IconNames.FILTER_LIST}
-                    onClick={() => updatePipesState(node.getInternalPipeIDsForNode(), true)}
-                >
-                    Select internal pipes
-                </Button>
-                <Button
-                    small
-                    icon={IconNames.FILTER_KEEP}
-                    onClick={() => updatePipesState(node.getPipeIdsForNode(), true)}
-                >
-                    Select all pipes
-                </Button>
-                <Button
-                    small
-                    icon={IconNames.FILTER_REMOVE}
-                    onClick={() => updatePipesState(node.getPipeIdsForNode(), false)}
-                >
-                    Deselect all pipes
-                </Button>
+                {/* TODO: abstract this into a global state */}
+                {/* TODO: controls shoudl disable if node has no pipes and hide if pipe data is not loaded */}
+                {node.pipes.length > 0 && (
+                    <>
+                        <Button
+                            small
+                            icon={IconNames.FILTER_LIST}
+                            onClick={() => updatePipesState(node.getInternalPipeIDsForNode(), true)}
+                        >
+                            Select internal pipes
+                        </Button>
+                        <Button
+                            small
+                            icon={IconNames.FILTER_KEEP}
+                            onClick={() => updatePipesState(node.getPipeIdsForNode(), true)}
+                        >
+                            Select all pipes
+                        </Button>
+                        <Button
+                            small
+                            icon={IconNames.FILTER_REMOVE}
+                            onClick={() => updatePipesState(node.getPipeIdsForNode(), false)}
+                        >
+                            Deselect all pipes
+                        </Button>
+                    </>
+                )}
             </div>
-
-            <div className='node-links-wrap'>
-                <h4>Links</h4>
-                {node.getLinksForNode().map((link: NOCLink) => (
-                    <LinkDetails key={link.name} link={link} showEmpty />
-                ))}
-            </div>
+            {/* TODO: abstract this into a global state */}
+            {node.pipes.length > 0 && (
+                <div className='node-links-wrap'>
+                    <h4>Links</h4>
+                    {node.getLinksForNode().map((link: NOCLink) => (
+                        <LinkDetails key={link.name} link={link} showEmpty />
+                    ))}
+                </div>
+            )}
         </Card>
     );
-}
+};
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
     const { chip } = useContext(DataSource);
@@ -219,6 +232,6 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
             </div>
         </>
     );
-}
+};
 
 export default ComputeNodesPropertiesTab;
