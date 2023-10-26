@@ -12,6 +12,7 @@ export default function PropertiesPanel() {
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
                 <Tab id='tab1' title='Compute Node' panel={<ComputeNodesPropertiesTab />} />
+                {/* TODO: abstract this into a global state */}
                 {chip?.pipes.size > 0 && (
                     //
                     <Tab id='tab2' title='All pipes' panel={<PipesPropertiesTab />} />

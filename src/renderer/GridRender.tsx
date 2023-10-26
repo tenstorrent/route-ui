@@ -98,6 +98,7 @@ export default function GridRender() {
                     labelRenderer={(value) => `${value.toFixed(1)}`}
                 />
                 <hr />
+                {/* TODO: abstract this into a global state */}
                 {chip?.pipes.size > 0 && (
                     <>
                         <Tooltip2 content='Show pipes' position={Position.RIGHT}>
@@ -133,6 +134,7 @@ export default function GridRender() {
                     />
                 </Tooltip2>
                 <hr />
+                {/* TODO: abstract this into a global state */}
                 {chip?.pipes.size > 0 && (
                     <>
                         {/* Link saturation */}
@@ -194,6 +196,7 @@ export default function GridRender() {
                         <hr />
                     </>
                 )}
+                {/* TODO: abstract this into a global state */}
                 {opCycles !== 0 && (
                     <>
                         <div>

@@ -167,6 +167,8 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                         Detailed View
                     </Button>
                 )}
+                {/* TODO: abstract this into a global state */}
+                {/* TODO: controls shoudl disable if node has no pipes and hide if pipe data is not loaded */}
                 {node.pipes.length > 0 && (
                     <>
                         <Button
@@ -193,6 +195,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     </>
                 )}
             </div>
+            {/* TODO: abstract this into a global state */}
             {node.pipes.length > 0 && (
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
