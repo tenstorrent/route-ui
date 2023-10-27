@@ -1,0 +1,47 @@
+@import "variables";
+
+.bottom-dock {
+    padding: 0 20px;
+    background-color: $tt-light-gray;
+    position: relative;
+
+    .dock-close-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    pre {
+        color: $tt-dark-gray;
+    }
+
+    .bp4-tab-panel {
+        margin-top: 0px;
+    }
+
+    .bp4-tab {
+        border: none;
+        color: $tt-dark-gray;
+        transition: background-color 250ms linear, color 250ms linear, border 250ms ease-out;
+
+        &:hover {
+            color: $tt-medium-gray;
+        }
+
+        &[aria-selected="true"] {
+            color: $tt-dark-blue;
+            background-color: transparent;
+        }
+    }
+
+
+    .bp4-tab-indicator {
+        bottom: 2px;
+        height: 1px;
+        background-color: $tt-dark-blue;
+    }
+
+    .operands-table {
+        height: 302px;
+    }
+}

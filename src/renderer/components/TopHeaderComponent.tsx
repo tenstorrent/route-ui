@@ -1,8 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import path from 'path';
-import { Switch } from '@blueprintjs/core';
-import { RootState, setHighContrastState } from '../../data/store';
+import { Button, Switch } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { getDockOpenState, RootState, setHighContrastState, setDockOpenState } from '../../data/store';
 import '../scss/TopHeaderComponent.scss';
 
 const TopHeaderComponent: React.FC = () => {
@@ -18,6 +19,8 @@ const TopHeaderComponent: React.FC = () => {
         return state.nodeSelection.architecture;
     });
 
+    const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
+
     return (
         <div className='top-header-component'>
             <Switch
@@ -29,6 +32,11 @@ const TopHeaderComponent: React.FC = () => {
                 {architecture ? ` Architecture: ${architecture}` : ''} |{' '}
                 {fileName ? `Loaded ${path.basename(fileName[0])}` : ''}
             </div>
+            <Button
+                icon={IconNames.APPLICATION}
+                text='Dock'
+                onClick={() => dispatch(setDockOpenState(!isDockOpen))}
+            />
         </div>
     );
 };

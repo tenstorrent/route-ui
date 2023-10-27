@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useMemo, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -43,7 +43,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
             setNodeList(allNodes || []);
             setDram(selectedNode?.dramChannel || null);
         }
-    }, [uid, chip, isOpen, showLinkSaturation]);
+    }, [uid, chip, showLinkSaturation]);
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -52,7 +52,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     };
 
     return (
-        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false}>
+        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false}>
             <Card
                 className='detailed-view-card'
                 style={{

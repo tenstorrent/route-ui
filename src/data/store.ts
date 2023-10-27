@@ -15,6 +15,26 @@ import {
 import { LinkType, NOC } from './Types';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, LINK_SATURATION_INITIAIL_PERCENT } from './constants';
 
+interface UIState {
+    dockOpen: boolean;
+}
+
+const uiStateInitialState: UIState = {
+    dockOpen: false,
+};
+
+const uiStateSlice = createSlice({
+    name: 'uiState',
+    initialState: uiStateInitialState,
+    reducers: {
+        setDockOpenState: (state, action: PayloadAction<boolean>) => {
+            state.dockOpen = action.payload;
+        },
+    },
+});
+export const { setDockOpenState } = uiStateSlice.actions;
+export const getDockOpenState = (state: RootState) => state.uiState.dockOpen;
+
 const highContrastInitialState: HighContrastState = {
     enabled: false,
 };
@@ -377,6 +397,7 @@ export const {
 
 const store = configureStore({
     reducer: {
+        uiState: uiStateSlice.reducer,
         pipeSelection: pipeSelectionSlice.reducer,
         nodeSelection: nodeSelectionSlice.reducer,
         linkSaturation: linkSaturationSlice.reducer,

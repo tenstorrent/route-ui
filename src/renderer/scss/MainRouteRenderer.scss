@@ -39,6 +39,65 @@
     }
 }
 
+$dock-height: 420px;
+
+.outer-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+
+
+    .dock {
+        margin: 0 20px;
+        width: calc(100% - 40px);
+        height: 0px;
+        overflow: hidden;
+    }
+
+    &.dock-open {
+        .dock {
+            height: $dock-height - 20px;
+            bottom: 0;
+        }
+
+        .main-wrapper {
+            height: calc(100vh - $dock-height);
+            overflow: hidden;
+        }
+
+        .grid-container {
+            height: calc(100vh - 10px - $dock-height);
+        }
+
+        .properties-panel-nodes {
+            max-height: calc(100vh - 100px - $dock-height);
+        }
+
+        .list-wrap {
+            max-height: calc(100vh - 150px - $dock-height);
+        }
+
+        .inner-sidebar {
+            max-height: calc(100vh - 20px - $dock-height);
+            overflow-y: scroll;
+
+        }
+    }
+
+    &.detailed-view-open {
+        .inner-sidebar {
+            max-height: calc(100vh - 640px);
+            overflow-y: scroll;
+        }
+
+        .grid-container {
+            height: calc(100vh - 640px);
+        }
+    }
+}
+
 .main-wrapper {
     margin-top: 20px;
     display: flex;
@@ -59,8 +118,15 @@
 }
 
 .inner-sidebar {
-    display: flex;
-    flex-direction: column;
+    max-height: calc(100vh - 100px);
+    overflow-y: scroll;
+
+    .inner-sidebar-wrap {
+        display: flex;
+        flex-direction: column;
+        padding: 0 8px;
+
+    }
 
     hr {
         border: none;
