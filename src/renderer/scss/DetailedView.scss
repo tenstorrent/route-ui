@@ -9,6 +9,9 @@
     box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);
     border: 1px solid $tt-medium-gray;
     border-radius: 0;
+    bottom: 10px;
+    left: 10px;
+    z-index: 100;
 
     .detailed-view-header {
         display: flex;
@@ -141,7 +144,8 @@
         display: flex;
         gap: 5px;
 
-        .bp4-button:not([class*=bp4-intent-]):disabled, .bp4-button:not([class*=bp4-intent-]).bp4-disabled {
+        .bp4-button:not([class*=bp4-intent-]):disabled,
+        .bp4-button:not([class*=bp4-intent-]).bp4-disabled {
             color: $tt-very-dark-gray;
         }
     }
