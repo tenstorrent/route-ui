@@ -120,6 +120,7 @@ $dock-height: 420px;
 .inner-sidebar {
     max-height: calc(100vh - 100px);
     overflow-y: scroll;
+    min-width: 200px;
 
     .inner-sidebar-wrap {
         display: flex;
