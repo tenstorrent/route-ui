@@ -29,16 +29,16 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     const dispatch = useDispatch();
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
 
-    const selectedNode = uid ? chip?.getNode(uid) : null;
-    const node = useMemo(() => selectedNode || null, [selectedNode]);
+    const node = uid ? chip?.getNode(uid) : null;
+
     const nodeList = useMemo(() => {
-        if (chip && selectedNode && selectedNode.dramChannelId > -1) {
-            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === selectedNode?.dramChannelId)];
+        if (chip && node && node.dramChannelId > -1) {
+            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === node?.dramChannelId)];
         }
         return [];
-    }, [selectedNode]);
+    }, [node, chip]);
 
-    const dram = useMemo(() => selectedNode?.dramChannel || null, [selectedNode]);
+    const dram = node?.dramChannel || null;
 
 
     const changePipeState = (pipeList: string[], state: boolean) => {

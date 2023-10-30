@@ -32,11 +32,13 @@ const TopHeaderComponent: React.FC = () => {
                 {architecture ? ` Architecture: ${architecture}` : ''} |{' '}
                 {fileName ? `Loaded ${path.basename(fileName[0])}` : ''}
             </div>
-            <Button
-                icon={IconNames.APPLICATION}
-                text='Dock'
-                onClick={() => dispatch(setDockOpenState(!isDockOpen))}
-            />
+            {process.env.NODE_ENV === 'development' && (
+                <Button
+                    icon={IconNames.APPLICATION}
+                    text='Dock'
+                    onClick={() => dispatch(setDockOpenState(!isDockOpen))}
+                />
+            )}
         </div>
     );
 };
