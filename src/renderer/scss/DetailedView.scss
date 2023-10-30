@@ -35,6 +35,10 @@
     .node-links-wrap {
         min-width: 250px;
         padding: 5px;
+
+        &:empty {
+            display: none;
+        }
     }
 
     span.label {
