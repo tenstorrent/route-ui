@@ -269,6 +269,8 @@ export default class Chip {
                     );
                     operation = new BuildableOperation(operationName, [], [], []);
                     chip.addOperation(operation);
+                    // TODO: next iterration only add exisitng operations.
+                    // return null;
                 }
 
                 const inputs = opJson.inputs.map(

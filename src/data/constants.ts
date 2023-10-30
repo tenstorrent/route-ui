@@ -1,4 +1,4 @@
-import { DramBankLinkName, DramNOCLinkName, NOCLinkName } from './Types';
+import { DramBankLinkName, DramNOCLinkName, EthernetLinkName, NOCLinkName } from './Types';
 
 export const LINK_SATURATION_INITIAIL_PERCENT = 75;
 
@@ -20,5 +20,7 @@ export const INTERNAL_LINK_NAMES = [
     DramBankLinkName.DRAM_INOUT,
     DramBankLinkName.DRAM0_INOUT,
     DramBankLinkName.DRAM1_INOUT,
+    EthernetLinkName.ETH_IN,
+    EthernetLinkName.ETH_OUT,
 ];
 export const NOC_LINK_NAMES = [NOCLinkName.NOC0_IN, NOCLinkName.NOC0_OUT, NOCLinkName.NOC1_IN, NOCLinkName.NOC1_OUT];
