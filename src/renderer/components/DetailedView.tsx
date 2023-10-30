@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -10,11 +10,11 @@ import {
     updatePipeSelection,
 } from '../../data/store';
 import DataSource, { GridContext } from '../../data/DataSource';
-import { ComputeNode, DramChannel, NOCLink } from '../../data/Chip';
+import { NOCLink } from '../../data/Chip';
 import '../scss/DetailedView.scss';
 import DetailedViewPipeRenderer from './detailed-view-components/DetailedViewPipeRenderer';
 import LinkDetails from './LinkDetails';
-import { Architecture, ComputeNodeType, NOCLinkName, NOC, DramBankLinkName } from '../../data/Types';
+import { Architecture, ComputeNodeType, DramBankLinkName, NOC, NOCLinkName } from '../../data/Types';
 import { filterIterable } from '../../utils/IterableHelpers';
 
 interface DetailedViewProps {
@@ -28,22 +28,18 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);
     const dispatch = useDispatch();
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
-    const [node, setNode] = React.useState<ComputeNode | null>(null);
-    const [nodeList, setNodeList] = React.useState<ComputeNode[]>([]);
-    const [dram, setDram] = React.useState<DramChannel | null>(null);
-    useEffect(() => {
-        if (chip && uid !== null) {
-            const selectedNode = chip.getNode(uid);
-            let allNodes: ComputeNode[] | undefined;
-            if (selectedNode && selectedNode.dramChannelId > -1) {
-                allNodes = [...filterIterable(chip.nodes, (n) => n.dramChannelId === selectedNode?.dramChannelId)];
-            }
 
-            setNode(selectedNode || null);
-            setNodeList(allNodes || []);
-            setDram(selectedNode?.dramChannel || null);
+    const node = uid ? chip?.getNode(uid) : null;
+
+    const nodeList = useMemo(() => {
+        if (chip && node && node.dramChannelId > -1) {
+            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === node?.dramChannelId)];
         }
-    }, [uid, chip, isOpen, showLinkSaturation]);
+        return [];
+    }, [node, chip]);
+
+    const dram = node?.dramChannel || null;
+
 
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -52,15 +48,10 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
     };
 
     return (
-        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false}>
+        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false}>
             <Card
                 className='detailed-view-card'
-                style={{
-                    bottom: '10px',
-                    left: '10px',
-                    zIndex: 100,
-                    zoom,
-                }}
+                style={{ zoom }}
             >
                 <div className='detailed-view-header'>
                     {node && (
