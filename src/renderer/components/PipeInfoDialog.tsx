@@ -44,7 +44,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
 
         // becuase this is a useful fragment
         // eslint-disable-next-line react/jsx-no-useless-fragment
-        return <>{out}</>;
+        return out;
     };
 
     useEffect(() => {
@@ -52,9 +52,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
     }, [chip]);
 
     if (hide) {
-        // becuase this is a useful fragment too
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        return <>{contents}</>;
+        return contents as JSX.Element
     }
 
     return (
