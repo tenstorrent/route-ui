@@ -1,13 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DataSource from '../../../data/DataSource';
-import {
-    openDetailedView,
-    RootState,
-    selectGroup,
-    updateNodeSelection,
-    updatePipeSelection,
-} from '../../../data/store';
+import { openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection, } from '../../../data/store';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
 import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
@@ -157,7 +151,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 </div>
             )}
             <div className='node-controls'>
-                {node.type === ComputeNodeType.DRAM && (
+                {(node.type === ComputeNodeType.DRAM || node.type === ComputeNodeType.ETHERNET) && (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}

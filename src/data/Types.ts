@@ -54,6 +54,7 @@ export enum LinkType {
     NONE = '',
     NOC = 'noc',
     DRAM = 'dram',
+    ETHERNET = 'eth',
 }
 
 export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName | EthernetLinkName;

@@ -36,15 +36,15 @@ interface NodeGridElementProps {
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({
-    //
-    node,
-    showEmptyLinks,
-    showOperationColors,
-    showNodeLocation,
-    showLinkSaturation,
-    linkSaturationTreshold,
-    //
-}) => {
+                                                             //
+                                                             node,
+                                                             showEmptyLinks,
+                                                             showOperationColors,
+                                                             showNodeLocation,
+                                                             showLinkSaturation,
+                                                             linkSaturationTreshold,
+                                                             //
+                                                         }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
     // const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
@@ -142,11 +142,11 @@ interface OffChipNodeLinkCongestionLayerProps {
  * @constructor
  */
 const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerProps> = ({
-    //
-    node,
-    showLinkSaturation,
-    linkSaturationTreshold,
-}) => {
+                                                                                           //
+                                                                                           node,
+                                                                                           showLinkSaturation,
+                                                                                           linkSaturationTreshold,
+                                                                                       }) => {
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
     if (!showLinkSaturation) {
@@ -163,7 +163,10 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
                 }) || [];
             break;
         case ComputeNodeType.ETHERNET:
-            // TODO: but we will be rendering congestion for these in the future
+            offChipLinkIds =
+                [...(node.externalLinks).values()].map((link) => {
+                    return link.uid;
+                }) || [];
             break;
 
         case ComputeNodeType.PCIE:
@@ -172,6 +175,7 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
         default:
             return null;
     }
+
 
     const saturationValues = offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
     const saturation = Math.max(...saturationValues) || 0;
@@ -191,10 +195,10 @@ interface OperationGroupRenderProps {
 
 /** Adds a highlight layer to a Core node element when the core's operation ("operation group") is selected. */
 const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
-    //
-    node,
-    //
-}) => {
+                                                                       //
+                                                                       node,
+                                                                       //
+                                                                   }) => {
     const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
     let operationStyles = {};
     if (node.opName !== '' && selectedGroup.selected) {
@@ -213,10 +217,10 @@ interface OperandHighlightProps {
 
 /** no idea what this does and if it does anything. verify and delete  */
 const OperandHighlight: React.FC<OperandHighlightProps> = ({
-    //
-    node,
-    //
-}) => {
+                                                               //
+                                                               node,
+                                                               //
+                                                           }) => {
     const operandsIn: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
     );
@@ -247,10 +251,10 @@ interface NodeFocusPipeRendererProps {
 }
 
 const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
-    //
-    node,
-    //
-}) => {
+                                                                         //
+                                                                         node,
+                                                                         //
+                                                                     }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
@@ -283,13 +287,13 @@ interface NodePipeRendererProps {
 }
 
 const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
-    //
-    node,
-    showEmptyLinks,
-    showLinkSaturation,
-    linkSaturationTreshold,
-    //
-}) => {
+                                                               //
+                                                               node,
+                                                               showEmptyLinks,
+                                                               showLinkSaturation,
+                                                               linkSaturationTreshold,
+                                                               //
+                                                           }) => {
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
