@@ -21,21 +21,21 @@ function QueuesPropertiesTab() {
 }
 
 export default function PropertiesPanel() {
-    const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
+    const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');
     const { chip } = useContext<GridContext>(DataSource);
     return (
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
-                <Tab id='tab1' title='Compute Node' panel={<ComputeNodesPropertiesTab />} />
+                <Tab id='tab-nodes' title='Compute Node' panel={<ComputeNodesPropertiesTab />} />
                 {/* TODO: abstract this into a global state */}
                 {chip && chip.pipes.size > 0 && (
                     //
-                    <Tab id='tab2' title='All pipes' panel={<PipesPropertiesTab />} />
+                    <Tab id='tab-pipes' title='All pipes' panel={<PipesPropertiesTab />} />
                 )}
-                <Tab id='tab3' title='Operations' panel={<OperationsPropertiesTab />} />
+                <Tab id='tab-ops' title='Operations' panel={<OperationsPropertiesTab />} />
 
                 {process.env.NODE_ENV === 'development' && (
-                    <Tab id='tab4' title='Queues' panel={<QueuesPropertiesTab />} />
+                    <Tab id='tab-queues' title='Queues' panel={<QueuesPropertiesTab />} />
                 )}
             </Tabs>
         </div>
