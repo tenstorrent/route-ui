@@ -1,4 +1,5 @@
-import type { OperationName, QueueName, OpGraphNodeType } from '../GraphTypes';
+import type { OperationName, QueueName } from '../GraphTypes';
+import { OpGraphNodeType } from '../GraphTypes';
 
 export type CoreID = string;
 
