@@ -4,7 +4,7 @@ import ComputeNodesPropertiesTab from './components/properties-panel/ComputeNode
 import OperationsPropertiesTab from './components/properties-panel/OperationsPropertiesTab';
 import PipesPropertiesTab from './components/properties-panel/PipesPropertiesTab';
 import DataSource, { GridContext } from '../data/DataSource';
-import QueuesPropertiesTab from './components/QueuesPropertiesTab';
+import QueuesPropertiesTab from './components/properties-panel/QueuesPropertiesTab';
 
 export default function PropertiesPanel() {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');

@@ -2,12 +2,12 @@ import React, { useReducer } from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { Button, Icon } from '@blueprintjs/core';
 
-interface ExpandableGroupProps {
-    items: Array<[key: string, item: React.ReactElement<ExpandableGroupProps>, expandedContent: React.ReactNode]>;
-    // eslint-disable-next-line react/require-default-props
-    itemClassName?: string;
-}
-
+/**
+ * Renders a target element within a clickable button, which toggles the visibility of the expanded content.
+ *
+ * `targetClassName` will be added to the `div` element that contains the button and expanded content.
+ *
+ */
 function ExpandableComponent(props: {
     expandedContent: React.ReactNode;
     targetClassName: string;
@@ -30,10 +30,19 @@ function ExpandableComponent(props: {
     );
 }
 
-const ExpandableGroup: React.FC<ExpandableGroupProps> = ({
-    items,
-    itemClassName,
-}: ExpandableGroupProps): React.ReactElement => {
+interface ExpandableItem {
+    key: string;
+    target: React.ReactElement<ExpandableGroupProps>;
+    expandedContent: React.ReactNode;
+    className?: string;
+}
+
+interface ExpandableGroupProps {
+    items: ExpandableItem[];
+}
+
+/** Renders a list of target items, which can each be expanded to display additional content. */
+const ExpandableGroup: React.FC<ExpandableGroupProps> = ({ items }: ExpandableGroupProps): React.ReactElement => {
     interface ExpansionState {
         expanded: Set<string>;
     }
@@ -57,7 +66,7 @@ const ExpandableGroup: React.FC<ExpandableGroupProps> = ({
     };
 
     const expandAll = () => {
-        items.forEach(([key]) => {
+        items.forEach(({ key }) => {
             expansionDispatch([key, true]);
         });
     };
@@ -73,14 +82,14 @@ const ExpandableGroup: React.FC<ExpandableGroupProps> = ({
                 </Tooltip2>
             </div>
             <div>
-                {items.map(([key, item, content]) => (
+                {items.map(({ key, target, expandedContent, className }) => (
                     <ExpandableComponent
-                        target={item}
-                        targetClassName={itemClassName || ''}
-                        expandedContent={content}
+                        key={key}
+                        target={target}
+                        targetClassName={className || ''}
+                        expandedContent={expandedContent}
                         isExpanded={expansion.expanded.has(key)}
                         onExpandedChange={(isExpanded) => expansionDispatch([key, isExpanded])}
-                        key={key}
                     />
                 ))}
             </div>

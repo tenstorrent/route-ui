@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 import React, { useContext, useState } from 'react';
-import { Button, Icon, InputGroup, PopoverPosition } from '@blueprintjs/core';
+import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
