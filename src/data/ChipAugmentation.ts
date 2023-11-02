@@ -2,8 +2,7 @@ import { ComputeNodeType, Loc } from './Types';
 import type { OperandName, Operation, OperationName, OpGraphNode, OpGraphNodeId, Queue } from './GraphTypes';
 import { OpGraphNodeType } from './GraphTypes';
 import type { ComputeNode } from './Chip';
-import type Chip from "./Chip";
-
+import type Chip from './Chip';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of OpGraphNodeType. */

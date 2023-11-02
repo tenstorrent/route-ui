@@ -40,7 +40,6 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
 
     const dram = node?.dramChannel || null;
 
-
     const changePipeState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
             dispatch(updatePipeSelection({ id: pipeId, selected: state }));
@@ -49,10 +48,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ showLinkSaturation, linkSat
 
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false}>
-            <Card
-                className='detailed-view-card'
-                style={{ zoom }}
-            >
+            <Card className='detailed-view-card' style={{ zoom }}>
                 <div className='detailed-view-header'>
                     {node && (
                         <h3>

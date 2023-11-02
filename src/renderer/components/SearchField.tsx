@@ -25,7 +25,7 @@ function SearchField({ searchQuery, onQueryChanged, controls }: SearchFieldProps
                             icon={IconNames.CROSS}
                         />
                     ) : (
-                        <Icon icon={IconNames.SEARCH}/>
+                        <Icon icon={IconNames.SEARCH} />
                     )
                 }
                 placeholder=''

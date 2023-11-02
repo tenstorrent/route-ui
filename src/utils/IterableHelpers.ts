@@ -1,9 +1,8 @@
-export const isIterable = (value: unknown): value is Iterable<unknown> => (
+export const isIterable = (value: unknown): value is Iterable<unknown> =>
     value !== null &&
     typeof value === 'object' &&
     Symbol.iterator in value &&
-    typeof value[Symbol.iterator] === 'function'
-);
+    typeof value[Symbol.iterator] === 'function';
 
 export function* mapIterable<T, U>(iterable: Iterable<T>, f: (val: T) => U): Iterable<U> {
     // eslint-disable-next-line no-restricted-syntax

@@ -15,7 +15,8 @@ import {
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    DramNOCLinkName, EthernetLinkName,
+    DramNOCLinkName,
+    EthernetLinkName,
     LinkType,
     Loc,
     NetworkLinkName,
@@ -360,7 +361,9 @@ export default class Chip {
                                     }
                                 }
                             } else {
-                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`);
+                                console.warn(
+                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`,
+                                );
                             }
                         });
                     });
@@ -382,7 +385,9 @@ export default class Chip {
                                     }
                                 }
                             } else {
-                                console.warn(`Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`);
+                                console.warn(
+                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`,
+                                );
                             }
                         });
                     });
@@ -724,7 +729,6 @@ export class ComputeNode {
             }
             // TODO: PCIE links will go here
         });
-
 
         // Associate with operation
         const opName: OperationName = nodeJSON.op_name;
