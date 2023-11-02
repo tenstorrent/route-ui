@@ -1,7 +1,7 @@
 import React from 'react';
-import { OpGraphNode } from '../../data/GraphTypes';
+import { GraphVertex } from '../../data/GraphTypes';
 
-const GraphNodeDetails = (props: { graphNode: OpGraphNode }): React.ReactElement => {
+const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactElement => {
     const { graphNode } = props;
     const inputs = [...graphNode.inputs];
     const outputs = [...graphNode.outputs];
@@ -24,4 +24,4 @@ const GraphNodeDetails = (props: { graphNode: OpGraphNode }): React.ReactElement
     );
 };
 
-export default GraphNodeDetails;
+export default GraphVertexDetails;

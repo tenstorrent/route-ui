@@ -1,18 +1,18 @@
 import type { OperationName, QueueName } from '../GraphTypes';
-import { OpGraphNodeType } from '../GraphTypes';
+import { GraphVertexType } from '../GraphTypes';
 
 export type CoreID = string;
 
 interface OperationOperandJSON {
     index: number;
     name: OperationName;
-    type: OpGraphNodeType.OPERATION;
+    type: GraphVertexType.OPERATION;
 }
 
 interface QueueOperandJSON {
     index: number;
     name: QueueName;
-    type: OpGraphNodeType.QUEUE;
+    type: GraphVertexType.QUEUE;
 }
 
 export type OperandJSON = OperationOperandJSON | QueueOperandJSON;

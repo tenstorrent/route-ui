@@ -2,7 +2,7 @@ import React, { useContext, useMemo, useState } from 'react';
 import DataSource from '../../../data/DataSource';
 import SearchField from '../SearchField';
 import FilterableComponent from '../FilterableComponent';
-import GraphNodeDetails from '../GraphNodeDetails';
+import GraphVertexDetails from '../GraphVertexDetails';
 import HighlightedText from '../HighlightedText';
 import ExpandableGroup from '../ExpandableGroup';
 
@@ -29,7 +29,7 @@ function QueuesPropertiesTab() {
                                     component={<HighlightedText text={queue.name} filter={filterQuery} />}
                                 />
                             ),
-                            expandedContent: queue && <GraphNodeDetails graphNode={queue} />,
+                            expandedContent: queue && <GraphVertexDetails graphNode={queue} />,
                             className: '',
                         }))}
                     />

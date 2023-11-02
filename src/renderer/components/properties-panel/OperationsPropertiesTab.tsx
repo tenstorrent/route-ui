@@ -9,7 +9,7 @@ import DataSource from '../../../data/DataSource';
 import FilterableComponent from '../FilterableComponent';
 import SelectableOperation from '../SelectableOperation';
 import SearchField from '../SearchField';
-import GraphNodeDetails from '../GraphNodeDetails';
+import GraphVertexDetails from '../GraphVertexDetails';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -73,7 +73,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                             selectFunc={setOperationSelectionState}
                                             stringFilter={filterQuery}
                                         />
-                                        {operation && <GraphNodeDetails graphNode={operation} />}
+                                        {operation && <GraphVertexDetails graphNode={operation} />}
                                     </>
                                 }
                             />
