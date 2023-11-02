@@ -5,12 +5,13 @@ import { IconNames } from '@blueprintjs/icons';
 interface SearchFieldProps {
     searchQuery: string;
     onQueryChanged: (query: string) => void;
+    controls: React.ReactElement[];
 }
 
 /**
  * Renders a search field. Controlled component.
  */
-function SearchField({ searchQuery, onQueryChanged }: SearchFieldProps): React.ReactElement {
+function SearchField({ searchQuery, onQueryChanged, controls }: SearchFieldProps): React.ReactElement {
     return (
         <div className='search-field'>
             <InputGroup
@@ -31,6 +32,7 @@ function SearchField({ searchQuery, onQueryChanged }: SearchFieldProps): React.R
                 value={searchQuery}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => onQueryChanged(e.target.value)}
             />
+            {controls}
         </div>
     );
 }

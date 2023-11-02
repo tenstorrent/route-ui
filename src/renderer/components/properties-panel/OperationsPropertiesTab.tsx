@@ -8,8 +8,8 @@ import { clearAllOperations, RootState, selectGroup } from '../../../data/store'
 import DataSource from '../../../data/DataSource';
 import FilterableComponent from '../FilterableComponent';
 import SelectableOperation from '../SelectableOperation';
-import SearchField from "../SearchField";
-import GraphNodeDetails from "../GraphNodeDetails";
+import SearchField from '../SearchField';
+import GraphNodeDetails from '../GraphNodeDetails';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -44,13 +44,18 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     return (
         <div>
             <div>
-                <SearchField searchQuery={filterQuery} onQueryChanged={setFilterQuery} />
-                <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
-                </Tooltip2>
-                <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
-                </Tooltip2>
+                <SearchField
+                    searchQuery={filterQuery}
+                    onQueryChanged={setFilterQuery}
+                    controls={[
+                        <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT}>
+                            <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
+                        </Tooltip2>,
+                        <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT}>
+                            <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                        </Tooltip2>,
+                    ]}
+                />
             </div>
             <div className='operations-wrap list-wrap'>
                 <div className='scrollable-content'>

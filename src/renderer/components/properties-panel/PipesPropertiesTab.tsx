@@ -9,6 +9,7 @@ import { PipeSegment } from '../../../data/Chip';
 import { clearAllPipes, updatePipeSelection } from '../../../data/store';
 import FilterableComponent from '../FilterableComponent';
 import SelectablePipe from '../SelectablePipe';
+import SearchField from '../SearchField';
 
 const PipesPropertiesTab = () => {
     const dispatch = useDispatch();
@@ -31,32 +32,18 @@ const PipesPropertiesTab = () => {
 
     return (
         <div className='pipe-renderer-panel'>
-            <div className='search-field'>
-                <InputGroup
-                    rightElement={
-                        pipeFilter ? (
-                            <Button
-                                minimal
-                                onClick={() => {
-                                    setPipeFilter('');
-                                }}
-                                icon={IconNames.CROSS}
-                            />
-                        ) : (
-                            <Icon icon={IconNames.SEARCH}/>
-                        )
-                    }
-                    placeholder=''
-                    value={pipeFilter}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}
-                />
-                <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()}/>
-                </Tooltip2>
-                <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}/>
-                </Tooltip2>
-            </div>
+            <SearchField
+                searchQuery={pipeFilter}
+                onQueryChanged={setPipeFilter}
+                controls={[
+                    <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT}>
+                        <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
+                    </Tooltip2>,
+                    <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT}>
+                        <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
+                    </Tooltip2>,
+                ]}
+            />
             <div className='properties-panel__content'>
                 <div className='pipelist-wrap list-wrap'>
                     {chip && (
@@ -68,7 +55,7 @@ const PipesPropertiesTab = () => {
                                     filterQuery={pipeFilter}
                                     component={
                                         <li>
-                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter}/>
+                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter} />
                                         </li>
                                     }
                                 />
