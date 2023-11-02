@@ -21,7 +21,7 @@ interface HasOperands {
 
 export interface Queue extends HasOperands {
     readonly name: QueueName;
-    readonly nodeType: GraphVertexType.QUEUE;
+    readonly vertexType: GraphVertexType.QUEUE;
 }
 
 export interface Operation extends HasOperands {

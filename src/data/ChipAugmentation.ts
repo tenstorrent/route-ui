@@ -8,7 +8,7 @@ import type { ComputeNode } from './Chip';
 export abstract class AbstractGraphVertex {
     readonly name: GraphVertexId;
 
-    abstract readonly nodeType: GraphVertexType;
+    abstract readonly vertexType: GraphVertexType;
 
     protected inputOperands: Operand[];
 
@@ -32,7 +32,7 @@ export abstract class AbstractGraphVertex {
 }
 
 export class BuildableQueue extends AbstractGraphVertex implements Queue {
-    readonly nodeType = GraphVertexType.QUEUE;
+    readonly vertexType = GraphVertexType.QUEUE;
 }
 
 /**
@@ -40,7 +40,7 @@ export class BuildableQueue extends AbstractGraphVertex implements Queue {
  * additions to the data structure contents.
  */
 export class BuildableOperation extends AbstractGraphVertex implements Operation {
-    readonly nodeType = GraphVertexType.OPERATION;
+    readonly vertexType = GraphVertexType.OPERATION;
 
     protected _cores: ComputeNode[];
 
