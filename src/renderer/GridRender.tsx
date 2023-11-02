@@ -11,7 +11,7 @@ import {
     RootState,
     selectAllPipes,
     updateCLK,
-    updateDRAMBandwidth,
+    updateDRAMBandwidth, updateFocusPipe,
     updateLinkSaturation,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
@@ -245,7 +245,13 @@ export default function GridRender() {
             </div>
 
             {chip && (
-                <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}>
+                <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}
+                     // this is to address the issue with focus pipe getting stuck becuase of
+                    // TODO: find a better solution
+                     onMouseEnter={() => {
+                         dispatch(updateFocusPipe(null));
+                     }}
+                >
                     <div
                         className='node-container'
                         style={{

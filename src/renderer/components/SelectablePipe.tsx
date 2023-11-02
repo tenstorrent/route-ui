@@ -29,11 +29,11 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                 hide={focusPipe !== pipeSegment.id}
                 contents={
                     <span className='label'
-                          onMouseLeave={() => {
-                              dispatch(updateFocusPipe(null));
-                          }}
-                          onMouseEnter={() => {
+                          onMouseOver={() => {
                               dispatch(updateFocusPipe(pipeSegment.id));
+                          }}
+                          onMouseOut={() => {
+                              dispatch(updateFocusPipe(null));
                           }}
                     >
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-constructor */
 import {
     ChipDesignJSON,
     DramChannelJSON,
@@ -14,7 +15,7 @@ import {
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    DramNOCLinkName,
+    DramNOCLinkName, EthernetLinkName,
     LinkType,
     Loc,
     NetworkLinkName,
@@ -34,7 +35,7 @@ export default class Chip {
         if (!Chip.NOC_ORDER) {
             Chip.NOC_ORDER = new Map(
                 Object.keys(NOCLinkName)
-                    .map((key) => NOCLinkName[key])
+                    .map((key) => NOCLinkName[key as keyof typeof NOCLinkName])
                     .map((noc, index) => [noc, index]),
             );
         }
@@ -262,13 +263,17 @@ export default class Chip {
             };
 
             Object.entries(operationsJson).map(([operationName, opJson]) => {
-                let operation = augmentedChip.operationsByName.get(operationName);
+                const operation = augmentedChip.operationsByName.get(operationName);
                 if (!operation) {
                     console.error(
-                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
+                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.\nThis is not an error`,
                     );
-                    operation = new BuildableOperation(operationName, [], [], []);
-                    chip.addOperation(operation);
+                    /** temporarily disabling this until new op-to-pipe with chip_id and graph_id is present */
+                    // operation = new BuildableOperation(operationName, [], [], []);
+                    // chip.addOperation(operation);
+                    // TODO: we should add ALL operations but only add the operations that run on this chip to the chip. likely requires a separate structure (graph?)
+                    //
+                    return null;
                 }
 
                 const inputs = opJson.inputs.map(
@@ -404,6 +409,9 @@ export default class Chip {
             node.links.forEach((link) => {
                 links.push(link);
             });
+            node.externalLinks.forEach((link) => {
+                links.push(link);
+            });
         });
         this.dramChannels.forEach((dramChannel) => {
             dramChannel.links.forEach((link) => {
@@ -520,6 +528,9 @@ export abstract class NetworkLink {
         if (Object.values(DramBankLinkName).includes(name as DramBankLinkName)) {
             return new DramBankLink(name as DramBankLinkName, uid, json);
         }
+        if (Object.values(EthernetLinkName).includes(name as EthernetLinkName)) {
+            return new EthernetLink(name as EthernetLinkName, uid, json);
+        }
 
         throw new Error('Invalid network link name');
     }
@@ -565,8 +576,15 @@ export class NOCLink extends NetworkLink {
 }
 
 export class DramNOCLink extends NOCLink {
-    // eslint-disable-next-line no-useless-constructor
     constructor(name: DramNOCLinkName, uid: string, json: NOCLinkJSON) {
+        super(name, uid, json);
+    }
+}
+
+export class EthernetLink extends NetworkLink {
+    public readonly type: LinkType = LinkType.ETHERNET;
+
+    constructor(name: EthernetLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
 }
@@ -621,12 +639,17 @@ export class ComputeNode {
 
         const linkId = `${node.loc.x}-${node.loc.y}`;
 
-        node.links = new Map(
-            Object.entries(nodeJSON.links).map(([link, linkJson], index) => [
-                link,
-                new NOCLink(link as NOCLinkName, `${linkId}-${index}`, linkJson),
-            ]),
-        );
+        Object.entries(nodeJSON.links).forEach(([linkName, linkJson], index) => {
+            const link: NetworkLink = NetworkLink.CREATE(linkName as NOCLinkName, `${linkId}-${index}`, linkJson);
+            if (link.type === LinkType.NOC) {
+                node.links.set(linkName, link as NOCLink);
+            }
+            if (link.type === LinkType.ETHERNET) {
+                node.externalLinks.set(linkName, link as EthernetLink);
+            }
+            // TODO: PCIE links will go here
+        });
+
 
         // Associate with operation
         const opName: OperationName = nodeJSON.op_name;
@@ -661,6 +684,9 @@ export class ComputeNode {
     public opCycles: number = 0;
 
     public links: Map<any, NOCLink> = new Map();
+
+    /** @description Off chip links that are not part of the NOC, excluding DRAM links */
+    public externalLinks: Map<any, NetworkLink> = new Map();
 
     public dramChannel: DramChannel | null = null;
 

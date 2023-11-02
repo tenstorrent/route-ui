@@ -45,13 +45,19 @@ export enum DramBankLinkName {
     DRAM1_INOUT = 'dram1_inout',
 }
 
+export enum EthernetLinkName {
+    ETH_IN = 'from_ethernet',
+    ETH_OUT = 'to_ethernet',
+}
+
 export enum LinkType {
     NONE = '',
     NOC = 'noc',
     DRAM = 'dram',
+    ETHERNET = 'eth',
 }
 
-export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName;
+export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName | EthernetLinkName;
 
 
 export enum ComputeNodeType {

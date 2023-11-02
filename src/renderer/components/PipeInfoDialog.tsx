@@ -20,10 +20,10 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
     const { chip } = useContext(DataSource);
     const setupData = () => {
         const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
-        const out: JSX.Element[] = [];
+        const output: JSX.Element[] = [];
         if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
             if (pipe.producerCores.length > 0) {
-                out.push(
+                output.push(
                     <div className="producer-consumer">
                         <h3>Producer:</h3>
                         <h2>{[...new Set(pipe.producerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
@@ -31,7 +31,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
                 );
             }
             if (pipe.consumerCores.length > 0) {
-                out.push(
+                output.push(
                     <div className="producer-consumer">
                         <h3>Consumer:</h3>
                         <h2>{[...new Set(pipe.consumerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
@@ -42,9 +42,8 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
             return undefined;
         }
 
-        // becuase this is a useful fragment
         // eslint-disable-next-line react/jsx-no-useless-fragment
-        return <>{out}</>;
+        return <>{output}</>;
     };
 
     useEffect(() => {
@@ -52,9 +51,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
     }, [chip]);
 
     if (hide) {
-        // becuase this is a useful fragment too
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        return <>{contents}</>;
+        return contents as JSX.Element
     }
 
     return (
