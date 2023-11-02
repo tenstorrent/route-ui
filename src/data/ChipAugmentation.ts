@@ -1,15 +1,14 @@
-import { ComputeNodeType, Loc } from './Types';
-import type { OperandName, Operation, OperationName, OpGraphNode, OpGraphNodeId, Queue } from './GraphTypes';
-import { OpGraphNodeType } from './GraphTypes';
+import { ComputeNodeType } from './Types';
+import type { OperandName, Operation, OperationName, GraphVertex, GraphVertexId, Queue } from './GraphTypes';
+import { GraphVertexType } from './GraphTypes';
 import type { ComputeNode } from './Chip';
-import type Chip from './Chip';
 
 /** Provides common functionality for Graph Nodes.
- * Intended to be extended once for each value of OpGraphNodeType. */
-export abstract class AbstractOpGraphNode {
-    readonly name: OpGraphNodeId;
+ * Intended to be extended once for each value of `GraphVertexType`. */
+export abstract class AbstractGraphVertex {
+    readonly name: GraphVertexId;
 
-    abstract readonly nodeType: OpGraphNodeType;
+    abstract readonly nodeType: GraphVertexType;
 
     protected inputOperands: Operand[];
 
@@ -32,16 +31,16 @@ export abstract class AbstractOpGraphNode {
     }
 }
 
-export class BuildableQueue extends AbstractOpGraphNode implements Queue {
-    readonly nodeType = OpGraphNodeType.QUEUE;
+export class BuildableQueue extends AbstractGraphVertex implements Queue {
+    readonly nodeType = GraphVertexType.QUEUE;
 }
 
 /**
- * A concrete implementation of the Operation interface which has methods to support incremental
- * additions to the data structure.
+ * An implementation of the `Operation` interface which has methods to support incremental
+ * additions to the data structure contents.
  */
-export class BuildableOperation extends AbstractOpGraphNode implements Operation {
-    readonly nodeType = OpGraphNodeType.OPERATION;
+export class BuildableOperation extends AbstractGraphVertex implements Operation {
+    readonly nodeType = GraphVertexType.OPERATION;
 
     protected _cores: ComputeNode[];
 
@@ -51,6 +50,11 @@ export class BuildableOperation extends AbstractOpGraphNode implements Operation
         cores.forEach((core) => this.assignCore(core));
     }
 
+    /** Creates a mutual association between this Operation and the provided core, such that `core.operation` will
+     * reference this operation.
+     *
+     *  Throws an exception if the provided core already has another Operation assigned.
+     */
     assignCore(core: ComputeNode) {
         if (core.type !== ComputeNodeType.CORE) {
             throw new Error(`Can't assign the non-core ${core.uid} to an operation (${this.name})`);
@@ -59,6 +63,10 @@ export class BuildableOperation extends AbstractOpGraphNode implements Operation
             core.operation = this;
         } else if (core.operation !== this) {
             throw new Error("Core already has an operation assignment. Can't reassign core to this operation.");
+        }
+        if (this._cores.includes(core)) {
+            console.warn(`Assigning core ${core.uid} to operation ${this.name}; core is already assigned to this operation.`)
+            return;
         }
         this._cores.push(core);
     }
@@ -84,25 +92,25 @@ export class Operand {
     readonly name: OperandName;
 
     /** Type of the operand (e.g., QUEUE or OP). */
-    readonly type: OpGraphNodeType;
+    readonly type: GraphVertexType;
 
     public pipeIdsByCore: Map<string, string[]>;
 
     /** Bandwidth associated with the operand. */
     public bandwidth: number = 0;
 
-    readonly from?: OpGraphNode;
+    readonly from?: GraphVertex;
 
-    readonly to?: OpGraphNode;
+    readonly to?: GraphVertex;
 
     readonly perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
 
     constructor(
         name: string,
-        type: OpGraphNodeType,
+        type: GraphVertexType,
         pipesByCore?: Map<string, string[]>,
-        from?: OpGraphNode,
-        to?: OpGraphNode,
+        from?: GraphVertex,
+        to?: GraphVertex,
     ) {
         this.name = name;
         this.type = type;
