@@ -35,21 +35,6 @@ export abstract class AbstractOpGraphNode {
 
 export class BuildableQueue extends AbstractOpGraphNode implements Queue {
     readonly nodeType = OpGraphNodeType.QUEUE;
-
-    static FromOperandFactory(chip: Chip, operationName: OperationName, operandDirection: 'input' | 'output') {
-        return (operand: Operand) => {
-            if (operand.type === OpGraphNodeType.QUEUE) {
-                let queue = chip.getQueue(operand.name);
-                if (!queue) {
-                    queue = new BuildableQueue(operand.name);
-                    // @ts-expect-error : addQueue is protected
-                    chip.addQueue(queue);
-                }
-                const queueOperands = operandDirection === 'input' ? queue.outputs : queue.inputs;
-                queueOperands.push(new Operand(operationName, OpGraphNodeType.OPERATION));
-            }
-        };
-    }
 }
 
 /**

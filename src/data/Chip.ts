@@ -315,8 +315,30 @@ export default class Chip {
                         ),
                 );
 
-                inputs.forEach(BuildableQueue.FromOperandFactory(chip, operationName, 'input'));
-                outputs.forEach(BuildableQueue.FromOperandFactory(chip, operationName, 'output'));
+                // Extract queues from input operands
+                inputs.forEach((operand) => {
+                    if (operand.type === OpGraphNodeType.QUEUE) {
+                        let queue = augmentedChip.queuesByName.get(operand.name);
+                        if (!queue) {
+                            queue = new BuildableQueue(operand.name);
+                            chip.addQueue(queue);
+                        }
+                        const queueOperands = queue.outputs;
+                        queueOperands.push(new Operand(operationName, OpGraphNodeType.OPERATION));
+                    }
+                });
+                // Extract queues from output operands
+                outputs.forEach((operand) => {
+                    if (operand.type === OpGraphNodeType.QUEUE) {
+                        let queue = augmentedChip.queuesByName.get(operand.name);
+                        if (!queue) {
+                            queue = new BuildableQueue(operand.name);
+                            chip.addQueue(queue);
+                        }
+                        const queueOperands = queue.inputs;
+                        queueOperands.push(new Operand(operationName, OpGraphNodeType.OPERATION));
+                    }
+                });
 
                 operation.assignInputs(inputs);
                 operation.assignOutputs(outputs);
@@ -406,8 +428,30 @@ export default class Chip {
                 (operandJson: OperandJSON) => new Operand(operandJson.name, operandJson.type),
             );
 
-            inputs.forEach(BuildableQueue.FromOperandFactory(chip, opName, 'input'));
-            outputs.forEach(BuildableQueue.FromOperandFactory(chip, opName, 'output'));
+            // Extract queues from input operands
+            inputs.forEach((operand) => {
+                if (operand.type === OpGraphNodeType.QUEUE) {
+                    let queue = newChip.queuesByName.get(operand.name);
+                    if (!queue) {
+                        queue = new BuildableQueue(operand.name);
+                        chip.addQueue(queue);
+                    }
+                    const queueOperands = queue.outputs;
+                    queueOperands.push(new Operand(opName, OpGraphNodeType.OPERATION));
+                }
+            });
+            // Extract queues from output operands
+            outputs.forEach((operand) => {
+                if (operand.type === OpGraphNodeType.QUEUE) {
+                    let queue = newChip.queuesByName.get(operand.name);
+                    if (!queue) {
+                        queue = new BuildableQueue(operand.name);
+                        chip.addQueue(queue);
+                    }
+                    const queueOperands = queue.inputs;
+                    queueOperands.push(new Operand(opName, OpGraphNodeType.OPERATION));
+                }
+            });
 
             return new BuildableOperation(opName, cores, inputs, outputs);
         });
