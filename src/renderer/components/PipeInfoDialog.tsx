@@ -24,7 +24,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
         if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
             if (pipe.producerCores.length > 0) {
                 output.push(
-                    <div className="producer-consumer">
+                    <div className='producer-consumer'>
                         <h3>Producer:</h3>
                         <h2>{[...new Set(pipe.producerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
                     </div>,
@@ -32,7 +32,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
             }
             if (pipe.consumerCores.length > 0) {
                 output.push(
-                    <div className="producer-consumer">
+                    <div className='producer-consumer'>
                         <h3>Consumer:</h3>
                         <h2>{[...new Set(pipe.consumerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
                     </div>,
@@ -51,7 +51,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
     }, [chip]);
 
     if (hide) {
-        return contents as JSX.Element
+        return contents as JSX.Element;
     }
 
     return (

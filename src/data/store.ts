@@ -13,7 +13,12 @@ import {
     PipeSelectionState,
 } from './StateTypes';
 import { LinkType, NOC } from './Types';
-import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, ETH_BANDWIDTH_INITIAL_GBS, LINK_SATURATION_INITIAIL_PERCENT } from './constants';
+import {
+    AICLK_INITIAL_MHZ,
+    DRAM_BANDWIDTH_INITIAL_GBS,
+    ETH_BANDWIDTH_INITIAL_GBS,
+    LINK_SATURATION_INITIAIL_PERCENT,
+} from './constants';
 
 interface UIState {
     dockOpen: boolean;
@@ -374,16 +379,14 @@ const linkSaturationSlice = createSlice({
     },
 });
 
-
 const updateEthernetLinks = (state: NetworkCongestionState) => {
-
     Object.values(state.links).forEach((linkState: LinkState) => {
         if (linkState.type === LinkType.ETHERNET) {
-            linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS
+            linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
             recalculateLinkSaturation(linkState, state.totalOps);
         }
     });
-}
+};
 const updateDRAMLinks = (state: NetworkCongestionState) => {
     const DRAMBandwidthBytes = state.DRAMBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
     const CLKHz = state.CLKMHz * 1000 * 1000;

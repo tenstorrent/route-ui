@@ -84,7 +84,9 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
             .filter((pipeSegment: PipeSelection) => pipeSegment.selected)
             .map((pipeSegment: PipeSelection) => pipeSegment.id);
 
-        const validPipes = link.pipes.map((pipeSegment) => pipeSegment.id).filter((pipeId) => selectedPipeIds.includes(pipeId));
+        const validPipes = link.pipes
+            .map((pipeSegment) => pipeSegment.id)
+            .filter((pipeId) => selectedPipeIds.includes(pipeId));
 
         const { name } = link;
         if (name && validLinkIds.includes(name as NOCLinkName | DramNOCLinkName)) {
