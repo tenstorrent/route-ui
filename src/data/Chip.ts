@@ -23,7 +23,7 @@ import {
     NOC,
     NOCLinkName,
 } from './Types';
-import { DETAILED_VIEW_LINK_NAMES, INTERNAL_LINK_NAMES } from './constants';
+import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
@@ -837,7 +837,10 @@ export class ComputeNode {
         } as ComputeNodeState;
     }
 
-    public getLinksForNode = (): NOCLink[] => {
+    /**
+     * @description Returns the links for node in the order defined by the NOC.
+     */
+    public getNOCLinksForNode = (): NOCLink[] => {
         return [...this.links.values()].sort((a, b) => {
             const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
             const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
@@ -848,7 +851,7 @@ export class ComputeNode {
     public getInternalLinksForNode = (): NetworkLink[] => {
         const links: NetworkLink[] = [...this.links.values()]
             .filter((link) => {
-                return DETAILED_VIEW_LINK_NAMES.includes(link.name);
+                return INTERNAL_LINK_NAMES.includes(link.name);
             })
             .sort((a, b) => {
                 const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
@@ -876,7 +879,7 @@ export class ComputeNode {
     getInternalPipeIDsForNode = (): string[] => {
         return [...this.links.values()]
             .filter((link) => {
-                return INTERNAL_LINK_NAMES.includes(link.name as NOCLinkName);
+                return INTERNAL_NOC_LINK_NAMES.includes(link.name as NOCLinkName);
             })
             .map((link) => {
                 return [...link.pipes.map((pipe) => pipe.id)];
