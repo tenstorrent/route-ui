@@ -197,7 +197,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
             {node.pipes.length > 0 && (
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
-                    {node.getLinksForNode().map((link: NOCLink) => (
+                    {node.getNOCLinksForNode().map((link: NOCLink) => (
                         <LinkDetails key={link.name} link={link} showEmpty />
                     ))}
                 </div>
