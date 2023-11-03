@@ -39,6 +39,65 @@
     }
 }
 
+$dock-height: 420px;
+
+.outer-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+
+
+    .dock {
+        margin: 0 20px;
+        width: calc(100% - 40px);
+        height: 0px;
+        overflow: hidden;
+    }
+
+    &.dock-open {
+        .dock {
+            height: $dock-height - 20px;
+            bottom: 0;
+        }
+
+        .main-wrapper {
+            height: calc(100vh - $dock-height);
+            overflow: hidden;
+        }
+
+        .grid-container {
+            height: calc(100vh - 10px - $dock-height);
+        }
+
+        .properties-panel-nodes {
+            max-height: calc(100vh - 100px - $dock-height);
+        }
+
+        .list-wrap {
+            max-height: calc(100vh - 150px - $dock-height);
+        }
+
+        .inner-sidebar {
+            max-height: calc(100vh - 20px - $dock-height);
+            overflow-y: scroll;
+
+        }
+    }
+
+    &.detailed-view-open {
+        .inner-sidebar {
+            max-height: calc(100vh - 640px);
+            overflow-y: scroll;
+        }
+
+        .grid-container {
+            height: calc(100vh - 640px);
+        }
+    }
+}
+
 .main-wrapper {
     margin-top: 20px;
     display: flex;
@@ -52,15 +111,35 @@
     width: calc(100% - 100px);
 }
 
-.inner-sidebar {
+.sidebar {
     display: flex;
     flex-direction: column;
+    gap: 10px;
+}
+
+.inner-sidebar {
+    max-height: calc(100vh - 100px);
+    overflow-y: scroll;
+    min-width: 200px;
+
+    .inner-sidebar-wrap {
+        display: flex;
+        flex-direction: column;
+        padding: 0 8px;
+
+    }
 
     hr {
         border: none;
         width: 100%;
         border-top: 1px solid $hr;
 
+    }
+
+    .bp4-numeric-input {
+        .bp4-input-group {
+            max-width: 150px;
+        }
     }
 }
 
@@ -120,7 +199,34 @@
                 }
             }
 
+            &.core-highlight-input,
+            &.core-highlight-output {
+                .core-highlight {
+                    $inset: 7px;
+                    position: absolute;
+                    top: $inset;
+                    left: $inset;
+                    bottom: $inset;
+                    right: $inset;
+                    z-index: 0;
+                }
+            }
+
+            &.core-highlight-input {
+                .core-highlight {
+                    border: 2px solid $core-highlight-inout;
+                }
+            }
+
+            &.core-highlight-output {
+                .core-highlight {
+                    border: 2px solid $core-highlight-output;
+                }
+            }
+
             .group-border,
+            .operand-wrap,
+            .off-chip-congestion,
             .dram-border {
                 width: 100%;
                 height: 100%;
@@ -130,6 +236,28 @@
                 bottom: 0;
                 right: 0;
                 z-index: 0;
+            }
+
+            .off-chip-congestion {
+                width: unset;
+                height: unset;
+                $inset: 6px;
+                top: $inset;
+                left: $inset;
+                bottom: $inset;
+                right: $inset;
+            }
+
+            .operand-wrap {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .operand {
+                width: 20px;
+                height: 20px;
+                opacity: 0.5;
             }
 
             .node-type-label {
@@ -147,9 +275,16 @@
                 z-index: 0;
             }
 
+            .node-focus-svg,
             .node-svg {
                 position: absolute;
                 z-index: 1;
+            }
+
+            .node-svg {
+                &.focus-mode {
+                    opacity: 0.15;
+                }
             }
         }
     }
@@ -158,9 +293,8 @@
 }
 
 
-
 .opname {
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .properties-panel {
@@ -174,8 +308,6 @@
         display: inline-flex;
         flex-wrap: wrap;
         gap: 10px;
-
-
     }
 }
 
@@ -189,10 +321,11 @@
     gap: 20px;
     max-height: calc(100vh - 200px);
 
+
     .node-element {
         width: 25%;
         height: 100%;
-        min-width: 250px;
+        min-width: 260px;
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -208,12 +341,35 @@
             justify-content: space-between;
         }
 
+        .io-label {
+            color: $tt-white-text;
+            margin-bottom: 5px;
+        }
+
         .node-controls {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             gap: 10px;
             margin-bottom: 10px;
+        }
+    }
+
+    .producer-consumer {
+        margin-bottom: 10px;
+        margin-left: 1px;
+
+        h3 {
+            margin-left: -10px;
+            color: $tt-white-text;
+        }
+
+        h2 {
+            max-width: 50vw;
+            display: inline-block;
+            text-wrap: wrap;
+            word-break: break-word;
+            color: $tt-white-text;
         }
     }
 }
@@ -346,9 +502,11 @@
 
         .bp4-input-action {
             top: unset;
-            >.bp4-icon{
-                margin-right:5px;
-                svg{
+
+            > .bp4-icon {
+                margin-right: 5px;
+
+                svg {
                     fill: $tt-dark-gray
                 }
             }
@@ -378,6 +536,20 @@
 
     label {
         margin-bottom: 0;
+    }
+
+    .io-label {
+        margin-left: 12px;
+    }
+
+    .operation-input {
+        margin-bottom: 5px;
+        margin-left: 20px;
+
+        p {
+            margin-bottom: 0;
+            font-size: 12px;
+        }
     }
 }
 
@@ -423,6 +595,7 @@
         }
     }
 }
+
 
 
 

@@ -1,36 +1,31 @@
 // import yaml from 'js-yaml';
-import {useDispatch} from 'react-redux';
-import {parse} from 'yaml';
+import { parse } from 'yaml';
 import fs from 'fs';
-import {useNavigate} from 'react-router-dom';
-import {FC, useContext} from 'react';
-import {IconNames} from '@blueprintjs/icons';
-import {Button} from '@blueprintjs/core';
-import DataSource from '../../data/DataSource';
-import SVGData from '../../data/DataStructures';
+import { FC } from 'react';
+import { IconNames } from '@blueprintjs/icons';
+import { Button } from '@blueprintjs/core';
+import Chip from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
-import {closeDetailedView, loadedFilename, loadLinkData, loadNodesData, loadPipeSelection, setArchitecture, updateTotalOPs} from '../../data/store';
-import {SVGJson} from '../../data/JSONDataTypes';
+import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
+import { loadedFilename } from '../../data/store';
+import { useDispatch } from 'react-redux';
 
 interface FileLoaderProps {
-    updateData: (data: SVGData) => void;
+    onChipLoaded: (data: Chip) => void;
 }
 
-const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
-    const navigate = useNavigate();
-    const {setSvgData} = useContext(DataSource);
-
+const FileLoader: FC<FileLoaderProps> = ({ onChipLoaded }) => {
     const dispatch = useDispatch();
 
     const loadFile = async () => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
-        const {dialog} = remote;
+        const { dialog } = remote;
 
         await (async () => {
             const filename = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
-                filters: [{name: 'file', extensions: ['yaml']}],
+                filters: [{ name: 'file', extensions: ['yaml'] }],
             });
 
             if (!filename) {
@@ -50,23 +45,14 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
                     /* TEMPORARY vallidation off */
                     const isValid = true; // yamlValidate(doc);
                     if (isValid) {
-                        const svgData = new SVGData(doc as SVGJson);
-                        updateData(svgData);
-                        dispatch(closeDetailedView());
-                        dispatch(setArchitecture(svgData.architecture));
+                        const chip = Chip.CREATE_FROM_NETLIST_JSON(doc as NetlistAnalyzerDataJSON);
+                        onChipLoaded(chip);
                         dispatch(loadedFilename(filename));
-                        dispatch(loadPipeSelection(svgData.getAllPipeIds()));
-                        dispatch(loadNodesData(svgData.getAllNodes()));
-                        dispatch(loadLinkData(svgData.getAllLinks()));
-                        dispatch(updateTotalOPs(svgData.totalOpCycles));
-
-                        navigate('/render');
                     } else {
                         const errors = yamlValidate.errors?.map((error) => {
                             return error.message;
                         });
                         console.error(errors);
-                        console.error(errors?.join('\n'));
                         alert(`An error occurred parsing the file: ${errors?.join('\n')}`);
                     }
                 } catch (error) {
@@ -77,8 +63,8 @@ const FileLoader: FC<FileLoaderProps> = ({updateData}) => {
     };
 
     return (
-        <div className="">
-            <Button icon={IconNames.UPLOAD} text="Load visualizer output yaml file" onClick={loadFile} />
+        <div className=''>
+            <Button icon={IconNames.UPLOAD} text='Load netlist analyzer output yaml file' onClick={loadFile} />
         </div>
     );
 };

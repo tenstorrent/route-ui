@@ -1,40 +1,21 @@
-import {ARCHITECTURE, ComputeNodeType, Loc} from './DataStructures';
-
-export enum ComputeNodeTypeArch {
-    ARC = 'arc',
-    DRAM = 'dram',
-    ETHERNET = 'eth',
-    PCIE = 'pcie',
-    ROUTER = 'router_only',
-    FUNCTIONAL_WORKERS = 'functional_workers',
-}
-
-interface ChipDesignJson {
-    arch_name: ComputeNodeTypeArch;
-    grid: { x_size: number; y_size: number };
-    arc: string[];
-    dram: [string[]];
-    eth: string[];
-    pcie: string[];
-    router_only: string[];
-    functional_workers: string[];
-}
+import { ChipDesignJSON } from './JSONDataTypes';
+import { Architecture, ComputeNodeType, ComputeNodeTypeArch, Loc } from './Types';
 
 export default class ChipDesign {
     public totalCols: number = 0;
 
     public totalRows: number = 0;
 
-    public architecture: ARCHITECTURE = ARCHITECTURE.NONE;
+    public architecture: Architecture = Architecture.NONE;
 
     public nodes: ComputeNodeSimple[] = [];
 
-    constructor(json: ChipDesignJson) {
-        if (json.arch_name.toLowerCase().includes(ARCHITECTURE.GRAYSKULL)) {
-            this.architecture = ARCHITECTURE.GRAYSKULL;
+    constructor(json: ChipDesignJSON) {
+        if (json.arch_name.toLowerCase().includes(Architecture.GRAYSKULL)) {
+            this.architecture = Architecture.GRAYSKULL;
         }
-        if (json.arch_name.toLowerCase().includes(ARCHITECTURE.WORMHOLE)) {
-            this.architecture = ARCHITECTURE.WORMHOLE;
+        if (json.arch_name.toLowerCase().includes(Architecture.WORMHOLE)) {
+            this.architecture = Architecture.WORMHOLE;
         }
 
         this.totalCols = json.grid.x_size - 1;
@@ -47,9 +28,17 @@ export default class ChipDesign {
             ...json.functional_workers.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.CORE, loc);
             }),
-            ...json.dram.flat().map((loc) => {
-                return new ComputeNodeSimple(ComputeNodeType.DRAM, loc);
-            }),
+            ...json.dram
+                .map((channel, dramChannelId) => {
+                    return channel.map((loc, dramSubChannelId) => {
+                        const core = new ComputeNodeSimple(ComputeNodeType.DRAM, loc);
+                        core.dramChannelId = dramChannelId;
+                        core.dramSubchannelId = dramSubChannelId;
+                        return core;
+                    });
+                })
+                .flat(),
+
             ...json.eth.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.ETHERNET, loc);
             }),
@@ -58,7 +47,7 @@ export default class ChipDesign {
             }),
             ...json.router_only.map((loc) => {
                 return new ComputeNodeSimple(ComputeNodeType.ROUTER, loc);
-            })
+            }),
         );
         this.nodes = this.nodes.sort((a, b) => {
             if (a.loc.y !== b.loc.y) {
@@ -72,11 +61,15 @@ export default class ChipDesign {
 export class ComputeNodeSimple {
     public type: ComputeNodeType;
 
-    public loc: Loc = {x: 0, y: 0};
+    public loc: Loc = { x: 0, y: 0 };
+
+    public dramChannelId: number = -1;
+
+    public dramSubchannelId: number = 0;
 
     constructor(type: ComputeNodeType, location: string) {
         this.type = type;
-        this.loc = {x: parseInt(location.split('-')[0], 10), y: parseInt(location.split('-')[1], 10)};
+        this.loc = { x: parseInt(location.split('-')[0], 10), y: parseInt(location.split('-')[1], 10) };
     }
 }
 

@@ -1,17 +1,34 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import './scss/MainRouteRenderer.scss';
 import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
-import SideBar from './components/SideBar';
+import Chip from '../data/Chip';
+import { SideBar } from './components/SideBar';
+import { getDockOpenState, RootState } from '../data/store';
+import BottomDock from './components/BottomDock';
 
-const MainRouteRenderer: React.FC = () => {
+export interface MainRouteRendererProps {
+    updateData: (data: Chip) => void;
+}
+
+const MainRouteRenderer: React.FC<MainRouteRendererProps> = ({ updateData }) => {
+    const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
+    const isDetailedViewOpen = useSelector((state: RootState) => state.detailedView.isOpen);
     return (
-        <div className="main-wrapper">
-            <SideBar />
-            <div className="main-container">
-                <GridRender />
-                <PropertiesPanel />
+        <div
+            className={`outer-wrapper ${isDockOpen ? 'dock-open' : ''} ${
+                isDetailedViewOpen ? 'detailed-view-open' : ''
+            }`}
+        >
+            <div className='main-wrapper'>
+                <SideBar updateData={updateData} />
+                <div className='main-container'>
+                    <GridRender />
+                    <PropertiesPanel />
+                </div>
             </div>
+            <BottomDock />
         </div>
     );
 };

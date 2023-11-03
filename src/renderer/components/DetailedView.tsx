@@ -1,61 +1,29 @@
-import React, {useContext, useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {Button, Card, Overlay} from '@blueprintjs/core';
-import {IconNames} from '@blueprintjs/icons';
-import {closeDetailedView, openDetailedView, RootState, updateNodeSelection, updatePipeSelection} from '../../data/store';
-import DataSource, {SVGContext} from '../../data/DataSource';
-import {ARCHITECTURE, ComputeNode, ComputeNodeType, DramChannel, DramName, LinkName, NOC, NOCLink} from '../../data/DataStructures';
+import React, { useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Button, Card, Overlay } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { closeDetailedView, RootState } from '../../data/store';
+import DataSource, { GridContext } from '../../data/DataSource';
 import '../scss/DetailedView.scss';
-import PipeRenderer from './detailed-view-components/PipeRenderer';
-import {getInternalLinksForNode, getInternalPipeIDsForNode} from '../../data/utils';
-import LinkDetails from './LinkDetails';
+import { ComputeNodeType } from '../../data/Types';
+import DetailedViewDRAMRenderer from './detailed-view-components/DetailedViewDRAM';
+import DetailedViewETHRenderer from './detailed-view-components/DetailedViewETH';
 
 interface DetailedViewProps {
-    showLinkSaturation: boolean;
-    linkSaturationTreshold: number;
     zoom: number;
 }
 
-const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSaturationTreshold, zoom}) => {
-    const {svgData} = useContext<SVGContext>(DataSource);
-    const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);
+const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
     const dispatch = useDispatch();
-    const {isOpen, uid} = useSelector((state: RootState) => state.detailedView);
-    const [node, setNode] = React.useState<ComputeNode | null>(null);
-    const [nodeList, setNodeList] = React.useState<ComputeNode[]>([]);
-    const [dram, setDram] = React.useState<DramChannel | null>(null);
-    useEffect(() => {
-        if (svgData && uid !== null) {
-            const selectedNode = svgData.nodes.find((n) => n.uid === uid);
-            let allNodes: ComputeNode[] | undefined;
-            if (selectedNode && selectedNode.dramChannel > -1) {
-                allNodes = svgData?.nodes.filter((n) => n.dramChannel === selectedNode?.dramChannel);
-            }
-
-            setNode(selectedNode || null);
-            setNodeList(allNodes || []);
-            setDram(svgData?.dramChannels.find((d) => d.id === selectedNode?.dramChannel) || null);
-        }
-    }, [uid, svgData, isOpen, showLinkSaturation]);
-
-    const changePipeState = (pipeList: string[], state: boolean) => {
-        pipeList.forEach((pipeId) => {
-            dispatch(updatePipeSelection({id: pipeId, selected: state}));
-        });
-    };
+    const { chip } = useContext<GridContext>(DataSource);
+    const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);
+    const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
+    const node = uid ? chip?.getNode(uid) : null;
 
     return (
-        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false}>
-            <Card
-                className="detailed-view-card"
-                style={{
-                    bottom: '10px',
-                    left: '10px',
-                    zIndex: 100,
-                    zoom,
-                }}
-            >
-                <div className="detailed-view-header">
+        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false}>
+            <Card className='detailed-view-card' style={{ zoom }}>
+                <div className='detailed-view-header'>
                     {node && (
                         <h3>
                             {node.type} {node.loc.x},{node.loc.y}
@@ -63,172 +31,12 @@ const DetailedView: React.FC<DetailedViewProps> = ({showLinkSaturation, linkSatu
                     )}
                     <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                 </div>
-                <div className={`detailed-view-wrap arch-${architecture} type-${node?.type}`}>
-                    {node?.type === ComputeNodeType.DRAM && dram && (
-                        <>
-                            <div className="detailed-view-chip dram">
-                                <div className="dram-subchannels">
-                                    {dram?.subchannels.map((subchannel) => {
-                                        const currentNode = nodeList.find((n) => n.dramSubchannel === subchannel.subchannelId);
-                                        const noc0links: NOCLink[] = [];
-                                        const noc1links: NOCLink[] = [];
-                                        if (currentNode) {
-                                            noc0links.push(currentNode.links.get(LinkName.NOC0_IN) as NOCLink);
-                                            noc0links.push(currentNode.links.get(LinkName.NOC0_OUT) as NOCLink);
-                                            noc1links.push(currentNode.links.get(LinkName.NOC1_IN) as NOCLink);
-                                            noc1links.push(currentNode.links.get(LinkName.NOC1_OUT) as NOCLink);
-                                        }
-                                        const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
-                                        return (
-                                            <div key={subchannel.subchannelId} className={`${node?.dramSubchannel === subchannel.subchannelId ? 'current' : ''} subchannel`}>
-                                                {dram?.subchannels.length > 1 && (
-                                                    <h3 className="subchannel-name">
-                                                        {currentNode && (
-                                                            <Button
-                                                                style={{marginRight: '5px'}}
-                                                                small
-                                                                disabled={currentNode.uid === node.uid}
-                                                                icon={IconNames.PROPERTIES}
-                                                                onClick={() => {
-                                                                    dispatch(updateNodeSelection({id: currentNode.uid, selected: true}));
-                                                                    dispatch(openDetailedView(currentNode.uid));
-                                                                }}
-                                                            />
-                                                        )}
-                                                        Sub {subchannel.subchannelId} [{currentNode?.loc.x},{currentNode?.loc.y}]
-                                                    </h3>
-                                                )}
-                                                <div className="controls-wrap">
-                                                    <Button
-                                                        className="pipe-selection"
-                                                        small
-                                                        icon={IconNames.FILTER_LIST}
-                                                        disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), true)}
-                                                    />
-                                                    <Button
-                                                        className="pipe-selection"
-                                                        small
-                                                        icon={IconNames.FILTER_REMOVE}
-                                                        disabled={numPipes === 0}
-                                                        onClick={() => changePipeState(getInternalPipeIDsForNode(currentNode), false)}
-                                                    />
-                                                </div>
-                                                <div className="dram-subchannel">
-                                                    <div className="noc noc0">
-                                                        <div className=" router">
-                                                            <p className="label">
-                                                                NOC0
-                                                                <br />
-                                                                Router
-                                                            </p>
-                                                        </div>
-                                                        <PipeRenderer links={noc0links} showLinkSaturation={showLinkSaturation} linkSaturationTreshold={linkSaturationTreshold} />
-                                                        <div className="noc2axi">
-                                                            <p className="label">NOC2AXI</p>
-                                                        </div>
-                                                        <PipeRenderer
-                                                            className="centered-svg"
-                                                            links={subchannel.links.filter((link) => link.noc === NOC.NOC0)}
-                                                            showLinkSaturation={showLinkSaturation}
-                                                            linkSaturationTreshold={linkSaturationTreshold}
-                                                        />
-                                                    </div>
-                                                    <div className="noc noc1">
-                                                        <div className="router">
-                                                            <p className="label">
-                                                                NOC1
-                                                                <br />
-                                                                Router
-                                                            </p>
-                                                        </div>
-                                                        <PipeRenderer links={noc1links} showLinkSaturation={showLinkSaturation} linkSaturationTreshold={linkSaturationTreshold} />
-                                                        <div className="noc2axi">
-                                                            <p className="label">NOC2AXI</p>
-                                                        </div>
-                                                        <PipeRenderer
-                                                            className="centered-svg"
-                                                            links={subchannel.links.filter((link) => link.noc === NOC.NOC1)}
-                                                            showLinkSaturation={showLinkSaturation}
-                                                            linkSaturationTreshold={linkSaturationTreshold}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                <div className="axi">
-                                    <p className="label">AXI</p>
-                                    {architecture === ARCHITECTURE.WORMHOLE && <>6:2 XBAR</>}
-                                    {architecture === ARCHITECTURE.GRAYSKULL && <>2:1 XBAR</>}
-                                </div>
-                                <div className="off-chip">
-                                    {architecture === ARCHITECTURE.WORMHOLE && (
-                                        <>
-                                            <div className="axi-dram-wrap">
-                                                <PipeRenderer
-                                                    className="centered-svg"
-                                                    links={dram.links.filter((link) => link.name === DramName.DRAM0_INOUT)}
-                                                    showLinkSaturation={showLinkSaturation}
-                                                    linkSaturationTreshold={linkSaturationTreshold}
-                                                />
-                                                <div className="axi-dram">
-                                                    <p className="label">AXI DRAM0</p>
-                                                </div>
-                                            </div>
-                                            <div className="axi-dram-wrap">
-                                                <PipeRenderer
-                                                    className="centered-svg"
-                                                    links={dram.links.filter((link) => link.name === DramName.DRAM1_INOUT)}
-                                                    showLinkSaturation={showLinkSaturation}
-                                                    linkSaturationTreshold={linkSaturationTreshold}
-                                                />
-                                                <div className="axi-dram">
-                                                    <p className="label">AXI DRAM1</p>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )}
-                                    {architecture === ARCHITECTURE.GRAYSKULL && (
-                                        <div className="axi-dram-wrap">
-                                            <PipeRenderer
-                                                className="centered-svg"
-                                                links={dram.links.filter((link) => link.name === DramName.DRAM_INOUT)}
-                                                showLinkSaturation={showLinkSaturation}
-                                                linkSaturationTreshold={linkSaturationTreshold}
-                                            />
-                                            <div className="axi-dram">
-                                                <p className="label">Off-chip DRAM</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="detailed-view-data">
-                                <div className="node-links-wrap">
-                                    {nodeList.map((n, index) => {
-                                        return getInternalLinksForNode(n).map((link: NOCLink) => {
-                                            return <LinkDetails key={link.name} link={link} index={nodeList.length > 1 ? index : -1} showEmpty={false} />;
-                                        });
-                                    })}
-                                    {dram.subchannels
-                                        .map((sub) => sub.links)
-                                        .map((links) =>
-                                            links.map((link) => (
-                                                //
-                                                <LinkDetails key={link.name} link={link} showEmpty={false} />
-                                            ))
-                                        )}
-                                    {dram.links.map((link) => (
-                                        //
-                                        <LinkDetails key={link.name} link={link} showEmpty={false} />
-                                    ))}
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </div>
+                {node && (
+                    <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
+                        {node.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
+                        {node.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
+                    </div>
+                )}
             </Card>
         </Overlay>
     );

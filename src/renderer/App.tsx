@@ -1,30 +1,30 @@
-import {MemoryRouter as Router, Routes, Route} from 'react-router-dom';
-import {Provider} from 'react-redux';
+import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import './App.scss';
-import {useState} from 'react';
+import { useMemo, useState } from 'react';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
-import DataSource from '../data/DataSource';
-import SVGData from '../data/DataStructures';
+import DataSource, { GridContext } from '../data/DataSource';
+import Chip from '../data/Chip';
 import MainRouteRenderer from './MainRouteRenderer';
 import SplashScreen from './SplashScreen';
 import store from '../data/store';
-import {SVGJson} from '../data/JSONDataTypes';
 import TopHeaderComponent from './components/TopHeaderComponent';
 
 export default function App() {
-    const [svgData, setSvgData] = useState<SVGData>(null);
-
+    // @ts-ignore
+    const [chip, setChip] = useState<Chip>(null);
+    const memoizedChip = useMemo<GridContext>(() => ({ chip, setChip }), [chip]);
     return (
         <Provider store={store}>
-            <div className="header">
+            <div className='header'>
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            <DataSource.Provider value={{svgData, setSvgData}}>
+            <DataSource.Provider value={memoizedChip}>
                 <Router>
                     <Routes>
-                        <Route path="/" element={<SplashScreen updateData={setSvgData} />} />
-                        <Route path="/render" element={<MainRouteRenderer />} />
+                        <Route path='/' element={<SplashScreen updateChip={setChip} />} />
+                        <Route path='/render' element={<MainRouteRenderer updateData={setChip} />} />
                     </Routes>
                 </Router>
             </DataSource.Provider>
