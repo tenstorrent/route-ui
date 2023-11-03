@@ -8,6 +8,7 @@ import LinkDetails from '../LinkDetails';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import DataSource, { GridContext } from '../../../data/DataSource';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
+import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 
 interface DetailedViewETHRendererProps {
     node: ComputeNode;
@@ -37,24 +38,10 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node 
                             <div className='node-container'>
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <div className='router'>
-                                            <p className='label'>
-                                                NOC0
-                                                <br />
-                                                Router
-                                            </p>
-                                        </div>
-                                        <DetailedViewPipeRenderer links={noc0links} />
+                                        <DetailedViewNOCRouterRenderer links={noc0links} label="NOC0" />
                                     </div>
                                     <div className='col noc1'>
-                                        <div className='router'>
-                                            <p className='label'>
-                                                NOC1
-                                                <br />
-                                                Router
-                                            </p>
-                                        </div>
-                                        <DetailedViewPipeRenderer links={noc1links} />
+                                        <DetailedViewNOCRouterRenderer links={noc1links} label="NOC1" />
                                     </div>
                                     <div className='col'>
                                         <div className='router'>
@@ -70,7 +57,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node 
                                 </div>
                             </div>
                         </div>
-                        <div className='col eth-off-chip' >
+                        <div className='col eth-off-chip'>
                             <DetailedViewPipeRenderer links={internalLinks} className='centered-svg' />
                         </div>
                     </div>

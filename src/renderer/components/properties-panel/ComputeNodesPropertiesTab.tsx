@@ -13,7 +13,7 @@ import {
 } from '../../../data/store';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
-import { ComputeNodeType } from '../../../data/Types';
+import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
 import { GraphVertexType } from '../../../data/GraphTypes';
 import SelectablePipe from '../SelectablePipe';
@@ -109,7 +109,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
                                                     <SelectablePipe
-                                                        pipeSegment={new PipeSegment(pipeId, 0)}
+                                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                                         pipeFilter=''
                                                     />
                                                 </li>
@@ -142,7 +142,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
                                                     <SelectablePipe
-                                                        pipeSegment={new PipeSegment(pipeId, 0)}
+                                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                                         pipeFilter=''
                                                     />
                                                 </li>

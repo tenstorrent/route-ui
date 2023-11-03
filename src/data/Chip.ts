@@ -954,9 +954,9 @@ export class PipeSegment {
 
     readonly bandwidthUse: number;
 
-    constructor(id: string, bandwidth: number, nocId: string = '', linkTotalData: number = 0) {
+    constructor(id: string, bandwidth: number, linkName: NetworkLinkName, linkTotalData: number = 0) {
         this.id = id;
-        this.linkName = nocId as NetworkLinkName;
+        this.linkName = linkName as NetworkLinkName;
         this.bandwidth = bandwidth || 0;
         this.bandwidthUse = (this.bandwidth / linkTotalData) * 100 || 0;
     }

@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { openDetailedView, RootState, updateNodeSelection } from '../../../data/store';
-import { ComputeNode, NOCLink } from '../../../data/Chip';
+import { ComputeNode, DramBankLink, DramNOCLink, NOCLink } from '../../../data/Chip';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 import LinkDetails from '../LinkDetails';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import DataSource, { GridContext } from '../../../data/DataSource';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
+import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
@@ -77,38 +78,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <DetailedViewPipeControls node={currentNode} numPipes={numPipes} />
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <div className='router'>
-                                            <p className='label'>
-                                                NOC0
-                                                <br />
-                                                Router
-                                            </p>
-                                        </div>
-                                        <DetailedViewPipeRenderer links={noc0links} />
-                                        <div className='noc2axi'>
-                                            <p className='label'>NOC2AXI</p>
-                                        </div>
-                                        <DetailedViewPipeRenderer
-                                            className='centered-svg'
-                                            links={subchannel.links.filter((link) => link.noc === NOC.NOC0)}
-                                        />
+                                        <DetailedViewNOCRouterRenderer links={noc0links} label="NOC0" />
+                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC0} />
+
                                     </div>
                                     <div className='col noc1'>
-                                        <div className='router'>
-                                            <p className='label'>
-                                                NOC1
-                                                <br />
-                                                Router
-                                            </p>
-                                        </div>
-                                        <DetailedViewPipeRenderer links={noc1links} />
-                                        <div className='noc2axi'>
-                                            <p className='label'>NOC2AXI</p>
-                                        </div>
-                                        <DetailedViewPipeRenderer
-                                            className='centered-svg'
-                                            links={subchannel.links.filter((link) => link.noc === NOC.NOC1)}
-                                        />
+                                        <DetailedViewNOCRouterRenderer links={noc1links} label="NOC1" />
+                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC1} />
                                     </div>
                                 </div>
                             </div>
@@ -123,36 +99,12 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                 <div className='off-chip'>
                     {architecture === Architecture.WORMHOLE && (
                         <>
-                            <div className='axi-dram-wrap'>
-                                <DetailedViewPipeRenderer
-                                    className='centered-svg'
-                                    links={dram.links.filter((link) => link.name === DramBankLinkName.DRAM0_INOUT)}
-                                />
-                                <div className='axi-dram'>
-                                    <p className='label'>AXI DRAM0</p>
-                                </div>
-                            </div>
-                            <div className='axi-dram-wrap'>
-                                <DetailedViewPipeRenderer
-                                    className='centered-svg'
-                                    links={dram.links.filter((link) => link.name === DramBankLinkName.DRAM1_INOUT)}
-                                />
-                                <div className='axi-dram'>
-                                    <p className='label'>AXI DRAM1</p>
-                                </div>
-                            </div>
+                            <DetailedViewAXIRender links={dram.links} filter={DramBankLinkName.DRAM0_INOUT} label='AXI DRAM0' />
+                            <DetailedViewAXIRender links={dram.links} filter={DramBankLinkName.DRAM1_INOUT} label='AXI DRAM1' />
                         </>
                     )}
                     {architecture === Architecture.GRAYSKULL && (
-                        <div className='axi-dram-wrap'>
-                            <DetailedViewPipeRenderer
-                                className='centered-svg'
-                                links={dram.links.filter((link) => link.name === DramBankLinkName.DRAM_INOUT)}
-                            />
-                            <div className='axi-dram'>
-                                <p className='label'>Off-chip DRAM</p>
-                            </div>
-                        </div>
+                        <DetailedViewAXIRender links={dram.links} filter={DramBankLinkName.DRAM_INOUT} label='Off-chip DRAM' />
                     )}
                 </div>
             </div>
@@ -191,3 +143,42 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
 };
 
 export default DetailedViewDRAMRenderer;
+
+interface DetailedViewAXIRenderProps {
+    links: DramBankLink[];
+    filter: DramBankLinkName;
+    label: string;
+}
+
+const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ links, filter, label }) => {
+    return (
+        <div className='axi-dram-wrap'>
+            <DetailedViewPipeRenderer
+                className='centered-svg'
+                links={links.filter((link) => link.name === filter)}
+            />
+            <div className='axi-dram'>
+                <p className='label'>{label}</p>
+            </div>
+        </div>
+    );
+};
+
+interface DetailedViewANOC2XIRenderProps {
+    links: DramNOCLink[];
+    noc: NOC;
+}
+
+const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({ links, noc}) => {
+    return (
+        <>
+            <div className='noc2axi'>
+                <p className='label'>NOC2AXI</p>
+            </div>
+            <DetailedViewPipeRenderer
+                className='centered-svg'
+                links={links.filter((link) => link.noc === noc)}
+            />
+        </>
+    );
+};
