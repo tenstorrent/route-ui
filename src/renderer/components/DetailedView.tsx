@@ -31,10 +31,12 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
                     )}
                     <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                 </div>
-                <div className={`detailed-view-wrap arch-${architecture} type-${node?.type}`}>
-                    {node?.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
-                    {node?.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
-                </div>
+                {node && (
+                    <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
+                        {node.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
+                        {node.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
+                    </div>
+                )}
             </Card>
         </Overlay>
     );

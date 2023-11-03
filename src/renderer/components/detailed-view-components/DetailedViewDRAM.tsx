@@ -22,13 +22,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
     const dispatch = useDispatch();
 
     const nodeList = useMemo(() => {
-        if (chip && node && node.dramChannelId > -1) {
-            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === node?.dramChannelId)];
+        if (chip && node.dramChannelId > -1) {
+            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === node.dramChannelId)];
         }
         return [];
     }, [node, chip]);
 
-    const dram = node?.dramChannel || null;
+    const dram = node.dramChannel || null;
 
     if (dram === null) {
         return null;
@@ -37,7 +37,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
         <>
             <div className='detailed-view-chip dram'>
                 <div className='node-container'>
-                    {dram?.subchannels.map((subchannel) => {
+                    {dram.subchannels.map((subchannel) => {
                         const currentNode = nodeList.find((n) => n.dramSubchannelId === subchannel.subchannelId);
                         const noc0links: NOCLink[] = [];
                         const noc1links: NOCLink[] = [];
@@ -52,9 +52,9 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                             <div
                                 key={subchannel.subchannelId}
                                 // prettier-ignore
-                                className={`subchannel ${node?.dramSubchannelId === subchannel.subchannelId ? 'current' : ''}`}
+                                className={`subchannel ${node.dramSubchannelId === subchannel.subchannelId ? 'current' : ''}`}
                             >
-                                {dram?.subchannels.length > 1 && (
+                                {dram.subchannels.length > 1 && (
                                     <h3 className='subchannel-name'>
                                         {currentNode && (
                                             <Button
