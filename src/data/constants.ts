@@ -10,6 +10,7 @@ export const AICLK_INITIAL_MHZ = 1000;
 
 export const MAX_CONGESTION_VALUE = 120;
 
+// TODO: INTERNAL_LINK_NAMES
 export const DETAILED_VIEW_LINK_NAMES = [
     NOCLinkName.NOC0_IN,
     NOCLinkName.NOC1_IN,
@@ -23,6 +24,8 @@ export const DETAILED_VIEW_LINK_NAMES = [
     EthernetLinkName.ETH_IN,
     EthernetLinkName.ETH_OUT,
 ];
+
+// TODO: INTERNAL_NOC_LINK_NAMES
 export const INTERNAL_LINK_NAMES = [
     NOCLinkName.NOC0_IN,
     NOCLinkName.NOC0_OUT,
