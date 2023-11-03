@@ -59,7 +59,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node 
                     </div>
                 </div>
             </div>
-            <div className='detailed-view-data'>
+            <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return <LinkDetails key={link.name} link={link} showEmpty={false} />;

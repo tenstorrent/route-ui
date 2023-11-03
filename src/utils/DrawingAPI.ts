@@ -358,7 +358,7 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
 
             break;
         default:
-            console.info('Unknown link type', linkName);
+            console.warn('Unknown link type', linkName);
             break;
     }
     return { lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform };

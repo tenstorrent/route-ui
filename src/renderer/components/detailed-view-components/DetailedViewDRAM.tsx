@@ -108,7 +108,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                     )}
                 </div>
             </div>
-            <div className='detailed-view-data'>
+            <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {nodeList.map((n, index) => {
                         return node.getInternalLinksForNode().map((link) => {

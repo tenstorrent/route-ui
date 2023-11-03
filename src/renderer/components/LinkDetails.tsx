@@ -22,8 +22,6 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, showEmpty, index }) => 
             return null;
         }
     }
-
-    console.log('linkState', linkState);
     return (
         <div key={link.name}>
             <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
