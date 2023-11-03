@@ -59,7 +59,6 @@ export enum LinkType {
 
 export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName | EthernetLinkName;
 
-
 export enum ComputeNodeType {
     NONE = '',
     ROUTER = 'router',

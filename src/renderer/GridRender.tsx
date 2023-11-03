@@ -11,7 +11,8 @@ import {
     RootState,
     selectAllPipes,
     updateCLK,
-    updateDRAMBandwidth, updateFocusPipe,
+    updateDRAMBandwidth,
+    updateFocusPipe,
     updateLinkSaturation,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
@@ -77,7 +78,7 @@ export default function GridRender() {
     return (
         <>
             <div className='inner-sidebar'>
-                <div className={'inner-sidebar-wrap'}>
+                <div className='inner-sidebar-wrap'>
                     <label htmlFor='detailedViewZoom'>Detailed view zoom</label>
                     <Slider
                         id='detailedViewZoom'
@@ -245,12 +246,13 @@ export default function GridRender() {
             </div>
 
             {chip && (
-                <div className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}
-                     // this is to address the issue with focus pipe getting stuck becuase of
+                <div
+                    className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}
+                    // this is to address the issue with focus pipe getting stuck because of Popover2
                     // TODO: find a better solution
-                     onMouseEnter={() => {
-                         dispatch(updateFocusPipe(null));
-                     }}
+                    onMouseEnter={() => {
+                        dispatch(updateFocusPipe(null));
+                    }}
                 >
                     <div
                         className='node-container'
@@ -277,11 +279,7 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
-            <DetailedView
-                showLinkSaturation={showLinkSaturation}
-                zoom={detailedViewZoom}
-                linkSaturationTreshold={linkSaturationTreshold}
-            />
+            <DetailedView zoom={detailedViewZoom} />
         </>
     );
 }

@@ -13,7 +13,7 @@ import { ComputeNode } from '../../data/Chip';
 import {
     calculateLinkCongestionColor,
     drawLink,
-    drawNOC,
+    drawNOCRouter,
     drawSelections,
     getDramGroupingStyles,
     getNodeOpStyles,
@@ -36,15 +36,15 @@ interface NodeGridElementProps {
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({
-                                                             //
-                                                             node,
-                                                             showEmptyLinks,
-                                                             showOperationColors,
-                                                             showNodeLocation,
-                                                             showLinkSaturation,
-                                                             linkSaturationTreshold,
-                                                             //
-                                                         }) => {
+    //
+    node,
+    showEmptyLinks,
+    showOperationColors,
+    showNodeLocation,
+    showLinkSaturation,
+    linkSaturationTreshold,
+    //
+}) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
     // const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
@@ -142,11 +142,11 @@ interface OffChipNodeLinkCongestionLayerProps {
  * @constructor
  */
 const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerProps> = ({
-                                                                                           //
-                                                                                           node,
-                                                                                           showLinkSaturation,
-                                                                                           linkSaturationTreshold,
-                                                                                       }) => {
+    //
+    node,
+    showLinkSaturation,
+    linkSaturationTreshold,
+}) => {
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
     if (!showLinkSaturation) {
@@ -164,7 +164,7 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
             break;
         case ComputeNodeType.ETHERNET:
             offChipLinkIds =
-                [...(node.externalLinks).values()].map((link) => {
+                [...node.internalLinks.values()].map((link) => {
                     return link.uid;
                 }) || [];
             break;
@@ -175,7 +175,6 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
         default:
             return null;
     }
-
 
     const saturationValues = offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
     const saturation = Math.max(...saturationValues) || 0;
@@ -195,10 +194,10 @@ interface OperationGroupRenderProps {
 
 /** Adds a highlight layer to a Core node element when the core's operation ("operation group") is selected. */
 const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
-                                                                       //
-                                                                       node,
-                                                                       //
-                                                                   }) => {
+    //
+    node,
+    //
+}) => {
     const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
     let operationStyles = {};
     if (node.opName !== '' && selectedGroup.selected) {
@@ -217,10 +216,10 @@ interface OperandHighlightProps {
 
 /** no idea what this does and if it does anything. verify and delete  */
 const OperandHighlight: React.FC<OperandHighlightProps> = ({
-                                                               //
-                                                               node,
-                                                               //
-                                                           }) => {
+    //
+    node,
+    //
+}) => {
     const operandsIn: { op: string; selected: boolean }[] = useSelector(
         (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
     );
@@ -251,10 +250,11 @@ interface NodeFocusPipeRendererProps {
 }
 
 const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
-                                                                         //
-                                                                         node,
-                                                                         //
-                                                                     }) => {
+    //
+    node,
+    //
+}) => {
+    // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
@@ -287,13 +287,14 @@ interface NodePipeRendererProps {
 }
 
 const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
-                                                               //
-                                                               node,
-                                                               showEmptyLinks,
-                                                               showLinkSaturation,
-                                                               linkSaturationTreshold,
-                                                               //
-                                                           }) => {
+    //
+    node,
+    showEmptyLinks,
+    showLinkSaturation,
+    linkSaturationTreshold,
+    //
+}) => {
+    // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
@@ -353,10 +354,10 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_OUT, node, selectedPipeIds);
 
     if (noc0numPipes > 0) {
-        drawNOC(svg, NOC_CONFIGURATION.noc0);
+        drawNOCRouter(svg, NOC_CONFIGURATION.noc0);
     }
     if (noc1numPipes > 0) {
-        drawNOC(svg, NOC_CONFIGURATION.noc1);
+        drawNOCRouter(svg, NOC_CONFIGURATION.noc1);
     }
     return (
         <svg

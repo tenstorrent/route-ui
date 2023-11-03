@@ -3,7 +3,7 @@ import type { Operand } from './ChipAugmentation';
 
 export type OperationName = string;
 export type QueueName = string;
-export type OpGraphNodeId = OperationName | QueueName
+export type OpGraphNodeId = OperationName | QueueName;
 
 export type OperandName = string;
 

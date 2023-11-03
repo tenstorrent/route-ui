@@ -1,12 +1,18 @@
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import DataSource from '../../../data/DataSource';
-import { openDetailedView, RootState, selectGroup, updateNodeSelection, updatePipeSelection, } from '../../../data/store';
-import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
-import { NodeSelectionState } from '../../../data/StateTypes';
 import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
+import DataSource from '../../../data/DataSource';
+import {
+    openDetailedView,
+    RootState,
+    selectGroup,
+    updateNodeSelection,
+    updatePipeSelection,
+} from '../../../data/store';
+import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
+import { NodeSelectionState } from '../../../data/StateTypes';
 import { ComputeNodeType } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
 import { OpGraphNodeType } from '../../../data/GraphTypes';
@@ -41,8 +47,6 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
-
-    // console.log(`RENDERED NODE ${node.uid} WITH OPERATION`, node.operation);
 
     return (
         <Card className='node-element'>

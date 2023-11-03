@@ -31,7 +31,7 @@ const OperationDetails = (props: { operation: Operation }): React.ReactElement =
             ))}
         </div>
     );
-}
+};
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -77,7 +77,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                 icon={IconNames.CROSS}
                             />
                         ) : (
-                            <Icon icon={IconNames.SEARCH}/>
+                            <Icon icon={IconNames.SEARCH} />
                         )
                     }
                     placeholder=''
@@ -85,10 +85,10 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOpsFilter(e.target.value)}
                 />
                 <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()}/>
+                    <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                 </Tooltip2>
                 <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}/>
+                    <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
                 </Tooltip2>
             </div>
             <div className='operations-wrap list-wrap'>
@@ -107,7 +107,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                             selectFunc={setOperationSelectionState}
                                             stringFilter={opsFilter}
                                         />
-                                        {operation && <OperationDetails operation={operation}/>}
+                                        {operation && <OperationDetails operation={operation} />}
                                     </>
                                 }
                             />

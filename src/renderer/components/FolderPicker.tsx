@@ -98,7 +98,11 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                 isOpen={showGraphSelect}
                 placement='right'
             >
-                <FolderPicker disabled={selectedArchitecture === Architecture.NONE} onSelectFolder={loadFolder} disabledText="Select Architecture Before Loading Graph" />
+                <FolderPicker
+                    disabled={selectedArchitecture === Architecture.NONE}
+                    onSelectFolder={loadFolder}
+                    disabledText='Select Architecture Before Loading Graph'
+                />
             </Popover2>
 
             {/* Temporary elements to display success of selection */}
@@ -150,8 +154,13 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
                 }
                 disabled={disabled}
             >
-                <Tooltip2 disabled={!disabled} content={disabledText} placement="bottom">
-                    <Button className='load-folder-button' disabled={disabled} icon={IconNames.GRAPH} text='Load Perf Analyzer Folder' />
+                <Tooltip2 disabled={!disabled} content={disabledText} placement='bottom'>
+                    <Button
+                        className='load-folder-button'
+                        disabled={disabled}
+                        icon={IconNames.GRAPH}
+                        text='Load Perf Analyzer Folder'
+                    />
                 </Tooltip2>
             </Popover2>
         </div>

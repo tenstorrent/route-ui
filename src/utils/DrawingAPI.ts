@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
-import { DramBankLinkName, DramNOCLinkName, NetworkLinkName, NOCLinkName } from '../data/Types';
+import { DramBankLinkName, DramNOCLinkName, EthernetLinkName, NetworkLinkName, NOCLinkName } from '../data/Types';
 import { MAX_CONGESTION_VALUE } from '../data/constants';
 
 export const NODE_SIZE = 100;
@@ -220,6 +220,7 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
             break;
 
         case NOCLinkName.NOC0_IN:
+        case EthernetLinkName.ETH_IN:
             if (renderType === LinkRenderType.GRID) {
                 arrowOffset = -10;
                 lineStartX = NOC_CENTER.x + NOC_0_X_OFFSET - CORE_DISPERSION;
@@ -247,6 +248,7 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
             }
             break;
         case NOCLinkName.NOC0_OUT:
+        case EthernetLinkName.ETH_OUT:
             if (renderType === LinkRenderType.GRID) {
                 arrowOffset = -10;
                 lineStartX = CORE_CENTER.x + NOC_0_X_OFFSET + CORE_DISPERSION;
@@ -356,7 +358,7 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
 
             break;
         default:
-            // console.info('Unknown link type', linkName);
+            console.info('Unknown link type', linkName);
             break;
     }
     return { lineEndX, lineEndY, lineStartX, lineStartY, arrow, arrowSecondary, transform };
@@ -419,6 +421,7 @@ export const drawPipesDirect = (
     });
 };
 
+/** @description node element helper function to calculate selected pipes per link */
 export const drawSelections = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
     nocLinkName: NOCLinkName,
@@ -431,7 +434,7 @@ export const drawSelections = (
     return pipeIds.length;
 };
 
-export const drawNOC = (
+export const drawNOCRouter = (
     svg: d3.Selection<SVGSVGElement | null, unknown, null, undefined>,
     point: { x: number; y: number },
 ) => {

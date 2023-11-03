@@ -43,7 +43,7 @@ const PipesPropertiesTab = () => {
                                 icon={IconNames.CROSS}
                             />
                         ) : (
-                            <Icon icon={IconNames.SEARCH}/>
+                            <Icon icon={IconNames.SEARCH} />
                         )
                     }
                     placeholder=''
@@ -51,10 +51,10 @@ const PipesPropertiesTab = () => {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPipeFilter(e.target.value)}
                 />
                 <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()}/>
+                    <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
                 </Tooltip2>
                 <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT}>
-                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}/>
+                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
                 </Tooltip2>
             </div>
             <div className='properties-panel__content'>
@@ -68,7 +68,7 @@ const PipesPropertiesTab = () => {
                                     filterQuery={pipeFilter}
                                     component={
                                         <li>
-                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter}/>
+                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter} />
                                         </li>
                                     }
                                 />

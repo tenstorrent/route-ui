@@ -32,6 +32,18 @@
     flex-direction: row;
     gap: 20px;
 
+
+    .chip-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .eth-off-chip {
+        .pipe-renderer {
+            transform: rotate(90deg);
+        }
+    }
+
     .node-links-wrap {
         min-width: 250px;
         padding: 5px;
@@ -49,9 +61,20 @@
         font-size: 16px;
         font-weight: bold;
         margin: 0;
+        line-height: 1.1;
+
+        &.single-line {
+            line-height: 2.2;
+        }
     }
 
-    .dram-subchannels {
+    &.type-eth {
+        p.label {
+            padding: 7px 0;
+        }
+    }
+
+    .node-container {
         display: flex;
         flex-direction: row;
         gap: 20px;
@@ -60,6 +83,9 @@
             .subchannel-name {
                 margin-bottom: 5px;
                 color: $detailed-vew-light-text;
+                button{
+                    margin-right: 5px;
+                }
             }
 
             &.current {
@@ -69,27 +95,29 @@
             }
         }
 
-        .dram-subchannel {
+        .node {
             display: flex;
             flex-direction: row;
             gap: 10px;
         }
 
-        .noc {
-            display: flex;
-            flex-direction: column;
-            column-gap: 10px;
+    }
 
-            .noc2axi,
-            .router {
-                background-color: $detailed-vew-component;
-                color: $tt-very-dark-gray;
-                width: 120px;
-                text-align: center;
-                padding: 6px;
-            }
 
+    .col {
+        display: flex;
+        flex-direction: column;
+        column-gap: 10px;
+
+        .noc2axi,
+        .router {
+            background-color: $detailed-vew-component;
+            color: $tt-very-dark-gray;
+            width: 120px;
+            text-align: center;
+            padding: 6px;
         }
+
     }
 
     .axi {
