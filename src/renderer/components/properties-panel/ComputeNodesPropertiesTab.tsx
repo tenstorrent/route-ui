@@ -1,5 +1,8 @@
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { IconNames } from '@blueprintjs/icons';
 import DataSource from '../../../data/DataSource';
 import {
     openDetailedView,
@@ -10,10 +13,7 @@ import {
 } from '../../../data/store';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
-import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
-import { IconNames } from '@blueprintjs/icons';
-import { ComputeNodeType } from '../../../data/Types';
+import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
 import { GraphVertexType } from '../../../data/GraphTypes';
 import SelectablePipe from '../SelectablePipe';
@@ -47,8 +47,6 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
-
-    // console.log(`RENDERED NODE ${node.uid} WITH OPERATION`, node.operation);
 
     return (
         <Card className='node-element'>
@@ -111,7 +109,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
                                                     <SelectablePipe
-                                                        pipeSegment={new PipeSegment(pipeId, 0)}
+                                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                                         pipeFilter=''
                                                     />
                                                 </li>
@@ -144,7 +142,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                             {io.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
                                                     <SelectablePipe
-                                                        pipeSegment={new PipeSegment(pipeId, 0)}
+                                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                                         pipeFilter=''
                                                     />
                                                 </li>

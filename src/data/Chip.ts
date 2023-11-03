@@ -23,8 +23,8 @@ import {
     NOC,
     NOCLinkName,
 } from './Types';
-import { INTERNAL_LINK_NAMES, NOC_LINK_NAMES } from './constants';
-import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
+import { DETAILED_VIEW_LINK_NAMES, INTERNAL_LINK_NAMES } from './constants';
+import type { Operation, OperationName } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import {
@@ -40,8 +40,8 @@ export default class Chip {
     public static GET_NOC_ORDER(): Map<NOCLinkName, number> {
         if (!Chip.NOC_ORDER) {
             Chip.NOC_ORDER = new Map(
-                Object.keys(NOCLinkName)
-                    .map((key) => NOCLinkName[key as keyof typeof NOCLinkName])
+                (Object.keys(NOCLinkName) as Array<keyof typeof NOCLinkName>)
+                    .map((key) => NOCLinkName[key])
                     .map((noc, index) => [noc, index]),
             );
         }
@@ -259,6 +259,26 @@ export default class Chip {
                     });
                 });
 
+                node.internalLinks.forEach((link) => {
+                    link.pipes.forEach((pipeSegment) => {
+                        let pipe: Pipe;
+                        if (!chip.pipesById.has(pipeSegment.id)) {
+                            pipe = new Pipe(pipeSegment.id);
+                            chip.pipesById.set(pipe.id, pipe);
+                        } else {
+                            pipe = chip.pipesById.get(pipeSegment.id) as Pipe;
+                        }
+                        if (!pipe.nodes.includes(node)) {
+                            pipe.nodes.push(node);
+                        }
+                        pipe.segments.push(pipeSegment);
+
+                        if (!node.pipes.includes(pipe)) {
+                            node.pipes.push(pipe);
+                        }
+                    });
+                });
+
                 return node;
             })
             .sort((a, b) => {
@@ -288,8 +308,8 @@ export default class Chip {
             Object.entries(operationsJson).map(([operationName, opJson]) => {
                 const operation = augmentedChip.operationsByName.get(operationName);
                 if (!operation) {
-                    console.error(
-                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.\nThis is not an error`,
+                    console.warn(
+                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
                     );
                     /** temporarily disabling this until new op-to-pipe with chip_id and graph_id is present */
                     // operation = new BuildableOperation(operationName, [], [], []);
@@ -489,7 +509,7 @@ export default class Chip {
             node.links.forEach((link) => {
                 links.push(link);
             });
-            node.externalLinks.forEach((link) => {
+            node.internalLinks.forEach((link) => {
                 links.push(link);
             });
         });
@@ -569,12 +589,15 @@ export class DramChannel {
 }
 
 export class DramSubchannel {
-    public subchannelId: number;
+    public readonly subchannelId: number;
+
+    public readonly channelId: number;
 
     public links: DramNOCLink[] = [];
 
     constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
+        this.channelId = channelId;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(
                 NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink,
@@ -725,7 +748,7 @@ export class ComputeNode {
                 node.links.set(linkName, link as NOCLink);
             }
             if (link.type === LinkType.ETHERNET) {
-                node.externalLinks.set(linkName, link as EthernetLink);
+                node.internalLinks.set(linkName, link as EthernetLink);
             }
             // TODO: PCIE links will go here
         });
@@ -765,7 +788,7 @@ export class ComputeNode {
     public links: Map<any, NOCLink> = new Map();
 
     /** @description Off chip links that are not part of the NOC, excluding DRAM links */
-    public externalLinks: Map<any, NetworkLink> = new Map();
+    public internalLinks: Map<any, NetworkLink> = new Map();
 
     public dramChannel: DramChannel | null = null;
 
@@ -780,13 +803,11 @@ export class ComputeNode {
     /**
      * only relevant for dram nodes
      */
-    /** @Deprecated */
     public dramSubchannelId: number = 0;
 
     /**
      * only relevant for dram nodes
      */
-    /** @Deprecated */
     public dramChannelId: number = -1;
 
     public operation?: Operation;
@@ -824,36 +845,47 @@ export class ComputeNode {
         });
     };
 
-    public getInternalLinksForNode = (): NOCLink[] => {
-        return [...this.links.values()]
+    public getInternalLinksForNode = (): NetworkLink[] => {
+        const links: NetworkLink[] = [...this.links.values()]
             .filter((link) => {
-                return INTERNAL_LINK_NAMES.includes(link.name);
+                return DETAILED_VIEW_LINK_NAMES.includes(link.name);
             })
             .sort((a, b) => {
                 const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
                 const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
                 return firstKeyOrder - secondKeyOrder;
             });
+        links.push(...this.internalLinks.values());
+        return links;
     };
 
     public getPipeIdsForNode = (): string[] => {
-        const pipes: string[] = [];
+        const pipeIds: string[] = [];
 
         this.links.forEach((link) => {
-            pipes.push(...link.pipes.map((pipe) => pipe.id));
+            pipeIds.push(...link.pipes.map((pipe) => pipe.id));
         });
 
-        return pipes;
+        this.internalLinks.forEach((link) => {
+            pipeIds.push(...link.pipes.map((pipe) => pipe.id));
+        });
+
+        return pipeIds;
     };
 
     getInternalPipeIDsForNode = (): string[] => {
         return [...this.links.values()]
             .filter((link) => {
-                return NOC_LINK_NAMES.includes(link.name as NOCLinkName);
+                return INTERNAL_LINK_NAMES.includes(link.name as NOCLinkName);
             })
             .map((link) => {
                 return [...link.pipes.map((pipe) => pipe.id)];
             })
+            .concat(
+                ...[...this.internalLinks.values()].map((link) => {
+                    return [...link.pipes.map((pipe) => pipe.id)];
+                }),
+            )
             .flat();
     };
 
@@ -912,19 +944,21 @@ export class Pipe {
 export class PipeSegment {
     readonly id: string;
 
+    /** @description unused?
+     @Deprecated */
     location: Loc = { x: 0, y: 0 };
 
-    bandwidth: number = 0;
+    readonly bandwidth: number;
 
-    linkName: NetworkLinkName;
+    readonly linkName: NetworkLinkName;
 
-    bandwidthUse: number = 0;
+    readonly bandwidthUse: number;
 
-    constructor(id: string, bandwidth: number, nocId: string = '', linkTotalData: number = 0) {
+    constructor(id: string, bandwidth: number, linkName: NetworkLinkName, linkTotalData: number = 0) {
         this.id = id;
-        this.linkName = nocId as NetworkLinkName;
-        this.bandwidth = bandwidth;
-        this.bandwidthUse = (this.bandwidth / linkTotalData) * 100;
+        this.linkName = linkName as NetworkLinkName;
+        this.bandwidth = bandwidth || 0;
+        this.bandwidthUse = (this.bandwidth / linkTotalData) * 100 || 0;
     }
 }
 
