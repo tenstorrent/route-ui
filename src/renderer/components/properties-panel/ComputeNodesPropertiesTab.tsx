@@ -15,7 +15,7 @@ import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
 import { ComputeNodeType } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
-import { OpGraphNodeType } from '../../../data/GraphTypes';
+import { GraphVertexType } from '../../../data/GraphTypes';
 import SelectablePipe from '../SelectablePipe';
 import LinkDetails from '../LinkDetails';
 
@@ -92,7 +92,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                             <ul className='scrollable-content'>
                                 <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                     <div key={io.name} style={{ fontSize: '12px' }}>
-                                        {io.type === OpGraphNodeType.OPERATION ? (
+                                        {io.type === GraphVertexType.OPERATION ? (
                                             <SelectableOperation
                                                 opName={io.name}
                                                 value={nodesSelectionState.groups[io.name]?.selected}
@@ -125,7 +125,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                             <ul className='scrollable-content'>
                                 <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
                                     <div key={io.name} style={{ fontSize: '12px' }}>
-                                        {io.type === OpGraphNodeType.OPERATION ? (
+                                        {io.type === GraphVertexType.OPERATION ? (
                                             <SelectableOperation
                                                 opName={io.name}
                                                 value={nodesSelectionState.groups[io.name]?.selected}
