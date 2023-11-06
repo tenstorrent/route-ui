@@ -7,7 +7,7 @@ import {
     NodeDataJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { BuildableOperation, BuildableQueue, Operand } from './ChipAugmentation';
+import { BuildableOperation, BuildableQueue, Operand } from './Graph';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
@@ -33,6 +33,7 @@ import {
     OperandJSON,
     OperationDetails,
 } from './sources/GraphDescriptor';
+import { QueueDescriptorJson } from './sources/QueueDescriptor';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -166,7 +167,7 @@ export default class Chip {
         return this.queuesByName.values();
     }
 
-    public getQueue(name: QueueName) {
+    public getQueue(name: QueueName): Queue | undefined {
         return this.queuesByName.get(name);
     }
 
@@ -482,6 +483,12 @@ export default class Chip {
         });
         forEach(operations, (operation) => newChip.addOperation(operation));
         return newChip;
+    }
+
+    static AUGMENT_FROM_QUEUE_DESCRIPTOR(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
+        forEach(chip.queuesByName.values(), (queue) => {
+            queue.details = {...queueDescriptorJson[queue.name]};
+        });
     }
 
     public generateInitialPipesSelectionState(): PipeSelection[] {

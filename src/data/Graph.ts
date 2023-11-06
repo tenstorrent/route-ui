@@ -2,6 +2,7 @@ import { ComputeNodeType } from './Types';
 import type { OperandName, Operation, OperationName, GraphVertex, GraphVertexId, Queue } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
 import type { ComputeNode } from './Chip';
+import { QueueDetailsJson } from "./sources/QueueDescriptor";
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -33,6 +34,8 @@ export abstract class AbstractGraphVertex {
 
 export class BuildableQueue extends AbstractGraphVertex implements Queue {
     readonly vertexType = GraphVertexType.QUEUE;
+
+    details?: QueueDetailsJson;
 }
 
 /**

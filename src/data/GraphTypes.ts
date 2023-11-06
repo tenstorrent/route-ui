@@ -1,5 +1,6 @@
 import type { ComputeNode } from './Chip';
-import type { Operand } from './ChipAugmentation';
+import type { Operand } from './Graph';
+import type { QueueDetailsJson } from "./sources/QueueDescriptor";
 
 export type OperationName = string;
 export type QueueName = string;
@@ -22,6 +23,8 @@ interface HasOperands {
 export interface Queue extends HasOperands {
     readonly name: QueueName;
     readonly vertexType: GraphVertexType.QUEUE;
+    readonly details?: QueueDetailsJson;
+
 }
 
 export interface Operation extends HasOperands {
