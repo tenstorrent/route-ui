@@ -24,7 +24,7 @@ import {
     NOCLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
-import type { Operation, OperationName } from './GraphTypes';
+import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import {
