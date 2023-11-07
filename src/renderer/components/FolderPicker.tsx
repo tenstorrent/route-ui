@@ -13,6 +13,7 @@ import Chip from '../../data/Chip';
 import { Architecture } from '../../data/Types';
 import { ChipDesignJSON } from '../../data/JSONDataTypes';
 import { GraphDescriptorJSON } from '../../data/sources/GraphDescriptor';
+import { QueueDescriptorJson } from "../../data/sources/QueueDescriptor";
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
     if (architecture === Architecture.NONE) {
@@ -28,6 +29,9 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
     return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
+/** Implements a temporary wrapper around the Folder Loading component, to provide state and context that is not yet
+ * present in the App's higher-level components
+ * */
 export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Chip) => void }): React.ReactElement => {
     const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null);
     const [selectedGraph, setSelectedGraph] = React.useState<string | null>(null);
@@ -45,21 +49,29 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
     };
 
     const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
-        const chip = await loadChipFromArchitecture(architecture);
+        let chip = await loadChipFromArchitecture(architecture);
         const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
         const graphDescriptorJson = await loadJsonFile(graphPath);
 
-        const newChip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+        chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+
+        const queuesPath = path.join(folderPath, 'queue_descriptor', 'queue_descriptor.json');
+        const queueDescriptorJson = await loadJsonFile(queuesPath);
+
+        chip = Chip.AUGMENT_FROM_QUEUE_DESCRIPTOR(chip, queueDescriptorJson as QueueDescriptorJson);
 
         // const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
         // const analyzerResultsJson = await loadJsonFile(analyzerResultsPath)
-        return newChip;
+        return chip
     };
 
     return (
         <div className='folder-load-container'>
             <div>
-                <ButtonGroup className='architecture-button-group'>
+                <ButtonGroup
+                    // The architecture will (at some point) be specified in the selected folder, but until then it needs to be selectable.
+                    className='architecture-button-group'
+                >
                     <Button
                         icon='person'
                         active={selectedArchitecture === Architecture.GRAYSKULL}

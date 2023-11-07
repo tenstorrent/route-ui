@@ -497,6 +497,11 @@ export default class Chip {
         forEach(chip.queuesByName.values(), (queue) => {
             queue.details = { ...queueDescriptorJson[queue.name] };
         });
+
+        const newChip = new Chip(chip.chipId);
+        Object.assign(newChip, chip);
+
+        return newChip;
     }
 
     public generateInitialPipesSelectionState(): PipeSelection[] {
