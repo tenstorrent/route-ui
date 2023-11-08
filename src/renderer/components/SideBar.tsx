@@ -20,7 +20,7 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
 
     const { chip } = useContext(DataSource);
     const dispatch = useDispatch();
-    const reloadApp = () => {
+    const reloadAppData = () => {
         dispatch(loadedFilename(''));
         navigate('/');
     };
@@ -93,11 +93,11 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
     };
     return (
         <div className='sidebar'>
-            <Tooltip2 content='Load new netlist analyzer output .yaml file'>
-                <Button icon={IconNames.REFRESH} text='' onClick={reloadApp} />
+            <Tooltip2 content='Load new dataset'>
+                <Button icon={IconNames.FolderSharedOpen} text='' onClick={reloadAppData} />
             </Tooltip2>
             <Tooltip2 content='Load ops to pipes mapping'>
-                <Button icon={IconNames.IMPORT} text='' onClick={loadOpsToPipes} />
+                <Button icon={IconNames.SERIES_FILTERED} text='' onClick={loadOpsToPipes} />
             </Tooltip2>
         </div>
     );
