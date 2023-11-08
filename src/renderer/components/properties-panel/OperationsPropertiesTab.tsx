@@ -76,7 +76,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                             />
                                         }
                                         content={<GraphVertexDetails graphNode={operation} />}
-                                        open={allOpen}
+                                        isOpen={allOpen}
                                     />
                                 }
                             />

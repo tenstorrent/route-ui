@@ -32,7 +32,7 @@ function QueuesPropertiesTab() {
                                     key={queue.name}
                                     content={queue && <GraphVertexDetails graphNode={queue} />}
                                     label={<HighlightedText text={queue.name} filter={filterQuery} />}
-                                    open={allOpen}
+                                    isOpen={allOpen}
                                     styles={{ color: '#000' }}
                                 />
                             }

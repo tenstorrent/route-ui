@@ -121,7 +121,7 @@ export default function GridRender() {
                             flexDirection: 'column',
                         }}
                         label='Grid Controls'
-                        open={false}
+                        isOpen={false}
                         content={
                             <>
                                 <Tooltip2 content='Show all links overlay' position={Position.RIGHT}>
@@ -156,7 +156,7 @@ export default function GridRender() {
                     {chip?.pipes.size > 0 && (
                         <Collapsible
                             label='Congestion'
-                            open
+                            isOpen
                             styles={{
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -283,7 +283,7 @@ export default function GridRender() {
                             </>
                         }
                         label='CLK Controls'
-                        open
+                        isOpen
                     />
                 </div>
             </div>
