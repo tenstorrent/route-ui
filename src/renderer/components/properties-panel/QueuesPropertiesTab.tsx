@@ -30,11 +30,12 @@ function QueuesPropertiesTab() {
                             component={
                                 <Collapsible
                                     key={queue.name}
-                                    content={queue && <GraphVertexDetails graphNode={queue} />}
                                     label={<HighlightedText text={queue.name} filter={filterQuery} />}
                                     isOpen={allOpen}
                                     styles={{ color: '#000' }}
-                                />
+                                >
+                                    {queue && <GraphVertexDetails graphNode={queue} />}
+                                </Collapsible>
                             }
                         />
                     ))}

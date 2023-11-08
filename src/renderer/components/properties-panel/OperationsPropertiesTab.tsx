@@ -75,9 +75,10 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                                 stringFilter={filterQuery}
                                             />
                                         }
-                                        content={<GraphVertexDetails graphNode={operation} />}
                                         isOpen={allOpen}
-                                    />
+                                    >
+                                        {operation && <GraphVertexDetails graphNode={operation} />}
+                                    </Collapsible>
                                 }
                             />
                         );

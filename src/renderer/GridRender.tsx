@@ -122,35 +122,33 @@ export default function GridRender() {
                         }}
                         label='Grid Controls'
                         isOpen={false}
-                        content={
-                            <>
-                                <Tooltip2 content='Show all links overlay' position={Position.RIGHT}>
-                                    <Switch
-                                        checked={showEmptyLinks}
-                                        label='links'
-                                        disabled={!showPipes}
-                                        onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
-                                    />
-                                </Tooltip2>
-                                <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
-                                    <Switch
-                                        checked={showOperationColors}
-                                        label='operations'
-                                        onChange={(event) => setShowOperationColors(event.currentTarget.checked)}
-                                    />
-                                </Tooltip2>
-                                <Tooltip2 content='Show Compute Node locations' position={Position.RIGHT}>
-                                    <Switch
-                                        checked={showNodeLocation}
-                                        label='location'
-                                        onChange={(event) => setShowNodeLocation(event.currentTarget.checked)}
-                                    />
-                                </Tooltip2>
-                                <hr />
-                            </>
-                        }
-
-                    />
+                    >
+                        <>
+                            <Tooltip2 content='Show all links overlay' position={Position.RIGHT}>
+                                <Switch
+                                    checked={showEmptyLinks}
+                                    label='links'
+                                    disabled={!showPipes}
+                                    onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
+                                />
+                            </Tooltip2>
+                            <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
+                                <Switch
+                                    checked={showOperationColors}
+                                    label='operations'
+                                    onChange={(event) => setShowOperationColors(event.currentTarget.checked)}
+                                />
+                            </Tooltip2>
+                            <Tooltip2 content='Show Compute Node locations' position={Position.RIGHT}>
+                                <Switch
+                                    checked={showNodeLocation}
+                                    label='location'
+                                    onChange={(event) => setShowNodeLocation(event.currentTarget.checked)}
+                                />
+                            </Tooltip2>
+                            <hr />
+                        </>
+                    </Collapsible>
                     {/* TODO: abstract this into a global state */}
 
                     {chip?.pipes.size > 0 && (
@@ -161,7 +159,8 @@ export default function GridRender() {
                                 display: 'flex',
                                 flexDirection: 'column',
                             }}
-                            content={
+                        >
+                            {
                                 <>
                                     {/* Link saturation */}
                                     <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
@@ -232,10 +231,10 @@ export default function GridRender() {
                                     <hr />
                                 </>
                             }
-                        />
+                        </Collapsible>
                     )}
-                    <Collapsible
-                        content={
+                    <Collapsible label='CLK Controls' isOpen>
+                        {
                             <>
                                 {/* TODO: abstract this into a global state */}
 
@@ -282,9 +281,7 @@ export default function GridRender() {
                                 <DRAMBandwidthControls />
                             </>
                         }
-                        label='CLK Controls'
-                        isOpen
-                    />
+                    </Collapsible>
                 </div>
             </div>
 

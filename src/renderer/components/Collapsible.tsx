@@ -5,27 +5,34 @@ import { IconNames } from '@blueprintjs/icons';
 import '../scss/Collapsible.scss';
 
 interface CollapsibleProps {
-    content: React.ReactElement | null;
     label: string | JSX.Element;
     isOpen?: boolean;
     styles?: React.CSSProperties;
 }
 
-const Collapsible: React.FC<CollapsibleProps> = ({ content, label, isOpen, styles }) => {
+
+/**
+ *
+ * @param label Clickable label
+ * @param isOpen state, initial state and action to change state
+ * @param styles
+ * @param children ReactNode
+ * @constructor
+ */
+const Collapsible: React.FC<React.PropsWithChildren<CollapsibleProps>> = ({ label, isOpen, styles , children}) => {
     const [isOpenState, setIsOpenState] = React.useState(isOpen);
     useEffect(() => {
         setIsOpenState(isOpen);
     }, [isOpen]);
 
     const icon = isOpenState ? IconNames.CARET_UP : IconNames.CARET_DOWN;
-
     return (
         <div className='collapsible-component'>
             <Button small minimal onClick={() => setIsOpenState(!isOpenState)} rightIcon={icon}>
                 {label}
             </Button>
             <Collapse isOpen={isOpenState}>
-                <div style={styles}>{content}</div>
+                <div style={styles}>{children}</div>
             </Collapse>
         </div>
     );
