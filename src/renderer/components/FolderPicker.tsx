@@ -2,18 +2,17 @@ import React from 'react';
 
 import path from 'path';
 
-import { Button, ButtonGroup } from '@blueprintjs/core';
+import { Button, ButtonGroup, Menu, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
 import '../scss/FolderPicker.scss';
 
 import { getAvailableGraphNames, loadJsonFile, validatePerfResultsFolder } from 'utils/Files';
-import GraphPicker from './GraphPicker';
 import Chip from '../../data/Chip';
 import { Architecture } from '../../data/Types';
 import { ChipDesignJSON } from '../../data/JSONDataTypes';
 import { GraphDescriptorJSON } from '../../data/sources/GraphDescriptor';
-import { QueueDescriptorJson } from "../../data/sources/QueueDescriptor";
+import { QueueDescriptorJson } from '../../data/sources/QueueDescriptor';
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
     if (architecture === Architecture.NONE) {
@@ -62,7 +61,17 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
 
         // const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
         // const analyzerResultsJson = await loadJsonFile(analyzerResultsPath)
-        return chip
+        return chip;
+    };
+
+    const onSelectGraphName = (graphName: string) => {
+        setSelectedGraph(graphName);
+        setShowGraphSelect(false);
+        if (selectedFolder) {
+            loadGraph(selectedFolder, graphName, selectedArchitecture)
+                .then((chip) => onDataLoad(chip))
+                .catch((err) => console.log(err));
+        }
     };
 
     return (
@@ -92,19 +101,19 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
             </div>
             <Popover2
                 content={
-                    <GraphPicker
-                        options={graphOptions}
-                        selected={selectedGraph}
-                        onSelect={(graphName) => {
-                            setSelectedGraph(graphName);
-                            setShowGraphSelect(false);
-                            if (selectedFolder) {
-                                loadGraph(selectedFolder, graphName, selectedArchitecture)
-                                    .then((chip) => onDataLoad(chip))
-                                    .catch((err) => console.log(err));
-                            }
-                        }}
-                    />
+                    <div className='graph-picker'>
+                        <h3>Select a graph</h3>
+                        <Menu>
+                            {graphOptions.map((item) => (
+                                <MenuItem
+                                    key={item}
+                                    selected={selectedGraph === item}
+                                    onClick={(_e) => onSelectGraphName(item)}
+                                    text={item}
+                                />
+                            ))}
+                        </Menu>
+                    </div>
                 }
                 disabled={!showGraphSelect}
                 isOpen={showGraphSelect}
