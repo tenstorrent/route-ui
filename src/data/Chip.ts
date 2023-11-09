@@ -163,6 +163,10 @@ export default class Chip {
 
     private queuesByName: Map<QueueName, BuildableQueue>;
 
+    public get hasQueues(): boolean {
+        return this.queuesByName.size > 0;
+    }
+
     public get queues(): Iterable<Queue> {
         return this.queuesByName.values();
     }
@@ -178,6 +182,10 @@ export default class Chip {
     }
 
     private pipesById: Map<string, Pipe> = new Map();
+
+    public get hasPipes(): boolean {
+        return this.pipesById.size > 0;
+    }
 
     get pipes(): Map<string, Pipe> {
         return this.pipesById;
@@ -487,7 +495,7 @@ export default class Chip {
 
     static AUGMENT_FROM_QUEUE_DESCRIPTOR(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
         forEach(chip.queuesByName.values(), (queue) => {
-            queue.details = {...queueDescriptorJson[queue.name]};
+            queue.details = { ...queueDescriptorJson[queue.name] };
         });
     }
 

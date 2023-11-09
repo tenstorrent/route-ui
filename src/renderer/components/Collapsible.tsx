@@ -31,7 +31,7 @@ const Collapsible: React.FC<React.PropsWithChildren<CollapsibleProps>> = ({ labe
             <Button small minimal onClick={() => setIsOpenState(!isOpenState)} rightIcon={icon}>
                 {label}
             </Button>
-            <Collapse isOpen={isOpenState}>
+            <Collapse isOpen={isOpenState} keepChildrenMounted>
                 <div style={styles}>{children}</div>
             </Collapse>
         </div>

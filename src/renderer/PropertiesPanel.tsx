@@ -14,13 +14,13 @@ export default function PropertiesPanel() {
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
                 <Tab id='tab-nodes' title='Compute Node' panel={<ComputeNodesPropertiesTab />} />
                 {/* TODO: abstract this into a global state */}
-                {chip && chip.pipes.size > 0 && (
+                {chip?.hasPipes && (
                     //
                     <Tab id='tab-pipes' title='All pipes' panel={<PipesPropertiesTab />} />
                 )}
                 <Tab id='tab-ops' title='Operations' panel={<OperationsPropertiesTab />} />
-
-                {process.env.NODE_ENV === 'development' && (
+                {chip?.hasQueues && (
+                    //
                     <Tab id='tab-queues' title='Queues' panel={<QueuesPropertiesTab />} />
                 )}
             </Tabs>

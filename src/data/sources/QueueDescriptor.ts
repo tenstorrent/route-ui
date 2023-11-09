@@ -1,6 +1,4 @@
-import type { OperationName, QueueName, GraphVertexType } from '../GraphTypes';
-import type Chip from "../Chip";
-import { forEach } from "../../utils/IterableHelpers";
+import type { QueueName } from '../GraphTypes';
 
 interface AllocationInfoJson {
     address: number;
