@@ -2,7 +2,7 @@ import React from 'react';
 
 import path from 'path';
 
-import { Button, ButtonGroup, Menu, MenuItem } from '@blueprintjs/core';
+import { Button, ButtonGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
 import '../scss/FolderPicker.scss';
@@ -77,28 +77,31 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
 
     return (
         <div className='folder-load-container'>
+            <h3>Load From Folder</h3>
             <div>
-                <ButtonGroup
-                    // The architecture will (at some point) be specified in the selected folder, but until then it needs to be selectable.
-                    className='architecture-button-group'
-                >
-                    <Button
-                        icon='person'
-                        active={selectedArchitecture === Architecture.GRAYSKULL}
-                        onClick={() => setSelectedArchitecture(Architecture.GRAYSKULL)}
-                        className='architecture-button'
+                <Tooltip2 content="Select Architecture" position="left">
+                    <ButtonGroup
+                        // The architecture will (at some point) be specified in the selected folder, but until then it needs to be selectable.
+                        className='architecture-button-group'
                     >
-                        Grayskull
-                    </Button>
-                    <Button
-                        icon='globe-network'
-                        active={selectedArchitecture === Architecture.WORMHOLE}
-                        onClick={() => setSelectedArchitecture(Architecture.WORMHOLE)}
-                        className='architecture-button'
-                    >
-                        Wormhole
-                    </Button>
-                </ButtonGroup>
+                        <Button
+                            icon='person'
+                            active={selectedArchitecture === Architecture.GRAYSKULL}
+                            onClick={() => setSelectedArchitecture(Architecture.GRAYSKULL)}
+                            className='architecture-button'
+                        >
+                            Grayskull
+                        </Button>
+                        <Button
+                            icon='globe-network'
+                            active={selectedArchitecture === Architecture.WORMHOLE}
+                            onClick={() => setSelectedArchitecture(Architecture.WORMHOLE)}
+                            className='architecture-button'
+                        >
+                            Wormhole
+                        </Button>
+                    </ButtonGroup>
+                </Tooltip2>
             </div>
             <FolderPicker
                 disabled={selectedArchitecture === Architecture.NONE}
@@ -113,8 +116,7 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                 disabled={!showGraphSelect}
             />
 
-            {/* Temporary elements to display success of selection */}
-            {selectedArchitecture && <p>Selected Architecture: {selectedArchitecture}</p>}
+            {/* For Debugging */}
             {selectedFolder && <p>Selected Folder: {selectedFolder}</p>}
             {selectedGraph && <p>Selected Graph: {selectedGraph}</p>}
         </div>
