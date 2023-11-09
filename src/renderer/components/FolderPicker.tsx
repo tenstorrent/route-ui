@@ -13,6 +13,7 @@ import { Architecture } from '../../data/Types';
 import { ChipDesignJSON } from '../../data/JSONDataTypes';
 import { GraphDescriptorJSON } from '../../data/sources/GraphDescriptor';
 import { QueueDescriptorJson } from '../../data/sources/QueueDescriptor';
+import PopoverMenu from './PopoverMenu';
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
     if (architecture === Architecture.NONE) {
@@ -104,27 +105,13 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                 onSelectFolder={loadFolder}
                 disabledText='Select Architecture Before Loading Graph'
             />
-            <Popover2
-                content={
-                    <div className='graph-picker'>
-                        <h3>Select a graph</h3>
-                        <Menu>
-                            {graphOptions.map((item) => (
-                                <MenuItem
-                                    key={item}
-                                    selected={selectedGraph === item}
-                                    onClick={(_e) => onSelectGraphName(item)}
-                                    text={item}
-                                />
-                            ))}
-                        </Menu>
-                    </div>
-                }
+            <PopoverMenu // Graph picker
+                label="Select Graph"
+                options={graphOptions}
+                selectedItem={selectedGraph}
+                onSelectItem={onSelectGraphName}
                 disabled={!showGraphSelect}
-                placement='right'
-            >
-                <Button icon="globe-network" disabled={!showGraphSelect}>Select Graph</Button>
-            </Popover2>
+            />
 
             {/* Temporary elements to display success of selection */}
             {selectedArchitecture && <p>Selected Architecture: {selectedArchitecture}</p>}
