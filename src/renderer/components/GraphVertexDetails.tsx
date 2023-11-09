@@ -25,29 +25,29 @@ const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactEleme
     return (
         <div className='operation-details' style={{ color: '#000', marginLeft: '20px' }}>
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
-            {inputs.map((io) => (
-                <div className='operation-input' key={io.name}>
-                    {io.type === GraphVertexType.OPERATION ? (
+            {inputs.map((operand) => (
+                <div className='operation-operand' key={operand.name}>
+                    {operand.type === GraphVertexType.OPERATION ? (
                         <SelectableOperation
-                            opName={io.name}
-                            value={nodesSelectionState.groups[io.name]?.selected}
+                            opName={operand.name}
+                            value={nodesSelectionState.groups[operand.name]?.selected}
                             selectFunc={setOperationSelectionState}
                             stringFilter=''
                         />
                     ) : (
                         <div className='op-element'>
                             <Checkbox checked={false} disabled />
-                            <span>{io.name}</span>
+                            <span>{operand.name}</span>
                         </div>
                     )}
                 </div>
             ))}
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
-            {outputs.map((io) => (
-                <div className='operation-input' key={io.name}>
+            {outputs.map((operand) => (
+                <div className='operation-operand' key={operand.name}>
                     {/* DEBUGING RENDER */}
                     {/* <ul> */}
-                    {/*     {[...io.pipeIdsByCore.entries()].map(([coreId,pipeIds ]) => ( */}
+                    {/*     {[...operand.pipeIdsByCore.entries()].map(([coreId,pipeIds ]) => ( */}
                     {/*         <li key={coreId}> */}
                     {/*             <p>{coreId}</p> */}
                     {/*             <ul> */}
@@ -58,17 +58,17 @@ const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactEleme
                     {/*         </li> */}
                     {/*     ))} */}
                     {/* </ul> */}
-                    {io.type === GraphVertexType.OPERATION ? (
+                    {operand.type === GraphVertexType.OPERATION ? (
                         <SelectableOperation
-                            opName={io.name}
-                            value={nodesSelectionState.groups[io.name]?.selected}
+                            opName={operand.name}
+                            value={nodesSelectionState.groups[operand.name]?.selected}
                             selectFunc={setOperationSelectionState}
                             stringFilter=''
                         />
                     ) : (
                         <div className='op-element'>
                             <Checkbox checked={false} disabled />
-                            <span>{io.name}</span>
+                            <span>{operand.name}</span>
                         </div>
                     )}
                 </div>
