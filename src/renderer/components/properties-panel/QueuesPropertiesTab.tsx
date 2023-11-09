@@ -1,14 +1,16 @@
 import React, { useContext, useMemo, useState } from 'react';
+import { Button } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import DataSource from '../../../data/DataSource';
 import SearchField from '../SearchField';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import HighlightedText from '../HighlightedText';
-import ExpandableGroup from '../ExpandableGroup';
+import Collapsible from '../Collapsible';
 
 function QueuesPropertiesTab() {
     const { chip } = useContext(DataSource);
-
+    const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
 
     const queuesList = useMemo(() => (chip ? [...chip.queues] : []), [chip]);
@@ -16,23 +18,27 @@ function QueuesPropertiesTab() {
     return (
         <div>
             <SearchField searchQuery={filterQuery} onQueryChanged={setFilterQuery} controls={[]} />
+            <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
+            <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             <div className='operations-wrap list-wrap'>
                 <div className='scrollable-content'>
-                    <ExpandableGroup
-                        items={queuesList.map((queue) => ({
-                            key: queue.name,
-                            target: (
-                                <FilterableComponent
+                    {queuesList.map((queue) => (
+                        <FilterableComponent
+                            key={queue.name}
+                            filterableString={queue.name}
+                            filterQuery={filterQuery}
+                            component={
+                                <Collapsible
                                     key={queue.name}
-                                    filterableString={queue.name}
-                                    filterQuery={filterQuery}
-                                    component={<HighlightedText text={queue.name} filter={filterQuery} />}
-                                />
-                            ),
-                            expandedContent: queue && <GraphVertexDetails graphNode={queue} />,
-                            className: '',
-                        }))}
-                    />
+                                    label={<HighlightedText text={queue.name} filter={filterQuery} />}
+                                    isOpen={allOpen}
+                                    styles={{ color: '#000' }}
+                                >
+                                    {queue && <GraphVertexDetails graphNode={queue} />}
+                                </Collapsible>
+                            }
+                        />
+                    ))}
                 </div>
             </div>
         </div>

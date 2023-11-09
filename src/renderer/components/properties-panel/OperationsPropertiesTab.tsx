@@ -10,17 +10,16 @@ import FilterableComponent from '../FilterableComponent';
 import SelectableOperation from '../SelectableOperation';
 import SearchField from '../SearchField';
 import GraphVertexDetails from '../GraphVertexDetails';
+import Collapsible from '../Collapsible';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
 
     const { chip } = useContext(DataSource);
-
     const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.groups);
-
     const [filterQuery, setFilterQuery] = useState<string>('');
-
     const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
+    const [allOpen, setAllOpen] = useState(true);
 
     const selectFilteredOperations = () => {
         if (!chip) {
@@ -40,7 +39,6 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                 selected,
             }),
         );
-
     return (
         <div>
             <div>
@@ -56,6 +54,8 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                         </Tooltip2>,
                     ]}
                 />
+                <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
+                <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
             <div className='operations-wrap list-wrap'>
                 <div className='scrollable-content'>
@@ -66,15 +66,19 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                 filterableString={operation.name}
                                 filterQuery={filterQuery}
                                 component={
-                                    <>
-                                        <SelectableOperation
-                                            opName={operation.name}
-                                            value={groupsSelectionState[operation.name]?.selected}
-                                            selectFunc={setOperationSelectionState}
-                                            stringFilter={filterQuery}
-                                        />
+                                    <Collapsible
+                                        label={
+                                            <SelectableOperation
+                                                opName={operation.name}
+                                                value={groupsSelectionState[operation.name]?.selected}
+                                                selectFunc={setOperationSelectionState}
+                                                stringFilter={filterQuery}
+                                            />
+                                        }
+                                        isOpen={allOpen}
+                                    >
                                         {operation && <GraphVertexDetails graphNode={operation} />}
-                                    </>
+                                    </Collapsible>
                                 }
                             />
                         );
