@@ -103,7 +103,7 @@ export default function GridRender() {
                         labelRenderer={(value) => `${value.toFixed(1)}`}
                     />
                     <hr />
-                    {/* {chip?.pipes.size > 0 && ( */}
+                    {/* {chip?.hasPipes && ( */}
                     {/*     <> */}
                     {/*         <Tooltip2 content='Show pipes' position={Position.RIGHT}> */}
                     {/*             <Switch */}
@@ -151,7 +151,7 @@ export default function GridRender() {
                     </Collapsible>
                     {/* TODO: abstract this into a global state */}
 
-                    {chip?.pipes.size > 0 && (
+                    {chip?.hasPipes && (
                         <Collapsible
                             label='Congestion'
                             isOpen

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo, useState } from 'react';
-import { Button } from '@blueprintjs/core';
+import { Button, Checkbox } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import DataSource from '../../../data/DataSource';
 import SearchField from '../SearchField';
@@ -30,7 +30,12 @@ function QueuesPropertiesTab() {
                             component={
                                 <Collapsible
                                     key={queue.name}
-                                    label={<HighlightedText text={queue.name} filter={filterQuery} />}
+                                    label={
+                                        <div className='op-element'>
+                                            <Checkbox checked={false} disabled />
+                                            <HighlightedText text={queue.name} filter={filterQuery} />
+                                        </div>
+                                    }
                                     isOpen={allOpen}
                                     styles={{ color: '#000' }}
                                 >
