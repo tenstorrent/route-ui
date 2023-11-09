@@ -28,6 +28,23 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
     return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
+const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
+    let chip = await loadChipFromArchitecture(architecture);
+    const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
+    const graphDescriptorJson = await loadJsonFile(graphPath);
+
+    chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+
+    const queuesPath = path.join(folderPath, 'queue_descriptor', 'queue_descriptor.json');
+    const queueDescriptorJson = await loadJsonFile(queuesPath);
+
+    chip = Chip.AUGMENT_FROM_QUEUE_DESCRIPTOR(chip, queueDescriptorJson as QueueDescriptorJson);
+
+    // const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
+    // const analyzerResultsJson = await loadJsonFile(analyzerResultsPath)
+    return chip;
+};
+
 /** Implements a temporary wrapper around the Folder Loading component, to provide state and context that is not yet
  * present in the App's higher-level components
  * */
@@ -45,23 +62,6 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
         console.log(`Available graphs: ${graphs}`);
         setGraphOptions(graphs);
         setShowGraphSelect(true);
-    };
-
-    const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
-        let chip = await loadChipFromArchitecture(architecture);
-        const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
-        const graphDescriptorJson = await loadJsonFile(graphPath);
-
-        chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
-
-        const queuesPath = path.join(folderPath, 'queue_descriptor', 'queue_descriptor.json');
-        const queueDescriptorJson = await loadJsonFile(queuesPath);
-
-        chip = Chip.AUGMENT_FROM_QUEUE_DESCRIPTOR(chip, queueDescriptorJson as QueueDescriptorJson);
-
-        // const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
-        // const analyzerResultsJson = await loadJsonFile(analyzerResultsPath)
-        return chip;
     };
 
     const onSelectGraphName = (graphName: string) => {
@@ -99,6 +99,11 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                     </Button>
                 </ButtonGroup>
             </div>
+            <FolderPicker
+                disabled={selectedArchitecture === Architecture.NONE}
+                onSelectFolder={loadFolder}
+                disabledText='Select Architecture Before Loading Graph'
+            />
             <Popover2
                 content={
                     <div className='graph-picker'>
@@ -116,14 +121,9 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                     </div>
                 }
                 disabled={!showGraphSelect}
-                isOpen={showGraphSelect}
                 placement='right'
             >
-                <FolderPicker
-                    disabled={selectedArchitecture === Architecture.NONE}
-                    onSelectFolder={loadFolder}
-                    disabledText='Select Architecture Before Loading Graph'
-                />
+                <Button icon="globe-network" disabled={!showGraphSelect}>Select Graph</Button>
             </Popover2>
 
             {/* Temporary elements to display success of selection */}
@@ -166,7 +166,7 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
     return (
         <div className='folder-picker'>
             <Popover2
-                position='top'
+                position='right'
                 content={
                     <div className={Classes.POPOVER2_DISMISS}>
                         <Button icon={IconNames.FOLDER_OPEN} text='Local' onClick={() => selectLocalFolder()} />
@@ -180,7 +180,7 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
                         className='load-folder-button'
                         disabled={disabled}
                         icon={IconNames.GRAPH}
-                        text='Load Perf Analyzer Folder'
+                        text='Load Perf Results Folder'
                     />
                 </Tooltip2>
             </Popover2>
