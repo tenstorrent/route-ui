@@ -14,6 +14,7 @@ import { ChipDesignJSON } from '../../data/JSONDataTypes';
 import { GraphDescriptorJSON } from '../../data/sources/GraphDescriptor';
 import { QueueDescriptorJson } from '../../data/sources/QueueDescriptor';
 import PopoverMenu from './PopoverMenu';
+import type { PerfAnalyzerResultsJson } from '../../data/sources/PerfAnalyzerResults';
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
     if (architecture === Architecture.NONE) {
@@ -39,10 +40,23 @@ const loadGraph = async (folderPath: string, graphName: string, architecture: Ar
     const queuesPath = path.join(folderPath, 'queue_descriptor', 'queue_descriptor.json');
     const queueDescriptorJson = await loadJsonFile(queuesPath);
 
-    chip = Chip.AUGMENT_FROM_QUEUE_DESCRIPTOR(chip, queueDescriptorJson as QueueDescriptorJson);
+    chip = Chip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
 
-    // const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
-    // const analyzerResultsJson = await loadJsonFile(analyzerResultsPath)
+    const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
+    const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsJson;
+
+    const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
+        /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
+         *   `perf_results/perf_info_all_epochs.csv`.
+         *
+         * The node ID keys in the perf analyzer results file don't have the chip ID (device ID) component.
+         * We're forcing chip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
+         */
+        Object.entries(analyzerResultsJson).map(([chipId, result]) => [`0-${chipId}`, result]),
+    );
+
+    chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
+
     return chip;
 };
 
@@ -79,7 +93,7 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
         <div className='folder-load-container'>
             <h3>Load From Folder</h3>
             <div>
-                <Tooltip2 content="Select Architecture" position="left">
+                <Tooltip2 content='Select Architecture' position='left'>
                     <ButtonGroup
                         // The architecture will (at some point) be specified in the selected folder, but until then it needs to be selectable.
                         className='architecture-button-group'
@@ -109,7 +123,7 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                 disabledText='Select Architecture Before Loading Graph'
             />
             <PopoverMenu // Graph picker
-                label="Select Graph"
+                label='Select Graph'
                 options={graphOptions}
                 selectedItem={selectedGraph}
                 onSelectItem={onSelectGraphName}
