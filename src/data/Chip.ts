@@ -514,7 +514,6 @@ export default class Chip {
             const node = chip.getNode(nodeUid);
             if (node.type === ComputeNodeType.CORE) {
                 node.perfAnalyzerResults = perfAnalyzerJson[node.uid]
-                console.log('Assigning analyzer results to core ', node.uid);
             }
             else {
                 console.error('Attempted to add perf details to a node that is not a core:', nodeUid, node);

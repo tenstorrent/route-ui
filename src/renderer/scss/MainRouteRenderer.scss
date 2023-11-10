@@ -522,6 +522,7 @@ $dock-height: 420px;
         gap: 5px;
         justify-items: center;
         align-items: center;
+        margin-bottom: 6px;
 
         .color-swatch {
             width: 10px;
@@ -535,7 +536,7 @@ $dock-height: 420px;
     }
 
     .core-runtime-metrics {
-        margin: 12px 0 0 12px;
+        margin-left: 12px;
         .core-runtime-item {
             margin-bottom: 4px;
             display: flex;
