@@ -34,6 +34,7 @@ import {
     OperationDetails,
 } from './sources/GraphDescriptor';
 import { QueueDescriptorJson } from './sources/QueueDescriptor';
+import { CorePerfJson, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -493,13 +494,32 @@ export default class Chip {
         return newChip;
     }
 
-    static AUGMENT_FROM_QUEUE_DESCRIPTOR(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
+    static AUGMENT_WITH_QUEUE_DETAILS(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
         forEach(chip.queuesByName.values(), (queue) => {
             queue.details = { ...queueDescriptorJson[queue.name] };
         });
 
         const newChip = new Chip(chip.chipId);
         Object.assign(newChip, chip);
+
+        return newChip;
+    }
+
+    static AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip: Chip, perfAnalyzerJson: PerfAnalyzerResultsJson) {
+        const newChip = new Chip(chip.chipId);
+        Object.assign(newChip, chip);
+
+
+        forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
+            const node = chip.getNode(nodeUid);
+            if (node.type === ComputeNodeType.CORE) {
+                node.perfAnalyzerResults = perfAnalyzerJson[node.uid]
+                console.log('Assigning analyzer results to core ', node.uid);
+            }
+            else {
+                console.error('Attempted to add perf details to a node that is not a core:', nodeUid, node);
+            }
+        });
 
         return newChip;
     }
@@ -831,6 +851,8 @@ export class ComputeNode {
     public dramChannelId: number = -1;
 
     public operation?: Operation;
+
+    public perfAnalyzerResults?: CorePerfJson;
 
     constructor(uid: string, operation?: Operation) {
         this.uid = uid;
