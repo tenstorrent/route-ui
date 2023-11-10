@@ -24,9 +24,10 @@ interface ComputeNodeProps {
     nodesSelectionState: NodeSelectionState;
 }
 
-const CoreOperationRuntimeMetrics = (props: { core: ComputeNode }) => {
-    const { core } = props;
-    if (!core.perfAnalyzerResults) {
+const CoreOperationRuntimeMetrics = (props: { coreNode: ComputeNode }) => {
+    const { coreNode } = props;
+
+    if (coreNode.type !== ComputeNodeType.CORE || !coreNode.perfAnalyzerResults) {
         return null;
     }
     const runtimeMetrics: [string, string | number, string?][] = [
@@ -35,8 +36,8 @@ const CoreOperationRuntimeMetrics = (props: { core: ComputeNode }) => {
         //  - it's probably only useful to put heatmap-related values here (once heatmap is implemented),
         //    and leave other details for a drilling-down workflow
         //  - Operand-specific metrics should probably go under each operand?
-        ['Kernel Total Runtime', core.perfAnalyzerResults.kernel_total_runtime, 'ns'],
-        ['Bandwidth Limited Factor', core.perfAnalyzerResults.bw_limited_factor],
+        ['Kernel Total Runtime', coreNode.perfAnalyzerResults.kernel_total_runtime, 'ns'],
+        ['Bandwidth Limited Factor', coreNode.perfAnalyzerResults.bw_limited_factor],
     ];
     return (
         <div className='core-runtime-metrics'>
@@ -111,7 +112,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                             stringFilter=''
                         />
                     </Tooltip2>
-                    {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics core={node} />}
+                    {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics coreNode={node} />}
                 </div>
             )}
             {node.operation && (
