@@ -534,12 +534,31 @@ $dock-height: 420px;
         }
     }
 
+    .graph-vertex-details {
+        color: #000;
+        margin-left: 20px;
+
+        .queue-detail-item {
+            margin: 4px 0 10px 12px;
+            display: flex;
+
+            .queue-detail-label {
+                font-size: 12px;
+                padding-right: 6px;
+            }
+            .queue-detail-value {
+                font-size: 12px;
+            }
+        }
+    }
+
     label {
         margin-bottom: 0;
     }
 
     .io-label {
         margin-left: 12px;
+        margin-bottom: 6px;
     }
 
     .operation-operand {
