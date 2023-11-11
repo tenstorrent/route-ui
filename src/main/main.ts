@@ -105,7 +105,7 @@ const createWindow = async () => {
         } else {
             mainWindow.show();
         }
-        mainWindow.title = `${mainWindow.title} ${app.getVersion()}`;
+        mainWindow.setTitle(`${mainWindow.title} ${app.getVersion()}`);
     });
 
     mainWindow.on('closed', () => {
