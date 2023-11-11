@@ -1,12 +1,10 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "0.2.7",
-  "description": "A foundation for scalable desktop apps",
-  "license": "MIT",
+  "name": "route-ui",
+  "version": "0.3.0-alpha-1",
+  "description": "Tenstorrent RouteUI",
+  "license": "None",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Denis Kartashevskiy"
   },
   "main": "./dist/main/main.js",
   "scripts": {
