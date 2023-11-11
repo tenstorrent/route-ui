@@ -20,17 +20,18 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
     if (architecture === Architecture.NONE) {
         throw new Error('No architecture provided.');
     }
-    const remote = await import('@electron/remote');
-    const architecturesPath = path.join(remote.app.getAppPath(), 'assets', 'architectures');
-    const architectureFilename = {
-        [Architecture.GRAYSKULL]: path.join(architecturesPath, 'arch-grayskull.json'),
-        [Architecture.WORMHOLE]: path.join(architecturesPath, 'arch-wormhole.json'),
+    const grayskullArch = await import('../../data/architectures/arch-grayskull.json');
+    const wormholeArch = await import('../../data/architectures/arch-wormhole.json');
+
+    const architectureJson = {
+        [Architecture.GRAYSKULL]: grayskullArch.default,
+        [Architecture.WORMHOLE]: wormholeArch.default,
     }[architecture];
-    const architectureJson = await loadJsonFile(architectureFilename);
     return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
 const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
+    console.log('Loading graph:', graphName);
     let chip = await loadChipFromArchitecture(architecture);
     const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
     const graphDescriptorJson = await loadJsonFile(graphPath);
@@ -60,8 +61,14 @@ const loadGraph = async (folderPath: string, graphName: string, architecture: Ar
     return chip;
 };
 
-/** Implements a temporary wrapper around the Folder Loading component, to provide state and context that is not yet
- * present in the App's higher-level components
+/** Implements a temporary wrapper around the Folder Loading component & Graph selection component, to provide state
+ * and context that is not yet present in the App's higher-level components.
+ *
+ * TODO: We want the folder and graph selection state values to persist after the graph is loaded, so that we
+ *   a) know what graph is loaded, and
+ *   b) can change to loading/viewing a different graph without loading the folder again
+ *
+ * TODO: Decouple graph selection from folder selection
  * */
 export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Chip) => void }): React.ReactElement => {
     const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null);
@@ -69,23 +76,38 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
     const [selectedArchitecture, setSelectedArchitecture] = React.useState<Architecture>(Architecture.NONE);
     const [graphOptions, setGraphOptions] = React.useState<string[]>([]);
     const [showGraphSelect, setShowGraphSelect] = React.useState(false);
+    const [error, setError] = React.useState<string | null>(null);
 
     const loadFolder = async (folderPath: string) => {
-        console.log(`Loading folder: ${folderPath}`);
+        console.log(`Selected folder: ${folderPath}`);
         setSelectedFolder(folderPath);
-        const graphs = await getAvailableGraphNames(folderPath);
-        console.log(`Available graphs: ${graphs}`);
+        let graphs;
+        try {
+            graphs = await getAvailableGraphNames(folderPath);
+        } catch (err) {
+            console.error('Failed to read graph names from folder:', err);
+            setError(err ? err.toString() : 'Unknown Error');
+            return;
+        }
         setGraphOptions(graphs);
         setShowGraphSelect(true);
     };
 
     const onSelectGraphName = (graphName: string) => {
         setSelectedGraph(graphName);
-        setShowGraphSelect(false);
         if (selectedFolder) {
             loadGraph(selectedFolder, graphName, selectedArchitecture)
-                .then((chip) => onDataLoad(chip))
-                .catch((err) => console.log(err));
+                .then((chip) => {
+                    setShowGraphSelect(false);
+                    onDataLoad(chip);
+                    return null;
+                })
+                .catch((err) => {
+                    console.error(err);
+                    setError(err);
+                });
+        } else {
+            console.error('Attempted to load graph but no folder path was available');
         }
     };
 
@@ -133,6 +155,11 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
             {/* For Debugging */}
             {selectedFolder && <p>Selected Folder: {selectedFolder}</p>}
             {selectedGraph && <p>Selected Graph: {selectedGraph}</p>}
+            {error && (
+                <div className='loading-error'>
+                    <p>{error.toString()}</p>
+                </div>
+            )}
         </div>
     );
 };
