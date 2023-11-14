@@ -863,6 +863,10 @@ export class ComputeNode {
         });
     };
 
+
+    /**
+     * @description Returns all internal links with noc links.
+     */
     public getInternalLinksForNode = (): NetworkLink[] => {
         const links: NetworkLink[] = [...this.links.values()]
             .filter((link) => {

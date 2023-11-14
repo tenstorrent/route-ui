@@ -55,6 +55,7 @@ export enum LinkType {
     NOC = 'noc',
     DRAM = 'dram',
     ETHERNET = 'eth',
+    PCIE = 'pcie',
 }
 
 export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName | EthernetLinkName;
@@ -69,6 +70,7 @@ export enum ComputeNodeType {
 }
 
 export enum NOC {
+    ANY = '',
     NOC0 = 'noc0',
     NOC1 = 'noc1',
 }

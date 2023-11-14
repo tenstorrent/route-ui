@@ -25,6 +25,7 @@ import {
 import { getGroupColor } from '../../data/ColorGenerator';
 import { HighlightType, PipeSelection } from '../../data/StateTypes';
 import { ComputeNodeType, NOC, NOCLinkName } from '../../data/Types';
+import { INTERNAL_NOC_LINK_NAMES } from '../../data/constants';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -170,7 +171,15 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
             break;
 
         case ComputeNodeType.PCIE:
-            // TODO: but we will be rendering congestion for these in the future
+            // TODO: implement once we have real data
+            // offChipLinkIds =
+            //     [...node.links.entries()]
+            //         .filter(([linkName]) => {
+            //             return INTERNAL_NOC_LINK_NAMES.includes(linkName);
+            //         })
+            //         .map(([_name, link]) => {
+            //             return link.uid;
+            //         }) || [];
             break;
         default:
             return null;

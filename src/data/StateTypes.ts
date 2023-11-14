@@ -70,4 +70,5 @@ export interface NetworkCongestionState {
     totalOps: number;
     CLKMHz: number;
     DRAMBandwidthGBs: number;
+    PCIBandwidthGBs: number;
 }
