@@ -1,9 +1,10 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Checkbox } from '@blueprintjs/core';
+import { selectGroup } from 'data/store/slices/nodeSelection.slice';
+import { RootState } from 'data/store/createStore';
 import { GraphVertex, GraphVertexType } from '../../data/GraphTypes';
 import SelectableOperation from './SelectableOperation';
-import { RootState, selectGroup } from '../../data/store';
 
 const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactElement | null => {
     const { graphNode } = props;

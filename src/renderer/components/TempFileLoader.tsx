@@ -7,17 +7,12 @@ import { FC, useContext } from 'react';
 import { IconNames } from '@blueprintjs/icons';
 import { Button } from '@blueprintjs/core';
 import path from 'path';
+import { closeDetailedView } from 'data/store/slices/detailedView.slice';
+import { loadLinkData, updateTotalOPs } from 'data/store/slices/linkSaturation.slice';
+import { loadNodesData, setArchitecture, loadedFilename } from 'data/store/slices/nodeSelection.slice';
+import { loadPipeSelection } from 'data/store/slices/pipeSelection.slice';
 import DataSource from '../../data/DataSource';
 import Chip from '../../data/Chip';
-import {
-    closeDetailedView,
-    loadedFilename,
-    loadLinkData,
-    loadNodesData,
-    loadPipeSelection,
-    setArchitecture,
-    updateTotalOPs,
-} from '../../data/store';
 import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
 import { mapIterable } from '../../utils/IterableHelpers';
 

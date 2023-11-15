@@ -4,9 +4,9 @@ import { Cell, Column, Table2 } from '@blueprintjs/table';
 import '../scss/BottomDock.scss';
 import { IconNames } from '@blueprintjs/icons';
 import { useDispatch } from 'react-redux';
-import { setDockOpenState } from '../../data/store';
+import { setDockOpenState } from 'data/store/slices/uiState.slice';
 
-const BottomDock: React.FC = ({}) => {
+const BottomDock: React.FC = () => {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
     const dispatch = useDispatch();
     const dollarCellRenderer = (rowIndex: number) => <Cell>{`$${(rowIndex * 40).toFixed(2)}`}</Cell>;

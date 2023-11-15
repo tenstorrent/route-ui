@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import path from 'path';
 import { Button, Switch } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { getDockOpenState, RootState, setHighContrastState, setDockOpenState } from '../../data/store';
+import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import { setHighContrastState } from 'data/store/slices/highContrast.slice';
+import { setDockOpenState } from 'data/store/slices/uiState.slice';
+import { RootState } from 'data/store/createStore';
 import '../scss/TopHeaderComponent.scss';
 
 const TopHeaderComponent: React.FC = () => {

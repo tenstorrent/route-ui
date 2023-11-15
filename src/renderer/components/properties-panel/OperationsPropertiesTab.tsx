@@ -3,8 +3,9 @@ import React, { useContext, useMemo, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
+import { selectGroup, clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import { RootState } from 'data/store/createStore';
 
-import { clearAllOperations, RootState, selectGroup } from '../../../data/store';
 import DataSource from '../../../data/DataSource';
 import FilterableComponent from '../FilterableComponent';
 import SelectableOperation from '../SelectableOperation';
@@ -46,10 +47,18 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[
-                        <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT} key='select-all-ops'>
+                        <Tooltip2
+                            content='Select all filtered operations'
+                            position={PopoverPosition.RIGHT}
+                            key='select-all-ops'
+                        >
                             <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                         </Tooltip2>,
-                        <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT} key='deselect-all-ops'>
+                        <Tooltip2
+                            content='Deselect all operations'
+                            position={PopoverPosition.RIGHT}
+                            key='deselect-all-ops'
+                        >
                             <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
                         </Tooltip2>,
                     ]}

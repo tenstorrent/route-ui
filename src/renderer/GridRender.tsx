@@ -3,22 +3,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Classes, NumericInput, Position, Slider, Switch } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
-import DataSource, { GridContext } from '../data/DataSource';
-import { calculateLinkCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
 import {
-    clearAllOperations,
-    clearAllPipes,
-    RootState,
-    selectAllPipes,
-    updateCLK,
-    updateDRAMBandwidth,
-    updateFocusPipe,
     updateLinkSaturation,
-    updatePCIBandwidth,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
     updateTotalOPs,
-} from '../data/store';
+    updateCLK,
+    updateDRAMBandwidth,
+    updatePCIBandwidth,
+} from 'data/store/slices/linkSaturation.slice';
+import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import { selectAllPipes, clearAllPipes, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
+import { RootState } from 'data/store/createStore';
+
+import DataSource, { GridContext } from '../data/DataSource';
+import { calculateLinkCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
+
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
@@ -31,7 +31,6 @@ import {
 import { NOC } from '../data/Types';
 import { mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
-
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -292,7 +291,7 @@ export default function GridRender() {
 
             {chip && (
                 <div
-                    className="grid-container"
+                    className='grid-container'
                     // this is to address the issue with focus pipe getting stuck because of Popover2
                     // TODO: find a better solution
                     onMouseEnter={() => {

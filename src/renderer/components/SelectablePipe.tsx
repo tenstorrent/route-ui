@@ -1,7 +1,9 @@
 import React, { ChangeEvent, FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Checkbox } from '@blueprintjs/core';
-import { RootState, selectPipeSelectionById, updateFocusPipe, updatePipeSelection } from '../../data/store';
+import { selectPipeSelectionById } from 'data/store/selectors/pipeSelection.selectors';
+import { updatePipeSelection, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
+import { RootState } from 'data/store/createStore';
 import HighlightedText from './HighlightedText';
 import { convertBytes, PipeSegment } from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
@@ -33,7 +35,13 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                         onMouseOver={() => {
                             dispatch(updateFocusPipe(pipeSegment.id));
                         }}
+                        onFocus={() => {
+                            dispatch(updateFocusPipe(pipeSegment.id));
+                        }}
                         onMouseOut={() => {
+                            dispatch(updateFocusPipe(null));
+                        }}
+                        onBlur={() => {
                             dispatch(updateFocusPipe(null));
                         }}
                     >

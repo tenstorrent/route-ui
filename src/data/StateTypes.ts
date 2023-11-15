@@ -72,3 +72,9 @@ export interface NetworkCongestionState {
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;
 }
+
+export enum IoType {
+    ALL = 'all',
+    IN = 'in',
+    OUT = 'out',
+}

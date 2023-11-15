@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { useSelector } from 'react-redux';
+import { RootState } from 'data/store/createStore';
 import { NetworkLink, NOCLink } from '../../../data/Chip';
 import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
-import { RootState } from '../../../data/store';
 import { PipeSelection } from '../../../data/StateTypes';
 import {
     DramBankLinkName,
