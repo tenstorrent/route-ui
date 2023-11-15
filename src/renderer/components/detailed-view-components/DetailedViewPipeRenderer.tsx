@@ -89,6 +89,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         isHighContrast,
     ]);
 
+    console.log(links);
     const linkNames = links.map((link) => link.name).join(' ');
     return (
         <div className='pipe-renderer' data-links={linkNames}>
