@@ -4,11 +4,11 @@ import fs from 'fs';
 import { FC } from 'react';
 import { IconNames } from '@blueprintjs/icons';
 import { Button } from '@blueprintjs/core';
+import { useDispatch } from 'react-redux';
+import { loadedFilename } from 'data/store/slices/nodeSelection.slice';
 import Chip from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
 import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
-import { loadedFilename } from '../../data/store';
-import { useDispatch } from 'react-redux';
 
 interface FileLoaderProps {
     onChipLoaded: (data: Chip) => void;

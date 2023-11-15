@@ -3,10 +3,10 @@ import React, { useContext, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
+import { updatePipeSelection, clearAllPipes } from 'data/store/slices/pipeSelection.slice';
 
 import DataSource from '../../../data/DataSource';
 import { PipeSegment } from '../../../data/Chip';
-import { clearAllPipes, updatePipeSelection } from '../../../data/store';
 import FilterableComponent from '../FilterableComponent';
 import SelectablePipe from '../SelectablePipe';
 import SearchField from '../SearchField';
@@ -36,7 +36,11 @@ const PipesPropertiesTab = () => {
                 searchQuery={pipeFilter}
                 onQueryChanged={setPipeFilter}
                 controls={[
-                    <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT} key='select-all-pipes'>
+                    <Tooltip2
+                        content='Select all filtered pipes'
+                        position={PopoverPosition.RIGHT}
+                        key='select-all-pipes'
+                    >
                         <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
                     </Tooltip2>,
                     <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT} key='deselect-all-pipes'>

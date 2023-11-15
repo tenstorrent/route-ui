@@ -3,14 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
+import { RootState } from 'data/store/createStore';
+import { openDetailedView } from 'data/store/slices/detailedView.slice';
+import { updateNodeSelection, selectGroup } from 'data/store/slices/nodeSelection.slice';
+import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import DataSource from '../../../data/DataSource';
-import {
-    openDetailedView,
-    RootState,
-    selectGroup,
-    updateNodeSelection,
-    updatePipeSelection,
-} from '../../../data/store';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
@@ -186,7 +183,9 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 </div>
             )}
             <div className='node-controls'>
-                {(node.type === ComputeNodeType.DRAM || node.type === ComputeNodeType.ETHERNET || node.type === ComputeNodeType.PCIE) && (
+                {(node.type === ComputeNodeType.DRAM ||
+                    node.type === ComputeNodeType.ETHERNET ||
+                    node.type === ComputeNodeType.PCIE) && (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}

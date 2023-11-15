@@ -1,19 +1,15 @@
 import React, { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { closeDetailedView } from 'data/store/slices/detailedView.slice';
+import { loadLinkData, updateTotalOPs } from 'data/store/slices/linkSaturation.slice';
+import { setArchitecture, loadNodesData } from 'data/store/slices/nodeSelection.slice';
+import { loadPipeSelection } from 'data/store/slices/pipeSelection.slice';
 
 import FileLoader from './components/FileLoader';
 import Chip from '../data/Chip';
 import { TempFolderLoadingContext } from './components/FolderPicker';
-import {
-    closeDetailedView,
-    loadedFilename,
-    loadLinkData,
-    loadNodesData,
-    loadPipeSelection,
-    setArchitecture,
-    updateTotalOPs,
-} from '../data/store';
+
 import { mapIterable } from '../utils/IterableHelpers';
 
 interface SplashScreenProps {

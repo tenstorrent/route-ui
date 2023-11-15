@@ -7,7 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import { parse } from 'yaml';
 import React, { useContext } from 'react';
-import { loadedFilename } from '../../data/store';
+import { loadedFilename } from 'data/store/slices/nodeSelection.slice';
+
 import Chip from '../../data/Chip';
 import DataSource from '../../data/DataSource';
 

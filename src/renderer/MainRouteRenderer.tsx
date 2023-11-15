@@ -1,11 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import { RootState } from 'data/store/createStore';
 import './scss/MainRouteRenderer.scss';
 import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
 import Chip from '../data/Chip';
 import { SideBar } from './components/SideBar';
-import { getDockOpenState, RootState } from '../data/store';
 import BottomDock from './components/BottomDock';
 
 export interface MainRouteRendererProps {

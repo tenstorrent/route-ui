@@ -1,14 +1,10 @@
 import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import {
-    getDramGroup,
-    getGroup,
-    openDetailedView,
-    RootState,
-    selectNodeSelectionById,
-    updateNodeSelection,
-} from '../../data/store';
+import { selectNodeSelectionById, getDramGroup, getGroup } from 'data/store/selectors/nodeSelection.selectors';
+import { openDetailedView } from 'data/store/slices/detailedView.slice';
+import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { RootState } from 'data/store/createStore';
 import { ComputeNode } from '../../data/Chip';
 import {
     calculateLinkCongestionColor,
@@ -169,9 +165,10 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
             break;
 
         case ComputeNodeType.PCIE:
-            offChipLinkIds = [...node.internalLinks].map(([link]) => {
-                return link.uid;
-            }) || [];
+            offChipLinkIds =
+                [...node.internalLinks].map(([link]) => {
+                    return link.uid;
+                }) || [];
             break;
         default:
             return null;
