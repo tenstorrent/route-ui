@@ -7,11 +7,12 @@ import { RootState } from '../../../data/store';
 import { PipeSelection } from '../../../data/StateTypes';
 import {
     DramBankLinkName,
-    DramNOCLinkName,
+    NOC2AXILinkName,
     EthernetLinkName,
     NetworkLinkName,
     NOC,
     NOCLinkName,
+    PCIeLinkName,
 } from '../../../data/Types';
 
 type DetailedViewPipeRendererProps = {
@@ -88,9 +89,10 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         isHighContrast,
     ]);
 
+    console.log(links);
     const linkNames = links.map((link) => link.name).join(' ');
     return (
-        <div className="pipe-renderer" data-links={linkNames}>
+        <div className='pipe-renderer' data-links={linkNames}>
             {/* DEBUGGING CODE BELOW */}
             {/* {links.map((link) => ( */}
             {/*   <div style={{color: '#fff'}} key={link.name}> */}
@@ -122,13 +124,14 @@ const LINK_NAMES = [
     NOCLinkName.NOC1_IN,
     NOCLinkName.NOC0_OUT,
     NOCLinkName.NOC1_OUT,
-    DramNOCLinkName.NOC0_NOC2AXI,
-    DramNOCLinkName.NOC1_NOC2AXI,
+    NOC2AXILinkName.NOC0_NOC2AXI,
+    NOC2AXILinkName.NOC1_NOC2AXI,
     DramBankLinkName.DRAM_INOUT,
     DramBankLinkName.DRAM0_INOUT,
     DramBankLinkName.DRAM1_INOUT,
     EthernetLinkName.ETH_IN,
     EthernetLinkName.ETH_OUT,
+    PCIeLinkName.PCIE_INOUT,
 ];
 
 const NOC_LINK_NAMES: NetworkLinkName[] = [
@@ -136,6 +139,6 @@ const NOC_LINK_NAMES: NetworkLinkName[] = [
     NOCLinkName.NOC1_IN,
     NOCLinkName.NOC0_OUT,
     NOCLinkName.NOC1_OUT,
-    DramNOCLinkName.NOC0_NOC2AXI,
-    DramNOCLinkName.NOC1_NOC2AXI,
+    NOC2AXILinkName.NOC0_NOC2AXI,
+    NOC2AXILinkName.NOC1_NOC2AXI,
 ];

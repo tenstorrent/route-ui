@@ -12,7 +12,7 @@
     }
 }
 
-.graph-picker {
+.popover-list-picker {
     color: black;
     padding: 2px 10px;
     height:fit-content;
@@ -21,4 +21,13 @@
         max-height: 400px;
         height: 100%;
     }
+}
+
+.loading-error {
+    color: #ff5020;
+    width: 50%;
+    margin: auto;
+    background: #400610;
+    word-wrap: break-word;
+    padding: 10px;
 }

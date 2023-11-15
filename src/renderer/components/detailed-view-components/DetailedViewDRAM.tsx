@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { openDetailedView, RootState, updateNodeSelection } from '../../../data/store';
-import { ComputeNode, DramBankLink, DramNOCLink, NOCLink } from '../../../data/Chip';
+import { ComputeNode, NOCLink } from '../../../data/Chip';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
-import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 import LinkDetails from '../LinkDetails';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import DataSource, { GridContext } from '../../../data/DataSource';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
+import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
@@ -78,12 +78,11 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <DetailedViewPipeControls node={currentNode} numPipes={numPipes} />
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <DetailedViewNOCRouterRenderer links={noc0links} label="NOC0" />
+                                        <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
                                         <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC0} />
-
                                     </div>
                                     <div className='col noc1'>
-                                        <DetailedViewNOCRouterRenderer links={noc1links} label="NOC1" />
+                                        <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
                                         <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC1} />
                                     </div>
                                 </div>
@@ -99,12 +98,24 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                 <div className='off-chip'>
                     {architecture === Architecture.WORMHOLE && (
                         <>
-                            <DetailedViewAXIRender links={dram.links} filter={DramBankLinkName.DRAM0_INOUT} label='AXI DRAM0' />
-                            <DetailedViewAXIRender links={dram.links} filter={DramBankLinkName.DRAM1_INOUT} label='AXI DRAM1' />
+                            <DetailedViewAXIRender
+                                links={dram.links}
+                                filter={DramBankLinkName.DRAM0_INOUT}
+                                label='AXI DRAM0'
+                            />
+                            <DetailedViewAXIRender
+                                links={dram.links}
+                                filter={DramBankLinkName.DRAM1_INOUT}
+                                label='AXI DRAM1'
+                            />
                         </>
                     )}
                     {architecture === Architecture.GRAYSKULL && (
-                        <DetailedViewAXIRender links={dram.links} filter={DramBankLinkName.DRAM_INOUT} label='Off-chip DRAM' />
+                        <DetailedViewAXIRender
+                            links={dram.links}
+                            filter={DramBankLinkName.DRAM_INOUT}
+                            label='Off-chip DRAM'
+                        />
                     )}
                 </div>
             </div>
@@ -143,42 +154,3 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
 };
 
 export default DetailedViewDRAMRenderer;
-
-interface DetailedViewAXIRenderProps {
-    links: DramBankLink[];
-    filter: DramBankLinkName;
-    label: string;
-}
-
-const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ links, filter, label }) => {
-    return (
-        <div className='axi-dram-wrap'>
-            <DetailedViewPipeRenderer
-                className='centered-svg'
-                links={links.filter((link) => link.name === filter)}
-            />
-            <div className='axi-dram'>
-                <p className='label'>{label}</p>
-            </div>
-        </div>
-    );
-};
-
-interface DetailedViewANOC2XIRenderProps {
-    links: DramNOCLink[];
-    noc: NOC;
-}
-
-const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({ links, noc}) => {
-    return (
-        <>
-            <div className='noc2axi'>
-                <p className='label'>NOC2AXI</p>
-            </div>
-            <DetailedViewPipeRenderer
-                className='centered-svg'
-                links={links.filter((link) => link.noc === noc)}
-            />
-        </>
-    );
-};

@@ -14,6 +14,7 @@ import {
     updateDRAMBandwidth,
     updateFocusPipe,
     updateLinkSaturation,
+    updatePCIBandwidth,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
     updateTotalOPs,
@@ -21,14 +22,20 @@ import {
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
-import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, LINK_SATURATION_INITIAIL_PERCENT } from '../data/constants';
+import {
+    AICLK_INITIAL_MHZ,
+    DRAM_BANDWIDTH_INITIAL_GBS,
+    LINK_SATURATION_INITIAIL_PERCENT,
+    PCIE_BANDWIDTH_INITIAL_GBS,
+} from '../data/constants';
 import { NOC } from '../data/Types';
 import { mapIterable } from '../utils/IterableHelpers';
+import Collapsible from './components/Collapsible';
+
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
-    const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
     const [showNodeLocation, setShowNodeLocation] = useState(false);
     const [gridZoom, setGridZoom] = useState(1);
@@ -102,152 +109,190 @@ export default function GridRender() {
                         labelRenderer={(value) => `${value.toFixed(1)}`}
                     />
                     <hr />
-                    {/* TODO: abstract this into a global state */}
-                    {chip?.pipes.size > 0 && (
+                    {/* {chip?.hasPipes && ( */}
+                    {/*     <> */}
+                    {/*         <Tooltip2 content='Show pipes' position={Position.RIGHT}> */}
+                    {/*             <Switch */}
+                    {/*                 checked={showPipes} */}
+                    {/*                 label='pipes' */}
+                    {/*                 onChange={(event) => setShowPipes(event.currentTarget.checked)} */}
+                    {/*             /> */}
+                    {/*         </Tooltip2> */}
+                    {/*         <hr /> */}
+                    {/*     </> */}
+                    {/* )} */}
+                    <Collapsible
+                        styles={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                        label='Grid Controls'
+                        isOpen={false}
+                    >
                         <>
-                            <Tooltip2 content='Show pipes' position={Position.RIGHT}>
+                            <Tooltip2 content='Show all links overlay' position={Position.RIGHT}>
                                 <Switch
-                                    checked={showPipes}
-                                    label='pipes'
-                                    onChange={(event) => setShowPipes(event.currentTarget.checked)}
+                                    checked={showEmptyLinks}
+                                    label='links'
+                                    onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
+                                />
+                            </Tooltip2>
+                            <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
+                                <Switch
+                                    checked={showOperationColors}
+                                    label='operations'
+                                    onChange={(event) => setShowOperationColors(event.currentTarget.checked)}
+                                />
+                            </Tooltip2>
+                            <Tooltip2 content='Show Compute Node locations' position={Position.RIGHT}>
+                                <Switch
+                                    checked={showNodeLocation}
+                                    label='location'
+                                    onChange={(event) => setShowNodeLocation(event.currentTarget.checked)}
                                 />
                             </Tooltip2>
                             <hr />
                         </>
-                    )}
-                    <Tooltip2 content='Show all links overlay' position={Position.RIGHT}>
-                        <Switch
-                            checked={showEmptyLinks}
-                            label='links'
-                            disabled={!showPipes}
-                            onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
-                        />
-                    </Tooltip2>
-                    <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
-                        <Switch
-                            checked={showOperationColors}
-                            label='operations'
-                            onChange={(event) => setShowOperationColors(event.currentTarget.checked)}
-                        />
-                    </Tooltip2>
-                    <Tooltip2 content='Show Compute Node locations' position={Position.RIGHT}>
-                        <Switch
-                            checked={showNodeLocation}
-                            label='location'
-                            onChange={(event) => setShowNodeLocation(event.currentTarget.checked)}
-                        />
-                    </Tooltip2>
-                    <hr />
+                    </Collapsible>
                     {/* TODO: abstract this into a global state */}
-                    {chip?.pipes.size > 0 && (
-                        <>
-                            {/* Link saturation */}
-                            <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
-                                <Switch
-                                    checked={showLinkSaturation}
-                                    label='link congestion'
-                                    onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
-                                />
-                            </Tooltip2>
-                            <Switch
-                                disabled={!showLinkSaturation}
-                                checked={showLinkSaturationNOC0}
-                                label='noc0'
-                                onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC0, event.currentTarget.checked)}
-                            />
-                            <Switch
-                                disabled={!showLinkSaturation}
-                                checked={showLinkSaturationNOC1}
-                                label='noc1'
-                                onChange={(event) => onShowLinkSaturationForNOC(NOC.NOC1, event.currentTarget.checked)}
-                            />
-                            <div
-                                className='congestion-legend'
-                                style={{
-                                    ...(showLinkSaturation ? congestionLegendStyle : null),
-                                    width: '100%',
-                                    height: '3px',
-                                }}
-                            />
-                            <Slider
-                                className='link-saturation-slider'
-                                min={0}
-                                max={125}
-                                disabled={!showLinkSaturation}
-                                labelStepSize={50}
-                                value={linkSaturationTreshold}
-                                onChange={onLinkSaturationChange}
-                                labelRenderer={(value) => `${value.toFixed(0)}`}
-                            />
-                            <hr />
 
-                            <Tooltip2 content='Select all pipes'>
-                                <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())}>
-                                    Select all pipes
-                                </Button>
-                            </Tooltip2>
-                            <Tooltip2 content='Clear all pipes selection'>
-                                <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())}>
-                                    Deselect pipes
-                                </Button>
-                            </Tooltip2>
-                            <hr />
-                            <Tooltip2 content='Clear all operation selection'>
-                                <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())}>
-                                    Deselect ops
-                                </Button>
-                            </Tooltip2>
-                            <hr />
-                        </>
+                    {chip?.hasPipes && (
+                        <Collapsible
+                            label='Congestion'
+                            isOpen
+                            styles={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                            }}
+                        >
+                            {
+                                <>
+                                    {/* Link saturation */}
+                                    <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
+                                        <Switch
+                                            checked={showLinkSaturation}
+                                            label='link congestion'
+                                            onChange={(event) => onShowLinkSaturation(event.currentTarget.checked)}
+                                        />
+                                    </Tooltip2>
+                                    <Switch
+                                        disabled={!showLinkSaturation}
+                                        checked={showLinkSaturationNOC0}
+                                        label='noc0'
+                                        onChange={(event) =>
+                                            onShowLinkSaturationForNOC(NOC.NOC0, event.currentTarget.checked)
+                                        }
+                                    />
+                                    <Switch
+                                        disabled={!showLinkSaturation}
+                                        checked={showLinkSaturationNOC1}
+                                        label='noc1'
+                                        onChange={(event) =>
+                                            onShowLinkSaturationForNOC(NOC.NOC1, event.currentTarget.checked)
+                                        }
+                                    />
+                                    <div
+                                        className='congestion-legend'
+                                        style={{
+                                            ...(showLinkSaturation ? congestionLegendStyle : null),
+                                            width: '100%',
+                                            height: '3px',
+                                        }}
+                                    />
+                                    <Slider
+                                        className='link-saturation-slider'
+                                        min={0}
+                                        max={125}
+                                        disabled={!showLinkSaturation}
+                                        labelStepSize={50}
+                                        value={linkSaturationTreshold}
+                                        onChange={onLinkSaturationChange}
+                                        labelRenderer={(value) => `${value.toFixed(0)}`}
+                                    />
+                                    <hr />
+
+                                    <Tooltip2 content='Select all pipes'>
+                                        <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())}>
+                                            Select all pipes
+                                        </Button>
+                                    </Tooltip2>
+                                    <Tooltip2 content='Clear all pipes selection'>
+                                        <Button
+                                            icon={IconNames.FILTER_REMOVE}
+                                            onClick={() => dispatch(clearAllPipes())}
+                                        >
+                                            Deselect pipes
+                                        </Button>
+                                    </Tooltip2>
+                                    <hr />
+                                    <Tooltip2 content='Clear all operation selection'>
+                                        <Button
+                                            icon={IconNames.CUBE_REMOVE}
+                                            onClick={() => dispatch(clearAllOperations())}
+                                        >
+                                            Deselect ops
+                                        </Button>
+                                    </Tooltip2>
+                                    <hr />
+                                </>
+                            }
+                        </Collapsible>
                     )}
-                    {/* TODO: abstract this into a global state */}
-                    {opCycles !== 0 && (
-                        <>
-                            <div>
-                                <label
-                                    className={Classes.LABEL}
-                                    htmlFor='opCyclesInput'
-                                    style={{ marginBottom: '5px' }}
-                                >
-                                    AICLK cycles/input
-                                </label>
-                                <NumericInput
-                                    //
-                                    id='opCyclesInput'
-                                    value={opCycles}
-                                    stepSize={10000}
-                                    minorStepSize={100}
-                                    majorStepSize={100000}
-                                    min={1}
-                                    onValueChange={(value) => {
-                                        setOpCycles(value);
-                                        dispatch(updateTotalOPs(value));
-                                    }}
-                                    rightElement={
-                                        <Tooltip2 content='Reset Total OP Cycles'>
-                                            <Button
-                                                minimal
-                                                onClick={() => {
-                                                    const resetValue = chip?.totalOpCycles || 0;
-                                                    setOpCycles(resetValue);
-                                                    dispatch(updateTotalOPs(resetValue));
+                    <Collapsible label='CLK Controls' isOpen>
+                        {
+                            <>
+                                {/* TODO: abstract this into a global state */}
+
+                                {opCycles !== 0 && (
+                                    <>
+                                        <div>
+                                            <label
+                                                className={Classes.LABEL}
+                                                htmlFor='opCyclesInput'
+                                                style={{ marginBottom: '5px' }}
+                                            >
+                                                AICLK cycles/input
+                                            </label>
+                                            <NumericInput
+                                                //
+                                                id='opCyclesInput'
+                                                value={opCycles}
+                                                stepSize={10000}
+                                                minorStepSize={100}
+                                                majorStepSize={100000}
+                                                min={1}
+                                                onValueChange={(value) => {
+                                                    setOpCycles(value);
+                                                    dispatch(updateTotalOPs(value));
                                                 }}
-                                                icon={IconNames.RESET}
+                                                rightElement={
+                                                    <Tooltip2 content='Reset Total OP Cycles'>
+                                                        <Button
+                                                            minimal
+                                                            onClick={() => {
+                                                                const resetValue = chip?.totalOpCycles || 0;
+                                                                setOpCycles(resetValue);
+                                                                dispatch(updateTotalOPs(resetValue));
+                                                            }}
+                                                            icon={IconNames.RESET}
+                                                        />
+                                                    </Tooltip2>
+                                                }
                                             />
-                                        </Tooltip2>
-                                    }
-                                />
-                            </div>
-                            <hr />
-                        </>
-                    )}
-                    <DRAMBandwidthControls />
+                                        </div>
+                                        <hr />
+                                    </>
+                                )}
+                                <CLKBandwidthControls />
+                            </>
+                        }
+                    </Collapsible>
                 </div>
             </div>
 
             {chip && (
                 <div
-                    className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}
+                    className="grid-container"
                     // this is to address the issue with focus pipe getting stuck because of Popover2
                     // TODO: find a better solution
                     onMouseEnter={() => {
@@ -286,13 +331,14 @@ export default function GridRender() {
 
 interface DRAMBandwidthControlsProps {}
 
-const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
+const CLKBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
+    const PCIeBandwidth = useSelector((state: RootState) => state.linkSaturation.PCIBandwidthGBs);
     return (
         <>
-            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
+            <label className={Classes.LABEL} htmlFor='clkMHzInput' style={{ marginBottom: '5px' }}>
                 AICLK (MHz)
             </label>
             <NumericInput
@@ -336,6 +382,31 @@ const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
                         minimal
                         onClick={() => {
                             dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
+                        }}
+                        icon={IconNames.RESET}
+                    />
+                }
+            />
+            <br />
+            <label className={Classes.LABEL} htmlFor='pcieBandwidthInput' style={{ marginBottom: '5px' }}>
+                PCIe channel BW (GB/s)
+            </label>
+            <NumericInput
+                //
+                id='pcieBandwidthInput'
+                value={PCIeBandwidth}
+                stepSize={0.5}
+                minorStepSize={0.1}
+                majorStepSize={10}
+                min={0}
+                onValueChange={(value) => {
+                    dispatch(updatePCIBandwidth(value));
+                }}
+                rightElement={
+                    <Button
+                        minimal
+                        onClick={() => {
+                            dispatch(updatePCIBandwidth(PCIE_BANDWIDTH_INITIAL_GBS));
                         }}
                         icon={IconNames.RESET}
                     />

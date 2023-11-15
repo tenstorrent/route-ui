@@ -7,7 +7,7 @@ import {
     NodeDataJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { BuildableOperation, BuildableQueue, Operand } from './ChipAugmentation';
+import { BuildableOperation, BuildableQueue, Operand } from './Graph';
 import ChipDesign from './ChipDesign';
 import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
@@ -15,16 +15,16 @@ import {
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    DramNOCLinkName,
+    NOC2AXILinkName,
     EthernetLinkName,
     LinkType,
     Loc,
     NetworkLinkName,
     NOC,
-    NOCLinkName,
+    NOCLinkName, PCIeLinkName,
 } from './Types';
-import { DETAILED_VIEW_LINK_NAMES, INTERNAL_LINK_NAMES } from './constants';
-import type { Operation, OperationName } from './GraphTypes';
+import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
+import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import {
@@ -33,6 +33,8 @@ import {
     OperandJSON,
     OperationDetails,
 } from './sources/GraphDescriptor';
+import { QueueDescriptorJson } from './sources/QueueDescriptor';
+import { CorePerfJson, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -162,11 +164,15 @@ export default class Chip {
 
     private queuesByName: Map<QueueName, BuildableQueue>;
 
+    public get hasQueues(): boolean {
+        return this.queuesByName.size > 0;
+    }
+
     public get queues(): Iterable<Queue> {
         return this.queuesByName.values();
     }
 
-    public getQueue(name: QueueName) {
+    public getQueue(name: QueueName): Queue | undefined {
         return this.queuesByName.get(name);
     }
 
@@ -177,6 +183,10 @@ export default class Chip {
     }
 
     private pipesById: Map<string, Pipe> = new Map();
+
+    public get hasPipes(): boolean {
+        return this.pipesById.size > 0;
+    }
 
     get pipes(): Map<string, Pipe> {
         return this.pipesById;
@@ -484,6 +494,35 @@ export default class Chip {
         return newChip;
     }
 
+    static AUGMENT_WITH_QUEUE_DETAILS(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
+        forEach(chip.queuesByName.values(), (queue) => {
+            queue.details = { ...queueDescriptorJson[queue.name] };
+        });
+
+        const newChip = new Chip(chip.chipId);
+        Object.assign(newChip, chip);
+
+        return newChip;
+    }
+
+    static AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip: Chip, perfAnalyzerJson: PerfAnalyzerResultsJson) {
+        const newChip = new Chip(chip.chipId);
+        Object.assign(newChip, chip);
+
+
+        forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
+            const node = chip.getNode(nodeUid);
+            if (node.type === ComputeNodeType.CORE) {
+                node.perfAnalyzerResults = perfAnalyzerJson[node.uid]
+            }
+            else {
+                console.error('Attempted to add perf details to a node that is not a core:', nodeUid, node);
+            }
+        });
+
+        return newChip;
+    }
+
     public generateInitialPipesSelectionState(): PipeSelection[] {
         return this.allUniquePipes.map((pipeSegment) => {
             return { id: pipeSegment.id, selected: false } as PipeSelection;
@@ -593,14 +632,14 @@ export class DramSubchannel {
 
     public readonly channelId: number;
 
-    public links: DramNOCLink[] = [];
+    public links: NOC2AXILink[] = [];
 
     constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
         this.channelId = channelId;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(
-                NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink,
+                NetworkLink.CREATE(key as NOC2AXILinkName, `${channelId}-${subchannelId}-${key}`, value) as NOC2AXILink,
             );
         });
     }
@@ -625,8 +664,8 @@ export abstract class NetworkLink {
         if (Object.values(NOCLinkName).includes(name as NOCLinkName)) {
             return new NOCLink(name as NOCLinkName, uid, json);
         }
-        if (Object.values(DramNOCLinkName).includes(name as DramNOCLinkName)) {
-            return new DramNOCLink(name as DramNOCLinkName, uid, json);
+        if (Object.values(NOC2AXILinkName).includes(name as NOC2AXILinkName)) {
+            return new NOC2AXILink(name as NOC2AXILinkName, uid, json);
         }
         if (Object.values(DramBankLinkName).includes(name as DramBankLinkName)) {
             return new DramBankLink(name as DramBankLinkName, uid, json);
@@ -634,8 +673,11 @@ export abstract class NetworkLink {
         if (Object.values(EthernetLinkName).includes(name as EthernetLinkName)) {
             return new EthernetLink(name as EthernetLinkName, uid, json);
         }
+        if (Object.values(PCIeLinkName).includes(name as PCIeLinkName)) {
+            return new PCIeLink(name as PCIeLinkName, uid, json);
+        }
 
-        throw new Error('Invalid network link name');
+        throw new Error(`Invalid network link name ${name}`);
     }
 
     // readonly noc: NOC;
@@ -671,15 +713,15 @@ export class NOCLink extends NetworkLink {
 
     public readonly noc: NOC;
 
-    constructor(name: NOCLinkName | DramNOCLinkName, uid: string, json: NOCLinkJSON) {
+    constructor(name: NOCLinkName | NOC2AXILinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
         this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
         // this.name = name;
     }
 }
 
-export class DramNOCLink extends NOCLink {
-    constructor(name: DramNOCLinkName, uid: string, json: NOCLinkJSON) {
+export class NOC2AXILink extends NOCLink {
+    constructor(name: NOC2AXILinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
 }
@@ -688,6 +730,14 @@ export class EthernetLink extends NetworkLink {
     public readonly type: LinkType = LinkType.ETHERNET;
 
     constructor(name: EthernetLinkName, uid: string, json: NOCLinkJSON) {
+        super(name, uid, json);
+    }
+}
+
+export class PCIeLink extends NetworkLink {
+    public readonly type: LinkType = LinkType.PCIE;
+
+    constructor(name: PCIeLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
 }
@@ -750,7 +800,9 @@ export class ComputeNode {
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
             }
-            // TODO: PCIE links will go here
+            if (link.type === LinkType.PCIE) {
+                node.internalLinks.set(linkName, link as PCIeLink);
+            }
         });
 
         // Associate with operation
@@ -812,6 +864,8 @@ export class ComputeNode {
 
     public operation?: Operation;
 
+    public perfAnalyzerResults?: CorePerfJson;
+
     constructor(uid: string, operation?: Operation) {
         this.uid = uid;
         this.operation = operation;
@@ -837,7 +891,10 @@ export class ComputeNode {
         } as ComputeNodeState;
     }
 
-    public getLinksForNode = (): NOCLink[] => {
+    /**
+     * @description Returns the links for node in the order defined by the NOC.
+     */
+    public getNOCLinksForNode = (): NOCLink[] => {
         return [...this.links.values()].sort((a, b) => {
             const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
             const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
@@ -845,10 +902,13 @@ export class ComputeNode {
         });
     };
 
+    /**
+     * @description Returns all internal links with noc links.
+     */
     public getInternalLinksForNode = (): NetworkLink[] => {
         const links: NetworkLink[] = [...this.links.values()]
             .filter((link) => {
-                return DETAILED_VIEW_LINK_NAMES.includes(link.name);
+                return INTERNAL_LINK_NAMES.includes(link.name);
             })
             .sort((a, b) => {
                 const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
@@ -876,7 +936,7 @@ export class ComputeNode {
     getInternalPipeIDsForNode = (): string[] => {
         return [...this.links.values()]
             .filter((link) => {
-                return INTERNAL_LINK_NAMES.includes(link.name as NOCLinkName);
+                return INTERNAL_NOC_LINK_NAMES.includes(link.name as NOCLinkName);
             })
             .map((link) => {
                 return [...link.pipes.map((pipe) => pipe.id)];

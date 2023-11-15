@@ -21,7 +21,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node 
         node.links.get(NOCLinkName.NOC1_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC1_OUT) as NOCLink,
     ];
-    const internalLinks: NetworkLink[] = [...node.internalLinks.values()];
+    const internalNOCLinks: NetworkLink[] = [...node.internalLinks.values()];
     const numPipes = [...node.links.values()].map((link) => link.pipes).flat().length;
 
     return (
@@ -43,7 +43,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node 
                                         <div className='router'>
                                             <p className='label single-line'>Ethernet</p>
                                         </div>
-                                        <DetailedViewPipeRenderer links={internalLinks} />
+                                        <DetailedViewPipeRenderer links={internalNOCLinks} />
                                     </div>
                                 </div>
                             </div>
@@ -54,7 +54,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node 
                             </div>
                         </div>
                         <div className='col eth-off-chip'>
-                            <DetailedViewPipeRenderer links={internalLinks} className='centered-svg' />
+                            <DetailedViewPipeRenderer links={internalNOCLinks} className='centered-svg' />
                         </div>
                     </div>
                 </div>

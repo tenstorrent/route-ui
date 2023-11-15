@@ -36,10 +36,10 @@ const PipesPropertiesTab = () => {
                 searchQuery={pipeFilter}
                 onQueryChanged={setPipeFilter}
                 controls={[
-                    <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT}>
+                    <Tooltip2 content='Select all filtered pipes' position={PopoverPosition.RIGHT} key='select-all-pipes'>
                         <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
                     </Tooltip2>,
-                    <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT}>
+                    <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT} key='deselect-all-pipes'>
                         <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
                     </Tooltip2>,
                 ]}

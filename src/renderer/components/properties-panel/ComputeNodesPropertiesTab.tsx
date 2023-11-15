@@ -24,6 +24,36 @@ interface ComputeNodeProps {
     nodesSelectionState: NodeSelectionState;
 }
 
+const CoreOperationRuntimeMetrics = (props: { coreNode: ComputeNode }) => {
+    const { coreNode } = props;
+
+    if (coreNode.type !== ComputeNodeType.CORE || !coreNode.perfAnalyzerResults) {
+        return null;
+    }
+    const runtimeMetrics: [string, string | number, string?][] = [
+        // TODO: This is only a small subset of all details
+        //  - will likely want to add more organization if more details are added here
+        //  - it's probably only useful to put heatmap-related values here (once heatmap is implemented),
+        //    and leave other details for a drilling-down workflow
+        //  - Operand-specific metrics should probably go under each operand?
+        ['Kernel Total Runtime', coreNode.perfAnalyzerResults.kernel_total_runtime, 'ns'],
+        ['Bandwidth Limited Factor', coreNode.perfAnalyzerResults.bw_limited_factor],
+    ];
+    return (
+        <div className='core-runtime-metrics'>
+            {runtimeMetrics.map(([label, value, unit]) => (
+                <div className='core-runtime-item'>
+                    <h4 className='core-runtime-label'>{label}:</h4>
+                    <span className='core-runtime-value'>
+                        {value}
+                        {unit !== undefined ? ` ${unit}` : ''}
+                    </span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
@@ -82,6 +112,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                             stringFilter=''
                         />
                     </Tooltip2>
+                    {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics coreNode={node} />}
                 </div>
             )}
             {node.operation && (
@@ -155,7 +186,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 </div>
             )}
             <div className='node-controls'>
-                {(node.type === ComputeNodeType.DRAM || node.type === ComputeNodeType.ETHERNET) && (
+                {(node.type === ComputeNodeType.DRAM || node.type === ComputeNodeType.ETHERNET || node.type === ComputeNodeType.PCIE) && (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}
@@ -197,7 +228,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
             {node.pipes.length > 0 && (
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
-                    {node.getLinksForNode().map((link: NOCLink) => (
+                    {node.getNOCLinksForNode().map((link: NOCLink) => (
                         <LinkDetails key={link.name} link={link} showEmpty />
                     ))}
                 </div>

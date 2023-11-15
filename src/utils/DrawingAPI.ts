@@ -1,7 +1,14 @@
 import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
-import { DramBankLinkName, DramNOCLinkName, EthernetLinkName, NetworkLinkName, NOCLinkName } from '../data/Types';
+import {
+    DramBankLinkName,
+    EthernetLinkName,
+    NetworkLinkName,
+    NOC2AXILinkName,
+    NOCLinkName,
+    PCIeLinkName,
+} from '../data/Types';
 import { MAX_CONGESTION_VALUE } from '../data/constants';
 
 export const NODE_SIZE = 100;
@@ -55,7 +62,6 @@ export const drawLink = (
 
     // Draw line
     selector
-        // keeping this here for the prettier
         .append('line')
         .attr('x1', lineStartX)
         .attr('y1', lineStartY)
@@ -78,7 +84,12 @@ export const drawLink = (
             .attr('transform', transform)
             .attr('fill', color || '#7e7e7e');
     }
-    if (linkName === DramNOCLinkName.NOC0_NOC2AXI || DramNOCLinkName.NOC1_NOC2AXI || DramBankLinkName.DRAM_INOUT) {
+    if (
+        linkName === NOC2AXILinkName.NOC0_NOC2AXI ||
+        NOC2AXILinkName.NOC1_NOC2AXI ||
+        DramBankLinkName.DRAM_INOUT ||
+        PCIeLinkName.PCIE_INOUT
+    ) {
         selector
             //
             .append('polygon')
@@ -337,8 +348,9 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
         case DramBankLinkName.DRAM_INOUT:
         case DramBankLinkName.DRAM0_INOUT:
         case DramBankLinkName.DRAM1_INOUT:
-        case DramNOCLinkName.NOC0_NOC2AXI:
-        case DramNOCLinkName.NOC1_NOC2AXI:
+        case PCIeLinkName.PCIE_INOUT:
+        case NOC2AXILinkName.NOC0_NOC2AXI:
+        case NOC2AXILinkName.NOC1_NOC2AXI:
             arrowOffset = 5;
             lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
             lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
@@ -355,7 +367,6 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
                 p2: `${lineStartX + arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
                 p3: `${lineStartX},${lineStartY - arrowOffset}`,
             };
-
             break;
         default:
             console.warn('Unknown link type', linkName);
@@ -397,7 +408,7 @@ export const drawPipesDirect = (
                 .attr('transform', transform)
                 .attr('fill', '#9e9e9e');
         }
-        if (linkName === DramNOCLinkName.NOC0_NOC2AXI || DramNOCLinkName.NOC1_NOC2AXI || DramBankLinkName.DRAM_INOUT) {
+        if (linkName === NOC2AXILinkName.NOC0_NOC2AXI || NOC2AXILinkName.NOC1_NOC2AXI || DramBankLinkName.DRAM_INOUT) {
             svg
                 //
                 .append('polygon')
