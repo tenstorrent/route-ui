@@ -14,6 +14,7 @@ import {
     updateDRAMBandwidth,
     updateFocusPipe,
     updateLinkSaturation,
+    updatePCIBandwidth,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
     updateTotalOPs,
@@ -21,15 +22,20 @@ import {
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
-import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, LINK_SATURATION_INITIAIL_PERCENT } from '../data/constants';
+import {
+    AICLK_INITIAL_MHZ,
+    DRAM_BANDWIDTH_INITIAL_GBS,
+    LINK_SATURATION_INITIAIL_PERCENT,
+    PCIE_BANDWIDTH_INITIAL_GBS,
+} from '../data/constants';
 import { NOC } from '../data/Types';
 import { mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
 
+
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
     const [showEmptyLinks, setShowEmptyLinks] = useState(false);
-    const [showPipes, setShowPipes] = useState(true);
     const [showOperationColors, setShowOperationColors] = useState(false);
     const [showNodeLocation, setShowNodeLocation] = useState(false);
     const [gridZoom, setGridZoom] = useState(1);
@@ -128,7 +134,6 @@ export default function GridRender() {
                                 <Switch
                                     checked={showEmptyLinks}
                                     label='links'
-                                    disabled={!showPipes}
                                     onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
                                 />
                             </Tooltip2>
@@ -278,7 +283,7 @@ export default function GridRender() {
                                         <hr />
                                     </>
                                 )}
-                                <DRAMBandwidthControls />
+                                <CLKBandwidthControls />
                             </>
                         }
                     </Collapsible>
@@ -287,7 +292,7 @@ export default function GridRender() {
 
             {chip && (
                 <div
-                    className={`grid-container ${showPipes ? '' : 'pipes-hidden'}`}
+                    className="grid-container"
                     // this is to address the issue with focus pipe getting stuck because of Popover2
                     // TODO: find a better solution
                     onMouseEnter={() => {
@@ -326,13 +331,14 @@ export default function GridRender() {
 
 interface DRAMBandwidthControlsProps {}
 
-const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
+const CLKBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
+    const PCIeBandwidth = useSelector((state: RootState) => state.linkSaturation.PCIBandwidthGBs);
     return (
         <>
-            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
+            <label className={Classes.LABEL} htmlFor='clkMHzInput' style={{ marginBottom: '5px' }}>
                 AICLK (MHz)
             </label>
             <NumericInput
@@ -376,6 +382,31 @@ const DRAMBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
                         minimal
                         onClick={() => {
                             dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
+                        }}
+                        icon={IconNames.RESET}
+                    />
+                }
+            />
+            <br />
+            <label className={Classes.LABEL} htmlFor='pcieBandwidthInput' style={{ marginBottom: '5px' }}>
+                PCIe channel BW (GB/s)
+            </label>
+            <NumericInput
+                //
+                id='pcieBandwidthInput'
+                value={PCIeBandwidth}
+                stepSize={0.5}
+                minorStepSize={0.1}
+                majorStepSize={10}
+                min={0}
+                onValueChange={(value) => {
+                    dispatch(updatePCIBandwidth(value));
+                }}
+                rightElement={
+                    <Button
+                        minimal
+                        onClick={() => {
+                            dispatch(updatePCIBandwidth(PCIE_BANDWIDTH_INITIAL_GBS));
                         }}
                         icon={IconNames.RESET}
                     />

@@ -8,6 +8,7 @@ import '../scss/DetailedView.scss';
 import { ComputeNodeType } from '../../data/Types';
 import DetailedViewDRAMRenderer from './detailed-view-components/DetailedViewDRAM';
 import DetailedViewETHRenderer from './detailed-view-components/DetailedViewETH';
+import DetailedViewPCIERenderer from './detailed-view-components/DetailedViewPCIE';
 
 interface DetailedViewProps {
     zoom: number;
@@ -35,6 +36,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
                     <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
                         {node.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
                         {node.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
+                        {node.type === ComputeNodeType.PCIE && <DetailedViewPCIERenderer node={node} />}
                     </div>
                 )}
             </Card>

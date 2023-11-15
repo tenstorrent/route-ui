@@ -15,13 +15,13 @@ import {
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    DramNOCLinkName,
+    NOC2AXILinkName,
     EthernetLinkName,
     LinkType,
     Loc,
     NetworkLinkName,
     NOC,
-    NOCLinkName,
+    NOCLinkName, PCIeLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
@@ -632,14 +632,14 @@ export class DramSubchannel {
 
     public readonly channelId: number;
 
-    public links: DramNOCLink[] = [];
+    public links: NOC2AXILink[] = [];
 
     constructor(subchannelId: number, channelId: number, json: { [key: string]: NOCLinkJSON }) {
         this.subchannelId = subchannelId;
         this.channelId = channelId;
         Object.entries(json).forEach(([key, value]) => {
             this.links.push(
-                NetworkLink.CREATE(key as DramNOCLinkName, `${channelId}-${subchannelId}-${key}`, value) as DramNOCLink,
+                NetworkLink.CREATE(key as NOC2AXILinkName, `${channelId}-${subchannelId}-${key}`, value) as NOC2AXILink,
             );
         });
     }
@@ -664,8 +664,8 @@ export abstract class NetworkLink {
         if (Object.values(NOCLinkName).includes(name as NOCLinkName)) {
             return new NOCLink(name as NOCLinkName, uid, json);
         }
-        if (Object.values(DramNOCLinkName).includes(name as DramNOCLinkName)) {
-            return new DramNOCLink(name as DramNOCLinkName, uid, json);
+        if (Object.values(NOC2AXILinkName).includes(name as NOC2AXILinkName)) {
+            return new NOC2AXILink(name as NOC2AXILinkName, uid, json);
         }
         if (Object.values(DramBankLinkName).includes(name as DramBankLinkName)) {
             return new DramBankLink(name as DramBankLinkName, uid, json);
@@ -673,8 +673,11 @@ export abstract class NetworkLink {
         if (Object.values(EthernetLinkName).includes(name as EthernetLinkName)) {
             return new EthernetLink(name as EthernetLinkName, uid, json);
         }
+        if (Object.values(PCIeLinkName).includes(name as PCIeLinkName)) {
+            return new PCIeLink(name as PCIeLinkName, uid, json);
+        }
 
-        throw new Error('Invalid network link name');
+        throw new Error(`Invalid network link name ${name}`);
     }
 
     // readonly noc: NOC;
@@ -710,15 +713,15 @@ export class NOCLink extends NetworkLink {
 
     public readonly noc: NOC;
 
-    constructor(name: NOCLinkName | DramNOCLinkName, uid: string, json: NOCLinkJSON) {
+    constructor(name: NOCLinkName | NOC2AXILinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
         this.noc = name.includes('noc0') ? NOC.NOC0 : NOC.NOC1;
         // this.name = name;
     }
 }
 
-export class DramNOCLink extends NOCLink {
-    constructor(name: DramNOCLinkName, uid: string, json: NOCLinkJSON) {
+export class NOC2AXILink extends NOCLink {
+    constructor(name: NOC2AXILinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
 }
@@ -727,6 +730,14 @@ export class EthernetLink extends NetworkLink {
     public readonly type: LinkType = LinkType.ETHERNET;
 
     constructor(name: EthernetLinkName, uid: string, json: NOCLinkJSON) {
+        super(name, uid, json);
+    }
+}
+
+export class PCIeLink extends NetworkLink {
+    public readonly type: LinkType = LinkType.PCIE;
+
+    constructor(name: PCIeLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
 }
@@ -789,7 +800,9 @@ export class ComputeNode {
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
             }
-            // TODO: PCIE links will go here
+            if (link.type === LinkType.PCIE) {
+                node.internalLinks.set(linkName, link as PCIeLink);
+            }
         });
 
         // Associate with operation
@@ -889,6 +902,9 @@ export class ComputeNode {
         });
     };
 
+    /**
+     * @description Returns all internal links with noc links.
+     */
     public getInternalLinksForNode = (): NetworkLink[] => {
         const links: NetworkLink[] = [...this.links.values()]
             .filter((link) => {

@@ -46,10 +46,10 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[
-                        <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT}>
+                        <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT} key='select-all-ops'>
                             <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                         </Tooltip2>,
-                        <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT}>
+                        <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT} key='deselect-all-ops'>
                             <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
                         </Tooltip2>,
                     ]}

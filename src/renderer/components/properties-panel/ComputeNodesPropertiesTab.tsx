@@ -186,7 +186,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 </div>
             )}
             <div className='node-controls'>
-                {(node.type === ComputeNodeType.DRAM || node.type === ComputeNodeType.ETHERNET) && (
+                {(node.type === ComputeNodeType.DRAM || node.type === ComputeNodeType.ETHERNET || node.type === ComputeNodeType.PCIE) && (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}

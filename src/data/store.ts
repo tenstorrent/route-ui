@@ -5,7 +5,6 @@ import {
     ComputeNodeState,
     DetailedViewState,
     HighContrastState,
-    HighlightType,
     LinkState,
     NetworkCongestionState,
     NodeSelectionState,
@@ -18,6 +17,7 @@ import {
     DRAM_BANDWIDTH_INITIAL_GBS,
     ETH_BANDWIDTH_INITIAL_GBS,
     LINK_SATURATION_INITIAIL_PERCENT,
+    PCIE_BANDWIDTH_INITIAL_GBS,
 } from './constants';
 
 interface UIState {
@@ -171,7 +171,6 @@ const nodeSelectionSlice = createSlice({
         },
         loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
             state.groups = {};
-            state.coreHighlightList = {};
             state.ioGroupsIn = {};
             state.operandsIn = {};
             state.ioGroupsOut = {};
@@ -216,14 +215,6 @@ const nodeSelectionSlice = createSlice({
                     dramGroup.selected = false;
                 }
             });
-        },
-        updateCoreHighlight(state, action: PayloadAction<{ ids: string[]; selected: HighlightType }>) {
-            action.payload.ids.forEach((id) => {
-                state.coreHighlightList[id] = action.payload.selected;
-            });
-        },
-        resetCoreHighlight(state) {
-            state.coreHighlightList = {};
         },
         loadIoDataIn(state, action: PayloadAction<Map<string, string[]>>) {
             action.payload.forEach((ops, uid) => {
@@ -307,13 +298,10 @@ export enum IoType {
 }
 
 export const selectNodeSelectionById = (state: RootState, id: string) => state.nodeSelection.nodeList[id];
-export const getCoreHighlight = (state: RootState, id: string) =>
-    state.nodeSelection.coreHighlightList[id] || HighlightType.NONE;
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
 export const {
     //
     loadNodesData,
-    updateCoreHighlight,
     updateNodeSelection,
     selectGroup,
     clearAllOperations,
@@ -322,7 +310,6 @@ export const {
     selectOperand,
     loadIoDataIn,
     loadIoDataOut,
-    resetCoreHighlight,
 } = nodeSelectionSlice.actions;
 
 const networkCongestionInitialState: NetworkCongestionState = {
@@ -334,6 +321,7 @@ const networkCongestionInitialState: NetworkCongestionState = {
     totalOps: 0,
     CLKMHz: AICLK_INITIAL_MHZ,
     DRAMBandwidthGBs: DRAM_BANDWIDTH_INITIAL_GBS,
+    PCIBandwidthGBs: PCIE_BANDWIDTH_INITIAL_GBS,
 };
 
 const linkSaturationSlice = createSlice({
@@ -367,14 +355,20 @@ const linkSaturationSlice = createSlice({
             });
             updateDRAMLinks(state);
             updateEthernetLinks(state);
+            updatePCILinks(state);
         },
         updateCLK: (state, action: PayloadAction<number>) => {
             state.CLKMHz = action.payload;
             updateDRAMLinks(state);
+            updatePCILinks(state);
         },
         updateDRAMBandwidth: (state, action: PayloadAction<number>) => {
             state.DRAMBandwidthGBs = action.payload;
             updateDRAMLinks(state);
+        },
+        updatePCIBandwidth: (state, action: PayloadAction<number>) => {
+            state.PCIBandwidthGBs = action.payload;
+            updatePCILinks(state);
         },
     },
 });
@@ -397,6 +391,16 @@ const updateDRAMLinks = (state: NetworkCongestionState) => {
         }
     });
 };
+const updatePCILinks = (state: NetworkCongestionState) => {
+    const PCIBandwidthGBs = state.PCIBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
+    const CLKHz = state.CLKMHz * 1000 * 1000;
+    Object.values(state.links).forEach((linkState: LinkState) => {
+        if (linkState.type === LinkType.PCIE) {
+            linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
+            recalculateLinkSaturation(linkState, state.totalOps);
+        }
+    });
+};
 export const getLinkData = (state: RootState, id: string) => state.linkSaturation.links[id];
 export const {
     //
@@ -407,6 +411,7 @@ export const {
     updateShowLinkSaturationForNOC,
     updateCLK,
     updateDRAMBandwidth,
+    updatePCIBandwidth,
 } = linkSaturationSlice.actions;
 
 const store = configureStore({

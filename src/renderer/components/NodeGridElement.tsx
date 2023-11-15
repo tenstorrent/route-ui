@@ -47,7 +47,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
-    // const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
 
@@ -170,7 +169,9 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
             break;
 
         case ComputeNodeType.PCIE:
-            // TODO: but we will be rendering congestion for these in the future
+            offChipLinkIds = [...node.internalLinks].map(([link]) => {
+                return link.uid;
+            }) || [];
             break;
         default:
             return null;
