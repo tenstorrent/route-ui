@@ -171,7 +171,6 @@ const nodeSelectionSlice = createSlice({
         },
         loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
             state.groups = {};
-            // state.coreHighlightList = {};
             state.ioGroupsIn = {};
             state.operandsIn = {};
             state.ioGroupsOut = {};
@@ -299,8 +298,6 @@ export enum IoType {
 }
 
 export const selectNodeSelectionById = (state: RootState, id: string) => state.nodeSelection.nodeList[id];
-// export const getCoreHighlight = (state: RootState, id: string) =>
-//     state.nodeSelection.coreHighlightList[id] || HighlightType.NONE;
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
 export const {
     //
