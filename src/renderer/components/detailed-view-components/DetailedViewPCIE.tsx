@@ -1,6 +1,6 @@
 import React from 'react';
-import { ComputeNode, NetworkLink, NOCLink } from '../../../data/Chip';
-import { NOC, NOCLinkName } from '../../../data/Types';
+import { ComputeNode, NetworkLink, NOC2AXILink, NOCLink, PCIeLink } from '../../../data/Chip';
+import { NOC, NOC2AXILinkName, NOCLinkName, PCIeLinkName } from '../../../data/Types';
 import LinkDetails from '../LinkDetails';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
@@ -19,8 +19,7 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
         node.links.get(NOCLinkName.NOC1_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC1_OUT) as NOCLink,
     ];
-    // TODO: need the real deal here
-    const internalLinks: NetworkLink[] = [...node.internalLinks.values()];
+
     const numPipes = [...node.links.values()].map((link) => link.pipes).flat().length;
 
     return (
@@ -31,11 +30,17 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                     <div className='node'>
                         <div className='col noc0'>
                             <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
-                            <DetailedViewNOC2AXIRender links={noc0links} noc={NOC.NOC0} />
+                            <DetailedViewNOC2AXIRender
+                                links={[node.links.get(NOC2AXILinkName.NOC0_NOC2AXI) as NOC2AXILink]}
+                                noc={NOC.ANY}
+                            />
                         </div>
                         <div className='col noc1'>
                             <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
-                            <DetailedViewNOC2AXIRender links={noc1links} noc={NOC.NOC1} />
+                            <DetailedViewNOC2AXIRender
+                                links={[node.links.get(NOC2AXILinkName.NOC1_NOC2AXI) as NOC2AXILink]}
+                                noc={NOC.ANY}
+                            />
                         </div>
                     </div>
                 </div>
@@ -45,7 +50,11 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                         2:1 XBAR
                     </div>
                     <div className='off-chip'>
-                        <DetailedViewAXIRender links={node.getInternalLinksForNode()} filter={null} label='PCIe' />
+                        <DetailedViewAXIRender
+                            links={[node.internalLinks.get(PCIeLinkName.PCIE_INOUT) as PCIeLink]}
+                            filter={null}
+                            label='PCIe'
+                        />
                     </div>
                 </div>
             </div>

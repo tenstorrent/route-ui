@@ -25,7 +25,6 @@ import {
 import { getGroupColor } from '../../data/ColorGenerator';
 import { HighlightType, PipeSelection } from '../../data/StateTypes';
 import { ComputeNodeType, NOC, NOCLinkName } from '../../data/Types';
-import { INTERNAL_NOC_LINK_NAMES } from '../../data/constants';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -48,7 +47,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
-    // const coreHighlight = useSelector((state: RootState) => getCoreHighlight(state, node.uid));
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
 
@@ -171,15 +169,9 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
             break;
 
         case ComputeNodeType.PCIE:
-            // TODO: implement once we have real data
-            // offChipLinkIds =
-            //     [...node.links.entries()]
-            //         .filter(([linkName]) => {
-            //             return INTERNAL_NOC_LINK_NAMES.includes(linkName);
-            //         })
-            //         .map(([_name, link]) => {
-            //             return link.uid;
-            //         }) || [];
+            offChipLinkIds = [...node.internalLinks].map(([link]) => {
+                return link.uid;
+            }) || [];
             break;
         default:
             return null;

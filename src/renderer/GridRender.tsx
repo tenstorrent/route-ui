@@ -134,7 +134,6 @@ export default function GridRender() {
                                 <Switch
                                     checked={showEmptyLinks}
                                     label='links'
-                                    // disabled={!showPipes}
                                     onChange={(event) => setShowEmptyLinks(event.currentTarget.checked)}
                                 />
                             </Tooltip2>

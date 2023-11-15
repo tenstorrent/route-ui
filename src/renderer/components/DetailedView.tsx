@@ -36,7 +36,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
                     <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
                         {node.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
                         {node.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
-                        {/* {node.type === ComputeNodeType.PCIE && <DetailedViewPCIERenderer node={node} />} */}
+                        {node.type === ComputeNodeType.PCIE && <DetailedViewPCIERenderer node={node} />}
                     </div>
                 )}
             </Card>

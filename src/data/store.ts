@@ -358,6 +358,7 @@ const linkSaturationSlice = createSlice({
             });
             updateDRAMLinks(state);
             updateEthernetLinks(state);
+            updatePCILinks(state);
         },
         updateCLK: (state, action: PayloadAction<number>) => {
             state.CLKMHz = action.payload;

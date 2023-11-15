@@ -34,7 +34,7 @@ export enum Architecture {
     WORMHOLE = 'wormhole',
 }
 
-export enum DramNOCLinkName {
+export enum NOC2AXILinkName {
     NOC0_NOC2AXI = 'noc0_noc2axi',
     NOC1_NOC2AXI = 'noc1_noc2axi',
 }
@@ -50,6 +50,10 @@ export enum EthernetLinkName {
     ETH_OUT = 'to_ethernet',
 }
 
+export enum PCIeLinkName {
+    PCIE_INOUT = 'pcie_inout',
+}
+
 export enum LinkType {
     NONE = '',
     NOC = 'noc',
@@ -58,7 +62,7 @@ export enum LinkType {
     PCIE = 'pcie',
 }
 
-export type NetworkLinkName = NOCLinkName | DramNOCLinkName | DramBankLinkName | EthernetLinkName;
+export type NetworkLinkName = NOCLinkName | NOC2AXILinkName | DramBankLinkName | EthernetLinkName | PCIeLinkName;
 
 export enum ComputeNodeType {
     NONE = '',

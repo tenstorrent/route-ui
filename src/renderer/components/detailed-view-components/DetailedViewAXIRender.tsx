@@ -1,5 +1,5 @@
 import React from 'react';
-import { DramBankLink, DramNOCLink, NetworkLink, NOCLink } from '../../../data/Chip';
+import { DramBankLink, NOC2AXILink, NetworkLink, NOCLink } from '../../../data/Chip';
 import { DramBankLinkName, NetworkLinkName, NOC } from '../../../data/Types';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 
@@ -24,7 +24,7 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ li
 };
 
 interface DetailedViewANOC2XIRenderProps {
-    links: DramNOCLink[] | NOCLink[];
+    links: NOC2AXILink[] | NOCLink[];
     noc: NOC;
 }
 
