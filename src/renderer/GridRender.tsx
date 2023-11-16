@@ -15,6 +15,7 @@ import {
 import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import { selectAllPipes, clearAllPipes, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
 import { RootState } from 'data/store/createStore';
+import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
 import DataSource, { GridContext } from '../data/DataSource';
 import { calculateLinkCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
@@ -45,7 +46,7 @@ export default function GridRender() {
     const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
     const [opCycles, setOpCycles] = useState<number>(0);
 
-    const isHC = useSelector((state: RootState) => state.highContrast.enabled);
+    const isHC = useSelector(getHighContrastState);
     const dispatch = useDispatch();
 
     const onLinkSaturationChange = (value: number) => {

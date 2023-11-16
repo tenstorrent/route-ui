@@ -9,9 +9,7 @@ const nodesInitialState: NodeSelectionState = {
     operandsIn: {},
     ioGroupsOut: {},
     operandsOut: {},
-    filename: '',
     dram: [],
-    architecture: '',
 };
 
 const setBorders = (nodes: ComputeNodeState[]) => {
@@ -34,12 +32,6 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
-        loadedFilename(state, action: PayloadAction<string>) {
-            state.filename = action.payload;
-        },
-        setArchitecture(state, action: PayloadAction<string>) {
-            state.architecture = action.payload;
-        },
         loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
             state.groups = {};
             state.coreHighlightList = {};
@@ -178,8 +170,6 @@ export const {
     updateNodeSelection,
     selectGroup,
     clearAllOperations,
-    loadedFilename,
-    setArchitecture,
     selectOperand,
     loadIoDataIn,
     loadIoDataOut,

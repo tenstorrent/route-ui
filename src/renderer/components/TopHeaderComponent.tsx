@@ -1,28 +1,23 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import path from 'path';
 import { Button, Switch } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
-import { setHighContrastState } from 'data/store/slices/highContrast.slice';
-import { setDockOpenState } from 'data/store/slices/uiState.slice';
-import { RootState } from 'data/store/createStore';
+import {
+    getArchitectureSelector,
+    getDockOpenState,
+    getFileNameSelector,
+    getHighContrastState,
+} from 'data/store/selectors/uiState.selectors';
+import { setDockOpenState, setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 
 const TopHeaderComponent: React.FC = () => {
     const dispatch = useDispatch();
-    const isHighContrast = useSelector((state: RootState) => {
-        return state.highContrast.enabled;
-    });
+    const isHighContrast = useSelector(getHighContrastState);
+    const fileName = useSelector(getFileNameSelector);
+    const isDockOpen = useSelector(getDockOpenState);
 
-    const fileName = useSelector((state: RootState) => {
-        return state.nodeSelection.filename;
-    });
-    const architecture = useSelector((state: RootState) => {
-        return state.nodeSelection.architecture;
-    });
-
-    const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
+    const architecture = useSelector(getArchitectureSelector);
 
     return (
         <div className='top-header-component'>
@@ -32,8 +27,7 @@ const TopHeaderComponent: React.FC = () => {
                 onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
             />
             <div className='text-content'>
-                {architecture ? ` Architecture: ${architecture}` : ''} |{' '}
-                {fileName ? `Loaded ${path.basename(fileName[0])}` : ''}
+                {architecture ? ` Architecture: ${architecture}` : ''} | {fileName ? `Loaded ${fileName}` : ''}
             </div>
             {process.env.NODE_ENV === 'development' && (
                 <Button

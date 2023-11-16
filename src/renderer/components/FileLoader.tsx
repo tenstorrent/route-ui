@@ -5,7 +5,8 @@ import { FC } from 'react';
 import { IconNames } from '@blueprintjs/icons';
 import { Button } from '@blueprintjs/core';
 import { useDispatch } from 'react-redux';
-import { loadedFilename } from 'data/store/slices/nodeSelection.slice';
+import { setSelectedFile } from 'data/store/slices/uiState.slice';
+
 import Chip from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
 import { NetlistAnalyzerDataJSON } from '../../data/JSONDataTypes';
@@ -23,10 +24,11 @@ const FileLoader: FC<FileLoaderProps> = ({ onChipLoaded }) => {
         const { dialog } = remote;
 
         await (async () => {
-            const filename = await dialog.showOpenDialogSync({
+            const filelist = await dialog.showOpenDialogSync({
                 properties: ['openFile'],
                 filters: [{ name: 'file', extensions: ['yaml'] }],
             });
+            const filename = Array.isArray(filelist) ? filelist[0] : null;
 
             if (!filename) {
                 return;
@@ -47,7 +49,7 @@ const FileLoader: FC<FileLoaderProps> = ({ onChipLoaded }) => {
                     if (isValid) {
                         const chip = Chip.CREATE_FROM_NETLIST_JSON(doc as NetlistAnalyzerDataJSON);
                         onChipLoaded(chip);
-                        dispatch(loadedFilename(filename));
+                        dispatch(setSelectedFile(filename));
                     } else {
                         const errors = yamlValidate.errors?.map((error) => {
                             return error.message;

@@ -47,9 +47,7 @@ export interface NodeSelectionState {
     operandsOut: Record<string, boolean>;
     nodeList: Record<string, ComputeNodeState>;
     coreHighlightList: Record<string, HighlightType>;
-    filename: string;
     dram: { data: ComputeNodeState[]; selected: boolean }[];
-    architecture: string;
 }
 
 export interface LinkState {

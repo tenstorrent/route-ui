@@ -4,7 +4,7 @@ import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
-import { RootState } from 'data/store/createStore';
+import { getArchitectureSelector } from 'data/store/selectors/uiState.selectors';
 import { ComputeNode, NOCLink } from '../../../data/Chip';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import LinkDetails from '../LinkDetails';
@@ -20,7 +20,7 @@ interface DetailedViewDRAMRendererProps {
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node }) => {
     const { chip } = useContext<GridContext>(DataSource);
-    const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);
+    const architecture = useSelector(getArchitectureSelector);
     const dispatch = useDispatch();
 
     const nodeList = useMemo(() => {
