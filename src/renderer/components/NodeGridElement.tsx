@@ -20,8 +20,8 @@ import {
     toRGBA,
 } from '../../utils/DrawingAPI';
 import { getGroupColor } from '../../data/ColorGenerator';
-import { HighlightType, PipeSelection } from '../../data/StateTypes';
-import { ComputeNodeType, NOC, NOCLinkName } from '../../data/Types';
+import { PipeSelection } from '../../data/StateTypes';
+import { ComputeNodeType, HighlightType, NOC, NOCLinkName } from '../../data/Types';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -76,7 +76,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             onClick={triggerSelection}
         >
             <OperationGroupRender node={node} />
-            <OperandHighlight node={node} />
+            {/* <OperandHighlight node={node} /> */}
             <DramModuleBorder node={node} />
             <OffChipNodeLinkCongestionLayer
                 node={node}
@@ -209,40 +209,42 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
     return <div className='group-border' style={operationStyles} />;
 };
 
-interface OperandHighlightProps {
-    node: ComputeNode;
-}
+// TODO: confirm delete
+
+// interface OperandHighlightProps {
+//     node: ComputeNode;
+// }
 
 /** no idea what this does and if it does anything. verify and delete  */
-const OperandHighlight: React.FC<OperandHighlightProps> = ({
-    //
-    node,
-    //
-}) => {
-    const operandsIn: { op: string; selected: boolean }[] = useSelector(
-        (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
-    );
-
-    const operandsOut: { op: string; selected: boolean }[] = useSelector(
-        (state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || [],
-    );
-    return (
-        <div className='operand-wrap'>
-            {operandsIn
-                .filter((operand) => operand.selected)
-                .map((operand) => {
-                    const styles = { backgroundColor: getGroupColor(operand.op) };
-                    return <div className='operand in' style={styles} />;
-                })}
-            {operandsOut
-                .filter((operand) => operand.selected)
-                .map((operand) => {
-                    const styles = { backgroundColor: getGroupColor(operand.op) };
-                    return <div className='operand out' style={styles} />;
-                })}
-        </div>
-    );
-};
+// const OperandHighlight: React.FC<OperandHighlightProps> = ({
+//     //
+//     node,
+//     //
+// }) => {
+//     const operandsIn: { op: string; selected: boolean }[] = useSelector(
+//         (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
+//     );
+//
+//     const operandsOut: { op: string; selected: boolean }[] = useSelector(
+//         (state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || [],
+//     );
+//     return (
+//         <div className='operand-wrap'>
+//             {operandsIn
+//                 .filter((operand) => operand.selected)
+//                 .map((operand) => {
+//                     const styles = { backgroundColor: getGroupColor(operand.op) };
+//                     return <div className='operand in' style={styles} />;
+//                 })}
+//             {operandsOut
+//                 .filter((operand) => operand.selected)
+//                 .map((operand) => {
+//                     const styles = { backgroundColor: getGroupColor(operand.op) };
+//                     return <div className='operand out' style={styles} />;
+//                 })}
+//         </div>
+//     );
+// };
 
 interface NodeFocusPipeRendererProps {
     node: ComputeNode;

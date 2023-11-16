@@ -1,14 +1,9 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ComputeNodeState, HighlightType, IoType, NodeSelectionState } from 'data/StateTypes';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
-    coreHighlightList: {},
     groups: {},
-    ioGroupsIn: {},
-    operandsIn: {},
-    ioGroupsOut: {},
-    operandsOut: {},
     dram: [],
 };
 
@@ -32,13 +27,9 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
+        // this only runs one time per file load
         loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
             state.groups = {};
-            state.coreHighlightList = {};
-            state.ioGroupsIn = {};
-            state.operandsIn = {};
-            state.ioGroupsOut = {};
-            state.operandsOut = {};
             state.nodeList = {};
             state.dram = [];
             action.payload.forEach((item) => {
@@ -56,8 +47,6 @@ const nodeSelectionSlice = createSlice({
                     state.dram[item.dramChannelId].data.push(item);
                 }
             });
-
-            // this only runs one time per file load
             Object.values(state.groups).forEach((group) => {
                 setBorders(group.data);
             });
@@ -80,74 +69,6 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        updateCoreHighlight(state, action: PayloadAction<{ ids: string[]; selected: HighlightType }>) {
-            action.payload.ids.forEach((id) => {
-                state.coreHighlightList[id] = action.payload.selected;
-            });
-        },
-        resetCoreHighlight(state) {
-            state.coreHighlightList = {};
-        },
-        loadIoDataIn(state, action: PayloadAction<Map<string, string[]>>) {
-            action.payload.forEach((ops, uid) => {
-                state.ioGroupsIn[uid] = ops.map((op) => {
-                    state.operandsIn[op] = false;
-                    return { op, selected: false };
-                });
-            });
-        },
-        loadIoDataOut(state, action: PayloadAction<Map<string, string[]>>) {
-            action.payload.forEach((ops, uid) => {
-                state.ioGroupsOut[uid] = ops.map((op) => {
-                    state.operandsOut[op] = false;
-                    return { op, selected: false };
-                });
-            });
-        },
-        selectOperand(state, action: PayloadAction<{ op: string; selected: boolean; type?: IoType }>) {
-            const { op, selected } = action.payload;
-            const type = action.payload.type || IoType.ALL;
-            switch (type) {
-                case IoType.ALL:
-                    Object.values(state.ioGroupsIn).forEach((data) => {
-                        data.forEach((operand) => {
-                            if (operand.op === op) {
-                                operand.selected = selected;
-                            }
-                        });
-                    });
-                    Object.values(state.ioGroupsOut).forEach((data) => {
-                        data.forEach((operand) => {
-                            if (operand.op === op) {
-                                operand.selected = selected;
-                            }
-                        });
-                    });
-                    break;
-                case IoType.IN:
-                    state.operandsIn[op] = selected;
-                    Object.values(state.ioGroupsIn).forEach((data) => {
-                        data.forEach((operand) => {
-                            if (operand.op === op) {
-                                operand.selected = selected;
-                            }
-                        });
-                    });
-                    break;
-                case IoType.OUT:
-                    state.operandsOut[op] = selected;
-                    Object.values(state.ioGroupsOut).forEach((data) => {
-                        data.forEach((operand) => {
-                            if (operand.op === op) {
-                                operand.selected = selected;
-                            }
-                        });
-                    });
-                    break;
-                default:
-                    break;
-            }
-        },
         selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
             const { opName, selected } = action.payload;
             const group = state.groups[opName];
@@ -166,14 +87,9 @@ const nodeSelectionSlice = createSlice({
 export const {
     //
     loadNodesData,
-    updateCoreHighlight,
     updateNodeSelection,
     selectGroup,
     clearAllOperations,
-    selectOperand,
-    loadIoDataIn,
-    loadIoDataOut,
-    resetCoreHighlight,
 } = nodeSelectionSlice.actions;
 
 export const nodeSelectionReducer = nodeSelectionSlice.reducer;
