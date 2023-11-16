@@ -33,20 +33,9 @@ export interface NodeSelection {
     selected: boolean;
 }
 
-export enum HighlightType {
-    INPUT = 'input',
-    OUTPUT = 'output',
-    NONE = '',
-}
-
 export interface NodeSelectionState {
     groups: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
-    ioGroupsIn: Record<string, { op: string; selected: boolean }[]>;
-    operandsIn: Record<string, boolean>;
-    ioGroupsOut: Record<string, { op: string; selected: boolean }[]>;
-    operandsOut: Record<string, boolean>;
     nodeList: Record<string, ComputeNodeState>;
-    coreHighlightList: Record<string, HighlightType>;
     dram: { data: ComputeNodeState[]; selected: boolean }[];
 }
 

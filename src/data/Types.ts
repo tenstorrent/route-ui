@@ -84,3 +84,9 @@ export enum DRAMBank {
     BANK0 = 'bank0',
     BANK1 = 'bank1',
 }
+
+export enum HighlightType {
+    INPUT = 'input',
+    OUTPUT = 'output',
+    NONE = '',
+}
