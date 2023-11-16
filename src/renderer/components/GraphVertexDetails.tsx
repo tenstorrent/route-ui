@@ -60,7 +60,7 @@ const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactEleme
                     ) : (
                         <div className='op-element'>
                             <Checkbox checked={false} disabled />
-                            <span>{operand.name}</span>
+                            <span>- {operand.name}</span>
                         </div>
                     )}
                 </div>

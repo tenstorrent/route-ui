@@ -113,10 +113,9 @@ interface DramModuleBorderProps {
 
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
 const DramModuleBorder: React.FC<DramModuleBorderProps> = ({ node }) => {
-    const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannel?.id));
+    const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannelId));
     let dramStyles = {};
-
-    if (node.dramChannel && dramSelectionState && dramSelectionState.selected) {
+    if (node.dramChannelId > -1 && dramSelectionState && dramSelectionState.selected && dramSelectionState.data.length > 1) {
         const border = dramSelectionState.data.filter((n) => n.id === node.uid)[0]?.border;
         dramStyles = getDramGroupingStyles(border);
     }

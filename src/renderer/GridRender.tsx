@@ -32,6 +32,7 @@ import {
 import { NOC } from '../data/Types';
 import { mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
+import { Queue } from '../data/GraphTypes';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -75,6 +76,17 @@ export default function GridRender() {
             isHC,
         )}, ${calculateLinkCongestionColor(50, 0, isHC)}, ${calculateLinkCongestionColor(120, 0, isHC)})`,
     };
+
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    console.log(
+        [...chip?.queues].map((q: Queue) => {
+            console.log(
+                q.details?.['allocation-info'].map((info) => info.channel),
+                `${q.name} ${q.details?.location}`,
+                q.details?.['allocation-info'],
+            );
+        }),
+    );
 
     useEffect(() => {
         if (chip) {
