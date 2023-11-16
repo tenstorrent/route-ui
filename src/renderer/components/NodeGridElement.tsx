@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import { selectNodeSelectionById, getDramGroup, getGroup } from 'data/store/selectors/nodeSelection.selectors';
+import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { RootState } from 'data/store/createStore';
@@ -143,7 +144,7 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
     linkSaturationTreshold,
 }) => {
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
-    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
+    const isHighContrast = useSelector(getHighContrastState);
     if (!showLinkSaturation) {
         return null;
     }
@@ -293,7 +294,7 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     //
 }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
-    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
+    const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);

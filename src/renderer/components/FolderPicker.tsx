@@ -5,6 +5,14 @@ import path from 'path';
 import { Button, ButtonGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    getArchitectureSelector,
+    getFileNameSelector,
+    getFilePathSelector,
+} from 'data/store/selectors/uiState.selectors';
+import { setSelectedArchitecture, setSelectedFileName, setSelectedFolder } from 'data/store/slices/uiState.slice';
+
 import '../scss/FolderPicker.scss';
 
 import { getAvailableGraphNames, loadJsonFile, validatePerfResultsFolder } from 'utils/Files';
@@ -31,7 +39,6 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
 };
 
 const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
-    console.log('Loading graph:', graphName);
     let chip = await loadChipFromArchitecture(architecture);
     const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
     const graphDescriptorJson = await loadJsonFile(graphPath);
@@ -71,16 +78,18 @@ const loadGraph = async (folderPath: string, graphName: string, architecture: Ar
  * TODO: Decouple graph selection from folder selection
  * */
 export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Chip) => void }): React.ReactElement => {
-    const [selectedFolder, setSelectedFolder] = React.useState<string | null>(null);
-    const [selectedGraph, setSelectedGraph] = React.useState<string | null>(null);
-    const [selectedArchitecture, setSelectedArchitecture] = React.useState<Architecture>(Architecture.NONE);
+    const selectedFolder = useSelector(getFilePathSelector);
+    const selectedGraph = useSelector(getFileNameSelector);
+    const selectedArchitecture = useSelector(getArchitectureSelector);
+
+    const dispatch = useDispatch();
+
     const [graphOptions, setGraphOptions] = React.useState<string[]>([]);
     const [showGraphSelect, setShowGraphSelect] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
     const loadFolder = async (folderPath: string) => {
-        console.log(`Selected folder: ${folderPath}`);
-        setSelectedFolder(folderPath);
+        dispatch(setSelectedFolder(folderPath));
         let graphs;
         try {
             graphs = await getAvailableGraphNames(folderPath);
@@ -93,8 +102,12 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
         setShowGraphSelect(true);
     };
 
+    const handleSelectArchitecture = (arch: Architecture) => {
+        dispatch(setSelectedArchitecture(arch));
+    };
+
     const onSelectGraphName = (graphName: string) => {
-        setSelectedGraph(graphName);
+        dispatch(setSelectedFileName(graphName));
         if (selectedFolder) {
             loadGraph(selectedFolder, graphName, selectedArchitecture)
                 .then((chip) => {
@@ -123,7 +136,7 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                         <Button
                             icon='person'
                             active={selectedArchitecture === Architecture.GRAYSKULL}
-                            onClick={() => setSelectedArchitecture(Architecture.GRAYSKULL)}
+                            onClick={() => handleSelectArchitecture(Architecture.GRAYSKULL)}
                             className='architecture-button'
                         >
                             Grayskull
@@ -131,7 +144,7 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
                         <Button
                             icon='globe-network'
                             active={selectedArchitecture === Architecture.WORMHOLE}
-                            onClick={() => setSelectedArchitecture(Architecture.WORMHOLE)}
+                            onClick={() => handleSelectArchitecture(Architecture.WORMHOLE)}
                             className='architecture-button'
                         >
                             Wormhole

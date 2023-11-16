@@ -7,7 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import { parse } from 'yaml';
 import React, { useContext } from 'react';
-import { loadedFilename } from 'data/store/slices/nodeSelection.slice';
+import { setSelectedArchitecture, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
+import { Architecture } from 'data/Types';
 
 import Chip from '../../data/Chip';
 import DataSource from '../../data/DataSource';
@@ -22,7 +23,9 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
     const { chip } = useContext(DataSource);
     const dispatch = useDispatch();
     const reloadAppData = () => {
-        dispatch(loadedFilename(''));
+        dispatch(setSelectedFile(''));
+        dispatch(setSelectedArchitecture(Architecture.NONE));
+        dispatch(setSelectedFolder(''));
         navigate('/');
     };
 
