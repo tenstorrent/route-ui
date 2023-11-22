@@ -14,7 +14,13 @@ interface SelectableOperationProps {
     type?: GraphVertexType | null;
 }
 
-const SelectableOperation: FC<SelectableOperationProps> = ({ opName, selectFunc, value, stringFilter, type }) => {
+const SelectableOperation: FC<SelectableOperationProps> = ({
+    opName,
+    selectFunc,
+    value,
+    stringFilter,
+    type = null,
+}) => {
     return (
         <div className='op-element'>
             <Checkbox
