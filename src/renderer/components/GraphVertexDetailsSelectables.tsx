@@ -1,0 +1,47 @@
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Operand } from '../../data/Graph';
+import { RootState } from '../../data/store/createStore';
+import { selectGroup, selectQueue } from '../../data/store/slices/nodeSelection.slice';
+import { GraphVertexType } from '../../data/GraphTypes';
+import SelectableOperation from './SelectableOperation';
+
+const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.ReactElement | null => {
+    const { operand } = props;
+    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const dispatch = useDispatch();
+    const setOperationSelectionState = (opName: string, selected: boolean) =>
+        dispatch(
+            selectGroup({
+                opName,
+                selected,
+            }),
+        );
+
+    const setQueueSelectionState = (queueName: string, selected: boolean) =>
+        dispatch(
+            selectQueue({
+                queueName,
+                selected,
+            }),
+        );
+    return operand.type === GraphVertexType.OPERATION ? (
+        <SelectableOperation
+            opName={operand.name}
+            value={nodesSelectionState.groups[operand.name]?.selected}
+            selectFunc={setOperationSelectionState}
+            stringFilter=''
+            type={operand.type}
+        />
+    ) : (
+        <SelectableOperation
+            opName={operand.name}
+            value={nodesSelectionState.queues[operand.name]?.selected}
+            selectFunc={setQueueSelectionState}
+            stringFilter=''
+            type={operand.type}
+        />
+    );
+};
+
+export default GraphVertexDetailsSelectables;

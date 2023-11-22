@@ -5,3 +5,4 @@ export const getDramGroup = (state: RootState, id: number | undefined) =>
 
 export const selectNodeSelectionById = (state: RootState, id: string) => state.nodeSelection.nodeList[id];
 export const getGroup = (state: RootState, id: string) => state.nodeSelection.groups[id];
+export const getQueue = (state: RootState, id: string) => state.nodeSelection.queues[id];

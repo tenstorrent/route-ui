@@ -78,15 +78,15 @@ export default function GridRender() {
     };
 
     // eslint-disable-next-line no-unsafe-optional-chaining
-    console.log(
-        [...chip?.queues].map((q: Queue) => {
-            console.log(
-                q.details?.['allocation-info'].map((info) => info.channel),
-                `${q.name} ${q.details?.location}`,
-                q.details?.['allocation-info'],
-            );
-        }),
-    );
+    // console.log(
+    //     [...chip?.queues].map((q: Queue) => {
+    //         console.log(
+    //             q.details?.['allocation-info'].map((info) => info.channel),
+    //             `${q.name} ${q.details?.location}`,
+    //             q.details?.['allocation-info'],
+    //         );
+    //     }),
+    // );
 
     useEffect(() => {
         if (chip) {
