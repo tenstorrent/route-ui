@@ -1,7 +1,12 @@
 import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import { selectNodeSelectionById, getDramGroup, getGroup } from 'data/store/selectors/nodeSelection.selectors';
+import {
+    selectNodeSelectionById,
+    getDramGroup,
+    getGroup,
+    getQueue,
+} from 'data/store/selectors/nodeSelection.selectors';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
@@ -83,6 +88,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
                 showLinkSaturation={showLinkSaturation}
                 linkSaturationTreshold={linkSaturationTreshold}
             />
+            <QueueHighlightRenderer node={node} />
             <div className='node-border' />
             <div className='core-highlight' />
             {node.opName !== '' && showOperationColors && (
@@ -113,10 +119,14 @@ interface DramModuleBorderProps {
 
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
 const DramModuleBorder: React.FC<DramModuleBorderProps> = ({ node }) => {
-    const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannel?.id));
+    const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannelId));
     let dramStyles = {};
-
-    if (node.dramChannel && dramSelectionState && dramSelectionState.selected) {
+    if (
+        node.dramChannelId > -1 &&
+        dramSelectionState &&
+        dramSelectionState.selected &&
+        dramSelectionState.data.length > 1
+    ) {
         const border = dramSelectionState.data.filter((n) => n.id === node.uid)[0]?.border;
         dramStyles = getDramGroupingStyles(border);
     }
@@ -185,6 +195,20 @@ const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerPro
     congestionStyle = getOffChipCongestionStyles(saturationBg);
 
     return <div className='off-chip-congestion' style={congestionStyle} />;
+};
+
+const QueueHighlightRenderer: React.FC<{ node: ComputeNode }> = ({ node }) => {
+    const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
+    return (
+        <div className='queue-highlighter-content'>
+            {node.queueList.map((queue) => {
+                if (queueSelectionState[queue.name]?.selected) {
+                    return <div className='queue-highlighter' style={{ backgroundColor: getGroupColor(queue.name) }} />;
+                }
+                return null;
+            })}
+        </div>
+    );
 };
 
 interface OperationGroupRenderProps {

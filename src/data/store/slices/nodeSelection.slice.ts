@@ -4,6 +4,7 @@ import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
     groups: {},
+    queues: {},
     dram: [],
 };
 
@@ -32,6 +33,7 @@ const nodeSelectionSlice = createSlice({
             state.groups = {};
             state.nodeList = {};
             state.dram = [];
+            state.queues = {};
             action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
@@ -46,9 +48,20 @@ const nodeSelectionSlice = createSlice({
                     }
                     state.dram[item.dramChannelId].data.push(item);
                 }
+                if (item.queueNameList.length > 0) {
+                    item.queueNameList.forEach((queueName) => {
+                        if (!state.queues[queueName]) {
+                            state.queues[queueName] = { data: [], selected: false };
+                        }
+                        state.queues[queueName].data.push(item);
+                    });
+                }
             });
             Object.values(state.groups).forEach((group) => {
                 setBorders(group.data);
+            });
+            Object.values(state.queues).forEach((queue) => {
+                setBorders(queue.data);
             });
             state.dram.forEach((dramElement) => {
                 setBorders(dramElement.data);
@@ -69,7 +82,10 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
+
+        /** select operation */
         selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
+            // TODO: refactor
             const { opName, selected } = action.payload;
             const group = state.groups[opName];
             if (group) {
@@ -81,6 +97,18 @@ const nodeSelectionSlice = createSlice({
                 group.selected = false;
             });
         },
+        selectQueue(state, action: PayloadAction<{ queueName: string; selected: boolean }>) {
+            const { queueName, selected } = action.payload;
+            const queue = state.queues[queueName];
+            if (queue) {
+                queue.selected = selected;
+            }
+        },
+        clearAllQueues(state) {
+            Object.values(state.queues).forEach((queue) => {
+                queue.selected = false;
+            });
+        }
     },
 });
 
@@ -90,6 +118,8 @@ export const {
     updateNodeSelection,
     selectGroup,
     clearAllOperations,
+    selectQueue,
+    clearAllQueues,
 } = nodeSelectionSlice.actions;
 
 export const nodeSelectionReducer = nodeSelectionSlice.reducer;

@@ -227,6 +227,7 @@ $dock-height: 420px;
             .group-border,
             .operand-wrap,
             .off-chip-congestion,
+            .queue-highlighter-content,
             .dram-border {
                 width: 100%;
                 height: 100%;
@@ -286,9 +287,21 @@ $dock-height: 420px;
                     opacity: 0.15;
                 }
             }
+
+            .queue-highlighter-content {
+                display: flex;
+                flex-direction: row;
+                gap: 5px;
+                justify-content: flex-start;
+
+                .queue-highlighter {
+
+                    width: 5px;
+                    height: 100%;
+                }
+            }
         }
     }
-
 
 }
 
@@ -516,6 +529,22 @@ $dock-height: 420px;
 
 .opname,
 .operations-wrap {
+    .op-type.icon {
+        line-height: 1;
+        margin-left: -7px;
+
+        &.op{
+            svg {
+                fill: #5F6B7C;
+            }
+        }
+        &.queue{
+            svg {
+                stroke: #5F6B7C;
+            }
+        }
+    }
+
     .op-element {
         color: $tt-black;
         display: flex;
@@ -537,6 +566,7 @@ $dock-height: 420px;
 
     .core-runtime-metrics {
         margin-left: 12px;
+
         .core-runtime-item {
             margin-bottom: 4px;
             display: flex;
@@ -564,6 +594,7 @@ $dock-height: 420px;
                 font-size: 12px;
                 padding-right: 6px;
             }
+
             .queue-detail-value {
                 font-size: 12px;
             }
@@ -591,6 +622,10 @@ $dock-height: 420px;
 }
 
 .opname {
+    .graph-vertex-details {
+        margin-left: 0;
+    }
+
     span {
         color: $tt-white-text;
     }

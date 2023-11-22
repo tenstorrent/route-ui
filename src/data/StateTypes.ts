@@ -24,6 +24,7 @@ export interface ComputeNodeState extends NodeSelection {
     loc: { x: number; y: number };
     opName: string;
     border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
+    queueNameList: string[];
     dramChannelId: number | -1;
     dramSubchannelId: number | -1;
 }
@@ -35,6 +36,7 @@ export interface NodeSelection {
 
 export interface NodeSelectionState {
     groups: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
+    queues: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
     nodeList: Record<string, ComputeNodeState>;
     dram: { data: ComputeNodeState[]; selected: boolean }[];
 }

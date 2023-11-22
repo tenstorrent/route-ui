@@ -1,29 +1,15 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Checkbox } from '@blueprintjs/core';
-import { selectGroup } from 'data/store/slices/nodeSelection.slice';
-import { RootState } from 'data/store/createStore';
 import { GraphVertex, GraphVertexType } from '../../data/GraphTypes';
-import SelectableOperation from './SelectableOperation';
+import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
+
 
 const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactElement | null => {
     const { graphNode } = props;
     const inputs = [...graphNode.inputs];
     const outputs = [...graphNode.outputs];
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const dispatch = useDispatch();
-    const setOperationSelectionState = (opName: string, selected: boolean) =>
-        dispatch(
-            selectGroup({
-                opName,
-                selected,
-            }),
-        );
-
     if (inputs.length === 0 && outputs.length === 0) {
         return null;
     }
-
     const parseQueueLocation = (locationString: string) => {
         const match = locationString.match(/LOCATION::(\w+)/);
         if (match !== null) {
@@ -45,24 +31,21 @@ const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactEleme
                             {parseQueueLocation(graphNode.details.location)} (Device {graphNode.details['device-id']})
                         </div>
                     </div>
+                    {/* <div className='queue-detail-item'> */}
+                    {/*     <ul> */}
+                    {/*         {graphNode.details['allocation-info'].map((allocationInfo) => ( */}
+                    {/*             <li style={{ display: 'list-item' }}> */}
+                    {/*                 {allocationInfo.channel} | {allocationInfo.address} */}
+                    {/*             </li> */}
+                    {/*         ))} */}
+                    {/*     </ul> */}
+                    {/* </div> */}
                 </div>
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((operand) => (
                 <div className='operation-operand' key={operand.name}>
-                    {operand.type === GraphVertexType.OPERATION ? (
-                        <SelectableOperation
-                            opName={operand.name}
-                            value={nodesSelectionState.groups[operand.name]?.selected}
-                            selectFunc={setOperationSelectionState}
-                            stringFilter=''
-                        />
-                    ) : (
-                        <div className='op-element'>
-                            <Checkbox checked={false} disabled />
-                            <span>{operand.name}</span>
-                        </div>
-                    )}
+                    <GraphVertexDetailsSelectables operand={operand} />
                 </div>
             ))}
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
@@ -81,19 +64,7 @@ const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactEleme
                     {/*         </li> */}
                     {/*     ))} */}
                     {/* </ul> */}
-                    {operand.type === GraphVertexType.OPERATION ? (
-                        <SelectableOperation
-                            opName={operand.name}
-                            value={nodesSelectionState.groups[operand.name]?.selected}
-                            selectFunc={setOperationSelectionState}
-                            stringFilter=''
-                        />
-                    ) : (
-                        <div className='op-element'>
-                            <Checkbox checked={false} disabled />
-                            <span>{operand.name}</span>
-                        </div>
-                    )}
+                    <GraphVertexDetailsSelectables operand={operand} />
                 </div>
             ))}
         </div>
@@ -101,3 +72,4 @@ const GraphVertexDetails = (props: { graphNode: GraphVertex }): React.ReactEleme
 };
 
 export default GraphVertexDetails;
+

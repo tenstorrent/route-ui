@@ -21,7 +21,8 @@ import {
     Loc,
     NetworkLinkName,
     NOC,
-    NOCLinkName, PCIeLinkName,
+    NOCLinkName,
+    PCIeLinkName,
 } from './Types';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
@@ -55,12 +56,20 @@ export default class Chip {
 
     private nodesById: Map<string, ComputeNode> = new Map();
 
+    private nodeByChannelId: Map<number, ComputeNode[]> = new Map();
+
     public get nodes(): Iterable<ComputeNode> {
         return this.nodesById.values();
     }
 
     protected set nodes(value: Iterable<ComputeNode>) {
         this.nodesById = new Map(mapIterable(value, (node: ComputeNode) => [node.uid, node]));
+        [...this.nodesById.values()].forEach((node) => {
+            const channelId = node.dramChannelId;
+            if (channelId > -1) {
+                this.nodeByChannelId.set(channelId, [...(this.nodeByChannelId.get(channelId) || []), node]);
+            }
+        });
     }
 
     public getNode(nodeUID: string): ComputeNode {
@@ -69,6 +78,10 @@ export default class Chip {
             throw new Error(`Node ${nodeUID} does not exist on chip ${this.chipId}`);
         }
         return node;
+    }
+
+    public getNodeByChannelId(id: number): ComputeNode[] {
+        return this.nodeByChannelId.get(id) || [];
     }
 
     private _totalCols: number = 0;
@@ -496,7 +509,15 @@ export default class Chip {
 
     static AUGMENT_WITH_QUEUE_DETAILS(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
         forEach(chip.queuesByName.values(), (queue) => {
-            queue.details = { ...queueDescriptorJson[queue.name] };
+            const details = queueDescriptorJson[queue.name];
+            queue.details = { ...details };
+            details['allocation-info'].forEach((allocationInfo) => {
+                chip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
+                    if (!node.queueList.includes(queue)) {
+                        node.queueList.push(queue);
+                    }
+                });
+            });
         });
 
         const newChip = new Chip(chip.chipId);
@@ -509,13 +530,11 @@ export default class Chip {
         const newChip = new Chip(chip.chipId);
         Object.assign(newChip, chip);
 
-
         forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
             const node = chip.getNode(nodeUid);
             if (node.type === ComputeNodeType.CORE) {
-                node.perfAnalyzerResults = perfAnalyzerJson[node.uid]
-            }
-            else {
+                node.perfAnalyzerResults = perfAnalyzerJson[node.uid];
+            } else {
                 console.error('Attempted to add perf details to a node that is not a core:', nodeUid, node);
             }
         });
@@ -846,6 +865,8 @@ export class ComputeNode {
 
     public dramSubchannel: DramSubchannel | null = null;
 
+    public queueList: Queue[] = [];
+
     public consumerPipes: Pipe[] = [];
 
     public producerPipes: Pipe[] = [];
@@ -885,6 +906,7 @@ export class ComputeNode {
             id: this.uid,
             selected: false,
             loc: this.loc,
+            queueNameList: this.queueList.map((queue) => queue.name),
             opName: this.opName,
             dramChannelId: this.dramChannelId,
             dramSubchannelId: this.dramSubchannelId,
