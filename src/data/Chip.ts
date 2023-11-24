@@ -22,7 +22,7 @@ import {
     NetworkLinkName,
     NOC,
     NOCLinkName,
-    PCIeLinkName,
+    PCIeLinkName, QueueLocation,
 } from './Types';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
@@ -34,7 +34,7 @@ import {
     OperandJSON,
     OperationDetails,
 } from './sources/GraphDescriptor';
-import { QueueDescriptorJson } from './sources/QueueDescriptor';
+import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
 import { CorePerfJson, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 
 export default class Chip {
@@ -510,13 +510,16 @@ export default class Chip {
     static AUGMENT_WITH_QUEUE_DETAILS(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
         forEach(chip.queuesByName.values(), (queue) => {
             const details = queueDescriptorJson[queue.name];
+            details.processedLocation = parsedQueueLocation(details.location);
             queue.details = { ...details };
             details['allocation-info'].forEach((allocationInfo) => {
-                chip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
-                    if (!node.queueList.includes(queue)) {
-                        node.queueList.push(queue);
-                    }
-                });
+                if(details.processedLocation === QueueLocation.DRAM) {
+                    chip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
+                        if (!node.queueList.includes(queue)) {
+                            node.queueList.push(queue);
+                        }
+                    });
+                }
             });
         });
 
@@ -541,6 +544,7 @@ export default class Chip {
 
         return newChip;
     }
+
 
     public generateInitialPipesSelectionState(): PipeSelection[] {
         return this.allUniquePipes.map((pipeSegment) => {

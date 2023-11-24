@@ -1,4 +1,5 @@
 import type { QueueName } from '../GraphTypes';
+import { QueueLocation } from '../Types';
 
 interface AllocationInfoJson {
     address: number;
@@ -20,8 +21,24 @@ export interface QueueDetailsJson {
     'source-device-id': number;
     'tile-dim': string;
     type: string;
+    processedLocation: QueueLocation;
 }
 
 export interface QueueDescriptorJson {
     [queueName: QueueName]: QueueDetailsJson;
 }
+
+export const parsedQueueLocation = (locationString: string): QueueLocation => {
+    const match = locationString.match(/LOCATION::(\w+)/);
+    if (match !== null) {
+        switch (match[1]) {
+            case 'HOST':
+                return QueueLocation.HOST;
+            case 'DRAM':
+                return QueueLocation.DRAM;
+            default:
+                return QueueLocation.NONE;
+        }
+    }
+    return QueueLocation.NONE;
+};

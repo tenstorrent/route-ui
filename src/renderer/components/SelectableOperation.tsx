@@ -12,6 +12,7 @@ interface SelectableOperationProps {
     selectFunc: (operation: string, checked: boolean) => void;
     stringFilter: string;
     type?: GraphVertexType | null;
+    disabled?: boolean;
 }
 
 const SelectableOperation: FC<SelectableOperationProps> = ({
@@ -19,18 +20,19 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     selectFunc,
     value,
     stringFilter,
-    type = null,
+    type= null,
+    disabled = false,
 }) => {
     return (
         <div className='op-element'>
             <Checkbox
+                disabled={disabled}
                 checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     selectFunc(opName, e.target.checked);
                 }}
             />
-            {/* {type && <span className='op-type small'><i>{type}:</i></span>} */}
-            {type && (
+            {type !== null && (
                 <span className={`op-type icon ${type}`}>
                     {type === GraphVertexType.OPERATION && <Icon icon={IconNames.CUBE} />}
                     {type === GraphVertexType.QUEUE && <QueueIcon />}
@@ -47,5 +49,6 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
 
 SelectableOperation.defaultProps = {
     type: null,
+    disabled: false,
 };
 export default SelectableOperation;

@@ -23,9 +23,18 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
     const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
         dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
     };
+    if (pipeState?.selected === undefined) {
+        console.log('something is missing here');
+        console.log(pipeState);
+        console.log(pipeSegment);
+    }
     return (
         <>
-            <Checkbox checked={pipeState?.selected} onChange={handleCheckboxChange} />
+            <Checkbox
+                disabled={pipeState?.selected === undefined}
+                checked={pipeState?.selected}
+                onChange={handleCheckboxChange}
+            />
             <PipeInfoDialog
                 pipeId={pipeSegment.id}
                 hide={focusPipe !== pipeSegment.id}
@@ -45,7 +54,7 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                             dispatch(updateFocusPipe(null));
                         }}
                     >
-                        {pipeState && (
+                        {pipeState ? (
                             <>
                                 <HighlightedText text={pipeState.id} filter={pipeFilter} />{' '}
                                 {pipeSegment.bandwidth !== null ? convertBytes(pipeSegment.bandwidth) : ''}
@@ -59,6 +68,8 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                                     <ProgressBar percent={pipeSegment.bandwidthUse} />
                                 )}
                             </>
+                        ) : (
+                            <HighlightedText text={pipeSegment.id} filter={pipeFilter} />
                         )}
                     </span>
                 }

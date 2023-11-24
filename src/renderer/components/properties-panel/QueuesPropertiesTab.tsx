@@ -13,6 +13,7 @@ import { clearAllQueues, selectQueue } from '../../../data/store/slices/nodeSele
 import { RootState } from '../../../data/store/createStore';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
+import { QueueLocation } from '../../../data/Types';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
@@ -38,6 +39,7 @@ function QueuesPropertiesTab() {
             }
         });
     };
+
 
 
     return (
@@ -72,6 +74,7 @@ function QueuesPropertiesTab() {
                                     key={queue.name}
                                     label={
                                         <SelectableOperation
+                                            disabled={queueSelectionState[queue.name]?.selected === undefined}
                                             opName={queue.name}
                                             value={queueSelectionState[queue.name]?.selected}
                                             selectFunc={setQueueSelectionState}

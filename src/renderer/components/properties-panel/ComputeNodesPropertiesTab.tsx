@@ -5,18 +5,18 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
 import { RootState } from 'data/store/createStore';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
-import { selectGroup, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { selectGroup, selectQueue, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
-import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
+import { ComputeNodeType, NOCLinkName, QueueLocation } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import LinkDetails from '../LinkDetails';
 import GraphVertexDetails from '../GraphVertexDetails';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
-
+import Collapsible from '../Collapsible';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -70,6 +70,13 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 selected,
             }),
         );
+    const setQueueSelectionState = (queueName: string, selected: boolean) =>
+        dispatch(
+            selectQueue({
+                queueName,
+                selected,
+            }),
+        );
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
@@ -93,13 +100,13 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 </Tooltip2>
             </h3>
             {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
-            {node.type === ComputeNodeType.DRAM ? (
+            {node.type === ComputeNodeType.DRAM && (
                 <p>
                     Channel {node.dramChannelId}, Sub {node.dramSubchannelId}
                 </p>
-            ) : null}
+            )}
             {node.operation && (
-                <div className='opname'>
+                <div className='opname theme-dark'>
                     <Tooltip2 content={node.operation.name} position={PopoverPosition.LEFT}>
                         <SelectableOperation
                             opName={node.operation.name}
@@ -111,9 +118,28 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics coreNode={node} />}
                 </div>
             )}
+
+            {node.queueList.length > 0 && (
+                <div className='opname theme-dark'>
+                    <Collapsible label={<h4>Queues:</h4>} isOpen>
+                        {node.queueList.map((queue) => (
+                            <>
+
+                                <SelectableOperation
+                                    disabled={nodesSelectionState.queues[queue.name]?.selected === undefined}
+                                    opName={queue.name}
+                                    value={nodesSelectionState.queues[queue.name]?.selected}
+                                    selectFunc={setQueueSelectionState}
+                                    stringFilter=''
+                                />
+                                <GraphVertexDetails graphNode={queue} showQueueDetails={false}/>
+                            </>
+                        ))}
+                    </Collapsible>
+                </div>
+            )}
             {node.operation && (
-                <div className='opname'>
-                    <GraphVertexDetails graphNode={node.operation} />
+                <div className='opname theme-dark'>
                     {inputs && inputs.length && <h4 className='io-label'>Inputs:</h4>}
                     {inputs &&
                         inputs.map((operand) => (

@@ -90,3 +90,9 @@ export enum HighlightType {
     OUTPUT = 'output',
     NONE = '',
 }
+
+export enum QueueLocation {
+    NONE = '',
+    HOST = 'HOST',
+    DRAM = 'DRAM',
+}

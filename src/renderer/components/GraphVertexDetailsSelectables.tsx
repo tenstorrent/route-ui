@@ -35,6 +35,7 @@ const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.React
         />
     ) : (
         <SelectableOperation
+            disabled={nodesSelectionState.queues[operand.name]?.selected === undefined}
             opName={operand.name}
             value={nodesSelectionState.queues[operand.name]?.selected}
             selectFunc={setQueueSelectionState}
