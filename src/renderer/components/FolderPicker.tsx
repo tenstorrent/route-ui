@@ -22,7 +22,12 @@ import { ChipDesignJSON } from '../../data/JSONDataTypes';
 import { GraphDescriptorJSON } from '../../data/sources/GraphDescriptor';
 import { QueueDescriptorJson } from '../../data/sources/QueueDescriptor';
 import PopoverMenu from './PopoverMenu';
-import type { PerfAnalyzerResultsJson } from '../../data/sources/PerfAnalyzerResults';
+import type {
+    OpAttributesJSON,
+    OpMeasurementsJSON,
+    PerfAnalyzerResultsJson,
+} from '../../data/sources/PerfAnalyzerResults';
+import { PerfAnalyzerResultsPerOpJSON } from '../../data/sources/PerfAnalyzerResults';
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
     if (architecture === Architecture.NONE) {
@@ -50,21 +55,40 @@ const loadGraph = async (folderPath: string, graphName: string, architecture: Ar
 
     chip = Chip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
 
-    const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report.json');
-    const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsJson;
-
+    const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report_per_op.json');
+    const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsPerOpJSON;
+    const opAttributesMeasurements: Map<
+        string,
+        {
+            opAttributes: OpAttributesJSON;
+            opMeasurements: OpMeasurementsJSON;
+        }
+    > = new Map();
     const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
-        /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
-         *   `perf_results/perf_info_all_epochs.csv`.
-         *
-         * The node ID keys in the perf analyzer results file don't have the chip ID (device ID) component.
-         * We're forcing chip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
-         */
-        Object.entries(analyzerResultsJson).map(([chipId, result]) => [`0-${chipId}`, result]),
+        Object.entries(analyzerResultsJson)
+            .map(([opName, result]) => {
+                opAttributesMeasurements.set(opName, {
+                    opAttributes: result['op-attributes'],
+                    opMeasurements: result['op-measurements'],
+                });
+
+                /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
+                 *   `perf_results/perf_info_all_epochs.csv`.
+                 *
+                 * The node ID keys in the perf analyzer results file don't have the chip ID (device ID) component.
+                 * We're forcing chip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
+                 */
+                return Object.entries(result['core-measurements']).map(([chipId, corePerfJson]) => [
+                    `0-${chipId}`,
+                    corePerfJson,
+                ]);
+            })
+            .flat(),
     );
 
-    chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
+    // TODO: opAttributesMeasurements needs to be propagated to the data model
 
+    chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
     return chip;
 };
 
@@ -88,8 +112,21 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
     const [showGraphSelect, setShowGraphSelect] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
+    const [manualArchitectureSelection, setManualArchitectureSelection] = React.useState(false);
+
     const loadFolder = async (folderPath: string) => {
         dispatch(setSelectedFolder(folderPath));
+        setManualArchitectureSelection(false);
+
+        let metadata;
+        try {
+            metadata = await loadJsonFile(path.join(folderPath, 'metadata.json'));
+            handleSelectArchitecture(metadata.architecture as Architecture);
+        } catch (err) {
+            console.warn('Failed to read metadata from folder:', err);
+            setManualArchitectureSelection(true);
+        }
+
         let graphs;
         try {
             graphs = await getAvailableGraphNames(folderPath);
@@ -127,42 +164,42 @@ export const TempFolderLoadingContext = ({ onDataLoad }: { onDataLoad: (data: Ch
     return (
         <div className='folder-load-container'>
             <h3>Load From Folder</h3>
-            <div>
-                <Tooltip2 content='Select Architecture' position='left'>
-                    <ButtonGroup
-                        // The architecture will (at some point) be specified in the selected folder, but until then it needs to be selectable.
-                        className='architecture-button-group'
-                    >
-                        <Button
-                            icon='person'
-                            active={selectedArchitecture === Architecture.GRAYSKULL}
-                            onClick={() => handleSelectArchitecture(Architecture.GRAYSKULL)}
-                            className='architecture-button'
-                        >
-                            Grayskull
-                        </Button>
-                        <Button
-                            icon='globe-network'
-                            active={selectedArchitecture === Architecture.WORMHOLE}
-                            onClick={() => handleSelectArchitecture(Architecture.WORMHOLE)}
-                            className='architecture-button'
-                        >
-                            Wormhole
-                        </Button>
-                    </ButtonGroup>
-                </Tooltip2>
-            </div>
+
             <FolderPicker
-                disabled={selectedArchitecture === Architecture.NONE}
+                disabled={false}
                 onSelectFolder={loadFolder}
                 disabledText='Select Architecture Before Loading Graph'
             />
+            {manualArchitectureSelection && (
+                <div>
+                    <Tooltip2 content='Select Architecture' position='left'>
+                        <ButtonGroup className='architecture-button-group'>
+                            <Button
+                                icon='person'
+                                active={selectedArchitecture === Architecture.GRAYSKULL}
+                                onClick={() => handleSelectArchitecture(Architecture.GRAYSKULL)}
+                                className='architecture-button'
+                            >
+                                Grayskull
+                            </Button>
+                            <Button
+                                icon='globe-network'
+                                active={selectedArchitecture === Architecture.WORMHOLE}
+                                onClick={() => handleSelectArchitecture(Architecture.WORMHOLE)}
+                                className='architecture-button'
+                            >
+                                Wormhole
+                            </Button>
+                        </ButtonGroup>
+                    </Tooltip2>
+                </div>
+            )}
             <PopoverMenu // Graph picker
                 label='Select Graph'
                 options={graphOptions}
                 selectedItem={selectedGraph}
                 onSelectItem={onSelectGraphName}
-                disabled={!showGraphSelect}
+                disabled={!showGraphSelect || !selectedArchitecture}
             />
 
             {/* For Debugging */}
@@ -222,7 +259,7 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
                     <Button
                         className='load-folder-button'
                         disabled={disabled}
-                        icon={IconNames.GRAPH}
+                        icon={IconNames.FOLDER_SHARED}
                         text='Load Perf Results Folder'
                     />
                 </Tooltip2>
