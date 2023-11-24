@@ -502,6 +502,19 @@ $dock-height: 420px;
         &[aria-selected="true"] {
             color: $tt-black;
         }
+
+        &[data-tab-id="tab-ops"] {
+            svg {
+                fill: $tt-dark-gray;
+            }
+        }
+
+        &[data-tab-id="tab-queues"] {
+            svg {
+                stroke: $tt-dark-gray;
+            }
+        }
+
     }
 }
 
@@ -527,18 +540,20 @@ $dock-height: 420px;
     }
 }
 
+
 .opname,
 .operations-wrap {
     .op-type.icon {
         line-height: 1;
         margin-left: -7px;
 
-        &.op{
+        &.op {
             svg {
                 fill: #5F6B7C;
             }
         }
-        &.queue{
+
+        &.queue {
             svg {
                 stroke: #5F6B7C;
             }
@@ -628,6 +643,28 @@ $dock-height: 420px;
 
     span {
         color: $tt-white-text;
+    }
+}
+
+.theme-dark {
+    color: #fff;
+
+    .queue-detail-item {
+        color: #fff;
+    }
+
+    .op-type.icon {
+        &.op {
+            svg {
+                fill: $tt-light-gray;
+            }
+        }
+
+        &.queue {
+            svg {
+                stroke: $tt-light-gray;
+            }
+        }
     }
 }
 
