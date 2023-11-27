@@ -69,8 +69,3 @@ export interface CoreMeasurementsJSON {
     [coreId: string]: CorePerfJson;
 }
 
-// interface TotalPerformanceData {
-//     'op-attributes': OpAttributesJSON;
-//     'op-measurements': OpMeasurementsJSON;
-//     'core-measurements': CoreMeasurementsJSON;
-// }
