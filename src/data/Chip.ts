@@ -36,7 +36,13 @@ import {
     OperationDetails,
 } from './sources/GraphDescriptor';
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
-import { CorePerfJson, PerfAnalyzerResultsJson, PerfAnalyzerResultsOps, PerfAnalyzerResultsPerOpJSON } from './sources/PerfAnalyzerResults';
+import {
+    CorePerfJson,
+    OpMeasurementsJSON,
+    PerfAnalyzerResultsJson,
+    PerfAnalyzerResultsOps,
+    PerfAnalyzerResultsPerOpJSON,
+} from './sources/PerfAnalyzerResults';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -553,10 +559,10 @@ export default class Chip {
         forEach(perfAnalyzerResultsOps.entries(), ([opName, opDetails]) => {
             const operation = newChip.getOperation(opName);
             if (operation) {
-                operation.attributes = opDetails.opAttributes;
-                operation.measurements = opDetails.opMeasurements;
+                operation.details = opDetails;
             }
         });
+
         return newChip;
     }
 

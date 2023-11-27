@@ -3,7 +3,7 @@ import type { OperandName, Operation, OperationName, GraphVertex, GraphVertexId,
 import { GraphVertexType } from './GraphTypes';
 import type { ComputeNode } from './Chip';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
-import { OpAttributesJSON, OpMeasurementsJSON } from './sources/PerfAnalyzerResults';
+import { OpAttributesJSON, OpMeasurementsJSON, PerfAnalyzerResultsOps } from './sources/PerfAnalyzerResults';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -54,9 +54,11 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         cores.forEach((core) => this.assignCore(core));
     }
 
-    attributes: OpAttributesJSON | null = null;
+    details?: OpMeasurementsJSON;
 
-    measurements: OpMeasurementsJSON | null = null;
+    // attributes: OpAttributesJSON | null = null;
+
+    // measurements: OpMeasurementsJSON | null = null;
 
     /** Creates a mutual association between this Operation and the provided core, such that `core.operation` will
      * reference this operation.
