@@ -22,7 +22,8 @@ import {
     NetworkLinkName,
     NOC,
     NOCLinkName,
-    PCIeLinkName, QueueLocation,
+    PCIeLinkName,
+    QueueLocation,
 } from './Types';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
@@ -35,7 +36,7 @@ import {
     OperationDetails,
 } from './sources/GraphDescriptor';
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
-import { CorePerfJson, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
+import { CorePerfJson, PerfAnalyzerResultsJson, PerfAnalyzerResultsOps, PerfAnalyzerResultsPerOpJSON } from './sources/PerfAnalyzerResults';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -513,7 +514,7 @@ export default class Chip {
             details.processedLocation = parsedQueueLocation(details.location);
             queue.details = { ...details };
             details['allocation-info'].forEach((allocationInfo) => {
-                if(details.processedLocation === QueueLocation.DRAM) {
+                if (details.processedLocation === QueueLocation.DRAM) {
                     chip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
                         if (!node.queueList.includes(queue)) {
                             node.queueList.push(queue);
@@ -545,6 +546,19 @@ export default class Chip {
         return newChip;
     }
 
+    static AUGMENT_WITH_OP_PERFORMANCE(chip: Chip, perfAnalyzerResultsOps: PerfAnalyzerResultsOps) {
+        const newChip = new Chip(chip.chipId);
+        Object.assign(newChip, chip);
+
+        forEach(perfAnalyzerResultsOps.entries(), ([opName, opDetails]) => {
+            const operation = newChip.getOperation(opName);
+            if (operation) {
+                operation.attributes = opDetails.opAttributes;
+                operation.measurements = opDetails.opMeasurements;
+            }
+        });
+        return newChip;
+    }
 
     public generateInitialPipesSelectionState(): PipeSelection[] {
         return this.allUniquePipes.map((pipeSegment) => {

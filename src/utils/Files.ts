@@ -7,6 +7,7 @@ import {
     OpAttributesJSON,
     OpMeasurementsJSON,
     PerfAnalyzerResultsJson,
+    PerfAnalyzerResultsOps,
 } from 'data/sources/PerfAnalyzerResults';
 import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 import fs, { Dirent } from 'fs';
@@ -133,13 +134,7 @@ export const loadGraph = async (folderPath: string, graphName: string, architect
 
     const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report_per_op.json');
     const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsPerOpJSON;
-    const opAttributesMeasurements: Map<
-        string,
-        {
-            opAttributes: OpAttributesJSON;
-            opMeasurements: OpMeasurementsJSON;
-        }
-    > = new Map();
+    const opAttributesMeasurements: PerfAnalyzerResultsOps = new Map();
     const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
         Object.entries(analyzerResultsJson)
             .map(([opName, result]) => {
@@ -165,5 +160,8 @@ export const loadGraph = async (folderPath: string, graphName: string, architect
     // TODO: opAttributesMeasurements needs to be propagated to the data model
 
     chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
+
+    chip = Chip.AUGMENT_WITH_OP_PERFORMANCE(chip, opAttributesMeasurements);
+
     return chip;
 };

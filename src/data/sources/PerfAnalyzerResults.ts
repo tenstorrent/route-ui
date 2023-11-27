@@ -15,6 +15,14 @@ export interface PerfAnalyzerResultsPerOpJSON {
     };
 }
 
+export type PerfAnalyzerResultsOps = Map<
+    string,
+    {
+        opAttributes: OpAttributesJSON;
+        opMeasurements: OpMeasurementsJSON;
+    }
+>;
+
 export interface OpAttributesJSON {
     /** The epoch IDs that are captured in this analyzer result. Should be the same for every core result in this graph. */
     global_epoch_ids: number[];
