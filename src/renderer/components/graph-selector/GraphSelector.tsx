@@ -1,4 +1,4 @@
-import { useRenderChip } from 'renderer/hooks/useRenderChip';
+import { useRenderChip } from 'renderer/hooks/useRenderChip.hooks';
 import PopoverMenu from '../PopoverMenu';
 import { useFolderPicker } from '../../hooks/useFolderPicker.hooks';
 

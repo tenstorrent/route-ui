@@ -3,7 +3,7 @@ import { FC } from 'react';
 import FileLoader from './components/FileLoader';
 import { TempFolderLoadingContext } from './components/folder-picker/FolderPicker';
 
-import { useRenderChip } from './hooks/useRenderChip';
+import { useRenderChip } from './hooks/useRenderChip.hooks';
 
 const SplashScreen: FC = () => {
     const { renderFromChip } = useRenderChip();
