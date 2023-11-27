@@ -5,17 +5,19 @@ import path from 'path';
 interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
-    fileName: string;
-    filePath: string;
+    graphName: string;
+    folderPath: string;
     architecture: Architecture;
+    availableGraphs: string[];
 }
 
 const uiStateInitialState: UIState = {
     dockOpen: false,
     highContrastEnabled: false,
-    fileName: '',
-    filePath: '',
+    graphName: '',
+    folderPath: '',
     architecture: Architecture.NONE,
+    availableGraphs: [],
 };
 
 const uiStateSlice = createSlice({
@@ -29,17 +31,23 @@ const uiStateSlice = createSlice({
             state.highContrastEnabled = action.payload;
         },
         setSelectedFile(state, action: PayloadAction<string>) {
-            state.filePath = path.dirname(action.payload);
-            state.fileName = path.basename(action.payload);
+            state.folderPath = path.dirname(action.payload);
+            state.graphName = path.basename(action.payload);
         },
-        setSelectedFileName(state, action: PayloadAction<string>) {
-            state.fileName = action.payload;
+        setSelectedGraphName(state, action: PayloadAction<string>) {
+            state.graphName = action.payload;
         },
         setSelectedFolder(state, action: PayloadAction<string>) {
-            state.filePath = action.payload;
+            state.folderPath = action.payload;
         },
         setSelectedArchitecture(state, action: PayloadAction<Architecture>) {
             state.architecture = action.payload;
+        },
+        setAvailableGraphs(state, action: PayloadAction<string[]>) {
+            state.availableGraphs = action.payload;
+        },
+        clearAvailableGraphs(state) {
+            state.availableGraphs = [];
         },
     },
 });
@@ -49,7 +57,9 @@ export const {
     setDockOpenState,
     setHighContrastState,
     setSelectedFile,
-    setSelectedFileName,
+    setSelectedGraphName,
     setSelectedArchitecture,
     setSelectedFolder,
+    setAvailableGraphs,
+    clearAvailableGraphs,
 } = uiStateSlice.actions;

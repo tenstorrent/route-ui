@@ -1,3 +1,14 @@
+import Chip from 'data/Chip';
+import { ChipDesignJSON } from 'data/JSONDataTypes';
+import { Architecture } from 'data/Types';
+import { GraphDescriptorJSON } from 'data/sources/GraphDescriptor';
+import {
+    PerfAnalyzerResultsPerOpJSON,
+    OpAttributesJSON,
+    OpMeasurementsJSON,
+    PerfAnalyzerResultsJson,
+} from 'data/sources/PerfAnalyzerResults';
+import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 import fs, { Dirent } from 'fs';
 import path from 'path';
 
@@ -92,4 +103,67 @@ export const getAvailableGraphNames = async (perfResultsPath: string): Promise<s
     const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptor');
     const graphDirEntries = await readDirEntries(graphDescriptorsPath);
     return graphDirEntries.map((graphDirEntry) => graphDirEntry.name).filter((name) => !name.startsWith('.'));
+};
+
+const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
+    if (architecture === Architecture.NONE) {
+        throw new Error('No architecture provided.');
+    }
+    const grayskullArch = await import('data/architectures/arch-grayskull.json');
+    const wormholeArch = await import('data/architectures/arch-wormhole.json');
+
+    const architectureJson = {
+        [Architecture.GRAYSKULL]: grayskullArch.default,
+        [Architecture.WORMHOLE]: wormholeArch.default,
+    }[architecture];
+    return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
+};
+
+export const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
+    let chip = await loadChipFromArchitecture(architecture);
+    const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
+    const graphDescriptorJson = await loadJsonFile(graphPath);
+
+    chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+
+    const queuesPath = path.join(folderPath, 'queue_descriptor', 'queue_descriptor.json');
+    const queueDescriptorJson = await loadJsonFile(queuesPath);
+
+    chip = Chip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
+
+    const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report_per_op.json');
+    const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsPerOpJSON;
+    const opAttributesMeasurements: Map<
+        string,
+        {
+            opAttributes: OpAttributesJSON;
+            opMeasurements: OpMeasurementsJSON;
+        }
+    > = new Map();
+    const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
+        Object.entries(analyzerResultsJson)
+            .map(([opName, result]) => {
+                opAttributesMeasurements.set(opName, {
+                    opAttributes: result['op-attributes'],
+                    opMeasurements: result['op-measurements'],
+                });
+
+                /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
+                 *   `perf_results/perf_info_all_epochs.csv`.
+                 *
+                 * The node ID keys in the perf analyzer results file don't have the chip ID (device ID) component.
+                 * We're forcing chip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
+                 */
+                return Object.entries(result['core-measurements']).map(([chipId, corePerfJson]) => [
+                    `0-${chipId}`,
+                    corePerfJson,
+                ]);
+            })
+            .flat(),
+    );
+
+    // TODO: opAttributesMeasurements needs to be propagated to the data model
+
+    chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
+    return chip;
 };

@@ -5,7 +5,7 @@ import { FC } from 'react';
 import { IconNames } from '@blueprintjs/icons';
 import { Button } from '@blueprintjs/core';
 import { useDispatch } from 'react-redux';
-import { setSelectedFile } from 'data/store/slices/uiState.slice';
+import { clearAvailableGraphs, setSelectedFile } from 'data/store/slices/uiState.slice';
 
 import Chip from '../../data/Chip';
 import yamlValidate from '../../data/DataUtils';
@@ -22,6 +22,8 @@ const FileLoader: FC<FileLoaderProps> = ({ onChipLoaded }) => {
         // eslint-disable-next-line global-require
         const remote = require('@electron/remote');
         const { dialog } = remote;
+
+        dispatch(clearAvailableGraphs());
 
         await (async () => {
             const filelist = await dialog.showOpenDialogSync({

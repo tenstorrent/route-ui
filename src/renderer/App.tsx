@@ -17,14 +17,14 @@ export default function App() {
     const memoizedChip = useMemo<GridContext>(() => ({ chip, setChip }), [chip]);
     return (
         <Provider store={store}>
-            <div className='header'>
-                <TenstorrentLogo />
-                <TopHeaderComponent />
-            </div>
             <DataSource.Provider value={memoizedChip}>
                 <Router>
+                    <div className='header'>
+                        <TenstorrentLogo />
+                        <TopHeaderComponent />
+                    </div>
                     <Routes>
-                        <Route path='/' element={<SplashScreen updateChip={setChip} />} />
+                        <Route path='/' element={<SplashScreen />} />
                         <Route path='/render' element={<MainRouteRenderer updateData={setChip} />} />
                     </Routes>
                 </Router>
