@@ -15,12 +15,12 @@ import {
     ComputeNodeType,
     DRAMBank,
     DramBankLinkName,
-    NOC2AXILinkName,
     EthernetLinkName,
     LinkType,
     Loc,
     NetworkLinkName,
     NOC,
+    NOC2AXILinkName,
     NOCLinkName,
     PCIeLinkName,
     QueueLocation,
@@ -36,13 +36,7 @@ import {
     OperationDetails,
 } from './sources/GraphDescriptor';
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
-import {
-    CorePerfJson,
-    OpPerfJSON,
-    PerfAnalyzerResultsJson,
-    OpPerformanceByOp,
-    PerfAnalyzerResultsPerOpJSON,
-} from './sources/PerfAnalyzerResults';
+import { CorePerfJson, OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -399,7 +393,6 @@ export default class Chip {
                             queue = new BuildableQueue(operand.name);
                             chip.addQueue(queue);
                         }
-                        // const queueOperands = queue.outputs;
                         queue.assignOutputs([chip.createOperand(operationName, GraphVertexType.OPERATION)]);
                     }
                 });
@@ -411,7 +404,6 @@ export default class Chip {
                             queue = new BuildableQueue(operand.name);
                             chip.addQueue(queue);
                         }
-                        // const queueOperands = queue.inputs;
                         queue.assignInputs([chip.createOperand(operationName, GraphVertexType.OPERATION)]);
                     }
                 });
@@ -518,9 +510,7 @@ export default class Chip {
                         queue = new BuildableQueue(operand.name);
                         chip.addQueue(queue);
                     }
-                    // const queueOperands = queue.outputs;
                     queue.assignOutputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
-                    // queueOperands.push(newChip.createOperand(opName, GraphVertexType.OPERATION));
                 }
             });
             // Extract queues from output operands
@@ -531,8 +521,6 @@ export default class Chip {
                         queue = new BuildableQueue(operand.name);
                         chip.addQueue(queue);
                     }
-                    // const queueOperands = queue.inputs;
-                    // queueOperands.push(newChip.createOperand(opName, GraphVertexType.OPERATION));
                     queue.assignInputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
                 }
             });
