@@ -5,8 +5,9 @@ import { GraphDescriptorJSON } from 'data/sources/GraphDescriptor';
 import {
     PerfAnalyzerResultsPerOpJSON,
     OpAttributesJSON,
-    OpMeasurementsJSON,
+    OpPerfJSON,
     PerfAnalyzerResultsJson,
+    OpPerformanceByOp,
 } from 'data/sources/PerfAnalyzerResults';
 import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 import fs, { Dirent } from 'fs';
@@ -133,21 +134,14 @@ export const loadGraph = async (folderPath: string, graphName: string, architect
 
     const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report_per_op.json');
     const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsPerOpJSON;
-    const opAttributesMeasurements: Map<
-        string,
-        {
-            opAttributes: OpAttributesJSON;
-            opMeasurements: OpMeasurementsJSON;
-        }
-    > = new Map();
+    const opPerformanceByOp: OpPerformanceByOp = new Map();
     const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
         Object.entries(analyzerResultsJson)
             .map(([opName, result]) => {
-                opAttributesMeasurements.set(opName, {
-                    opAttributes: result['op-attributes'],
-                    opMeasurements: result['op-measurements'],
-                });
-
+                opPerformanceByOp.set(opName, {
+                    ...result['op-measurements'],
+                    ...result['op-attributes'],
+                } as OpPerfJSON);
                 /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
                  *   `perf_results/perf_info_all_epochs.csv`.
                  *
@@ -165,5 +159,8 @@ export const loadGraph = async (folderPath: string, graphName: string, architect
     // TODO: opAttributesMeasurements needs to be propagated to the data model
 
     chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
+
+    chip = Chip.AUGMENT_WITH_OP_PERFORMANCE(chip, opPerformanceByOp);
+
     return chip;
 };

@@ -2,7 +2,8 @@ import { ComputeNodeType } from './Types';
 import type { OperandName, Operation, OperationName, GraphVertex, GraphVertexId, Queue } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
 import type { ComputeNode } from './Chip';
-import { QueueDetailsJson } from "./sources/QueueDescriptor";
+import { QueueDetailsJson } from './sources/QueueDescriptor';
+import { OpAttributesJSON, OpPerfJSON, OpPerformanceByOp } from './sources/PerfAnalyzerResults';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -53,6 +54,12 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         cores.forEach((core) => this.assignCore(core));
     }
 
+    details?: OpPerfJSON;
+
+    // attributes: OpAttributesJSON | null = null;
+
+    // measurements: OpMeasurementsJSON | null = null;
+
     /** Creates a mutual association between this Operation and the provided core, such that `core.operation` will
      * reference this operation.
      *
@@ -68,7 +75,9 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
             throw new Error("Core already has an operation assignment. Can't reassign core to this operation.");
         }
         if (this._cores.includes(core)) {
-            console.warn(`Assigning core ${core.uid} to operation ${this.name}; core is already assigned to this operation.`)
+            console.warn(
+                `Assigning core ${core.uid} to operation ${this.name}; core is already assigned to this operation.`,
+            );
             return;
         }
         this._cores.push(core);

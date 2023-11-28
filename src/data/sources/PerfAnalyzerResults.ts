@@ -1,8 +1,5 @@
 import type { GraphName, OperationName } from '../GraphTypes';
 
-/** Perf Analyzer results for the given graph name, for a specific core */
-export interface CorePerfJson extends MeasurementsJSON {}
-
 export interface PerfAnalyzerResultsJson {
     [coreId: string]: CorePerfJson; // Maps a core ID to a perf analyzer result
 }
@@ -10,10 +7,12 @@ export interface PerfAnalyzerResultsJson {
 export interface PerfAnalyzerResultsPerOpJSON {
     [opName: string]: {
         'op-attributes': OpAttributesJSON;
-        'op-measurements': OpMeasurementsJSON;
+        'op-measurements': MeasurementsJSON;
         'core-measurements': CoreMeasurementsJSON;
     };
 }
+
+export type OpPerformanceByOp = Map<string, OpPerfJSON>;
 
 export interface OpAttributesJSON {
     /** The epoch IDs that are captured in this analyzer result. Should be the same for every core result in this graph. */
@@ -43,7 +42,9 @@ export interface OpAttributesJSON {
     grid_size: string;
 }
 
-export interface OpMeasurementsJSON extends MeasurementsJSON {}
+export interface OpPerfJSON extends MeasurementsJSON, OpAttributesJSON {}
+
+export interface CorePerfJson extends MeasurementsJSON {}
 
 interface MeasurementsJSON {
     warnings: string;
