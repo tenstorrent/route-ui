@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { readDirEntries, findFiles, validatePerfResultsFolder, getAvailableGraphNames } from '../Files';
+import { readDirEntries, findFiles, validatePerfResultsFolder, getAvailableGraphNames } from '../FileLoaders';
 
 const generateRandomKey = () => Math.random().toString(36).substring(2);
 

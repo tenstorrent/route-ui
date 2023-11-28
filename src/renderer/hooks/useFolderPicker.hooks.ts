@@ -6,7 +6,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAvailableGraphNames, loadGraph, loadJsonFile } from 'utils/Files';
+import { getAvailableGraphNames, loadGraph, loadJsonFile } from 'utils/FileLoaders';
 import {
     setSelectedArchitecture,
     setSelectedGraphName,

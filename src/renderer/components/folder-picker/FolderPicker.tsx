@@ -4,7 +4,7 @@ import { Button, ButtonGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
 import { Architecture } from 'data/Types';
-import { validatePerfResultsFolder } from 'utils/Files';
+import { validatePerfResultsFolder } from 'utils/FileLoaders';
 
 import usePopulateChipData from 'renderer/hooks/usePopulateChipData.hooks';
 import '../../scss/FolderPicker.scss';
