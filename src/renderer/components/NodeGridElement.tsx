@@ -203,7 +203,7 @@ const QueueHighlightRenderer: React.FC<{ node: ComputeNode }> = ({ node }) => {
         <div className='queue-highlighter-content'>
             {node.queueList.map((queue) => {
                 if (queueSelectionState[queue.name]?.selected) {
-                    return <div className='queue-highlighter' style={{ backgroundColor: getGroupColor(queue.name) }} />;
+                    return <div key={queue.name} className='queue-highlighter' style={{ backgroundColor: getGroupColor(queue.name) }} />;
                 }
                 return null;
             })}
