@@ -3,11 +3,10 @@ import { ChipDesignJSON } from 'data/JSONDataTypes';
 import { Architecture } from 'data/Types';
 import { GraphDescriptorJSON } from 'data/sources/GraphDescriptor';
 import {
-    PerfAnalyzerResultsPerOpJSON,
-    OpAttributesJSON,
     OpPerfJSON,
-    PerfAnalyzerResultsJson,
     OpPerformanceByOp,
+    PerfAnalyzerResultsJson,
+    PerfAnalyzerResultsPerOpJSON,
 } from 'data/sources/PerfAnalyzerResults';
 import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 import fs, { Dirent } from 'fs';
@@ -56,8 +55,7 @@ export const findFiles = async (
         (file) => ((isDir && file.isDirectory()) || (!isDir && file.isFile())) && file.name === searchQuery,
     );
     if (matches.length > 0) {
-        const results = matches.map((dirEntry) => path.join(searchPath, dirEntry.name));
-        return results;
+        return matches.map((dirEntry) => path.join(searchPath, dirEntry.name));
     }
     if (maxDepth === 0) {
         return [];
@@ -117,6 +115,7 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
         [Architecture.GRAYSKULL]: grayskullArch.default,
         [Architecture.WORMHOLE]: wormholeArch.default,
     }[architecture];
+
     return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
