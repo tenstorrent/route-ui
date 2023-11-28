@@ -12,7 +12,7 @@ export interface PerfAnalyzerResultsPerOpJSON {
     };
 }
 
-export type PerfAnalyzerResultsOps = Map<string, OpMeasurementsJSON>;
+export type OpPerformanceByOp = Map<string, OpPerfJSON>;
 
 export interface OpAttributesJSON {
     /** The epoch IDs that are captured in this analyzer result. Should be the same for every core result in this graph. */
@@ -42,7 +42,7 @@ export interface OpAttributesJSON {
     grid_size: string;
 }
 
-export interface OpMeasurementsJSON extends MeasurementsJSON, OpAttributesJSON {}
+export interface OpPerfJSON extends MeasurementsJSON, OpAttributesJSON {}
 
 export interface CorePerfJson extends MeasurementsJSON {}
 

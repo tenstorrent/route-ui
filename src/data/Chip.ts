@@ -38,9 +38,9 @@ import {
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
 import {
     CorePerfJson,
-    OpMeasurementsJSON,
+    OpPerfJSON,
     PerfAnalyzerResultsJson,
-    PerfAnalyzerResultsOps,
+    OpPerformanceByOp,
     PerfAnalyzerResultsPerOpJSON,
 } from './sources/PerfAnalyzerResults';
 
@@ -552,7 +552,7 @@ export default class Chip {
         return newChip;
     }
 
-    static AUGMENT_WITH_OP_PERFORMANCE(chip: Chip, perfAnalyzerResultsOps: PerfAnalyzerResultsOps) {
+    static AUGMENT_WITH_OP_PERFORMANCE(chip: Chip, perfAnalyzerResultsOps: OpPerformanceByOp) {
         const newChip = new Chip(chip.chipId);
         Object.assign(newChip, chip);
 
