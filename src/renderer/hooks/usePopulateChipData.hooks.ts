@@ -10,13 +10,13 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { mapIterable } from 'utils/IterableHelpers';
 
-export const useRenderChip = () => {
+const usePopulateChipData = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const { setChip } = useContext<GridContext>(DataSource);
 
-    const renderFromChip = (selectedChip: Chip) => {
+    const populateChipData = (selectedChip: Chip) => {
         setChip(selectedChip);
         dispatch(closeDetailedView());
         // TODO: remove the conditional as soon as the architecture become available inside the perf result file
@@ -30,7 +30,7 @@ export const useRenderChip = () => {
         navigate('/render');
     };
 
-    return { renderFromChip };
+    return { populateChipData };
 };
 
-export default useRenderChip;
+export default usePopulateChipData;

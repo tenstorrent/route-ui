@@ -6,10 +6,10 @@ import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
 import { Architecture } from 'data/Types';
 import { validatePerfResultsFolder } from 'utils/Files';
 
-import { useRenderChip } from 'renderer/hooks/useRenderChip.hooks';
+import usePopulateChipData from 'renderer/hooks/usePopulateChipData.hooks';
 import '../../scss/FolderPicker.scss';
 import PopoverMenu from '../PopoverMenu';
-import { DataLoadCallback, useFolderPicker } from '../../hooks/useFolderPicker.hooks';
+import { useFolderPicker } from '../../hooks/useFolderPicker.hooks';
 
 /** Implements a temporary wrapper around the Folder Loading component & Graph selection component, to provide state
  * and context that is not yet present in the App's higher-level components.
@@ -17,11 +17,8 @@ import { DataLoadCallback, useFolderPicker } from '../../hooks/useFolderPicker.h
  * TODO: Decouple graph selection from folder selection
  * */
 
-type FolderLoadingContextProps = {
-    onDataLoad: DataLoadCallback;
-};
 export const TempFolderLoadingContext = (): React.ReactElement => {
-    const { renderFromChip } = useRenderChip();
+    const { populateChipData } = usePopulateChipData();
     const {
         manualArchitectureSelection,
         loadFolder,
@@ -32,7 +29,7 @@ export const TempFolderLoadingContext = (): React.ReactElement => {
         onSelectGraphName,
         showGraphSelect,
         error,
-    } = useFolderPicker(renderFromChip);
+    } = useFolderPicker(populateChipData);
 
     return (
         <div className='folder-load-container'>

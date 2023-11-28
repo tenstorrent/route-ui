@@ -3,14 +3,14 @@ import { FC } from 'react';
 import FileLoader from './components/FileLoader';
 import { TempFolderLoadingContext } from './components/folder-picker/FolderPicker';
 
-import { useRenderChip } from './hooks/useRenderChip.hooks';
+import usePopulateChipData from './hooks/usePopulateChipData.hooks';
 
 const SplashScreen: FC = () => {
-    const { renderFromChip } = useRenderChip();
+    const { populateChipData } = usePopulateChipData();
 
     return (
         <div className='splash-screen'>
-            <FileLoader onChipLoaded={renderFromChip} />
+            <FileLoader onChipLoaded={populateChipData} />
             {/* <div> */}
             {/*    <TempFileLoader updateData={updateData} /> */}
             {/*    <Button icon={IconNames.APPLICATION} text='Render' onClick={() => navigate('/render')} /> */}
