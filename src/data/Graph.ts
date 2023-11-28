@@ -26,11 +26,18 @@ export abstract class AbstractGraphVertex {
 
     /** All input operands */
     get inputs(): Operand[] {
+        // TODO: this is a slight performance hit, to remove once pipe data is merged
+        if (process.env.NODE_ENV === 'development') {
+            return [...this.inputOperands];
+        }
         return this.inputOperands;
     }
 
     /** All output operands */
     get outputs(): Operand[] {
+        if (process.env.NODE_ENV === 'development') {
+            return [...this.outputOperands];
+        }
         return this.outputOperands;
     }
 
