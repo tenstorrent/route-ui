@@ -33,8 +33,8 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                 </div>
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
-            {inputs.map((operand) => (
-                <div className='operation-operand' key={graphNode.name + operand.name}>
+            {inputs.map((operand, index) => (
+                <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {/* DEBUGING RENDER */}
                     {/* <ul> */}
@@ -51,9 +51,10 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                     {/* </ul> */}
                 </div>
             ))}
+
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
-            {outputs.map((operand) => (
-                <div className='operation-operand' key={graphNode.name + operand.name}>
+            {outputs.map((operand, index) => (
+                <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {/* DEBUGING RENDER */}
                     {/* <ul> */}
