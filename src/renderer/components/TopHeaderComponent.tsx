@@ -25,7 +25,7 @@ const TopHeaderComponent: React.FC = () => {
                 onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
             />
             <div className='text-content'>
-                {architecture ? ` Architecture: ${architecture}` : ''}
+                {architecture ? <span>Architecture: <span className="architecture-label">{architecture}</span></span> : ''}
                 <GraphSelector />
             </div>
             {process.env.NODE_ENV === 'development' && (
