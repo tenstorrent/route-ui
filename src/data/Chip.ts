@@ -179,8 +179,6 @@ export default class Chip {
     protected addOperation(operation: BuildableOperation) {
         if (!this.getOperation(operation.name)) {
             this.operationsByName.set(operation.name, operation);
-        }else{
-            console.log('duplicate op', operation.name)
         }
     }
 
