@@ -5,18 +5,16 @@ import { IconNames } from '@blueprintjs/icons';
 import {
     getArchitectureSelector,
     getDockOpenState,
-    getFileNameSelector,
     getHighContrastState,
 } from 'data/store/selectors/uiState.selectors';
 import { setDockOpenState, setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
+import GraphSelector from './graph-selector/GraphSelector';
 
 const TopHeaderComponent: React.FC = () => {
     const dispatch = useDispatch();
     const isHighContrast = useSelector(getHighContrastState);
-    const fileName = useSelector(getFileNameSelector);
     const isDockOpen = useSelector(getDockOpenState);
-
     const architecture = useSelector(getArchitectureSelector);
 
     return (
@@ -27,7 +25,8 @@ const TopHeaderComponent: React.FC = () => {
                 onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
             />
             <div className='text-content'>
-                {architecture ? ` Architecture: ${architecture}` : ''} | {fileName ? `Loaded ${fileName}` : ''}
+                {architecture ? ` Architecture: ${architecture}` : ''}
+                <GraphSelector />
             </div>
             {process.env.NODE_ENV === 'development' && (
                 <Button

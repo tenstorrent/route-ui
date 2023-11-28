@@ -2,6 +2,7 @@ import { RootState } from '../createStore';
 
 export const getDockOpenState = (state: RootState) => state.uiState.dockOpen;
 export const getHighContrastState = (state: RootState) => state.uiState.highContrastEnabled;
-export const getFileNameSelector = (state: RootState) => state.uiState.fileName;
-export const getFilePathSelector = (state: RootState) => state.uiState.filePath;
+export const getGraphNameSelector = (state: RootState) => state.uiState.graphName;
+export const getFolderPathSelector = (state: RootState) => state.uiState.folderPath;
 export const getArchitectureSelector = (state: RootState) => state.uiState.architecture;
+export const getAvailableGraphsSelector = (state: RootState) => state.uiState.availableGraphs;

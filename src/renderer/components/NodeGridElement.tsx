@@ -223,7 +223,7 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
 }) => {
     const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
     let operationStyles = {};
-    if (node.opName !== '' && selectedGroup.selected) {
+    if (node.opName !== '' && selectedGroup?.selected) {
         const color = getGroupColor(node.opName);
         operationStyles = { borderColor: getGroupColor(node.opName) };
         const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
