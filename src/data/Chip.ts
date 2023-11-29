@@ -481,6 +481,7 @@ export default class Chip {
         });
         chip.totalRows = chipDesign.totalRows;
         chip.totalCols = chipDesign.totalCols;
+        chip.architecture = chipDesign.architecture;
         return chip;
     }
 

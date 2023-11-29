@@ -19,10 +19,7 @@ const usePopulateChipData = () => {
     const populateChipData = (selectedChip: Chip) => {
         setChip(selectedChip);
         dispatch(closeDetailedView());
-        // TODO: remove the conditional as soon as the architecture become available inside the perf result file
-        if (selectedChip.architecture) {
-            dispatch(setSelectedArchitecture(selectedChip.architecture));
-        }
+        dispatch(setSelectedArchitecture(selectedChip.architecture));
         dispatch(loadPipeSelection(selectedChip.generateInitialPipesSelectionState()));
         dispatch(loadNodesData([...mapIterable(selectedChip.nodes, (node) => node.generateInitialState())]));
         dispatch(loadLinkData(selectedChip.getAllLinks().map((link) => link.generateInitialState())));

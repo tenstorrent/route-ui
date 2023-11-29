@@ -1,5 +1,5 @@
 import Chip from 'data/Chip';
-import { ChipDesignJSON } from 'data/JSONDataTypes';
+import { ChipDesignJSON, MetadataJSON } from 'data/JSONDataTypes';
 import { Architecture } from 'data/Types';
 import { GraphDescriptorJSON } from 'data/sources/GraphDescriptor';
 import {
@@ -119,7 +119,22 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
     return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
-export const loadGraph = async (folderPath: string, graphName: string, architecture: Architecture): Promise<Chip> => {
+export const loadGraph = async (folderPath: string, graphName: string): Promise<Chip> => {
+    let architecture = Architecture.NONE;
+    try {
+        const metadata = (await loadJsonFile(path.join(folderPath, `metadata`, `${graphName}.json`))) as MetadataJSON;
+
+        const arch = metadata.arch_name;
+        if (arch.includes(Architecture.GRAYSKULL)) {
+            architecture = Architecture.GRAYSKULL;
+        }
+        if (arch.includes(Architecture.WORMHOLE)) {
+            architecture = Architecture.WORMHOLE;
+        }
+    } catch (err) {
+        console.error('Failed to read metadata from folder:', err);
+    }
+
     let chip = await loadChipFromArchitecture(architecture);
     const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
     const graphDescriptorJson = await loadJsonFile(graphPath);
