@@ -33,28 +33,42 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                 </div>
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
-            {inputs.map((operand) => (
-                <div className='operation-operand' key={operand.name}>
+            {inputs.map((operand, index) => (
+                <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
-                </div>
-            ))}
-            {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
-            {outputs.map((operand) => (
-                <div className='operation-operand' key={operand.name}>
                     {/* DEBUGING RENDER */}
                     {/* <ul> */}
-                    {/*     {[...operand.pipeIdsByCore.entries()].map(([coreId,pipeIds ]) => ( */}
-                    {/*         <li key={coreId}> */}
+                    {/*     {[...operand.pipeIdsByCore.entries()].map(([coreId, pipeIds]) => ( */}
+                    {/*         <li style={{ display: 'list-item' }} key={coreId}> */}
                     {/*             <p>{coreId}</p> */}
-                    {/*             <ul> */}
+                    {/*             <div> */}
                     {/*                 {pipeIds.map((pipeId) => ( */}
-                    {/*                     <li key={pipeId}>{pipeId}</li> */}
+                    {/*                     <span>{pipeId}, </span> */}
                     {/*                 ))} */}
-                    {/*             </ul> */}
+                    {/*             </div> */}
                     {/*         </li> */}
                     {/*     ))} */}
                     {/* </ul> */}
+                </div>
+            ))}
+
+            {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
+            {outputs.map((operand, index) => (
+                <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
+                    {/* DEBUGING RENDER */}
+                    {/* <ul> */}
+                    {/*     {[...operand.pipeIdsByCore.entries()].map(([coreId, pipeIds]) => ( */}
+                    {/*         <li style={{ display: 'list-item' }} key={coreId}> */}
+                    {/*             <p>{coreId}</p> */}
+                    {/*             <div> */}
+                    {/*                 {pipeIds.map((pipeId) => ( */}
+                    {/*                     <span>{pipeId}, </span> */}
+                    {/*                 ))} */}
+                    {/*             </div> */}
+                    {/*         </li> */}
+                    {/*     ))} */}
+                    {/* </ul> */}
                 </div>
             ))}
         </div>

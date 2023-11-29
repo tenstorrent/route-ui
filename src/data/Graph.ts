@@ -18,18 +18,47 @@ export abstract class AbstractGraphVertex {
 
     constructor(name: string, inputOperands?: Operand[], outputOperands?: Operand[]) {
         this.name = name;
-        this.inputOperands = inputOperands || [];
-        this.outputOperands = outputOperands || [];
+        this.inputOperands = [];
+        this.outputOperands = [];
+        this.assignInputs(inputOperands || []);
+        this.assignOutputs(outputOperands || []);
     }
 
     /** All input operands */
     get inputs(): Operand[] {
+        // TODO: this is a slight performance hit, to remove once pipe data is merged
+        if (process.env.NODE_ENV === 'development') {
+            return [...this.inputOperands];
+        }
         return this.inputOperands;
     }
 
     /** All output operands */
     get outputs(): Operand[] {
+        if (process.env.NODE_ENV === 'development') {
+            return [...this.outputOperands];
+        }
         return this.outputOperands;
+    }
+
+    assignInputs(inputs: Operand[]) {
+        this.inputOperands = [...new Set([...this.inputOperands, ...inputs])];
+        if (process.env.NODE_ENV === 'development') {
+            const inputNames = this.inputs.map((input) => input.name);
+            if (inputNames.length !== new Set(inputNames).size) {
+                throw new Error(`Operation ${this.name} has duplicate input operands`);
+            }
+        }
+    }
+
+    assignOutputs(outputs: Operand[]) {
+        this.outputOperands = [...new Set([...this.outputOperands, ...outputs])];
+        if (process.env.NODE_ENV === 'development') {
+            const outputNames = this.outputs.map((output) => output.name);
+            if (outputNames.length !== new Set(outputNames).size) {
+                throw new Error(`Operation ${this.name} has duplicate output operands`);
+            }
+        }
     }
 }
 
@@ -81,14 +110,6 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
             return;
         }
         this._cores.push(core);
-    }
-
-    assignInputs(inputs: Operand[]) {
-        this.inputs.push(...inputs);
-    }
-
-    assignOutputs(outputs: Operand[]) {
-        this.outputs.push(...outputs);
     }
 
     get cores() {
