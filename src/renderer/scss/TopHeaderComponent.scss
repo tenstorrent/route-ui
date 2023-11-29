@@ -6,7 +6,18 @@
     display: flex;
     gap: 20px;
     align-items: center;
-    .bp4-control.bp4-switch{
+
+    .bp4-control.bp4-switch {
         margin-bottom: 0;
+    }
+
+    .text-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        .architecture-label{
+            //font-weight: bold;
+            text-transform: uppercase;
+        }
     }
 }
