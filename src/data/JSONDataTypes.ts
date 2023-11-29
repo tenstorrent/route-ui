@@ -69,5 +69,5 @@ export interface ChipDesignJSON {
 
 // TODO: Populate this interface with (possible) missing attributes
 export interface MetadataJSON {
-    architecture: Architecture;
+    arch_name: string;
 }

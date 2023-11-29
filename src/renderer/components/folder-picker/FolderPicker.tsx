@@ -20,10 +20,8 @@ import { useFolderPicker } from '../../hooks/useFolderPicker.hooks';
 export const TempFolderLoadingContext = (): React.ReactElement => {
     const { populateChipData } = usePopulateChipData();
     const {
-        manualArchitectureSelection,
         loadFolder,
         selectedArchitecture,
-        handleSelectArchitecture,
         availableGraphs,
         selectedGraph,
         onSelectGraphName,
@@ -38,41 +36,14 @@ export const TempFolderLoadingContext = (): React.ReactElement => {
             <FolderPicker
                 disabled={false}
                 onSelectFolder={loadFolder}
-                disabledText='Select Architecture Before Loading Graph'
+                disabledText=''
             />
-            {manualArchitectureSelection && (
-                <div>
-                    <div className='auto-architecture-id-fail'>
-                        <p>Unable to identify Architecture - select below</p>
-                    </div>
-                    <Tooltip2 content='Select Architecture' position='left'>
-                        <ButtonGroup className='architecture-button-group'>
-                            <Button
-                                icon='person'
-                                active={selectedArchitecture === Architecture.GRAYSKULL}
-                                onClick={() => handleSelectArchitecture(Architecture.GRAYSKULL)}
-                                className='architecture-button'
-                            >
-                                Grayskull
-                            </Button>
-                            <Button
-                                icon='globe-network'
-                                active={selectedArchitecture === Architecture.WORMHOLE}
-                                onClick={() => handleSelectArchitecture(Architecture.WORMHOLE)}
-                                className='architecture-button'
-                            >
-                                Wormhole
-                            </Button>
-                        </ButtonGroup>
-                    </Tooltip2>
-                </div>
-            )}
             <PopoverMenu // Graph picker
                 label='Select Graph'
                 options={availableGraphs}
                 selectedItem={selectedGraph}
                 onSelectItem={onSelectGraphName}
-                disabled={!showGraphSelect || !selectedArchitecture}
+                disabled={!showGraphSelect}
             />
             {error && (
                 <div className='loading-error'>
