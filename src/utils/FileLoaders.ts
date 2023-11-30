@@ -139,35 +139,42 @@ const loadChipFromNetlistAnalyzer = async (folderPath: string, graphName: string
     const temporalEpoch = getTemporalEpochFromGraphName(graphName);
 
     try {
-        const entries = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
+        const netListAnalyzerFolders = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
         let netlistAnalyzerFilepath: string = '';
         let netlistAnalyzerOptoPipeFilepath: string = '';
-        for (const entry of entries) {
-            if (entry.isDirectory()) {
-                const subfolderPath = path.join(folderPath, 'netlist_analyzer', entry.name);
-                const subEntries = await readDirEntries(subfolderPath);
-                const netlistAnalyzerFile = subEntries.find(
-                    (subEntry) =>
-                        subEntry.isFile() &&
-                        subEntry.name.includes('temporal_epoch') &&
-                        getTemporalEpochFromGraphName(subEntry.name) === temporalEpoch,
-                );
-                if (netlistAnalyzerFile) {
-                    netlistAnalyzerFilepath = path.join(subfolderPath, netlistAnalyzerFile.name);
+        let modelName = ''; // TODO: confirm this is in fact model name
+        await Promise.all(
+            netListAnalyzerFolders.map(async (folder) => {
+                if (folder.isDirectory()) {
+                    const subfolderPath = path.join(folderPath, 'netlist_analyzer', folder.name);
+                    const dirents = await readDirEntries(subfolderPath);
+                    const netlistAnalyzerFile = dirents.find(
+                        (file) =>
+                            file.isFile() &&
+                            file.name.includes('temporal_epoch') &&
+                            getTemporalEpochFromGraphName(file.name) === temporalEpoch,
+                    );
+                    if (netlistAnalyzerFile) {
+                        modelName = folder.name;
+                        netlistAnalyzerFilepath = path.join(subfolderPath, netlistAnalyzerFile.name);
+                    }
+                    const optoPipesReportsFolder = path.join(subfolderPath, 'reports');
+                    const optoPipesFiles = await readDirEntries(optoPipesReportsFolder);
+                    const opToPipeFile = optoPipesFiles.find(
+                        (file) =>
+                            file.isFile() &&
+                            file.name.includes('temporal_epoch') &&
+                            getTemporalEpochFromGraphName(file.name) === temporalEpoch,
+                    );
+                    if (opToPipeFile) {
+                        netlistAnalyzerOptoPipeFilepath = path.join(optoPipesReportsFolder, opToPipeFile.name);
+                    }
                 }
-                const optoPipesFolder = path.join(subfolderPath, 'reports');
-                const optoPipesEntries = await readDirEntries(optoPipesFolder);
-                const opToPipeFile = optoPipesEntries.find(
-                    (optoPipeEntry) =>
-                        optoPipeEntry.isFile() &&
-                        optoPipeEntry.name.includes('temporal_epoch') &&
-                        getTemporalEpochFromGraphName(optoPipeEntry.name) === temporalEpoch,
-                );
-                if (opToPipeFile) {
-                    netlistAnalyzerOptoPipeFilepath = path.join(optoPipesFolder, opToPipeFile.name);
-                }
-            }
-        }
+            }),
+        );
+
+        console.info('MODEL NAME', modelName); // TODO: store model name somewhere
+
         if (netlistAnalyzerFilepath !== '') {
             const data = await readFile(netlistAnalyzerFilepath);
             let chip = Chip.CREATE_FROM_NETLIST_JSON(parse(data) as NetlistAnalyzerDataJSON);
@@ -181,9 +188,9 @@ const loadChipFromNetlistAnalyzer = async (folderPath: string, graphName: string
         }
     } catch (err) {
         console.error(err);
+        return null;
     }
-
-    throw new Error('Chip not found');
+    return null;
 };
 export const loadGraph = async (folderPath: string, graphName: string): Promise<Chip> => {
     let architecture = Architecture.NONE;

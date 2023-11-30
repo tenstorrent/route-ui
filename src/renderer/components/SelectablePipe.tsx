@@ -24,9 +24,9 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
         dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
     };
     if (pipeState?.selected === undefined) {
-        console.log('something is missing here');
-        console.log(pipeState);
-        console.log(pipeSegment);
+        // console.log('something is missing here');
+        // console.log(pipeState);
+        // console.log(pipeSegment);
     }
     return (
         <>
