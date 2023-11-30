@@ -9,6 +9,10 @@ import {
     PerfAnalyzerResultsPerOpJSON,
 } from 'data/sources/PerfAnalyzerResults';
 import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
+// TODO: Replace FS to use the native promise one
+// Node 20 supports FS using promises instead of callbacks
+// update this to use the new pattern
+// ref: https://nodejs.org/dist/latest-v20.x/docs/api/fs.html#fspromisesopendirpath-options
 import fs, { Dirent } from 'fs';
 import path from 'path';
 
@@ -177,4 +181,11 @@ export const loadGraph = async (folderPath: string, graphName: string): Promise<
     chip = Chip.AUGMENT_WITH_OP_PERFORMANCE(chip, opPerformanceByOp);
 
     return chip;
+};
+
+export const getAvailableNetlistFiles = async (folderPath: string): Promise<string[]> => {
+    const netlistAnalizerFileMask = /^analyzer_output_.*.yaml$/;
+    const allFilesList = await readDirEntries(folderPath);
+    const netlistFiles = allFilesList.map((file) => file.name).filter((file) => netlistAnalizerFileMask.test(file));
+    return netlistFiles;
 };
