@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-constructor */
+import { process } from '@electron/remote';
 import {
     ChipDesignJSON,
     DramChannelJSON,
@@ -171,9 +172,15 @@ export default class Chip {
     }
 
     protected addOperation(operation: BuildableOperation) {
-        if (!this.getOperation(operation.name)) {
+        if (!this.operationsByName.has(operation.name)) {
             this.operationsByName.set(operation.name, operation);
+        } else {
+            console.warn('Operation already exists', operation.name);
         }
+    }
+
+    protected updateOperation(operation: BuildableOperation) {
+        this.operationsByName.set(operation.name, operation);
     }
 
     private queuesByName: Map<QueueName, BuildableQueue>;
@@ -344,11 +351,13 @@ export default class Chip {
         if (chip) {
             const augmentedChip = new Chip(chip.chipId);
             Object.assign(augmentedChip, chip);
+            const regex = /^(\d+)-(\d+)-(\d+)$/;
 
             const pipesAsMap = (coresToPipes: Record<string, string[]>) => {
                 return new Map(
                     Object.entries(coresToPipes).map(([coreID, pipes]) => [
-                        coreID,
+                        // TODO: we will need to address this to keep all core IDs consistent
+                        coreID.replace(regex, '$1-$3-$2'),
                         pipes.map((pipeId) => pipeId.toString()),
                     ]),
                 );
@@ -528,7 +537,7 @@ export default class Chip {
 
             return new BuildableOperation(opName, cores, inputs, outputs);
         });
-        forEach(operations, (operation) => newChip.addOperation(operation));
+        forEach(operations, (operation) => newChip.updateOperation(operation));
         return newChip;
     }
 
@@ -839,7 +848,7 @@ export class ComputeNode {
         chipId: number,
         getOperation: (name: OperationName) => BuildableOperation | undefined,
     ): [node: ComputeNode, createdOperation?: BuildableOperation] {
-        const node = new ComputeNode(`0-${nodeJSON.location[1]}-${nodeJSON.location[0]}`);
+        const node = new ComputeNode(`0-${nodeJSON.location[0]}-${nodeJSON.location[1]}`);
         node.opCycles = nodeJSON.op_cycles;
         node.links = new Map();
         node.chipId = chipId;
@@ -850,7 +859,7 @@ export class ComputeNode {
             node.dramSubchannelId = nodeJSON.dram_subchannel || 0;
         }
         node.loc = { x: nodeJSON.location[0], y: nodeJSON.location[1] };
-        node.uid = `${node.chipId}-${node.loc.y}-${node.loc.x}`;
+        node.uid = `${node.chipId}-${node.loc.x}-${node.loc.y}`;
 
         if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
             node.dramChannelId = nodeJSON.dram_channel;
@@ -931,6 +940,7 @@ export class ComputeNode {
      */
     public dramChannelId: number = -1;
 
+    // TODO: check if reassigend operation is updated here.
     public operation?: Operation;
 
     public perfAnalyzerResults?: CorePerfJson;
