@@ -96,3 +96,11 @@ export enum QueueLocation {
     HOST = 'HOST',
     DRAM = 'DRAM',
 }
+
+export enum ApplicationMode {
+    NONE = '',
+    PERF_ANALYZER = 'perf-analyzer',
+    NETLIST_ANALYZER = 'netlist-analyzer',
+    // For the future
+    PERF_UI = 'perf-ui',
+}

@@ -1,18 +1,15 @@
-import usePopulateChipData from 'renderer/hooks/usePopulateChipData.hooks';
+import useFileLoader from 'renderer/hooks/useFileLoader.hook';
 import PopoverMenu from '../PopoverMenu';
-import { useFolderPicker } from '../../hooks/useFolderPicker.hooks';
 
 function GraphSelector() {
-    const { populateChipData } = usePopulateChipData();
-
-    const { availableGraphs, selectedGraph, onSelectGraphName } = useFolderPicker(populateChipData);
+    const { selectedGraph, handleSelectGraph, availableGraphs } = useFileLoader();
 
     return availableGraphs.length ? (
         <PopoverMenu // Graph picker
             label={selectedGraph}
             options={availableGraphs}
             selectedItem={selectedGraph}
-            onSelectItem={onSelectGraphName}
+            onSelectItem={handleSelectGraph}
             disabled={false}
         />
     ) : (
