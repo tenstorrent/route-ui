@@ -4,7 +4,7 @@ import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
-import usePerfAnalizerFileLoader from 'renderer/hooks/usePerfAnalyzerFileLoader.hooks';
+import usePerfAnalyzerFileLoader from 'renderer/hooks/usePerfAnalyzerFileLoader.hooks';
 import '../../scss/FolderPicker.scss';
 import PopoverMenu from '../PopoverMenu';
 
@@ -15,8 +15,8 @@ import PopoverMenu from '../PopoverMenu';
  * */
 
 export const TempFolderLoadingContext = (): React.ReactElement => {
-    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs, showGraphSelect } =
-        usePerfAnalizerFileLoader();
+    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs, enableGraphSelect } =
+        usePerfAnalyzerFileLoader();
 
     return (
         <div className='folder-load-container'>
@@ -28,7 +28,7 @@ export const TempFolderLoadingContext = (): React.ReactElement => {
                 options={availableGraphs}
                 selectedItem={selectedGraph}
                 onSelectItem={loadPerfAnalyzerGraph}
-                disabled={!showGraphSelect}
+                disabled={!enableGraphSelect}
             />
             {error && (
                 <div className='loading-error'>

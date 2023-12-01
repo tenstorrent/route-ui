@@ -5,7 +5,7 @@ import {
     setSelectedFile,
 } from 'data/store/slices/uiState.slice';
 
-import { Application } from 'data/Types';
+import { ApplicationMode } from 'data/Types';
 import Chip from 'data/Chip';
 import { NetlistAnalyzerDataJSON } from 'data/JSONDataTypes';
 import { dialog } from '@electron/remote';
@@ -16,21 +16,33 @@ import path from 'path';
 import { useDispatch } from 'react-redux';
 import usePopulateChipData from './usePopulateChipData.hooks';
 
-const useNetlistAnalizerFileLoader = () => {
+type NetlistAnalyzerFileLoaderHook = {
+    handleSelectNetlistFile: () => Promise<void>;
+    loadNetlistFile: (filename: string) => Promise<void>;
+};
+
+const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
     const dispatch = useDispatch();
     const { populateChipData } = usePopulateChipData();
 
     const selectFileDialog = () => {
-        const filelist = dialog.showOpenDialogSync({
-            properties: ['openFile'],
-            filters: [{ name: 'file', extensions: ['yaml'] }],
-        });
-        const filename = Array.isArray(filelist) ? filelist[0] : null;
+        try {
+            const filelist = dialog.showOpenDialogSync({
+                properties: ['openFile'],
+                filters: [{ name: 'file', extensions: ['yaml'] }],
+            });
+            const filename = Array.isArray(filelist) ? filelist[0] : null;
 
-        return filename;
+            return filename;
+        } catch (err) {
+            const error = err as Error;
+            console.error(error);
+            alert(`An error occurred selecting the file: ${error.message}`);
+            return null;
+        }
     };
 
-    const loadNetlistFile = async (filename: string) => {
+    const loadNetlistFile = async (filename: string): Promise<void> => {
         try {
             const data = await fs.readFile(filename, 'utf-8');
             const doc = parse(data);
@@ -51,10 +63,10 @@ const useNetlistAnalizerFileLoader = () => {
         dispatch(setAvailableGraphs(netlistFiles));
     };
 
-    const handleSelectNetlistFile = async () => {
+    const handleSelectNetlistFile = async (): Promise<void> => {
         const filename = selectFileDialog();
         if (filename) {
-            dispatch(setSelectedApplication(Application.NETLIST_ANALYZER));
+            dispatch(setSelectedApplication(ApplicationMode.NETLIST_ANALYZER));
             await loadFileList(filename);
             await loadNetlistFile(filename);
         }
@@ -63,4 +75,4 @@ const useNetlistAnalizerFileLoader = () => {
     return { handleSelectNetlistFile, loadNetlistFile };
 };
 
-export default useNetlistAnalizerFileLoader;
+export default useNetlistAnalyzerFileLoader;

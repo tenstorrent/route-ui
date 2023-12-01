@@ -1,5 +1,4 @@
 import {
-    getArchitectureSelector,
     getAvailableGraphsSelector,
     getFolderPathSelector,
     getGraphNameSelector,
@@ -16,20 +15,28 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAvailableGraphNames, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
 
 import { dialog } from '@electron/remote';
-import { Application } from 'data/Types';
+import { ApplicationMode } from 'data/Types';
 import { useState } from 'react';
 import usePopulateChipData from './usePopulateChipData.hooks';
 
-const usePerfAnalizerFileLoader = () => {
+type PerfAnalyzerFileLoaderHook = {
+    loadPerfAnalyzerFolder: () => Promise<void>;
+    loadPerfAnalyzerGraph: (graphName: string) => Promise<void>;
+    error: string | null;
+    selectedGraph: string;
+    availableGraphs: string[];
+    enableGraphSelect: boolean;
+};
+
+const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
     const { populateChipData } = usePopulateChipData();
 
     const dispatch = useDispatch();
     const selectedFolder = useSelector(getFolderPathSelector);
     const selectedGraph = useSelector(getGraphNameSelector);
-    const selectedArchitecture = useSelector(getArchitectureSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const [error, setError] = useState<string | null>(null);
-    const [showGraphSelect, setShowGraphSelect] = useState(false);
+    const [enableGraphSelect, setEnableGraphSelect] = useState(false);
 
     const selectFolderDialog = async (): Promise<string | null> => {
         const folderList = dialog.showOpenDialogSync({
@@ -48,40 +55,47 @@ const usePerfAnalizerFileLoader = () => {
         return folderPath;
     };
 
-    const loadFolderList = async (folderPath: string) => {
+    const loadFolderList = async (folderPath: string): Promise<void> => {
         dispatch(clearAvailableGraphs());
         const graphs = await getAvailableGraphNames(folderPath);
         dispatch(setAvailableGraphs(graphs));
     };
 
-    const loadFolder = async (folderPath: string) => {
+    const loadFolder = async (folderPath: string): Promise<void> => {
         try {
             const graphs = await getAvailableGraphNames(folderPath);
             dispatch(setSelectedFolder(folderPath));
             dispatch(setAvailableGraphs(graphs));
-            setShowGraphSelect(true);
-        } catch (err) {
-            console.error('Failed to read graph names from folder:', err);
-            setError(err ? err.toString() : 'Unknown Error');
+            setEnableGraphSelect(true);
+        } catch (e) {
+            const err = e as Error;
+            console.error('Failed to read graph names from folder:', err.message);
+            setError(err.message ?? 'Unknown Error');
         }
     };
 
-    const loadPerfAnalyzerGraph = async (graphName: string) => {
+    const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
         if (selectedFolder) {
-            const chip = await loadGraph(selectedFolder, graphName);
-            setShowGraphSelect(false);
-            populateChipData(chip);
-            dispatch(setSelectedGraphName(graphName));
-            dispatch(setSelectedArchitecture(chip.architecture));
+            try {
+                const chip = await loadGraph(selectedFolder, graphName);
+                setEnableGraphSelect(false);
+                populateChipData(chip);
+                dispatch(setSelectedGraphName(graphName));
+                dispatch(setSelectedArchitecture(chip.architecture));
+            } catch (e) {
+                const err = e as Error;
+                console.error('error loading and populating chip', err.message);
+                setError(err.message ?? 'Unknown Error');
+            }
         } else {
             console.error('Attempted to load graph but no folder path was available');
         }
     };
 
-    const loadPerfAnalyzerFolder = async () => {
+    const loadPerfAnalyzerFolder = async (): Promise<void> => {
         const folderPath = await selectFolderDialog();
         if (folderPath) {
-            dispatch(setSelectedApplication(Application.PERF_ANALYZER));
+            dispatch(setSelectedApplication(ApplicationMode.PERF_ANALYZER));
             await loadFolderList(folderPath);
             await loadFolder(folderPath);
         }
@@ -92,10 +106,9 @@ const usePerfAnalizerFileLoader = () => {
         loadPerfAnalyzerGraph,
         error,
         selectedGraph,
-        selectedArchitecture,
         availableGraphs,
-        showGraphSelect,
+        enableGraphSelect,
     };
 };
 
-export default usePerfAnalizerFileLoader;
+export default usePerfAnalyzerFileLoader;

@@ -1,10 +1,10 @@
 import { Button } from '@blueprintjs/core';
 import { FC } from 'react';
 import { IconNames } from '@blueprintjs/icons';
-import useNetlistAnalizerFileLoader from 'renderer/hooks/useNetlistAnalyzerFileLoader.hooks';
+import useNetlistAnalyzerFileLoader from 'renderer/hooks/useNetlistAnalyzerFileLoader.hooks';
 
 const FileLoader: FC = () => {
-    const { handleSelectNetlistFile } = useNetlistAnalizerFileLoader();
+    const { handleSelectNetlistFile } = useNetlistAnalyzerFileLoader();
 
     return (
         <div className=''>

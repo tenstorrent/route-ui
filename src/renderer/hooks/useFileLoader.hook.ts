@@ -1,39 +1,46 @@
-import { Application } from 'data/Types';
+import { ApplicationMode } from 'data/Types';
 import {
     getApplicationSelector,
-    getArchitectureSelector,
     getAvailableGraphsSelector,
     getFolderPathSelector,
     getGraphNameSelector,
 } from 'data/store/selectors/uiState.selectors';
 import path from 'path';
 import { useSelector } from 'react-redux';
-import useNetlistAnalizerFileLoader from './useNetlistAnalyzerFileLoader.hooks';
-import usePerfAnalizerFileLoader from './usePerfAnalyzerFileLoader.hooks';
+import useNetlistAnalyzerFileLoader from './useNetlistAnalyzerFileLoader.hooks';
+import usePerfAnalyzerFileLoader from './usePerfAnalyzerFileLoader.hooks';
 
-const useFileLoader = () => {
+type FileLoaderHook = {
+    selectedGraph: string;
+    handleSelectGraph: (name: string) => void;
+    availableGraphs: string[];
+};
+
+const useFileLoader = (): FileLoaderHook => {
     const selectedApplication = useSelector(getApplicationSelector);
     const selectedFolder = useSelector(getFolderPathSelector);
     const selectedGraph = useSelector(getGraphNameSelector);
-    const selectedArchitecture = useSelector(getArchitectureSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
 
-    const { loadPerfAnalyzerGraph } = usePerfAnalizerFileLoader();
-    const { loadNetlistFile } = useNetlistAnalizerFileLoader();
+    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const { loadNetlistFile } = useNetlistAnalyzerFileLoader();
 
-    const handleSelectGraph = (name: string) => {
-        if (selectedApplication === Application.NETLIST_ANALYZER) {
-            const fileName = path.join(selectedFolder, name);
-            loadNetlistFile(fileName);
-        } else if (selectedApplication === Application.PERF_ANALYZER) {
-            loadPerfAnalyzerGraph(name);
+    const handleSelectGraph = (name: string): void => {
+        try {
+            if (selectedApplication === ApplicationMode.NETLIST_ANALYZER) {
+                const fileName = path.join(selectedFolder, name);
+                loadNetlistFile(fileName);
+            } else if (selectedApplication === ApplicationMode.PERF_ANALYZER) {
+                loadPerfAnalyzerGraph(name);
+            }
+        } catch (err) {
+            const error = err as Error;
+            console.error('error switching graphs/netlist', error.message);
         }
     };
 
     return {
-        selectedFolder,
         selectedGraph,
-        selectedArchitecture,
         handleSelectGraph,
         availableGraphs,
     };

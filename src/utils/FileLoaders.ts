@@ -184,8 +184,8 @@ export const loadGraph = async (folderPath: string, graphName: string): Promise<
 };
 
 export const getAvailableNetlistFiles = async (folderPath: string): Promise<string[]> => {
-    const netlistAnalizerFileMask = /^analyzer_output_.*.yaml$/;
+    const netlistAnalyzerFileMask = /^analyzer_output_.*.yaml$/;
     const allFilesList = await readDirEntries(folderPath);
-    const netlistFiles = allFilesList.map((file) => file.name).filter((file) => netlistAnalizerFileMask.test(file));
+    const netlistFiles = allFilesList.map((file) => file.name).filter((file) => netlistAnalyzerFileMask.test(file));
     return netlistFiles;
 };

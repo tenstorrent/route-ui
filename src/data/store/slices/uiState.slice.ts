@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { Application, Architecture } from 'data/Types';
+import { ApplicationMode, Architecture } from 'data/Types';
 import path from 'path';
 
 interface UIState {
@@ -9,7 +9,7 @@ interface UIState {
     folderPath: string;
     architecture: Architecture;
     availableGraphs: string[];
-    selectedApplication: Application;
+    selectedApplication: ApplicationMode;
 }
 
 const uiStateInitialState: UIState = {
@@ -19,7 +19,7 @@ const uiStateInitialState: UIState = {
     folderPath: '',
     architecture: Architecture.NONE,
     availableGraphs: [],
-    selectedApplication: Application.NONE,
+    selectedApplication: ApplicationMode.NONE,
 };
 
 const uiStateSlice = createSlice({
@@ -51,11 +51,11 @@ const uiStateSlice = createSlice({
         clearAvailableGraphs(state) {
             state.availableGraphs = [];
         },
-        setSelectedApplication(state, action: PayloadAction<Application>) {
+        setSelectedApplication(state, action: PayloadAction<ApplicationMode>) {
             state.selectedApplication = action.payload;
         },
         clearSelectedApplication(state) {
-            state.selectedApplication = Application.NONE;
+            state.selectedApplication = ApplicationMode.NONE;
         },
     },
 });

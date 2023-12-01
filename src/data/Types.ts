@@ -97,7 +97,7 @@ export enum QueueLocation {
     DRAM = 'DRAM',
 }
 
-export enum Application {
+export enum ApplicationMode {
     NONE = '',
     PERF_ANALYZER = 'perf-analyzer',
     NETLIST_ANALYZER = 'netlist-analyzer',
