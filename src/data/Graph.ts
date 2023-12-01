@@ -1,9 +1,10 @@
+import { process } from '@electron/remote';
 import { ComputeNodeType } from './Types';
-import type { OperandName, Operation, OperationName, GraphVertex, GraphVertexId, Queue } from './GraphTypes';
+import type { GraphVertex, GraphVertexId, OperandName, Operation, OperationName, Queue } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
 import type { ComputeNode } from './Chip';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
-import { OpAttributesJSON, OpPerfJSON, OpPerformanceByOp } from './sources/PerfAnalyzerResults';
+import { OpPerfJSON } from './sources/PerfAnalyzerResults';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -85,24 +86,15 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
 
     details?: OpPerfJSON;
 
-    // attributes: OpAttributesJSON | null = null;
-
-    // measurements: OpMeasurementsJSON | null = null;
-
     /** Creates a mutual association between this Operation and the provided core, such that `core.operation` will
      * reference this operation.
      *
-     *  Throws an exception if the provided core already has another Operation assigned.
      */
     assignCore(core: ComputeNode) {
         if (core.type !== ComputeNodeType.CORE) {
             throw new Error(`Can't assign the non-core ${core.uid} to an operation (${this.name})`);
         }
-        if (!core.operation) {
-            core.operation = this;
-        } else if (core.operation !== this) {
-            throw new Error("Core already has an operation assignment. Can't reassign core to this operation.");
-        }
+        core.operation = this;
         if (this._cores.includes(core)) {
             console.warn(
                 `Assigning core ${core.uid} to operation ${this.name}; core is already assigned to this operation.`,

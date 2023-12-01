@@ -1,5 +1,5 @@
 import Chip from 'data/Chip';
-import { ChipDesignJSON, MetadataJSON } from 'data/JSONDataTypes';
+import { ChipDesignJSON, MetadataJSON, NetlistAnalyzerDataJSON } from 'data/JSONDataTypes';
 import { Architecture } from 'data/Types';
 import { GraphDescriptorJSON } from 'data/sources/GraphDescriptor';
 import {
@@ -11,6 +11,7 @@ import {
 import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 import fs, { Dirent } from 'fs';
 import path from 'path';
+import { parse } from 'yaml';
 
 export const readFile = async (filename: string): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -43,7 +44,10 @@ export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
 export const findFiles = async (
     searchPath: string,
     searchQuery: string,
-    options?: { isDir?: boolean; maxDepth?: number },
+    options?: {
+        isDir?: boolean;
+        maxDepth?: number;
+    },
 ): Promise<string[]> => {
     const { isDir = false, maxDepth = 0 } = options || {};
     if (maxDepth < 0) {
@@ -119,23 +123,100 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
     return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
-export const loadGraph = async (folderPath: string, graphName: string): Promise<Chip> => {
-    let architecture = Architecture.NONE;
-    try {
-        const metadata = (await loadJsonFile(path.join(folderPath, `metadata`, `${graphName}.json`))) as MetadataJSON;
-
-        const arch = metadata.arch_name;
-        if (arch.includes(Architecture.GRAYSKULL)) {
-            architecture = Architecture.GRAYSKULL;
+const getTemporalEpochFromGraphName = (filename: string): number | null => {
+    const regex = /temporal_epoch_(\d+)|fwd_(?:\d+_)*(\d+)/;
+    const match = filename.match(regex);
+    if (match) {
+        const numberMatch = match[1] || match[2];
+        if (numberMatch) {
+            return parseInt(numberMatch, 10);
         }
-        if (arch.includes(Architecture.WORMHOLE)) {
-            architecture = Architecture.WORMHOLE;
+    }
+    return null;
+};
+
+const loadChipFromNetlistAnalyzer = async (folderPath: string, graphName: string): Promise<Chip | null> => {
+    const temporalEpoch = getTemporalEpochFromGraphName(graphName);
+
+    try {
+        const netListAnalyzerFolders = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
+        let netlistAnalyzerFilepath: string = '';
+        let netlistAnalyzerOptoPipeFilepath: string = '';
+        let modelName = ''; // TODO: confirm this is in fact model name
+        await Promise.all(
+            netListAnalyzerFolders.map(async (folder) => {
+                if (folder.isDirectory()) {
+                    const subfolderPath = path.join(folderPath, 'netlist_analyzer', folder.name);
+                    const dirents = await readDirEntries(subfolderPath);
+                    const netlistAnalyzerFile = dirents.find(
+                        (file) =>
+                            file.isFile() &&
+                            file.name.includes('temporal_epoch') &&
+                            getTemporalEpochFromGraphName(file.name) === temporalEpoch,
+                    );
+                    if (netlistAnalyzerFile) {
+                        modelName = folder.name;
+                        netlistAnalyzerFilepath = path.join(subfolderPath, netlistAnalyzerFile.name);
+                    }
+                    const optoPipesReportsFolder = path.join(subfolderPath, 'reports');
+                    const optoPipesFiles = await readDirEntries(optoPipesReportsFolder);
+                    const opToPipeFile = optoPipesFiles.find(
+                        (file) =>
+                            file.isFile() &&
+                            file.name.includes('temporal_epoch') &&
+                            getTemporalEpochFromGraphName(file.name) === temporalEpoch,
+                    );
+                    if (opToPipeFile) {
+                        netlistAnalyzerOptoPipeFilepath = path.join(optoPipesReportsFolder, opToPipeFile.name);
+                    }
+                }
+            }),
+        );
+
+        console.info('MODEL NAME', modelName); // TODO: store model name somewhere
+
+        if (netlistAnalyzerFilepath !== '') {
+            const data = await readFile(netlistAnalyzerFilepath);
+            let chip = Chip.CREATE_FROM_NETLIST_JSON(parse(data) as NetlistAnalyzerDataJSON);
+            if (netlistAnalyzerOptoPipeFilepath !== '') {
+                const opsData = await readFile(netlistAnalyzerOptoPipeFilepath);
+                chip = Chip.AUGMENT_FROM_OPS_JSON(chip, parse(opsData).ops);
+            }
+            if (chip) {
+                return chip;
+            }
         }
     } catch (err) {
-        console.error('Failed to read metadata from folder:', err);
+        console.error(err);
+        return null;
+    }
+    return null;
+};
+export const loadGraph = async (folderPath: string, graphName: string): Promise<Chip> => {
+    let architecture = Architecture.NONE;
+
+    let chip: Chip | null = await loadChipFromNetlistAnalyzer(folderPath, graphName);
+
+    if (chip === null) {
+        try {
+            const metadata = (await loadJsonFile(
+                path.join(folderPath, `metadata`, `${graphName}.json`),
+            )) as MetadataJSON;
+
+            const arch = metadata.arch_name;
+            if (arch.includes(Architecture.GRAYSKULL)) {
+                architecture = Architecture.GRAYSKULL;
+            }
+            if (arch.includes(Architecture.WORMHOLE)) {
+                architecture = Architecture.WORMHOLE;
+            }
+        } catch (err) {
+            console.error('Failed to read metadata from folder:', err);
+        }
+
+        chip = await loadChipFromArchitecture(architecture);
     }
 
-    let chip = await loadChipFromArchitecture(architecture);
     const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
     const graphDescriptorJson = await loadJsonFile(graphPath);
 
@@ -169,8 +250,6 @@ export const loadGraph = async (folderPath: string, graphName: string): Promise<
             })
             .flat(),
     );
-
-    // TODO: opAttributesMeasurements needs to be propagated to the data model
 
     chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
 
