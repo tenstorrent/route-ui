@@ -203,7 +203,7 @@ export default class Chip {
         }
     }
 
-    protected operandsByName: Map<string, Operand> = new Map();
+    private operandsByName: Map<string, Operand> = new Map();
 
     protected createOperand(
         name: string,
