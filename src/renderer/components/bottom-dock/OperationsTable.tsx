@@ -1,10 +1,10 @@
 /* eslint-disable react/destructuring-assignment */
 import { Table2, Column, Cell } from '@blueprintjs/table';
 import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
-import useOperations from './useOperations.hooks';
+import useOperationsTable from './useOperationsTable.hooks';
 
 function OperationsTable() {
-    const { operations } = useOperations();
+    const { operations } = useOperationsTable();
 
     const operationRenderer = (rowIndex: number) => <Cell>{operations[rowIndex].name}</Cell>;
 

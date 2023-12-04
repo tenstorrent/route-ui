@@ -3,12 +3,12 @@ import { Operation } from 'data/GraphTypes';
 import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
 import { useContext, useMemo, useState } from 'react';
 
-type OperationsHook = {
+type OperationsTableHook = {
     operations: Operation[];
     setSortingColumn: (criteria: keyof OpPerfJSON) => void;
 };
 
-function useOperations(): OperationsHook {
+function useOperationsTable(): OperationsTableHook {
     const [sortingColumn, setSortingColumn] = useState<keyof OpPerfJSON>('kernel_total_runtime');
     const { chip } = useContext(DataSource);
     const operations = useMemo(() => {
@@ -23,4 +23,4 @@ function useOperations(): OperationsHook {
     return { operations, setSortingColumn };
 }
 
-export default useOperations;
+export default useOperationsTable;
