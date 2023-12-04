@@ -1,7 +1,7 @@
 import type { ComputeNode } from './Chip';
 import type { Operand } from './Graph';
 import type { QueueDetailsJson } from './sources/QueueDescriptor';
-import { OpAttributesJSON, OpPerfJSON, OpPerformanceByOp } from './sources/PerfAnalyzerResults';
+import { OpPerfJSON } from './sources/PerfAnalyzerResults';
 
 export type OperationName = string;
 export type QueueName = string;
@@ -23,13 +23,13 @@ interface HasOperands {
 
 // TODO: there is a possible inconsistency with detailes vs attributs and measurements
 
-export interface Queue extends HasOperands {
+export interface Queue extends HasOperands, Operand {
     readonly name: QueueName;
     readonly vertexType: GraphVertexType.QUEUE;
     readonly details?: QueueDetailsJson;
 }
 
-export interface Operation extends HasOperands {
+export interface Operation extends HasOperands, Operand {
     readonly name: OperationName;
     readonly vertexType: GraphVertexType.OPERATION;
     readonly cores: Iterable<ComputeNode>;

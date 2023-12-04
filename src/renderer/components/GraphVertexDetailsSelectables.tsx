@@ -25,13 +25,13 @@ const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.React
                 selected,
             }),
         );
-    return operand.type === GraphVertexType.OPERATION ? (
+    return operand.vertexType === GraphVertexType.OPERATION ? (
         <SelectableOperation
             opName={operand.name}
             value={nodesSelectionState.groups[operand.name]?.selected}
             selectFunc={setOperationSelectionState}
             stringFilter=''
-            type={operand.type}
+            type={operand.vertexType}
         />
     ) : (
         <SelectableOperation
@@ -40,7 +40,7 @@ const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.React
             value={nodesSelectionState.queues[operand.name]?.selected}
             selectFunc={setQueueSelectionState}
             stringFilter=''
-            type={operand.type}
+            type={operand.vertexType}
         />
     );
 };
