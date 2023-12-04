@@ -17,6 +17,7 @@ import LinkDetails from '../LinkDetails';
 import GraphVertexDetails from '../GraphVertexDetails';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import Collapsible from '../Collapsible';
+import { Operand } from '../../../data/Graph';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -80,7 +81,6 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
-
     return (
         <Card className='node-element'>
             <h3
@@ -116,6 +116,18 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                         />
                     </Tooltip2>
                     {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics coreNode={node} />}
+                    <Collapsible label={<h5>Op pipes:</h5>} isOpen styles={{ marginLeft: '20px' }}>
+                        <ul className="scrollable-content">
+                            {node.operation.uniquePipeIds.map((pipeId) => (
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                        pipeFilter=''
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </Collapsible>
                 </div>
             )}
 
@@ -124,7 +136,6 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     <Collapsible label={<h4>Queues:</h4>} isOpen>
                         {node.queueList.map((queue) => (
                             <>
-
                                 <SelectableOperation
                                     disabled={nodesSelectionState.queues[queue.name]?.selected === undefined}
                                     opName={queue.name}
@@ -132,7 +143,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                     selectFunc={setQueueSelectionState}
                                     stringFilter=''
                                 />
-                                <GraphVertexDetails graphNode={queue} showQueueDetails={false}/>
+                                <GraphVertexDetails graphNode={queue} showQueueDetails={false} />
                             </>
                         ))}
                     </Collapsible>

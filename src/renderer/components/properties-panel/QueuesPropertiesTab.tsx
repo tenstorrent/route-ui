@@ -82,7 +82,7 @@ function QueuesPropertiesTab() {
                                         />
                                     }
                                     isOpen={allOpen}
-                                    styles={{ color: '#000' }}
+                                    contentStyles={{ color: '#000' }}
                                 >
                                     {queue && <GraphVertexDetails graphNode={queue} />}
                                 </Collapsible>
