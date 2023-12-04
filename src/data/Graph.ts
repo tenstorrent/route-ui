@@ -2,13 +2,13 @@ import { process } from '@electron/remote';
 import { ComputeNodeType } from './Types';
 import type { GraphVertex, GraphVertexId, OperandName, Operation, OperationName, Queue } from './GraphTypes';
 import { GraphVertexType } from './GraphTypes';
-import type { ComputeNode } from './Chip';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 import { OpPerfJSON } from './sources/PerfAnalyzerResults';
+import { ComputeNode } from './Chip';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
-export abstract class AbstractGraphVertex {
+export abstract class AbstractGraphVertex implements Operand {
     readonly name: GraphVertexId;
 
     abstract readonly vertexType: GraphVertexType;
@@ -16,6 +16,38 @@ export abstract class AbstractGraphVertex {
     protected inputOperands: Operand[];
 
     protected outputOperands: Operand[];
+
+    private _pipeIdsByCore: Map<string, string[]> = new Map();
+
+    public toString(): string {
+        return `${this.name} (${this.vertexType})`;
+    }
+
+    public get pipeIdsByCore(): Map<string, string[]> {
+        return this._pipeIdsByCore;
+    }
+
+    public set pipeIdsByCore(value: Map<string, string[]>) {
+        // console.log(`updating ${this.name} with ${value.size}`);
+        if(this._pipeIdsByCore.size > 0) {
+            value.forEach((pipeids, key) => {
+                if(this._pipeIdsByCore.has(key)) {
+                    this._pipeIdsByCore.get(key)!.push(...pipeids);
+                }else{
+                    this._pipeIdsByCore.set(key, pipeids);
+                }
+            });
+        }
+        this._pipeIdsByCore = value;
+    }
+
+    public bandwidth: number = 0;
+
+    readonly from?: GraphVertex;
+
+    readonly to?: GraphVertex;
+
+    readonly perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
 
     constructor(name: string, inputOperands?: Operand[], outputOperands?: Operand[]) {
         this.name = name;
@@ -60,6 +92,18 @@ export abstract class AbstractGraphVertex {
                 throw new Error(`Operation ${this.name} has duplicate output operands`);
             }
         }
+    }
+
+    isConnected(): boolean {
+        return !!(this.from && this.to);
+    }
+
+    public getPipeIdsForCore(coreId: string): string[] {
+        return this.pipeIdsByCore.get(coreId) || [];
+    }
+
+    public getAllPipeIds() {
+        return this.pipeIdsByCore.values();
     }
 }
 
@@ -109,60 +153,17 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     }
 }
 
-/**
- * Represents the data structure for an operand.
- */
-export class Operand {
-    /** Name of the operand. */
-    readonly name: OperandName;
+export interface Operand {
+    name: OperandName;
+    vertexType: GraphVertexType;
+    from?: GraphVertex;
+    to?: GraphVertex;
+    pipeIdsByCore: Map<string, string[]>;
+    perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
 
-    /** Type of the operand (e.g., QUEUE or OP). */
-    readonly type: GraphVertexType;
+    getPipeIdsForCore(coreId: string): string[];
 
-    public pipeIdsByCore: Map<string, string[]>;
+    getAllPipeIds(): Iterable<string[]>;
 
-    /** Bandwidth associated with the operand. */
-    public bandwidth: number = 0;
-
-    readonly from?: GraphVertex;
-
-    readonly to?: GraphVertex;
-
-    readonly perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
-
-    constructor(
-        name: string,
-        type: GraphVertexType,
-        pipesByCore?: Map<string, string[]>,
-        from?: GraphVertex,
-        to?: GraphVertex,
-    ) {
-        this.name = name;
-        this.type = type;
-
-        this.pipeIdsByCore = pipesByCore || new Map();
-
-        if (!!from !== !!to) {
-            throw new Error('A connected operand must have both "from" and "to" values');
-        }
-        this.from = from;
-        this.to = to;
-    }
-
-    isConnected(): boolean {
-        return !!(this.from && this.to);
-    }
-
-    public getPipeIdsForCore(coreId: string): string[] {
-        return this.pipeIdsByCore.get(coreId) || [];
-    }
-
-    public getAllPipeIds() {
-        return this.pipeIdsByCore.values();
-    }
-}
-
-export enum OpIoType {
-    INPUTS = 'inputs',
-    OUTPUTS = 'outputs',
+    isConnected(): boolean;
 }

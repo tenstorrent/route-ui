@@ -180,7 +180,16 @@ export default class Chip {
     }
 
     protected updateOperation(operation: BuildableOperation) {
-        this.operationsByName.set(operation.name, operation);
+        if (!this.operationsByName.has(operation.name)) {
+            this.operationsByName.set(operation.name, operation);
+        } else {
+            const existingOperation = this.operationsByName.get(operation.name);
+            if (existingOperation) {
+                existingOperation.assignInputs(operation.inputs);
+                existingOperation.assignOutputs(operation.outputs);
+                existingOperation.pipeIdsByCore = operation.pipeIdsByCore;
+            }
+        }
     }
 
     private queuesByName: Map<QueueName, BuildableQueue>;
@@ -203,8 +212,6 @@ export default class Chip {
         }
     }
 
-    private operandsByName: Map<string, Operand> = new Map();
-
     protected createOperand(
         name: string,
         type: GraphVertexType,
@@ -212,17 +219,27 @@ export default class Chip {
         from?: GraphVertex,
         to?: GraphVertex,
     ): Operand {
-        let operand = this.operandsByName.get(name);
+        let operand: GraphVertex | undefined;
 
+        if (type === GraphVertexType.QUEUE) {
+            if (!this.queuesByName.has(name)) {
+                this.queuesByName.set(name, new BuildableQueue(name));
+            }
+            operand = this.queuesByName.get(name) as BuildableQueue;
+        }
+        if (type === GraphVertexType.OPERATION) {
+            if (!this.operationsByName.has(name)) {
+                console.log(`Operation ${name} does not exist, creating it`);
+                this.operationsByName.set(name, new BuildableOperation(name, [], [], []));
+            }
+            operand = this.operationsByName.get(name) as BuildableOperation;
+        }
         if (operand === undefined) {
-            operand = new Operand(name, type, pipesByCore, from, to);
-            this.operandsByName.set(name, operand);
+            throw new Error(`Operand ${name} is neither a queue nor an operation`);
         }
-        if (pipesByCore) {
+
+        if (pipesByCore && pipesByCore.size > 0) {
             operand.pipeIdsByCore = pipesByCore;
-        }
-        if (operand.type !== type) {
-            console.error(`${operand.name} type mismatch: ${operand.type} vs ${type}`);
         }
 
         return operand;
@@ -373,21 +390,21 @@ export default class Chip {
                     );
                     /** temporarily disabling this until new op-to-pipe with chip_id and graph_id is present */
                     // operation = new BuildableOperation(operationName, [], [], []);
-                    // chip.addOperation(operation);
-                    // TODO: we should add ALL operations but only add the operations that run on this chip to the chip. likely requires a separate structure (graph?)
+                    // augmentedChip.addOperation(operation);
+                    // TODO: we should add ALL operations but only add the operations that run on this chip to the augmentedChip. likely requires a separate structure (graph?)
                     //
                     return null;
                 }
 
                 const inputs = opJson.inputs.map((operandJson) =>
-                    chip.createOperand(
+                    augmentedChip.createOperand(
                         operandJson.name,
                         operandJson.type as GraphVertexType,
                         pipesAsMap(operandJson.pipes),
                     ),
                 );
                 const outputs = opJson.outputs.map((operandJson) =>
-                    chip.createOperand(
+                    augmentedChip.createOperand(
                         operandJson.name,
                         operandJson.type as GraphVertexType,
                         pipesAsMap(operandJson.pipes),
@@ -396,24 +413,24 @@ export default class Chip {
 
                 // Extract queues from input operands
                 inputs.forEach((operand) => {
-                    if (operand.type === GraphVertexType.QUEUE) {
+                    if (operand.vertexType === GraphVertexType.QUEUE) {
                         let queue = augmentedChip.queuesByName.get(operand.name);
                         if (!queue) {
                             queue = new BuildableQueue(operand.name);
-                            chip.addQueue(queue);
+                            augmentedChip.addQueue(queue);
                         }
-                        queue.assignOutputs([chip.createOperand(operationName, GraphVertexType.OPERATION)]);
+                        queue.assignOutputs([augmentedChip.createOperand(operationName, GraphVertexType.OPERATION)]);
                     }
                 });
                 // Extract queues from output operands
                 outputs.forEach((operand) => {
-                    if (operand.type === GraphVertexType.QUEUE) {
+                    if (operand.vertexType === GraphVertexType.QUEUE) {
                         let queue = augmentedChip.queuesByName.get(operand.name);
                         if (!queue) {
                             queue = new BuildableQueue(operand.name);
-                            chip.addQueue(queue);
+                            augmentedChip.addQueue(queue);
                         }
-                        queue.assignInputs([chip.createOperand(operationName, GraphVertexType.OPERATION)]);
+                        queue.assignInputs([augmentedChip.createOperand(operationName, GraphVertexType.OPERATION)]);
                     }
                 });
 
@@ -423,13 +440,13 @@ export default class Chip {
                 outputs.forEach((operand: Operand) => {
                     operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
-                            const pipe = chip.pipes.get(pipeId);
+                            const pipe = augmentedChip.pipes.get(pipeId);
                             if (pipe) {
                                 pipe.producerCoreOutputOperand = operand;
 
                                 if (!pipe.producerCores.includes(nodeId)) {
                                     pipe.producerCores.push(nodeId);
-                                    const node = chip.getNode(nodeId);
+                                    const node = augmentedChip.getNode(nodeId);
                                     if (node) {
                                         if (!node.producerPipes.includes(pipe)) {
                                             node.producerPipes.push(pipe);
@@ -438,7 +455,7 @@ export default class Chip {
                                 }
                             } else {
                                 console.warn(
-                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`,
+                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${augmentedChip.chipId}`,
                                 );
                             }
                         });
@@ -448,12 +465,12 @@ export default class Chip {
                 inputs.forEach((operand: Operand) => {
                     operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
-                            const pipe = chip.pipes.get(pipeId);
+                            const pipe = augmentedChip.pipes.get(pipeId);
                             if (pipe) {
                                 pipe.consumerCoreInputOperand = operand;
                                 if (!pipe.consumerCores.includes(nodeId)) {
                                     pipe.consumerCores.push(nodeId);
-                                    const node = chip.getNode(nodeId);
+                                    const node = augmentedChip.getNode(nodeId);
                                     if (node) {
                                         if (!node.consumerPipes.includes(pipe)) {
                                             node.consumerPipes.push(pipe);
@@ -462,7 +479,7 @@ export default class Chip {
                                 }
                             } else {
                                 console.warn(
-                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${chip.chipId}`,
+                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${augmentedChip.chipId}`,
                                 );
                             }
                         });
@@ -514,7 +531,7 @@ export default class Chip {
 
             // Extract queues from input operands
             inputs.forEach((operand) => {
-                if (operand.type === GraphVertexType.QUEUE) {
+                if (operand.vertexType === GraphVertexType.QUEUE) {
                     let queue = newChip.queuesByName.get(operand.name);
                     if (!queue) {
                         queue = new BuildableQueue(operand.name);
@@ -525,7 +542,7 @@ export default class Chip {
             });
             // Extract queues from output operands
             outputs.forEach((operand) => {
-                if (operand.type === GraphVertexType.QUEUE) {
+                if (operand.vertexType === GraphVertexType.QUEUE) {
                     let queue = newChip.queuesByName.get(operand.name);
                     if (!queue) {
                         queue = new BuildableQueue(operand.name);
@@ -535,8 +552,12 @@ export default class Chip {
                 }
             });
 
+            if (newChip.operationsByName.has(opName)) {
+                return newChip.operationsByName.get(opName) as BuildableOperation;
+            }
             return new BuildableOperation(opName, cores, inputs, outputs);
         });
+
         forEach(operations, (operation) => newChip.updateOperation(operation));
         return newChip;
     }
@@ -941,7 +962,22 @@ export class ComputeNode {
     public dramChannelId: number = -1;
 
     // TODO: check if reassigend operation is updated here.
-    public operation?: Operation;
+    private _operation: Operation | undefined = undefined;
+
+    public get operation(): Operation | undefined {
+        return this._operation;
+    }
+
+    public set operation(value: Operation | undefined) {
+        if (this._operation !== null) {
+            console.log('reassigning operation unexpectedly', value);
+            console.log('old operation', this._operation);
+        }
+        if (this._operation !== undefined) {
+            return;
+        }
+        this._operation = value;
+    }
 
     public perfAnalyzerResults?: CorePerfJson;
 

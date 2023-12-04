@@ -15,6 +15,9 @@ interface SelectableOperationProps {
     disabled?: boolean;
 }
 
+/**
+ * @description A selectable operation component that is really a selectable GraphVertex.
+ */
 const SelectableOperation: FC<SelectableOperationProps> = ({
     opName,
     selectFunc,
