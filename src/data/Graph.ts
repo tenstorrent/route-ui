@@ -94,6 +94,10 @@ export abstract class AbstractGraphVertex implements Operand {
         }
     }
 
+    get uniquePipeIds(): string[] {
+        return [...new Set([...this.pipeIdsByCore.values()].flat())];
+    }
+
     isConnected(): boolean {
         return !!(this.from && this.to);
     }
@@ -160,6 +164,7 @@ export interface Operand {
     to?: GraphVertex;
     pipeIdsByCore: Map<string, string[]>;
     perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
+    uniquePipeIds: string[];
 
     getPipeIdsForCore(coreId: string): string[];
 

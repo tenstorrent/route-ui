@@ -8,8 +8,8 @@ interface CollapsibleProps {
     label: string | JSX.Element;
     isOpen?: boolean;
     styles?: React.CSSProperties;
+    contentStyles?: React.CSSProperties;
 }
-
 
 /**
  *
@@ -19,7 +19,13 @@ interface CollapsibleProps {
  * @param children ReactNode
  * @constructor
  */
-const Collapsible: React.FC<React.PropsWithChildren<CollapsibleProps>> = ({ label, isOpen, styles , children}) => {
+const Collapsible: React.FC<React.PropsWithChildren<CollapsibleProps>> = ({
+    label,
+    isOpen=true,
+    styles= {},
+    contentStyles= {},
+    children,
+}) => {
     const [isOpenState, setIsOpenState] = React.useState(isOpen);
     useEffect(() => {
         setIsOpenState(isOpen);
@@ -27,18 +33,19 @@ const Collapsible: React.FC<React.PropsWithChildren<CollapsibleProps>> = ({ labe
 
     const icon = isOpenState ? IconNames.CARET_UP : IconNames.CARET_DOWN;
     return (
-        <div className='collapsible-component'>
+        <div className='collapsible-component' style={styles}>
             <Button small minimal onClick={() => setIsOpenState(!isOpenState)} rightIcon={icon}>
                 {label}
             </Button>
             <Collapse isOpen={isOpenState} keepChildrenMounted>
-                <div style={styles}>{children}</div>
+                <div style={contentStyles}>{children}</div>
             </Collapse>
         </div>
     );
 };
 
 Collapsible.defaultProps = {
+    contentStyles: {},
     styles: {},
     isOpen: true,
 };

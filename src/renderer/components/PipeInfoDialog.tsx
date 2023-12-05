@@ -64,7 +64,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
     return (
         <Tooltip2
             //
-            usePortal={false}
+            usePortal
             content={tooltipContent}
             position={Position.BOTTOM_RIGHT}
             hoverOpenDelay={150}

@@ -134,7 +134,7 @@ export default function GridRender() {
                     {/*     </> */}
                     {/* )} */}
                     <Collapsible
-                        styles={{
+                        contentStyles={{
                             display: 'flex',
                             flexDirection: 'column',
                         }}
@@ -172,7 +172,7 @@ export default function GridRender() {
                         <Collapsible
                             label='Congestion'
                             isOpen
-                            styles={{
+                            contentStyles={{
                                 display: 'flex',
                                 flexDirection: 'column',
                             }}

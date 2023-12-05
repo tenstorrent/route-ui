@@ -12,6 +12,9 @@ import SelectableOperation from '../SelectableOperation';
 import SearchField from '../SearchField';
 import GraphVertexDetails from '../GraphVertexDetails';
 import Collapsible from '../Collapsible';
+import SelectablePipe from '../SelectablePipe';
+import { PipeSegment } from '../../../data/Chip';
+import { NOCLinkName } from '../../../data/Types';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -86,7 +89,27 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                         }
                                         isOpen={allOpen}
                                     >
-                                        {operation && <GraphVertexDetails graphNode={operation} />}
+                                        <>
+                                            <Collapsible
+                                                label={<h5>pipes:</h5>}
+                                                isOpen={false}
+                                                styles={{ marginLeft: '20px' }}
+                                            >
+                                                <ul className='scrollable-content'>
+                                                    {operation.uniquePipeIds.map((pipeId) => (
+                                                        <li>
+                                                            <SelectablePipe
+                                                                pipeSegment={
+                                                                    new PipeSegment(pipeId, 0, NOCLinkName.NONE)
+                                                                }
+                                                                pipeFilter=''
+                                                            />
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </Collapsible>
+                                            {operation && <GraphVertexDetails graphNode={operation} />}
+                                        </>
                                     </Collapsible>
                                 }
                             />

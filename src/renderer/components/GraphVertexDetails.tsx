@@ -1,6 +1,10 @@
 import React, { FC } from 'react';
 import { GraphVertex, GraphVertexType } from '../../data/GraphTypes';
 import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
+import { PipeSegment } from '../../data/Chip';
+import { NOCLinkName } from '../../data/Types';
+import SelectablePipe from './SelectablePipe';
+import Collapsible from './Collapsible';
 
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;
@@ -36,19 +40,18 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {inputs.map((operand, index) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
-                    {/* DEBUGING RENDER */}
-                    {/* <ul> */}
-                    {/*     {[...operand.pipeIdsByCore.entries()].map(([coreId, pipeIds]) => ( */}
-                    {/*         <li style={{ display: 'list-item' }} key={coreId}> */}
-                    {/*             <p>{coreId}</p> */}
-                    {/*             <div> */}
-                    {/*                 {pipeIds.map((pipeId) => ( */}
-                    {/*                     <span>{pipeId}, </span> */}
-                    {/*                 ))} */}
-                    {/*             </div> */}
-                    {/*         </li> */}
-                    {/*     ))} */}
-                    {/* </ul> */}
+                    <Collapsible label={<h5>pipes:</h5>} isOpen={false}>
+                        <ul className='scrollable-content'>
+                            {operand.uniquePipeIds.map((pipeId) => (
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                        pipeFilter=''
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </Collapsible>
                 </div>
             ))}
 
@@ -56,19 +59,18 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {outputs.map((operand, index) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
-                    {/* DEBUGING RENDER */}
-                    {/* <ul> */}
-                    {/*     {[...operand.pipeIdsByCore.entries()].map(([coreId, pipeIds]) => ( */}
-                    {/*         <li style={{ display: 'list-item' }} key={coreId}> */}
-                    {/*             <p>{coreId}</p> */}
-                    {/*             <div> */}
-                    {/*                 {pipeIds.map((pipeId) => ( */}
-                    {/*                     <span>{pipeId}, </span> */}
-                    {/*                 ))} */}
-                    {/*             </div> */}
-                    {/*         </li> */}
-                    {/*     ))} */}
-                    {/* </ul> */}
+                    <Collapsible label={<h5>pipes:</h5>} isOpen={false}>
+                        <ul className='scrollable-content'>
+                            {operand.uniquePipeIds.map((pipeId) => (
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                        pipeFilter=''
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </Collapsible>
                 </div>
             ))}
         </div>
