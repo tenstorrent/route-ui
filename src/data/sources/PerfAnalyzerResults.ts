@@ -58,12 +58,10 @@ interface MeasurementsJSON {
     bw_bound_total_runtime: number;
     bw_bound_runtime_per_input: number;
     bw_bound_math_utilization: number;
-    output_pipe_bw_0: number; // Available vs required bandwidth for all operands
-    required_output_pipe_bw_0: number;
-    input_pipe_bw_0: number;
-    required_input_bw_0: number;
-    input_pipe_bw_1: number;
-    required_input_bw_1: number;
+    [key: `input_pipe_bw_${number}`]: number;
+    [key: `output_pipe_bw_${number}`]: number; // Available vs required bandwidth for all operands
+    [key: `required_input_bw_${number}`]: number;
+    [key: `required_output_bw_${number}`]: number;
 }
 
 export interface CoreMeasurementsJSON {
