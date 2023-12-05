@@ -7,7 +7,7 @@ import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
 import Chip from '../data/Chip';
 import { SideBar } from './components/SideBar';
-import BottomDock from './components/BottomDock';
+import BottomDock from './components/bottom-dock/BottomDock';
 
 export interface MainRouteRendererProps {
     updateData: (data: Chip) => void;
