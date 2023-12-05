@@ -2,6 +2,8 @@ import type { ComputeNode } from './Chip';
 import type { Operand } from './Graph';
 import type { QueueDetailsJson } from './sources/QueueDescriptor';
 import { OpPerfJSON } from './sources/PerfAnalyzerResults';
+import { OperationDetails } from './sources/GraphDescriptor';
+import { MeasurementDetails } from './OpPerfDetails';
 
 export type OperationName = string;
 export type QueueName = string;
@@ -33,7 +35,7 @@ export interface Operation extends HasOperands, Operand {
     readonly name: OperationName;
     readonly vertexType: GraphVertexType.OPERATION;
     readonly cores: Iterable<ComputeNode>;
-    details?: OpPerfJSON;
+    details?: MeasurementDetails
 }
 
 /** Type alias enumerates the possible GraphVertex types (cannot be done with subclasses alone) */
