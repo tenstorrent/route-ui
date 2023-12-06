@@ -17,6 +17,7 @@ import { getAvailableGraphNames, loadGraph, validatePerfResultsFolder } from 'ut
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
 import { useState } from 'react';
+import { sortPerfAnalyzerFiles } from 'utils/FilenameSorters';
 import usePopulateChipData from './usePopulateChipData.hooks';
 
 type PerfAnalyzerFileLoaderHook = {
@@ -65,7 +66,8 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         try {
             const graphs = await getAvailableGraphNames(folderPath);
             dispatch(setSelectedFolder(folderPath));
-            dispatch(setAvailableGraphs(graphs));
+            const sortedGraphs = sortPerfAnalyzerFiles(graphs);
+            dispatch(setAvailableGraphs(sortedGraphs));
             setEnableGraphSelect(true);
         } catch (e) {
             const err = e as Error;
