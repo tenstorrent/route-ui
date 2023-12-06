@@ -1,4 +1,12 @@
-const OperationsTableDictionary = {
+import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
+
+export type OperationsTableDictionaryKeyType = keyof OpPerfJSON | 'operation';
+
+type OperationsTableDictionaryType = {
+    [key in OperationsTableDictionaryKeyType]: string;
+};
+
+const OperationsTableDictionary: Partial<OperationsTableDictionaryType> = {
     grid_size: 'Grid',
     operation: 'Operation',
     kernel_total_runtime: 'Kernel Total Runtime',
