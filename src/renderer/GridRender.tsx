@@ -4,16 +4,16 @@ import { Button, Classes, NumericInput, Position, Slider, Switch } from '@bluepr
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
 import {
+    updateCLK,
+    updateDRAMBandwidth,
     updateLinkSaturation,
+    updatePCIBandwidth,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
     updateTotalOPs,
-    updateCLK,
-    updateDRAMBandwidth,
-    updatePCIBandwidth,
 } from 'data/store/slices/linkSaturation.slice';
 import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
-import { selectAllPipes, clearAllPipes, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
+import { clearAllPipes, selectAllPipes, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
 import { RootState } from 'data/store/createStore';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
@@ -30,9 +30,10 @@ import {
     PCIE_BANDWIDTH_INITIAL_GBS,
 } from '../data/constants';
 import { NOC } from '../data/Types';
-import { mapIterable } from '../utils/IterableHelpers';
+import { forEach, mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
-import { Queue } from '../data/GraphTypes';
+import { OperandDirection } from '../data/OpPerfDetails';
+import { Operand } from '../data/Graph';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -87,6 +88,29 @@ export default function GridRender() {
     //         );
     //     }),
     // );
+
+    /** this is a sample use of the new op perf details */
+    // TODO: move this to an operation/operand of whereever this makes sense. this business logic must live on data layer
+    if (chip) {
+        forEach(chip?.operations, (op) => {
+            console.group(op.name);
+            const slowestOperand = op.details?.slowestOperand;
+            let bottleneck: Operand | null = null;
+            if (slowestOperand) {
+                const slowestOperandDetails = op.details?.slowestOperandDetails;
+                if (slowestOperandDetails) {
+                    if (slowestOperandDetails.type === OperandDirection.INPUT) {
+                        bottleneck = [...op.inputs][slowestOperandDetails.index];
+                    } else if (slowestOperandDetails.type === OperandDirection.OUTPUT) {
+                        bottleneck = [...op.outputs][slowestOperandDetails.index];
+                    }
+                }
+            }
+            console.log(op.details);
+            console.log(bottleneck);
+            console.groupEnd();
+        });
+    }
 
     useEffect(() => {
         if (chip) {

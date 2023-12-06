@@ -1,5 +1,4 @@
 /* eslint-disable no-useless-constructor */
-import { process } from '@electron/remote';
 import {
     ChipDesignJSON,
     DramChannelJSON,
@@ -37,7 +36,8 @@ import {
     OperationDetails,
 } from './sources/GraphDescriptor';
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
-import { CorePerfJson, OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
+import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
+import { MeasurementDetails, OperandDirection, OpPerfDetails } from './OpPerfDetails';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -454,6 +454,8 @@ export default class Chip {
                                     }
                                 }
                             } else {
+                                // this might be a normal course of things, as per Xander those pipes are preexisting befor the graph is executed.
+                                // we might want to remove those segments alltogether if they are proven irrelevant or have a way to mark them in UI
                                 console.warn(
                                     `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${augmentedChip.chipId}`,
                                 );
@@ -478,6 +480,7 @@ export default class Chip {
                                     }
                                 }
                             } else {
+                                // ditto as above
                                 console.warn(
                                     `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${augmentedChip.chipId}`,
                                 );
@@ -591,7 +594,7 @@ export default class Chip {
         forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
             const node = chip.getNode(nodeUid);
             if (node.type === ComputeNodeType.CORE) {
-                node.perfAnalyzerResults = perfAnalyzerJson[node.uid];
+                node.perfAnalyzerResults = new MeasurementDetails(perfAnalyzerJson[node.uid]);
             } else {
                 console.error('Attempted to add perf details to a node that is not a core:', nodeUid, node);
             }
@@ -607,7 +610,7 @@ export default class Chip {
         forEach(perfAnalyzerResultsOps.entries(), ([opName, opDetails]) => {
             const operation = newChip.getOperation(opName);
             if (operation) {
-                operation.details = opDetails;
+                operation.details = new OpPerfDetails(opDetails);
             }
         });
 
@@ -969,17 +972,13 @@ export class ComputeNode {
     }
 
     public set operation(value: Operation | undefined) {
-        if (this._operation !== null) {
-            console.log('reassigning operation unexpectedly', value);
-            console.log('old operation', this._operation);
-        }
         if (this._operation !== undefined) {
             return;
         }
         this._operation = value;
     }
 
-    public perfAnalyzerResults?: CorePerfJson;
+    public perfAnalyzerResults?: MeasurementDetails;
 
     constructor(uid: string, operation?: Operation) {
         this.uid = uid;

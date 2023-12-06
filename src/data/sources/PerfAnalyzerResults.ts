@@ -46,7 +46,7 @@ export interface OpPerfJSON extends MeasurementsJSON, OpAttributesJSON {}
 
 export interface CorePerfJson extends MeasurementsJSON {}
 
-interface MeasurementsJSON {
+export interface MeasurementsJSON {
     warnings: string;
     kernel_total_runtime: number; // Key result for ranking op & core performance
     kernel_runtime_per_input: number;

@@ -5,6 +5,7 @@ import { GraphVertexType } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 import { OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { ComputeNode } from './Chip';
+import { OpPerfDetails } from './OpPerfDetails';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -29,11 +30,11 @@ export abstract class AbstractGraphVertex implements Operand {
 
     public set pipeIdsByCore(value: Map<string, string[]>) {
         // console.log(`updating ${this.name} with ${value.size}`);
-        if(this._pipeIdsByCore.size > 0) {
+        if (this._pipeIdsByCore.size > 0) {
             value.forEach((pipeids, key) => {
-                if(this._pipeIdsByCore.has(key)) {
+                if (this._pipeIdsByCore.has(key)) {
                     this._pipeIdsByCore.get(key)!.push(...pipeids);
-                }else{
+                } else {
                     this._pipeIdsByCore.set(key, pipeids);
                 }
             });
@@ -132,7 +133,7 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         cores.forEach((core) => this.assignCore(core));
     }
 
-    details?: OpPerfJSON;
+    details?: OpPerfDetails;
 
     /** Creates a mutual association between this Operation and the provided core, such that `core.operation` will
      * reference this operation.
