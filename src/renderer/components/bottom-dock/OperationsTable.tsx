@@ -1,20 +1,22 @@
-/* eslint-disable react/no-unstable-nested-components */
-import { Table2, Column, Cell, ColumnHeaderCell2 } from '@blueprintjs/table';
+import { Cell, Column, ColumnHeaderCell2, Table2 } from '@blueprintjs/table';
 import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
-import useOperationsTable from './useOperationsTable.hooks';
+import { useCallback } from 'react';
 import OperationsTableDictionary from './operationsTable.dict';
 import SortingMenu from './shared/SortingMenu';
+import useOperationsTable from './useOperationsTable.hooks';
 
 function OperationsTable() {
     const { operations, changeSorting, sortDirection, sortingColumn } = useOperationsTable();
 
     const operationRenderer = (rowIndex: number) => <Cell>{operations[rowIndex].name}</Cell>;
 
+    const renderMenu = useCallback(
+        (column: keyof OpPerfJSON | 'operation') => <SortingMenu sortFunction={changeSorting(column)} />,
+        [changeSorting],
+    );
+
     const headerRenderer = (column: keyof OpPerfJSON | 'operation') => (
-        <ColumnHeaderCell2
-            name={OperationsTableDictionary[column]}
-            menuRenderer={() => <SortingMenu sortFunction={changeSorting(column)} />}
-        />
+        <ColumnHeaderCell2 name={OperationsTableDictionary[column]} menuRenderer={() => renderMenu(column)} />
     );
 
     const cellRenderer = (key: keyof OpPerfJSON, rowIndex: number) => {
