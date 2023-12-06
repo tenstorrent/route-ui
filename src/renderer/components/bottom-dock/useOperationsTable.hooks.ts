@@ -23,18 +23,26 @@ function useOperationsTable(): OperationsTableHook {
     const { chip } = useContext(DataSource);
     const operations = useMemo(() => {
         const inputOperations = [...(chip?.operations ?? [])];
-        if (sortingColumn === 'operation') {
+        // Netlist analyzer files do not load operation details, so this needs a protection block otherwise the sorting will crash the app
+
+        try {
+            if (sortingColumn === 'operation') {
+                const sortedOperations =
+                    sortDirection === 'asc'
+                        ? inputOperations.sort((a, b) => sortAsc(a.name, b.name))
+                        : inputOperations.sort((a, b) => sortDesc(a.name, b.name));
+                return sortedOperations;
+            }
             const sortedOperations =
                 sortDirection === 'asc'
-                    ? inputOperations.sort((a, b) => sortAsc(a.name, b.name))
-                    : inputOperations.sort((a, b) => sortDesc(a.name, b.name));
+                    ? inputOperations.sort((a, b) => sortAsc(a.details![sortingColumn], b.details![sortingColumn]))
+                    : inputOperations.sort((a, b) => sortDesc(a.details![sortingColumn], b.details![sortingColumn]));
             return sortedOperations;
+        } catch (err) {
+            const error = err as Error;
+            console.error('error on selecting/sorting operators', error.message);
+            return [];
         }
-        const sortedOperations =
-            sortDirection === 'asc'
-                ? inputOperations.sort((a, b) => sortAsc(a.details![sortingColumn], b.details![sortingColumn]))
-                : inputOperations.sort((a, b) => sortDesc(a.details![sortingColumn], b.details![sortingColumn]));
-        return sortedOperations;
     }, [sortingColumn, chip, sortDirection]);
 
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {
