@@ -1,7 +1,7 @@
 import {
     clearAvailableGraphs,
     setAvailableGraphs,
-    setSelectedApplication,
+    setApplicationMode,
     setSelectedFile,
 } from 'data/store/slices/uiState.slice';
 
@@ -68,7 +68,7 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
     const handleSelectNetlistFile = async (): Promise<void> => {
         const filename = selectFileDialog();
         if (filename) {
-            dispatch(setSelectedApplication(ApplicationMode.NETLIST_ANALYZER));
+            dispatch(setApplicationMode(ApplicationMode.NETLIST_ANALYZER));
             await loadFileList(filename);
             await loadNetlistFile(filename);
         }

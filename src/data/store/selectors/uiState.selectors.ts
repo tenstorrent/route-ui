@@ -6,4 +6,4 @@ export const getGraphNameSelector = (state: RootState) => state.uiState.graphNam
 export const getFolderPathSelector = (state: RootState) => state.uiState.folderPath;
 export const getArchitectureSelector = (state: RootState) => state.uiState.architecture;
 export const getAvailableGraphsSelector = (state: RootState) => state.uiState.availableGraphs;
-export const getApplicationSelector = (state: RootState) => state.uiState.selectedApplication;
+export const getApplicationMode = (state: RootState) => state.uiState.applicationMode;

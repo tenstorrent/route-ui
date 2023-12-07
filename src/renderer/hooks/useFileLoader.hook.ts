@@ -1,6 +1,6 @@
 import { ApplicationMode } from 'data/Types';
 import {
-    getApplicationSelector,
+    getApplicationMode,
     getAvailableGraphsSelector,
     getFolderPathSelector,
     getGraphNameSelector,
@@ -17,7 +17,7 @@ type FileLoaderHook = {
 };
 
 const useFileLoader = (): FileLoaderHook => {
-    const selectedApplication = useSelector(getApplicationSelector);
+    const applicationMode = useSelector(getApplicationMode);
     const selectedFolder = useSelector(getFolderPathSelector);
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
@@ -27,10 +27,10 @@ const useFileLoader = (): FileLoaderHook => {
 
     const handleSelectGraph = (name: string): void => {
         try {
-            if (selectedApplication === ApplicationMode.NETLIST_ANALYZER) {
+            if (applicationMode === ApplicationMode.NETLIST_ANALYZER) {
                 const fileName = path.join(selectedFolder, name);
                 loadNetlistFile(fileName);
-            } else if (selectedApplication === ApplicationMode.PERF_ANALYZER) {
+            } else if (applicationMode === ApplicationMode.PERF_ANALYZER) {
                 loadPerfAnalyzerGraph(name);
             }
         } catch (err) {

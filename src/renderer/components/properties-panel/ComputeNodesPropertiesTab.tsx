@@ -10,14 +10,13 @@ import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
-import { ComputeNodeType, NOCLinkName, QueueLocation } from '../../../data/Types';
+import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import LinkDetails from '../LinkDetails';
 import GraphVertexDetails from '../GraphVertexDetails';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import Collapsible from '../Collapsible';
-import { Operand } from '../../../data/Graph';
 
 interface ComputeNodeProps {
     node: ComputeNode;
