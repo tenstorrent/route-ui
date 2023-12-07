@@ -18,7 +18,7 @@ import { RootState } from 'data/store/createStore';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
 import DataSource, { GridContext } from '../data/DataSource';
-import { calculateLinkCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
+import { calculateLinkCongestionColor, calculateOpCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
 
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
@@ -34,6 +34,14 @@ import { forEach, mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
 import { OperandDirection } from '../data/OpPerfDetails';
 import { Operand } from '../data/Graph';
+import {
+    getOperationPerformanceTreshold,
+    getShowOperationPerformanceGrid
+} from '../data/store/selectors/operationPerf.selectors';
+import {
+    updateOperationPerformanceThreshold,
+    updateShowOperationPerformanceGrid
+} from '../data/store/slices/operationPerf.slice';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -60,6 +68,9 @@ export default function GridRender() {
         dispatch(updateShowLinkSaturation(value));
     };
 
+    const onOpCongestionChange = (value: number) => {
+        dispatch(updateOperationPerformanceThreshold(value))
+    }
     const onShowLinkSaturationForNOC = (noc: NOC, selected: boolean) => {
         dispatch(updateShowLinkSaturationForNOC({ noc, selected }));
         if (noc === NOC.NOC0) {
@@ -77,6 +88,15 @@ export default function GridRender() {
             isHC,
         )}, ${calculateLinkCongestionColor(50, 0, isHC)}, ${calculateLinkCongestionColor(120, 0, isHC)})`,
     };
+
+    const opCongestionLegendStyle = {
+        background: `linear-gradient(to right, ${calculateOpCongestionColor(
+            0,
+            0,
+            isHC,
+        )}, ${calculateOpCongestionColor(5, 0, isHC)}, ${calculateOpCongestionColor(10, 0, isHC)})`,
+    };
+
 
     // eslint-disable-next-line no-unsafe-optional-chaining
     // console.log(
@@ -190,7 +210,33 @@ export default function GridRender() {
                             <hr />
                         </>
                     </Collapsible>
-                    {/* TODO: abstract this into a global state */}
+
+
+                    <Switch
+                        // checked={getShowOperationPerformanceGrid(useSelector((state: RootState) => state))}
+                        checked={useSelector(getShowOperationPerformanceGrid)}
+                        label='Op Perf'
+                        onChange={(event) => dispatch(updateShowOperationPerformanceGrid(event.currentTarget.checked))}
+                    />
+                    <div
+                        className='congestion-legend'
+                        style={{
+                            ...(useSelector(getShowOperationPerformanceGrid) ? opCongestionLegendStyle : null),
+                            width: '100%',
+                            height: '3px',
+                        }}
+                    />
+                    <Slider
+                        className='link-saturation-slider'
+                        min={0}
+                        max={10}
+                        disabled={!useSelector(getShowOperationPerformanceGrid)}
+                        labelStepSize={5}
+                        value={useSelector(getOperationPerformanceTreshold)}
+                        onChange={onOpCongestionChange}
+                        labelRenderer={(value) => `${value.toFixed(0)}`}
+                    />
+                    <hr />
 
                     {chip?.hasPipes && (
                         <Collapsible
