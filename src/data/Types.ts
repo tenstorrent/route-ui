@@ -84,3 +84,23 @@ export enum DRAMBank {
     BANK0 = 'bank0',
     BANK1 = 'bank1',
 }
+
+export enum HighlightType {
+    INPUT = 'input',
+    OUTPUT = 'output',
+    NONE = '',
+}
+
+export enum QueueLocation {
+    NONE = '',
+    HOST = 'HOST',
+    DRAM = 'DRAM',
+}
+
+export enum ApplicationMode {
+    NONE = '',
+    PERF_ANALYZER = 'perf-analyzer',
+    NETLIST_ANALYZER = 'netlist-analyzer',
+    // For the future
+    PERF_UI = 'perf-ui',
+}

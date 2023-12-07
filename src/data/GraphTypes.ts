@@ -1,6 +1,9 @@
 import type { ComputeNode } from './Chip';
 import type { Operand } from './Graph';
-import type { QueueDetailsJson } from "./sources/QueueDescriptor";
+import type { QueueDetailsJson } from './sources/QueueDescriptor';
+import { OpPerfJSON } from './sources/PerfAnalyzerResults';
+import { OperationDetails } from './sources/GraphDescriptor';
+import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
 
 export type OperationName = string;
 export type QueueName = string;
@@ -20,17 +23,19 @@ interface HasOperands {
     readonly outputs: Iterable<Operand>;
 }
 
-export interface Queue extends HasOperands {
+// TODO: there is a possible inconsistency with detailes vs attributs and measurements
+
+export interface Queue extends HasOperands, Operand {
     readonly name: QueueName;
     readonly vertexType: GraphVertexType.QUEUE;
     readonly details?: QueueDetailsJson;
-
 }
 
-export interface Operation extends HasOperands {
+export interface Operation extends HasOperands, Operand {
     readonly name: OperationName;
     readonly vertexType: GraphVertexType.OPERATION;
     readonly cores: Iterable<ComputeNode>;
+    details?: OpPerfDetails
 }
 
 /** Type alias enumerates the possible GraphVertex types (cannot be done with subclasses alone) */

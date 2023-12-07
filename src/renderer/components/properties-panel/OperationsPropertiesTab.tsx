@@ -3,14 +3,18 @@ import React, { useContext, useMemo, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
+import { selectGroup, clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import { RootState } from 'data/store/createStore';
 
-import { clearAllOperations, RootState, selectGroup } from '../../../data/store';
 import DataSource from '../../../data/DataSource';
 import FilterableComponent from '../FilterableComponent';
 import SelectableOperation from '../SelectableOperation';
 import SearchField from '../SearchField';
 import GraphVertexDetails from '../GraphVertexDetails';
 import Collapsible from '../Collapsible';
+import SelectablePipe from '../SelectablePipe';
+import { PipeSegment } from '../../../data/Chip';
+import { NOCLinkName } from '../../../data/Types';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -46,10 +50,18 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[
-                        <Tooltip2 content='Select all filtered operations' position={PopoverPosition.RIGHT} key='select-all-ops'>
+                        <Tooltip2
+                            content='Select all filtered operations'
+                            position={PopoverPosition.RIGHT}
+                            key='select-all-ops'
+                        >
                             <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                         </Tooltip2>,
-                        <Tooltip2 content='Deselect all operations' position={PopoverPosition.RIGHT} key='deselect-all-ops'>
+                        <Tooltip2
+                            content='Deselect all operations'
+                            position={PopoverPosition.RIGHT}
+                            key='deselect-all-ops'
+                        >
                             <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
                         </Tooltip2>,
                     ]}
@@ -77,7 +89,27 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                         }
                                         isOpen={allOpen}
                                     >
-                                        {operation && <GraphVertexDetails graphNode={operation} />}
+                                        <>
+                                            <Collapsible
+                                                label={<h5>pipes:</h5>}
+                                                isOpen={false}
+                                                styles={{ marginLeft: '20px' }}
+                                            >
+                                                <ul className='scrollable-content'>
+                                                    {operation.uniquePipeIds.map((pipeId) => (
+                                                        <li>
+                                                            <SelectablePipe
+                                                                pipeSegment={
+                                                                    new PipeSegment(pipeId, 0, NOCLinkName.NONE)
+                                                                }
+                                                                pipeFilter=''
+                                                            />
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </Collapsible>
+                                            {operation && <GraphVertexDetails graphNode={operation} />}
+                                        </>
                                     </Collapsible>
                                 }
                             />

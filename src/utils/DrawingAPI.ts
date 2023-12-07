@@ -9,7 +9,7 @@ import {
     NOCLinkName,
     PCIeLinkName,
 } from '../data/Types';
-import { MAX_CONGESTION_VALUE } from '../data/constants';
+import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../data/constants';
 
 export const NODE_SIZE = 100;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
@@ -457,6 +457,23 @@ export const drawNOCRouter = (
         .attr('stroke-width', 2)
         .attr('fill', '#9e9e9e')
         .attr('stroke', '#9e9e9e');
+};
+
+export const calculateOpCongestionColor = (
+    value: number,
+    min: number = 0,
+    max: number = MAX_OPERATION_PERFORMANCE_THRESHOLD,
+    isHC: boolean = false,
+): string => {
+    // const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
+    const normalizedVal = Math.min(value, max);
+    const ratio = (normalizedVal - min) / (max - min);
+    const intensity = Math.round(ratio * 255);
+    if (isHC) {
+        return `rgb(${intensity},${intensity},${255 - intensity})`;
+    }
+
+    return `rgb(${intensity}, ${255 - intensity}, 0)`;
 };
 
 export const calculateLinkCongestionColor = (value: number, min: number = 0, isHC: boolean = false): string => {

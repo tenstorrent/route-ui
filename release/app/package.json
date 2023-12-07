@@ -1,7 +1,7 @@
 {
   "name": "route-ui",
-  "version": "0.3.1-alpha-1",
-  "description": "Tenstorrent RouteUI",
+  "version": "0.4.0",
+  "description": "Tenstorrent Perf Debug Analyzer",
   "license": "None",
   "author": {
     "name": "Denis Kartashevskiy"

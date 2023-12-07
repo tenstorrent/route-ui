@@ -1,25 +1,23 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import path from 'path';
 import { Button, Switch } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { getDockOpenState, RootState, setHighContrastState, setDockOpenState } from '../../data/store';
+import {
+    getArchitectureSelector,
+    getDockOpenState,
+    getFolderPathSelector,
+    getHighContrastState,
+} from 'data/store/selectors/uiState.selectors';
+import { setDockOpenState, setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
+import GraphSelector from './graph-selector/GraphSelector';
 
 const TopHeaderComponent: React.FC = () => {
     const dispatch = useDispatch();
-    const isHighContrast = useSelector((state: RootState) => {
-        return state.highContrast.enabled;
-    });
-
-    const fileName = useSelector((state: RootState) => {
-        return state.nodeSelection.filename;
-    });
-    const architecture = useSelector((state: RootState) => {
-        return state.nodeSelection.architecture;
-    });
-
-    const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
+    const isHighContrast = useSelector(getHighContrastState);
+    const isDockOpen = useSelector(getDockOpenState);
+    const architecture = useSelector(getArchitectureSelector);
+    const folderPath = useSelector(getFolderPathSelector);
 
     return (
         <div className='top-header-component'>
@@ -28,10 +26,23 @@ const TopHeaderComponent: React.FC = () => {
                 label='Enable high contrast'
                 onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
             />
+
             <div className='text-content'>
-                {architecture ? ` Architecture: ${architecture}` : ''} |{' '}
-                {fileName ? `Loaded ${path.basename(fileName[0])}` : ''}
+                {architecture ? (
+                    <span>
+                        Architecture: <span className='architecture-label'>{architecture}</span>
+                    </span>
+                ) : (
+                    ''
+                )}
+                <GraphSelector />
             </div>
+            {folderPath && (
+                <div className='text-content'>
+                    <span>Selected Folder: </span>
+                    <span className='path-label'>{folderPath}</span>
+                </div>
+            )}
             {process.env.NODE_ENV === 'development' && (
                 <Button
                     icon={IconNames.APPLICATION}

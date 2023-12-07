@@ -1,4 +1,4 @@
-import { ComputeNodeTypeArch } from './Types';
+import { Architecture, ComputeNodeTypeArch } from './Types';
 
 export interface NodeDataJSON {
     location: number[];
@@ -65,4 +65,9 @@ export interface ChipDesignJSON {
     router_only: string[];
     functional_workers: string[];
     [unknownKey: string]: unknown;
+}
+
+// TODO: Populate this interface with (possible) missing attributes
+export interface MetadataJSON {
+    arch_name: string;
 }

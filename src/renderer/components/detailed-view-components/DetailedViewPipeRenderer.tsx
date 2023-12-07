@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { useSelector } from 'react-redux';
+import { RootState } from 'data/store/createStore';
+import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
+
 import { NetworkLink, NOCLink } from '../../../data/Chip';
 import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
-import { RootState } from '../../../data/store';
 import { PipeSelection } from '../../../data/StateTypes';
 import {
     DramBankLinkName,
@@ -25,7 +27,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
     const showLinkSaturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturation);
     const linkSaturationTreshold = useSelector((state: RootState) => state.linkSaturation.linkSaturation);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
-    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
+    const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
     const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
@@ -88,8 +90,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         noc1Saturation,
         isHighContrast,
     ]);
-
-    console.log(links);
+    
     const linkNames = links.map((link) => link.name).join(' ');
     return (
         <div className='pipe-renderer' data-links={linkNames}>

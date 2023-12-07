@@ -1,10 +1,12 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { RootState } from 'data/store/createStore';
+import { getLinkData } from 'data/store/selectors/linkSaturation.selectors';
+import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 import { PipeSegment, convertBytes, NetworkLink } from '../../data/Chip';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';
-import { getLinkData, RootState } from '../../data/store';
 
 type LinkDetailsProps = {
     link: NetworkLink;
@@ -13,7 +15,7 @@ type LinkDetailsProps = {
 };
 
 const LinkDetails: React.FC<LinkDetailsProps> = ({ link, showEmpty, index }) => {
-    const isHighContrast = useSelector((state: RootState) => state.highContrast.enabled);
+    const isHighContrast = useSelector(getHighContrastState);
     const linkState = useSelector((state: RootState) => getLinkData(state, link.uid));
     const color: string = calculateLinkCongestionColor(linkState?.saturation || 0, 0, isHighContrast);
 

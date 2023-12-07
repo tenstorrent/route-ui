@@ -1,23 +1,22 @@
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Card, Checkbox, PopoverPosition } from '@blueprintjs/core';
+import { Button, Card, PopoverPosition } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
+import { RootState } from 'data/store/createStore';
+import { openDetailedView } from 'data/store/slices/detailedView.slice';
+import { selectGroup, selectQueue, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import DataSource from '../../../data/DataSource';
-import {
-    openDetailedView,
-    RootState,
-    selectGroup,
-    updateNodeSelection,
-    updatePipeSelection,
-} from '../../../data/store';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
-import { GraphVertexType } from '../../../data/GraphTypes';
 import SelectablePipe from '../SelectablePipe';
 import LinkDetails from '../LinkDetails';
+import GraphVertexDetails from '../GraphVertexDetails';
+import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import Collapsible from '../Collapsible';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -63,9 +62,6 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
             dispatch(updatePipeSelection({ id: pipeId, selected: state }));
         });
     };
-    const setSelectionState = (selected: boolean) => {
-        dispatch(updateNodeSelection({ id: node.uid, selected }));
-    };
 
     const setOperationSelectionState = (opName: string, selected: boolean) =>
         dispatch(
@@ -74,10 +70,16 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 selected,
             }),
         );
+    const setQueueSelectionState = (queueName: string, selected: boolean) =>
+        dispatch(
+            selectQueue({
+                queueName,
+                selected,
+            }),
+        );
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
-
     return (
         <Card className='node-element'>
             <h3
@@ -91,19 +93,19 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                         small
                         icon={IconNames.CROSS}
                         onClick={() => {
-                            setSelectionState(false);
+                            dispatch(updateNodeSelection({ id: node.uid, selected: false }));
                         }}
                     />
                 </Tooltip2>
             </h3>
             {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
-            {node.type === ComputeNodeType.DRAM ? (
+            {node.type === ComputeNodeType.DRAM && (
                 <p>
                     Channel {node.dramChannelId}, Sub {node.dramSubchannelId}
                 </p>
-            ) : null}
+            )}
             {node.operation && (
-                <div className='opname'>
+                <div className='opname theme-dark'>
                     <Tooltip2 content={node.operation.name} position={PopoverPosition.LEFT}>
                         <SelectableOperation
                             opName={node.operation.name}
@@ -113,31 +115,50 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                         />
                     </Tooltip2>
                     {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics coreNode={node} />}
+                    <Collapsible label={<h5>Op pipes:</h5>} isOpen styles={{ marginLeft: '20px' }}>
+                        <ul className="scrollable-content">
+                            {node.operation.uniquePipeIds.map((pipeId) => (
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                        pipeFilter=''
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </Collapsible>
+                </div>
+            )}
+
+            {node.queueList.length > 0 && (
+                <div className='opname theme-dark'>
+                    <Collapsible label={<h4>Queues:</h4>} isOpen>
+                        {node.queueList.map((queue) => (
+                            <>
+                                <SelectableOperation
+                                    disabled={nodesSelectionState.queues[queue.name]?.selected === undefined}
+                                    opName={queue.name}
+                                    value={nodesSelectionState.queues[queue.name]?.selected}
+                                    selectFunc={setQueueSelectionState}
+                                    stringFilter=''
+                                />
+                                <GraphVertexDetails graphNode={queue} showQueueDetails={false} />
+                            </>
+                        ))}
+                    </Collapsible>
                 </div>
             )}
             {node.operation && (
-                <div className='opname'>
+                <div className='opname theme-dark'>
                     {inputs && inputs.length && <h4 className='io-label'>Inputs:</h4>}
                     {inputs &&
-                        inputs.map((io) => (
+                        inputs.map((operand) => (
                             <ul className='scrollable-content'>
-                                <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
-                                    <div key={io.name} style={{ fontSize: '12px' }}>
-                                        {io.type === GraphVertexType.OPERATION ? (
-                                            <SelectableOperation
-                                                opName={io.name}
-                                                value={nodesSelectionState.groups[io.name]?.selected}
-                                                selectFunc={setOperationSelectionState}
-                                                stringFilter=''
-                                            />
-                                        ) : (
-                                            <div className='op-element'>
-                                                <Checkbox checked={false} disabled />
-                                                <span>{io.name}</span>
-                                            </div>
-                                        )}
+                                <Tooltip2 content={operand.name} position={PopoverPosition.TOP}>
+                                    <div key={operand.name} style={{ fontSize: '12px' }}>
+                                        <GraphVertexDetailsSelectables operand={operand} />
                                         <ul className='scrollable-content'>
-                                            {io.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                            {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
                                                     <SelectablePipe
                                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
@@ -152,25 +173,13 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                         ))}
                     {outputs && outputs.length && <h4 className='io-label'>Outputs:</h4>}
                     {outputs &&
-                        outputs.map((io) => (
+                        outputs.map((operand) => (
                             <ul className='scrollable-content'>
-                                <Tooltip2 content={io.name} position={PopoverPosition.TOP}>
-                                    <div key={io.name} style={{ fontSize: '12px' }}>
-                                        {io.type === GraphVertexType.OPERATION ? (
-                                            <SelectableOperation
-                                                opName={io.name}
-                                                value={nodesSelectionState.groups[io.name]?.selected}
-                                                selectFunc={setOperationSelectionState}
-                                                stringFilter=''
-                                            />
-                                        ) : (
-                                            <div className='op-element'>
-                                                <Checkbox checked={false} disabled />
-                                                <span>{io.name}</span>
-                                            </div>
-                                        )}
+                                <Tooltip2 content={operand.name} position={PopoverPosition.TOP}>
+                                    <div key={operand.name} style={{ fontSize: '12px' }}>
+                                        <GraphVertexDetailsSelectables operand={operand} />
                                         <ul className='scrollable-content'>
-                                            {io.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                            {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
                                                 <li>
                                                     <SelectablePipe
                                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
@@ -186,7 +195,9 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 </div>
             )}
             <div className='node-controls'>
-                {(node.type === ComputeNodeType.DRAM || node.type === ComputeNodeType.ETHERNET || node.type === ComputeNodeType.PCIE) && (
+                {(node.type === ComputeNodeType.DRAM ||
+                    node.type === ComputeNodeType.ETHERNET ||
+                    node.type === ComputeNodeType.PCIE) && (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}

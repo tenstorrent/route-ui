@@ -2,7 +2,10 @@ import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { closeDetailedView, RootState } from '../../data/store';
+import { closeDetailedView } from 'data/store/slices/detailedView.slice';
+import { RootState } from 'data/store/createStore';
+import { getArchitectureSelector } from 'data/store/selectors/uiState.selectors';
+
 import DataSource, { GridContext } from '../../data/DataSource';
 import '../scss/DetailedView.scss';
 import { ComputeNodeType } from '../../data/Types';
@@ -17,7 +20,7 @@ interface DetailedViewProps {
 const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
     const dispatch = useDispatch();
     const { chip } = useContext<GridContext>(DataSource);
-    const architecture = useSelector((state: RootState) => state.nodeSelection.architecture);
+    const architecture = useSelector(getArchitectureSelector);
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
     const node = uid ? chip?.getNode(uid) : null;
 

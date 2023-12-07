@@ -21,27 +21,34 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
     const setupData = () => {
         const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
         const output: JSX.Element[] = [];
-        if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
-            if (pipe.producerCores.length > 0) {
-                output.push(
-                    <div className='producer-consumer'>
-                        <h3>Producer:</h3>
-                        <h2>{[...new Set(pipe.producerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
-                    </div>,
-                );
+        if (pipe) {
+            if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
+                if (pipe.producerCores.length > 0) {
+                    output.push(
+                        <div className='producer-consumer'>
+                            <h3>Producer:</h3>
+                            <h2>
+                                {[...new Set(pipe.producerCores.map((core) => chip?.getNode(core)?.operation?.name))]}
+                            </h2>
+                        </div>,
+                    );
+                }
+                if (pipe.consumerCores.length > 0) {
+                    output.push(
+                        <div className='producer-consumer'>
+                            <h3>Consumer:</h3>
+                            <h2>
+                                {[...new Set(pipe.consumerCores.map((core) => chip?.getNode(core)?.operation?.name))]}
+                            </h2>
+                        </div>,
+                    );
+                }
+            } else {
+                return undefined;
             }
-            if (pipe.consumerCores.length > 0) {
-                output.push(
-                    <div className='producer-consumer'>
-                        <h3>Consumer:</h3>
-                        <h2>{[...new Set(pipe.consumerCores.map((core) => chip?.getNode(core)?.operation?.name))]}</h2>
-                    </div>,
-                );
-            }
-        } else {
+        }else{
             return undefined;
         }
-
         // eslint-disable-next-line react/jsx-no-useless-fragment
         return <>{output}</>;
     };
@@ -57,7 +64,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
     return (
         <Tooltip2
             //
-            usePortal={false}
+            usePortal
             content={tooltipContent}
             position={Position.BOTTOM_RIGHT}
             hoverOpenDelay={150}

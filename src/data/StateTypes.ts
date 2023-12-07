@@ -24,6 +24,7 @@ export interface ComputeNodeState extends NodeSelection {
     loc: { x: number; y: number };
     opName: string;
     border: { left: boolean; right: boolean; top: boolean; bottom: boolean };
+    queueNameList: string[];
     dramChannelId: number | -1;
     dramSubchannelId: number | -1;
 }
@@ -33,23 +34,11 @@ export interface NodeSelection {
     selected: boolean;
 }
 
-export enum HighlightType {
-    INPUT = 'input',
-    OUTPUT = 'output',
-    NONE = '',
-}
-
 export interface NodeSelectionState {
     groups: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
-    ioGroupsIn: Record<string, { op: string; selected: boolean }[]>;
-    operandsIn: Record<string, boolean>;
-    ioGroupsOut: Record<string, { op: string; selected: boolean }[]>;
-    operandsOut: Record<string, boolean>;
+    queues: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
     nodeList: Record<string, ComputeNodeState>;
-    coreHighlightList: Record<string, HighlightType>;
-    filename: string;
     dram: { data: ComputeNodeState[]; selected: boolean }[];
-    architecture: string;
 }
 
 export interface LinkState {
@@ -71,4 +60,10 @@ export interface NetworkCongestionState {
     CLKMHz: number;
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;
+}
+
+export enum IoType {
+    ALL = 'all',
+    IN = 'in',
+    OUT = 'out',
 }

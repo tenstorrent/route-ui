@@ -1,7 +1,9 @@
 import React, { ChangeEvent, FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Checkbox } from '@blueprintjs/core';
-import { RootState, selectPipeSelectionById, updateFocusPipe, updatePipeSelection } from '../../data/store';
+import { selectPipeSelectionById } from 'data/store/selectors/pipeSelection.selectors';
+import { updatePipeSelection, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
+import { RootState } from 'data/store/createStore';
 import HighlightedText from './HighlightedText';
 import { convertBytes, PipeSegment } from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
@@ -21,9 +23,18 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
     const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
         dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
     };
+    if (pipeState?.selected === undefined) {
+        // console.log('something is missing here');
+        // console.log(pipeState);
+        // console.log(pipeSegment);
+    }
     return (
         <>
-            <Checkbox checked={pipeState?.selected} onChange={handleCheckboxChange} />
+            <Checkbox
+                disabled={pipeState?.selected === undefined}
+                checked={pipeState?.selected}
+                onChange={handleCheckboxChange}
+            />
             <PipeInfoDialog
                 pipeId={pipeSegment.id}
                 hide={focusPipe !== pipeSegment.id}
@@ -33,11 +44,17 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                         onMouseOver={() => {
                             dispatch(updateFocusPipe(pipeSegment.id));
                         }}
+                        onFocus={() => {
+                            dispatch(updateFocusPipe(pipeSegment.id));
+                        }}
                         onMouseOut={() => {
                             dispatch(updateFocusPipe(null));
                         }}
+                        onBlur={() => {
+                            dispatch(updateFocusPipe(null));
+                        }}
                     >
-                        {pipeState && (
+                        {pipeState ? (
                             <>
                                 <HighlightedText text={pipeState.id} filter={pipeFilter} />{' '}
                                 {pipeSegment.bandwidth !== null ? convertBytes(pipeSegment.bandwidth) : ''}
@@ -51,6 +68,8 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                                     <ProgressBar percent={pipeSegment.bandwidthUse} />
                                 )}
                             </>
+                        ) : (
+                            <HighlightedText text={pipeSegment.id} filter={pipeFilter} />
                         )}
                     </span>
                 }
