@@ -255,6 +255,10 @@ export default class Chip {
         return this.pipesById;
     }
 
+    public details = {
+        maxBwLimitedFactor: 0,
+    };
+
     constructor(chipId: number) {
         this.chipId = chipId;
         this.operationsByName = new Map();
@@ -595,6 +599,10 @@ export default class Chip {
             const node = chip.getNode(nodeUid);
             if (node.type === ComputeNodeType.CORE) {
                 node.perfAnalyzerResults = new MeasurementDetails(perfAnalyzerJson[node.uid]);
+                newChip.details.maxBwLimitedFactor = Math.max(
+                    newChip.details.maxBwLimitedFactor,
+                    node.perfAnalyzerResults.bw_limited_factor,
+                );
             } else {
                 console.error('Attempted to add perf details to a node that is not a core:', nodeUid, node);
             }
@@ -611,6 +619,10 @@ export default class Chip {
             const operation = newChip.getOperation(opName);
             if (operation) {
                 operation.details = new OpPerfDetails(opDetails);
+                newChip.details.maxBwLimitedFactor = Math.max(
+                    newChip.details.maxBwLimitedFactor,
+                    opDetails.bw_limited_factor,
+                );
             }
         });
 

@@ -9,6 +9,7 @@ import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { mapIterable } from 'utils/IterableHelpers';
+import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
 
 const usePopulateChipData = () => {
     const navigate = useNavigate();
@@ -18,6 +19,7 @@ const usePopulateChipData = () => {
 
     const populateChipData = (selectedChip: Chip) => {
         setChip(selectedChip);
+        dispatch(updateMaxBwLimitedFactor(selectedChip.details.maxBwLimitedFactor));
         dispatch(closeDetailedView());
         dispatch(setSelectedArchitecture(selectedChip.architecture));
         dispatch(loadPipeSelection(selectedChip.generateInitialPipesSelectionState()));

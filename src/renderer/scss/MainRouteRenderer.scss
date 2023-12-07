@@ -224,6 +224,7 @@ $dock-height: 420px;
                 }
             }
 
+            .operation-congestion,
             .group-border,
             .operand-wrap,
             .off-chip-congestion,
@@ -237,6 +238,11 @@ $dock-height: 420px;
                 bottom: 0;
                 right: 0;
                 z-index: 0;
+            }
+            .operation-congestion{
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .off-chip-congestion {

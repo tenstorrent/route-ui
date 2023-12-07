@@ -1,12 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import {
-    selectNodeSelectionById,
-    getDramGroup,
-    getGroup,
-    getQueue,
-} from 'data/store/selectors/nodeSelection.selectors';
+import { getDramGroup, getGroup, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
@@ -14,6 +9,7 @@ import { RootState } from 'data/store/createStore';
 import { ComputeNode } from '../../data/Chip';
 import {
     calculateLinkCongestionColor,
+    calculateOpCongestionColor,
     drawLink,
     drawNOCRouter,
     drawSelections,
@@ -27,6 +23,11 @@ import {
 import { getGroupColor } from '../../data/ColorGenerator';
 import { PipeSelection } from '../../data/StateTypes';
 import { ComputeNodeType, HighlightType, NOC, NOCLinkName } from '../../data/Types';
+import {
+    getOperationPerformanceTreshold,
+    getShowOperationPerformanceGrid,
+} from '../../data/store/selectors/operationPerf.selectors';
+import DataSource, { GridContext } from '../../data/DataSource';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -80,8 +81,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             }`}
             onClick={triggerSelection}
         >
+            <OperationCongestionLayer node={node} />
             <OperationGroupRender node={node} />
-            {/* <OperandHighlight node={node} /> */}
             <DramModuleBorder node={node} />
             <OffChipNodeLinkCongestionLayer
                 node={node}
@@ -96,7 +97,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             )}
             {showNodeLocation && (
                 <div className='node-location'>
-                    {node.loc.x},{node.loc.y}
+                    {/* {node.loc.x},{node.loc.y} */}
+                    {node.uid}
                 </div>
             )}
             <NodeFocusPipeRenderer node={node} />
@@ -112,6 +114,36 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 };
 
 export default NodeGridElement;
+
+const OperationCongestionLayer: React.FC<{ node: ComputeNode }> = ({ node }) => {
+    const { chip } = useContext<GridContext>(DataSource);
+    const render = useSelector((state: RootState) => getShowOperationPerformanceGrid(state));
+    const treshold = useSelector((state: RootState) => getOperationPerformanceTreshold(state));
+    const isHighContrast = useSelector(getHighContrastState);
+    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor;
+    if (!render) {
+        return null;
+    }
+    if (node.type !== ComputeNodeType.CORE || node.opName === '') {
+        return null;
+    }
+
+    const op = node.operation;
+    const opFactor = op?.details?.bw_limited_factor || 1;
+    if (opFactor > treshold) {
+        const congestionColor = toRGBA(
+            calculateOpCongestionColor(opFactor, 0, maxBwLimitedFactor, isHighContrast),
+            0.5,
+        );
+        // toRGBA(congestionColor, 0.5);
+        return (
+            <div className='operation-congestion' style={{ backgroundColor: congestionColor }}>
+                {opFactor}
+            </div>
+        );
+    }
+    return <div className='operation-congestion'></div>;
+};
 
 interface DramModuleBorderProps {
     node: ComputeNode;
@@ -203,7 +235,13 @@ const QueueHighlightRenderer: React.FC<{ node: ComputeNode }> = ({ node }) => {
         <div className='queue-highlighter-content'>
             {node.queueList.map((queue) => {
                 if (queueSelectionState[queue.name]?.selected) {
-                    return <div key={queue.name} className='queue-highlighter' style={{ backgroundColor: getGroupColor(queue.name) }} />;
+                    return (
+                        <div
+                            key={queue.name}
+                            className='queue-highlighter'
+                            style={{ backgroundColor: getGroupColor(queue.name) }}
+                        />
+                    );
                 }
                 return null;
             })}
@@ -232,43 +270,6 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
 
     return <div className='group-border' style={operationStyles} />;
 };
-
-// TODO: confirm delete
-
-// interface OperandHighlightProps {
-//     node: ComputeNode;
-// }
-
-/** no idea what this does and if it does anything. verify and delete  */
-// const OperandHighlight: React.FC<OperandHighlightProps> = ({
-//     //
-//     node,
-//     //
-// }) => {
-//     const operandsIn: { op: string; selected: boolean }[] = useSelector(
-//         (state: RootState) => state.nodeSelection.ioGroupsIn[node.uid] || [],
-//     );
-//
-//     const operandsOut: { op: string; selected: boolean }[] = useSelector(
-//         (state: RootState) => state.nodeSelection.ioGroupsOut[node.uid] || [],
-//     );
-//     return (
-//         <div className='operand-wrap'>
-//             {operandsIn
-//                 .filter((operand) => operand.selected)
-//                 .map((operand) => {
-//                     const styles = { backgroundColor: getGroupColor(operand.op) };
-//                     return <div className='operand in' style={styles} />;
-//                 })}
-//             {operandsOut
-//                 .filter((operand) => operand.selected)
-//                 .map((operand) => {
-//                     const styles = { backgroundColor: getGroupColor(operand.op) };
-//                     return <div className='operand out' style={styles} />;
-//                 })}
-//         </div>
-//     );
-// };
 
 interface NodeFocusPipeRendererProps {
     node: ComputeNode;

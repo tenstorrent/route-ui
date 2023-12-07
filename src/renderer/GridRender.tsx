@@ -18,7 +18,7 @@ import { RootState } from 'data/store/createStore';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
 import DataSource, { GridContext } from '../data/DataSource';
-import { calculateLinkCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
+import { calculateLinkCongestionColor, calculateOpCongestionColor, NODE_SIZE } from '../utils/DrawingAPI';
 
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
@@ -30,10 +30,16 @@ import {
     PCIE_BANDWIDTH_INITIAL_GBS,
 } from '../data/constants';
 import { NOC } from '../data/Types';
-import { forEach, mapIterable } from '../utils/IterableHelpers';
+import { mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
-import { OperandDirection } from '../data/OpPerfDetails';
-import { Operand } from '../data/Graph';
+import {
+    getOperationPerformanceTreshold,
+    getShowOperationPerformanceGrid,
+} from '../data/store/selectors/operationPerf.selectors';
+import {
+    updateOperationPerformanceThreshold,
+    updateShowOperationPerformanceGrid,
+} from '../data/store/slices/operationPerf.slice';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -60,6 +66,9 @@ export default function GridRender() {
         dispatch(updateShowLinkSaturation(value));
     };
 
+    const onOpCongestionChange = (value: number) => {
+        dispatch(updateOperationPerformanceThreshold(value));
+    };
     const onShowLinkSaturationForNOC = (noc: NOC, selected: boolean) => {
         dispatch(updateShowLinkSaturationForNOC({ noc, selected }));
         if (noc === NOC.NOC0) {
@@ -69,6 +78,7 @@ export default function GridRender() {
             setShowLinkSaturationNOC1(selected);
         }
     };
+    const maxBandwidthLimitedFactor = chip?.details.maxBwLimitedFactor;
 
     const congestionLegendStyle = {
         background: `linear-gradient(to right, ${calculateLinkCongestionColor(
@@ -76,6 +86,20 @@ export default function GridRender() {
             0,
             isHC,
         )}, ${calculateLinkCongestionColor(50, 0, isHC)}, ${calculateLinkCongestionColor(120, 0, isHC)})`,
+    };
+
+    const opCongestionLegendStyle = {
+        background: `linear-gradient(to right, ${calculateOpCongestionColor(
+            0,
+            0,
+            maxBandwidthLimitedFactor,
+            isHC,
+        )}, ${calculateOpCongestionColor(5, 0, maxBandwidthLimitedFactor, isHC)}, ${calculateOpCongestionColor(
+            10,
+            0,
+            maxBandwidthLimitedFactor,
+            isHC,
+        )})`,
     };
 
     // eslint-disable-next-line no-unsafe-optional-chaining
@@ -91,26 +115,26 @@ export default function GridRender() {
 
     /** this is a sample use of the new op perf details */
     // TODO: move this to an operation/operand of whereever this makes sense. this business logic must live on data layer
-    if (chip) {
-        forEach(chip?.operations, (op) => {
-            console.group(op.name);
-            const slowestOperand = op.details?.slowestOperand;
-            let bottleneck: Operand | null = null;
-            if (slowestOperand) {
-                const slowestOperandDetails = op.details?.slowestOperandDetails;
-                if (slowestOperandDetails) {
-                    if (slowestOperandDetails.type === OperandDirection.INPUT) {
-                        bottleneck = [...op.inputs][slowestOperandDetails.index];
-                    } else if (slowestOperandDetails.type === OperandDirection.OUTPUT) {
-                        bottleneck = [...op.outputs][slowestOperandDetails.index];
-                    }
-                }
-            }
-            console.log(op.details);
-            console.log(bottleneck);
-            console.groupEnd();
-        });
-    }
+    // if (chip) {
+    //     forEach(chip?.operations, (op) => {
+    //         console.group(op.name);
+    //         const slowestOperand = op.details?.slowestOperand;
+    //         let bottleneck: Operand | null = null;
+    //         if (slowestOperand) {
+    //             const slowestOperandDetails = op.details?.slowestOperandDetails;
+    //             if (slowestOperandDetails) {
+    //                 if (slowestOperandDetails.type === OperandDirection.INPUT) {
+    //                     bottleneck = [...op.inputs][slowestOperandDetails.index];
+    //                 } else if (slowestOperandDetails.type === OperandDirection.OUTPUT) {
+    //                     bottleneck = [...op.outputs][slowestOperandDetails.index];
+    //                 }
+    //             }
+    //         }
+    //         console.log(op.details);
+    //         console.log(bottleneck);
+    //         console.groupEnd();
+    //     });
+    // }
 
     useEffect(() => {
         if (chip) {
@@ -190,7 +214,32 @@ export default function GridRender() {
                             <hr />
                         </>
                     </Collapsible>
-                    {/* TODO: abstract this into a global state */}
+
+                    <Switch
+                        // checked={getShowOperationPerformanceGrid(useSelector((state: RootState) => state))}
+                        checked={useSelector(getShowOperationPerformanceGrid)}
+                        label='Op Perf'
+                        onChange={(event) => dispatch(updateShowOperationPerformanceGrid(event.currentTarget.checked))}
+                    />
+                    <div
+                        className='congestion-legend'
+                        style={{
+                            ...(useSelector(getShowOperationPerformanceGrid) ? opCongestionLegendStyle : null),
+                            width: '100%',
+                            height: '3px',
+                        }}
+                    />
+                    <Slider
+                        className='link-saturation-slider'
+                        min={0}
+                        max={chip?.details.maxBwLimitedFactor || 10}
+                        disabled={!useSelector(getShowOperationPerformanceGrid)}
+                        labelStepSize={5}
+                        value={useSelector(getOperationPerformanceTreshold)}
+                        onChange={onOpCongestionChange}
+                        labelRenderer={(value) => `${value.toFixed(0)}`}
+                    />
+                    <hr />
 
                     {chip?.hasPipes && (
                         <Collapsible
