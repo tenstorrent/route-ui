@@ -1,20 +1,22 @@
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { useDispatch } from 'react-redux';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import fs from 'fs';
-import path from 'path';
-import { parse } from 'yaml';
-import React, { useContext } from 'react';
+import { Architecture } from 'data/Types';
 import {
     clearAvailableGraphs,
+    setDockOpenState,
     setSelectedArchitecture,
     setSelectedFile,
     setSelectedFolder,
 } from 'data/store/slices/uiState.slice';
-import { Architecture } from 'data/Types';
+import fs from 'fs';
+import path from 'path';
+import React, { useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { parse } from 'yaml';
 
+import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import Chip from '../../data/Chip';
 import DataSource from '../../data/DataSource';
 
@@ -34,6 +36,8 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
         dispatch(setSelectedFolder(''));
         navigate('/');
     };
+
+    const isDockOpen = useSelector(getDockOpenState);
 
     const loadOpsToPipes = async () => {
         // eslint-disable-next-line global-require
@@ -108,6 +112,9 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
             </Tooltip2>
             <Tooltip2 content='Load ops to pipes mapping'>
                 <Button icon={IconNames.SERIES_FILTERED} text='' onClick={loadOpsToPipes} />
+            </Tooltip2>
+            <Tooltip2 content='Show/Hide table dock'>
+                <Button icon={IconNames.APPLICATION} text='' onClick={() => dispatch(setDockOpenState(!isDockOpen))} />
             </Tooltip2>
         </div>
     );
