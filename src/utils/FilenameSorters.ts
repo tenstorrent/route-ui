@@ -5,7 +5,6 @@ export function sortNetlistAnalyzerFiles(filenames: string[]) {
     return filenames.sort((a, b) => {
         const parsedA = NETLIST_ANALYZER_REGEX.exec(a);
         const parsedB = NETLIST_ANALYZER_REGEX.exec(b);
-        console.log({ parsedA, parsedB });
         if (!parsedA?.[1] || !parsedB?.[1]) {
             return 1;
         }
