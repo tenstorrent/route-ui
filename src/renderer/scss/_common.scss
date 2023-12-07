@@ -81,7 +81,8 @@ $footer-height: 20px;
     grid-template-columns: 1fr;
     justify-items: center;
     align-items: center;
-
+    align-content: center;
+    gap: 40px;
 }
 
 button, .button {
