@@ -14,14 +14,13 @@ import PopoverMenu from '../PopoverMenu';
  * TODO: Decouple graph selection from folder selection
  * */
 
-export const TempFolderLoadingContext = (): React.ReactElement => {
+export const PerfDataLoader = (): React.ReactElement => {
     const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs, enableGraphSelect } =
         usePerfAnalyzerFileLoader();
 
     return (
         <div className='folder-load-container'>
-            <h3>Load From Folder</h3>
-
+            <h3>Load Folder</h3>
             <FolderPicker disabled={false} onSelectFolder={loadPerfAnalyzerFolder} disabledText='' />
             <PopoverMenu // Graph picker
                 label='Select Graph'
@@ -63,7 +62,7 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
                         className='load-folder-button'
                         disabled={disabled}
                         icon={IconNames.FOLDER_SHARED}
-                        text='Load Perf Results Folder'
+                        text='Load Perf Analyzer Results'
                     />
                 </Tooltip2>
             </Popover2>

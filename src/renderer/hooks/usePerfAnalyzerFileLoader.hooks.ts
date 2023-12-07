@@ -6,7 +6,7 @@ import {
 import {
     clearAvailableGraphs,
     setAvailableGraphs,
-    setSelectedApplication,
+    setApplicationMode,
     setSelectedArchitecture,
     setSelectedFolder,
     setSelectedGraphName,
@@ -97,7 +97,7 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
     const loadPerfAnalyzerFolder = async (): Promise<void> => {
         const folderPath = await selectFolderDialog();
         if (folderPath) {
-            dispatch(setSelectedApplication(ApplicationMode.PERF_ANALYZER));
+            dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
             await loadFolderList(folderPath);
             await loadFolder(folderPath);
         }

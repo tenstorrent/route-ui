@@ -9,7 +9,7 @@ interface UIState {
     folderPath: string;
     architecture: Architecture;
     availableGraphs: string[];
-    selectedApplication: ApplicationMode;
+    applicationMode: ApplicationMode;
 }
 
 const uiStateInitialState: UIState = {
@@ -19,7 +19,7 @@ const uiStateInitialState: UIState = {
     folderPath: '',
     architecture: Architecture.NONE,
     availableGraphs: [],
-    selectedApplication: ApplicationMode.NONE,
+    applicationMode: ApplicationMode.NONE,
 };
 
 const uiStateSlice = createSlice({
@@ -51,11 +51,11 @@ const uiStateSlice = createSlice({
         clearAvailableGraphs(state) {
             state.availableGraphs = [];
         },
-        setSelectedApplication(state, action: PayloadAction<ApplicationMode>) {
-            state.selectedApplication = action.payload;
+        setApplicationMode(state, action: PayloadAction<ApplicationMode>) {
+            state.applicationMode = action.payload;
         },
         clearSelectedApplication(state) {
-            state.selectedApplication = ApplicationMode.NONE;
+            state.applicationMode = ApplicationMode.NONE;
         },
     },
 });
@@ -70,6 +70,6 @@ export const {
     setSelectedFolder,
     setAvailableGraphs,
     clearAvailableGraphs,
-    setSelectedApplication,
+    setApplicationMode,
     clearSelectedApplication,
 } = uiStateSlice.actions;

@@ -1,7 +1,7 @@
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { Architecture } from 'data/Types';
+import { ApplicationMode, Architecture } from 'data/Types';
 import {
     clearAvailableGraphs,
     setDockOpenState,
@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { parse } from 'yaml';
 
-import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import Chip from '../../data/Chip';
 import DataSource from '../../data/DataSource';
 
@@ -26,7 +26,7 @@ export interface SideBarProps {
 
 export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
     const navigate = useNavigate();
-
+    const applicationMode = useSelector(getApplicationMode);
     const { chip } = useContext(DataSource);
     const dispatch = useDispatch();
     const reloadAppData = () => {
@@ -110,12 +110,20 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
             <Tooltip2 content='Load new dataset'>
                 <Button icon={IconNames.FolderSharedOpen} text='' onClick={reloadAppData} />
             </Tooltip2>
-            <Tooltip2 content='Load ops to pipes mapping'>
-                <Button icon={IconNames.SERIES_FILTERED} text='' onClick={loadOpsToPipes} />
-            </Tooltip2>
-            <Tooltip2 content='Show/Hide table dock'>
-                <Button icon={IconNames.APPLICATION} text='' onClick={() => dispatch(setDockOpenState(!isDockOpen))} />
-            </Tooltip2>
+            {applicationMode === ApplicationMode.NETLIST_ANALYZER && (
+                <Tooltip2 content='Load ops to pipes mapping'>
+                    <Button icon={IconNames.SERIES_FILTERED} text='' onClick={loadOpsToPipes} />
+                </Tooltip2>
+            )}
+            {applicationMode === ApplicationMode.PERF_ANALYZER && (
+                <Tooltip2 content='Show/Hide table dock'>
+                    <Button
+                        icon={IconNames.APPLICATION}
+                        text=''
+                        onClick={() => dispatch(setDockOpenState(!isDockOpen))}
+                    />
+                </Tooltip2>
+            )}
         </div>
     );
 };
