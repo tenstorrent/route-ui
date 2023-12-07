@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import { getDramGroup, getGroup, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
@@ -8,7 +8,8 @@ import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { RootState } from 'data/store/createStore';
 import { ComputeNode } from '../../data/Chip';
 import {
-    calculateLinkCongestionColor, calculateOpCongestionColor,
+    calculateLinkCongestionColor,
+    calculateOpCongestionColor,
     drawLink,
     drawNOCRouter,
     drawSelections,
@@ -26,6 +27,7 @@ import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
 } from '../../data/store/selectors/operationPerf.selectors';
+import DataSource, { GridContext } from '../../data/DataSource';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -114,9 +116,11 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 export default NodeGridElement;
 
 const OperationCongestionLayer: React.FC<{ node: ComputeNode }> = ({ node }) => {
+    const { chip } = useContext<GridContext>(DataSource);
     const render = useSelector((state: RootState) => getShowOperationPerformanceGrid(state));
     const treshold = useSelector((state: RootState) => getOperationPerformanceTreshold(state));
     const isHighContrast = useSelector(getHighContrastState);
+    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor;
     if (!render) {
         return null;
     }
@@ -127,9 +131,16 @@ const OperationCongestionLayer: React.FC<{ node: ComputeNode }> = ({ node }) => 
     const op = node.operation;
     const opFactor = op?.details?.bw_limited_factor || 1;
     if (opFactor > treshold) {
-        const congestionColor = toRGBA(calculateOpCongestionColor(opFactor, 0, isHighContrast), 0.5);
+        const congestionColor = toRGBA(
+            calculateOpCongestionColor(opFactor, 0, maxBwLimitedFactor, isHighContrast),
+            0.5,
+        );
         // toRGBA(congestionColor, 0.5);
-        return <div className='operation-congestion' style={{ backgroundColor: congestionColor }} >{opFactor}</div>;
+        return (
+            <div className='operation-congestion' style={{ backgroundColor: congestionColor }}>
+                {opFactor}
+            </div>
+        );
     }
     return <div className='operation-congestion'></div>;
 };

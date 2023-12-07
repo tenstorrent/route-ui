@@ -459,8 +459,13 @@ export const drawNOCRouter = (
         .attr('stroke', '#9e9e9e');
 };
 
-export const calculateOpCongestionColor = (value: number, min: number = 0, isHC: boolean = false): string => {
-    const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
+export const calculateOpCongestionColor = (
+    value: number,
+    min: number = 0,
+    max: number = MAX_OPERATION_PERFORMANCE_THRESHOLD,
+    isHC: boolean = false,
+): string => {
+    // const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
     const intensity = Math.round(ratio * 255);
@@ -469,7 +474,7 @@ export const calculateOpCongestionColor = (value: number, min: number = 0, isHC:
     }
 
     return `rgb(${intensity}, ${255 - intensity}, 0)`;
-}
+};
 
 export const calculateLinkCongestionColor = (value: number, min: number = 0, isHC: boolean = false): string => {
     const max = MAX_CONGESTION_VALUE;
