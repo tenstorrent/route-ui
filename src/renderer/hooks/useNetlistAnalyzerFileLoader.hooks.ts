@@ -14,6 +14,7 @@ import { getAvailableNetlistFiles } from 'utils/FileLoaders';
 import { parse } from 'yaml';
 import path from 'path';
 import { useDispatch } from 'react-redux';
+import { sortNetlistAnalyzerFiles } from 'utils/FilenameSorters';
 import usePopulateChipData from './usePopulateChipData.hooks';
 
 type NetlistAnalyzerFileLoaderHook = {
@@ -60,7 +61,8 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
         dispatch(clearAvailableGraphs());
         const filePath = path.dirname(filename);
         const netlistFiles = await getAvailableNetlistFiles(filePath);
-        dispatch(setAvailableGraphs(netlistFiles));
+        const sortedNetlistFiles = sortNetlistAnalyzerFiles(netlistFiles);
+        dispatch(setAvailableGraphs(sortedNetlistFiles));
     };
 
     const handleSelectNetlistFile = async (): Promise<void> => {
