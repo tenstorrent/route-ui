@@ -54,7 +54,10 @@ export default function GridRender() {
     const [detailedViewZoom, setDetailedViewZoom] = useState<number>(1);
     const [opCycles, setOpCycles] = useState<number>(0);
 
-    const isHC = useSelector(getHighContrastState);
+    const isHC: boolean = useSelector(getHighContrastState);
+
+    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor || 10;
+
     const dispatch = useDispatch();
 
     const onLinkSaturationChange = (value: number) => {
@@ -78,7 +81,6 @@ export default function GridRender() {
             setShowLinkSaturationNOC1(selected);
         }
     };
-    const maxBandwidthLimitedFactor = chip?.details.maxBwLimitedFactor;
 
     const congestionLegendStyle = {
         background: `linear-gradient(to right, ${calculateLinkCongestionColor(
@@ -89,17 +91,11 @@ export default function GridRender() {
     };
 
     const opCongestionLegendStyle = {
-        background: `linear-gradient(to right, ${calculateOpCongestionColor(
+        background: `linear-gradient(to right, ${calculateOpCongestionColor(0, 0, isHC)}, ${calculateOpCongestionColor(
+            maxBwLimitedFactor / 2,
             0,
-            0,
-            maxBandwidthLimitedFactor,
             isHC,
-        )}, ${calculateOpCongestionColor(5, 0, maxBandwidthLimitedFactor, isHC)}, ${calculateOpCongestionColor(
-            10,
-            0,
-            maxBandwidthLimitedFactor,
-            isHC,
-        )})`,
+        )}, ${calculateOpCongestionColor(maxBwLimitedFactor, 0, isHC)})`,
     };
 
     // eslint-disable-next-line no-unsafe-optional-chaining
