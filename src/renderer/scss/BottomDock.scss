@@ -40,8 +40,44 @@
         height: 1px;
         background-color: $tt-dark-blue;
     }
+
     .operations-table,
     .operands-table {
         height: 302px;
+
+        .bp4-table-cell-ledger-odd {
+            background-color: $tt-extra-light-gray;
+        }
+    }
+
+    .op-element {
+        color: $tt-black;
+        display: flex;
+        gap: 5px;
+        justify-items: center;
+        align-items: center;
+        margin-bottom: 0;
+
+        .bp4-control:not(.bp4-align-right) {
+            margin: 0;
+        }
+
+        .color-swatch {
+            width: 10px;
+            height: 10px;
+            border: 1px solid $tt-white-text;
+            display: inline-block;
+
+            &.transparent {
+            }
+        }
+    }
+    .table-operation-cell>div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+
     }
 }
