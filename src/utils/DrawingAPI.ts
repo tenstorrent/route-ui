@@ -462,10 +462,9 @@ export const drawNOCRouter = (
 export const calculateOpCongestionColor = (
     value: number,
     min: number = 0,
-    max: number = MAX_OPERATION_PERFORMANCE_THRESHOLD,
     isHC: boolean = false,
 ): string => {
-    // const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
+    const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
     const intensity = Math.round(ratio * 255);
