@@ -116,26 +116,22 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 export default NodeGridElement;
 
 const OperationCongestionLayer: React.FC<{ node: ComputeNode }> = ({ node }) => {
-    const { chip } = useContext<GridContext>(DataSource);
     const render = useSelector((state: RootState) => getShowOperationPerformanceGrid(state));
-    const treshold = useSelector((state: RootState) => getOperationPerformanceTreshold(state));
-    const isHighContrast = useSelector(getHighContrastState);
-    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor;
+    const threshold = useSelector((state: RootState) => getOperationPerformanceTreshold(state));
+    const isHighContrast: boolean = useSelector(getHighContrastState);
+
     if (!render) {
         return null;
     }
+
     if (node.type !== ComputeNodeType.CORE || node.opName === '') {
         return null;
     }
 
-    const op = node.operation;
-    const opFactor = op?.details?.bw_limited_factor || 1;
-    if (opFactor > treshold) {
-        const congestionColor = toRGBA(
-            calculateOpCongestionColor(opFactor, 0, maxBwLimitedFactor, isHighContrast),
-            0.5,
-        );
-        // toRGBA(congestionColor, 0.5);
+    const opFactor = node.perfAnalyzerResults?.bw_limited_factor || 1;
+
+    if (opFactor > threshold) {
+        const congestionColor = toRGBA(calculateOpCongestionColor(opFactor, 0, isHighContrast), 0.5);
         return (
             <div className='operation-congestion' style={{ backgroundColor: congestionColor }}>
                 {opFactor}
