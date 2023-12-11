@@ -1,6 +1,6 @@
 import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import OperationsTableDictionary from './operationsTable.dict';
 import SortingMenu from './shared/SortingMenu';
@@ -26,6 +26,10 @@ function OperationsTable() {
                 selected,
             }),
         );
+
+    useEffect(() => {
+        setOpList([...(chip?.operations ?? [])]);
+    }, [chip]);
 
     const onExpandClick = (op: Operation) => {
         const list = [...op.cores]
@@ -90,17 +94,30 @@ function OperationsTable() {
         return <Cell>{cellContent}</Cell>;
     };
 
-    if (!operations.length) {
+    if (!opList.length) {
         return <pre>No data available</pre>;
     }
+
+    const otherColWidth = null;
+
     return (
         <Table2
             renderMode={RenderMode.NONE}
             forceRerenderOnSelectionChange
             selectionModes={SelectionModes.NONE}
             className='operations-table'
-            numRows={operations.length}
+            numRows={opList.length}
             enableColumnHeader
+            columnWidths={[
+                290,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+            ]}
             cellRendererDependencies={[sortDirection, sortingColumn, nodesSelectionState.groups, opList]}
         >
             <Column
