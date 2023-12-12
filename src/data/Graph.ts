@@ -1,11 +1,11 @@
 import { process } from '@electron/remote';
 import { ComputeNodeType } from './Types';
-import type { GraphVertex, GraphVertexId, OperandName, Operation, OperationName, Queue } from './GraphTypes';
-import { GraphVertexType } from './GraphTypes';
+import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 import { OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { ComputeNode } from './Chip';
 import { OpPerfDetails } from './OpPerfDetails';
+import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */

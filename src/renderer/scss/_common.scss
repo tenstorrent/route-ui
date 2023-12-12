@@ -1,12 +1,12 @@
-body {
-    /*position: relative;
-    color: white;*/
-    /*overflow-y: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;*/
-    //height: 100vh;
+::-webkit-scrollbar-track {
+    background-color: transparent;
+    pointer-events: none;
+}
 
+::-webkit-scrollbar-button {
+}
+
+body {
     margin: 0;
     background: $tt-background;
     color: $tt-white-text;
@@ -118,6 +118,7 @@ button, .button {
         background-color: inherit;
         cursor: default;
         transition: color 100ms linear, background-color 100ms linear;
+
         &:hover {
             background-color: transparentize($tt-medium-blue, 0.9);
         }

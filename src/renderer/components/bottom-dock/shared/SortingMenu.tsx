@@ -9,8 +9,8 @@ type SortingMenuProps = {
 function SortingMenu({ sortFunction }: SortingMenuProps) {
     return (
         <Menu>
-            <MenuItem icon='sort-asc' text='Sort Asc' onClick={() => sortFunction('asc')} />
-            <MenuItem icon='sort-desc' text='Sort Desc' onClick={() => sortFunction('desc')} />
+            <MenuItem icon='sort-asc' text='Sort Asc' onClick={() => sortFunction(SortingDirection.ASC)} />
+            <MenuItem icon='sort-desc' text='Sort Desc' onClick={() => sortFunction(SortingDirection.DESC)} />
         </Menu>
     );
 }

@@ -1,5 +1,4 @@
-import type { OperationName, QueueName } from '../GraphTypes';
-import { GraphVertexType } from '../GraphTypes';
+import { GraphVertexType, OperationName, QueueName } from '../GraphNames';
 
 export type CoreID = string;
 

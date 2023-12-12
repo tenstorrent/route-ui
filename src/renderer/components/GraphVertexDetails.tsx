@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
-import { GraphVertex, GraphVertexType } from '../../data/GraphTypes';
+import { GraphVertex } from '../../data/GraphTypes';
 import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
 import { PipeSegment } from '../../data/Chip';
 import { NOCLinkName } from '../../data/Types';
 import SelectablePipe from './SelectablePipe';
 import Collapsible from './Collapsible';
+import { GraphVertexType } from '../../data/GraphNames';
 
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;

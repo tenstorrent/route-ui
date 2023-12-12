@@ -26,8 +26,8 @@ import {
     QueueLocation,
 } from './Types';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
-import type { Operation, OperationName, Queue, QueueName } from './GraphTypes';
-import { GraphVertex, GraphVertexType } from './GraphTypes';
+import type { Operation, Queue } from './GraphTypes';
+import { GraphVertex } from './GraphTypes';
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import {
     aggregateCoresByOperation,
@@ -38,6 +38,7 @@ import {
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { MeasurementDetails, OperandDirection, OpPerfDetails } from './OpPerfDetails';
+import { GraphVertexType, OperationName, QueueName } from './GraphNames';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
