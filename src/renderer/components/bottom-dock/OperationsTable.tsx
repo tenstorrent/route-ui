@@ -1,14 +1,84 @@
-import { Cell, Column, ColumnHeaderCell2, Table2 } from '@blueprintjs/table';
+import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
-import { useCallback } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import OperationsTableDictionary from './operationsTable.dict';
 import SortingMenu from './shared/SortingMenu';
 import useOperationsTable from './useOperationsTable.hooks';
+import SelectableOperation from '../SelectableOperation';
+import { RootState } from '../../../data/store/createStore';
+import { selectGroup } from '../../../data/store/slices/nodeSelection.slice';
+import DataSource from '../../../data/DataSource';
+import { Operation } from '../../../data/GraphTypes';
 
 function OperationsTable() {
-    const { operations, changeSorting, sortDirection, sortingColumn } = useOperationsTable();
+    const { chip } = useContext(DataSource);
+    const dispatch = useDispatch();
+    // TODO: map of operations or core with actual performance details. as table data. ish....
+    const [opList, setOpList] = useState<Operation[]>([...(chip?.operations ?? [])]);
+    const [drillDownLevel, setDrillDownLevel] = useState(0);
+    const { operations, changeSorting, sortDirection, sortingColumn } = useOperationsTable(opList);
+    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const setOperationSelectionState = (opName: string, selected: boolean) =>
+        dispatch(
+            selectGroup({
+                opName,
+                selected,
+            }),
+        );
 
-    const operationRenderer = (rowIndex: number) => <Cell>{operations[rowIndex].name}</Cell>;
+    useEffect(() => {
+        setOpList([...(chip?.operations ?? [])]);
+    }, [chip]);
+
+    const onExpandClick = (op: Operation) => {
+        const list = [...op.cores]
+            .map((core) => {
+                return core.operation;
+            })
+            .filter((operation) => operation !== undefined) as Operation[];
+        setDrillDownLevel(drillDownLevel + 1);
+        setOpList(list);
+    };
+
+    const operationRenderer = (rowIndex: number) => {
+        const opName = operations[rowIndex].name;
+        // console.log(rowIndex, opName);
+        return (
+            <Cell interactive className='table-cell-interactive table-operation-cell'>
+                <SelectableOperation
+                    opName={opName}
+                    value={nodesSelectionState.groups[opName]?.selected}
+                    selectFunc={setOperationSelectionState}
+                    stringFilter=''
+                    type={null}
+                />
+                {/* {drillDownLevel === 0 && ( */}
+                {/*     <Button */}
+                {/*         style={{ height: '18px' }} */}
+                {/*         small */}
+                {/*         minimal */}
+                {/*         icon={IconNames.ARROW_RIGHT} */}
+                {/*         onClick={() => { */}
+                {/*             onExpandClick(operations[rowIndex]); */}
+                {/*         }} */}
+                {/*     /> */}
+                {/* )} */}
+                {/* {drillDownLevel > 0 && ( */}
+                {/*     <Button */}
+                {/*         style={{ height: '18px' }} */}
+                {/*         small */}
+                {/*         minimal */}
+                {/*         icon={IconNames.ARROW_LEFT} */}
+                {/*         onClick={() => { */}
+                {/*             setDrillDownLevel(0); */}
+                {/*             setOpList([...(chip?.operations ?? [])]); */}
+                {/*         }} */}
+                {/*     /> */}
+                {/* )} */}
+            </Cell>
+        );
+    };
 
     const renderMenu = useCallback(
         (column: keyof OpPerfJSON | 'operation') => <SortingMenu sortFunction={changeSorting(column)} />,
@@ -24,16 +94,31 @@ function OperationsTable() {
         return <Cell>{cellContent}</Cell>;
     };
 
-    if (!operations.length) {
+    if (!opList.length) {
         return <pre>No data available</pre>;
     }
 
+    const otherColWidth = null;
+
     return (
         <Table2
+            renderMode={RenderMode.NONE}
+            forceRerenderOnSelectionChange
+            selectionModes={SelectionModes.NONE}
             className='operations-table'
-            numRows={operations.length}
+            numRows={opList.length}
             enableColumnHeader
-            cellRendererDependencies={[sortDirection, sortingColumn]}
+            columnWidths={[
+                290,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+                otherColWidth,
+            ]}
+            cellRendererDependencies={[sortDirection, sortingColumn, nodesSelectionState.groups, opList]}
         >
             <Column
                 name={OperationsTableDictionary.operation}

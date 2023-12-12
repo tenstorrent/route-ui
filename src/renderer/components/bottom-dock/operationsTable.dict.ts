@@ -7,7 +7,7 @@ type OperationsTableDictionaryType = {
 };
 
 const OperationsTableDictionary: Partial<OperationsTableDictionaryType> = {
-    grid_size: 'Grid',
+    grid_size: 'Grid size',
     operation: 'Operation',
     kernel_total_runtime: 'Kernel Total Runtime',
     kernel_math_utilization: 'Kernel Math Utilization',

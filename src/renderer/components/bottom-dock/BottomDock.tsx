@@ -17,17 +17,17 @@ const BottomDock: React.FC = () => {
         <div className='dock bottom-dock'>
             <Tabs id='dock-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className={Classes.TABS}>
                 <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
-                <Tab
-                    id='tab2'
-                    title='Operands'
-                    panel={
-                        <Table2 numRows={40} className='operands-table' enableColumnResizing>
-                            <Column name='Dollars' cellRenderer={dollarCellRenderer} />
-                            <Column name='Euros' cellRenderer={euroCellRenderer} />
-                        </Table2>
-                    }
-                />
-                <Tab id='tab3' title='Console' panel={<pre>SOME STUFF HERE</pre>} />
+                {/* <Tab */}
+                {/*     id='tab2' */}
+                {/*     title='Operands' */}
+                {/*     panel={ */}
+                {/*         <Table2 numRows={40} className='operands-table' enableColumnResizing> */}
+                {/*             <Column name='Dollars' cellRenderer={dollarCellRenderer} /> */}
+                {/*             <Column name='Euros' cellRenderer={euroCellRenderer} /> */}
+                {/*         </Table2> */}
+                {/*     } */}
+                {/* /> */}
+                {/* <Tab id='tab3' title='Console' panel={<pre>SOME STUFF HERE</pre>} /> */}
             </Tabs>
             <Button
                 minimal
