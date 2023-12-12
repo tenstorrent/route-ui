@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Operand } from '../../data/Graph';
 import { RootState } from '../../data/store/createStore';
 import { selectGroup, selectQueue } from '../../data/store/slices/nodeSelection.slice';
-import { GraphVertexType } from '../../data/GraphTypes';
 import SelectableOperation from './SelectableOperation';
+import { GraphVertexType } from '../../data/GraphNames';
 
 const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.ReactElement | null => {
     const { operand } = props;

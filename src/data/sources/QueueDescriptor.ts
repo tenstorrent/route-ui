@@ -1,5 +1,5 @@
-import type { QueueName } from '../GraphTypes';
 import { QueueLocation } from '../Types';
+import { QueueName } from '../GraphNames';
 
 interface AllocationInfoJson {
     address: number;

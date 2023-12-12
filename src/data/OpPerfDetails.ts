@@ -1,5 +1,5 @@
-import { CoreMeasurementsJSON, MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
-import { GraphName, OperationName } from './GraphTypes';
+import { MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
+import { GraphName, OperationName } from './GraphNames';
 
 export class MeasurementDetails implements MeasurementsJSON {
     [key: `input_pipe_bw_${number}`]: number; // available bandwidth (hole size)

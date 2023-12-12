@@ -3,8 +3,8 @@ import { Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import HighlightedText from './HighlightedText';
 import { getGroupColor } from '../../data/ColorGenerator';
-import { GraphVertexType } from '../../data/GraphTypes';
 import QueueIcon from '../../main/assets/QueueIcon';
+import { GraphVertexType } from '../../data/GraphNames';
 
 interface SelectableOperationProps {
     opName: string;

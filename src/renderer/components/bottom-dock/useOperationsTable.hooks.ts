@@ -1,67 +1,52 @@
-import DataSource from 'data/DataSource';
-import { Operation } from 'data/GraphTypes';
-import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
-import { useContext, useState } from 'react';
-import { QueueDetailsJson } from '../../../data/sources/QueueDescriptor';
+import { useState } from 'react';
+import { MeasurementDetails } from '../../../data/OpPerfDetails';
 
-export type SortingDirection = 'asc' | 'desc';
+export enum SortingDirection {
+    ASC = 'asc',
+    DESC = 'desc',
+}
 
-export interface OperationsTableData {
-    operation: string;
+export interface OpTableFields extends MeasurementDetails {
+    name: string;
     grid_size: number;
-    kernel_total_runtime: number;
-    kernel_math_utilization: number;
-    bw_limited_factor: number;
-    slowest_operand: string;
-    bw_bound_total_runtime: number;
-    bw_bound_math_utilization: number;
+    core_id: string;
 }
 
 type OperationsTableHook = {
-    operations: Operation[];
+    opTableFields: OpTableFields[];
     changeSorting: (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => void;
     sortingColumn: OperationTableColumn;
     sortDirection: SortingDirection;
 };
 
-type OperationTableColumn = keyof OpPerfJSON | 'operation' ;
+type OperationTableColumn = keyof OpTableFields | 'operation';
 
 const sortAsc = (a: any, b: any) => (a > b ? 1 : -1);
 const sortDesc = (a: any, b: any) => (a < b ? 1 : -1);
 
-function useOperationsTable(opList: Operation[]): OperationsTableHook {
+function useOperationsTable(opList: OpTableFields[]): OperationsTableHook {
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
-    const [sortDirection, setSortDirection] = useState<SortingDirection>('desc');
+    const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
 
-    const operations = (() => {
+    const opTableFields = (() => {
         const inputOperations = opList;
 
-            if (sortingColumn === 'operation') {
-                const sortedOperations =
-                    sortDirection === 'asc'
-                        ? inputOperations.sort((a, b) => sortAsc(a.name, b.name))
-                        : inputOperations.sort((a, b) => sortDesc(a.name, b.name));
-                return sortedOperations;
-            }
+        if (sortingColumn === 'operation') {
+            return sortDirection === SortingDirection.ASC
+                ? inputOperations.sort((a, b) => sortAsc(a.name, b.name))
+                : inputOperations.sort((a, b) => sortDesc(a.name, b.name));
+        }
 
-            const sortedOperations =
-                sortDirection === 'asc'
-                    ? inputOperations.sort((a, b) => sortAsc(
-                        a.details ? a.details[sortingColumn] : '',
-                        b.details ? b.details[sortingColumn] : '')
-                    )
-                    : inputOperations.sort((a, b) => sortDesc(
-                        a.details ? a.details[sortingColumn] : '',
-                        b.details ? b.details[sortingColumn] : '')
-                    );
-            return sortedOperations;
+        return sortDirection === SortingDirection.ASC
+            ? inputOperations.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
+            : inputOperations.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
     })();
 
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {
-        setSortingColumn(selectedColumn);
         setSortDirection(direction);
+        setSortingColumn(selectedColumn);
     };
-    return { operations, changeSorting, sortingColumn, sortDirection };
+    return { opTableFields, changeSorting, sortingColumn, sortDirection };
 }
 
 export default useOperationsTable;

@@ -1,6 +1,7 @@
 import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
+import { OpTableFields } from './useOperationsTable.hooks';
 
-export type OperationsTableDictionaryKeyType = keyof OpPerfJSON | 'operation';
+export type OperationsTableDictionaryKeyType = keyof OpTableFields | 'operation';
 
 type OperationsTableDictionaryType = {
     [key in OperationsTableDictionaryKeyType]: string;
@@ -8,6 +9,7 @@ type OperationsTableDictionaryType = {
 
 const OperationsTableDictionary: Partial<OperationsTableDictionaryType> = {
     grid_size: 'Grid size',
+    core_id: 'Core ID',
     operation: 'Operation',
     kernel_total_runtime: 'Kernel Total Runtime',
     kernel_math_utilization: 'Kernel Math Utilization',
