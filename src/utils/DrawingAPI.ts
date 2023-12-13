@@ -351,22 +351,24 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
         case PCIeLinkName.PCIE_INOUT:
         case NOC2AXILinkName.NOC0_NOC2AXI:
         case NOC2AXILinkName.NOC1_NOC2AXI:
-            arrowOffset = 5;
-            lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
-            lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
-            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET;
-            lineEndY = 0;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-                p3: `${lineEndX},${lineEndY + arrowOffset}`,
-            };
+            if (renderType === LinkRenderType.DETAILED_VIEW) {
+                arrowOffset = 5;
+                lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
+                lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+                lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET;
+                lineEndY = 0;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY + arrowOffset}`,
+                };
 
-            arrowSecondary = {
-                p1: `${lineStartX - arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
-                p2: `${lineStartX + arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
-                p3: `${lineStartX},${lineStartY - arrowOffset}`,
-            };
+                arrowSecondary = {
+                    p1: `${lineStartX - arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineStartX + arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineStartX},${lineStartY - arrowOffset}`,
+                };
+            }
             break;
         default:
             console.warn('Unknown link type', linkName);
