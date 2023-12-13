@@ -102,6 +102,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                                                 pipeSegment={
                                                                     new PipeSegment(pipeId, 0, NOCLinkName.NONE)
                                                                 }
+                                                                showBandwidth={false}
                                                                 pipeFilter=''
                                                             />
                                                         </li>
