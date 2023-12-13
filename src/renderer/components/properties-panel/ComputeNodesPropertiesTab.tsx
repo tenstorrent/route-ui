@@ -115,18 +115,18 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                         />
                     </Tooltip2>
                     {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics coreNode={node} />}
-                    <Collapsible label={<h5>Op pipes:</h5>} isOpen styles={{ marginLeft: '20px' }}>
-                        <ul className="scrollable-content">
-                            {node.operation.uniquePipeIds.map((pipeId) => (
-                                <li>
-                                    <SelectablePipe
-                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
-                                        pipeFilter=''
-                                    />
-                                </li>
-                            ))}
-                        </ul>
-                    </Collapsible>
+                    {/* <Collapsible label={<h5>Op pipes:</h5>} isOpen styles={{ marginLeft: '20px' }}> */}
+                    {/*     <ul className="scrollable-content"> */}
+                    {/*         {node.operation.uniquePipeIds.map((pipeId) => ( */}
+                    {/*             <li> */}
+                    {/*                 <SelectablePipe */}
+                    {/*                     pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)} */}
+                    {/*                     pipeFilter='' */}
+                    {/*                 /> */}
+                    {/*             </li> */}
+                    {/*         ))} */}
+                    {/*     </ul> */}
+                    {/* </Collapsible> */}
                 </div>
             )}
 
@@ -163,6 +163,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                                     <SelectablePipe
                                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                                         pipeFilter=''
+                                                        showBandwidth={false}
                                                     />
                                                 </li>
                                             ))}
@@ -184,6 +185,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                                     <SelectablePipe
                                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                                         pipeFilter=''
+                                                        showBandwidth={false}
                                                     />
                                                 </li>
                                             ))}

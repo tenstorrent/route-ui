@@ -13,10 +13,11 @@ import PipeInfoDialog from './PipeInfoDialog';
 interface SelectablePipeProps {
     pipeSegment: PipeSegment;
     pipeFilter: string;
+    showBandwidth?: boolean;
     showBandwidthUse?: boolean;
 }
 
-const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, showBandwidthUse = false }) => {
+const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, showBandwidth = true, showBandwidthUse = false }) => {
     const dispatch = useDispatch();
     const pipeState = useSelector((state: RootState) => selectPipeSelectionById(state, pipeSegment.id));
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
@@ -57,7 +58,7 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                         {pipeState ? (
                             <>
                                 <HighlightedText text={pipeState.id} filter={pipeFilter} />{' '}
-                                {pipeSegment.bandwidth !== null ? convertBytes(pipeSegment.bandwidth) : ''}
+                                {showBandwidth ? convertBytes(pipeSegment.bandwidth) : ''}
                                 {showBandwidthUse && <span>{pipeSegment.bandwidthUse.toFixed(0)}%</span>}
                                 <span
                                     className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`}
@@ -79,5 +80,6 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
 };
 SelectablePipe.defaultProps = {
     showBandwidthUse: false,
+    showBandwidth: true,
 };
 export default SelectablePipe;

@@ -59,7 +59,7 @@ const PipesPropertiesTab = () => {
                                     filterQuery={pipeFilter}
                                     component={
                                         <li>
-                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter} />
+                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter} showBandwidth={false} />
                                         </li>
                                     }
                                 />

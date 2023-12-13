@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { GraphVertex } from '../../data/GraphTypes';
+import { GraphVertex, Queue } from '../../data/GraphTypes';
 import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
 import { PipeSegment } from '../../data/Chip';
 import { NOCLinkName } from '../../data/Types';
@@ -27,18 +27,19 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {graphNode.vertexType === GraphVertexType.QUEUE && graphNode.details && showQueueDetails && (
                 <div className='queue-details'>
                     <div className='queue-detail-item'>
-                        {/* TODO: Find out the string format and possible vales for Queue Location (and other details) and convert to an enum,
+                        {/* TODO: Find out the string format and possible values for Queue Location (and other details) and convert to an enum,
                               so we're not parsing raw data
                           */}
                         <h5 className='queue-detail-label'>Queue Location:</h5>
                         <div className='queue-detail-value'>
-                            {graphNode.details.processedLocation} (Device {graphNode.details['device-id']})
+                            {(graphNode as Queue).details?.processedLocation} (Device{' '}
+                            {(graphNode as Queue).details!['device-id']})
                         </div>
                     </div>
                 </div>
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
-            {inputs.map((operand, index) => (
+            {inputs.map((operand) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     <Collapsible label={<h5>pipes:</h5>} isOpen={false}>
@@ -48,6 +49,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                         pipeFilter=''
+                                        showBandwidth={false}
                                     />
                                 </li>
                             ))}
@@ -57,7 +59,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             ))}
 
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
-            {outputs.map((operand, index) => (
+            {outputs.map((operand) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     <Collapsible label={<h5>pipes:</h5>} isOpen={false}>
@@ -67,6 +69,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                         pipeFilter=''
+                                        showBandwidth={false}
                                     />
                                 </li>
                             ))}
