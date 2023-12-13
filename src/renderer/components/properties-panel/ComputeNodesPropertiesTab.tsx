@@ -87,7 +87,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     node.uid === detailedViewState.uid && detailedViewState.isOpen ? 'detailed-view' : ''
                 }`}
             >
-                {node.type.toUpperCase()} - {node.loc.x}, {node.loc.y}
+                {node.type.toUpperCase()}  {node.uid}
                 <Tooltip2 content='Close ComputeNode'>
                     <Button
                         small
