@@ -178,8 +178,9 @@ $dock-height: 420px;
 
             .node-location {
                 position: absolute;
-                top: 0;
+                top: 3px;
                 left: 20px;
+                font-size: 12px;
             }
 
             &.selected {

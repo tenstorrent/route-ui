@@ -230,7 +230,7 @@ export default class Chip {
         }
         if (type === GraphVertexType.OPERATION) {
             if (!this.operationsByName.has(name)) {
-                console.log(`Operation ${name} does not exist, creating it`);
+                // console.log(`Operation ${name} does not exist, creating it`);
                 this.operationsByName.set(name, new BuildableOperation(name, [], [], []));
             }
             operand = this.operationsByName.get(name) as BuildableOperation;
@@ -240,7 +240,18 @@ export default class Chip {
         }
 
         if (pipesByCore && pipesByCore.size > 0) {
-            operand.pipeIdsByCore = pipesByCore;
+            if (operand.pipeIdsByCore.size > 0) {
+                pipesByCore.forEach((newPipeIds, core) => {
+                    if (operand!.pipeIdsByCore.has(core)) {
+                        const existingPipes = operand!.pipeIdsByCore.get(core) || [];
+                        operand!.pipeIdsByCore.set(core, existingPipes.concat(newPipeIds));
+                    } else {
+                        operand!.pipeIdsByCore.set(core, newPipeIds);
+                    }
+                });
+            } else {
+                operand.pipeIdsByCore = pipesByCore;
+            }
         }
 
         return operand;
