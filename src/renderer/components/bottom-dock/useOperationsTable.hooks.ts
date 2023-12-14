@@ -21,8 +21,18 @@ type OperationsTableHook = {
 
 type OperationTableColumn = keyof OpTableFields | 'operation';
 
-const sortAsc = (a: any, b: any) => (a > b ? 1 : -1);
-const sortDesc = (a: any, b: any) => (a < b ? 1 : -1);
+const sortAsc = (a: any, b: any) => {
+    if (a === b) {
+        return 0;
+    }
+    return (a > b ? 1 : -1);
+}
+const sortDesc = (a: any, b: any) => {
+    if (a === b) {
+        return 0;
+    }
+    return (a < b ? 1 : -1);
+}
 
 function useOperationsTable(opList: OpTableFields[]): OperationsTableHook {
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
