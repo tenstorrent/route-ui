@@ -10,6 +10,7 @@ export interface OpTableFields extends MeasurementDetails {
     name: string;
     grid_size: number;
     core_id: string;
+    // bw_bound_math_utilization: number;
 }
 
 type OperationsTableHook = {

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
@@ -19,6 +19,7 @@ function OperationsTable() {
     const [coreView, setCoreView] = useState(false);
     const { opTableFields, changeSorting, sortDirection, sortingColumn } = useOperationsTable(tableFields);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const [firstColumnWidth, setFirstColumnWidth] = useState(310);
     const setOperationSelectionState = (opName: string, selected: boolean) =>
         dispatch(
             selectGroup({
@@ -26,6 +27,13 @@ function OperationsTable() {
                 selected,
             }),
         );
+    const table = useRef<Table2>(null);
+
+    const recalculateFirstColumnWidth = useCallback(() => {
+        const width = table.current?.locator?.getWidestVisibleCellInColumn(0) ?? 0;
+        console.log('width', width);
+        setFirstColumnWidth(width === 0 ? 310 : width + 80);
+    }, [table, setFirstColumnWidth]);
 
     const resetOpTableDetails = () => {
         if (!chip) {
@@ -84,7 +92,7 @@ function OperationsTable() {
                         onClick={() => {
                             expandOperationCores(tableFields[rowIndex]);
                         }}
-                        title="View operation cores"
+                        title='View operation cores'
                     />
                 )}
 
@@ -93,7 +101,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        title="Back to operations view"
+                        title='Back to operations view'
                         icon={IconNames.ARROW_LEFT}
                         onClick={() => {
                             resetOpTableDetails();
@@ -166,14 +174,18 @@ function OperationsTable() {
 
     return (
         <Table2
+            ref={table}
+            firstColumn
             renderMode={RenderMode.NONE}
             forceRerenderOnSelectionChange
             selectionModes={SelectionModes.NONE}
             className='operations-table'
             numRows={tableFields.length}
             enableColumnHeader
+            onCompleteRender={recalculateFirstColumnWidth}
+            // onCompleteRender={resizeColumns}
             columnWidths={[
-                290,
+                firstColumnWidth,
                 otherColWidth,
                 otherColWidth,
                 otherColWidth,
@@ -182,10 +194,19 @@ function OperationsTable() {
                 otherColWidth,
                 otherColWidth,
             ]}
-            cellRendererDependencies={[sortDirection, sortingColumn, nodesSelectionState.groups, tableFields, coreView]}
+            // columnWidths={columnWidths}
+            cellRendererDependencies={[
+                firstColumnWidth,
+                sortDirection,
+                sortingColumn,
+                nodesSelectionState.groups,
+                tableFields,
+                coreView,
+            ]}
         >
             {/* TODO: render this in a simple loop maybe? */}
             <Column
+                id='operation'
                 cellRenderer={firstColumnCellRenderer}
                 columnHeaderCellRenderer={() => headerRenderer('operation')}
             />
@@ -221,7 +242,7 @@ function OperationsTable() {
                 columnHeaderCellRenderer={() => headerRenderer('bw_bound_total_runtime')}
             />
             <Column
-                cellRenderer={(rowIndex) => cellRenderer('bw_bound_math_utilization', rowIndex)}
+                cellRenderer={(rowIndex) => cellRenderer(OperationsTableDictionary.bw_bound_math_utilization, rowIndex)}
                 columnHeaderCellRenderer={() => headerRenderer('bw_bound_math_utilization')}
             />
         </Table2>
