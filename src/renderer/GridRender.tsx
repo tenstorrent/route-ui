@@ -343,6 +343,13 @@ export default function GridRender() {
                                                 majorStepSize={100000}
                                                 min={1}
                                                 onValueChange={(value) => {
+
+                                                    if (value === 0) {
+                                                        return;
+                                                    }
+                                                    if (Number.isNaN(value)) {
+                                                        return;
+                                                    }
                                                     setOpCycles(value);
                                                     dispatch(updateTotalOPs(value));
                                                 }}
