@@ -43,7 +43,12 @@ a {
 }
 
 .node-item:focus {
-    outline-offset: -2px;
+    outline: none;
+    //outline-offset: -2px;
+}
+.node-item:-ms-keyboard-active {
+    outline: $focus-ring solid 2px;
+    //outline-offset: -2px;
 }
 
 $top-nav-height: 70px;
