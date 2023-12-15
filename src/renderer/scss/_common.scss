@@ -23,10 +23,27 @@ a {
     color: $tt-light-blue;
 }
 
-*:active,
-*:focus {
-    outline: 0;
-    border: none;
+
+:focus {
+    outline-offset: 0px;
+}
+
+.bp4-control input:focus ~ .bp4-control-indicator {
+    outline-offset: 0;
+}
+
+:focus {
+    outline: $focus-ring solid 2px;
+    outline-offset: 0px;
+}
+
+.bp4-control input:focus ~ .bp4-control-indicator {
+    outline: $focus-ring solid 2px;
+    outline-offset: 0;
+}
+
+.node-item:focus {
+    outline-offset: -2px;
 }
 
 $top-nav-height: 70px;
@@ -86,7 +103,6 @@ $footer-height: 20px;
 }
 
 button, .button {
-    //@include common-monserrat;
     background-color: $tt-medium-blue;
     border: none;
     border-radius: 2px;
@@ -109,9 +125,9 @@ button, .button {
             background-color: lighten($tt-medium-blue, 20%);
         }
 
-        &:focus {
-            outline: none;
-        }
+        //&:focus {
+        //    outline: none;
+        //}
     }
 
     &.node-item {
