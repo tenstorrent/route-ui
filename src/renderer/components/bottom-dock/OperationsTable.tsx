@@ -13,13 +13,16 @@ import { ComputeNode } from '../../../data/Chip';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
+    const DEFAULT_COLUMN_WIDTH = 310;
+    const COLUM_WIDTH_OFFSET = 80;
+
     const { chip } = useContext(DataSource);
     const dispatch = useDispatch();
     const [tableFields, setTableFields] = useState<OpTableFields[]>([]);
     const [coreView, setCoreView] = useState(false);
     const { opTableFields, changeSorting, sortDirection, sortingColumn } = useOperationsTable(tableFields);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const [firstColumnWidth, setFirstColumnWidth] = useState(310);
+    const [firstColumnWidth, setFirstColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
     const setOperationSelectionState = (opName: string, selected: boolean) =>
         dispatch(
             selectGroup({
@@ -31,8 +34,7 @@ function OperationsTable() {
 
     const recalculateFirstColumnWidth = useCallback(() => {
         const width = table.current?.locator?.getWidestVisibleCellInColumn(0) ?? 0;
-        console.log('width', width);
-        setFirstColumnWidth(width === 0 ? 310 : width + 80);
+        setFirstColumnWidth(width === 0 ? DEFAULT_COLUMN_WIDTH : width + COLUM_WIDTH_OFFSET);
     }, [table, setFirstColumnWidth]);
 
     const resetOpTableDetails = () => {
