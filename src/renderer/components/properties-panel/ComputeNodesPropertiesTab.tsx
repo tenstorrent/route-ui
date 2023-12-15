@@ -98,7 +98,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     />
                 </Tooltip2>
             </h3>
-            {node.opCycles ? <p>{node.opCycles.toLocaleString()} cycles</p> : null}
+            {node.opCycles ? <p>Perf model estimate {node.opCycles.toLocaleString()} cycles</p> : null}
             {node.type === ComputeNodeType.DRAM && (
                 <p>
                     Channel {node.dramChannelId}, Sub {node.dramSubchannelId}
