@@ -11,9 +11,11 @@ import Chip from '../data/Chip';
 import MainRouteRenderer from './MainRouteRenderer';
 import SplashScreen from './SplashScreen';
 import TopHeaderComponent from './components/TopHeaderComponent';
+import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
 
 export default function App() {
     // @ts-ignore
+    useKeyboardFocus();
     const [chip, setChip] = useState<Chip>(null);
     const memoizedChip = useMemo<GridContext>(() => ({ chip, setChip }), [chip]);
     FocusStyleManager.onlyShowFocusOnTabs();
