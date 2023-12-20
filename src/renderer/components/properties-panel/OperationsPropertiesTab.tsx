@@ -15,6 +15,7 @@ import Collapsible from '../Collapsible';
 import SelectablePipe from '../SelectablePipe';
 import { PipeSegment } from '../../../data/Chip';
 import { NOCLinkName } from '../../../data/Types';
+import { Operation } from '../../../data/GraphTypes';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -71,7 +72,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
             </div>
             <div className='operations-wrap list-wrap'>
                 <div className='scrollable-content'>
-                    {operationsList.map((operation) => {
+                    {operationsList.map((operation:Operation) => {
                         return (
                             <FilterableComponent
                                 key={operation.name}
@@ -81,6 +82,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                     <Collapsible
                                         label={
                                             <SelectableOperation
+                                                disabled={operation.isOffchip}
                                                 opName={operation.name}
                                                 value={groupsSelectionState[operation.name]?.selected}
                                                 selectFunc={setOperationSelectionState}

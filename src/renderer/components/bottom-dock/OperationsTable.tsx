@@ -75,6 +75,7 @@ function OperationsTable() {
             <Cell interactive className='table-cell-interactive table-operation-cell'>
                 {opName ? (
                     <SelectableOperation
+                        disabled={nodesSelectionState.groups[opName]===undefined}
                         opName={opName}
                         value={nodesSelectionState.groups[opName]?.selected}
                         selectFunc={setOperationSelectionState}
@@ -90,6 +91,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
+                        disabled={nodesSelectionState.groups[opName]===undefined}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
                             expandOperationCores(tableFields[rowIndex]);

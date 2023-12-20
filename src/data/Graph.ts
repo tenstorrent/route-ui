@@ -6,6 +6,11 @@ import { OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { ComputeNode } from './Chip';
 import { OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
+import { name } from 'chalk';
+import core from 'ajv/dist/vocabularies/core';
+import { types } from 'sass';
+import Error = types.Error;
+import * as console from 'console';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -155,6 +160,10 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
 
     get cores() {
         return this._cores.values();
+    }
+
+    get isOffchip(): boolean {
+        return this._cores.length === 0;
     }
 }
 

@@ -517,7 +517,7 @@ export default class Chip {
         const chipDesign = new ChipDesign(json);
         const chip = new Chip(0);
         chip.nodes = chipDesign.nodes.map((simpleNode) => {
-            const node = new ComputeNode(`0-${simpleNode.loc.x}-${simpleNode.loc.y}`);
+            const node = new ComputeNode(`${chip.chipId}-${simpleNode.loc.x}-${simpleNode.loc.y}`);
             node.type = simpleNode.type;
             node.loc = simpleNode.loc;
             node.dramChannelId = simpleNode.dramChannelId;
@@ -896,7 +896,7 @@ export class ComputeNode {
         chipId: number,
         getOperation: (name: OperationName) => BuildableOperation | undefined,
     ): [node: ComputeNode, createdOperation?: BuildableOperation] {
-        const node = new ComputeNode(`0-${nodeJSON.location[0]}-${nodeJSON.location[1]}`);
+        const node = new ComputeNode(`${chipId}-${nodeJSON.location[0]}-${nodeJSON.location[1]}`);
         node.opCycles = nodeJSON.op_cycles;
         node.links = new Map();
         node.chipId = chipId;
