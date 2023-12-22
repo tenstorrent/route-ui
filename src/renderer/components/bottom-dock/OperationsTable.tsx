@@ -3,6 +3,7 @@ import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } f
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { JSX } from 'react/jsx-runtime';
 import OperationsTableDictionary from './operationsTable.dict';
 import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
 import SelectableOperation from '../SelectableOperation';
@@ -75,7 +76,7 @@ function OperationsTable() {
             <Cell interactive className='table-cell-interactive table-operation-cell'>
                 {opName ? (
                     <SelectableOperation
-                        disabled={nodesSelectionState.groups[opName]===undefined}
+                        disabled={nodesSelectionState.groups[opName] === undefined}
                         opName={opName}
                         value={nodesSelectionState.groups[opName]?.selected}
                         selectFunc={setOperationSelectionState}
@@ -91,7 +92,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={nodesSelectionState.groups[opName]===undefined}
+                        disabled={nodesSelectionState.groups[opName] === undefined}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
                             expandOperationCores(tableFields[rowIndex]);
@@ -152,7 +153,7 @@ function OperationsTable() {
         dispatch(updateNodeSelection({ id, selected }));
     };
 
-    const cellRenderer = (key: keyof OpTableFields, rowIndex: number) => {
+    const cellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
         const cellContent = (tableFields[rowIndex][key] || '').toString();
         if (key === 'core_id') {
             return (
@@ -179,7 +180,6 @@ function OperationsTable() {
     return (
         <Table2
             ref={table}
-            firstColumn
             renderMode={RenderMode.NONE}
             forceRerenderOnSelectionChange
             selectionModes={SelectionModes.NONE}
@@ -187,7 +187,6 @@ function OperationsTable() {
             numRows={tableFields.length}
             enableColumnHeader
             onCompleteRender={recalculateFirstColumnWidth}
-            // onCompleteRender={resizeColumns}
             columnWidths={[
                 firstColumnWidth,
                 otherColWidth,
@@ -208,7 +207,6 @@ function OperationsTable() {
                 coreView,
             ]}
         >
-            {/* TODO: render this in a simple loop maybe? */}
             <Column
                 id='operation'
                 cellRenderer={firstColumnCellRenderer}
@@ -246,7 +244,7 @@ function OperationsTable() {
                 columnHeaderCellRenderer={() => headerRenderer('bw_bound_total_runtime')}
             />
             <Column
-                cellRenderer={(rowIndex) => cellRenderer(OperationsTableDictionary.bw_bound_math_utilization, rowIndex)}
+                cellRenderer={(rowIndex) => cellRenderer('bw_bound_math_utilization', rowIndex)}
                 columnHeaderCellRenderer={() => headerRenderer('bw_bound_math_utilization')}
             />
         </Table2>

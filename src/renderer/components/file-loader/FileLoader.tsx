@@ -3,6 +3,8 @@ import { FC } from 'react';
 import { IconNames } from '@blueprintjs/icons';
 import useNetlistAnalyzerFileLoader from 'renderer/hooks/useNetlistAnalyzerFileLoader.hooks';
 
+/** @deprecated */
+/** @description This component is deprecated and will be removed in the future - we have unified app modes */
 const FileLoader: FC = () => {
     const { handleSelectNetlistFile } = useNetlistAnalyzerFileLoader();
 

@@ -1,4 +1,11 @@
-import { Architecture, ComputeNodeTypeArch } from './Types';
+import { ComputeNodeTypeArch } from './Types';
+
+export interface GraphnameToEpochToDeviceJSON {
+    [key: string]: {
+        epoch_id: number;
+        target_device: number;
+    };
+}
 
 export interface NodeDataJSON {
     location: number[];
@@ -64,6 +71,7 @@ export interface ChipDesignJSON {
     pcie: string[];
     router_only: string[];
     functional_workers: string[];
+
     [unknownKey: string]: unknown;
 }
 

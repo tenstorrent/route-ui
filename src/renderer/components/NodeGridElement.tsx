@@ -76,7 +76,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     return (
         <button
             type='button'
-            className={`node-item ${highlightClass} ${nodeState.selected ? 'selected' : ''} ${
+            className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
             }`}
             onClick={triggerSelection}

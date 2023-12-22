@@ -17,15 +17,16 @@ import { getAvailableGraphNames, loadGraph, validatePerfResultsFolder } from 'ut
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
 import { useState } from 'react';
-import { sortPerfAnalyzerFiles } from 'utils/FilenameSorters';
+import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import usePopulateChipData from './usePopulateChipData.hooks';
+import { GraphRelationshipState } from '../../data/StateTypes';
 
 type PerfAnalyzerFileLoaderHook = {
     loadPerfAnalyzerFolder: () => Promise<void>;
     loadPerfAnalyzerGraph: (graphName: string) => Promise<void>;
     error: string | null;
     selectedGraph: string;
-    availableGraphs: string[];
+    availableGraphs: GraphRelationshipState[];
     enableGraphSelect: boolean;
 };
 
@@ -56,17 +57,16 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         return folderPath;
     };
 
-    const loadFolderList = async (folderPath: string): Promise<void> => {
-        dispatch(clearAvailableGraphs());
-        const graphs = await getAvailableGraphNames(folderPath);
-        dispatch(setAvailableGraphs(graphs));
-    };
-
     const loadFolder = async (folderPath: string): Promise<void> => {
+        setError(null);
+        setEnableGraphSelect(false);
         try {
             const graphs = await getAvailableGraphNames(folderPath);
+            if (!graphs.length) {
+                throw new Error(`No graphs found in\n${folderPath}`);
+            }
             dispatch(setSelectedFolder(folderPath));
-            const sortedGraphs = sortPerfAnalyzerFiles(graphs);
+            const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
             setEnableGraphSelect(true);
         } catch (e) {
@@ -79,7 +79,10 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
         if (selectedFolder) {
             try {
-                const chip = await loadGraph(selectedFolder, graphName);
+                const chip = await loadGraph(
+                    selectedFolder,
+                    availableGraphs.find((g) => g.name === graphName) as GraphRelationshipState,
+                );
                 setEnableGraphSelect(false);
                 populateChipData(chip);
                 dispatch(setSelectedGraphName(graphName));
@@ -98,7 +101,7 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         const folderPath = await selectFolderDialog();
         if (folderPath) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
-            await loadFolderList(folderPath);
+            dispatch(clearAvailableGraphs());
             await loadFolder(folderPath);
         }
     };

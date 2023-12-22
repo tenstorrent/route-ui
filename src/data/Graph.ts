@@ -1,16 +1,13 @@
 import { process } from '@electron/remote';
+import { types } from 'sass';
+import * as console from 'console';
 import { ComputeNodeType } from './Types';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
-import { OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { ComputeNode } from './Chip';
 import { OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
-import { name } from 'chalk';
-import core from 'ajv/dist/vocabularies/core';
-import { types } from 'sass';
 import Error = types.Error;
-import * as console from 'console';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -34,7 +31,6 @@ export abstract class AbstractGraphVertex implements Operand {
     }
 
     public set pipeIdsByCore(value: Map<string, string[]>) {
-        // console.log(`updating ${this.name} with ${value.size}`);
         if (this._pipeIdsByCore.size > 0) {
             value.forEach((pipeids, key) => {
                 if (this._pipeIdsByCore.has(key)) {

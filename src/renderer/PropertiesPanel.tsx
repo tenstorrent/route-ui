@@ -15,15 +15,38 @@ export default function PropertiesPanel() {
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
                 <Tab id='tab-nodes' title='Nodes' panel={<ComputeNodesPropertiesTab />} />
-                {/* TODO: abstract this into a global state */}
                 {chip?.hasPipes && (
-                    //
-                    <Tab id='tab-pipes' title={<span>Pipes <Icon icon={IconNames.FILTER} /></span>} panel={<PipesPropertiesTab />} />
+                    <Tab
+                        id='tab-pipes'
+                        title={
+                            <span>
+                                Pipes <Icon icon={IconNames.FILTER} />
+                            </span>
+                        }
+                        panel={<PipesPropertiesTab />}
+                    />
                 )}
-                <Tab id='tab-ops' title={<span>Operations <Icon icon={IconNames.CUBE} /></span>} panel={<OperationsPropertiesTab />} />
+                {chip?.hasOperations && (
+                    <Tab
+                        id='tab-ops'
+                        title={
+                            <span>
+                                Operations <Icon icon={IconNames.CUBE} />
+                            </span>
+                        }
+                        panel={<OperationsPropertiesTab />}
+                    />
+                )}
                 {chip?.hasQueues && (
-                    //
-                    <Tab id='tab-queues' title={<span>Queues <QueueIcon /> </span>} panel={<QueuesPropertiesTab />} />
+                    <Tab
+                        id='tab-queues'
+                        title={
+                            <span>
+                                Queues <QueueIcon />{' '}
+                            </span>
+                        }
+                        panel={<QueuesPropertiesTab />}
+                    />
                 )}
             </Tabs>
         </div>

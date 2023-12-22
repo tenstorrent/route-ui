@@ -104,3 +104,19 @@ export enum ApplicationMode {
     // For the future
     PERF_UI = 'perf-ui',
 }
+
+/** cluster descriptor format
+ * from clusterhack */
+export class ClusterCoordinates {
+    x: number;
+
+    y: number;
+
+    r: number;
+
+    s: number;
+
+    get coords(): [number, number, number, number] {
+        return [this.x, this.y, this.r, this.s];
+    }
+}

@@ -67,3 +67,9 @@ export enum IoType {
     IN = 'in',
     OUT = 'out',
 }
+
+export interface GraphRelationshipState {
+    name: string;
+    temporalEpoch: number;
+    chipId: number;
+}

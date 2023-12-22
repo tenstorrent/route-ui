@@ -22,6 +22,8 @@ type NetlistAnalyzerFileLoaderHook = {
     loadNetlistFile: (filename: string) => Promise<void>;
 };
 
+/** @deprecated */
+
 const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
     const dispatch = useDispatch();
     const { populateChipData } = usePopulateChipData();
@@ -57,12 +59,10 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
         }
     };
 
+    /** @deprecated */
     const loadFileList = async (filename: string) => {
         dispatch(clearAvailableGraphs());
-        const filePath = path.dirname(filename);
-        const netlistFiles = await getAvailableNetlistFiles(filePath);
-        const sortedNetlistFiles = sortNetlistAnalyzerFiles(netlistFiles);
-        dispatch(setAvailableGraphs(sortedNetlistFiles));
+        throw new Error('not implemented');
     };
 
     const handleSelectNetlistFile = async (): Promise<void> => {
