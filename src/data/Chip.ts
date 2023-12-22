@@ -199,6 +199,10 @@ export default class Chip {
         return this.queuesByName.size > 0;
     }
 
+    public get hasOperations(): boolean {
+        return this.operationsByName.size > 0;
+    }
+
     public get queues(): Iterable<Queue> {
         return this.queuesByName.values();
     }
@@ -536,8 +540,11 @@ export default class Chip {
 
         const opMap: Map<OperationName, OperationDetails> = aggregateCoresByOperation(graphDescriptorJson);
 
-        // eslint-disable-next-line no-restricted-syntax
         const operations = mapIterable(opMap.entries(), ([opName, opDetails]) => {
+            if (opName === undefined) {
+                console.error('Likely an empty graph');
+                throw new Error('opName is undefined');
+            }
             const cores: ComputeNode[] = opDetails.cores
                 // `core.id` is only an x-y locations and doesn't include Chip ID
                 .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`));
