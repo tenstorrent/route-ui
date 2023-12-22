@@ -1,23 +1,27 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Switch } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
+import { Switch } from '@blueprintjs/core';
 import {
     getArchitectureSelector,
-    getDockOpenState,
+    getAvailableGraphsSelector,
     getFolderPathSelector,
+    getGraphNameSelector,
     getHighContrastState,
 } from 'data/store/selectors/uiState.selectors';
-import { setDockOpenState, setHighContrastState } from 'data/store/slices/uiState.slice';
+import { setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
 
 const TopHeaderComponent: React.FC = () => {
     const dispatch = useDispatch();
     const isHighContrast = useSelector(getHighContrastState);
-    const isDockOpen = useSelector(getDockOpenState);
     const architecture = useSelector(getArchitectureSelector);
+    const selectedGraph = useSelector(getGraphNameSelector);
+    const availableGraphs = useSelector(getAvailableGraphsSelector);
     const folderPath = useSelector(getFolderPathSelector);
+
+    const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
+    const selectedGraphInfo = `${selectedGraph}  Chip: ${selectedGraphItem?.chipId} Epoch: ${selectedGraphItem?.temporalEpoch}`;
 
     return (
         <div className='top-header-component'>
@@ -41,15 +45,23 @@ const TopHeaderComponent: React.FC = () => {
                 <div className='text-content'>
                     <span>Selected Folder: </span>
                     <span className='path-label'>{folderPath}</span>
+                    {/* this will need a better layout */}
+                    {selectedGraph && (
+                        <>
+                            <span>Selected graph: </span>
+                            <span className='path-label'>{selectedGraphInfo}</span>
+                        </>
+                    )}
                 </div>
             )}
-            {process.env.NODE_ENV === 'development' && (
-                <Button
-                    icon={IconNames.APPLICATION}
-                    text='Dock'
-                    onClick={() => dispatch(setDockOpenState(!isDockOpen))}
-                />
-            )}
+
+            {/* {process.env.NODE_ENV === 'development' && ( */}
+            {/*     <Button */}
+            {/*         icon={IconNames.APPLICATION} */}
+            {/*         text='Dock' */}
+            {/*         onClick={() => dispatch(setDockOpenState(!isDockOpen))} */}
+            {/*     /> */}
+            {/* )} */}
         </div>
     );
 };

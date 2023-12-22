@@ -14,8 +14,8 @@ import TopHeaderComponent from './components/TopHeaderComponent';
 import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
 
 export default function App() {
-    // @ts-ignore
     useKeyboardFocus();
+    // @ts-ignore
     const [chip, setChip] = useState<Chip>(null);
     const memoizedChip = useMemo<GridContext>(() => ({ chip, setChip }), [chip]);
     FocusStyleManager.onlyShowFocusOnTabs();

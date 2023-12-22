@@ -20,11 +20,11 @@ export const PerfDataLoader = (): React.ReactElement => {
 
     return (
         <div className='folder-load-container'>
-            <h3>Load Folder</h3>
+            {/* <h3>Load Folder</h3> */}
             <FolderPicker disabled={false} onSelectFolder={loadPerfAnalyzerFolder} disabledText='' />
             <PopoverMenu // Graph picker
                 label='Select Graph'
-                options={availableGraphs}
+                options={availableGraphs.map((graph) => graph.name)}
                 selectedItem={selectedGraph}
                 onSelectItem={loadPerfAnalyzerGraph}
                 disabled={!enableGraphSelect}
@@ -48,6 +48,7 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
     return (
         <div className='folder-picker'>
             <Popover2
+                autoFocus
                 position='right'
                 content={
                     <div className={Classes.POPOVER2_DISMISS}>
@@ -62,7 +63,7 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
                         className='load-folder-button'
                         disabled={disabled}
                         icon={IconNames.FOLDER_SHARED}
-                        text='Load Perf Analyzer Results'
+                        text='Select a folder'
                     />
                 </Tooltip2>
             </Popover2>

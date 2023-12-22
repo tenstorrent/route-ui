@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ApplicationMode, Architecture } from 'data/Types';
 import path from 'path';
+import { GraphRelationshipState } from '../../StateTypes';
 
 interface UIState {
     dockOpen: boolean;
@@ -8,7 +9,7 @@ interface UIState {
     graphName: string;
     folderPath: string;
     architecture: Architecture;
-    availableGraphs: string[];
+    availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
 }
 
@@ -45,7 +46,7 @@ const uiStateSlice = createSlice({
         setSelectedArchitecture(state, action: PayloadAction<Architecture>) {
             state.architecture = action.payload;
         },
-        setAvailableGraphs(state, action: PayloadAction<string[]>) {
+        setAvailableGraphs(state, action: PayloadAction<GraphRelationshipState[]>) {
             state.availableGraphs = action.payload;
         },
         clearAvailableGraphs(state) {

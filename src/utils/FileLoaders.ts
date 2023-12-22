@@ -1,5 +1,10 @@
 import Chip from 'data/Chip';
-import { ChipDesignJSON, MetadataJSON, NetlistAnalyzerDataJSON } from 'data/JSONDataTypes';
+import {
+    ChipDesignJSON,
+    GraphnameToEpochToDeviceJSON,
+    MetadataJSON,
+    NetlistAnalyzerDataJSON,
+} from 'data/JSONDataTypes';
 import { Architecture } from 'data/Types';
 import { GraphDescriptorJSON } from 'data/sources/GraphDescriptor';
 import {
@@ -16,6 +21,7 @@ import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 import fs, { Dirent } from 'fs';
 import path from 'path';
 import { parse } from 'yaml';
+import { GraphRelationshipState } from '../data/StateTypes';
 
 export const readFile = async (filename: string): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -80,36 +86,61 @@ export const findFiles = async (
     return subfolderResults.flat();
 };
 
+/** @description
+ * this used to check for all of the important folders. we no longer care
+ * the app can work as long as there is at least something usable there.
+ */
 export const validatePerfResultsFolder = async (dirPath: string): Promise<[isValid: boolean, error: string | null]> => {
-    if (path.basename(dirPath) !== 'perf_results') {
-        return [false, 'Folder name must be "perf_results"'];
-    }
     if (!fs.existsSync(dirPath)) {
         return [false, 'Folder does not exist'];
     }
-
-    const analyzerFolderExists =
-        (await findFiles(dirPath, 'analyzer_results', { isDir: true, maxDepth: 0 })).length === 1;
-    const graphFolderExists = (await findFiles(dirPath, 'graph_descriptor', { isDir: true, maxDepth: 0 })).length === 1;
-
-    if (analyzerFolderExists && graphFolderExists) {
-        return [true, null];
+    return [true, null];
+};
+const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Promise<GraphRelationshipState[]> => {
+    try {
+        const netlistAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
+        return netlistAnalyzerFiles
+            .filter((file) => file.isFile() && file.name.includes('temporal_epoch'))
+            .map((file) => file.name)
+            .map((filename) => {
+                const epoch = getTemporalEpochFromGraphName(filename);
+                const chipId = getChipIdFromFilename(filename);
+                return {
+                    name: filename,
+                    temporalEpoch: epoch,
+                    chipId,
+                } as GraphRelationshipState;
+            });
+    } catch (err) {
+        console.error('Failed to read netlist_analyzer folder', err);
+        return [];
     }
-    const missingSubfolders: string[] = [];
-    if (!analyzerFolderExists) {
-        missingSubfolders.push('analyzer_folder');
-    }
-    if (!graphFolderExists) {
-        missingSubfolders.push('graph_descriptor');
-    }
-
-    return [false, `Selected folder is missing required subdirectory: ${missingSubfolders.join(', ')}`];
 };
 
-export const getAvailableGraphNames = async (perfResultsPath: string): Promise<string[]> => {
-    const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptor');
-    const graphDirEntries = await readDirEntries(graphDescriptorsPath);
-    return graphDirEntries.map((graphDirEntry) => graphDirEntry.name).filter((name) => !name.startsWith('.'));
+export const getAvailableGraphNames = async (perfResultsPath: string): Promise<GraphRelationshipState[]> => {
+    try {
+        const runtimeDataPath = path.join(perfResultsPath, 'runtime_data.yaml');
+        const runtimeDataYaml = await readFile(runtimeDataPath);
+        const runtimeData = parse(runtimeDataYaml);
+
+        return Object.entries(runtimeData.graph_to_epoch_map as GraphnameToEpochToDeviceJSON).map(
+            ([graphName, mapping]) => {
+                return {
+                    name: graphName,
+                    temporalEpoch: mapping.epoch_id,
+                    chipId: mapping.target_device,
+                } as GraphRelationshipState;
+            },
+        );
+    } catch (err) {
+        console.error('Failed to read runtime_data.yaml', err);
+    }
+
+    return getAvailableGraphNamesFromNetlistAnalyzer(perfResultsPath);
+
+    // const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptor');
+    // const graphDirEntries = await readDirEntries(graphDescriptorsPath);
+    // return graphDirEntries.map((graphDirEntry) => graphDirEntry.name).filter((name) => !name.startsWith('.'));
 };
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
@@ -127,6 +158,7 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
     return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
+/** @description only for netlist analizer files */
 const getTemporalEpochFromGraphName = (filename: string): number | null => {
     const regex = /temporal_epoch_(\d+)|fwd_(?:\d+_)*(\d+)/;
     const match = filename.match(regex);
@@ -139,74 +171,91 @@ const getTemporalEpochFromGraphName = (filename: string): number | null => {
     return null;
 };
 
-const loadChipFromNetlistAnalyzer = async (folderPath: string, graphName: string): Promise<Chip | null> => {
-    const temporalEpoch = getTemporalEpochFromGraphName(graphName);
+/** @description only for netlist analizer files */
+const getChipIdFromFilename = (filename: string): number | null => {
+    const regex = /chip(?:_|)(\d+)/;
+    const match = filename.match(regex);
+    return match ? parseInt(match[1], 10) : null;
+};
 
+/** @description only for netlist analizer files */
+const isFileMatchByIdOrEpoch = (filename: string, id: number | null, epoch: number | null): boolean => {
+    if (id === null && epoch === null) {
+        return false;
+    }
+    if (epoch === null) {
+        return getChipIdFromFilename(filename) === id;
+    }
+    if (id === null) {
+        return getTemporalEpochFromGraphName(filename) === epoch;
+    }
+
+    return getTemporalEpochFromGraphName(filename) === epoch && getChipIdFromFilename(filename) === id;
+};
+
+const loadChipFromNetlistAnalyzer = async (
+    folderPath: string,
+    graphName: string,
+    chipId: number | null,
+    temporalEpoch: number | null,
+): Promise<Chip | null> => {
     try {
-        const netListAnalyzerFolders = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
+        const netListAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
         let netlistAnalyzerFilepath: string = '';
         let netlistAnalyzerOptoPipeFilepath: string = '';
-        let modelName = ''; // TODO: confirm this is in fact model name
-        await Promise.all(
-            netListAnalyzerFolders.map(async (folder) => {
-                if (folder.isDirectory()) {
-                    const subfolderPath = path.join(folderPath, 'netlist_analyzer', folder.name);
-                    const dirents = await readDirEntries(subfolderPath);
-                    const netlistAnalyzerFile = dirents.find(
-                        (file) =>
-                            file.isFile() &&
-                            file.name.includes('temporal_epoch') &&
-                            getTemporalEpochFromGraphName(file.name) === temporalEpoch,
-                    );
-                    if (netlistAnalyzerFile) {
-                        modelName = folder.name;
-                        netlistAnalyzerFilepath = path.join(subfolderPath, netlistAnalyzerFile.name);
-                    }
-                    const optoPipesReportsFolder = path.join(subfolderPath, 'reports');
-                    const optoPipesFiles = await readDirEntries(optoPipesReportsFolder);
-                    const opToPipeFile = optoPipesFiles.find(
-                        (file) =>
-                            file.isFile() &&
-                            file.name.includes('temporal_epoch') &&
-                            getTemporalEpochFromGraphName(file.name) === temporalEpoch,
-                    );
-                    if (opToPipeFile) {
-                        netlistAnalyzerOptoPipeFilepath = path.join(optoPipesReportsFolder, opToPipeFile.name);
-                    }
-                }
-            }),
+        netListAnalyzerFiles.forEach((file) => {
+            if (
+                file.isFile() &&
+                file.name.includes('temporal_epoch') &&
+                isFileMatchByIdOrEpoch(file.name, chipId, temporalEpoch)
+            ) {
+                netlistAnalyzerFilepath = path.join(folderPath, 'netlist_analyzer', file.name);
+            }
+        });
+        const optoPipesReportsFolder = path.join(folderPath, 'reports');
+        const optoPipesFiles = await readDirEntries(optoPipesReportsFolder);
+        const opToPipeFile = optoPipesFiles.find(
+            (file) =>
+                file.isFile() &&
+                file.name.includes('temporal_epoch') &&
+                getTemporalEpochFromGraphName(file.name) === temporalEpoch,
         );
-
-        console.info('MODEL NAME', modelName); // TODO: store model name somewhere
-
+        if (opToPipeFile) {
+            netlistAnalyzerOptoPipeFilepath = path.join(optoPipesReportsFolder, opToPipeFile.name);
+        }
         if (netlistAnalyzerFilepath !== '') {
             const data = await readFile(netlistAnalyzerFilepath);
             let chip = Chip.CREATE_FROM_NETLIST_JSON(parse(data) as NetlistAnalyzerDataJSON);
             if (netlistAnalyzerOptoPipeFilepath !== '') {
-                const opsData = await readFile(netlistAnalyzerOptoPipeFilepath);
-                chip = Chip.AUGMENT_FROM_OPS_JSON(chip, parse(opsData).ops);
-            }
-            if (chip) {
-                return chip;
+                try {
+                    const opsData = await readFile(netlistAnalyzerOptoPipeFilepath);
+                    chip = Chip.AUGMENT_FROM_OPS_JSON(chip, parse(opsData).ops);
+                    if (chip) {
+                        return chip;
+                    }
+                } catch (err) {
+                    console.error('Failed to read opto pipes file', err);
+                }
+                if (chip) {
+                    return chip;
+                }
             }
         }
     } catch (err) {
         console.error(err);
-        return null;
     }
     return null;
 };
-export const loadGraph = async (folderPath: string, graphName: string): Promise<Chip> => {
+export const loadGraph = async (folderPath: string, graph: GraphRelationshipState): Promise<Chip> => {
+    const { name, chipId, temporalEpoch } = graph;
+
     let architecture = Architecture.NONE;
 
-    let chip: Chip | null = await loadChipFromNetlistAnalyzer(folderPath, graphName);
+    let chip: Chip | null = await loadChipFromNetlistAnalyzer(path.join(folderPath), name, chipId, temporalEpoch);
 
     if (chip === null) {
         try {
-            const metadata = (await loadJsonFile(
-                path.join(folderPath, `metadata`, `${graphName}.json`),
-            )) as MetadataJSON;
-
+            const metadata = (await loadJsonFile(path.join(folderPath, `metadata`, `${name}.json`))) as MetadataJSON;
             const arch = metadata.arch_name;
             if (arch.includes(Architecture.GRAYSKULL)) {
                 architecture = Architecture.GRAYSKULL;
@@ -217,47 +266,62 @@ export const loadGraph = async (folderPath: string, graphName: string): Promise<
         } catch (err) {
             console.error('Failed to read metadata from folder:', err);
         }
-
         chip = await loadChipFromArchitecture(architecture);
     }
 
-    const graphPath = path.join(folderPath, 'graph_descriptor', graphName, 'cores_to_ops.json');
-    const graphDescriptorJson = await loadJsonFile(graphPath);
+    try {
+        const graphPath = path.join(folderPath, `perf_results`, 'graph_descriptor', name, 'cores_to_ops.json');
+        const graphDescriptorJson = await loadJsonFile(graphPath);
 
-    chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+        chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+    } catch (err) {
+        console.error('graph_descriptor.json not found, skipping \n', err);
+    }
+    try {
+        const queuesPath = path.join(folderPath, `perf_results`, 'queue_descriptor', 'queue_descriptor.json');
+        const queueDescriptorJson = await loadJsonFile(queuesPath);
 
-    const queuesPath = path.join(folderPath, 'queue_descriptor', 'queue_descriptor.json');
-    const queueDescriptorJson = await loadJsonFile(queuesPath);
+        chip = Chip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
+    } catch (err) {
+        console.error('graph_descriptor.json not found, skipping \n', err);
+    }
+    try {
+        const analyzerResultsPath = path.join(
+            folderPath,
+            `perf_results`,
+            'analyzer_results',
+            name,
+            'graph_perf_report_per_op.json',
+        );
+        const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsPerOpJSON;
 
-    chip = Chip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
+        const opPerformanceByOp: OpPerformanceByOp = new Map();
+        const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
+            Object.entries(analyzerResultsJson)
+                .map(([opName, result]) => {
+                    opPerformanceByOp.set(opName, {
+                        ...result['op-measurements'],
+                        ...result['op-attributes'],
+                    } as OpPerfJSON);
+                    /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
+                     *   `perf_results/perf_info_all_epochs.csv`.
+                     *
+                     * The node ID keys in the perf analyzer results file don't have the chip ID (device ID) component.
+                     * We're forcing chip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
+                     */
+                    return Object.entries(result['core-measurements']).map(([coreId, corePerfJson]) => {
+                        return [`${chip?.chipId}-${coreId}`, corePerfJson];
+                    });
+                })
+                .flat(),
+        );
 
-    const analyzerResultsPath = path.join(folderPath, 'analyzer_results', graphName, 'graph_perf_report_per_op.json');
-    const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsPerOpJSON;
-    const opPerformanceByOp: OpPerformanceByOp = new Map();
-    const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
-        Object.entries(analyzerResultsJson)
-            .map(([opName, result]) => {
-                opPerformanceByOp.set(opName, {
-                    ...result['op-measurements'],
-                    ...result['op-attributes'],
-                } as OpPerfJSON);
-                /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
-                 *   `perf_results/perf_info_all_epochs.csv`.
-                 *
-                 * The node ID keys in the perf analyzer results file don't have the chip ID (device ID) component.
-                 * We're forcing chip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
-                 */
-                return Object.entries(result['core-measurements']).map(([chipId, corePerfJson]) => [
-                    `0-${chipId}`,
-                    corePerfJson,
-                ]);
-            })
-            .flat(),
-    );
+        chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
 
-    chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
-
-    chip = Chip.AUGMENT_WITH_OP_PERFORMANCE(chip, opPerformanceByOp);
+        chip = Chip.AUGMENT_WITH_OP_PERFORMANCE(chip, opPerformanceByOp);
+    } catch (err) {
+        console.error('graph_perf_report_per_op.json not found, skipping \n', err);
+    }
 
     return chip;
 };
@@ -265,6 +329,5 @@ export const loadGraph = async (folderPath: string, graphName: string): Promise<
 export const getAvailableNetlistFiles = async (folderPath: string): Promise<string[]> => {
     const netlistAnalyzerFileMask = /^analyzer_output_.*.yaml$/;
     const allFilesList = await readDirEntries(folderPath);
-    const netlistFiles = allFilesList.map((file) => file.name).filter((file) => netlistAnalyzerFileMask.test(file));
-    return netlistFiles;
+    return allFilesList.map((file) => file.name).filter((file) => netlistAnalyzerFileMask.test(file));
 };
