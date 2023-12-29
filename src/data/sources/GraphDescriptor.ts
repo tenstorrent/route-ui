@@ -34,7 +34,7 @@ export interface GraphDescriptorJSON {
 }
 
 /** Intermediate data structure that describes an operation, to help with loading. */
-export interface OperationDetails {
+export interface OperationDescription {
     name: OperationName;
     type: string;
     cores: CoreDetails[];
@@ -48,9 +48,9 @@ export interface CoreDetails {
 }
 
 /** Builds an inversion of the Graph Descriptor JSON data structure to collect groups of cores by the operation mapped to them. */
-export const aggregateCoresByOperation = (json: GraphDescriptorJSON): Map<string, OperationDetails> => {
+export const aggregateCoresByOperation = (json: GraphDescriptorJSON): Map<string, OperationDescription> => {
     return Object.entries<CoreOperationMappingJSON>(json).reduce(
-        (opsMap: Map<OperationName, OperationDetails>, [coreId, opMapping]) => {
+        (opsMap: Map<OperationName, OperationDescription>, [coreId, opMapping]) => {
             const opName: OperationName = opMapping['op-name'];
             if (!opsMap.has(opName)) {
                 opsMap.set(opName, {

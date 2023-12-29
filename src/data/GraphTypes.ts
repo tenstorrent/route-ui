@@ -20,6 +20,7 @@ export interface Operation extends HasOperands, Operand {
     readonly vertexType: GraphVertexType.OPERATION;
     readonly cores: Iterable<ComputeNode>;
     details?: OpPerfDetails
+    slowestOperand: Operand | null;
     isOffchip: boolean;
 }
 

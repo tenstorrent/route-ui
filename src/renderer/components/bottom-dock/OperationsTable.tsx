@@ -23,7 +23,8 @@ function OperationsTable() {
     const [coreView, setCoreView] = useState(false);
     const { opTableFields, changeSorting, sortDirection, sortingColumn } = useOperationsTable(tableFields);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const [firstColumnWidth, setFirstColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
+    const [operationNameColumnWidth, setOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
+    const [slowOperationNameColumnWidth, setSlowOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
     const setOperationSelectionState = (opName: string, selected: boolean) =>
         dispatch(
             selectGroup({
@@ -33,10 +34,13 @@ function OperationsTable() {
         );
     const table = useRef<Table2>(null);
 
-    const recalculateFirstColumnWidth = useCallback(() => {
+    const recalculateOperationColumnWidths = useCallback(() => {
         const width = table.current?.locator?.getWidestVisibleCellInColumn(0) ?? 0;
-        setFirstColumnWidth(width === 0 ? DEFAULT_COLUMN_WIDTH : width + COLUM_WIDTH_OFFSET);
-    }, [table, setFirstColumnWidth]);
+        setOperationNameColumnWidth(width === 0 ? DEFAULT_COLUMN_WIDTH : width + COLUM_WIDTH_OFFSET);
+
+        const slowWidth = table.current?.locator?.getWidestVisibleCellInColumn(5) ?? 0;
+        setSlowOperationNameColumnWidth(slowWidth === 0 ? DEFAULT_COLUMN_WIDTH : slowWidth + COLUM_WIDTH_OFFSET);
+    }, [table, setOperationNameColumnWidth, setSlowOperationNameColumnWidth]);
 
     const resetOpTableDetails = () => {
         if (!chip) {
@@ -44,7 +48,11 @@ function OperationsTable() {
         }
         setTableFields(
             [...chip.operations].map((op) => {
-                return { name: op.name, ...op.details } as unknown as OpTableFields;
+                return {
+                    name: op.name,
+                    ...op.details,
+                    slowestOperandRef: op.slowestOperand,
+                } as unknown as OpTableFields;
             }),
         );
     };
@@ -57,20 +65,26 @@ function OperationsTable() {
     if (!chip) {
         return <pre>No data available</pre>;
     }
-    const expandOperationCores = (op: OpTableFields) => {
-        const operation = chip.getOperation(op.name);
+    // const expandOperationCores = (fields: OpTableFields) => {
+    const expandOperationCores = (opName: string) => {
+        const operation = chip.getOperation(opName);
         if (operation === undefined) {
             return;
         }
         const list = [...operation.cores].map((core: ComputeNode) => {
-            return { name: core.opName, ...core.perfAnalyzerResults, core_id: core.uid } as OpTableFields;
+            return {
+                name: core.opName,
+                ...core.perfAnalyzerResults,
+                core_id: core.uid,
+                slowestOperandRef: core.operation?.slowestOperand,
+            } as OpTableFields;
         });
 
         setCoreView(true);
         setTableFields(list);
     };
 
-    const firstColumnCellRenderer = (rowIndex: number) => {
+    const operationCellRenderer = (rowIndex: number) => {
         const opName = opTableFields[rowIndex].name;
         return (
             <Cell interactive className='table-cell-interactive table-operation-cell'>
@@ -95,7 +109,7 @@ function OperationsTable() {
                         disabled={nodesSelectionState.groups[opName] === undefined}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
-                            expandOperationCores(tableFields[rowIndex]);
+                            expandOperationCores(opName);
                         }}
                         title='View operation cores'
                     />
@@ -168,6 +182,38 @@ function OperationsTable() {
                 </Cell>
             );
         }
+
+        return <Cell>{cellContent}</Cell>;
+    };
+
+    const slowestOperandCellRenderer = (rowIndex: number): JSX.Element => {
+        const cellContent = tableFields[rowIndex].slowest_operand;
+        const slowestOperand = tableFields[rowIndex].slowestOperandRef;
+        if (slowestOperand) {
+            return (
+                <Cell className='table-cell-interactive table-operation-cell'>
+                    <SelectableOperation
+                        disabled={nodesSelectionState.groups[slowestOperand.name] === undefined}
+                        opName={slowestOperand.name}
+                        value={nodesSelectionState.groups[slowestOperand.name]?.selected}
+                        selectFunc={setOperationSelectionState}
+                        stringFilter=''
+                        type={null}
+                    />
+                    <Button
+                        style={{ height: '18px' }}
+                        small
+                        minimal
+                        disabled={nodesSelectionState.groups[slowestOperand.name] === undefined}
+                        icon={IconNames.ARROW_RIGHT}
+                        onClick={() => {
+                            expandOperationCores(slowestOperand.name);
+                        }}
+                        title='View operation cores'
+                    />
+                </Cell>
+            );
+        }
         return <Cell>{cellContent}</Cell>;
     };
 
@@ -186,20 +232,19 @@ function OperationsTable() {
             className='operations-table'
             numRows={tableFields.length}
             enableColumnHeader
-            onCompleteRender={recalculateFirstColumnWidth}
+            onCompleteRender={recalculateOperationColumnWidths}
             columnWidths={[
-                firstColumnWidth,
+                operationNameColumnWidth,
                 otherColWidth,
                 otherColWidth,
                 otherColWidth,
                 otherColWidth,
-                otherColWidth,
+                slowOperationNameColumnWidth,
                 otherColWidth,
                 otherColWidth,
             ]}
-            // columnWidths={columnWidths}
             cellRendererDependencies={[
-                firstColumnWidth,
+                operationNameColumnWidth,
                 sortDirection,
                 sortingColumn,
                 nodesSelectionState.groups,
@@ -209,7 +254,7 @@ function OperationsTable() {
         >
             <Column
                 id='operation'
-                cellRenderer={firstColumnCellRenderer}
+                cellRenderer={operationCellRenderer}
                 columnHeaderCellRenderer={() => headerRenderer('operation')}
             />
             {!coreView ? (
@@ -236,7 +281,7 @@ function OperationsTable() {
                 columnHeaderCellRenderer={() => headerRenderer('bw_limited_factor')}
             />
             <Column
-                cellRenderer={(rowIndex) => cellRenderer('slowest_operand', rowIndex)}
+                cellRenderer={(rowIndex) => slowestOperandCellRenderer(rowIndex)}
                 columnHeaderCellRenderer={() => headerRenderer('slowest_operand')}
             />
             <Column

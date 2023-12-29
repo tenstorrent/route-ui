@@ -12,6 +12,7 @@ import MainRouteRenderer from './MainRouteRenderer';
 import SplashScreen from './SplashScreen';
 import TopHeaderComponent from './components/TopHeaderComponent';
 import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
+import { generateRuntimeData } from '../main/util';
 
 export default function App() {
     useKeyboardFocus();

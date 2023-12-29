@@ -32,6 +32,8 @@ export class MeasurementDetails implements MeasurementsJSON {
 
     warnings: string;
 
+    // slowestOperand: GraphVertex | null = null;
+
     constructor(json: MeasurementsJSON) {
         this.bw_bound_math_utilization = json.bw_bound_math_utilization;
         this.bw_bound_runtime_per_input = json.bw_bound_runtime_per_input;
@@ -54,12 +56,12 @@ export class MeasurementDetails implements MeasurementsJSON {
         });
     }
 
-    private _slowestOperand: OperandPerformance | undefined;
+    public _slowestOperand: OperandPerformance | undefined;
 
     get slowestOperand(): OperandPerformance | null {
-        if (this._slowestOperand !== undefined) {
-            return this._slowestOperand;
-        }
+        // if (this._slowestOperand !== undefined) {
+        //     return this._slowestOperand;
+        // }
         let operandType;
         if (this.slowest_operand.startsWith(OperandDirection.INPUT)) {
             operandType = OperandDirection.INPUT;
@@ -77,6 +79,9 @@ export class MeasurementDetails implements MeasurementsJSON {
         return this._slowestOperand;
     }
 
+
+    /** doesn't look like this will be needed, usage discouraged */
+    /** @deprecated */
     get slowestOperandDetails() {
         if (this.slowestOperand?.direction && this.slowestOperand?.index !== null) {
             const [actual, required] =
@@ -122,7 +127,7 @@ export enum OperandDirection {
 
 type OperandPerformance = {
     direction: OperandDirection;
-    index: number | null;
+    index: number;
 };
 
 export class OpPerfDetails extends MeasurementDetails implements OpPerfJSON {

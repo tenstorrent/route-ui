@@ -240,6 +240,8 @@ const loadChipFromNetlistAnalyzer = async (
                     return chip;
                 }
             }
+        }else{
+            console.error('Failed to read netlist analyzer file');
         }
     } catch (err) {
         console.error(err);
@@ -255,7 +257,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
 
     if (chip === null) {
         try {
-            const metadata = (await loadJsonFile(path.join(folderPath, `metadata`, `${name}.json`))) as MetadataJSON;
+            const metadata = (await loadJsonFile(path.join(folderPath, 'perf_results', 'metadata', `${name}.json`))) as MetadataJSON;
             const arch = metadata.arch_name;
             if (arch.includes(Architecture.GRAYSKULL)) {
                 architecture = Architecture.GRAYSKULL;
