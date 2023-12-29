@@ -33,6 +33,7 @@ import { NOC } from '../data/Types';
 import { mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
 import {
+    getMaxBwLimitedFactor,
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
 } from '../data/store/selectors/operationPerf.selectors';
@@ -97,40 +98,6 @@ export default function GridRender() {
             isHC,
         )}, ${calculateOpCongestionColor(maxBwLimitedFactor, 0, isHC)})`,
     };
-
-    // eslint-disable-next-line no-unsafe-optional-chaining
-    // console.log(
-    //     [...chip?.queues].map((q: Queue) => {
-    //         console.log(
-    //             q.details?.['allocation-info'].map((info) => info.channel),
-    //             `${q.name} ${q.details?.location}`,
-    //             q.details?.['allocation-info'],
-    //         );
-    //     }),
-    // );
-
-    /** this is a sample use of the new op perf details */
-    // TODO: move this to an operation/operand of whereever this makes sense. this business logic must live on data layer
-    // if (chip) {
-    //     forEach(chip?.operations, (op) => {
-    //         console.group(op.name);
-    //         const slowestOperand = op.details?.slowestOperand;
-    //         let bottleneck: Operand | null = null;
-    //         if (slowestOperand) {
-    //             const slowestOperandDetails = op.details?.slowestOperandDetails;
-    //             if (slowestOperandDetails) {
-    //                 if (slowestOperandDetails.type === OperandDirection.INPUT) {
-    //                     bottleneck = [...op.inputs][slowestOperandDetails.index];
-    //                 } else if (slowestOperandDetails.type === OperandDirection.OUTPUT) {
-    //                     bottleneck = [...op.outputs][slowestOperandDetails.index];
-    //                 }
-    //             }
-    //         }
-    //         console.log(op.details);
-    //         console.log(bottleneck);
-    //         console.groupEnd();
-    //     });
-    // }
 
     useEffect(() => {
         if (chip) {
@@ -228,9 +195,9 @@ export default function GridRender() {
                     <Slider
                         className='link-saturation-slider'
                         min={0}
-                        max={chip?.details.maxBwLimitedFactor || 10}
+                        max={maxBwLimitedFactor || 10}
                         disabled={!useSelector(getShowOperationPerformanceGrid)}
-                        labelStepSize={5}
+                        labelStepSize={Math.max(5, maxBwLimitedFactor / 5)}
                         value={useSelector(getOperationPerformanceTreshold)}
                         onChange={onOpCongestionChange}
                         labelRenderer={(value) => `${value.toFixed(0)}`}
@@ -343,7 +310,6 @@ export default function GridRender() {
                                                 majorStepSize={100000}
                                                 min={1}
                                                 onValueChange={(value) => {
-
                                                     if (value === 0) {
                                                         return;
                                                     }
