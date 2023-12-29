@@ -18,11 +18,14 @@ export function resolveHtmlPath(htmlFileName: string) {
  */
 export const generateRuntimeData = () => {
     let output = '';
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 72; i++) {
         const e = i;
-        const string = `test_unary_chip${e}:
-  epoch_id: 0
-  target_device: ${e}\n`;
+        // const string = `test_unary_chip${e}:
+        const string = `fwd_0_${e}_temporal_epoch_${e}:
+  epoch_id: ${e}
+  target_device: 1\n`;
+  // epoch_id: 0
+  // target_device: ${e}\n`;
         output += string;
     }
     console.log(output);

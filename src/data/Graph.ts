@@ -5,7 +5,7 @@ import { ComputeNodeType } from './Types';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 import { ComputeNode } from './Chip';
-import { OpPerfDetails } from './OpPerfDetails';
+import { OperandDirection, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
 import Error = types.Error;
 
@@ -61,18 +61,11 @@ export abstract class AbstractGraphVertex implements Operand {
 
     /** All input operands */
     get inputs(): Operand[] {
-        // TODO: this is a slight performance hit, to remove once pipe data is merged
-        if (process.env.NODE_ENV === 'development') {
-            return [...this.inputOperands];
-        }
         return this.inputOperands;
     }
 
     /** All output operands */
     get outputs(): Operand[] {
-        if (process.env.NODE_ENV === 'development') {
-            return [...this.outputOperands];
-        }
         return this.outputOperands;
     }
 
@@ -132,6 +125,17 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         super(name, inputOperands, outputOperands);
         this._cores = [];
         cores.forEach((core) => this.assignCore(core));
+    }
+
+    get slowestOperand(): Operand | null {
+        const result = this.details?.slowestOperand;
+        if (result) {
+            if (result.direction === OperandDirection.INPUT) {
+                return [...this.inputs][result.index];
+            }
+            return [...this.outputs][result.index];
+        }
+        return null;
     }
 
     details?: OpPerfDetails;

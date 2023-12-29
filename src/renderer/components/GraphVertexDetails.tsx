@@ -67,6 +67,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                             {operand.uniquePipeIds.map((pipeId) => (
                                 <li>
                                     <SelectablePipe
+                                        key={pipeId}
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                         pipeFilter=''
                                         showBandwidth={false}

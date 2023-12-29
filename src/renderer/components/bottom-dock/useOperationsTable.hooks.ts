@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
+import { Operand } from '../../../data/Graph';
 
 export enum SortingDirection {
     ASC = 'asc',
@@ -10,6 +11,7 @@ export interface OpTableFields extends MeasurementDetails {
     name: string;
     grid_size: number;
     core_id: string;
+    slowestOperandRef: Operand | null;
     // bw_bound_math_utilization: number;
 }
 

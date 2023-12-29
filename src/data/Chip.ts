@@ -33,7 +33,7 @@ import {
     aggregateCoresByOperation,
     GraphDescriptorJSON,
     OperandJSON,
-    OperationDetails,
+    OperationDescription,
 } from './sources/GraphDescriptor';
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
@@ -405,10 +405,11 @@ export default class Chip {
             Object.entries(operationsJson).map(([operationName, opJson]) => {
                 const operation = augmentedChip.operationsByName.get(operationName);
                 if (!operation) {
-                    console.warn(
-                        `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
-                    );
-                    /** temporarily disabling this until new op-to-pipe with chip_id and graph_id is present */
+                    /** this is perfectly normal, optopipe is a singlefile per temporal epoch and is multichip
+                     * we will want to capture ALL information for multichip routing */
+                    // console.warn(
+                    //     `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
+                    // );
                     // operation = new BuildableOperation(operationName, [], [], []);
                     // augmentedChip.addOperation(operation);
                     // TODO: we should add ALL operations but only add the operations that run on this chip to the augmentedChip. likely requires a separate structure (graph?)
@@ -538,20 +539,20 @@ export default class Chip {
         const newChip = new Chip(chip.chipId);
         Object.assign(newChip, chip);
 
-        const opMap: Map<OperationName, OperationDetails> = aggregateCoresByOperation(graphDescriptorJson);
+        const opMap: Map<OperationName, OperationDescription> = aggregateCoresByOperation(graphDescriptorJson);
 
-        const operations = mapIterable(opMap.entries(), ([opName, opDetails]) => {
+        const operations = mapIterable(opMap.entries(), ([opName, opDescriptor]) => {
             if (opName === undefined) {
                 console.error('Likely an empty graph');
                 throw new Error('opName is undefined');
             }
-            const cores: ComputeNode[] = opDetails.cores
+            const cores: ComputeNode[] = opDescriptor.cores
                 // `core.id` is only an x-y locations and doesn't include Chip ID
                 .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`));
-            const inputs = opDetails.inputs.map((operandJson) =>
+            const inputs = opDescriptor.inputs.map((operandJson) =>
                 newChip.createOperand(operandJson.name, operandJson.type),
             );
-            const outputs = opDetails.outputs.map((operandJson: OperandJSON) =>
+            const outputs = opDescriptor.outputs.map((operandJson: OperandJSON) =>
                 newChip.createOperand(operandJson.name, operandJson.type),
             );
 
