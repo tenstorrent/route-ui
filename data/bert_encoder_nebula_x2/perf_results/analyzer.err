@@ -1,0 +1,5 @@
+[92m2023-12-29 18:46:35 | INFO    [0m | Started running performance analysis[0m
+[92m2023-12-29 18:46:35 | INFO    [0m | Starting overlay decouple analysis[0m
+[92m2023-12-29 18:46:35 | INFO    [0m | Skipping test run since --skip-run is set. Reading perf results from ./tt_build/test_inference_8381574644216967368/perf_results/[0m
+[92m2023-12-29 18:46:35 | INFO    [0m | program_name 0-run_fwd[0m
+[92m2023-12-29 18:46:35 | INFO    [0m | Analysis finished successfully[0m

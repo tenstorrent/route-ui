@@ -1,0 +1,99 @@
+fwd_0_temporal_epoch_0:
+  placement:
+    - "0   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+  Op_types:
+    matmul:
+      Num_cores: 1
+      Core_utilization(%): 1.25
+  Total_core_utilization(%): 1.25
+fwd_1_temporal_epoch_0:
+  placement:
+    - "19  20  18  14  15  16  2   25  "
+    - "24  17  11  12  13  10  4   5   "
+    - "6   3   23  21  7   40  41  8   "
+    - "44  45  33  22  34  35  36  31  "
+    - "39  38  37  9   46  47  32  42  "
+    - "43  1   50  56  54  57  58  55  "
+    - "52  53  51  59  49  27  28  26  "
+    - "29  30  0   48  .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+  Op_types:
+    subtract:
+      Num_cores: 1
+      Core_utilization(%): 1.25
+    reciprocal:
+      Num_cores: 2
+      Core_utilization(%): 2.5
+    exp:
+      Num_cores: 1
+      Core_utilization(%): 1.25
+    multiply:
+      Num_cores: 5
+      Core_utilization(%): 6.25
+    gelu:
+      Num_cores: 1
+      Core_utilization(%): 1.25
+    nop:
+      Num_cores: 2
+      Core_utilization(%): 2.5
+    matmul:
+      Num_cores: 36
+      Core_utilization(%): 45
+    sqrt:
+      Num_cores: 1
+      Core_utilization(%): 1.25
+    add:
+      Num_cores: 11
+      Core_utilization(%): 13.75
+  Total_core_utilization(%): 75
+fwd_2_temporal_epoch_1:
+  placement:
+    - "33  31  34  35  32  29  30  28  "
+    - "36  27  19  20  2   23  24  12  "
+    - "4   13  14  15  10  18  17  16  "
+    - "3   25  26  11  21  22  1   50  "
+    - "56  54  57  58  55  52  53  51  "
+    - "59  49  6   7   5   8   9   0   "
+    - "39  45  43  46  47  44  41  42  "
+    - "40  48  37  38  .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+    - ".   .   .   .   .   .   .   .   "
+  Op_types:
+    subtract:
+      Num_cores: 3
+      Core_utilization(%): 3.75
+    reciprocal:
+      Num_cores: 4
+      Core_utilization(%): 5
+    exp:
+      Num_cores: 1
+      Core_utilization(%): 1.25
+    multiply:
+      Num_cores: 11
+      Core_utilization(%): 13.75
+    gelu:
+      Num_cores: 1
+      Core_utilization(%): 1.25
+    nop:
+      Num_cores: 3
+      Core_utilization(%): 3.75
+    matmul:
+      Num_cores: 19
+      Core_utilization(%): 23.75
+    sqrt:
+      Num_cores: 3
+      Core_utilization(%): 3.75
+    add:
+      Num_cores: 15
+      Core_utilization(%): 18.75
+  Total_core_utilization(%): 75

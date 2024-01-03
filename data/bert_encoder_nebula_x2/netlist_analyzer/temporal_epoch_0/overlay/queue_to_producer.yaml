@@ -1,0 +1,154 @@
+e2e_norm_ff_0_mean.lc1_0:
+  0:
+    name: e2e_norm_ff_0_mean.lc1_0
+    channel: 0
+    queue_target_device: 0
+    addr: 0x6880100
+    producers:
+      0:
+        chip_id: 0
+        x: 9
+        y: 6
+e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0
+    channel: 1
+    queue_target_device: 0
+    addr: 0x6880100
+    producers:
+      1:
+        chip_id: 0
+        x: 1
+        y: 1
+e2e_ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0
+    channel: 5
+    queue_target_device: 0
+    addr: 0x68821a0
+    producers:
+      2:
+        chip_id: 0
+        x: 9
+        y: 6
+e2e_ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0
+    channel: 2
+    queue_target_device: 0
+    addr: 0x6880100
+    producers:
+      3:
+        chip_id: 0
+        x: 1
+        y: 6
+e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0
+    channel: 0
+    queue_target_device: 0
+    addr: 0x68821a0
+    producers:
+      4:
+        chip_id: 0
+        x: 1
+        y: 6
+e2e_ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.lc1_0
+    channel: 4
+    queue_target_device: 0
+    addr: 0xb808320
+    producers:
+      5:
+        chip_id: 0
+        x: 1
+        y: 6
+e2e_ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0
+    channel: 0
+    queue_target_device: 0
+    addr: 0x6884240
+    producers:
+      6:
+        chip_id: 0
+        x: 1
+        y: 6
+e2e_add_ff_0_0:
+  0:
+    name: e2e_add_ff_0_0
+    channel: 1
+    queue_target_device: 0
+    addr: 0x6884240
+    producers:
+      7:
+        chip_id: 0
+        x: 1
+        y: 6
+e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0
+    channel: 5
+    queue_target_device: 0
+    addr: 0x6880100
+    producers:
+      8:
+        chip_id: 0
+        x: 9
+        y: 6
+e2e_ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.lc1_0
+    channel: 4
+    queue_target_device: 0
+    addr: 0xb800100
+    producers:
+      9:
+        chip_id: 0
+        x: 9
+        y: 6
+e2e_attention_mask_s_brcst_m2_0_1.lc1_0:
+  0:
+    name: e2e_attention_mask_s_brcst_m2_0_1.lc1_0
+    channel: 2
+    queue_target_device: 0
+    addr: 0x68821a0
+    producers:
+      10:
+        chip_id: 0
+        x: 1
+        y: 6
+e2e_ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.lc1_0
+    channel: 1
+    queue_target_device: 0
+    addr: 0x68821a0
+    producers:
+      11:
+        chip_id: 0
+        x: 9
+        y: 6
+e2e_ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.lc1_0:
+  0:
+    name: e2e_ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.lc1_0
+    channel: 3
+    queue_target_device: 0
+    addr: 0xb800100
+    producers:
+      12:
+        chip_id: 0
+        x: 9
+        y: 6
+e2e_ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_0:
+  0:
+    name: e2e_ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_0
+    channel: 3
+    queue_target_device: 0
+    addr: 0xb8021a0
+    producers:
+      13:
+        chip_id: 0
+        x: 1
+        y: 6

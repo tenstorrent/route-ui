@@ -1,0 +1,1046 @@
+graph_name: queues_graph
+---
+buffer_101000000000:  # Queue e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 101000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x6880100
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0
+---
+buffer_103000000000:  # Queue e2e_ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 103000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x68821a0
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.lc1_0
+---
+buffer_105000000000:  # Queue e2e_ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_0: r = 0, c = 0
+  uniqid: 105000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb8021a0
+  q_slots: 1
+  md_op_name: e2e_ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_0
+---
+buffer_107000000000:  # Queue e2e_ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 107000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb808320
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.lc1_0
+---
+buffer_109000000000:  # Queue e2e_add_ff_0_0: r = 0, c = 0
+  uniqid: 109000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x6884240
+  q_slots: 1
+  md_op_name: e2e_add_ff_0_0
+---
+buffer_111000000000:  # Queue e2e_norm_ff_0_mean.lc1_0: r = 0, c = 0
+  uniqid: 111000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x6880100
+  q_slots: 1
+  md_op_name: e2e_norm_ff_0_mean.lc1_0
+---
+buffer_113000000000:  # Queue lc.input_tensor.norm_ff_1_recip_s_brcst_m1_0_0.0: r = 0, c = 0
+  uniqid: 113000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb835f20
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_ff_1_recip_s_brcst_m1_0_0.0
+---
+buffer_115000000000:  # Queue lc.input_tensor.norm_ff_1_var.0: r = 0, c = 0
+  uniqid: 115000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688e560
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_ff_1_var.0
+---
+buffer_117000000000:  # Queue lc.input_tensor.norm_ff_1_mean.0: r = 0, c = 0
+  uniqid: 117000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x6895f40
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_ff_1_mean.0
+---
+buffer_119000000000:  # Queue lc.input_tensor.norm_mha_1_recip_s_brcst_m1_0_0.0: r = 0, c = 0
+  uniqid: 119000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb8356e0
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_mha_1_recip_s_brcst_m1_0_0.0
+---
+buffer_121000000000:  # Queue lc.input_tensor.norm_mha_1_var.0: r = 0, c = 0
+  uniqid: 121000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688dd20
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_mha_1_var.0
+---
+buffer_123000000000:  # Queue lc.input_tensor.mha_1_as_softmax.dc.reduce_sum.1.0: r = 0, c = 0
+  uniqid: 123000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688d4e0
+  q_slots: 1
+  md_op_name: lc.input_tensor.mha_1_as_softmax.dc.reduce_sum.1.0
+---
+buffer_125000000000:  # Queue lc.input_tensor.norm_ff_0_recip_s_brcst_m1_0_0.0: r = 0, c = 0
+  uniqid: 125000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68862e0
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_ff_0_recip_s_brcst_m1_0_0.0
+---
+buffer_127000000000:  # Queue constant_1_norm_ff_0_var_plus_eps: r = 0, c = 0
+  uniqid: 127000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x688c460
+  q_slots: 1
+  md_op_name: constant_1_norm_ff_0_var_plus_eps
+---
+buffer_129000000000:  # Queue lc.input_tensor.norm_ff_0_var.0: r = 0, c = 0
+  uniqid: 129000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688c460
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_ff_0_var.0
+---
+buffer_131000000000:  # Queue lc.input_tensor.norm_ff_0_mean.0: r = 0, c = 0
+  uniqid: 131000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb8062e0
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_ff_0_mean.0
+---
+buffer_133000000000:  # Queue lc.input_tensor.norm_mha_0_recip_s_brcst_m1_0_0.0: r = 0, c = 0
+  uniqid: 133000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x6886b20
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_mha_0_recip_s_brcst_m1_0_0.0
+---
+buffer_135000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.attention.self.value.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 135000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb807360
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.attention.self.value.bias_s_brcst_m2_0_0.0
+---
+buffer_137000000000:  # Queue lc.input_tensor.mha_0_as_softmax.dc.reduce_sum.1.0: r = 0, c = 0
+  uniqid: 137000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68b57a0
+  q_slots: 1
+  md_op_name: lc.input_tensor.mha_0_as_softmax.dc.reduce_sum.1.0
+---
+buffer_139000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.attention.self.query.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 139000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb80c580
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.attention.self.query.bias_s_brcst_m2_0_0.0
+---
+buffer_141000000000:  # Queue ff.bert.encoder.layer.0.attention.self.value.bias: r = 0, c = 0
+  uniqid: 141000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb804240
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.self.value.bias
+---
+buffer_143000000000:  # Queue ff.bert.encoder.layer.0.attention.self.query.weight: r = 0, c = 0
+  uniqid: 143000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x689a0e0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.self.query.weight
+---
+buffer_145000000000:  # Queue lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.0: r = 0, c = 0
+  uniqid: 145000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68de120
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.0
+---
+buffer_147000000000:  # Queue ff.bert.encoder.layer.0.attention.self.value.weight: r = 0, c = 0
+  uniqid: 147000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68acc80
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.self.value.weight
+---
+buffer_149000000000:  # Queue ff.bert.encoder.layer.1.attention.output.dense.weight: r = 0, c = 0
+  uniqid: 149000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x6887ba0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.output.dense.weight
+---
+buffer_151000000000:  # Queue ff.bert.encoder.layer.0.output.dense.weight: r = 0, c = 0
+  uniqid: 151000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 64
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb80ac00
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.output.dense.weight
+---
+buffer_153000000000:  # Queue ff.bert.encoder.layer.0.attention.output.dense.weight: r = 0, c = 0
+  uniqid: 153000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb82b420
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.output.dense.weight
+---
+buffer_155000000000:  # Queue e2e_ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 155000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb800100
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.lc1_0
+---
+buffer_157000000000:  # Queue lc.input_tensor.norm_mha_1_mean.0: r = 0, c = 0
+  uniqid: 157000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x6895700
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_mha_1_mean.0
+---
+buffer_159000000000:  # Queue ff.bert.encoder.layer.0.attention.output.dense.bias: r = 0, c = 0
+  uniqid: 159000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68b8080
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.output.dense.bias
+---
+buffer_161000000000:  # Queue e2e_ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 161000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb800100
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.lc1_0
+---
+buffer_163000000000:  # Queue ff.bert.encoder.layer.0.intermediate.dense.weight: r = 0, c = 0
+  uniqid: 163000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 64
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x688c460
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.intermediate.dense.weight
+---
+buffer_165000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 165000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb836760
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.0
+---
+buffer_167000000000:  # Queue e2e_ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 167000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x6880100
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0
+---
+buffer_169000000000:  # Queue e2e_attention_mask_s_brcst_m2_0_1.lc1_0: r = 0, c = 0
+  uniqid: 169000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x68821a0
+  q_slots: 1
+  md_op_name: e2e_attention_mask_s_brcst_m2_0_1.lc1_0
+---
+buffer_171000000000:  # Queue ff.bert.encoder.layer.0.intermediate.dense.bias: r = 0, c = 0
+  uniqid: 171000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68ba120
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.intermediate.dense.bias
+---
+buffer_173000000000:  # Queue ff.bert.encoder.layer.1.attention.output.LayerNorm.bias: r = 0, c = 0
+  uniqid: 173000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688f5e0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.output.LayerNorm.bias
+---
+buffer_175000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.attention.output.LayerNorm.weight_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 175000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb80d600
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.attention.output.LayerNorm.weight_s_brcst_m2_0_0.0
+---
+buffer_177000000000:  # Queue ff.bert.encoder.layer.0.output.dense.bias: r = 0, c = 0
+  uniqid: 177000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x68980a0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.output.dense.bias
+---
+buffer_179000000000:  # Queue constant_1_norm_mha_1_var_plus_eps: r = 0, c = 0
+  uniqid: 179000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb807ba0
+  q_slots: 1
+  md_op_name: constant_1_norm_mha_1_var_plus_eps
+---
+buffer_181000000000:  # Queue ff.bert.encoder.layer.0.attention.self.key.bias: r = 0, c = 0
+  uniqid: 181000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68b5fe0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.self.key.bias
+---
+buffer_183000000000:  # Queue ff.bert.encoder.layer.0.output.LayerNorm.weight: r = 0, c = 0
+  uniqid: 183000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68de960
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.output.LayerNorm.weight
+---
+buffer_185000000000:  # Queue ff.bert.encoder.layer.0.attention.self.key.weight: r = 0, c = 0
+  uniqid: 185000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb843300
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.self.key.weight
+---
+buffer_187000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 187000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x68998a0
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.0
+---
+buffer_189000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 189000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688eda0
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.0
+---
+buffer_191000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.attention.output.dense.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 191000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x68a2b40
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.attention.output.dense.bias_s_brcst_m2_0_0.0
+---
+buffer_193000000000:  # Queue e2e_ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 193000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x6884240
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0
+---
+buffer_195000000000:  # Queue ff.bert.encoder.layer.0.output.LayerNorm.bias: r = 0, c = 0
+  uniqid: 195000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x6896780
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.output.LayerNorm.bias
+---
+buffer_197000000000:  # Queue lc.input_tensor.norm_mha_0_var.0: r = 0, c = 0
+  uniqid: 197000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688cca0
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_mha_0_var.0
+---
+buffer_199000000000:  # Queue lc.input_tensor.attention_mask_s_brcst_m2_1_1.0: r = 0, c = 0
+  uniqid: 199000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68e1240
+  q_slots: 1
+  md_op_name: lc.input_tensor.attention_mask_s_brcst_m2_1_1.0
+---
+buffer_201000000000:  # Queue ff.bert.encoder.layer.1.intermediate.dense.bias: r = 0, c = 0
+  uniqid: 201000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb839040
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.intermediate.dense.bias
+---
+buffer_203000000000:  # Queue encoder_input: r = 0, c = 0
+  uniqid: 203000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x300020a0
+  q_slots: 1
+  md_op_name: encoder_input
+---
+buffer_205000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.attention.self.value.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 205000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x6887360
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.attention.self.value.bias_s_brcst_m2_0_0.0
+---
+buffer_207000000000:  # Queue ff.bert.encoder.layer.0.attention.output.LayerNorm.bias: r = 0, c = 0
+  uniqid: 207000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb84bd60
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.output.LayerNorm.bias
+---
+buffer_209000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 209000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb80b500
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.0
+---
+buffer_211000000000:  # Queue attention_mask: r = 0, c = 0
+  uniqid: 211000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x30000000
+  q_slots: 1
+  md_op_name: attention_mask
+---
+buffer_213000000000:  # Queue ff.bert.encoder.layer.1.attention.self.key.bias: r = 0, c = 0
+  uniqid: 213000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb808c20
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.self.key.bias
+---
+buffer_215000000000:  # Queue encoder1.output_norm_ff_1_bias: r = 0, c = 0
+  uniqid: 215000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2048
+  dram_chan: 0
+  dram_addr: 0x800000000
+  q_slots: 1
+  md_op_name: encoder1.output_norm_ff_1_bias
+---
+buffer_217000000000:  # Queue ff.bert.encoder.layer.0.attention.output.LayerNorm.weight: r = 0, c = 0
+  uniqid: 217000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x6896000
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.output.LayerNorm.weight
+---
+buffer_219000000000:  # Queue ff.bert.encoder.layer.1.output.LayerNorm.weight: r = 0, c = 0
+  uniqid: 219000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x6891680
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.output.LayerNorm.weight
+---
+buffer_221000000000:  # Queue ff.bert.encoder.layer.1.output.dense.bias: r = 0, c = 0
+  uniqid: 221000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68b3700
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.output.dense.bias
+---
+buffer_223000000000:  # Queue ff.reciprocal_of_sqrt_of_head_size_1: r = 0, c = 0
+  uniqid: 223000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68b0e20
+  q_slots: 1
+  md_op_name: ff.reciprocal_of_sqrt_of_head_size_1
+---
+buffer_225000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 225000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb80bd40
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.0
+---
+buffer_227000000000:  # Queue ff.bert.encoder.layer.1.attention.output.LayerNorm.weight: r = 0, c = 0
+  uniqid: 227000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68b1660
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.output.LayerNorm.weight
+---
+buffer_229000000000:  # Queue ff.bert.encoder.layer.1.output.dense.weight: r = 0, c = 0
+  uniqid: 229000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 64
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x688fdc0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.output.dense.weight
+---
+buffer_231000000000:  # Queue constant_1_norm_mha_0_var_plus_eps: r = 0, c = 0
+  uniqid: 231000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x688cca0
+  q_slots: 1
+  md_op_name: constant_1_norm_mha_0_var_plus_eps
+---
+buffer_233000000000:  # Queue ff.bert.encoder.layer.1.attention.output.dense.bias: r = 0, c = 0
+  uniqid: 233000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb836fa0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.output.dense.bias
+---
+buffer_235000000000:  # Queue ff.bert.encoder.layer.1.attention.self.query.bias: r = 0, c = 0
+  uniqid: 235000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x688a3c0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.self.query.bias
+---
+buffer_237000000000:  # Queue e2e_ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 237000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68821a0
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0
+---
+buffer_239000000000:  # Queue ff.reciprocal_of_sqrt_of_head_size_0: r = 0, c = 0
+  uniqid: 239000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb80cdc0
+  q_slots: 1
+  md_op_name: ff.reciprocal_of_sqrt_of_head_size_0
+---
+buffer_241000000000:  # Queue ff.bert.encoder.layer.1.attention.self.query.weight: r = 0, c = 0
+  uniqid: 241000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x688d4e0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.self.query.weight
+---
+buffer_243000000000:  # Queue lc.input_tensor.norm_mha_0_mean.0: r = 0, c = 0
+  uniqid: 243000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb806b20
+  q_slots: 1
+  md_op_name: lc.input_tensor.norm_mha_0_mean.0
+---
+buffer_245000000000:  # Queue ff.bert.encoder.layer.1.attention.self.value.bias: r = 0, c = 0
+  uniqid: 245000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb833640
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.self.value.bias
+---
+buffer_247000000000:  # Queue ff.bert.encoder.layer.1.attention.self.key.weight: r = 0, c = 0
+  uniqid: 247000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x6884240
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.self.key.weight
+---
+buffer_249000000000:  # Queue ff.bert.encoder.layer.1.attention.self.value.weight: r = 0, c = 0
+  uniqid: 249000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 16
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68b4ea0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.attention.self.value.weight
+---
+buffer_251000000000:  # Queue ff.bert.encoder.layer.1.output.LayerNorm.bias: r = 0, c = 0
+  uniqid: 251000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb841260
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.output.LayerNorm.bias
+---
+buffer_253000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.attention.self.key.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 253000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x68a2300
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.attention.self.key.bias_s_brcst_m2_0_0.0
+---
+buffer_255000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 255000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68e0a00
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.0
+---
+buffer_257000000000:  # Queue e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 257000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68821a0
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0
+---
+buffer_259000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 259000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x6899060
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.0
+---
+buffer_261000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 261000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68dd8e0
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.0
+---
+buffer_263000000000:  # Queue e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0: r = 0, c = 0
+  uniqid: 263000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x6880100
+  q_slots: 1
+  md_op_name: e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0
+---
+buffer_265000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.attention.self.query.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 265000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb80a3c0
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.attention.self.query.bias_s_brcst_m2_0_0.0
+---
+buffer_267000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 267000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68e1a80
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.0
+---
+buffer_269000000000:  # Queue lc.input_tensor.attention_mask_s_brcst_m2_0_1.0: r = 0, c = 0
+  uniqid: 269000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb80acc0
+  q_slots: 1
+  md_op_name: lc.input_tensor.attention_mask_s_brcst_m2_0_1.0
+---
+buffer_271000000000:  # Queue constant_1_norm_ff_1_var_plus_eps: r = 0, c = 0
+  uniqid: 271000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb8083e0
+  q_slots: 1
+  md_op_name: constant_1_norm_ff_1_var_plus_eps
+---
+buffer_273000000000:  # Queue lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m2_0_1.0: r = 0, c = 0
+  uniqid: 273000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x6898820
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m2_0_1.0
+---
+buffer_275000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 275000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 0
+  dram_addr: 0x68b05e0
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.0
+---
+buffer_277000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.output.dense.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 277000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 3
+  dram_addr: 0xb80de40
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.output.dense.bias_s_brcst_m2_0_0.0
+---
+buffer_279000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.intermediate.dense.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 279000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 1
+  dram_addr: 0x68a3380
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.intermediate.dense.bias_s_brcst_m2_0_0.0
+---
+buffer_281000000000:  # Queue lc.input_tensor.ff.bert.encoder.layer.0.attention.output.LayerNorm.bias_s_brcst_m2_0_0.0: r = 0, c = 0
+  uniqid: 281000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68e22c0
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.bert.encoder.layer.0.attention.output.LayerNorm.bias_s_brcst_m2_0_0.0
+---
+buffer_283000000000:  # Queue lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m2_0_1.0: r = 0, c = 0
+  uniqid: 283000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 4
+  dram_addr: 0xb84b520
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m2_0_1.0
+---
+buffer_285000000000:  # Queue ff.bert.encoder.layer.0.attention.self.query.bias: r = 0, c = 0
+  uniqid: 285000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 4
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x6893720
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.0.attention.self.query.bias
+---
+buffer_287000000000:  # Queue ff.bert.encoder.layer.1.intermediate.dense.weight: r = 0, c = 0
+  uniqid: 287000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 64
+  tile_size: 2080
+  dram_chan: 5
+  dram_addr: 0x68bd0c0
+  q_slots: 1
+  md_op_name: ff.bert.encoder.layer.1.intermediate.dense.weight
+---
+buffer_289000000000:  # Queue lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.0: r = 0, c = 0
+  uniqid: 289000000000
+  id: 0
+  core_coordinates: [0, 0]
+  size_tiles: 1
+  tile_size: 2080
+  dram_chan: 2
+  dram_addr: 0x68957c0
+  q_slots: 1
+  md_op_name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.0

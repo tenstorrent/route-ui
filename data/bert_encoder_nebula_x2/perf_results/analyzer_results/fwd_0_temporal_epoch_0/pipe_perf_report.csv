@@ -1,0 +1,4 @@
+global_epoch_ids,program_names,graph_name,warnings,op_name,first_to_last_input,grid_size,operand,source/dest,pipe_type,required_kernel_bw,pipe_bw,percentage_of_difference
+[0],['run_fwd'],fwd_0_temporal_epoch_0,<< BW for some pipes not measured. >>,ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1,0->0,"[1, 1]",input-0,lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.0,input-queue-pipe,3.52,0,-100
+[0],['run_fwd'],fwd_0_temporal_epoch_0,<< BW for some pipes not measured. >>,ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1,0->0,"[1, 1]",input-1,ff.bert.encoder.layer.1.output.LayerNorm.bias,input-queue-pipe,14.08,0,-100
+[0],['run_fwd'],fwd_0_temporal_epoch_0,<< BW for some pipes not measured. >>,ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1,0->0,"[1, 1]",output,e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0,output-queue-pipe,14.08,27.37,94.39

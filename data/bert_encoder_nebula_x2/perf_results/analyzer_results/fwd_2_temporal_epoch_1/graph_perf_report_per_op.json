@@ -1,0 +1,3134 @@
+{
+    "mha_1_as_softmax.dc.exp.0": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 114171,
+            "kernel_runtime_per_input": 114171.0,
+            "model_runtime_per_input": 113920,
+            "kernel_math_utilization": 82.96,
+            "model_math_utilization": 83.15,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 114171,
+            "bw_bound_runtime_per_input": 114171.0,
+            "bw_bound_math_utilization": 82.96,
+            "output_pipe_bw_0": 1.83,
+            "required_output_pipe_bw_0": 1.17,
+            "input_pipe_bw_0": 7.13,
+            "required_input_bw_0": 1.17
+        },
+        "core-measurements": {
+            "4-3": {
+                "warnings": "",
+                "kernel_total_runtime": 114171,
+                "kernel_runtime_per_input": 114171.0,
+                "model_runtime_per_input": 113920,
+                "kernel_math_utilization": 82.96,
+                "model_math_utilization": 83.15,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 114171,
+                "bw_bound_runtime_per_input": 114171.0,
+                "bw_bound_math_utilization": 82.96,
+                "output_pipe_bw_0": 1.83,
+                "required_output_pipe_bw_0": 1.17,
+                "input_pipe_bw_0": 7.13,
+                "required_input_bw_0": 1.17
+            }
+        }
+    },
+    "ff_1_ff1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 17417,
+            "kernel_runtime_per_input": 17417.0,
+            "model_runtime_per_input": 17420,
+            "kernel_math_utilization": 73.49,
+            "model_math_utilization": 73.48,
+            "bw_limited_factor": 4.93,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 85844.0,
+            "bw_bound_runtime_per_input": 85844.0,
+            "bw_bound_math_utilization": 14.91,
+            "output_pipe_bw_0": 1.55,
+            "required_output_pipe_bw_0": 7.64,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 1.91,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 7.64
+        },
+        "core-measurements": {
+            "3-7": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 17417,
+                "kernel_runtime_per_input": 17417.0,
+                "model_runtime_per_input": 17420,
+                "kernel_math_utilization": 73.49,
+                "model_math_utilization": 73.48,
+                "bw_limited_factor": 4.93,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 85844.0,
+                "bw_bound_runtime_per_input": 85844.0,
+                "bw_bound_math_utilization": 14.91,
+                "output_pipe_bw_0": 1.55,
+                "required_output_pipe_bw_0": 7.64,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 1.91,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 7.64
+            }
+        }
+    },
+    "mha_1_as_softmax.dc.reciprocal.2": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 14896,
+            "kernel_runtime_per_input": 14896.0,
+            "model_runtime_per_input": 14688,
+            "kernel_math_utilization": 73.04,
+            "model_math_utilization": 74.07,
+            "bw_limited_factor": 5.1,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 75974.0,
+            "bw_bound_runtime_per_input": 75974.0,
+            "bw_bound_math_utilization": 14.32,
+            "output_pipe_bw_0": 0.44,
+            "required_output_pipe_bw_0": 2.23,
+            "input_pipe_bw_0": 8.69,
+            "required_input_bw_0": 2.23
+        },
+        "core-measurements": {
+            "8-3": {
+                "warnings": "",
+                "kernel_total_runtime": 14896,
+                "kernel_runtime_per_input": 14896.0,
+                "model_runtime_per_input": 14688,
+                "kernel_math_utilization": 73.04,
+                "model_math_utilization": 74.07,
+                "bw_limited_factor": 5.1,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 75974.0,
+                "bw_bound_runtime_per_input": 75974.0,
+                "bw_bound_math_utilization": 14.32,
+                "output_pipe_bw_0": 0.44,
+                "required_output_pipe_bw_0": 2.23,
+                "input_pipe_bw_0": 8.69,
+                "required_input_bw_0": 2.23
+            }
+        }
+    },
+    "mha_1_as_div": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 5631,
+            "kernel_runtime_per_input": 5631.0,
+            "model_runtime_per_input": 10541,
+            "kernel_math_utilization": 27.28,
+            "model_math_utilization": 14.57,
+            "bw_limited_factor": 11.2,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 63051.0,
+            "bw_bound_runtime_per_input": 63051.0,
+            "bw_bound_math_utilization": 2.44,
+            "output_pipe_bw_0": 2.11,
+            "required_output_pipe_bw_0": 23.64,
+            "input_pipe_bw_0": 9.92,
+            "required_input_bw_0": 23.64,
+            "input_pipe_bw_1": 9.54,
+            "required_input_bw_1": 23.64
+        },
+        "core-measurements": {
+            "2-3": {
+                "warnings": "",
+                "kernel_total_runtime": 5631,
+                "kernel_runtime_per_input": 5631.0,
+                "model_runtime_per_input": 10541,
+                "kernel_math_utilization": 27.28,
+                "model_math_utilization": 14.57,
+                "bw_limited_factor": 11.2,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 63051.0,
+                "bw_bound_runtime_per_input": 63051.0,
+                "bw_bound_math_utilization": 2.44,
+                "output_pipe_bw_0": 2.11,
+                "required_output_pipe_bw_0": 23.64,
+                "input_pipe_bw_0": 9.92,
+                "required_input_bw_0": 23.64,
+                "input_pipe_bw_1": 9.54,
+                "required_input_bw_1": 23.64
+            }
+        }
+    },
+    "norm_ff_1_sub": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 2040,
+            "kernel_runtime_per_input": 2040.0,
+            "model_runtime_per_input": 3462,
+            "kernel_math_utilization": 6.27,
+            "model_math_utilization": 3.7,
+            "bw_limited_factor": 29.19,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 59544.0,
+            "bw_bound_runtime_per_input": 59544.0,
+            "bw_bound_math_utilization": 0.21,
+            "output_pipe_bw_0": 0.56,
+            "required_output_pipe_bw_0": 16.31,
+            "input_pipe_bw_0": 3.41,
+            "required_input_bw_0": 16.31,
+            "input_pipe_bw_1": 7.23,
+            "required_input_bw_1": 16.31
+        },
+        "core-measurements": {
+            "2-8": {
+                "warnings": "",
+                "kernel_total_runtime": 2040,
+                "kernel_runtime_per_input": 2040.0,
+                "model_runtime_per_input": 3462,
+                "kernel_math_utilization": 6.27,
+                "model_math_utilization": 3.7,
+                "bw_limited_factor": 29.19,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 59544.0,
+                "bw_bound_runtime_per_input": 59544.0,
+                "bw_bound_math_utilization": 0.21,
+                "output_pipe_bw_0": 0.56,
+                "required_output_pipe_bw_0": 16.31,
+                "input_pipe_bw_0": 3.41,
+                "required_input_bw_0": 16.31,
+                "input_pipe_bw_1": 7.23,
+                "required_input_bw_1": 16.31
+            }
+        }
+    },
+    "add_ff_1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 2081,
+            "kernel_runtime_per_input": 2081.0,
+            "model_runtime_per_input": 3461,
+            "kernel_math_utilization": 6.15,
+            "model_math_utilization": 3.7,
+            "bw_limited_factor": 27.39,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 56990.0,
+            "bw_bound_runtime_per_input": 56990.0,
+            "bw_bound_math_utilization": 0.22,
+            "output_pipe_bw_0": 0.58,
+            "required_output_pipe_bw_0": 15.99,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 15.99,
+            "input_pipe_bw_1": 7.72,
+            "required_input_bw_1": 15.99
+        },
+        "core-measurements": {
+            "9-7": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 2081,
+                "kernel_runtime_per_input": 2081.0,
+                "model_runtime_per_input": 3461,
+                "kernel_math_utilization": 6.15,
+                "model_math_utilization": 3.7,
+                "bw_limited_factor": 27.39,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 56990.0,
+                "bw_bound_runtime_per_input": 56990.0,
+                "bw_bound_math_utilization": 0.22,
+                "output_pipe_bw_0": 0.58,
+                "required_output_pipe_bw_0": 15.99,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 15.99,
+                "input_pipe_bw_1": 7.72,
+                "required_input_bw_1": 15.99
+            }
+        }
+    },
+    "mha_1_as_softmax.dc.reduce_sum.1.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3902,
+            "kernel_runtime_per_input": 3902.0,
+            "model_runtime_per_input": 3778,
+            "kernel_math_utilization": 78.73,
+            "model_math_utilization": 81.31,
+            "bw_limited_factor": 11.0,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 42917.33,
+            "bw_bound_runtime_per_input": 42917.0,
+            "bw_bound_math_utilization": 7.16,
+            "output_pipe_bw_0": 32.31,
+            "required_output_pipe_bw_0": 8.53,
+            "input_pipe_bw_0": 3.1,
+            "required_input_bw_0": 34.12,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 8.53
+        },
+        "core-measurements": {
+            "7-3": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3902,
+                "kernel_runtime_per_input": 3902.0,
+                "model_runtime_per_input": 3778,
+                "kernel_math_utilization": 78.73,
+                "model_math_utilization": 81.31,
+                "bw_limited_factor": 11.0,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 42917.33,
+                "bw_bound_runtime_per_input": 42917.0,
+                "bw_bound_math_utilization": 7.16,
+                "output_pipe_bw_0": 32.31,
+                "required_output_pipe_bw_0": 8.53,
+                "input_pipe_bw_0": 3.1,
+                "required_input_bw_0": 34.12,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 8.53
+            }
+        }
+    },
+    "add_mha_1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 2054,
+            "kernel_runtime_per_input": 2054.0,
+            "model_runtime_per_input": 3461,
+            "kernel_math_utilization": 6.23,
+            "model_math_utilization": 3.7,
+            "bw_limited_factor": 18.65,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 38310.0,
+            "bw_bound_runtime_per_input": 38310.0,
+            "bw_bound_math_utilization": 0.33,
+            "output_pipe_bw_0": 0.87,
+            "required_output_pipe_bw_0": 16.2,
+            "input_pipe_bw_0": 5.11,
+            "required_input_bw_0": 16.2,
+            "input_pipe_bw_1": 8.25,
+            "required_input_bw_1": 16.2
+        },
+        "core-measurements": {
+            "8-4": {
+                "warnings": "",
+                "kernel_total_runtime": 2054,
+                "kernel_runtime_per_input": 2054.0,
+                "model_runtime_per_input": 3461,
+                "kernel_math_utilization": 6.23,
+                "model_math_utilization": 3.7,
+                "bw_limited_factor": 18.65,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 38310.0,
+                "bw_bound_runtime_per_input": 38310.0,
+                "bw_bound_math_utilization": 0.33,
+                "output_pipe_bw_0": 0.87,
+                "required_output_pipe_bw_0": 16.2,
+                "input_pipe_bw_0": 5.11,
+                "required_input_bw_0": 16.2,
+                "input_pipe_bw_1": 8.25,
+                "required_input_bw_1": 16.2
+            }
+        }
+    },
+    "norm_ff_1_weights": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 2025,
+            "kernel_runtime_per_input": 2025.0,
+            "model_runtime_per_input": 3523,
+            "kernel_math_utilization": 18.96,
+            "model_math_utilization": 10.9,
+            "bw_limited_factor": 17.06,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 34540.0,
+            "bw_bound_runtime_per_input": 34540.0,
+            "bw_bound_math_utilization": 1.11,
+            "output_pipe_bw_0": 0.96,
+            "required_output_pipe_bw_0": 16.43,
+            "input_pipe_bw_0": 8.04,
+            "required_input_bw_0": 16.43,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 16.43
+        },
+        "core-measurements": {
+            "2-9": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 2025,
+                "kernel_runtime_per_input": 2025.0,
+                "model_runtime_per_input": 3523,
+                "kernel_math_utilization": 18.96,
+                "model_math_utilization": 10.9,
+                "bw_limited_factor": 17.06,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 34540.0,
+                "bw_bound_runtime_per_input": 34540.0,
+                "bw_bound_math_utilization": 1.11,
+                "output_pipe_bw_0": 0.96,
+                "required_output_pipe_bw_0": 16.43,
+                "input_pipe_bw_0": 8.04,
+                "required_input_bw_0": 16.43,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 16.43
+            }
+        }
+    },
+    "lc.input_tensor.mha_1_as_softmax.dc.reduce_sum.1.0_splt_brcst_1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 593,
+            "kernel_runtime_per_input": 593.0,
+            "model_runtime_per_input": 1444,
+            "kernel_math_utilization": 5.4,
+            "model_math_utilization": 2.22,
+            "bw_limited_factor": 57.45,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 34069.0,
+            "bw_bound_runtime_per_input": 34069.0,
+            "bw_bound_math_utilization": 0.09,
+            "output_pipe_bw_0": 0.24,
+            "required_output_pipe_bw_0": 14.03,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 14.03
+        },
+        "core-measurements": {
+            "6-3": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 593,
+                "kernel_runtime_per_input": 593.0,
+                "model_runtime_per_input": 1444,
+                "kernel_math_utilization": 5.4,
+                "model_math_utilization": 2.22,
+                "bw_limited_factor": 57.45,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 34069.0,
+                "bw_bound_runtime_per_input": 34069.0,
+                "bw_bound_math_utilization": 0.09,
+                "output_pipe_bw_0": 0.24,
+                "required_output_pipe_bw_0": 14.03,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 14.03
+            }
+        }
+    },
+    "norm_mha_1_bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1710,
+            "kernel_runtime_per_input": 1710.0,
+            "model_runtime_per_input": 2055,
+            "kernel_math_utilization": 7.49,
+            "model_math_utilization": 6.23,
+            "bw_limited_factor": 12.81,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 21912.0,
+            "bw_bound_runtime_per_input": 21912.0,
+            "bw_bound_math_utilization": 0.58,
+            "output_pipe_bw_0": 1.52,
+            "required_output_pipe_bw_0": 19.46,
+            "input_pipe_bw_0": 10.46,
+            "required_input_bw_0": 19.46,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 19.46
+        },
+        "core-measurements": {
+            "2-7": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1710,
+                "kernel_runtime_per_input": 1710.0,
+                "model_runtime_per_input": 2055,
+                "kernel_math_utilization": 7.49,
+                "model_math_utilization": 6.23,
+                "bw_limited_factor": 12.81,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 21912.0,
+                "bw_bound_runtime_per_input": 21912.0,
+                "bw_bound_math_utilization": 0.58,
+                "output_pipe_bw_0": 1.52,
+                "required_output_pipe_bw_0": 19.46,
+                "input_pipe_bw_0": 10.46,
+                "required_input_bw_0": 19.46,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 19.46
+            }
+        }
+    },
+    "mha_1_as_mask": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 6040,
+            "kernel_runtime_per_input": 6040.0,
+            "model_runtime_per_input": 8223,
+            "kernel_math_utilization": 8.48,
+            "model_math_utilization": 6.23,
+            "bw_limited_factor": 3.36,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 20294.0,
+            "bw_bound_runtime_per_input": 20294.0,
+            "bw_bound_math_utilization": 2.52,
+            "output_pipe_bw_0": 6.56,
+            "required_output_pipe_bw_0": 22.04,
+            "input_pipe_bw_0": 8.33,
+            "required_input_bw_0": 22.04,
+            "input_pipe_bw_1": 10.76,
+            "required_input_bw_1": 22.04
+        },
+        "core-measurements": {
+            "3-3": {
+                "warnings": "",
+                "kernel_total_runtime": 6040,
+                "kernel_runtime_per_input": 6040.0,
+                "model_runtime_per_input": 8223,
+                "kernel_math_utilization": 8.48,
+                "model_math_utilization": 6.23,
+                "bw_limited_factor": 3.36,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 20294.0,
+                "bw_bound_runtime_per_input": 20294.0,
+                "bw_bound_math_utilization": 2.52,
+                "output_pipe_bw_0": 6.56,
+                "required_output_pipe_bw_0": 22.04,
+                "input_pipe_bw_0": 8.33,
+                "required_input_bw_0": 22.04,
+                "input_pipe_bw_1": 10.76,
+                "required_input_bw_1": 22.04
+            }
+        }
+    },
+    "mha_1_value": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3934,
+            "kernel_runtime_per_input": 3934.0,
+            "model_runtime_per_input": 4044,
+            "kernel_math_utilization": 78.09,
+            "model_math_utilization": 75.96,
+            "bw_limited_factor": 5.13,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 20169.0,
+            "bw_bound_runtime_per_input": 20169.0,
+            "bw_bound_math_utilization": 15.23,
+            "output_pipe_bw_0": 1.65,
+            "required_output_pipe_bw_0": 8.46,
+            "input_pipe_bw_0": 9.21,
+            "required_input_bw_0": 8.46,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 8.46
+        },
+        "core-measurements": {
+            "2-4": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3934,
+                "kernel_runtime_per_input": 3934.0,
+                "model_runtime_per_input": 4044,
+                "kernel_math_utilization": 78.09,
+                "model_math_utilization": 75.96,
+                "bw_limited_factor": 5.13,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 20169.0,
+                "bw_bound_runtime_per_input": 20169.0,
+                "bw_bound_math_utilization": 15.23,
+                "output_pipe_bw_0": 1.65,
+                "required_output_pipe_bw_0": 8.46,
+                "input_pipe_bw_0": 9.21,
+                "required_input_bw_0": 8.46,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 8.46
+            }
+        }
+    },
+    "mha_1_as_softmax.dc.multiply.3": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 7477,
+            "kernel_runtime_per_input": 7477.0,
+            "model_runtime_per_input": 14093,
+            "kernel_math_utilization": 20.54,
+            "model_math_utilization": 10.9,
+            "bw_limited_factor": 2.54,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 18980.0,
+            "bw_bound_runtime_per_input": 18980.0,
+            "bw_bound_math_utilization": 8.09,
+            "output_pipe_bw_0": 7.67,
+            "required_output_pipe_bw_0": 17.8,
+            "input_pipe_bw_0": 7.01,
+            "required_input_bw_0": 17.8,
+            "input_pipe_bw_1": 8.57,
+            "required_input_bw_1": 17.8
+        },
+        "core-measurements": {
+            "9-3": {
+                "warnings": "",
+                "kernel_total_runtime": 7477,
+                "kernel_runtime_per_input": 7477.0,
+                "model_runtime_per_input": 14093,
+                "kernel_math_utilization": 20.54,
+                "model_math_utilization": 10.9,
+                "bw_limited_factor": 2.54,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 18980.0,
+                "bw_bound_runtime_per_input": 18980.0,
+                "bw_bound_math_utilization": 8.09,
+                "output_pipe_bw_0": 7.67,
+                "required_output_pipe_bw_0": 17.8,
+                "input_pipe_bw_0": 7.01,
+                "required_input_bw_0": 17.8,
+                "input_pipe_bw_1": 8.57,
+                "required_input_bw_1": 17.8
+            }
+        }
+    },
+    "ff1_gelu": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 17999,
+            "kernel_runtime_per_input": 17999.0,
+            "model_runtime_per_input": 17370,
+            "kernel_math_utilization": 48.36,
+            "model_math_utilization": 50.11,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 17999,
+            "bw_bound_runtime_per_input": 17999.0,
+            "bw_bound_math_utilization": 48.36,
+            "output_pipe_bw_0": 188.56,
+            "required_output_pipe_bw_0": 7.4,
+            "input_pipe_bw_0": 17.08,
+            "required_input_bw_0": 7.4
+        },
+        "core-measurements": {
+            "6-7": {
+                "warnings": "",
+                "kernel_total_runtime": 17999,
+                "kernel_runtime_per_input": 17999.0,
+                "model_runtime_per_input": 17370,
+                "kernel_math_utilization": 48.36,
+                "model_math_utilization": 50.11,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 17999,
+                "bw_bound_runtime_per_input": 17999.0,
+                "bw_bound_math_utilization": 48.36,
+                "output_pipe_bw_0": 188.56,
+                "required_output_pipe_bw_0": 7.4,
+                "input_pipe_bw_0": 17.08,
+                "required_input_bw_0": 7.4
+            }
+        }
+    },
+    "mha_1_as": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 8150,
+            "kernel_runtime_per_input": 8150.0,
+            "model_runtime_per_input": 6388,
+            "kernel_math_utilization": 37.69,
+            "model_math_utilization": 48.09,
+            "bw_limited_factor": 2.0,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 16266.0,
+            "bw_bound_runtime_per_input": 16266.0,
+            "bw_bound_math_utilization": 18.89,
+            "output_pipe_bw_0": 8.18,
+            "required_output_pipe_bw_0": 16.33,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 4.08,
+            "input_pipe_bw_1": 7.5,
+            "required_input_bw_1": 4.08
+        },
+        "core-measurements": {
+            "9-2": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 8150,
+                "kernel_runtime_per_input": 8150.0,
+                "model_runtime_per_input": 6388,
+                "kernel_math_utilization": 37.69,
+                "model_math_utilization": 48.09,
+                "bw_limited_factor": 2.0,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 16266.0,
+                "bw_bound_runtime_per_input": 16266.0,
+                "bw_bound_math_utilization": 18.89,
+                "output_pipe_bw_0": 8.18,
+                "required_output_pipe_bw_0": 16.33,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 4.08,
+                "input_pipe_bw_1": 7.5,
+                "required_input_bw_1": 4.08
+            }
+        }
+    },
+    "ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_splt_brcst_2": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1311,
+            "kernel_runtime_per_input": 1311.0,
+            "model_runtime_per_input": 3336,
+            "kernel_math_utilization": 9.76,
+            "model_math_utilization": 3.84,
+            "bw_limited_factor": 12.09,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 15852.0,
+            "bw_bound_runtime_per_input": 15852.0,
+            "bw_bound_math_utilization": 0.81,
+            "output_pipe_bw_0": 2.1,
+            "required_output_pipe_bw_0": 25.39,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 25.39
+        },
+        "core-measurements": {
+            "1-3": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1311,
+                "kernel_runtime_per_input": 1311.0,
+                "model_runtime_per_input": 3336,
+                "kernel_math_utilization": 9.76,
+                "model_math_utilization": 3.84,
+                "bw_limited_factor": 12.09,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 15852.0,
+                "bw_bound_runtime_per_input": 15852.0,
+                "bw_bound_math_utilization": 0.81,
+                "output_pipe_bw_0": 2.1,
+                "required_output_pipe_bw_0": 25.39,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 25.39
+            }
+        }
+    },
+    "mha_1_ac": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 3958,
+            "kernel_runtime_per_input": 3958.0,
+            "model_runtime_per_input": 3778,
+            "kernel_math_utilization": 77.61,
+            "model_math_utilization": 81.31,
+            "bw_limited_factor": 3.87,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 15324.8,
+            "bw_bound_runtime_per_input": 15325.0,
+            "bw_bound_math_utilization": 20.05,
+            "output_pipe_bw_0": 6.67,
+            "required_output_pipe_bw_0": 8.41,
+            "input_pipe_bw_0": 8.69,
+            "required_input_bw_0": 33.63,
+            "input_pipe_bw_1": 8.78,
+            "required_input_bw_1": 8.41
+        },
+        "core-measurements": {
+            "4-4": {
+                "warnings": "",
+                "kernel_total_runtime": 3958,
+                "kernel_runtime_per_input": 3958.0,
+                "model_runtime_per_input": 3778,
+                "kernel_math_utilization": 77.61,
+                "model_math_utilization": 81.31,
+                "bw_limited_factor": 3.87,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 15324.8,
+                "bw_bound_runtime_per_input": 15325.0,
+                "bw_bound_math_utilization": 20.05,
+                "output_pipe_bw_0": 6.67,
+                "required_output_pipe_bw_0": 8.41,
+                "input_pipe_bw_0": 8.69,
+                "required_input_bw_0": 33.63,
+                "input_pipe_bw_1": 8.78,
+                "required_input_bw_1": 8.41
+            }
+        }
+    },
+    "ff_1_ff2": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 14791,
+            "kernel_runtime_per_input": 14791.0,
+            "model_runtime_per_input": 14491,
+            "kernel_math_utilization": 83.94,
+            "model_math_utilization": 85.68,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 14791,
+            "bw_bound_runtime_per_input": 14791.0,
+            "bw_bound_math_utilization": 83.94,
+            "output_pipe_bw_0": 88.75,
+            "required_output_pipe_bw_0": 2.25,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 9.0,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 9.0
+        },
+        "core-measurements": {
+            "7-7": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 14791,
+                "kernel_runtime_per_input": 14791.0,
+                "model_runtime_per_input": 14491,
+                "kernel_math_utilization": 83.94,
+                "model_math_utilization": 85.68,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 14791,
+                "bw_bound_runtime_per_input": 14791.0,
+                "bw_bound_math_utilization": 83.94,
+                "output_pipe_bw_0": 88.75,
+                "required_output_pipe_bw_0": 2.25,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 9.0,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 9.0
+            }
+        }
+    },
+    "norm_mha_1_sub": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 2000,
+            "kernel_runtime_per_input": 2000.0,
+            "model_runtime_per_input": 3462,
+            "kernel_math_utilization": 6.4,
+            "model_math_utilization": 3.7,
+            "bw_limited_factor": 5.22,
+            "slowest_operand": "input-1",
+            "bw_bound_total_runtime": 10436.0,
+            "bw_bound_runtime_per_input": 10436.0,
+            "bw_bound_math_utilization": 1.23,
+            "output_pipe_bw_0": 5.01,
+            "required_output_pipe_bw_0": 16.64,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 16.64,
+            "input_pipe_bw_1": 3.19,
+            "required_input_bw_1": 16.64
+        },
+        "core-measurements": {
+            "1-5": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 2000,
+                "kernel_runtime_per_input": 2000.0,
+                "model_runtime_per_input": 3462,
+                "kernel_math_utilization": 6.4,
+                "model_math_utilization": 3.7,
+                "bw_limited_factor": 5.22,
+                "slowest_operand": "input-1",
+                "bw_bound_total_runtime": 10436.0,
+                "bw_bound_runtime_per_input": 10436.0,
+                "bw_bound_math_utilization": 1.23,
+                "output_pipe_bw_0": 5.01,
+                "required_output_pipe_bw_0": 16.64,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 16.64,
+                "input_pipe_bw_1": 3.19,
+                "required_input_bw_1": 16.64
+            }
+        }
+    },
+    "norm_ff_0_output": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 1617,
+            "kernel_runtime_per_input": 1617.0,
+            "model_runtime_per_input": 2635,
+            "kernel_math_utilization": 23.75,
+            "model_math_utilization": 14.57,
+            "bw_limited_factor": 6.19,
+            "slowest_operand": "input-1",
+            "bw_bound_total_runtime": 10010.67,
+            "bw_bound_runtime_per_input": 10011.0,
+            "bw_bound_math_utilization": 3.84,
+            "output_pipe_bw_0": 90.19,
+            "required_output_pipe_bw_0": 20.58,
+            "input_pipe_bw_0": 8.76,
+            "required_input_bw_0": 20.58,
+            "input_pipe_bw_1": 3.32,
+            "required_input_bw_1": 20.58
+        },
+        "core-measurements": {
+            "9-1": {
+                "warnings": "",
+                "kernel_total_runtime": 1617,
+                "kernel_runtime_per_input": 1617.0,
+                "model_runtime_per_input": 2635,
+                "kernel_math_utilization": 23.75,
+                "model_math_utilization": 14.57,
+                "bw_limited_factor": 6.19,
+                "slowest_operand": "input-1",
+                "bw_bound_total_runtime": 10010.67,
+                "bw_bound_runtime_per_input": 10011.0,
+                "bw_bound_math_utilization": 3.84,
+                "output_pipe_bw_0": 90.19,
+                "required_output_pipe_bw_0": 20.58,
+                "input_pipe_bw_0": 8.76,
+                "required_input_bw_0": 20.58,
+                "input_pipe_bw_1": 3.32,
+                "required_input_bw_1": 20.58
+            }
+        }
+    },
+    "norm_mha_1_recip_s_brcst_m1_0_0.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 584,
+            "kernel_runtime_per_input": 584.0,
+            "model_runtime_per_input": 399,
+            "kernel_math_utilization": 32.88,
+            "model_math_utilization": 48.12,
+            "bw_limited_factor": 14.58,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 8512.0,
+            "bw_bound_runtime_per_input": 8512.0,
+            "bw_bound_math_utilization": 2.26,
+            "output_pipe_bw_0": 0.98,
+            "required_output_pipe_bw_0": 14.25,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 14.25,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 3.56
+        },
+        "core-measurements": {
+            "8-5": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 584,
+                "kernel_runtime_per_input": 584.0,
+                "model_runtime_per_input": 399,
+                "kernel_math_utilization": 32.88,
+                "model_math_utilization": 48.12,
+                "bw_limited_factor": 14.58,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 8512.0,
+                "bw_bound_runtime_per_input": 8512.0,
+                "bw_bound_math_utilization": 2.26,
+                "output_pipe_bw_0": 0.98,
+                "required_output_pipe_bw_0": 14.25,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 14.25,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 3.56
+            }
+        }
+    },
+    "ff_1_ff1.bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 5784,
+            "kernel_runtime_per_input": 5784.0,
+            "model_runtime_per_input": 8223,
+            "kernel_math_utilization": 8.85,
+            "model_math_utilization": 6.23,
+            "bw_limited_factor": 1.34,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 7762.67,
+            "bw_bound_runtime_per_input": 7763.0,
+            "bw_bound_math_utilization": 6.6,
+            "output_pipe_bw_0": 189.36,
+            "required_output_pipe_bw_0": 23.02,
+            "input_pipe_bw_0": 17.15,
+            "required_input_bw_0": 23.02,
+            "input_pipe_bw_1": "N/A",
+            "required_input_bw_1": 23.02
+        },
+        "core-measurements": {
+            "4-7": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 5784,
+                "kernel_runtime_per_input": 5784.0,
+                "model_runtime_per_input": 8223,
+                "kernel_math_utilization": 8.85,
+                "model_math_utilization": 6.23,
+                "bw_limited_factor": 1.34,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 7762.67,
+                "bw_bound_runtime_per_input": 7763.0,
+                "bw_bound_math_utilization": 6.6,
+                "output_pipe_bw_0": 189.36,
+                "required_output_pipe_bw_0": 23.02,
+                "input_pipe_bw_0": 17.15,
+                "required_input_bw_0": 23.02,
+                "input_pipe_bw_1": "N/A",
+                "required_input_bw_1": 23.02
+            }
+        }
+    },
+    "norm_ff_0_bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1683,
+            "kernel_runtime_per_input": 1683.0,
+            "model_runtime_per_input": 2055,
+            "kernel_math_utilization": 7.61,
+            "model_math_utilization": 6.23,
+            "bw_limited_factor": 3.79,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 6386.0,
+            "bw_bound_runtime_per_input": 6386.0,
+            "bw_bound_math_utilization": 2.0,
+            "output_pipe_bw_0": 5.21,
+            "required_output_pipe_bw_0": 19.77,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 19.77,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 19.77
+        },
+        "core-measurements": {
+            "2-2": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1683,
+                "kernel_runtime_per_input": 1683.0,
+                "model_runtime_per_input": 2055,
+                "kernel_math_utilization": 7.61,
+                "model_math_utilization": 6.23,
+                "bw_limited_factor": 3.79,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 6386.0,
+                "bw_bound_runtime_per_input": 6386.0,
+                "bw_bound_math_utilization": 2.0,
+                "output_pipe_bw_0": 5.21,
+                "required_output_pipe_bw_0": 19.77,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 19.77,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 19.77
+            }
+        }
+    },
+    "norm_ff_0_sub": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 2043,
+            "kernel_runtime_per_input": 2043.0,
+            "model_runtime_per_input": 3462,
+            "kernel_math_utilization": 6.27,
+            "model_math_utilization": 3.7,
+            "bw_limited_factor": 2.66,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 5430.0,
+            "bw_bound_runtime_per_input": 5430.0,
+            "bw_bound_math_utilization": 2.36,
+            "output_pipe_bw_0": 6.13,
+            "required_output_pipe_bw_0": 16.29,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 16.29,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 16.29
+        },
+        "core-measurements": {
+            "1-1": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 2043,
+                "kernel_runtime_per_input": 2043.0,
+                "model_runtime_per_input": 3462,
+                "kernel_math_utilization": 6.27,
+                "model_math_utilization": 3.7,
+                "bw_limited_factor": 2.66,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 5430.0,
+                "bw_bound_runtime_per_input": 5430.0,
+                "bw_bound_math_utilization": 2.36,
+                "output_pipe_bw_0": 6.13,
+                "required_output_pipe_bw_0": 16.29,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 16.29,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 16.29
+            }
+        }
+    },
+    "norm_ff_0_recip_s_brcst_m1_0_0.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 597,
+            "kernel_runtime_per_input": 597.0,
+            "model_runtime_per_input": 399,
+            "kernel_math_utilization": 32.16,
+            "model_math_utilization": 48.12,
+            "bw_limited_factor": 8.6,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 5132.0,
+            "bw_bound_runtime_per_input": 5132.0,
+            "bw_bound_math_utilization": 3.74,
+            "output_pipe_bw_0": 1.62,
+            "required_output_pipe_bw_0": 13.94,
+            "input_pipe_bw_0": 2.97,
+            "required_input_bw_0": 13.94,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 3.48
+        },
+        "core-measurements": {
+            "8-1": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 597,
+                "kernel_runtime_per_input": 597.0,
+                "model_runtime_per_input": 399,
+                "kernel_math_utilization": 32.16,
+                "model_math_utilization": 48.12,
+                "bw_limited_factor": 8.6,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 5132.0,
+                "bw_bound_runtime_per_input": 5132.0,
+                "bw_bound_math_utilization": 3.74,
+                "output_pipe_bw_0": 1.62,
+                "required_output_pipe_bw_0": 13.94,
+                "input_pipe_bw_0": 2.97,
+                "required_input_bw_0": 13.94,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 3.48
+            }
+        }
+    },
+    "ff.bert.encoder.layer.1.attention.self.query.bias_s_brcst_m2_0_0.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 666,
+            "kernel_runtime_per_input": 666.0,
+            "model_runtime_per_input": 296,
+            "kernel_math_utilization": 28.83,
+            "model_math_utilization": 64.86,
+            "bw_limited_factor": 6.82,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 4543.0,
+            "bw_bound_runtime_per_input": 4543.0,
+            "bw_bound_math_utilization": 4.23,
+            "output_pipe_bw_0": 1.83,
+            "required_output_pipe_bw_0": 12.49,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 3.12,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 12.49
+        },
+        "core-measurements": {
+            "6-2": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 666,
+                "kernel_runtime_per_input": 666.0,
+                "model_runtime_per_input": 296,
+                "kernel_math_utilization": 28.83,
+                "model_math_utilization": 64.86,
+                "bw_limited_factor": 6.82,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 4543.0,
+                "bw_bound_runtime_per_input": 4543.0,
+                "bw_bound_math_utilization": 4.23,
+                "output_pipe_bw_0": 1.83,
+                "required_output_pipe_bw_0": 12.49,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 3.12,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 12.49
+            }
+        }
+    },
+    "norm_ff_1_recip_s_brcst_m1_0_0.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 578,
+            "kernel_runtime_per_input": 578.0,
+            "model_runtime_per_input": 399,
+            "kernel_math_utilization": 33.22,
+            "model_math_utilization": 48.12,
+            "bw_limited_factor": 7.85,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 4537.0,
+            "bw_bound_runtime_per_input": 4537.0,
+            "bw_bound_math_utilization": 4.23,
+            "output_pipe_bw_0": 1.83,
+            "required_output_pipe_bw_0": 14.39,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 14.39,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 3.6
+        },
+        "core-measurements": {
+            "9-8": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 578,
+                "kernel_runtime_per_input": 578.0,
+                "model_runtime_per_input": 399,
+                "kernel_math_utilization": 33.22,
+                "model_math_utilization": 48.12,
+                "bw_limited_factor": 7.85,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 4537.0,
+                "bw_bound_runtime_per_input": 4537.0,
+                "bw_bound_math_utilization": 4.23,
+                "output_pipe_bw_0": 1.83,
+                "required_output_pipe_bw_0": 14.39,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 14.39,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 3.6
+            }
+        }
+    },
+    "mha_1_value.bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 2033,
+            "kernel_runtime_per_input": 2033.0,
+            "model_runtime_per_input": 3461,
+            "kernel_math_utilization": 6.3,
+            "model_math_utilization": 3.7,
+            "bw_limited_factor": 2.22,
+            "slowest_operand": "input-1",
+            "bw_bound_total_runtime": 4520.0,
+            "bw_bound_runtime_per_input": 4520.0,
+            "bw_bound_math_utilization": 2.83,
+            "output_pipe_bw_0": 7.42,
+            "required_output_pipe_bw_0": 16.37,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 16.37,
+            "input_pipe_bw_1": 7.36,
+            "required_input_bw_1": 16.37
+        },
+        "core-measurements": {
+            "3-4": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 2033,
+                "kernel_runtime_per_input": 2033.0,
+                "model_runtime_per_input": 3461,
+                "kernel_math_utilization": 6.3,
+                "model_math_utilization": 3.7,
+                "bw_limited_factor": 2.22,
+                "slowest_operand": "input-1",
+                "bw_bound_total_runtime": 4520.0,
+                "bw_bound_runtime_per_input": 4520.0,
+                "bw_bound_math_utilization": 2.83,
+                "output_pipe_bw_0": 7.42,
+                "required_output_pipe_bw_0": 16.37,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 16.37,
+                "input_pipe_bw_1": 7.36,
+                "required_input_bw_1": 16.37
+            }
+        }
+    },
+    "norm_mha_1_sq": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 1685,
+            "kernel_runtime_per_input": 1685.0,
+            "model_runtime_per_input": 2191,
+            "kernel_math_utilization": 22.79,
+            "model_math_utilization": 17.53,
+            "bw_limited_factor": 2.65,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 4472.53,
+            "bw_bound_runtime_per_input": 4473.0,
+            "bw_bound_math_utilization": 8.59,
+            "output_pipe_bw_0": 89.7,
+            "required_output_pipe_bw_0": 19.75,
+            "input_pipe_bw_0": 7.44,
+            "required_input_bw_0": 19.75,
+            "input_pipe_bw_1": 9.83,
+            "required_input_bw_1": 19.75
+        },
+        "core-measurements": {
+            "2-5": {
+                "warnings": "",
+                "kernel_total_runtime": 1685,
+                "kernel_runtime_per_input": 1685.0,
+                "model_runtime_per_input": 2191,
+                "kernel_math_utilization": 22.79,
+                "model_math_utilization": 17.53,
+                "bw_limited_factor": 2.65,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 4472.53,
+                "bw_bound_runtime_per_input": 4473.0,
+                "bw_bound_math_utilization": 8.59,
+                "output_pipe_bw_0": 89.7,
+                "required_output_pipe_bw_0": 19.75,
+                "input_pipe_bw_0": 7.44,
+                "required_input_bw_0": 19.75,
+                "input_pipe_bw_1": 9.83,
+                "required_input_bw_1": 19.75
+            }
+        }
+    },
+    "mha_1_query": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3779,
+            "kernel_runtime_per_input": 3779.0,
+            "model_runtime_per_input": 3618,
+            "kernel_math_utilization": 81.29,
+            "model_math_utilization": 84.91,
+            "bw_limited_factor": 1.17,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 4438.0,
+            "bw_bound_runtime_per_input": 4438.0,
+            "bw_bound_math_utilization": 69.22,
+            "output_pipe_bw_0": 7.5,
+            "required_output_pipe_bw_0": 8.81,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 8.81,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 8.81
+        },
+        "core-measurements": {
+            "7-2": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3779,
+                "kernel_runtime_per_input": 3779.0,
+                "model_runtime_per_input": 3618,
+                "kernel_math_utilization": 81.29,
+                "model_math_utilization": 84.91,
+                "bw_limited_factor": 1.17,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 4438.0,
+                "bw_bound_runtime_per_input": 4438.0,
+                "bw_bound_math_utilization": 69.22,
+                "output_pipe_bw_0": 7.5,
+                "required_output_pipe_bw_0": 8.81,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 8.81,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 8.81
+            }
+        }
+    },
+    "ff_1_ff2.bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1737,
+            "kernel_runtime_per_input": 1737.0,
+            "model_runtime_per_input": 2055,
+            "kernel_math_utilization": 7.37,
+            "model_math_utilization": 6.23,
+            "bw_limited_factor": 2.45,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 4252.0,
+            "bw_bound_runtime_per_input": 4252.0,
+            "bw_bound_math_utilization": 3.01,
+            "output_pipe_bw_0": 7.83,
+            "required_output_pipe_bw_0": 19.16,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 19.16,
+            "input_pipe_bw_1": "N/A",
+            "required_input_bw_1": 19.16
+        },
+        "core-measurements": {
+            "8-7": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1737,
+                "kernel_runtime_per_input": 1737.0,
+                "model_runtime_per_input": 2055,
+                "kernel_math_utilization": 7.37,
+                "model_math_utilization": 6.23,
+                "bw_limited_factor": 2.45,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 4252.0,
+                "bw_bound_runtime_per_input": 4252.0,
+                "bw_bound_math_utilization": 3.01,
+                "output_pipe_bw_0": 7.83,
+                "required_output_pipe_bw_0": 19.16,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 19.16,
+                "input_pipe_bw_1": "N/A",
+                "required_input_bw_1": 19.16
+            }
+        }
+    },
+    "mha_1_key.bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3010,
+            "kernel_runtime_per_input": 3010.0,
+            "model_runtime_per_input": 5335,
+            "kernel_math_utilization": 4.25,
+            "model_math_utilization": 2.4,
+            "bw_limited_factor": 1.4,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 4218.0,
+            "bw_bound_runtime_per_input": 4218.0,
+            "bw_bound_math_utilization": 3.03,
+            "output_pipe_bw_0": 7.89,
+            "required_output_pipe_bw_0": 11.06,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 11.06,
+            "input_pipe_bw_1": "N/A",
+            "required_input_bw_1": 11.06
+        },
+        "core-measurements": {
+            "4-2": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3010,
+                "kernel_runtime_per_input": 3010.0,
+                "model_runtime_per_input": 5335,
+                "kernel_math_utilization": 4.25,
+                "model_math_utilization": 2.4,
+                "bw_limited_factor": 1.4,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 4218.0,
+                "bw_bound_runtime_per_input": 4218.0,
+                "bw_bound_math_utilization": 3.03,
+                "output_pipe_bw_0": 7.89,
+                "required_output_pipe_bw_0": 11.06,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 11.06,
+                "input_pipe_bw_1": "N/A",
+                "required_input_bw_1": 11.06
+            }
+        }
+    },
+    "mha_1_output.bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1738,
+            "kernel_runtime_per_input": 1738.0,
+            "model_runtime_per_input": 2055,
+            "kernel_math_utilization": 7.36,
+            "model_math_utilization": 6.23,
+            "bw_limited_factor": 2.38,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 4138.0,
+            "bw_bound_runtime_per_input": 4138.0,
+            "bw_bound_math_utilization": 3.09,
+            "output_pipe_bw_0": 8.04,
+            "required_output_pipe_bw_0": 19.15,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 19.15,
+            "input_pipe_bw_1": "N/A",
+            "required_input_bw_1": 19.15
+        },
+        "core-measurements": {
+            "7-4": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1738,
+                "kernel_runtime_per_input": 1738.0,
+                "model_runtime_per_input": 2055,
+                "kernel_math_utilization": 7.36,
+                "model_math_utilization": 6.23,
+                "bw_limited_factor": 2.38,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 4138.0,
+                "bw_bound_runtime_per_input": 4138.0,
+                "bw_bound_math_utilization": 3.09,
+                "output_pipe_bw_0": 8.04,
+                "required_output_pipe_bw_0": 19.15,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 19.15,
+                "input_pipe_bw_1": "N/A",
+                "required_input_bw_1": 19.15
+            }
+        }
+    },
+    "norm_mha_1_recip": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3999,
+            "kernel_runtime_per_input": 3999.0,
+            "model_runtime_per_input": 3648,
+            "kernel_math_utilization": 68.02,
+            "model_math_utilization": 74.56,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3999,
+            "bw_bound_runtime_per_input": 3999.0,
+            "bw_bound_math_utilization": 68.02,
+            "output_pipe_bw_0": 28.4,
+            "required_output_pipe_bw_0": 2.08,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 2.08
+        },
+        "core-measurements": {
+            "7-5": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3999,
+                "kernel_runtime_per_input": 3999.0,
+                "model_runtime_per_input": 3648,
+                "kernel_math_utilization": 68.02,
+                "model_math_utilization": 74.56,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3999,
+                "bw_bound_runtime_per_input": 3999.0,
+                "bw_bound_math_utilization": 68.02,
+                "output_pipe_bw_0": 28.4,
+                "required_output_pipe_bw_0": 2.08,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 2.08
+            }
+        }
+    },
+    "norm_ff_0_recip": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3989,
+            "kernel_runtime_per_input": 3989.0,
+            "model_runtime_per_input": 3648,
+            "kernel_math_utilization": 68.19,
+            "model_math_utilization": 74.56,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3989,
+            "bw_bound_runtime_per_input": 3989.0,
+            "bw_bound_math_utilization": 68.19,
+            "output_pipe_bw_0": 28.4,
+            "required_output_pipe_bw_0": 2.09,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 2.09
+        },
+        "core-measurements": {
+            "7-1": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3989,
+                "kernel_runtime_per_input": 3989.0,
+                "model_runtime_per_input": 3648,
+                "kernel_math_utilization": 68.19,
+                "model_math_utilization": 74.56,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3989,
+                "bw_bound_runtime_per_input": 3989.0,
+                "bw_bound_math_utilization": 68.19,
+                "output_pipe_bw_0": 28.4,
+                "required_output_pipe_bw_0": 2.09,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 2.09
+            }
+        }
+    },
+    "norm_ff_1_recip": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3987,
+            "kernel_runtime_per_input": 3987.0,
+            "model_runtime_per_input": 3648,
+            "kernel_math_utilization": 68.22,
+            "model_math_utilization": 74.56,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3987,
+            "bw_bound_runtime_per_input": 3987.0,
+            "bw_bound_math_utilization": 68.22,
+            "output_pipe_bw_0": 28.49,
+            "required_output_pipe_bw_0": 2.09,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 2.09
+        },
+        "core-measurements": {
+            "8-8": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3987,
+                "kernel_runtime_per_input": 3987.0,
+                "model_runtime_per_input": 3648,
+                "kernel_math_utilization": 68.22,
+                "model_math_utilization": 74.56,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3987,
+                "bw_bound_runtime_per_input": 3987.0,
+                "bw_bound_math_utilization": 68.22,
+                "output_pipe_bw_0": 28.49,
+                "required_output_pipe_bw_0": 2.09,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 2.09
+            }
+        }
+    },
+    "norm_mha_1_sqrt": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 3878,
+            "kernel_runtime_per_input": 3878.0,
+            "model_runtime_per_input": 3648,
+            "kernel_math_utilization": 67.25,
+            "model_math_utilization": 71.49,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3878,
+            "bw_bound_runtime_per_input": 3878.0,
+            "bw_bound_math_utilization": 67.25,
+            "output_pipe_bw_0": 28.59,
+            "required_output_pipe_bw_0": 2.15,
+            "input_pipe_bw_0": 5.77,
+            "required_input_bw_0": 2.15
+        },
+        "core-measurements": {
+            "6-5": {
+                "warnings": "",
+                "kernel_total_runtime": 3878,
+                "kernel_runtime_per_input": 3878.0,
+                "model_runtime_per_input": 3648,
+                "kernel_math_utilization": 67.25,
+                "model_math_utilization": 71.49,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3878,
+                "bw_bound_runtime_per_input": 3878.0,
+                "bw_bound_math_utilization": 67.25,
+                "output_pipe_bw_0": 28.59,
+                "required_output_pipe_bw_0": 2.15,
+                "input_pipe_bw_0": 5.77,
+                "required_input_bw_0": 2.15
+            }
+        }
+    },
+    "norm_ff_1_sqrt": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3878,
+            "kernel_runtime_per_input": 3878.0,
+            "model_runtime_per_input": 3648,
+            "kernel_math_utilization": 67.25,
+            "model_math_utilization": 71.49,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3878,
+            "bw_bound_runtime_per_input": 3878.0,
+            "bw_bound_math_utilization": 67.25,
+            "output_pipe_bw_0": 28.59,
+            "required_output_pipe_bw_0": 2.15,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 2.15
+        },
+        "core-measurements": {
+            "7-8": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3878,
+                "kernel_runtime_per_input": 3878.0,
+                "model_runtime_per_input": 3648,
+                "kernel_math_utilization": 67.25,
+                "model_math_utilization": 71.49,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3878,
+                "bw_bound_runtime_per_input": 3878.0,
+                "bw_bound_math_utilization": 67.25,
+                "output_pipe_bw_0": 28.59,
+                "required_output_pipe_bw_0": 2.15,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 2.15
+            }
+        }
+    },
+    "norm_ff_0_sqrt": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 3875,
+            "kernel_runtime_per_input": 3875.0,
+            "model_runtime_per_input": 3648,
+            "kernel_math_utilization": 67.3,
+            "model_math_utilization": 71.49,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3875,
+            "bw_bound_runtime_per_input": 3875.0,
+            "bw_bound_math_utilization": 67.3,
+            "output_pipe_bw_0": 28.59,
+            "required_output_pipe_bw_0": 2.15,
+            "input_pipe_bw_0": 4.78,
+            "required_input_bw_0": 2.15
+        },
+        "core-measurements": {
+            "6-1": {
+                "warnings": "",
+                "kernel_total_runtime": 3875,
+                "kernel_runtime_per_input": 3875.0,
+                "model_runtime_per_input": 3648,
+                "kernel_math_utilization": 67.3,
+                "model_math_utilization": 71.49,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3875,
+                "bw_bound_runtime_per_input": 3875.0,
+                "bw_bound_math_utilization": 67.3,
+                "output_pipe_bw_0": 28.59,
+                "required_output_pipe_bw_0": 2.15,
+                "input_pipe_bw_0": 4.78,
+                "required_input_bw_0": 2.15
+            }
+        }
+    },
+    "mha_1_key": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3837,
+            "kernel_runtime_per_input": 3837.0,
+            "model_runtime_per_input": 4044,
+            "kernel_math_utilization": 80.06,
+            "model_math_utilization": 75.96,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3837,
+            "bw_bound_runtime_per_input": 3837.0,
+            "bw_bound_math_utilization": 80.06,
+            "output_pipe_bw_0": 89.95,
+            "required_output_pipe_bw_0": 8.67,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 8.67,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 8.67
+        },
+        "core-measurements": {
+            "3-2": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3837,
+                "kernel_runtime_per_input": 3837.0,
+                "model_runtime_per_input": 4044,
+                "kernel_math_utilization": 80.06,
+                "model_math_utilization": 75.96,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3837,
+                "bw_bound_runtime_per_input": 3837.0,
+                "bw_bound_math_utilization": 80.06,
+                "output_pipe_bw_0": 89.95,
+                "required_output_pipe_bw_0": 8.67,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 8.67,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 8.67
+            }
+        }
+    },
+    "norm_mha_1_mean.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1217,
+            "kernel_runtime_per_input": 1217.0,
+            "model_runtime_per_input": 1037,
+            "kernel_math_utilization": 63.11,
+            "model_math_utilization": 74.06,
+            "bw_limited_factor": 3.14,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 3822.0,
+            "bw_bound_runtime_per_input": 3822.0,
+            "bw_bound_math_utilization": 20.09,
+            "output_pipe_bw_0": 2.18,
+            "required_output_pipe_bw_0": 6.84,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 27.35,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 6.84
+        },
+        "core-measurements": {
+            "9-4": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1217,
+                "kernel_runtime_per_input": 1217.0,
+                "model_runtime_per_input": 1037,
+                "kernel_math_utilization": 63.11,
+                "model_math_utilization": 74.06,
+                "bw_limited_factor": 3.14,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 3822.0,
+                "bw_bound_runtime_per_input": 3822.0,
+                "bw_bound_math_utilization": 20.09,
+                "output_pipe_bw_0": 2.18,
+                "required_output_pipe_bw_0": 6.84,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 27.35,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 6.84
+            }
+        }
+    },
+    "mha_1_output": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 3721,
+            "kernel_runtime_per_input": 3721.0,
+            "model_runtime_per_input": 3618,
+            "kernel_math_utilization": 82.56,
+            "model_math_utilization": 84.91,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3721,
+            "bw_bound_runtime_per_input": 3721.0,
+            "bw_bound_math_utilization": 82.56,
+            "output_pipe_bw_0": 89.7,
+            "required_output_pipe_bw_0": 8.94,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 8.94,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 8.94
+        },
+        "core-measurements": {
+            "6-4": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 3721,
+                "kernel_runtime_per_input": 3721.0,
+                "model_runtime_per_input": 3618,
+                "kernel_math_utilization": 82.56,
+                "model_math_utilization": 84.91,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3721,
+                "bw_bound_runtime_per_input": 3721.0,
+                "bw_bound_math_utilization": 82.56,
+                "output_pipe_bw_0": 89.7,
+                "required_output_pipe_bw_0": 8.94,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 8.94,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 8.94
+            }
+        }
+    },
+    "norm_ff_1_mean.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1231,
+            "kernel_runtime_per_input": 1231.0,
+            "model_runtime_per_input": 1037,
+            "kernel_math_utilization": 62.39,
+            "model_math_utilization": 74.06,
+            "bw_limited_factor": 2.94,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 3625.0,
+            "bw_bound_runtime_per_input": 3625.0,
+            "bw_bound_math_utilization": 21.19,
+            "output_pipe_bw_0": 2.3,
+            "required_output_pipe_bw_0": 6.76,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 27.03,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 6.76
+        },
+        "core-measurements": {
+            "1-8": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1231,
+                "kernel_runtime_per_input": 1231.0,
+                "model_runtime_per_input": 1037,
+                "kernel_math_utilization": 62.39,
+                "model_math_utilization": 74.06,
+                "bw_limited_factor": 2.94,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 3625.0,
+                "bw_bound_runtime_per_input": 3625.0,
+                "bw_bound_math_utilization": 21.19,
+                "output_pipe_bw_0": 2.3,
+                "required_output_pipe_bw_0": 6.76,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 27.03,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 6.76
+            }
+        }
+    },
+    "ff.bert.encoder.layer.1.attention.self.value.bias_s_brcst_m2_0_0.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 579,
+            "kernel_runtime_per_input": 579.0,
+            "model_runtime_per_input": 392,
+            "kernel_math_utilization": 33.16,
+            "model_math_utilization": 48.98,
+            "bw_limited_factor": 6.21,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 3593.0,
+            "bw_bound_runtime_per_input": 3593.0,
+            "bw_bound_math_utilization": 5.34,
+            "output_pipe_bw_0": 2.32,
+            "required_output_pipe_bw_0": 14.37,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 3.59,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 14.37
+        },
+        "core-measurements": {
+            "1-4": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 579,
+                "kernel_runtime_per_input": 579.0,
+                "model_runtime_per_input": 392,
+                "kernel_math_utilization": 33.16,
+                "model_math_utilization": 48.98,
+                "bw_limited_factor": 6.21,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 3593.0,
+                "bw_bound_runtime_per_input": 3593.0,
+                "bw_bound_math_utilization": 5.34,
+                "output_pipe_bw_0": 2.32,
+                "required_output_pipe_bw_0": 14.37,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 3.59,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 14.37
+            }
+        }
+    },
+    "norm_ff_0_sq": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 1707,
+            "kernel_runtime_per_input": 1707.0,
+            "model_runtime_per_input": 2191,
+            "kernel_math_utilization": 22.5,
+            "model_math_utilization": 17.53,
+            "bw_limited_factor": 2.04,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 3481.6,
+            "bw_bound_runtime_per_input": 3482.0,
+            "bw_bound_math_utilization": 11.03,
+            "output_pipe_bw_0": 89.22,
+            "required_output_pipe_bw_0": 19.5,
+            "input_pipe_bw_0": 9.56,
+            "required_input_bw_0": 19.5,
+            "input_pipe_bw_1": 12.09,
+            "required_input_bw_1": 19.5
+        },
+        "core-measurements": {
+            "2-1": {
+                "warnings": "",
+                "kernel_total_runtime": 1707,
+                "kernel_runtime_per_input": 1707.0,
+                "model_runtime_per_input": 2191,
+                "kernel_math_utilization": 22.5,
+                "model_math_utilization": 17.53,
+                "bw_limited_factor": 2.04,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 3481.6,
+                "bw_bound_runtime_per_input": 3482.0,
+                "bw_bound_math_utilization": 11.03,
+                "output_pipe_bw_0": 89.22,
+                "required_output_pipe_bw_0": 19.5,
+                "input_pipe_bw_0": 9.56,
+                "required_input_bw_0": 19.5,
+                "input_pipe_bw_1": 12.09,
+                "required_input_bw_1": 19.5
+            }
+        }
+    },
+    "norm_ff_1_bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1746,
+            "kernel_runtime_per_input": 1746.0,
+            "model_runtime_per_input": 2055,
+            "kernel_math_utilization": 7.33,
+            "model_math_utilization": 6.23,
+            "bw_limited_factor": 1.84,
+            "slowest_operand": "output",
+            "bw_bound_total_runtime": 3219.0,
+            "bw_bound_runtime_per_input": 3219.0,
+            "bw_bound_math_utilization": 3.98,
+            "output_pipe_bw_0": 10.34,
+            "required_output_pipe_bw_0": 19.06,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 19.06,
+            "input_pipe_bw_1": "N/A",
+            "required_input_bw_1": 19.06
+        },
+        "core-measurements": {
+            "3-9": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1746,
+                "kernel_runtime_per_input": 1746.0,
+                "model_runtime_per_input": 2055,
+                "kernel_math_utilization": 7.33,
+                "model_math_utilization": 6.23,
+                "bw_limited_factor": 1.84,
+                "slowest_operand": "output",
+                "bw_bound_total_runtime": 3219.0,
+                "bw_bound_runtime_per_input": 3219.0,
+                "bw_bound_math_utilization": 3.98,
+                "output_pipe_bw_0": 10.34,
+                "required_output_pipe_bw_0": 19.06,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 19.06,
+                "input_pipe_bw_1": "N/A",
+                "required_input_bw_1": 19.06
+            }
+        }
+    },
+    "mha_1_query.bias": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 3008,
+            "kernel_runtime_per_input": 3008.0,
+            "model_runtime_per_input": 5335,
+            "kernel_math_utilization": 4.26,
+            "model_math_utilization": 2.4,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 3008,
+            "bw_bound_runtime_per_input": 3008.0,
+            "bw_bound_math_utilization": 4.26,
+            "output_pipe_bw_0": 90.68,
+            "required_output_pipe_bw_0": 11.06,
+            "input_pipe_bw_0": 12.54,
+            "required_input_bw_0": 11.06,
+            "input_pipe_bw_1": 12.36,
+            "required_input_bw_1": 11.06
+        },
+        "core-measurements": {
+            "8-2": {
+                "warnings": "",
+                "kernel_total_runtime": 3008,
+                "kernel_runtime_per_input": 3008.0,
+                "model_runtime_per_input": 5335,
+                "kernel_math_utilization": 4.26,
+                "model_math_utilization": 2.4,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 3008,
+                "bw_bound_runtime_per_input": 3008.0,
+                "bw_bound_math_utilization": 4.26,
+                "output_pipe_bw_0": 90.68,
+                "required_output_pipe_bw_0": 11.06,
+                "input_pipe_bw_0": 12.54,
+                "required_input_bw_0": 11.06,
+                "input_pipe_bw_1": 12.36,
+                "required_input_bw_1": 11.06
+            }
+        }
+    },
+    "norm_ff_1_output": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 2021,
+            "kernel_runtime_per_input": 2021.0,
+            "model_runtime_per_input": 3523,
+            "kernel_math_utilization": 19.0,
+            "model_math_utilization": 10.9,
+            "bw_limited_factor": 1.43,
+            "slowest_operand": "input-1",
+            "bw_bound_total_runtime": 2896.0,
+            "bw_bound_runtime_per_input": 2896.0,
+            "bw_bound_math_utilization": 13.26,
+            "output_pipe_bw_0": 89.22,
+            "required_output_pipe_bw_0": 16.47,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 16.47,
+            "input_pipe_bw_1": 11.49,
+            "required_input_bw_1": 16.47
+        },
+        "core-measurements": {
+            "1-9": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 2021,
+                "kernel_runtime_per_input": 2021.0,
+                "model_runtime_per_input": 3523,
+                "kernel_math_utilization": 19.0,
+                "model_math_utilization": 10.9,
+                "bw_limited_factor": 1.43,
+                "slowest_operand": "input-1",
+                "bw_bound_total_runtime": 2896.0,
+                "bw_bound_runtime_per_input": 2896.0,
+                "bw_bound_math_utilization": 13.26,
+                "output_pipe_bw_0": 89.22,
+                "required_output_pipe_bw_0": 16.47,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 16.47,
+                "input_pipe_bw_1": 11.49,
+                "required_input_bw_1": 16.47
+            }
+        }
+    },
+    "norm_mha_1_weights": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1650,
+            "kernel_runtime_per_input": 1650.0,
+            "model_runtime_per_input": 2635,
+            "kernel_math_utilization": 23.27,
+            "model_math_utilization": 14.57,
+            "bw_limited_factor": 1.61,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 2654.86,
+            "bw_bound_runtime_per_input": 2655.0,
+            "bw_bound_math_utilization": 14.46,
+            "output_pipe_bw_0": 90.19,
+            "required_output_pipe_bw_0": 20.17,
+            "input_pipe_bw_0": 12.54,
+            "required_input_bw_0": 20.17,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 20.17
+        },
+        "core-measurements": {
+            "1-7": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1650,
+                "kernel_runtime_per_input": 1650.0,
+                "model_runtime_per_input": 2635,
+                "kernel_math_utilization": 23.27,
+                "model_math_utilization": 14.57,
+                "bw_limited_factor": 1.61,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 2654.86,
+                "bw_bound_runtime_per_input": 2655.0,
+                "bw_bound_math_utilization": 14.46,
+                "output_pipe_bw_0": 90.19,
+                "required_output_pipe_bw_0": 20.17,
+                "input_pipe_bw_0": 12.54,
+                "required_input_bw_0": 20.17,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 20.17
+            }
+        }
+    },
+    "norm_ff_1_bias_output_nop_0": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "",
+            "kernel_total_runtime": 1317,
+            "kernel_runtime_per_input": 1317.0,
+            "model_runtime_per_input": 1506,
+            "kernel_math_utilization": 9.72,
+            "model_math_utilization": 8.5,
+            "bw_limited_factor": 1.72,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 2265.14,
+            "bw_bound_runtime_per_input": 2265.0,
+            "bw_bound_math_utilization": 5.65,
+            "output_pipe_bw_0": 101.46,
+            "required_output_pipe_bw_0": 25.27,
+            "input_pipe_bw_0": 14.69,
+            "required_input_bw_0": 25.27
+        },
+        "core-measurements": {
+            "4-9": {
+                "warnings": "",
+                "kernel_total_runtime": 1317,
+                "kernel_runtime_per_input": 1317.0,
+                "model_runtime_per_input": 1506,
+                "kernel_math_utilization": 9.72,
+                "model_math_utilization": 8.5,
+                "bw_limited_factor": 1.72,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 2265.14,
+                "bw_bound_runtime_per_input": 2265.0,
+                "bw_bound_math_utilization": 5.65,
+                "output_pipe_bw_0": 101.46,
+                "required_output_pipe_bw_0": 25.27,
+                "input_pipe_bw_0": 14.69,
+                "required_input_bw_0": 25.27
+            }
+        }
+    },
+    "norm_ff_1_var.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1250,
+            "kernel_runtime_per_input": 1250.0,
+            "model_runtime_per_input": 944,
+            "kernel_math_utilization": 61.44,
+            "model_math_utilization": 81.36,
+            "bw_limited_factor": 1.43,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 1789.71,
+            "bw_bound_runtime_per_input": 1790.0,
+            "bw_bound_math_utilization": 42.91,
+            "output_pipe_bw_0": 28.3,
+            "required_output_pipe_bw_0": 6.66,
+            "input_pipe_bw_0": 18.6,
+            "required_input_bw_0": 26.62,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 6.66
+        },
+        "core-measurements": {
+            "4-8": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1250,
+                "kernel_runtime_per_input": 1250.0,
+                "model_runtime_per_input": 944,
+                "kernel_math_utilization": 61.44,
+                "model_math_utilization": 81.36,
+                "bw_limited_factor": 1.43,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 1789.71,
+                "bw_bound_runtime_per_input": 1790.0,
+                "bw_bound_math_utilization": 42.91,
+                "output_pipe_bw_0": 28.3,
+                "required_output_pipe_bw_0": 6.66,
+                "input_pipe_bw_0": 18.6,
+                "required_input_bw_0": 26.62,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 6.66
+            }
+        }
+    },
+    "norm_ff_1_sq": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1735,
+            "kernel_runtime_per_input": 1735.0,
+            "model_runtime_per_input": 2191,
+            "kernel_math_utilization": 22.13,
+            "model_math_utilization": 17.53,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 1735,
+            "bw_bound_runtime_per_input": 1735.0,
+            "bw_bound_math_utilization": 22.13,
+            "output_pipe_bw_0": 89.7,
+            "required_output_pipe_bw_0": 19.18,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 19.18,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 19.18
+        },
+        "core-measurements": {
+            "3-8": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1735,
+                "kernel_runtime_per_input": 1735.0,
+                "model_runtime_per_input": 2191,
+                "kernel_math_utilization": 22.13,
+                "model_math_utilization": 17.53,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 1735,
+                "bw_bound_runtime_per_input": 1735.0,
+                "bw_bound_math_utilization": 22.13,
+                "output_pipe_bw_0": 89.7,
+                "required_output_pipe_bw_0": 19.18,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 19.18,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 19.18
+            }
+        }
+    },
+    "norm_mha_1_output": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1610,
+            "kernel_runtime_per_input": 1610.0,
+            "model_runtime_per_input": 2635,
+            "kernel_math_utilization": 23.85,
+            "model_math_utilization": 14.57,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 1610,
+            "bw_bound_runtime_per_input": 1610.0,
+            "bw_bound_math_utilization": 23.85,
+            "output_pipe_bw_0": 90.43,
+            "required_output_pipe_bw_0": 20.67,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 20.67,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 20.67
+        },
+        "core-measurements": {
+            "9-5": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1610,
+                "kernel_runtime_per_input": 1610.0,
+                "model_runtime_per_input": 2635,
+                "kernel_math_utilization": 23.85,
+                "model_math_utilization": 14.57,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 1610,
+                "bw_bound_runtime_per_input": 1610.0,
+                "bw_bound_math_utilization": 23.85,
+                "output_pipe_bw_0": 90.43,
+                "required_output_pipe_bw_0": 20.67,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 20.67,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 20.67
+            }
+        }
+    },
+    "norm_ff_0_weights": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1609,
+            "kernel_runtime_per_input": 1609.0,
+            "model_runtime_per_input": 2635,
+            "kernel_math_utilization": 23.87,
+            "model_math_utilization": 14.57,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 1609,
+            "bw_bound_runtime_per_input": 1609.0,
+            "bw_bound_math_utilization": 23.87,
+            "output_pipe_bw_0": 90.43,
+            "required_output_pipe_bw_0": 20.68,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 20.68,
+            "input_pipe_bw_1": "N/A",
+            "required_input_bw_1": 20.68
+        },
+        "core-measurements": {
+            "1-2": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1609,
+                "kernel_runtime_per_input": 1609.0,
+                "model_runtime_per_input": 2635,
+                "kernel_math_utilization": 23.87,
+                "model_math_utilization": 14.57,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 1609,
+                "bw_bound_runtime_per_input": 1609.0,
+                "bw_bound_math_utilization": 23.87,
+                "output_pipe_bw_0": 90.43,
+                "required_output_pipe_bw_0": 20.68,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 20.68,
+                "input_pipe_bw_1": "N/A",
+                "required_input_bw_1": 20.68
+            }
+        }
+    },
+    "norm_ff_0_var_plus_eps": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 634,
+            "kernel_runtime_per_input": 634.0,
+            "model_runtime_per_input": 631,
+            "kernel_math_utilization": 5.05,
+            "model_math_utilization": 5.07,
+            "bw_limited_factor": 2.33,
+            "slowest_operand": "input-0",
+            "bw_bound_total_runtime": 1476.0,
+            "bw_bound_runtime_per_input": 1476.0,
+            "bw_bound_math_utilization": 2.17,
+            "output_pipe_bw_0": 28.59,
+            "required_output_pipe_bw_0": 13.12,
+            "input_pipe_bw_0": 5.64,
+            "required_input_bw_0": 13.12,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 13.12
+        },
+        "core-measurements": {
+            "4-1": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 634,
+                "kernel_runtime_per_input": 634.0,
+                "model_runtime_per_input": 631,
+                "kernel_math_utilization": 5.05,
+                "model_math_utilization": 5.07,
+                "bw_limited_factor": 2.33,
+                "slowest_operand": "input-0",
+                "bw_bound_total_runtime": 1476.0,
+                "bw_bound_runtime_per_input": 1476.0,
+                "bw_bound_math_utilization": 2.17,
+                "output_pipe_bw_0": 28.59,
+                "required_output_pipe_bw_0": 13.12,
+                "input_pipe_bw_0": 5.64,
+                "required_input_bw_0": 13.12,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 13.12
+            }
+        }
+    },
+    "norm_mha_1_var.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1262,
+            "kernel_runtime_per_input": 1262.0,
+            "model_runtime_per_input": 944,
+            "kernel_math_utilization": 60.86,
+            "model_math_utilization": 81.36,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 1262,
+            "bw_bound_runtime_per_input": 1262.0,
+            "bw_bound_math_utilization": 60.86,
+            "output_pipe_bw_0": 28.3,
+            "required_output_pipe_bw_0": 6.59,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 26.37,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 6.59
+        },
+        "core-measurements": {
+            "3-5": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1262,
+                "kernel_runtime_per_input": 1262.0,
+                "model_runtime_per_input": 944,
+                "kernel_math_utilization": 60.86,
+                "model_math_utilization": 81.36,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 1262,
+                "bw_bound_runtime_per_input": 1262.0,
+                "bw_bound_math_utilization": 60.86,
+                "output_pipe_bw_0": 28.3,
+                "required_output_pipe_bw_0": 6.59,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 26.37,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 6.59
+            }
+        }
+    },
+    "norm_ff_0_var.lc1": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 1252,
+            "kernel_runtime_per_input": 1252.0,
+            "model_runtime_per_input": 944,
+            "kernel_math_utilization": 61.34,
+            "model_math_utilization": 81.36,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 1252,
+            "bw_bound_runtime_per_input": 1252.0,
+            "bw_bound_math_utilization": 61.34,
+            "output_pipe_bw_0": 28.3,
+            "required_output_pipe_bw_0": 6.65,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 26.58,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 6.65
+        },
+        "core-measurements": {
+            "3-1": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 1252,
+                "kernel_runtime_per_input": 1252.0,
+                "model_runtime_per_input": 944,
+                "kernel_math_utilization": 61.34,
+                "model_math_utilization": 81.36,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 1252,
+                "bw_bound_runtime_per_input": 1252.0,
+                "bw_bound_math_utilization": 61.34,
+                "output_pipe_bw_0": 28.3,
+                "required_output_pipe_bw_0": 6.65,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 26.58,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 6.65
+            }
+        }
+    },
+    "norm_ff_1_var_plus_eps": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 633,
+            "kernel_runtime_per_input": 633.0,
+            "model_runtime_per_input": 631,
+            "kernel_math_utilization": 5.06,
+            "model_math_utilization": 5.07,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 633,
+            "bw_bound_runtime_per_input": 633.0,
+            "bw_bound_math_utilization": 5.06,
+            "output_pipe_bw_0": 28.69,
+            "required_output_pipe_bw_0": 13.14,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 13.14,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 13.14
+        },
+        "core-measurements": {
+            "6-8": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 633,
+                "kernel_runtime_per_input": 633.0,
+                "model_runtime_per_input": 631,
+                "kernel_math_utilization": 5.06,
+                "model_math_utilization": 5.07,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 633,
+                "bw_bound_runtime_per_input": 633.0,
+                "bw_bound_math_utilization": 5.06,
+                "output_pipe_bw_0": 28.69,
+                "required_output_pipe_bw_0": 13.14,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 13.14,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 13.14
+            }
+        }
+    },
+    "norm_mha_1_var_plus_eps": {
+        "op-attributes": {
+            "global_epoch_ids": [
+                2
+            ],
+            "program_names": [
+                "run_fwd"
+            ],
+            "graph_name": "fwd_2_temporal_epoch_1",
+            "first_to_last_input": "0->0",
+            "grid_size": "[1, 1]"
+        },
+        "op-measurements": {
+            "warnings": "<< BW for some pipes not measured. >>",
+            "kernel_total_runtime": 624,
+            "kernel_runtime_per_input": 624.0,
+            "model_runtime_per_input": 631,
+            "kernel_math_utilization": 5.13,
+            "model_math_utilization": 5.07,
+            "bw_limited_factor": 1,
+            "slowest_operand": "N/A",
+            "bw_bound_total_runtime": 624,
+            "bw_bound_runtime_per_input": 624.0,
+            "bw_bound_math_utilization": 5.13,
+            "output_pipe_bw_0": 28.89,
+            "required_output_pipe_bw_0": 13.33,
+            "input_pipe_bw_0": 0.0,
+            "required_input_bw_0": 13.33,
+            "input_pipe_bw_1": 0.0,
+            "required_input_bw_1": 13.33
+        },
+        "core-measurements": {
+            "4-5": {
+                "warnings": "<< BW for some pipes not measured. >>",
+                "kernel_total_runtime": 624,
+                "kernel_runtime_per_input": 624.0,
+                "model_runtime_per_input": 631,
+                "kernel_math_utilization": 5.13,
+                "model_math_utilization": 5.07,
+                "bw_limited_factor": 1,
+                "slowest_operand": "N/A",
+                "bw_bound_total_runtime": 624,
+                "bw_bound_runtime_per_input": 624.0,
+                "bw_bound_math_utilization": 5.13,
+                "output_pipe_bw_0": 28.89,
+                "required_output_pipe_bw_0": 13.33,
+                "input_pipe_bw_0": 0.0,
+                "required_input_bw_0": 13.33,
+                "input_pipe_bw_1": 0.0,
+                "required_input_bw_1": 13.33
+            }
+        }
+    }
+}

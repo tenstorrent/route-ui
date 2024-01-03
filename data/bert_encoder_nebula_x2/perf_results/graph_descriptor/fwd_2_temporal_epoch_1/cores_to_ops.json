@@ -1,0 +1,1482 @@
+{
+    "1-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "e2e_add_ff_0_0",
+                "type": "queue"
+            },
+            {
+                "index": 1,
+                "name": "e2e_norm_ff_0_mean.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "0-0",
+        "num-inputs": 2,
+        "num-outputs": 2,
+        "op-name": "norm_ff_0_sub",
+        "op-type": "subtract",
+        "outputs": [
+            {
+                "name": "norm_ff_0_sq",
+                "type": "op"
+            },
+            {
+                "name": "norm_ff_0_output",
+                "type": "op"
+            }
+        ]
+    },
+    "1-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_output",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "1-0",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_weights",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_ff_0_bias",
+                "type": "op"
+            }
+        ]
+    },
+    "1-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "e2e_ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "2-0",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_splt_brcst_2",
+        "op-type": "nop",
+        "outputs": [
+            {
+                "name": "mha_1_as_div",
+                "type": "op"
+            }
+        ]
+    },
+    "1-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "lc.input_tensor.ff.bert.encoder.layer.1.attention.self.value.bias_s_brcst_m2_0_0.0",
+                "type": "queue"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.self.value.bias",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "3-0",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "ff.bert.encoder.layer.1.attention.self.value.bias_s_brcst_m2_0_0.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_value.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "1-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "add_mha_1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_mha_1_mean.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "4-0",
+        "num-inputs": 2,
+        "num-outputs": 2,
+        "op-name": "norm_mha_1_sub",
+        "op-type": "subtract",
+        "outputs": [
+            {
+                "name": "norm_mha_1_sq",
+                "type": "op"
+            },
+            {
+                "name": "norm_mha_1_output",
+                "type": "op"
+            }
+        ]
+    },
+    "1-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_output",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "5-0",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_weights",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_mha_1_bias",
+                "type": "op"
+            }
+        ]
+    },
+    "1-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "add_ff_1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_ff_1_mean.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "6-0",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_mean.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_ff_1_sub",
+                "type": "op"
+            }
+        ]
+    },
+    "1-9": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_sub",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_ff_1_recip_s_brcst_m1_0_0.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "7-0",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_output",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_ff_1_weights",
+                "type": "op"
+            }
+        ]
+    },
+    "2-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_sub",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_ff_0_sub",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "0-1",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_sq",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_ff_0_var.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "2-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_weights",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "1-1",
+        "num-inputs": 2,
+        "num-outputs": 4,
+        "op-name": "norm_ff_0_bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "mha_1_query",
+                "type": "op"
+            },
+            {
+                "name": "mha_1_value",
+                "type": "op"
+            },
+            {
+                "name": "mha_1_key",
+                "type": "op"
+            },
+            {
+                "name": "add_mha_1",
+                "type": "op"
+            }
+        ]
+    },
+    "2-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_as",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1_splt_brcst_2",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "2-1",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_as_div",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "mha_1_as_mask",
+                "type": "op"
+            }
+        ]
+    },
+    "2-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_bias",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.self.value.weight",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "3-1",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_value",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_value.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "2-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_sub",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_mha_1_sub",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "4-1",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_sq",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_mha_1_var.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "2-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_weights",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "5-1",
+        "num-inputs": 2,
+        "num-outputs": 2,
+        "op-name": "norm_mha_1_bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "ff_1_ff1",
+                "type": "op"
+            },
+            {
+                "name": "add_ff_1",
+                "type": "op"
+            }
+        ]
+    },
+    "2-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "add_ff_1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_ff_1_mean.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "6-1",
+        "num-inputs": 2,
+        "num-outputs": 2,
+        "op-name": "norm_ff_1_sub",
+        "op-type": "subtract",
+        "outputs": [
+            {
+                "name": "norm_ff_1_sq",
+                "type": "op"
+            },
+            {
+                "name": "norm_ff_1_output",
+                "type": "op"
+            }
+        ]
+    },
+    "2-9": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_output",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "7-1",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_weights",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_ff_1_bias",
+                "type": "op"
+            }
+        ]
+    },
+    "3-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_sq",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_ff_0_var.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "0-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_var.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_ff_0_var_plus_eps",
+                "type": "op"
+            }
+        ]
+    },
+    "3-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_bias",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.self.key.weight",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "1-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_key",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_key.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "3-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_as_div",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_attention_mask_s_brcst_m2_0_1.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "2-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_as_mask",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "mha_1_as_softmax.dc.exp.0",
+                "type": "op"
+            }
+        ]
+    },
+    "3-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_value",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.self.value.bias_s_brcst_m2_0_0.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "3-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_value.bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "mha_1_ac",
+                "type": "op"
+            }
+        ]
+    },
+    "3-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_sq",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_mha_1_var.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "4-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_var.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_mha_1_var_plus_eps",
+                "type": "op"
+            }
+        ]
+    },
+    "3-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_bias",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.intermediate.dense.weight",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "5-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "ff_1_ff1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "ff_1_ff1.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "3-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_sub",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_ff_1_sub",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "6-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_sq",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_ff_1_var.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "3-9": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_weights",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "7-2",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "norm_ff_1_bias_output_nop_0",
+                "type": "op"
+            }
+        ]
+    },
+    "4-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_var.lc1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "constant_1_norm_ff_0_var_plus_eps",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "0-3",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_var_plus_eps",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "norm_ff_0_sqrt",
+                "type": "op"
+            }
+        ]
+    },
+    "4-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_key",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "1-3",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_key.bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "mha_1_as",
+                "type": "op"
+            }
+        ]
+    },
+    "4-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_as_mask",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "2-3",
+        "num-inputs": 1,
+        "num-outputs": 2,
+        "op-name": "mha_1_as_softmax.dc.exp.0",
+        "op-type": "exp",
+        "outputs": [
+            {
+                "name": "mha_1_as_softmax.dc.reduce_sum.1.lc1",
+                "type": "op"
+            },
+            {
+                "name": "mha_1_as_softmax.dc.multiply.3",
+                "type": "op"
+            }
+        ]
+    },
+    "4-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_as_softmax.dc.multiply.3",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "mha_1_value.bias",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "3-3",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_ac",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_output",
+                "type": "op"
+            }
+        ]
+    },
+    "4-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_var.lc1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "constant_1_norm_mha_1_var_plus_eps",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "4-3",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_var_plus_eps",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "norm_mha_1_sqrt",
+                "type": "op"
+            }
+        ]
+    },
+    "4-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "ff_1_ff1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "5-3",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "ff_1_ff1.bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "ff1_gelu",
+                "type": "op"
+            }
+        ]
+    },
+    "4-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_sq",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_ff_1_var.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "6-3",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_var.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_ff_1_var_plus_eps",
+                "type": "op"
+            }
+        ]
+    },
+    "4-9": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_bias",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "7-3",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_bias_output_nop_0",
+        "op-type": "nop",
+        "outputs": [
+            {
+                "name": "encoder1.output_norm_ff_1_bias",
+                "type": "queue"
+            }
+        ]
+    },
+    "6-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_var_plus_eps",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "0-4",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_sqrt",
+        "op-type": "sqrt",
+        "outputs": [
+            {
+                "name": "norm_ff_0_recip",
+                "type": "op"
+            }
+        ]
+    },
+    "6-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "lc.input_tensor.ff.bert.encoder.layer.1.attention.self.query.bias_s_brcst_m2_0_0.0",
+                "type": "queue"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.self.query.bias",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "1-4",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "ff.bert.encoder.layer.1.attention.self.query.bias_s_brcst_m2_0_0.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_query.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "6-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "lc.input_tensor.mha_1_as_softmax.dc.reduce_sum.1.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "2-4",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "lc.input_tensor.mha_1_as_softmax.dc.reduce_sum.1.0_splt_brcst_1",
+        "op-type": "nop",
+        "outputs": [
+            {
+                "name": "mha_1_as_softmax.dc.reduce_sum.1.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "6-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_ac",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.output.dense.weight",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "3-4",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_output",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_output.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "6-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_var_plus_eps",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "4-4",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_sqrt",
+        "op-type": "sqrt",
+        "outputs": [
+            {
+                "name": "norm_mha_1_recip",
+                "type": "op"
+            }
+        ]
+    },
+    "6-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "ff_1_ff1.bias",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "5-4",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "ff1_gelu",
+        "op-type": "gelu",
+        "outputs": [
+            {
+                "name": "ff_1_ff2",
+                "type": "op"
+            }
+        ]
+    },
+    "6-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_var.lc1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "constant_1_norm_ff_1_var_plus_eps",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "6-4",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_var_plus_eps",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "norm_ff_1_sqrt",
+                "type": "op"
+            }
+        ]
+    },
+    "7-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_sqrt",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "0-5",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_recip",
+        "op-type": "reciprocal",
+        "outputs": [
+            {
+                "name": "norm_ff_0_recip_s_brcst_m1_0_0.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "7-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_bias",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.self.query.weight",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "1-5",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_query",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_query.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "7-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_as_softmax.dc.exp.0",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.mha_1_as_softmax.dc.reduce_sum.1.0_splt_brcst_1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "2-5",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_as_softmax.dc.reduce_sum.1.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_as_softmax.dc.reciprocal.2",
+                "type": "op"
+            }
+        ]
+    },
+    "7-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_output",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "3-5",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_output.bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "add_mha_1",
+                "type": "op"
+            }
+        ]
+    },
+    "7-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_sqrt",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "4-5",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_recip",
+        "op-type": "reciprocal",
+        "outputs": [
+            {
+                "name": "norm_mha_1_recip_s_brcst_m1_0_0.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "7-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "ff1_gelu",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.output.dense.weight",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "5-5",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "ff_1_ff2",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "ff_1_ff2.bias",
+                "type": "op"
+            }
+        ]
+    },
+    "7-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_var_plus_eps",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "6-5",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_sqrt",
+        "op-type": "sqrt",
+        "outputs": [
+            {
+                "name": "norm_ff_1_recip",
+                "type": "op"
+            }
+        ]
+    },
+    "8-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_recip",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_ff_0_recip_s_brcst_m1_0_0.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "0-6",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_recip_s_brcst_m1_0_0.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_ff_0_output",
+                "type": "op"
+            }
+        ]
+    },
+    "8-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_query",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.attention.self.query.bias_s_brcst_m2_0_0.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "1-6",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_query.bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "mha_1_as",
+                "type": "op"
+            }
+        ]
+    },
+    "8-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_as_softmax.dc.reduce_sum.1.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "2-6",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "mha_1_as_softmax.dc.reciprocal.2",
+        "op-type": "reciprocal",
+        "outputs": [
+            {
+                "name": "mha_1_as_softmax.dc.multiply.3",
+                "type": "op"
+            }
+        ]
+    },
+    "8-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_bias",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "mha_1_output.bias",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "3-6",
+        "num-inputs": 2,
+        "num-outputs": 2,
+        "op-name": "add_mha_1",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "norm_mha_1_sub",
+                "type": "op"
+            },
+            {
+                "name": "norm_mha_1_mean.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "8-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_recip",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_mha_1_recip_s_brcst_m1_0_0.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "4-6",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_recip_s_brcst_m1_0_0.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_mha_1_output",
+                "type": "op"
+            }
+        ]
+    },
+    "8-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "ff_1_ff2",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "e2e_ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "5-6",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "ff_1_ff2.bias",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "add_ff_1",
+                "type": "op"
+            }
+        ]
+    },
+    "8-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_sqrt",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "6-6",
+        "num-inputs": 1,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_recip",
+        "op-type": "reciprocal",
+        "outputs": [
+            {
+                "name": "norm_ff_1_recip_s_brcst_m1_0_0.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "9-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_0_sub",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_ff_0_recip_s_brcst_m1_0_0.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "0-7",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_0_output",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_ff_0_weights",
+                "type": "op"
+            }
+        ]
+    },
+    "9-2": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_query.bias",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "mha_1_key.bias",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "1-7",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_as",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "mha_1_as_div",
+                "type": "op"
+            }
+        ]
+    },
+    "9-3": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "mha_1_as_softmax.dc.exp.0",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "mha_1_as_softmax.dc.reciprocal.2",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "2-7",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "mha_1_as_softmax.dc.multiply.3",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "mha_1_ac",
+                "type": "op"
+            }
+        ]
+    },
+    "9-4": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "add_mha_1",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_mha_1_mean.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "3-7",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_mean.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_mha_1_sub",
+                "type": "op"
+            }
+        ]
+    },
+    "9-5": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_sub",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "norm_mha_1_recip_s_brcst_m1_0_0.lc1",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "4-7",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_mha_1_output",
+        "op-type": "multiply",
+        "outputs": [
+            {
+                "name": "norm_mha_1_weights",
+                "type": "op"
+            }
+        ]
+    },
+    "9-7": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_mha_1_bias",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "ff_1_ff2.bias",
+                "type": "op"
+            }
+        ],
+        "logical-core-id": "5-7",
+        "num-inputs": 2,
+        "num-outputs": 2,
+        "op-name": "add_ff_1",
+        "op-type": "add",
+        "outputs": [
+            {
+                "name": "norm_ff_1_sub",
+                "type": "op"
+            },
+            {
+                "name": "norm_ff_1_mean.lc1",
+                "type": "op"
+            }
+        ]
+    },
+    "9-8": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "norm_ff_1_recip",
+                "type": "op"
+            },
+            {
+                "index": 1,
+                "name": "lc.input_tensor.norm_ff_1_recip_s_brcst_m1_0_0.0",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "6-7",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "norm_ff_1_recip_s_brcst_m1_0_0.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "norm_ff_1_output",
+                "type": "op"
+            }
+        ]
+    }
+}

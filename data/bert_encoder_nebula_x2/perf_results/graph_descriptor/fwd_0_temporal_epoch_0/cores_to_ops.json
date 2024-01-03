@@ -1,0 +1,27 @@
+{
+    "1-1": {
+        "inputs": [
+            {
+                "index": 0,
+                "name": "lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.0",
+                "type": "queue"
+            },
+            {
+                "index": 1,
+                "name": "ff.bert.encoder.layer.1.output.LayerNorm.bias",
+                "type": "queue"
+            }
+        ],
+        "logical-core-id": "0-0",
+        "num-inputs": 2,
+        "num-outputs": 1,
+        "op-name": "ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1",
+        "op-type": "matmul",
+        "outputs": [
+            {
+                "name": "e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0",
+                "type": "queue"
+            }
+        ]
+    }
+}

@@ -1,0 +1,11 @@
+encoder1.output_norm_ff_1_bias:
+  0:
+    name: encoder1.output_norm_ff_1_bias
+    channel: 0
+    queue_target_device: 0
+    addr: 0x0
+    producers:
+      0:
+        chip_id: 0
+        x: 4
+        y: 9

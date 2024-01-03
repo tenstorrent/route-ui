@@ -1,0 +1,80 @@
+{
+    "1-1-ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1": {
+        "average-math-utilization": 32.487308502197266,
+        "brisc-bw-operand-input-0": 0.0,
+        "brisc-bw-operand-input-1": 0.0,
+        "brisc-num-tiles-operand-input-0": 0,
+        "brisc-num-tiles-operand-input-1": 0,
+        "brisc-pop-num-cycles-operand-input-0": 666,
+        "brisc-pop-num-cycles-operand-input-1": 1242,
+        "first-input-recorded": 0,
+        "first-unpack-first-input": 62342819,
+        "first-unpack-last-input": 62342819,
+        "input-0": {
+            "first-unpack-to-last-pack": 591,
+            "first-unpack-to-last-pack-without-wait-for-tile": "N/A",
+            "math-activity": 192,
+            "math-utilization-first-unpack-to-last-pack": 32.487308502197266,
+            "pack-runtime": 950,
+            "packer-stalled-on-ncrisc-intermediate-dump": "N/A",
+            "total-unpack-wait-for-tile-after-first-unpack": "N/A",
+            "total-wait-for-free-tile-after-first-unpack": "N/A",
+            "unpacker-stalled-on-ncrisc-intermediate-dump": "N/A"
+        },
+        "last-input-recorded": 0,
+        "last-pack-first-input": 62343410,
+        "last-pack-last-input": 62343410,
+        "model-math-utilization": 48.979591369628906,
+        "model-num-cycles": 392,
+        "num-cycles-per-tensor": null,
+        "num-tensors-per-second": null,
+        "out-of-memory": false,
+        "packer-overlay-decoupled-output-bw": 27.36842105263158,
+        "total-runtime": 591,
+        "trisc-bw-operand-input-0": "N/A",
+        "trisc-bw-operand-input-1": "N/A",
+        "trisc-bw-operand-output-0": "N/A",
+        "trisc-num-tiles-operand-input-0": 1,
+        "trisc-num-tiles-operand-input-1": 4,
+        "trisc-num-tiles-operand-output-0": 4,
+        "trisc-total-tensor-size-operand-input-0": 2080,
+        "trisc-total-tensor-size-operand-input-1": 8320,
+        "trisc-total-tensor-size-operand-output-0": 8320
+    },
+    "per-epoch-events": {
+        "AICLK": 1000,
+        "device-id": 0,
+        "epoch-global-id": 0,
+        "epoch-local-id": 0,
+        "first-input-recorded": 0,
+        "first-unpack-first-input": 62342819,
+        "graph-name": "fwd_0_temporal_epoch_0",
+        "last-input-0-execution-time": 591,
+        "last-input-recorded": 0,
+        "last-pack": {
+            "input_0": {
+                "core-id": "(x=1,y=1)",
+                "end-timestamp": 62343410
+            }
+        },
+        "last-pack-first-input": 62343410,
+        "last-pack-last-input": 62343410,
+        "longest-op-each-input": {
+            "input-0": {
+                "op-name": "ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1",
+                "runtime": 591
+            }
+        },
+        "num-cycles-per-input": "N/A",
+        "num-inputs-per-second": "N/A",
+        "program-id": 0,
+        "program-name": "run_fwd",
+        "total-runtime": 591,
+        "unpack-first-block-available": {
+            "input_0": {
+                "core-id": "(x=1,y=1)",
+                "timestamp": 62342819
+            }
+        }
+    }
+}

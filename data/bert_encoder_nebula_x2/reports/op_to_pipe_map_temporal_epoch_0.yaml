@@ -1,0 +1,1037 @@
+ops:
+  norm_mha_0_weights:
+    inputs:
+      - name: norm_mha_0_output
+        type: op
+        pipes:
+          1-8-4:
+            - 595000000000
+      - name: ff.bert.encoder.layer.0.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-8-4:
+            - 596000000000
+    outputs:
+      - name: norm_mha_0_bias
+        type: op
+        pipes:
+          1-8-4:
+            - 577000000000
+  norm_mha_0_var_plus_eps:
+    inputs:
+      - name: norm_mha_0_var.lc1
+        type: op
+        pipes:
+          1-7-8:
+            - 593000000000
+      - name: constant_1_norm_mha_0_var_plus_eps
+        type: queue
+        pipes:
+          1-7-8:
+            - 594000000000
+    outputs:
+      - name: norm_mha_0_sqrt
+        type: op
+        pipes:
+          1-7-8:
+            - 588000000000
+  norm_mha_0_var.lc1:
+    inputs:
+      - name: norm_mha_0_sq
+        type: op
+        pipes:
+          1-7-7:
+            - 591000000000
+      - name: lc.input_tensor.norm_mha_0_var.0
+        type: queue
+        pipes:
+          1-7-7:
+            - 592000000000
+    outputs:
+      - name: norm_mha_0_var_plus_eps
+        type: op
+        pipes:
+          1-7-7:
+            - 593000000000
+  norm_mha_0_sq:
+    inputs:
+      - name: norm_mha_0_sub
+        type: op
+        pipes:
+          1-7-6:
+            - 586000000000
+      - name: norm_mha_0_sub
+        type: op
+        pipes:
+          1-7-6:
+            - 587000000000
+    outputs:
+      - name: norm_mha_0_var.lc1
+        type: op
+        pipes:
+          1-7-6:
+            - 591000000000
+  norm_mha_0_recip_s_brcst_m1_0_0.lc1:
+    inputs:
+      - name: norm_mha_0_recip
+        type: op
+        pipes:
+          1-8-2:
+            - 584000000000
+      - name: lc.input_tensor.norm_mha_0_recip_s_brcst_m1_0_0.0
+        type: queue
+        pipes:
+          1-8-2:
+            - 585000000000
+    outputs:
+      - name: norm_mha_0_output
+        type: op
+        pipes:
+          1-8-2:
+            - 582000000000
+  mha_0_query:
+    inputs:
+      - name: encoder_input
+        type: queue
+        pipes:
+          1-4-1:
+            - 566000000000
+      - name: ff.bert.encoder.layer.0.attention.self.query.weight
+        type: queue
+        pipes:
+          1-4-1:
+            - 567000000000
+    outputs:
+      - name: mha_0_query.bias
+        type: op
+        pipes:
+          1-4-1:
+            - 568000000000
+  mha_0_output.bias:
+    inputs:
+      - name: mha_0_output
+        type: op
+        pipes:
+          1-7-1:
+            - 564000000000
+      - name: ff.bert.encoder.layer.0.attention.output.dense.bias_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-7-1:
+            - 565000000000
+    outputs:
+      - name: add_mha_0
+        type: op
+        pipes:
+          1-7-1:
+            - 475000000000
+  mha_0_key:
+    inputs:
+      - name: encoder_input
+        type: queue
+        pipes:
+          1-3-7:
+            - 558000000000
+      - name: ff.bert.encoder.layer.0.attention.self.key.weight
+        type: queue
+        pipes:
+          1-3-7:
+            - 559000000000
+    outputs:
+      - name: mha_0_key.bias
+        type: op
+        pipes:
+          1-3-7:
+            - 560000000000
+  norm_mha_0_sub:
+    inputs:
+      - name: add_mha_0
+        type: op
+        pipes:
+          1-7-4:
+            - 589000000000
+      - name: norm_mha_0_mean.lc1
+        type: op
+        pipes:
+          1-7-4:
+            - 590000000000
+    outputs:
+      - name: norm_mha_0_sq
+        type: op
+        pipes:
+          1-7-4:
+            - 586000000000
+            - 587000000000
+      - name: norm_mha_0_output
+        type: op
+        pipes:
+          1-7-4:
+            - 581000000000
+  norm_mha_0_sqrt:
+    inputs:
+      - name: norm_mha_0_var_plus_eps
+        type: op
+        pipes:
+          1-7-9:
+            - 588000000000
+    outputs:
+      - name: norm_mha_0_recip
+        type: op
+        pipes:
+          1-7-9:
+            - 583000000000
+  norm_mha_0_output:
+    inputs:
+      - name: norm_mha_0_sub
+        type: op
+        pipes:
+          1-8-3:
+            - 581000000000
+      - name: norm_mha_0_recip_s_brcst_m1_0_0.lc1
+        type: op
+        pipes:
+          1-8-3:
+            - 582000000000
+    outputs:
+      - name: norm_mha_0_weights
+        type: op
+        pipes:
+          1-8-3:
+            - 595000000000
+  mha_0_as_softmax.dc.reciprocal.2:
+    inputs:
+      - name: mha_0_as_softmax.dc.reduce_sum.1.lc1
+        type: op
+        pipes:
+          1-5-2:
+            - 555000000000
+    outputs:
+      - name: mha_0_as_softmax.dc.multiply.3
+        type: op
+        pipes:
+          1-5-2:
+            - 554000000000
+  mha_0_as_softmax.dc.multiply.3:
+    inputs:
+      - name: mha_0_as_softmax.dc.exp.0
+        type: op
+        pipes:
+          1-5-3:
+            - 553000000000
+      - name: mha_0_as_softmax.dc.reciprocal.2
+        type: op
+        pipes:
+          1-5-3:
+            - 554000000000
+    outputs:
+      - name: mha_0_ac
+        type: op
+        pipes:
+          1-5-3:
+            - 544000000000
+  mha_0_as_softmax.dc.exp.0:
+    inputs:
+      - name: mha_0_as_mask
+        type: op
+        pipes:
+          1-4-8:
+            - 552000000000
+    outputs:
+      - name: mha_0_as_softmax.dc.reduce_sum.1.lc1
+        type: op
+        pipes:
+          1-4-8:
+            - 556000000000
+      - name: mha_0_as_softmax.dc.multiply.3
+        type: op
+        pipes:
+          1-4-8:
+            - 553000000000
+  mha_0_as_div:
+    inputs:
+      - name: mha_0_as
+        type: op
+        pipes:
+          1-4-6:
+            - 548000000000
+      - name: ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.lc1_splt_brcst_2
+        type: op
+        pipes:
+          1-4-6:
+            - 549000000000
+    outputs:
+      - name: mha_0_as_mask
+        type: op
+        pipes:
+          1-4-6:
+            - 550000000000
+  mha_0_ac:
+    inputs:
+      - name: mha_0_as_softmax.dc.multiply.3
+        type: op
+        pipes:
+          1-5-8:
+            - 544000000000
+      - name: mha_0_value.bias
+        type: op
+        pipes:
+          1-5-8:
+            - 545000000000
+    outputs:
+      - name: mha_0_output
+        type: op
+        pipes:
+          1-5-8:
+            - 562000000000
+  ff_0_ff2:
+    inputs:
+      - name: ff0_gelu
+        type: op
+        pipes:
+          1-9-1:
+            - 539000000000
+      - name: ff.bert.encoder.layer.0.output.dense.weight
+        type: queue
+        pipes:
+          1-9-1:
+            - 540000000000
+    outputs:
+      - name: ff_0_ff2.bias
+        type: op
+        pipes:
+          1-9-1:
+            - 541000000000
+  ff_0_ff1.bias:
+    inputs:
+      - name: ff_0_ff1
+        type: op
+        pipes:
+          1-8-8:
+            - 537000000000
+      - name: ff.bert.encoder.layer.0.intermediate.dense.bias_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-8-8:
+            - 538000000000
+    outputs:
+      - name: ff0_gelu
+        type: op
+        pipes:
+          1-8-8:
+            - 534000000000
+  norm_mha_0_mean.lc1:
+    inputs:
+      - name: add_mha_0
+        type: op
+        pipes:
+          1-7-3:
+            - 579000000000
+      - name: lc.input_tensor.norm_mha_0_mean.0
+        type: queue
+        pipes:
+          1-7-3:
+            - 580000000000
+    outputs:
+      - name: norm_mha_0_sub
+        type: op
+        pipes:
+          1-7-3:
+            - 590000000000
+  norm_ff_0_mean.lc1:
+    inputs:
+      - name: add_ff_0
+        type: op
+        pipes:
+          1-9-4:
+            - 574000000000
+      - name: lc.input_tensor.norm_ff_0_mean.0
+        type: queue
+        pipes:
+          1-9-4:
+            - 575000000000
+    outputs:
+      []
+  ff_0_ff1:
+    inputs:
+      - name: norm_mha_0_bias
+        type: op
+        pipes:
+          1-8-7:
+            - 535000000000
+      - name: ff.bert.encoder.layer.0.intermediate.dense.weight
+        type: queue
+        pipes:
+          1-8-7:
+            - 536000000000
+    outputs:
+      - name: ff_0_ff1.bias
+        type: op
+        pipes:
+          1-8-7:
+            - 537000000000
+  ff0_gelu:
+    inputs:
+      - name: ff_0_ff1.bias
+        type: op
+        pipes:
+          1-8-9:
+            - 534000000000
+    outputs:
+      - name: ff_0_ff2
+        type: op
+        pipes:
+          1-8-9:
+            - 539000000000
+  lc.input_tensor.mha_0_as_softmax.dc.reduce_sum.1.0_splt_brcst_1:
+    inputs:
+      - name: lc.input_tensor.mha_0_as_softmax.dc.reduce_sum.1.0
+        type: queue
+        pipes:
+          1-4-9:
+            - 543000000000
+    outputs:
+      - name: mha_0_as_softmax.dc.reduce_sum.1.lc1
+        type: op
+        pipes:
+          1-4-9:
+            - 557000000000
+  ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m2_0_1.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m2_0_1.0
+        type: queue
+        pipes:
+          1-1-9:
+            - 532000000000
+      - name: ff.reciprocal_of_sqrt_of_head_size_1
+        type: queue
+        pipes:
+          1-1-9:
+            - 533000000000
+    outputs:
+      - name: ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1
+        type: op
+        pipes:
+          1-1-9:
+            - 529000000000
+  mha_0_value:
+    inputs:
+      - name: encoder_input
+        type: queue
+        pipes:
+          1-5-6:
+            - 570000000000
+      - name: ff.bert.encoder.layer.0.attention.self.value.weight
+        type: queue
+        pipes:
+          1-5-6:
+            - 571000000000
+    outputs:
+      - name: mha_0_value.bias
+        type: op
+        pipes:
+          1-5-6:
+            - 572000000000
+  ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.lc1:
+    inputs:
+      - name: ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m2_0_1.lc1
+        type: op
+        pipes:
+          1-2-1:
+            - 529000000000
+      - name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_1_s_brcst_m1_0_2.0
+        type: queue
+        pipes:
+          1-2-1:
+            - 530000000000
+    outputs:
+      []
+  ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m2_0_1.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m2_0_1.0
+        type: queue
+        pipes:
+          1-3-3:
+            - 527000000000
+      - name: ff.reciprocal_of_sqrt_of_head_size_0
+        type: queue
+        pipes:
+          1-3-3:
+            - 528000000000
+    outputs:
+      - name: ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.lc1
+        type: op
+        pipes:
+          1-3-3:
+            - 524000000000
+  ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.lc1:
+    inputs:
+      - name: ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m2_0_1.lc1
+        type: op
+        pipes:
+          1-3-4:
+            - 524000000000
+      - name: lc.input_tensor.ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.0
+        type: queue
+        pipes:
+          1-3-4:
+            - 525000000000
+    outputs:
+      - name: ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.lc1_splt_brcst_2
+        type: op
+        pipes:
+          1-3-4:
+            - 526000000000
+  ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.output.dense.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-1-2:
+            - 521000000000
+      - name: ff.bert.encoder.layer.1.output.dense.bias
+        type: queue
+        pipes:
+          1-1-2:
+            - 522000000000
+    outputs:
+      []
+  mha_0_key.bias:
+    inputs:
+      - name: mha_0_key
+        type: op
+        pipes:
+          1-3-8:
+            - 560000000000
+      - name: ff.bert.encoder.layer.0.attention.self.key.bias_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-3-8:
+            - 561000000000
+    outputs:
+      - name: mha_0_as
+        type: op
+        pipes:
+          1-3-8:
+            - 547000000000
+  ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.weight_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-1-1:
+            - 518000000000
+      - name: ff.bert.encoder.layer.1.output.LayerNorm.weight
+        type: queue
+        pipes:
+          1-1-1:
+            - 519000000000
+    outputs:
+      []
+  mha_0_value.bias:
+    inputs:
+      - name: mha_0_value
+        type: op
+        pipes:
+          1-5-7:
+            - 572000000000
+      - name: ff.bert.encoder.layer.0.attention.self.value.bias_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-5-7:
+            - 573000000000
+    outputs:
+      - name: mha_0_ac
+        type: op
+        pipes:
+          1-5-7:
+            - 545000000000
+  mha_0_query.bias:
+    inputs:
+      - name: mha_0_query
+        type: op
+        pipes:
+          1-4-2:
+            - 568000000000
+      - name: ff.bert.encoder.layer.0.attention.self.query.bias_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-4-2:
+            - 569000000000
+    outputs:
+      - name: mha_0_as
+        type: op
+        pipes:
+          1-4-2:
+            - 546000000000
+  ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.attention.self.key.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-2-2:
+            - 512000000000
+      - name: ff.bert.encoder.layer.1.attention.self.key.bias
+        type: queue
+        pipes:
+          1-2-2:
+            - 513000000000
+    outputs:
+      []
+  mha_0_as_softmax.dc.reduce_sum.1.lc1:
+    inputs:
+      - name: mha_0_as_softmax.dc.exp.0
+        type: op
+        pipes:
+          1-5-1:
+            - 556000000000
+      - name: lc.input_tensor.mha_0_as_softmax.dc.reduce_sum.1.0_splt_brcst_1
+        type: op
+        pipes:
+          1-5-1:
+            - 557000000000
+    outputs:
+      - name: mha_0_as_softmax.dc.reciprocal.2
+        type: op
+        pipes:
+          1-5-1:
+            - 555000000000
+  ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.attention.output.dense.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-1-7:
+            - 509000000000
+      - name: ff.bert.encoder.layer.1.attention.output.dense.bias
+        type: queue
+        pipes:
+          1-1-7:
+            - 510000000000
+    outputs:
+      []
+  ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.attention.output.LayerNorm.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-1-4:
+            - 503000000000
+      - name: ff.bert.encoder.layer.1.attention.output.LayerNorm.bias
+        type: queue
+        pipes:
+          1-1-4:
+            - 504000000000
+    outputs:
+      []
+  ff.bert.encoder.layer.0.output.dense.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.output.dense.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-2-6:
+            - 501000000000
+      - name: ff.bert.encoder.layer.0.output.dense.bias
+        type: queue
+        pipes:
+          1-2-6:
+            - 502000000000
+    outputs:
+      - name: ff_0_ff2.bias
+        type: op
+        pipes:
+          1-2-6:
+            - 542000000000
+  ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.output.LayerNorm.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-2-3:
+            - 495000000000
+      - name: ff.bert.encoder.layer.0.output.LayerNorm.bias
+        type: queue
+        pipes:
+          1-2-3:
+            - 496000000000
+    outputs:
+      []
+  norm_mha_0_bias:
+    inputs:
+      - name: norm_mha_0_weights
+        type: op
+        pipes:
+          1-8-6:
+            - 577000000000
+      - name: ff.bert.encoder.layer.0.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-8-6:
+            - 578000000000
+    outputs:
+      - name: ff_0_ff1
+        type: op
+        pipes:
+          1-8-6:
+            - 535000000000
+      - name: add_ff_0
+        type: op
+        pipes:
+          1-8-6:
+            - 471000000000
+  ff.bert.encoder.layer.0.intermediate.dense.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.intermediate.dense.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-2-7:
+            - 493000000000
+      - name: ff.bert.encoder.layer.0.intermediate.dense.bias
+        type: queue
+        pipes:
+          1-2-7:
+            - 494000000000
+    outputs:
+      - name: ff_0_ff1.bias
+        type: op
+        pipes:
+          1-2-7:
+            - 538000000000
+  norm_mha_0_recip:
+    inputs:
+      - name: norm_mha_0_sqrt
+        type: op
+        pipes:
+          1-8-1:
+            - 583000000000
+    outputs:
+      - name: norm_mha_0_recip_s_brcst_m1_0_0.lc1
+        type: op
+        pipes:
+          1-8-1:
+            - 584000000000
+  ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.output.LayerNorm.weight_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-2-4:
+            - 498000000000
+      - name: ff.bert.encoder.layer.0.output.LayerNorm.weight
+        type: queue
+        pipes:
+          1-2-4:
+            - 499000000000
+    outputs:
+      []
+  ff.bert.encoder.layer.0.attention.self.value.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.attention.self.value.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-5-4:
+            - 491000000000
+      - name: ff.bert.encoder.layer.0.attention.self.value.bias
+        type: queue
+        pipes:
+          1-5-4:
+            - 492000000000
+    outputs:
+      - name: mha_0_value.bias
+        type: op
+        pipes:
+          1-5-4:
+            - 573000000000
+  ff.bert.encoder.layer.0.attention.self.query.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.attention.self.query.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-3-9:
+            - 489000000000
+      - name: ff.bert.encoder.layer.0.attention.self.query.bias
+        type: queue
+        pipes:
+          1-3-9:
+            - 490000000000
+    outputs:
+      - name: mha_0_query.bias
+        type: op
+        pipes:
+          1-3-9:
+            - 569000000000
+  ff.bert.encoder.layer.0.attention.self.key.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.attention.self.key.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-3-6:
+            - 487000000000
+      - name: ff.bert.encoder.layer.0.attention.self.key.bias
+        type: queue
+        pipes:
+          1-3-6:
+            - 488000000000
+    outputs:
+      - name: mha_0_key.bias
+        type: op
+        pipes:
+          1-3-6:
+            - 561000000000
+  ff.bert.encoder.layer.0.attention.output.dense.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.attention.output.dense.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-3-1:
+            - 485000000000
+      - name: ff.bert.encoder.layer.0.attention.output.dense.bias
+        type: queue
+        pipes:
+          1-3-1:
+            - 486000000000
+    outputs:
+      - name: mha_0_output.bias
+        type: op
+        pipes:
+          1-3-1:
+            - 565000000000
+  ff.bert.encoder.layer.0.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.attention.output.LayerNorm.weight_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-2-9:
+            - 483000000000
+      - name: ff.bert.encoder.layer.0.attention.output.LayerNorm.weight
+        type: queue
+        pipes:
+          1-2-9:
+            - 484000000000
+    outputs:
+      - name: norm_mha_0_weights
+        type: op
+        pipes:
+          1-2-9:
+            - 596000000000
+  mha_0_as:
+    inputs:
+      - name: mha_0_query.bias
+        type: op
+        pipes:
+          1-4-3:
+            - 546000000000
+      - name: mha_0_key.bias
+        type: op
+        pipes:
+          1-4-3:
+            - 547000000000
+    outputs:
+      - name: mha_0_as_div
+        type: op
+        pipes:
+          1-4-3:
+            - 548000000000
+  ff.bert.encoder.layer.0.attention.output.LayerNorm.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.0.attention.output.LayerNorm.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-2-8:
+            - 481000000000
+      - name: ff.bert.encoder.layer.0.attention.output.LayerNorm.bias
+        type: queue
+        pipes:
+          1-2-8:
+            - 482000000000
+    outputs:
+      - name: norm_mha_0_bias
+        type: op
+        pipes:
+          1-2-8:
+            - 578000000000
+  ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.intermediate.dense.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-1-3:
+            - 515000000000
+      - name: ff.bert.encoder.layer.1.intermediate.dense.bias
+        type: queue
+        pipes:
+          1-1-3:
+            - 516000000000
+    outputs:
+      []
+  attention_mask_s_brcst_m2_1_1.lc1:
+    inputs:
+      - name: lc.input_tensor.attention_mask_s_brcst_m2_1_1.0
+        type: queue
+        pipes:
+          1-3-2:
+            - 479000000000
+      - name: attention_mask
+        type: queue
+        pipes:
+          1-3-2:
+            - 480000000000
+    outputs:
+      - name: mha_0_as_mask
+        type: op
+        pipes:
+          1-3-2:
+            - 551000000000
+  mha_0_as_mask:
+    inputs:
+      - name: mha_0_as_div
+        type: op
+        pipes:
+          1-4-7:
+            - 550000000000
+      - name: attention_mask_s_brcst_m2_1_1.lc1
+        type: op
+        pipes:
+          1-4-7:
+            - 551000000000
+    outputs:
+      - name: mha_0_as_softmax.dc.exp.0
+        type: op
+        pipes:
+          1-4-7:
+            - 552000000000
+  ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.attention.output.LayerNorm.weight_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          1-1-6:
+            - 506000000000
+      - name: ff.bert.encoder.layer.1.attention.output.LayerNorm.weight
+        type: queue
+        pipes:
+          1-1-6:
+            - 507000000000
+    outputs:
+      []
+  attention_mask_s_brcst_m2_0_1.lc1:
+    inputs:
+      - name: lc.input_tensor.attention_mask_s_brcst_m2_0_1.0
+        type: queue
+        pipes:
+          1-1-8:
+            - 476000000000
+      - name: attention_mask
+        type: queue
+        pipes:
+          1-1-8:
+            - 477000000000
+    outputs:
+      []
+  ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.lc1_splt_brcst_2:
+    inputs:
+      - name: ff.reciprocal_of_sqrt_of_head_size_0_s_brcst_m1_0_2.lc1
+        type: op
+        pipes:
+          1-4-4:
+            - 526000000000
+    outputs:
+      - name: mha_0_as_div
+        type: op
+        pipes:
+          1-4-4:
+            - 549000000000
+  add_mha_0:
+    inputs:
+      - name: encoder_input
+        type: queue
+        pipes:
+          1-7-2:
+            - 474000000000
+      - name: mha_0_output.bias
+        type: op
+        pipes:
+          1-7-2:
+            - 475000000000
+    outputs:
+      - name: norm_mha_0_sub
+        type: op
+        pipes:
+          1-7-2:
+            - 589000000000
+      - name: norm_mha_0_mean.lc1
+        type: op
+        pipes:
+          1-7-2:
+            - 579000000000
+  ff_0_ff2.bias:
+    inputs:
+      - name: ff_0_ff2
+        type: op
+        pipes:
+          1-9-2:
+            - 541000000000
+      - name: ff.bert.encoder.layer.0.output.dense.bias_s_brcst_m2_0_0.lc1
+        type: op
+        pipes:
+          1-9-2:
+            - 542000000000
+    outputs:
+      - name: add_ff_0
+        type: op
+        pipes:
+          1-9-2:
+            - 472000000000
+  add_ff_0:
+    inputs:
+      - name: norm_mha_0_bias
+        type: op
+        pipes:
+          1-9-3:
+            - 471000000000
+      - name: ff_0_ff2.bias
+        type: op
+        pipes:
+          1-9-3:
+            - 472000000000
+    outputs:
+      - name: norm_ff_0_mean.lc1
+        type: op
+        pipes:
+          1-9-3:
+            - 574000000000
+  mha_0_output:
+    inputs:
+      - name: mha_0_ac
+        type: op
+        pipes:
+          1-5-9:
+            - 562000000000
+      - name: ff.bert.encoder.layer.0.attention.output.dense.weight
+        type: queue
+        pipes:
+          1-5-9:
+            - 563000000000
+    outputs:
+      - name: mha_0_output.bias
+        type: op
+        pipes:
+          1-5-9:
+            - 564000000000
+  ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1:
+    inputs:
+      - name: lc.input_tensor.ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.0
+        type: queue
+        pipes:
+          0-1-1:
+            - 468000000000
+      - name: ff.bert.encoder.layer.1.output.LayerNorm.bias
+        type: queue
+        pipes:
+          0-1-1:
+            - 469000000000
+    outputs:
+      - name: e2e_ff.bert.encoder.layer.1.output.LayerNorm.bias_s_brcst_m2_0_0.lc1_0
+        type: queue
+        pipes:
+          0-1-1:
+            - 470000000000
