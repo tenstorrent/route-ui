@@ -713,6 +713,12 @@ $dock-height: 420px;
     }
 }
 
+.slowest-operand-render{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+}
 
 
 

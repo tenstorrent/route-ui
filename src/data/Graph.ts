@@ -5,7 +5,7 @@ import { ComputeNodeType } from './Types';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 import { ComputeNode } from './Chip';
-import { OperandDirection, OpPerfDetails } from './OpPerfDetails';
+import { OperandDirection, OperandPerformance, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
 import Error = types.Error;
 
@@ -128,12 +128,16 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     }
 
     get slowestOperand(): Operand | null {
-        const result = this.details?.slowestOperand;
-        if (result) {
-            if (result.direction === OperandDirection.INPUT) {
-                return [...this.inputs][result.index];
+        const result = this.details?.slowestOperandPerformance;
+        return result ? this.getOperandByPerformance(result) : null;
+    }
+
+    getOperandByPerformance(op:OperandPerformance | null): Operand | null {
+        if (op) {
+            if (op.direction === OperandDirection.INPUT) {
+                return [...this.inputs][op.index];
             }
-            return [...this.outputs][result.index];
+            return [...this.outputs][op.index];
         }
         return null;
     }

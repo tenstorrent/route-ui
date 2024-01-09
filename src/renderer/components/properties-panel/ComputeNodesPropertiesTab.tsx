@@ -1,12 +1,13 @@
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Card, PopoverPosition } from '@blueprintjs/core';
+import { Button, Card, Icon, PopoverPosition } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
 import { RootState } from 'data/store/createStore';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { selectGroup, selectQueue, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
+import { JSX } from 'react/jsx-runtime';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { NodeSelectionState } from '../../../data/StateTypes';
@@ -17,26 +18,47 @@ import LinkDetails from '../LinkDetails';
 import GraphVertexDetails from '../GraphVertexDetails';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import Collapsible from '../Collapsible';
+import { calculateSlowestOperand } from '../../../utils/DataUtils';
+import { OperandDirection } from '../../../data/OpPerfDetails';
 
 interface ComputeNodeProps {
     node: ComputeNode;
     nodesSelectionState: NodeSelectionState;
 }
 
-const CoreOperationRuntimeMetrics = (props: { coreNode: ComputeNode }) => {
-    const { coreNode } = props;
+const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
+    const { node } = props;
 
-    if (coreNode.type !== ComputeNodeType.CORE || !coreNode.perfAnalyzerResults) {
+    if (node.type !== ComputeNodeType.CORE || !node.perfAnalyzerResults) {
         return null;
     }
-    const runtimeMetrics: [string, string | number, string?][] = [
+
+    const slowestOperandPerformance = calculateSlowestOperand(node.perfAnalyzerResults.slowest_operand);
+    const slowestOperand = node.operation?.getOperandByPerformance(slowestOperandPerformance);
+    const metrics = node.perfAnalyzerResults.slowestOperandDetails;
+    const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
         //  - will likely want to add more organization if more details are added here
         //  - it's probably only useful to put heatmap-related values here (once heatmap is implemented),
         //    and leave other details for a drilling-down workflow
         //  - Operand-specific metrics should probably go under each operand?
-        ['Kernel Total Runtime', coreNode.perfAnalyzerResults.kernel_total_runtime, 'ns'],
-        ['Bandwidth Limited Factor', coreNode.perfAnalyzerResults.bw_limited_factor],
+
+        ['Kernel Total Runtime', node.perfAnalyzerResults.kernel_total_runtime, 'ns'],
+        ['Bandwidth Limited Factor', node.perfAnalyzerResults.bw_limited_factor],
+        [
+            'Slowest Operand',
+            <div className='slowest-operand-render'>
+                {metrics?.type === OperandDirection.OUTPUT ? (
+                    <Icon size={12} icon={IconNames.EXPORT} title={node.perfAnalyzerResults.slowest_operand} />
+                ) : (
+                    <Icon size={12} icon={IconNames.IMPORT} title={node.perfAnalyzerResults.slowest_operand} />
+                )}
+                {<span title={slowestOperand?.name}>{slowestOperand?.name}</span> || 'n/a'}
+            </div>,
+        ],
+
+        ['Math utilisation', node.perfAnalyzerResults.bw_bound_math_utilization, '%'],
+        ['BW a / r', `${metrics?.actual || 'n/a'} / ${metrics?.required || 'n/a'}`],
     ];
     return (
         <div className='core-runtime-metrics'>
@@ -87,7 +109,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     node.uid === detailedViewState.uid && detailedViewState.isOpen ? 'detailed-view' : ''
                 }`}
             >
-                {node.type.toUpperCase()}  {node.uid}
+                {node.type.toUpperCase()} {node.uid}
                 <Tooltip2 content='Close ComputeNode'>
                     <Button
                         small
@@ -106,15 +128,15 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
             )}
             {node.operation && (
                 <div className='opname theme-dark'>
-                    <Tooltip2 content={node.operation.name} position={PopoverPosition.LEFT}>
+                    <div  title={node.operation.name} >
                         <SelectableOperation
                             opName={node.operation.name}
                             value={nodesSelectionState.groups[node.operation.name]?.selected}
                             selectFunc={setOperationSelectionState}
                             stringFilter=''
                         />
-                    </Tooltip2>
-                    {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics coreNode={node} />}
+                    </div>
+                    {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics node={node} />}
                     {/* <Collapsible label={<h5>Op pipes:</h5>} isOpen styles={{ marginLeft: '20px' }}> */}
                     {/*     <ul className="scrollable-content"> */}
                     {/*         {node.operation.uniquePipeIds.map((pipeId) => ( */}
@@ -154,7 +176,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     {inputs &&
                         inputs.map((operand) => (
                             <ul className='scrollable-content'>
-                                <Tooltip2 content={operand.name} position={PopoverPosition.TOP}>
+                                <div title={operand.name}>
                                     <div key={operand.name} style={{ fontSize: '12px' }}>
                                         <GraphVertexDetailsSelectables operand={operand} />
                                         <ul className='scrollable-content'>
@@ -169,14 +191,14 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                             ))}
                                         </ul>
                                     </div>
-                                </Tooltip2>
+                                </div>
                             </ul>
                         ))}
                     {outputs && outputs.length && <h4 className='io-label'>Outputs:</h4>}
                     {outputs &&
                         outputs.map((operand) => (
                             <ul className='scrollable-content'>
-                                <Tooltip2 content={operand.name} position={PopoverPosition.TOP}>
+                                <div title={operand.name} >
                                     <div key={operand.name} style={{ fontSize: '12px' }}>
                                         <GraphVertexDetailsSelectables operand={operand} />
                                         <ul className='scrollable-content'>
@@ -191,7 +213,7 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                                             ))}
                                         </ul>
                                     </div>
-                                </Tooltip2>
+                                </div>
                             </ul>
                         ))}
                 </div>
