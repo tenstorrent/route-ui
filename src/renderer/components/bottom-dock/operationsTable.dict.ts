@@ -1,4 +1,3 @@
-import { OpPerfJSON } from 'data/sources/PerfAnalyzerResults';
 import { OpTableFields } from './useOperationsTable.hooks';
 
 export type OperationsTableDictionaryKeyType = keyof OpTableFields | 'operation';

@@ -60,6 +60,7 @@
 
         .bp4-control:not(.bp4-align-right) {
             margin: 0;
+            margin-right: -7px;
         }
 
         .color-swatch {
@@ -76,7 +77,7 @@
     .table-operation-cell > div {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         gap: 5px;
 

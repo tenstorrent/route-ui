@@ -1,7 +1,7 @@
 import type { ComputeNode } from './Chip';
 import type { Operand } from './Graph';
 import type { QueueDetailsJson } from './sources/QueueDescriptor';
-import { OpPerfDetails } from './OpPerfDetails';
+import { OperandPerformance, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
 
 interface HasOperands {
@@ -22,6 +22,7 @@ export interface Operation extends HasOperands, Operand {
     details?: OpPerfDetails
     slowestOperand: Operand | null;
     isOffchip: boolean;
+    getOperandByPerformance(op:OperandPerformance | null): Operand | null;
 }
 
 /** Type alias enumerates the possible GraphVertex types (cannot be done with subclasses alone) */

@@ -11,6 +11,7 @@ import { RootState } from '../../../data/store/createStore';
 import { selectGroup, updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode } from '../../../data/Chip';
+import { OperandDirection } from '../../../data/OpPerfDetails';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -187,11 +188,16 @@ function OperationsTable() {
     };
 
     const slowestOperandCellRenderer = (rowIndex: number): JSX.Element => {
-        const cellContent = tableFields[rowIndex].slowest_operand;
+        const slowOpString = tableFields[rowIndex].slowest_operand;
         const slowestOperand = tableFields[rowIndex].slowestOperandRef;
         if (slowestOperand) {
             return (
                 <Cell className='table-cell-interactive table-operation-cell'>
+                    {slowOpString.includes('output') ? (
+                        <Icon size={12} icon={IconNames.EXPORT} title={slowOpString} />
+                    ) : (
+                        <Icon size={12} icon={IconNames.IMPORT} title={slowOpString}/>
+                    )}
                     <SelectableOperation
                         disabled={nodesSelectionState.groups[slowestOperand.name] === undefined}
                         opName={slowestOperand.name}
@@ -214,7 +220,7 @@ function OperationsTable() {
                 </Cell>
             );
         }
-        return <Cell>{cellContent}</Cell>;
+        return <Cell>{slowOpString}</Cell>;
     };
 
     if (!tableFields.length) {
