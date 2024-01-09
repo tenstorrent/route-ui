@@ -47,7 +47,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         ['Bandwidth Limited Factor', node.perfAnalyzerResults.bw_limited_factor],
         [
             'Slowest Operand',
-            <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+            <div className='slowest-operand-render'>
                 {metrics?.type === OperandDirection.OUTPUT ? (
                     <Icon size={12} icon={IconNames.EXPORT} title={node.perfAnalyzerResults.slowest_operand} />
                 ) : (
@@ -58,7 +58,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         ],
 
         ['Math utilisation', node.perfAnalyzerResults.bw_bound_math_utilization, '%'],
-        ['BW a/r', `${metrics?.actual || 'n/a'} / ${metrics?.required || 'n/a'}`],
+        ['BW a / r', `${metrics?.actual || 'n/a'} / ${metrics?.required || 'n/a'}`],
     ];
     return (
         <div className='core-runtime-metrics'>
