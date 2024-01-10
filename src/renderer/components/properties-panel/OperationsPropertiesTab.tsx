@@ -3,7 +3,7 @@ import React, { useContext, useMemo, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { selectGroup, clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import { RootState } from 'data/store/createStore';
 
 import DataSource from '../../../data/DataSource';
@@ -16,6 +16,7 @@ import SelectablePipe from '../SelectablePipe';
 import { PipeSegment } from '../../../data/Chip';
 import { NOCLinkName } from '../../../data/Types';
 import { Operation } from '../../../data/GraphTypes';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -26,24 +27,18 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
     const [allOpen, setAllOpen] = useState(true);
 
+    const { selected, selectOperation } = useSelectableGraphVertex();
     const selectFilteredOperations = () => {
         if (!chip) {
             return;
         }
         Object.keys(groupsSelectionState).forEach((op) => {
             if (op.toLowerCase().includes(filterQuery.toLowerCase())) {
-                dispatch(selectGroup({ opName: op, selected: true }));
+                selectOperation(op, true);
             }
         });
     };
 
-    const setOperationSelectionState = (opName: string, selected: boolean) =>
-        dispatch(
-            selectGroup({
-                opName,
-                selected,
-            }),
-        );
     return (
         <div>
             <div>
@@ -72,7 +67,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
             </div>
             <div className='operations-wrap list-wrap'>
                 <div className='scrollable-content'>
-                    {operationsList.map((operation:Operation) => {
+                    {operationsList.map((operation: Operation) => {
                         return (
                             <FilterableComponent
                                 key={operation.name}
@@ -84,8 +79,8 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                             <SelectableOperation
                                                 disabled={operation.isOffchip}
                                                 opName={operation.name}
-                                                value={groupsSelectionState[operation.name]?.selected}
-                                                selectFunc={setOperationSelectionState}
+                                                value={selected(operation.name)}
+                                                selectFunc={selectOperation}
                                                 stringFilter={filterQuery}
                                             />
                                         }

@@ -1,16 +1,15 @@
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Card, Icon, PopoverPosition } from '@blueprintjs/core';
+import { Button, Card, Icon } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
 import { RootState } from 'data/store/createStore';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
-import { selectGroup, selectQueue, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { JSX } from 'react/jsx-runtime';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
-import { NodeSelectionState } from '../../../data/StateTypes';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
@@ -20,10 +19,10 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import Collapsible from '../Collapsible';
 import { calculateSlowestOperand } from '../../../utils/DataUtils';
 import { OperandDirection } from '../../../data/OpPerfDetails';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 
 interface ComputeNodeProps {
     node: ComputeNode;
-    nodesSelectionState: NodeSelectionState;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -75,9 +74,12 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
+
+
+    const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -85,20 +87,6 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
         });
     };
 
-    const setOperationSelectionState = (opName: string, selected: boolean) =>
-        dispatch(
-            selectGroup({
-                opName,
-                selected,
-            }),
-        );
-    const setQueueSelectionState = (queueName: string, selected: boolean) =>
-        dispatch(
-            selectQueue({
-                queueName,
-                selected,
-            }),
-        );
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
@@ -131,8 +119,8 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                     <div  title={node.operation.name} >
                         <SelectableOperation
                             opName={node.operation.name}
-                            value={nodesSelectionState.groups[node.operation.name]?.selected}
-                            selectFunc={setOperationSelectionState}
+                            value={selected(node.operation.name)}
+                            selectFunc={selectOperation}
                             stringFilter=''
                         />
                     </div>
@@ -152,16 +140,17 @@ const ComputeNodePropertiesCard = ({ node, nodesSelectionState }: ComputeNodePro
                 </div>
             )}
 
+
             {node.queueList.length > 0 && (
                 <div className='opname theme-dark'>
                     <Collapsible label={<h4>Queues:</h4>} isOpen>
                         {node.queueList.map((queue) => (
                             <>
                                 <SelectableOperation
-                                    disabled={nodesSelectionState.queues[queue.name]?.selected === undefined}
+                                    disabled={disabledQueue(queue.name)}
                                     opName={queue.name}
-                                    value={nodesSelectionState.queues[queue.name]?.selected}
-                                    selectFunc={setQueueSelectionState}
+                                    value={selected(queue.name)}
+                                    selectFunc={selectQueue}
                                     stringFilter=''
                                 />
                                 <GraphVertexDetails graphNode={queue} showQueueDetails={false} />
@@ -291,7 +280,7 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
             <div className='properties-panel-nodes'>
                 {selectedNodes.map((node: ComputeNode) => (
-                    <ComputeNodePropertiesCard key={node.uid} node={node} nodesSelectionState={nodesSelectionState} />
+                    <ComputeNodePropertiesCard key={node.uid} node={node} />
                 ))}
             </div>
         </>

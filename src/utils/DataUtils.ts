@@ -15,6 +15,3 @@ export const calculateSlowestOperand = (operand: string): OperandPerformance | n
         index: parseInt(operand.split('-')[1], 10) || 0,
     };
 };
-
-
-// required_output_pipe_bw_
