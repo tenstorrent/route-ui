@@ -161,6 +161,7 @@ function OperationsTable() {
         );
     };
 
+    // TODO: value is not a good name, isSelected either, shoudl reveisit when a better name becomes available
     const selectNode = (id: string, value: boolean) => {
         dispatch(updateNodeSelection({ id, selected: value }));
     };
