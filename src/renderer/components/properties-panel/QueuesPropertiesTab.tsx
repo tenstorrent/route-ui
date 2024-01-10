@@ -36,25 +36,28 @@ function QueuesPropertiesTab() {
     };
 
     return (
-        <div>
-            <SearchField
-                searchQuery={filterQuery}
-                onQueryChanged={setFilterQuery}
-                controls={[
-                    <Tooltip2
-                        content='Select all filtered queues'
-                        position={PopoverPosition.RIGHT}
-                        key='select-all-ops'
-                    >
-                        <Button icon={<QueueIconPlus />} onClick={() => selectFilteredQueue()} />
-                    </Tooltip2>,
-                    <Tooltip2 content='Deselect all queues' position={PopoverPosition.RIGHT} key='deselect-all-ops'>
-                        <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues())} />
-                    </Tooltip2>,
-                ]}
-            />
-            <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
-            <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
+        <>
+            <div className='properties-filter'>
+                <SearchField
+                    searchQuery={filterQuery}
+                    onQueryChanged={setFilterQuery}
+                    controls={[
+                        <Tooltip2
+                            content='Select all filtered queues'
+                            position={PopoverPosition.RIGHT}
+                            key='select-all-ops'
+                        >
+                            <Button icon={<QueueIconPlus />} onClick={() => selectFilteredQueue()} />
+                        </Tooltip2>,
+                        <Tooltip2 content='Deselect all queues' position={PopoverPosition.RIGHT} key='deselect-all-ops'>
+                            <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues())} />
+                        </Tooltip2>,
+                    ]}
+                />
+                <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
+                <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
+            </div>
+
             <div className='operations-wrap list-wrap'>
                 <div className='scrollable-content'>
                     {queuesList.map((queue) => (
@@ -84,7 +87,7 @@ function QueuesPropertiesTab() {
                     ))}
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

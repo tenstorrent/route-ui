@@ -40,8 +40,8 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     };
 
     return (
-        <div>
-            <div>
+        <>
+            <div className='properties-filter'>
                 <SearchField
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
@@ -117,7 +117,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                     })}
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

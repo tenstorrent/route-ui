@@ -17,7 +17,9 @@
     padding: 2px 10px;
     height:fit-content;
     .bp4-menu {
-        overflow-y: scroll;
+        color-scheme: normal;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
         max-height: 400px;
         height: 100%;
     }
