@@ -2,7 +2,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectGroup, selectQueue } from '../../data/store/slices/nodeSelection.slice';
 import { RootState } from '../../data/store/createStore';
 
-const useSelectableGraphVertex = () => {
+type SelectableGraphVertexHook = {
+    disabledQueue: (name: string) => boolean;
+    disabledOperation: (name: string) => boolean;
+    selected: (name: string) => boolean;
+    selectQueue: (queueName: string, selected: boolean) => void;
+    selectOperation: (opName: string, selected: boolean) => void;
+};
+
+const useSelectableGraphVertex = (): SelectableGraphVertexHook => {
     const dispatch = useDispatch();
     const setQueueSelectionState = (queueName: string, selected: boolean) =>
         dispatch(
