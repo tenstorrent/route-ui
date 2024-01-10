@@ -8,10 +8,10 @@ import OperationsTableDictionary from './operationsTable.dict';
 import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
 import SelectableOperation from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
-import { selectGroup, updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
+import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode } from '../../../data/Chip';
-import { OperandDirection } from '../../../data/OpPerfDetails';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -26,13 +26,9 @@ function OperationsTable() {
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const [operationNameColumnWidth, setOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
     const [slowOperationNameColumnWidth, setSlowOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
-    const setOperationSelectionState = (opName: string, selected: boolean) =>
-        dispatch(
-            selectGroup({
-                opName,
-                selected,
-            }),
-        );
+
+    const { selected,  selectOperation, disabledOperation } = useSelectableGraphVertex();
+
     const table = useRef<Table2>(null);
 
     const recalculateOperationColumnWidths = useCallback(() => {
@@ -47,6 +43,7 @@ function OperationsTable() {
         if (!chip) {
             return;
         }
+
         setTableFields(
             [...chip.operations].map((op) => {
                 return {
@@ -61,12 +58,12 @@ function OperationsTable() {
     useEffect(() => {
         resetOpTableDetails();
         setCoreView(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
     if (!chip) {
         return <pre>No data available</pre>;
     }
-    // const expandOperationCores = (fields: OpTableFields) => {
     const expandOperationCores = (opName: string) => {
         const operation = chip.getOperation(opName);
         if (operation === undefined) {
@@ -91,10 +88,10 @@ function OperationsTable() {
             <Cell interactive className='table-cell-interactive table-operation-cell'>
                 {opName ? (
                     <SelectableOperation
-                        disabled={nodesSelectionState.groups[opName] === undefined}
+                        disabled={disabledOperation(opName)}
                         opName={opName}
-                        value={nodesSelectionState.groups[opName]?.selected}
-                        selectFunc={setOperationSelectionState}
+                        value={selected(opName)}
+                        selectFunc={selectOperation}
                         stringFilter=''
                         type={null}
                     />
@@ -164,8 +161,9 @@ function OperationsTable() {
         );
     };
 
-    const selectNode = (id: string, selected: boolean) => {
-        dispatch(updateNodeSelection({ id, selected }));
+    // TODO: value is not a good name, isSelected either, shoudl reveisit when a better name becomes available
+    const selectNode = (id: string, value: boolean) => {
+        dispatch(updateNodeSelection({ id, selected: value }));
     };
 
     const cellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
@@ -196,13 +194,13 @@ function OperationsTable() {
                     {slowOpString.includes('output') ? (
                         <Icon size={12} icon={IconNames.EXPORT} title={slowOpString} />
                     ) : (
-                        <Icon size={12} icon={IconNames.IMPORT} title={slowOpString}/>
+                        <Icon size={12} icon={IconNames.IMPORT} title={slowOpString} />
                     )}
                     <SelectableOperation
-                        disabled={nodesSelectionState.groups[slowestOperand.name] === undefined}
+                        disabled={disabledOperation(slowestOperand.name)}
                         opName={slowestOperand.name}
-                        value={nodesSelectionState.groups[slowestOperand.name]?.selected}
-                        selectFunc={setOperationSelectionState}
+                        value={selected(slowestOperand.name)}
+                        selectFunc={selectOperation}
                         stringFilter=''
                         type={null}
                     />

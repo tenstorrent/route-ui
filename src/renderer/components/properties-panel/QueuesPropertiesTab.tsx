@@ -9,11 +9,11 @@ import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import Collapsible from '../Collapsible';
 import SelectableOperation from '../SelectableOperation';
-import { clearAllQueues, selectQueue } from '../../../data/store/slices/nodeSelection.slice';
+import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
 import { RootState } from '../../../data/store/createStore';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
-import { QueueLocation } from '../../../data/Types';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
@@ -22,25 +22,18 @@ function QueuesPropertiesTab() {
     const [filterQuery, setFilterQuery] = useState<string>('');
     const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
     const queuesList = useMemo(() => (chip ? [...chip.queues] : []), [chip]);
-    const setQueueSelectionState = (queueName: string, selected: boolean) =>
-        dispatch(
-            selectQueue({
-                queueName,
-                selected,
-            }),
-        );
+
+    const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const selectFilteredQueue = () => {
         if (!chip) {
             return;
         }
         Object.keys(queueSelectionState).forEach((name) => {
             if (name.toLowerCase().includes(filterQuery.toLowerCase())) {
-                dispatch(selectQueue({ queueName: name, selected: true }));
+                selectQueue(name, true);
             }
         });
     };
-
-
 
     return (
         <div>
@@ -74,10 +67,10 @@ function QueuesPropertiesTab() {
                                     key={queue.name}
                                     label={
                                         <SelectableOperation
-                                            disabled={queueSelectionState[queue.name]?.selected === undefined}
+                                            disabled={disabledQueue(queue.name)}
                                             opName={queue.name}
-                                            value={queueSelectionState[queue.name]?.selected}
-                                            selectFunc={setQueueSelectionState}
+                                            value={selected(queue.name)}
+                                            selectFunc={selectQueue}
                                             stringFilter={filterQuery}
                                         />
                                     }

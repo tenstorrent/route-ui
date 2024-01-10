@@ -1,44 +1,26 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Operand } from '../../data/Graph';
-import { RootState } from '../../data/store/createStore';
-import { selectGroup, selectQueue } from '../../data/store/slices/nodeSelection.slice';
 import SelectableOperation from './SelectableOperation';
 import { GraphVertexType } from '../../data/GraphNames';
+import useSelectableGraphVertex from '../hooks/useSelectableGraphVertex.hook';
 
 const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.ReactElement | null => {
     const { operand } = props;
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const dispatch = useDispatch();
-    const setOperationSelectionState = (opName: string, selected: boolean) =>
-        dispatch(
-            selectGroup({
-                opName,
-                selected,
-            }),
-        );
-
-    const setQueueSelectionState = (queueName: string, selected: boolean) =>
-        dispatch(
-            selectQueue({
-                queueName,
-                selected,
-            }),
-        );
+    const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
     return operand.vertexType === GraphVertexType.OPERATION ? (
         <SelectableOperation
             opName={operand.name}
-            value={nodesSelectionState.groups[operand.name]?.selected}
-            selectFunc={setOperationSelectionState}
+            value={selected(operand.name)}
+            selectFunc={selectOperation}
             stringFilter=''
             type={operand.vertexType}
         />
     ) : (
         <SelectableOperation
-            disabled={nodesSelectionState.queues[operand.name]?.selected === undefined}
+            disabled={disabledQueue(operand.name)}
             opName={operand.name}
-            value={nodesSelectionState.queues[operand.name]?.selected}
-            selectFunc={setQueueSelectionState}
+            value={selected(operand.name)}
+            selectFunc={selectQueue}
             stringFilter=''
             type={operand.vertexType}
         />
