@@ -48,6 +48,12 @@
         .bp4-table-cell-ledger-odd {
             background-color: $tt-extra-light-gray;
         }
+
+        .bp4-table-cell{
+            &.align-right{
+                text-align: right;
+            }
+        }
     }
 
     .op-element {
