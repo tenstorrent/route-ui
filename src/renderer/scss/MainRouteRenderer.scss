@@ -71,26 +71,30 @@ $dock-height: 420px;
             height: calc(100vh - 10px - $dock-height);
         }
 
+        .properties-panel {
+            margin-block-end: 10px;
+        }
+
         .properties-panel-nodes {
-            max-height: calc(100vh - 100px - $dock-height);
+            max-height: calc(100vh - 70px - $dock-height);
         }
 
         .list-wrap {
             max-height: calc(100vh - 150px - $dock-height);
         }
 
+        .properties-panel__content .list-wrap {
+            max-height: calc(100vh - 120px - $dock-height);
+        }
+
         .inner-sidebar {
             max-height: calc(100vh - 20px - $dock-height);
-            overflow-y: scroll;
-
-
         }
     }
 
     &.detailed-view-open {
         .inner-sidebar {
             max-height: calc(100vh - 640px);
-            overflow-y: scroll;
         }
 
         .grid-container {
@@ -120,14 +124,15 @@ $dock-height: 420px;
 
 .inner-sidebar {
     max-height: calc(100vh - 100px);
-    overflow-y: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
     min-width: 220px;
     overflow-x: hidden;
 
     .inner-sidebar-wrap {
         display: flex;
         flex-direction: column;
-        padding: 0 8px;
+        margin-inline: 10px;
 
     }
 
@@ -321,9 +326,8 @@ $dock-height: 420px;
 
 .properties-panel {
     background-color: $tt-medium-light-gray;
-    padding: 10px;
     flex-grow: 1;
-    overflow-x: scroll;
+    overflow-x: auto;
     white-space: nowrap;
     color-scheme: light;
 
@@ -334,12 +338,18 @@ $dock-height: 420px;
     }
 }
 
+.properties-filter {
+    padding-inline: 10px;
+}
+
 
 .properties-panel-nodes {
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: scroll;
-    overflow-y: scroll;
+    overflow-x: auto;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    padding: 10px;
     width: 100%;
     gap: 20px;
     max-height: calc(100vh - 200px);
@@ -472,7 +482,9 @@ $dock-height: 420px;
 
 
 .list-wrap {
-    overflow-y: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    padding-inline: 10px;
     max-height: calc(100vh - 240px);
     width: 100%;
     margin-top: 20px;
@@ -493,8 +505,12 @@ $dock-height: 420px;
     display: flex;
     flex-direction: column;
 
+    & > .search-field {
+        padding-inline: 10px;
+    }
+
     ul[role='listbox'] {
-        overflow-y: scroll;
+        overflow-y: auto;
         max-height: 80vh;
     }
 
@@ -504,6 +520,11 @@ $dock-height: 420px;
 }
 
 .properties-tabs {
+    .bp4-tab-list {
+        padding-inline: 10px;
+        padding-block-start: 10px;
+    }
+
     .bp4-tab {
         background-color: $tt-medium-light-gray;
         color: $tt-black;
@@ -524,7 +545,6 @@ $dock-height: 420px;
                 stroke: $tt-dark-gray;
             }
         }
-
     }
 }
 
@@ -720,6 +740,3 @@ $dock-height: 420px;
     align-items: center;
     gap: 4px;
 }
-
-
-
