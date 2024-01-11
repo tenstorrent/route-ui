@@ -102,8 +102,7 @@ operationsTableColumns.set('bw_bound_math_utilization', {
     },
 });
 operationsTableColumns.set('model_runtime_per_input', {
-    label: 'Model Runtime Per Input',
-    // units: ' cycles',
+    label: 'Model Estimate (cycles per input)',
     sortable: true,
     align: 'right',
     formatter: (value: number) => {

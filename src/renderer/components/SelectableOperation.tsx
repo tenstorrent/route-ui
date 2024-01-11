@@ -23,7 +23,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     selectFunc,
     value,
     stringFilter,
-    type= null,
+    type = null,
     disabled = false,
 }) => {
     return (
