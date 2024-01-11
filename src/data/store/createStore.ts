@@ -5,6 +5,7 @@ import { pipeSelectionReducer } from './slices/pipeSelection.slice';
 import { nodeSelectionReducer } from './slices/nodeSelection.slice';
 import { linkSaturationReducer } from './slices/linkSaturation.slice';
 import { operationPerformanceReducer } from './slices/operationPerf.slice';
+import { loggingReducer } from './slices/logging.slice';
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         linkSaturation: linkSaturationReducer,
         detailedView: detailedViewReducer,
         operationPerformance: operationPerformanceReducer,
+        logging: loggingReducer,
     },
 });
 
