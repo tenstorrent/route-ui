@@ -247,7 +247,8 @@ $dock-height: 420px;
                 right: 0;
                 z-index: 0;
             }
-            .operation-congestion{
+
+            .operation-congestion {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -612,9 +613,30 @@ $dock-height: 420px;
     .core-runtime-metrics {
         margin-left: 12px;
 
+        .model-perf-estimate {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+
+            .bp4-icon {
+                svg {
+                    fill: $tt-yellow;
+                }
+                &.out-of-memory {
+                    svg {
+                        fill: currentColor;
+                    }
+                }
+            }
+
+        }
+
         .core-runtime-item {
             margin-bottom: 4px;
             display: flex;
+            .bp4-popover2-target{
+                display: flex;
+            }
 
             h4 {
                 font-size: 10pt;
@@ -734,7 +756,7 @@ $dock-height: 420px;
     }
 }
 
-.slowest-operand-render{
+.slowest-operand-render {
     display: flex;
     flex-direction: row;
     align-items: center;

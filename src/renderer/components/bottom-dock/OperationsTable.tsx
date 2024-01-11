@@ -239,7 +239,7 @@ function OperationsTable() {
     }
 
     const otherColWidth = null;
-// TODO: i would like to automate itteration over the columns in the near future
+// TODO: i would like to automate iteration over the columns in the near future
     return (
         <Table2
             ref={table}
@@ -257,6 +257,7 @@ function OperationsTable() {
                 otherColWidth,
                 otherColWidth,
                 slowOperationNameColumnWidth,
+                otherColWidth,
                 otherColWidth,
                 otherColWidth,
             ]}
@@ -309,8 +310,13 @@ function OperationsTable() {
                 cellRenderer={(rowIndex) => cellRenderer('bw_bound_math_utilization', rowIndex)}
                 columnHeaderCellRenderer={() => headerRenderer('bw_bound_math_utilization')}
             />
+            <Column
+                cellRenderer={(rowIndex) => cellRenderer('model_runtime_per_input', rowIndex)}
+                columnHeaderCellRenderer={() => headerRenderer('model_runtime_per_input')}
+            />
         </Table2>
     );
 }
+
 
 export default OperationsTable;

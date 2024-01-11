@@ -101,14 +101,33 @@ operationsTableColumns.set('bw_bound_math_utilization', {
         return numberFormatter1.format(value);
     },
 });
+operationsTableColumns.set('model_runtime_per_input', {
+    label: 'Model Runtime Per Input',
+    // units: ' cycles',
+    sortable: true,
+    align: 'right',
+    formatter: (value: number) => {
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(value)) {
+            return 'n/a';
+        }
+        return numberFormatter0.format(value);
+    },
+});
 
 const sortAsc = (a: any, b: any) => {
+    if(typeof a === 'string' && typeof b === 'number') {
+        return 1;
+    }
     if (a === b) {
         return 0;
     }
     return a > b ? 1 : -1;
 };
 const sortDesc = (a: any, b: any) => {
+    if(typeof a === 'string' && typeof b === 'number') {
+        return 1;
+    }
     if (a === b) {
         return 0;
     }
@@ -120,17 +139,17 @@ function useOperationsTable(opList: OpTableFields[]): OperationsTableHook {
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
 
     const opTableFields = (() => {
-        const inputOperations = opList;
+        const tableFields = opList;
 
         if (sortingColumn === 'operation') {
             return sortDirection === SortingDirection.ASC
-                ? inputOperations.sort((a, b) => sortAsc(a.name, b.name))
-                : inputOperations.sort((a, b) => sortDesc(a.name, b.name));
+                ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
+                : tableFields.sort((a, b) => sortDesc(a.name, b.name));
         }
 
         return sortDirection === SortingDirection.ASC
-            ? inputOperations.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
-            : inputOperations.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
+            ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
+            : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
     })();
 
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {

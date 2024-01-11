@@ -8,6 +8,13 @@ import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { JSX } from 'react/jsx-runtime';
+import { Intent } from '@blueprintjs/core/src/common/intent';
+import {
+    INTENT_DANGER,
+    INTENT_PRIMARY,
+    INTENT_SUCCESS,
+    INTENT_WARNING,
+} from '@blueprintjs/core/lib/esnext/common/classes';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
@@ -35,6 +42,24 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     const slowestOperandPerformance = calculateSlowestOperand(node.perfAnalyzerResults.slowest_operand);
     const slowestOperand = node.operation?.getOperandByPerformance(slowestOperandPerformance);
     const metrics = node.perfAnalyzerResults.slowestOperandDetails;
+    // eslint-disable-next-line no-restricted-globals
+    const outOfMemory = isNaN(node.perfAnalyzerResults.model_runtime_per_input);
+    const modelRuntimeIcon = (node.opCycles !== node.perfAnalyzerResults.model_runtime_per_input || outOfMemory) && (
+        <Tooltip2
+            content={
+                outOfMemory
+                    ? 'Out of memory, using Netlist analyzer data'
+                    : `Netlist model estimate of ${node.opCycles.toLocaleString()} does not match perf model estimate`
+            }
+        >
+            <Icon iconSize={11} icon={IconNames.WARNING_SIGN} className={outOfMemory ? 'out-of-memory' : ''} />
+        </Tooltip2>
+    );
+
+    const modelRuntimeValue = outOfMemory
+        ? node.opCycles.toLocaleString()
+        : node.perfAnalyzerResults.model_runtime_per_input.toLocaleString();
+
     const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
         //  - will likely want to add more organization if more details are added here
@@ -42,7 +67,15 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         //    and leave other details for a drilling-down workflow
         //  - Operand-specific metrics should probably go under each operand?
 
-        ['Kernel Total Runtime', node.perfAnalyzerResults.kernel_total_runtime, 'ns'],
+        [
+            'Model Estimate',
+            <span className='model-perf-estimate'>
+                {modelRuntimeIcon}
+                {modelRuntimeValue}
+            </span>,
+            'cycles',
+        ],
+        ['Kernel Total Runtime', node.perfAnalyzerResults.kernel_total_runtime.toLocaleString(), 'cycles'],
         ['Bandwidth Limited Factor', node.perfAnalyzerResults.bw_limited_factor],
         [
             'Slowest Operand',
@@ -78,7 +111,6 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
 
-
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -86,7 +118,6 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
             dispatch(updatePipeSelection({ id: pipeId, selected: state }));
         });
     };
-
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
@@ -108,7 +139,6 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                     />
                 </Tooltip2>
             </h3>
-            {node.opCycles ? <p>Perf model estimate {node.opCycles.toLocaleString()} cycles</p> : null}
             {node.type === ComputeNodeType.DRAM && (
                 <p>
                     Channel {node.dramChannelId}, Sub {node.dramSubchannelId}
@@ -116,7 +146,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
             )}
             {node.operation && (
                 <div className='opname theme-dark'>
-                    <div  title={node.operation.name} >
+                    <div title={node.operation.name}>
                         <SelectableOperation
                             opName={node.operation.name}
                             value={selected(node.operation.name)}
@@ -139,7 +169,6 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                     {/* </Collapsible> */}
                 </div>
             )}
-
 
             {node.queueList.length > 0 && (
                 <div className='opname theme-dark'>
@@ -187,7 +216,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                     {outputs &&
                         outputs.map((operand) => (
                             <ul className='scrollable-content'>
-                                <div title={operand.name} >
+                                <div title={operand.name}>
                                     <div key={operand.name} style={{ fontSize: '12px' }}>
                                         <GraphVertexDetailsSelectables operand={operand} />
                                         <ul className='scrollable-content'>
