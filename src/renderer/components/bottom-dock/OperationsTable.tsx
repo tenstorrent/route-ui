@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
-import OperationsTableDictionary from './operationsTable.dict';
 import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
 import SelectableOperation from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
@@ -22,12 +21,13 @@ function OperationsTable() {
     const dispatch = useDispatch();
     const [tableFields, setTableFields] = useState<OpTableFields[]>([]);
     const [coreView, setCoreView] = useState(false);
-    const { opTableFields, changeSorting, sortDirection, sortingColumn } = useOperationsTable(tableFields);
+    const { operationsTableColumns, opTableFields, changeSorting, sortDirection, sortingColumn } =
+        useOperationsTable(tableFields);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const [operationNameColumnWidth, setOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
     const [slowOperationNameColumnWidth, setSlowOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
 
-    const { selected,  selectOperation, disabledOperation } = useSelectableGraphVertex();
+    const { selected, selectOperation, disabledOperation } = useSelectableGraphVertex();
 
     const table = useRef<Table2>(null);
 
@@ -130,15 +130,18 @@ function OperationsTable() {
         );
     };
 
-    const headerRenderer = (column: keyof OpTableFields | 'operation', disableSorting?: boolean) => {
+    const headerRenderer = (column: keyof OpTableFields | 'operation') => {
         const currentSortClass = sortingColumn === column ? 'current-sort' : '';
         const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
         let targetSortDirection = sortDirection;
         if (sortingColumn === column) {
             targetSortDirection = sortDirection === SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         }
-        if (disableSorting) {
-            return <ColumnHeaderCell2 name={OperationsTableDictionary[column]} />;
+
+        const definition = operationsTableColumns.get(column);
+
+        if (!definition?.sortable) {
+            return <ColumnHeaderCell2 name={definition?.label ?? column} />;
         }
         return (
             <div
@@ -146,10 +149,7 @@ function OperationsTable() {
                 role='button'
                 onClick={() => changeSorting(column)(targetSortDirection)}
             >
-                <ColumnHeaderCell2
-                    className={`${currentSortClass} ${sortDirectionClass}`}
-                    name={OperationsTableDictionary[column]}
-                />
+                <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label} />
                 {sortingColumn === column && (
                     <span className='sort-icon'>
                         <Icon
@@ -167,22 +167,35 @@ function OperationsTable() {
     };
 
     const cellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
-        const cellContent = (tableFields[rowIndex][key] || '').toString();
+        let cellContent = tableFields[rowIndex][key] || '';
+        const definition = operationsTableColumns.get(key);
+        if (definition?.formatter) {
+            cellContent = definition.formatter(cellContent);
+        } else {
+            cellContent = cellContent.toString();
+        }
+        const alignmentClass = definition?.align ? `align-${definition.align}` : '';
+        const units = definition?.units ? `${definition.units}` : '';
         if (key === 'core_id') {
             return (
                 <Cell>
                     <Checkbox
                         checked={nodesSelectionState.nodeList[cellContent]?.selected}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            selectNode(cellContent, e.target.checked);
+                            selectNode(cellContent.toString(), e.target.checked);
                         }}
-                        label={cellContent}
+                        label={cellContent+units}
                     />
                 </Cell>
             );
         }
 
-        return <Cell>{cellContent}</Cell>;
+        return (
+            <Cell className={alignmentClass}>
+                {cellContent}
+                {units}
+            </Cell>
+        );
     };
 
     const slowestOperandCellRenderer = (rowIndex: number): JSX.Element => {
@@ -226,7 +239,7 @@ function OperationsTable() {
     }
 
     const otherColWidth = null;
-
+// TODO: i would like to automate itteration over the columns in the near future
     return (
         <Table2
             ref={table}
@@ -264,12 +277,12 @@ function OperationsTable() {
             {!coreView ? (
                 <Column
                     cellRenderer={(rowIndex) => cellRenderer('grid_size', rowIndex)}
-                    columnHeaderCellRenderer={() => headerRenderer('grid_size', true)}
+                    columnHeaderCellRenderer={() => headerRenderer('grid_size')}
                 />
             ) : (
                 <Column
                     cellRenderer={(rowIndex) => cellRenderer('core_id', rowIndex)}
-                    columnHeaderCellRenderer={() => headerRenderer('core_id', true)}
+                    columnHeaderCellRenderer={() => headerRenderer('core_id')}
                 />
             )}
             <Column
