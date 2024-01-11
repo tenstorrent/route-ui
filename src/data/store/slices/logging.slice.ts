@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type LogType = 'info' | 'error' | 'warning' | 'log';
+import { LogType } from '../../Types';
 
 export interface Log<T extends LogType = LogType> {
     logType: T;
