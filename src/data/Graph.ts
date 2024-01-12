@@ -1,13 +1,10 @@
 import { process } from '@electron/remote';
-import { types } from 'sass';
-import * as console from 'console';
 import { ComputeNodeType } from './Types';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 import { ComputeNode } from './Chip';
 import { OperandDirection, OperandPerformance, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
-import Error = types.Error;
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -132,7 +129,7 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         return result ? this.getOperandByPerformance(result) : null;
     }
 
-    getOperandByPerformance(op:OperandPerformance | null): Operand | null {
+    getOperandByPerformance(op: OperandPerformance | null): Operand | null {
         if (op) {
             if (op.direction === OperandDirection.INPUT) {
                 return [...this.inputs][op.index];
