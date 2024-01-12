@@ -127,7 +127,7 @@ function OperationsTable() {
         const definition = operationsTableColumns.get(column);
 
         if (!definition?.sortable) {
-            return <ColumnHeaderCell2 name={definition?.label ?? column} c />;
+            return <ColumnHeaderCell2 name={definition?.label ?? column} />;
         }
         return (
             <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label}>
