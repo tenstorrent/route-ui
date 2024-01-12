@@ -20,7 +20,7 @@ export const loggingSlice = createSlice({
     name: 'logging',
     initialState: loggingInitialState,
     reducers: {
-        pushEntry: (state, action: PayloadAction<{ type?: LogLevel; message: string }>) => {
+        pushEntry: (state, action: PayloadAction<{ message: string; type?: LogLevel }>) => {
             state.entryList.push({
                 logType: action.payload.type ?? LogLevel.LOG,
                 timestamp: Date.now(),
