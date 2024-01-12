@@ -120,3 +120,10 @@ export class ClusterCoordinates {
         return [this.x, this.y, this.r, this.s];
     }
 }
+
+export enum LogLevel {
+    INFO = 'info',
+    ERROR = 'error',
+    WARNING = 'warning',
+    LOG = 'log',
+}
