@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { LogLevel } from '../../Types';
 
-export interface LogEntry<T extends LogLevel = LogLevel> {
-    logType: T;
+export interface LogEntry {
+    logType: LogLevel;
     timestamp: number;
     message: string;
 }
