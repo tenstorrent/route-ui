@@ -121,7 +121,7 @@ export class ClusterCoordinates {
     }
 }
 
-export enum LogType {
+export enum LogLevel {
     INFO = 'info',
     ERROR = 'error',
     WARNING = 'warning',

@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { LogType } from '../../Types';
+import { LogLevel } from '../../Types';
 
-export interface LogEntry<T extends LogType = LogType> {
+export interface LogEntry<T extends LogLevel = LogLevel> {
     logType: T;
     timestamp: number;
     message: string;
@@ -20,9 +20,9 @@ export const loggingSlice = createSlice({
     name: 'logging',
     initialState: loggingInitialState,
     reducers: {
-        pushEntry: (state, action: PayloadAction<{ type?: LogType; message: string }>) => {
+        pushEntry: (state, action: PayloadAction<{ type?: LogLevel; message: string }>) => {
             state.entryList.push({
-                logType: action.payload.type ?? LogType.LOG,
+                logType: action.payload.type ?? LogLevel.LOG,
                 timestamp: Date.now(),
                 message: action.payload.message,
             });
