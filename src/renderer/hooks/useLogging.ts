@@ -1,52 +1,52 @@
 /* eslint-disable no-console */
 
 import { useDispatch, useSelector } from 'react-redux';
-import { pushEntry, LogEntry } from '../../data/store/slices/logging.slice';
+import { pushEntry } from '../../data/store/slices/logging.slice';
+import { getOutputsToConsole } from '../../data/store/selectors/logging.selector';
 
-import { RootState } from '../../data/store/createStore';
-import { LogType } from '../../data/Types';
+import { LogLevel } from '../../data/Types';
 
 interface LoggingHook {
-    logMessage: (message: string) => void;
-    logInfo: (message: string) => void;
-    logError: (message: string) => void;
-    logWarning: (message: string) => void;
-
-    listAllLogs: () => Array<LogEntry>;
-    listMessageLogs: () => Array<LogEntry<LogType.LOG>>;
-    listInfoLogs: () => Array<LogEntry<LogType.INFO>>;
-    listErrorLogs: () => Array<LogEntry<LogType.ERROR>>;
-    listWarningLogs: () => Array<LogEntry<LogType.WARNING>>;
+    log: (message: string) => void;
+    info: (message: string) => void;
+    error: (message: string) => void;
+    warn: (message: string) => void;
 }
 
 const useLogging = (): LoggingHook => {
     const dispatch = useDispatch();
 
-    const allLogs = useSelector((state: RootState) => state.logging.entryList);
+    const outputsToConsole = useSelector(getOutputsToConsole);
 
     return {
-        logMessage: (message: string) => {
-            console.log(message);
-            dispatch(pushEntry({ type: LogType.LOG, message }));
-        },
-        logInfo: (message: string) => {
-            console.info(message);
-            dispatch(pushEntry({ type: LogType.INFO, message }));
-        },
-        logError: (message: string) => {
-            console.error(message);
-            dispatch(pushEntry({ type: LogType.ERROR, message }));
-        },
-        logWarning: (message: string) => {
-            console.warn(message);
-            dispatch(pushEntry({ type: LogType.WARNING, message }));
-        },
+        log: (message: string) => {
+            if (outputsToConsole) {
+                console.log(message);
+            }
 
-        listAllLogs: () => allLogs,
-        listMessageLogs: () => allLogs.filter((l) => l.logType === 'log') as Array<LogEntry<LogType.LOG>>,
-        listInfoLogs: () => allLogs.filter((l) => l.logType === 'info') as Array<LogEntry<LogType.INFO>>,
-        listErrorLogs: () => allLogs.filter((l) => l.logType === 'error') as Array<LogEntry<LogType.ERROR>>,
-        listWarningLogs: () => allLogs.filter((l) => l.logType === 'warning') as Array<LogEntry<LogType.WARNING>>,
+            dispatch(pushEntry({ type: LogLevel.LOG, message }));
+        },
+        info: (message: string) => {
+            if (outputsToConsole) {
+                console.info(message);
+            }
+
+            dispatch(pushEntry({ type: LogLevel.INFO, message }));
+        },
+        error: (message: string) => {
+            if (outputsToConsole) {
+                console.error(message);
+            }
+
+            dispatch(pushEntry({ type: LogLevel.ERROR, message }));
+        },
+        warn: (message: string) => {
+            if (outputsToConsole) {
+                console.warn(message);
+            }
+
+            dispatch(pushEntry({ type: LogLevel.WARNING, message }));
+        },
     };
 };
 
