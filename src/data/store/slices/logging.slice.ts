@@ -10,10 +10,12 @@ export interface LogEntry {
 
 export interface LoggingState {
     entryList: Array<LogEntry>;
+    outputsToConsole: boolean;
 }
 
 const loggingInitialState: LoggingState = {
     entryList: [],
+    outputsToConsole: false,
 };
 
 export const loggingSlice = createSlice({
@@ -27,9 +29,12 @@ export const loggingSlice = createSlice({
                 message: action.payload.message,
             });
         },
+        setOutputsToConsole: (state, action: PayloadAction<boolean>) => {
+            state.outputsToConsole = action.payload;
+        },
     },
 });
 
-export const { pushEntry } = loggingSlice.actions;
+export const { pushEntry, setOutputsToConsole } = loggingSlice.actions;
 
 export const loggingReducer = loggingSlice.reducer;
