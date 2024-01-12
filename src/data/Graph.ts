@@ -29,15 +29,20 @@ export abstract class AbstractGraphVertex implements Operand {
 
     public set pipeIdsByCore(value: Map<string, string[]>) {
         if (this._pipeIdsByCore.size > 0) {
-            value.forEach((pipeids, key) => {
-                if (this._pipeIdsByCore.has(key)) {
-                    this._pipeIdsByCore.get(key)!.push(...pipeids);
+            value.forEach((pipeIds, coreId) => {
+                if (this._pipeIdsByCore.has(coreId)) {
+                    this._pipeIdsByCore.get(coreId)!.push(...pipeIds);
                 } else {
-                    this._pipeIdsByCore.set(key, pipeids);
+                    this._pipeIdsByCore.set(coreId, pipeIds);
                 }
             });
         }
+
         this._pipeIdsByCore = value;
+
+        this._pipeIdsByCore.forEach((pipeIds, coreId) => {
+            this._pipeIdsByCore.set(coreId, [...new Set(pipeIds.map((pipeId) => pipeId.toString()))]);
+        });
     }
 
     public bandwidth: number = 0;

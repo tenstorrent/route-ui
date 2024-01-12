@@ -243,24 +243,17 @@ export default class Chip {
         }
 
         if (pipesByCore && pipesByCore.size > 0) {
-            const newPipesByCore = new Map<string, string[]>();
-            pipesByCore.forEach((pipeIds, core) => {
-                newPipesByCore.set(core, [...new Set(pipeIds.map((pipeId) => pipeId.toString()))]);
-            });
-
             if (operand.pipeIdsByCore.size > 0) {
-                newPipesByCore.forEach((newPipeIds, core) => {
-                    if (operand!.pipeIdsByCore.has(core)) {
-                        const existingPipes = operand!.pipeIdsByCore.get(core) || [];
-                        const updatedPipes = [...existingPipes, ...newPipeIds];
-
-                        newPipesByCore.set(core, [...new Set(updatedPipes)]);
+                pipesByCore.forEach((newPipeIds, coreId) => {
+                    if (operand!.pipeIdsByCore.has(coreId)) {
+                        const existingPipesIds = operand!.pipeIdsByCore.get(coreId) || [];
+                        pipesByCore.set(coreId, [...existingPipesIds, ...newPipeIds]);
                     } else {
-                        newPipesByCore.set(core, [...new Set(newPipeIds)]);
+                        pipesByCore.set(coreId, newPipeIds);
                     }
                 });
             }
-            operand.pipeIdsByCore = newPipesByCore;
+            operand.pipeIdsByCore = pipesByCore;
         }
         return operand;
     }
