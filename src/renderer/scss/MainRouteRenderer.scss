@@ -594,15 +594,21 @@ $dock-height: 420px;
     .op-element {
         color: $tt-black;
         display: flex;
-        gap: 5px;
-        justify-items: center;
         align-items: center;
         margin-bottom: 6px;
+        gap: 5px;
+
+        .highlighted-text {
+            flex-shrink: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
         .color-swatch {
             width: 10px;
             height: 10px;
             border: 1px solid $tt-white-text;
+            flex-shrink: 0;
             display: inline-block;
 
             &.transparent {
@@ -622,6 +628,7 @@ $dock-height: 420px;
                 svg {
                     fill: $tt-yellow;
                 }
+
                 &.out-of-memory {
                     svg {
                         fill: currentColor;
@@ -634,7 +641,8 @@ $dock-height: 420px;
         .core-runtime-item {
             margin-bottom: 4px;
             display: flex;
-            .bp4-popover2-target{
+
+            .bp4-popover2-target {
                 display: flex;
             }
 

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
@@ -14,9 +14,6 @@ import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook'
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
-    const DEFAULT_COLUMN_WIDTH = 310;
-    const COLUM_WIDTH_OFFSET = 80;
-
     const { chip } = useContext(DataSource);
     const dispatch = useDispatch();
     const [tableFields, setTableFields] = useState<OpTableFields[]>([]);
@@ -24,20 +21,9 @@ function OperationsTable() {
     const { operationsTableColumns, opTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable(tableFields);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const [operationNameColumnWidth, setOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
-    const [slowOperationNameColumnWidth, setSlowOperationNameColumnWidth] = useState(DEFAULT_COLUMN_WIDTH);
-
     const { selected, selectOperation, disabledOperation } = useSelectableGraphVertex();
-
     const table = useRef<Table2>(null);
 
-    const recalculateOperationColumnWidths = useCallback(() => {
-        const width = table.current?.locator?.getWidestVisibleCellInColumn(0) ?? 0;
-        setOperationNameColumnWidth(width === 0 ? DEFAULT_COLUMN_WIDTH : width + COLUM_WIDTH_OFFSET);
-
-        const slowWidth = table.current?.locator?.getWidestVisibleCellInColumn(5) ?? 0;
-        setSlowOperationNameColumnWidth(slowWidth === 0 ? DEFAULT_COLUMN_WIDTH : slowWidth + COLUM_WIDTH_OFFSET);
-    }, [table, setOperationNameColumnWidth, setSlowOperationNameColumnWidth]);
 
     const resetOpTableDetails = () => {
         if (!chip) {
@@ -144,20 +130,21 @@ function OperationsTable() {
             return <ColumnHeaderCell2 name={definition?.label ?? column} />;
         }
         return (
-            <div
-                className='sortable-table-header'
-                role='button'
-                onClick={() => changeSorting(column)(targetSortDirection)}
-            >
-                <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label} />
-                {sortingColumn === column && (
-                    <span className='sort-icon'>
-                        <Icon
-                            icon={sortDirection === SortingDirection.ASC ? IconNames.SORT_ASC : IconNames.SORT_DESC}
-                        />
-                    </span>
-                )}
-            </div>
+            <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label}>
+                <div
+                    className='sortable-table-header'
+                    role='button'
+                    onClick={() => changeSorting(column)(targetSortDirection)}
+                >
+                    {sortingColumn === column && (
+                        <span className='sort-icon'>
+                            <Icon
+                                icon={sortDirection === SortingDirection.ASC ? IconNames.SORT_ASC : IconNames.SORT_DESC}
+                            />
+                        </span>
+                    )}
+                </div>
+            </ColumnHeaderCell2>
         );
     };
 
@@ -184,7 +171,7 @@ function OperationsTable() {
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             selectNode(cellContent.toString(), e.target.checked);
                         }}
-                        label={cellContent+units}
+                        label={cellContent + units}
                     />
                 </Cell>
             );
@@ -238,8 +225,7 @@ function OperationsTable() {
         return <pre>No data available</pre>;
     }
 
-    const otherColWidth = null;
-// TODO: i would like to automate iteration over the columns in the near future
+    // TODO: i would like to automate iteration over the columns in the near future
     return (
         <Table2
             ref={table}
@@ -249,25 +235,15 @@ function OperationsTable() {
             className='operations-table'
             numRows={tableFields.length}
             enableColumnHeader
-            onCompleteRender={recalculateOperationColumnWidths}
-            columnWidths={[
-                operationNameColumnWidth,
-                otherColWidth,
-                otherColWidth,
-                otherColWidth,
-                otherColWidth,
-                slowOperationNameColumnWidth,
-                otherColWidth,
-                otherColWidth,
-                otherColWidth,
-            ]}
+            numFrozenColumns={1}
             cellRendererDependencies={[
-                operationNameColumnWidth,
                 sortDirection,
                 sortingColumn,
                 nodesSelectionState.groups,
                 tableFields,
                 coreView,
+                opTableFields,
+                tableFields.length,
             ]}
         >
             <Column
@@ -317,6 +293,5 @@ function OperationsTable() {
         </Table2>
     );
 }
-
 
 export default OperationsTable;
