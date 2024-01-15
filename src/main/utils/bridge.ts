@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 
-import { ElectronEvents } from '../../data/Types';
+import { ElectronEvents } from '../ElectronTypes';
 
 export function listenToEventFromWindow<T extends Array<any>>(
     eventName: ElectronEvents,

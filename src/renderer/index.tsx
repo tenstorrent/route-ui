@@ -4,7 +4,7 @@ import { updateStateOnEvent } from './utils/bridge';
 
 import App from './App';
 import { setLogOutputEnabledState } from '../data/store/slices/logging.slice';
-import { ElectronEvents } from '../data/Types';
+import { ElectronEvents } from '../main/ElectronTypes';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);

@@ -127,7 +127,3 @@ export enum LogLevel {
     WARNING = 'warning',
     LOG = 'log',
 }
-
-export enum ElectronEvents {
-    TOGGLE_LOGGING_PANEL = 'toggle-logging-panel',
-}

@@ -1,7 +1,7 @@
 import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 
 import { sendEventToWindow } from './utils/bridge';
-import { ElectronEvents } from '../data/Types';
+import { ElectronEvents } from './ElectronTypes';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
     selector?: string;
