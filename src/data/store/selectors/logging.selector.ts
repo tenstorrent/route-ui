@@ -10,4 +10,4 @@ export const getLogEntriesByType = (state: RootState, type: LogLevel) =>
 
 export const getOutputsToConsole = (state: RootState) => state.logging.outputsToConsole;
 
-export const getLogOutputEnabledState = (state: RootState) => state.logging.logOutputEnabled;
+export const getLogOutputEnabled = (state: RootState) => state.logging.logOutputEnabled;

@@ -34,12 +34,12 @@ export const loggingSlice = createSlice({
         setOutputsToConsole: (state, action: PayloadAction<boolean>) => {
             state.outputsToConsole = action.payload;
         },
-        setLogOutputEnabledState: (state, action: PayloadAction<boolean>) => {
+        setLogOutputEnabled: (state, action: PayloadAction<boolean>) => {
             state.logOutputEnabled = action.payload;
         },
     },
 });
 
-export const { pushEntry, setOutputsToConsole, setLogOutputEnabledState } = loggingSlice.actions;
+export const { pushEntry, setOutputsToConsole, setLogOutputEnabled } = loggingSlice.actions;
 
 export const loggingReducer = loggingSlice.reducer;
