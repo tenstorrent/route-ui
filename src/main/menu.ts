@@ -142,12 +142,13 @@ export default class MenuBuilder {
             submenu: [
                 {
                     label: 'Toggle logging',
+                    id: 'toggle-logging',
                     type: 'checkbox',
                     checked: false,
                     enabled: false,
                     accelerator: 'Alt+Command+L',
                     click: (menuItem) => {
-                        sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOGGING_PANEL, menuItem.checked);
+                        sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
                     },
                 },
             ],
@@ -267,6 +268,7 @@ export default class MenuBuilder {
                 submenu: [
                     {
                         label: 'Toggle &logging',
+                        id: 'toggle-logging',
                         type: 'checkbox',
                         checked: false,
                         enabled: false,
@@ -274,7 +276,7 @@ export default class MenuBuilder {
                         click: (menuItem) => {
                             menuItem.checked = !menuItem.checked;
 
-                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOGGING_PANEL, menuItem.checked);
+                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
                         },
                     },
                 ],

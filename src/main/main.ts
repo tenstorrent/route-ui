@@ -105,7 +105,15 @@ const createWindow = async () => {
     });
 
     const menuBuilder = new MenuBuilder(mainWindow);
-    menuBuilder.buildMenu();
+    const menu = menuBuilder.buildMenu();
+
+    listenToEventFromWindow(ElectronEvents.ENABLE_LOGGING_MENU, (isEnabled: boolean) => {
+        const loggingMenu = menu.getMenuItemById('toggle-logging');
+
+        if (loggingMenu) {
+            loggingMenu.enabled = isEnabled;
+        }
+    });
 
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
