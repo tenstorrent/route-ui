@@ -11,11 +11,13 @@ export interface LogEntry {
 export interface LoggingState {
     entryList: Array<LogEntry>;
     outputsToConsole: boolean;
+    loggingPanelEnabled: boolean;
 }
 
 const loggingInitialState: LoggingState = {
     entryList: [],
     outputsToConsole: false,
+    loggingPanelEnabled: false,
 };
 
 export const loggingSlice = createSlice({
@@ -32,9 +34,12 @@ export const loggingSlice = createSlice({
         setOutputsToConsole: (state, action: PayloadAction<boolean>) => {
             state.outputsToConsole = action.payload;
         },
+        setLoggingPanelEnabledState: (state, action: PayloadAction<boolean>) => {
+            state.loggingPanelEnabled = action.payload;
+        },
     },
 });
 
-export const { pushEntry, setOutputsToConsole } = loggingSlice.actions;
+export const { pushEntry, setOutputsToConsole, setLoggingPanelEnabledState } = loggingSlice.actions;
 
 export const loggingReducer = loggingSlice.reducer;

@@ -9,3 +9,5 @@ export const getLogEntriesByType = (state: RootState, type: LogLevel) =>
     state.logging.entryList.filter((e) => e.logType === type);
 
 export const getOutputsToConsole = (state: RootState) => state.logging.outputsToConsole;
+
+export const getLoggingPanelEnabledState = (state: RootState) => state.logging.loggingPanelEnabled;
