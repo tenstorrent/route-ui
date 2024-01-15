@@ -1,0 +1,30 @@
+@import "variables";
+
+.logs-table {
+    overflow: auto;
+    height: 300px;
+}
+
+.logs-table .bp4-table-cell:is(:nth-of-type(6n+1), :nth-of-type(6n+2), :nth-of-type(6n+3)) {
+    background: $tt-light-gray;
+}
+
+.log-message {
+    font-family: 'Cascadia Code', 'Monaco', 'Courier New', Courier, monospace;
+    margin: 0;
+    display: inline-block;
+}
+
+.log-message.log_error { color: $tt-red; }
+.log-message.log_warning { color: $tt-yellow; }
+.log-message.log_info { color: $tt-dark-blue; }
+.log-message.log_log { color: $tt-dark-gray; }
+
+.log-type {
+    text-align: center;
+}
+
+.log-type.log_error { color: $tt-red; }
+.log-type.log_warning { color: $tt-yellow; }
+.log-type.log_info { color: $tt-dark-blue; }
+.log-type.log_log { color: $tt-dark-gray; }

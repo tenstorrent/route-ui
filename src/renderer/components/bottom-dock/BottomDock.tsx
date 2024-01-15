@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import { Button, Classes, Tab, TabId, Tabs } from '@blueprintjs/core';
 import '../../scss/BottomDock.scss';
 import { IconNames } from '@blueprintjs/icons';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setDockOpenState } from 'data/store/slices/uiState.slice';
 import OperationsTable from './OperationsTable';
+import LogsTable from '../LogsTable';
+import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
 
 const BottomDock: React.FC = () => {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
     const dispatch = useDispatch();
+
+    const isLogOutputEnabled = useSelector(getLogOutputEnabled);
 
     return (
         <div className='dock bottom-dock'>
@@ -24,7 +28,7 @@ const BottomDock: React.FC = () => {
                 {/*         </Table2> */}
                 {/*     } */}
                 {/* /> */}
-                {/* <Tab id='tab3' title='Console' panel={<pre>SOME STUFF HERE</pre>} /> */}
+                {isLogOutputEnabled && <Tab id='tab3' title='Logs' panel={<LogsTable />} />}
             </Tabs>
             <Button
                 minimal
