@@ -1,5 +1,8 @@
 import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
 
+import { sendEventToWindow } from './utils/bridge';
+import { ElectronEvents } from './ElectronEvents';
+
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
     selector?: string;
     submenu?: DarwinMenuItemConstructorOptions[] | Menu;
@@ -134,6 +137,21 @@ export default class MenuBuilder {
                 },
             ],
         };
+        const subMenuDebug: MenuItemConstructorOptions = {
+            label: 'Debug',
+            submenu: [
+                {
+                    label: 'Toggle logging',
+                    type: 'checkbox',
+                    checked: false,
+                    enabled: false,
+                    accelerator: 'Alt+Command+L',
+                    click: (menuItem) => {
+                        sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOGGING_PANEL, menuItem.checked);
+                    },
+                },
+            ],
+        };
         const subMenuWindow: DarwinMenuItemConstructorOptions = {
             label: 'Window',
             submenu: [
@@ -186,11 +204,11 @@ export default class MenuBuilder {
                 ? subMenuViewDev
                 : subMenuViewProd;
 
-        return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+        return [subMenuAbout, subMenuEdit, subMenuView, subMenuDebug, subMenuWindow, subMenuHelp];
     }
 
     buildDefaultTemplate() {
-        const templateDefault = [
+        const templateDefault: MenuItemConstructorOptions[] = [
             {
                 label: '&File',
                 submenu: [
@@ -243,6 +261,23 @@ export default class MenuBuilder {
                                   },
                               },
                           ],
+            },
+            {
+                label: '&Debug',
+                submenu: [
+                    {
+                        label: 'Toggle &logging',
+                        type: 'checkbox',
+                        checked: false,
+                        enabled: false,
+                        accelerator: 'Alt+Ctrl+L',
+                        click: (menuItem) => {
+                            menuItem.checked = !menuItem.checked;
+
+                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOGGING_PANEL, menuItem.checked);
+                        },
+                    },
+                ],
             },
             {
                 label: 'Help',
