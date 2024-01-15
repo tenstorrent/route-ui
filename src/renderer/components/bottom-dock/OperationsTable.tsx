@@ -90,7 +90,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={nodesSelectionState.groups[opName] === undefined}
+                        disabled={nodesSelectionState.operations[opName] === undefined}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
                             expandOperationCores(opName);
@@ -208,7 +208,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={nodesSelectionState.groups[slowestOperand.name] === undefined}
+                        disabled={nodesSelectionState.operations[slowestOperand.name] === undefined}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
                             expandOperationCores(slowestOperand.name);
@@ -239,7 +239,7 @@ function OperationsTable() {
             cellRendererDependencies={[
                 sortDirection,
                 sortingColumn,
-                nodesSelectionState.groups,
+                nodesSelectionState.operations,
                 tableFields,
                 coreView,
                 opTableFields,

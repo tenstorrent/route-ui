@@ -1,7 +1,7 @@
-import React, { useContext, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import { getDramGroup, getGroup, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { getDramGroup, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
@@ -27,7 +27,6 @@ import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
 } from '../../data/store/selectors/operationPerf.selectors';
-import DataSource, { GridContext } from '../../data/DataSource';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -255,7 +254,7 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
     node,
     //
 }) => {
-    const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
+    const selectedGroup = useSelector((state: RootState) => getOperation(state, node.opName));
     let operationStyles = {};
     if (node.opName !== '' && selectedGroup?.selected) {
         const color = getGroupColor(node.opName);

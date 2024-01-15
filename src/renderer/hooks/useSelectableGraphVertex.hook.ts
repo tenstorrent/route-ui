@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { selectGroup, selectQueue } from '../../data/store/slices/nodeSelection.slice';
+import { selectOperation, selectQueue } from '../../data/store/slices/nodeSelection.slice';
 import { RootState } from '../../data/store/createStore';
 
 type SelectableGraphVertexHook = {
@@ -21,13 +21,13 @@ const useSelectableGraphVertex = (): SelectableGraphVertexHook => {
         );
     const setOperationSelectionState = (opName: string, selected: boolean) => {
         dispatch(
-            selectGroup({
+            selectOperation({
                 opName,
                 selected,
             }),
         );
     };
-    const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.groups);
+    const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
     const queuesSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
 
     return {
