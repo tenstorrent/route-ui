@@ -35,7 +35,7 @@ export interface NodeSelection {
 }
 
 export interface NodeSelectionState {
-    groups: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
+    operations: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
     queues: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
     nodeList: Record<string, ComputeNodeState>;
     dram: { data: ComputeNodeState[]; selected: boolean }[];

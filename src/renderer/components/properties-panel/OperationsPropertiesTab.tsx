@@ -22,7 +22,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
 
     const { chip } = useContext(DataSource);
-    const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.groups);
+    const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
     const [allOpen, setAllOpen] = useState(true);

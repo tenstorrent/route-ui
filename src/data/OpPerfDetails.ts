@@ -152,7 +152,7 @@ export class OpPerfDetails extends MeasurementDetails implements OpPerfJSON {
 
 export enum OpPerfDynamicProperties {
     INPUT_PIPE_BW = 'input_pipe_bw_',
-    REQUIRED_INPUT_BW = 'required_input_bw_',
+    REQUIRED_INPUT_BW = 'required_input_bw_', // inconsistent naming in source data
     OUTPUT_PIPE_BW = 'output_pipe_bw_',
     REQUIRED_OUTPUT_BW = 'required_output_pipe_bw_',
 }

@@ -3,7 +3,7 @@ import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
-    groups: {},
+    operations: {},
     queues: {},
     dram: [],
 };
@@ -28,19 +28,18 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
-        // this only runs one time per file load
         loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
-            state.groups = {};
+            state.operations = {};
             state.nodeList = {};
             state.dram = [];
             state.queues = {};
             action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
-                    if (!state.groups[item.opName]) {
-                        state.groups[item.opName] = { data: [], selected: false };
+                    if (!state.operations[item.opName]) {
+                        state.operations[item.opName] = { data: [], selected: false };
                     }
-                    state.groups[item.opName].data.push(item);
+                    state.operations[item.opName].data.push(item);
                 }
                 if (item.dramChannelId !== -1) {
                     if (!state.dram[item.dramChannelId]) {
@@ -57,8 +56,8 @@ const nodeSelectionSlice = createSlice({
                     });
                 }
             });
-            Object.values(state.groups).forEach((group) => {
-                setBorders(group.data);
+            Object.values(state.operations).forEach((operation) => {
+                setBorders(operation.data);
             });
             Object.values(state.queues).forEach((queue) => {
                 setBorders(queue.data);
@@ -83,18 +82,16 @@ const nodeSelectionSlice = createSlice({
             });
         },
 
-        /** select operation */
-        selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
-            // TODO: refactor
+        selectOperation(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
             const { opName, selected } = action.payload;
-            const group = state.groups[opName];
-            if (group) {
-                group.selected = selected;
+            const operation = state.operations[opName];
+            if (operation) {
+                operation.selected = selected;
             }
         },
         clearAllOperations(state) {
-            Object.values(state.groups).forEach((group) => {
-                group.selected = false;
+            Object.values(state.operations).forEach((operation) => {
+                operation.selected = false;
             });
         },
         selectQueue(state, action: PayloadAction<{ queueName: string; selected: boolean }>) {
@@ -116,7 +113,7 @@ export const {
     //
     loadNodesData,
     updateNodeSelection,
-    selectGroup,
+    selectOperation,
     clearAllOperations,
     selectQueue,
     clearAllQueues,
