@@ -35,6 +35,7 @@ export const loggingSlice = createSlice({
             state.outputsToConsole = action.payload;
         },
         setLogOutputEnabledState: (state, action: PayloadAction<boolean>) => {
+            state.logOutputEnabled = action.payload;
         },
     },
 });
