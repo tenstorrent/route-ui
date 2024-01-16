@@ -13,9 +13,9 @@
     align-items: flex-start;
     padding: 5px;
 
-    & .log-timestamp { flex-shrink: 0; }
+    .log-timestamp { flex-shrink: 0; }
 
-    & pre {
+    pre {
         font-family: inherit;
         margin: 0;
         flex-grow: 1;
