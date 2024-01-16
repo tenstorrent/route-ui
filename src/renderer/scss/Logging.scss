@@ -23,8 +23,8 @@
         white-space: break-spaces;
     }
 
-    &.log-line-odd { background-color: $tt-light-gray; }
-    &.log-line-even { background-color: $tt-medium-light-gray; }
+    &:nth-last-of-type(odd) { background-color: $tt-light-gray; }
+    &:nth-last-of-type(even) { background-color: $tt-medium-light-gray; }
 
     &.log-error { color: $tt-red; }
     &.log-warning { color: darkgoldenrod; }

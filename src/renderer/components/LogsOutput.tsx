@@ -29,11 +29,8 @@ const LogsOutput: FC = () => {
 
     return (
         <div className='logs-container'>
-            {reversedLogs.map((log, index) => (
-                <article
-                    key={log.timestamp}
-                    className={`log-message log-${log.logType} ${index % 2 === 0 ? 'log-line-even' : 'log-line-odd'}`}
-                >
+            {reversedLogs.map((log) => (
+                <article key={log.timestamp} className={`log-message log-${log.logType}`}>
                     <span className='log-type'>
                         <Icon icon={ICON_MAP[log.logType]} />
                     </span>
