@@ -24,11 +24,12 @@ const formatter = new Intl.DateTimeFormat('en-US', {
 
 const LogsOutput: FC = () => {
     const logs = useSelector(getLogEntries);
-    const sortedLogs = [...logs].sort((a, b) => b.timestamp - a.timestamp);
+    // Reverse the logs so that the newest logs are at the top
+    const reversedLogs = [...logs].reverse();
 
     return (
         <div className='logs-container'>
-            {sortedLogs.map((log, index) => (
+            {reversedLogs.map((log, index) => (
                 <article
                     key={log.timestamp}
                     className={`log-message log-${log.logType} ${index % 2 === 0 ? 'log-line-even' : 'log-line-odd'}`}
