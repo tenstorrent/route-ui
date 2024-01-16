@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDockOpenState } from 'data/store/slices/uiState.slice';
 import OperationsTable from './OperationsTable';
-import LogsTable from '../LogsTable';
+import LogsOutput from '../LogsOutput';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
 
 const BottomDock: React.FC = () => {
@@ -28,7 +28,7 @@ const BottomDock: React.FC = () => {
                 {/*         </Table2> */}
                 {/*     } */}
                 {/* /> */}
-                {isLogOutputEnabled && <Tab id='tab3' title='Logs' panel={<LogsTable />} />}
+                {isLogOutputEnabled && <Tab id='tab3' title='Logs' panel={<LogsOutput />} />}
             </Tabs>
             <Button
                 minimal
