@@ -1,24 +1,16 @@
 import { FC, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { Cell, Column, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { Icon } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import { getLogEntries } from '../../data/store/selectors/logging.selector';
 import { LogLevel } from '../../data/Types';
 
 const ICON_MAP = {
-    [LogLevel.ERROR]: 'error',
-    [LogLevel.WARNING]: 'warning-sign',
-    [LogLevel.INFO]: 'info-sign',
-    [LogLevel.LOG]: 'help',
+    [LogLevel.ERROR]: IconNames.ERROR,
+    [LogLevel.WARNING]: IconNames.WARNING_SIGN,
+    [LogLevel.INFO]: IconNames.INFO_SIGN,
+    [LogLevel.LOG]: IconNames.HELP,
 } as const;
-
-const LogsTable: FC = () => {
-    const table = useRef<Table2>(null);
-    const logs = useSelector(getLogEntries);
-
-    const cellRenderer = (field: 'logType' | 'timestamp' | 'message', row: number) => {
-        const logLine = logs[row];
-        let cell = <Cell key={logLine.timestamp.toString()} />;
 
         const formatter = new Intl.DateTimeFormat('en-US', {
             year: 'numeric',
