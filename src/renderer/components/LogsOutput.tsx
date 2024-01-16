@@ -31,7 +31,7 @@ const LogsOutput: FC = () => {
             {sortedLogs.map((log, index) => (
                 <article
                     key={log.timestamp}
-                    className={`log-message log_${log.logType} ${index % 2 === 0 ? 'log-line-even' : 'log-line-odd'}`}
+                    className={`log-message log-${log.logType} ${index % 2 === 0 ? 'log-line-even' : 'log-line-odd'}`}
                 >
                     <span className='log-type'>
                         <Icon icon={ICON_MAP[log.logType]} />

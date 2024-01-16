@@ -26,8 +26,8 @@
     &.log-line-odd { background-color: $tt-light-gray; }
     &.log-line-even { background-color: $tt-medium-light-gray; }
 
-    &.log_error { color: $tt-red; }
-    &.log_warning { color: darkgoldenrod; }
-    &.log_info { color: $tt-dark-blue; }
-    &.log_log { color: $tt-dark-gray; }
+    &.log-error { color: $tt-red; }
+    &.log-warning { color: darkgoldenrod; }
+    &.log-info { color: $tt-dark-blue; }
+    &.log-log { color: $tt-dark-gray; }
 }
