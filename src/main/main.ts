@@ -9,12 +9,14 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, nativeImage } from 'electron';
+import { app, BrowserWindow, shell, nativeImage } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 // import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { listenToEventFromWindow } from './utils/bridge';
+import { ElectronEvents } from './ElectronEvents';
 
 class AppUpdater {
     constructor() {
@@ -25,12 +27,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-    const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-    console.log(msgTemplate(arg));
-    event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
     const sourceMapSupport = require('source-map-support');
@@ -109,7 +105,15 @@ const createWindow = async () => {
     });
 
     const menuBuilder = new MenuBuilder(mainWindow);
-    menuBuilder.buildMenu();
+    const menu = menuBuilder.buildMenu();
+
+    listenToEventFromWindow(ElectronEvents.ENABLE_LOGGING_MENU, (isEnabled: boolean) => {
+        const loggingMenu = menu.getMenuItemById('toggle-logging');
+
+        if (loggingMenu) {
+            loggingMenu.enabled = isEnabled;
+        }
+    });
 
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {

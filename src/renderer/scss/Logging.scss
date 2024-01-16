@@ -1,0 +1,33 @@
+@import "variables";
+
+.logs-container {
+    overflow: auto;
+    height: 300px;
+}
+
+.log-message {
+    font-family: 'Cascadia Code', 'Monaco', 'Courier New', Courier, monospace;
+    margin: 0;
+    display: flex;
+    gap: 5px;
+    align-items: flex-start;
+    padding: 5px;
+
+    .log-timestamp { flex-shrink: 0; }
+
+    pre {
+        font-family: inherit;
+        margin: 0;
+        flex-grow: 1;
+        color: inherit;
+        white-space: break-spaces;
+    }
+
+    &:nth-last-of-type(odd) { background-color: $tt-light-gray; }
+    &:nth-last-of-type(even) { background-color: $tt-medium-light-gray; }
+
+    &.log-error { color: $tt-red; }
+    &.log-warning { color: darkgoldenrod; }
+    &.log-info { color: $tt-dark-blue; }
+    &.log-log { color: $tt-dark-gray; }
+}
