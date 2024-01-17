@@ -5,7 +5,7 @@ export const getLogEntry = (state: RootState, id: number) => state.logging.entry
 
 export const getLogEntries = (state: RootState) => state.logging.entryList;
 
-export const getLogEntriesByType = (state: RootState, type: LogLevel) =>
+export const getLogEntriesByType = (type: LogLevel) => (state: RootState) =>
     state.logging.entryList.filter((e) => e.logType === type);
 
 export const getOutputsToConsole = (state: RootState) => state.logging.outputsToConsole;
