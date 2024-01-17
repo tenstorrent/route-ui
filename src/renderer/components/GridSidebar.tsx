@@ -20,7 +20,10 @@ import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
 } from '../../data/store/selectors/operationPerf.selectors';
-import { updateShowOperationPerformanceGrid } from '../../data/store/slices/operationPerf.slice';
+import {
+    updateOperationPerformanceThreshold,
+    updateShowOperationPerformanceGrid,
+} from '../../data/store/slices/operationPerf.slice';
 import { clearAllPipes, selectAllPipes } from '../../data/store/slices/pipeSelection.slice';
 import { clearAllOperations } from '../../data/store/slices/nodeSelection.slice';
 import {
@@ -164,7 +167,7 @@ export const GridSidebar: FC = () => {
                     disabled={!useSelector(getShowOperationPerformanceGrid)}
                     labelStepSize={Math.max(5, maxBwLimitedFactor / 5)}
                     value={useSelector(getOperationPerformanceTreshold)}
-                    onChange={onOpCongestionChange}
+                    onChange={(value: number) => dispatch(updateOperationPerformanceThreshold(value))}
                     labelRenderer={(value) => `${value.toFixed(0)}`}
                 />
                 <hr />
