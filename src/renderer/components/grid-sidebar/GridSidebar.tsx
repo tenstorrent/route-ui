@@ -4,8 +4,6 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconNames } from '@blueprintjs/icons';
 import {
-    updateDetailedViewZoom,
-    updateGridZoom,
     updateLinkSaturation,
     updateShowEmptyLinks,
     updateShowLinkSaturation,
@@ -26,8 +24,6 @@ import {
 import { clearAllPipes, selectAllPipes } from '../../../data/store/slices/pipeSelection.slice';
 import { clearAllOperations } from '../../../data/store/slices/nodeSelection.slice';
 import {
-    getDetailedViewZoom,
-    getGridZoom,
     getLinkSaturation,
     getShowEmptyLinks,
     getShowLinkSaturation,
@@ -40,6 +36,7 @@ import { NOC } from '../../../data/Types';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../../utils/DrawingAPI';
 import DataSource, { GridContext } from '../../../data/DataSource';
+import { ZoomControls } from './ZoomControls';
 
 export const GridSidebar: FC = () => {
     const { chip } = useContext<GridContext>(DataSource);
@@ -52,9 +49,6 @@ export const GridSidebar: FC = () => {
 
     const showLinkSaturationNOC0 = useSelector(getShowLinkSaturationNOC0);
     const showLinkSaturationNOC1 = useSelector(getShowLinkSaturationNOC1);
-
-    const detailedViewZoom = useSelector(getDetailedViewZoom);
-    const gridZoom = useSelector(getGridZoom);
 
     const showEmptyLinks = useSelector(getShowEmptyLinks);
     const showOperationColors = useSelector(getShowOperationColors);
@@ -81,31 +75,8 @@ export const GridSidebar: FC = () => {
     return (
         <div className='inner-sidebar'>
             <div className='inner-sidebar-wrap'>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label htmlFor='detailedViewZoom'>Detailed view zoom</label>
-                <Slider
-                    id='detailedViewZoom'
-                    min={0.5}
-                    max={1}
-                    stepSize={0.1}
-                    labelStepSize={1}
-                    value={detailedViewZoom}
-                    onChange={(value: number) => dispatch(updateDetailedViewZoom(value))}
-                    labelRenderer={(value) => `${value.toFixed(1)}`}
-                />
+                <ZoomControls />
 
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label htmlFor='gridZoom'>Zoom</label>
-                <Slider
-                    min={0.5}
-                    max={3}
-                    id='gridZoom'
-                    stepSize={0.25}
-                    labelStepSize={1}
-                    value={gridZoom}
-                    onChange={(value: number) => dispatch(updateGridZoom(value))}
-                    labelRenderer={(value) => `${value.toFixed(1)}`}
-                />
                 <hr />
                 {/* {chip?.hasPipes && ( */}
                 {/*     <> */}
