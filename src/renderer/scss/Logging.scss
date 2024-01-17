@@ -20,7 +20,10 @@
         margin: 0;
         flex-grow: 1;
         color: inherit;
-        white-space: break-spaces;
+        white-space: pre-wrap;
+        line-break: loose;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     &:nth-last-of-type(odd) { background-color: $tt-light-gray; }
