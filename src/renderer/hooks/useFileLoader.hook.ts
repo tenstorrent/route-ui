@@ -2,6 +2,7 @@ import { getAvailableGraphsSelector, getGraphNameSelector } from 'data/store/sel
 import { useSelector } from 'react-redux';
 import usePerfAnalyzerFileLoader from './usePerfAnalyzerFileLoader.hooks';
 import { GraphRelationshipState } from '../../data/StateTypes';
+import useLogging from './useLogging.hook';
 
 type FileLoaderHook = {
     selectedGraph: string;
@@ -10,6 +11,7 @@ type FileLoaderHook = {
 };
 
 const useFileLoader = (): FileLoaderHook => {
+    const logging = useLogging();
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
 
@@ -20,7 +22,7 @@ const useFileLoader = (): FileLoaderHook => {
             loadPerfAnalyzerGraph(name);
         } catch (err) {
             const error = err as Error;
-            console.error('error switching graphs/netlist', error.message);
+            logging.error(`error switching graphs/netlist ${error.message}`);
         }
     };
 
