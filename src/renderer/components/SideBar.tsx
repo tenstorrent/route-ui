@@ -19,12 +19,14 @@ import { parse } from 'yaml';
 import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import Chip from '../../data/Chip';
 import DataSource from '../../data/DataSource';
+import useLogging from '../hooks/useLogging.hook';
 
 export interface SideBarProps {
     updateData: (data: Chip) => void;
 }
 
 export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
+    const logging = useLogging();
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { chip } = useContext(DataSource);
@@ -56,7 +58,7 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
 
             fs.readFile(String(filelist), 'utf-8', (err, data) => {
                 if (err) {
-                    console.error(err);
+                    logging.error(err.message);
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
@@ -79,7 +81,7 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
                                 // console.log(JSON.stringify(data));
                                 break;
                             default:
-                                console.log('unknown file type');
+                                logging.log('Unknown file type. The accepted formats are .yaml and .json.');
                         }
                         if (filename.includes('op_to_pipe')) {
                             if (chip) {
@@ -99,7 +101,7 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
                             // console.log(JSON.stringify(parseOpDataFormat(json)));
                         }
                     } catch (error) {
-                        console.error(error);
+                        logging.error((error as Error).message);
                     }
                 });
             });

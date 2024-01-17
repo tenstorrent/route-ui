@@ -16,6 +16,7 @@ import path from 'path';
 import { useDispatch } from 'react-redux';
 import { sortNetlistAnalyzerFiles } from 'utils/FilenameSorters';
 import usePopulateChipData from './usePopulateChipData.hooks';
+import useLogging from './useLogging.hook';
 
 type NetlistAnalyzerFileLoaderHook = {
     handleSelectNetlistFile: () => Promise<void>;
@@ -27,6 +28,7 @@ type NetlistAnalyzerFileLoaderHook = {
 const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
     const dispatch = useDispatch();
     const { populateChipData } = usePopulateChipData();
+    const logging = useLogging();
 
     const selectFileDialog = () => {
         try {
@@ -39,7 +41,7 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
             return filename;
         } catch (err) {
             const error = err as Error;
-            console.error(error);
+            logging.error(`An error occurred selecting the file: ${error.message}`);
             alert(`An error occurred selecting the file: ${error.message}`);
             return null;
         }
@@ -54,7 +56,7 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
             dispatch(setSelectedFile(filename));
         } catch (err) {
             const error = err as Error;
-            console.error(error);
+            logging.error(`An error occurred reading the file: ${error.message}`);
             alert(`An error occurred reading the file: ${error.message}`);
         }
     };
