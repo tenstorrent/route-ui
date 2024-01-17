@@ -41,7 +41,7 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
             return filename;
         } catch (err) {
             const error = err as Error;
-            logging.error(error.message);
+            logging.error(`An error occurred selecting the file: ${error.message}`);
             alert(`An error occurred selecting the file: ${error.message}`);
             return null;
         }
@@ -56,7 +56,7 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
             dispatch(setSelectedFile(filename));
         } catch (err) {
             const error = err as Error;
-            logging.error(error.message);
+            logging.error(`An error occurred reading the file: ${error.message}`);
             alert(`An error occurred reading the file: ${error.message}`);
         }
     };

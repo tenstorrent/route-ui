@@ -46,7 +46,7 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
 
             fs.readFile(String(filelist), 'utf-8', (err, data) => {
                 if (err) {
-                    logger.error(err.message);
+                    logger.error(`An error occurred reading the file: ${err.message}`);
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
@@ -54,7 +54,7 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
                     try {
                         const json = JSON.parse(data);
                     } catch (error) {
-                        logger.error((error as Error).message);
+                        logger.error(`Error parsing JSON file: ${(error as Error).message}`);
                     }
                 });
             });

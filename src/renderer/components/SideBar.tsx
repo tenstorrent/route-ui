@@ -81,7 +81,7 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
                                 // console.log(JSON.stringify(data));
                                 break;
                             default:
-                                logging.log('unknown file type');
+                                logging.log('Unknown file type. The accepted formats are .yaml and .json.');
                         }
                         if (filename.includes('op_to_pipe')) {
                             if (chip) {
