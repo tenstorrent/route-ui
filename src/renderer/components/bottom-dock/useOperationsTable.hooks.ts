@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
+import { Operation } from '../../../data/GraphTypes';
 
 export enum SortingDirection {
     ASC = 'asc',
@@ -16,6 +17,7 @@ export interface OperationTableColumnDefinition {
 }
 
 export interface OpTableFields extends MeasurementDetails {
+    operation: Operation | null
     name: string;
     grid_size: number;
     core_id: string;

@@ -5,12 +5,14 @@ import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
 import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
-import SelectableOperation from '../SelectableOperation';
+import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import { GraphVertexType } from '../../../data/GraphNames';
+import { Operation } from '../../../data/GraphTypes';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -24,7 +26,6 @@ function OperationsTable() {
     const { selected, selectOperation, disabledOperation } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
 
-
     const resetOpTableDetails = () => {
         if (!chip) {
             return;
@@ -33,6 +34,7 @@ function OperationsTable() {
         setTableFields(
             [...chip.operations].map((op) => {
                 return {
+                    operation: op,
                     name: op.name,
                     ...op.details,
                     slowestOperandRef: op.slowestOperand,
@@ -73,14 +75,16 @@ function OperationsTable() {
         return (
             <Cell interactive className='table-cell-interactive table-operation-cell'>
                 {opName ? (
-                    <SelectableOperation
-                        disabled={disabledOperation(opName)}
-                        opName={opName}
-                        value={selected(opName)}
-                        selectFunc={selectOperation}
-                        stringFilter=''
-                        type={null}
-                    />
+                    <SelectableOperationPerformance operation={opTableFields[rowIndex].operation || null}>
+                        <SelectableOperation
+                            disabled={disabledOperation(opName)}
+                            opName={opName}
+                            value={selected(opName)}
+                            selectFunc={selectOperation}
+                            stringFilter=''
+                            type={GraphVertexType.OPERATION}
+                        />
+                    </SelectableOperationPerformance>
                 ) : (
                     ''
                 )}
@@ -196,14 +200,18 @@ function OperationsTable() {
                     ) : (
                         <Icon size={12} icon={IconNames.IMPORT} title={slowOpString} />
                     )}
-                    <SelectableOperation
-                        disabled={disabledOperation(slowestOperand.name)}
-                        opName={slowestOperand.name}
-                        value={selected(slowestOperand.name)}
-                        selectFunc={selectOperation}
-                        stringFilter=''
-                        type={null}
-                    />
+                    <SelectableOperationPerformance
+                        operation={slowestOperand.vertexType === GraphVertexType.OPERATION ? slowestOperand as Operation : null}
+                    >
+                        <SelectableOperation
+                            disabled={disabledOperation(slowestOperand.name)}
+                            opName={slowestOperand.name}
+                            value={selected(slowestOperand.name)}
+                            selectFunc={selectOperation}
+                            stringFilter=''
+                            type={slowestOperand.vertexType}
+                        />
+                    </SelectableOperationPerformance>
                     <Button
                         style={{ height: '18px' }}
                         small
