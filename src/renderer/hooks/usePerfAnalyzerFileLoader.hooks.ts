@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import { GraphRelationshipState } from '../../data/StateTypes';
+import useLogging from './useLogging.hook';
 
 type PerfAnalyzerFileLoaderHook = {
     loadPerfAnalyzerFolder: () => Promise<void>;
@@ -39,6 +40,7 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const [error, setError] = useState<string | null>(null);
     const [enableGraphSelect, setEnableGraphSelect] = useState(false);
+    const logging = useLogging();
 
     const selectFolderDialog = async (): Promise<string | null> => {
         const folderList = dialog.showOpenDialogSync({
@@ -71,7 +73,7 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
             setEnableGraphSelect(true);
         } catch (e) {
             const err = e as Error;
-            console.error('Failed to read graph names from folder:', err.message);
+            logging.error(`Failed to read graph names from folder: ${err.message}`);
             setError(err.message ?? 'Unknown Error');
         }
     };
@@ -89,11 +91,11 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
                 dispatch(setSelectedArchitecture(chip.architecture));
             } catch (e) {
                 const err = e as Error;
-                console.error('error loading and populating chip', err.message);
+                logging.error(`error loading and populating chip ${err.message}`);
                 setError(err.message ?? 'Unknown Error');
             }
         } else {
-            console.error('Attempted to load graph but no folder path was available');
+            logging.error('Attempted to load graph but no folder path was available');
         }
     };
 

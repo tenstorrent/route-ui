@@ -7,6 +7,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Button } from '@blueprintjs/core';
 import DataSource from '../../data/DataSource';
 import Chip from '../../data/Chip';
+import useLogging from '../hooks/useLogging.hook';
 
 interface OpsFileLoaderProps {
     updateData: (data: Chip) => void;
@@ -22,6 +23,7 @@ interface OpsFileLoaderProps {
  *
  */
 const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
+    const logger = useLogging();
     const navigate = useNavigate();
     const { setChip } = useContext(DataSource);
 
@@ -44,7 +46,7 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
 
             fs.readFile(String(filelist), 'utf-8', (err, data) => {
                 if (err) {
-                    console.error(err);
+                    logger.error(`An error occurred reading the file: ${err.message}`);
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
@@ -52,7 +54,7 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
                     try {
                         const json = JSON.parse(data);
                     } catch (error) {
-                        console.error(error);
+                        logger.error(`Error parsing JSON file: ${(error as Error).message}`);
                     }
                 });
             });
