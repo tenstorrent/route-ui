@@ -13,18 +13,18 @@ import {
     updateShowNodeLocation,
     updateShowOperationColors,
 } from 'data/store/slices/linkSaturation.slice';
-import Collapsible from './Collapsible';
+import Collapsible from '../Collapsible';
 import { CLKBandwidthControls } from './CLKBandwidthControls';
 import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
-} from '../../data/store/selectors/operationPerf.selectors';
+} from '../../../data/store/selectors/operationPerf.selectors';
 import {
     updateOperationPerformanceThreshold,
     updateShowOperationPerformanceGrid,
-} from '../../data/store/slices/operationPerf.slice';
-import { clearAllPipes, selectAllPipes } from '../../data/store/slices/pipeSelection.slice';
-import { clearAllOperations } from '../../data/store/slices/nodeSelection.slice';
+} from '../../../data/store/slices/operationPerf.slice';
+import { clearAllPipes, selectAllPipes } from '../../../data/store/slices/pipeSelection.slice';
+import { clearAllOperations } from '../../../data/store/slices/nodeSelection.slice';
 import {
     getDetailedViewZoom,
     getGridZoom,
@@ -35,11 +35,11 @@ import {
     getShowLinkSaturationNOC1,
     getShowNodeLocation,
     getShowOperationColors,
-} from '../../data/store/selectors/linkSaturation.selectors';
-import { NOC } from '../../data/Types';
-import { getHighContrastState } from '../../data/store/selectors/uiState.selectors';
-import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../utils/DrawingAPI';
-import DataSource, { GridContext } from '../../data/DataSource';
+} from '../../../data/store/selectors/linkSaturation.selectors';
+import { NOC } from '../../../data/Types';
+import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
+import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../../utils/DrawingAPI';
+import DataSource, { GridContext } from '../../../data/DataSource';
 
 export const GridSidebar: FC = () => {
     const { chip } = useContext<GridContext>(DataSource);

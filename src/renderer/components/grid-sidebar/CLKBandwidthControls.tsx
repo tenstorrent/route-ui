@@ -9,9 +9,9 @@ import {
     updatePCIBandwidth,
     updateTotalOPs,
 } from 'data/store/slices/linkSaturation.slice';
-import { RootState } from '../../data/store/createStore';
-import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../data/constants';
-import DataSource, { GridContext } from '../../data/DataSource';
+import { RootState } from '../../../data/store/createStore';
+import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
+import DataSource, { GridContext } from '../../../data/DataSource';
 
 interface DRAMBandwidthControlsProps {}
 

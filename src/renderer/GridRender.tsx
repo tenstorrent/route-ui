@@ -9,7 +9,7 @@ import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
 import { mapIterable } from '../utils/IterableHelpers';
-import { GridSidebar } from './components/GridSidebar';
+import { GridSidebar } from './components/grid-sidebar/GridSidebar';
 import {
     getDetailedViewZoom,
     getGridZoom,
