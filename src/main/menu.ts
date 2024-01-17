@@ -145,7 +145,6 @@ export default class MenuBuilder {
                     id: 'toggle-logging',
                     type: 'checkbox',
                     checked: false,
-                    enabled: false,
                     accelerator: 'Alt+Command+L',
                     click: (menuItem) => {
                         sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
@@ -271,7 +270,6 @@ export default class MenuBuilder {
                         id: 'toggle-logging',
                         type: 'checkbox',
                         checked: false,
-                        enabled: false,
                         accelerator: 'Alt+Ctrl+L',
                         click: (menuItem) => {
                             menuItem.checked = !menuItem.checked;

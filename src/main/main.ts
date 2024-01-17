@@ -15,8 +15,6 @@ import log from 'electron-log';
 // import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { listenToEventFromWindow } from './utils/bridge';
-import { ElectronEvents } from './ElectronEvents';
 
 class AppUpdater {
     constructor() {
@@ -105,15 +103,8 @@ const createWindow = async () => {
     });
 
     const menuBuilder = new MenuBuilder(mainWindow);
-    const menu = menuBuilder.buildMenu();
 
-    listenToEventFromWindow(ElectronEvents.ENABLE_LOGGING_MENU, (isEnabled: boolean) => {
-        const loggingMenu = menu.getMenuItemById('toggle-logging');
-
-        if (loggingMenu) {
-            loggingMenu.enabled = isEnabled;
-        }
-    });
+    menuBuilder.buildMenu();
 
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
