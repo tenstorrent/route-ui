@@ -8,8 +8,6 @@ import PropertiesPanel from './PropertiesPanel';
 import Chip from '../data/Chip';
 import { SideBar } from './components/SideBar';
 import BottomDock from './components/bottom-dock/BottomDock';
-import { sendEventToMain } from './utils/bridge';
-import { ElectronEvents } from '../main/ElectronEvents';
 
 export interface MainRouteRendererProps {
     updateData: (data: Chip) => void;
@@ -18,8 +16,6 @@ export interface MainRouteRendererProps {
 const MainRouteRenderer: React.FC<MainRouteRendererProps> = ({ updateData }) => {
     const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
     const isDetailedViewOpen = useSelector((state: RootState) => state.detailedView.isOpen);
-
-    sendEventToMain(ElectronEvents.ENABLE_LOGGING_MENU, true);
 
     return (
         <div
