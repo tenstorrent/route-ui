@@ -51,10 +51,15 @@ export interface LinkState {
 }
 
 export interface NetworkCongestionState {
-    linkSaturation: number;
+    linkSaturationTreshold: number;
     showLinkSaturation: boolean;
-    showNOC0: boolean;
-    showNOC1: boolean;
+    showLinkSaturationNOC0: boolean;
+    showLinkSaturationNOC1: boolean;
+    showEmptyLinks: boolean;
+    showOperationColors: boolean;
+    showNodeLocation: boolean;
+    gridZoom: number;
+    detailedViewZoom: number;
     links: Record<string, LinkState>;
     totalOps: number;
     CLKMHz: number;
