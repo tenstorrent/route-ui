@@ -1,0 +1,18 @@
+@import "variables";
+
+#splash-debug-panel {
+    display: grid;
+    place-items: stretch;
+    position: absolute;
+    inset: auto;
+    inset-block-end: 0;
+    inset-inline-end: 0;
+    width: clamp(300px, 50vw, 700px);
+    height: clamp(300px, 20vh, 500px);
+    margin: 10px;
+    overflow: hidden;
+
+    background-color: $tt-off-background;
+    border: thin solid $tt-medium-gray;
+    border-radius: 5px;
+}
