@@ -1,20 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Classes, NumericInput, Position, Slider, Switch } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
 import {
-    updateCLK,
-    updateDRAMBandwidth,
     updateLinkSaturation,
-    updatePCIBandwidth,
     updateShowLinkSaturation,
     updateShowLinkSaturationForNOC,
     updateTotalOPs,
 } from 'data/store/slices/linkSaturation.slice';
 import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import { clearAllPipes, selectAllPipes, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
-import { RootState } from 'data/store/createStore';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
 import DataSource, { GridContext } from '../data/DataSource';
@@ -23,17 +19,11 @@ import { calculateLinkCongestionColor, calculateOpCongestionColor, NODE_SIZE } f
 import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
-import {
-    AICLK_INITIAL_MHZ,
-    DRAM_BANDWIDTH_INITIAL_GBS,
-    LINK_SATURATION_INITIAIL_PERCENT,
-    PCIE_BANDWIDTH_INITIAL_GBS,
-} from '../data/constants';
+import { LINK_SATURATION_INITIAIL_PERCENT } from '../data/constants';
 import { NOC } from '../data/Types';
 import { mapIterable } from '../utils/IterableHelpers';
 import Collapsible from './components/Collapsible';
 import {
-    getMaxBwLimitedFactor,
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
 } from '../data/store/selectors/operationPerf.selectors';
@@ -41,6 +31,7 @@ import {
     updateOperationPerformanceThreshold,
     updateShowOperationPerformanceGrid,
 } from '../data/store/slices/operationPerf.slice';
+import { CLKBandwidthControls } from './components/CLKBandwidthControls';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -382,90 +373,3 @@ export default function GridRender() {
         </>
     );
 }
-
-interface DRAMBandwidthControlsProps {}
-
-const CLKBandwidthControls: React.FC<DRAMBandwidthControlsProps> = () => {
-    const dispatch = useDispatch();
-    const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
-    const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
-    const PCIeBandwidth = useSelector((state: RootState) => state.linkSaturation.PCIBandwidthGBs);
-    return (
-        <>
-            <label className={Classes.LABEL} htmlFor='clkMHzInput' style={{ marginBottom: '5px' }}>
-                AICLK (MHz)
-            </label>
-            <NumericInput
-                //
-                id='clkMHzInput'
-                value={clkMHz}
-                stepSize={10}
-                minorStepSize={1}
-                majorStepSize={100}
-                min={1}
-                onValueChange={(value) => {
-                    dispatch(updateCLK(value));
-                }}
-                rightElement={
-                    <Button
-                        minimal
-                        onClick={() => {
-                            dispatch(updateCLK(AICLK_INITIAL_MHZ));
-                        }}
-                        icon={IconNames.RESET}
-                    />
-                }
-            />
-            <br />
-            <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
-                DRAM channel BW (GB/s)
-            </label>
-            <NumericInput
-                //
-                id='dramBandwidthInput'
-                value={dramBandwidth}
-                stepSize={0.5}
-                minorStepSize={0.1}
-                majorStepSize={10}
-                min={0}
-                onValueChange={(value) => {
-                    dispatch(updateDRAMBandwidth(value));
-                }}
-                rightElement={
-                    <Button
-                        minimal
-                        onClick={() => {
-                            dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
-                        }}
-                        icon={IconNames.RESET}
-                    />
-                }
-            />
-            <br />
-            <label className={Classes.LABEL} htmlFor='pcieBandwidthInput' style={{ marginBottom: '5px' }}>
-                PCIe channel BW (GB/s)
-            </label>
-            <NumericInput
-                //
-                id='pcieBandwidthInput'
-                value={PCIeBandwidth}
-                stepSize={0.5}
-                minorStepSize={0.1}
-                majorStepSize={10}
-                min={0}
-                onValueChange={(value) => {
-                    dispatch(updatePCIBandwidth(value));
-                }}
-                rightElement={
-                    <Button
-                        minimal
-                        onClick={() => {
-                            dispatch(updatePCIBandwidth(PCIE_BANDWIDTH_INITIAL_GBS));
-                        }}
-                        icon={IconNames.RESET}
-                    />
-                }
-            />
-        </>
-    );
-};
