@@ -1,5 +1,5 @@
-import { Button, Classes, NumericInput, Position, Slider, Switch } from '@blueprintjs/core';
-import { FC, useContext, useState } from 'react';
+import { Button, Position, Slider, Switch } from '@blueprintjs/core';
+import { FC, useContext } from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconNames } from '@blueprintjs/icons';
@@ -12,7 +12,6 @@ import {
     updateShowLinkSaturationForNOC,
     updateShowNodeLocation,
     updateShowOperationColors,
-    updateTotalOPs,
 } from 'data/store/slices/linkSaturation.slice';
 import Collapsible from './Collapsible';
 import { CLKBandwidthControls } from './CLKBandwidthControls';
@@ -46,7 +45,6 @@ export const GridSidebar: FC = () => {
     const { chip } = useContext<GridContext>(DataSource);
     const hasPipes = chip?.hasPipes || false;
     const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor || 10;
-    const [opCycles, setOpCycles] = useState<number>(chip?.totalOpCycles || 0);
 
     const dispatch = useDispatch();
     const linkSaturationTreshold = useSelector(getLinkSaturation);
@@ -156,7 +154,6 @@ export const GridSidebar: FC = () => {
                 </Collapsible>
 
                 <Switch
-                    // checked={getShowOperationPerformanceGrid(useSelector((state: RootState) => state))}
                     checked={useSelector(getShowOperationPerformanceGrid)}
                     label='Op Perf'
                     onChange={(event) => dispatch(updateShowOperationPerformanceGrid(event.currentTarget.checked))}
@@ -270,60 +267,7 @@ export const GridSidebar: FC = () => {
                     </Collapsible>
                 )}
                 <Collapsible label='CLK Controls' isOpen>
-                    {
-                        <>
-                            {/* TODO: abstract this into a global state */}
-
-                            {opCycles !== 0 && (
-                                <>
-                                    <div>
-                                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                                        <label
-                                            className={Classes.LABEL}
-                                            htmlFor='opCyclesInput'
-                                            style={{ marginBottom: '5px' }}
-                                        >
-                                            AICLK cycles/input
-                                        </label>
-                                        <NumericInput
-                                            //
-                                            id='opCyclesInput'
-                                            value={opCycles}
-                                            stepSize={10000}
-                                            minorStepSize={100}
-                                            majorStepSize={100000}
-                                            min={1}
-                                            onValueChange={(value) => {
-                                                if (value === 0) {
-                                                    return;
-                                                }
-                                                if (Number.isNaN(value)) {
-                                                    return;
-                                                }
-                                                setOpCycles(value);
-                                                dispatch(updateTotalOPs(value));
-                                            }}
-                                            rightElement={
-                                                <Tooltip2 content='Reset Total OP Cycles'>
-                                                    <Button
-                                                        minimal
-                                                        onClick={() => {
-                                                            const resetValue = chip?.totalOpCycles || 0;
-                                                            setOpCycles(resetValue);
-                                                            dispatch(updateTotalOPs(resetValue));
-                                                        }}
-                                                        icon={IconNames.RESET}
-                                                    />
-                                                </Tooltip2>
-                                            }
-                                        />
-                                    </div>
-                                    <hr />
-                                </>
-                            )}
-                            <CLKBandwidthControls />
-                        </>
-                    }
+                    <CLKBandwidthControls />
                 </Collapsible>
             </div>
         </div>
