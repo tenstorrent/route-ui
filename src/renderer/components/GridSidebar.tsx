@@ -1,5 +1,5 @@
 import { Button, Classes, NumericInput, Position, Slider, Switch } from '@blueprintjs/core';
-import { FC } from 'react';
+import { FC, useContext, useState } from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconNames } from '@blueprintjs/icons';
@@ -33,25 +33,34 @@ import {
     getShowEmptyLinks,
     getShowLinkSaturation,
     getShowLinkSaturationNOC0,
+    getShowLinkSaturationNOC1,
+    getShowNodeLocation,
+    getShowOperationColors,
 } from '../../data/store/selectors/linkSaturation.selectors';
 import { NOC } from '../../data/Types';
 import { getHighContrastState } from '../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../utils/DrawingAPI';
+import DataSource, { GridContext } from '../../data/DataSource';
 
 export const GridSidebar: FC = () => {
+    const { chip } = useContext<GridContext>(DataSource);
+    const hasPipes = chip?.hasPipes || false;
+    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor || 10;
+    const [opCycles, setOpCycles] = useState<number>(chip?.totalOpCycles || 0);
+
     const dispatch = useDispatch();
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
 
     const showLinkSaturationNOC0 = useSelector(getShowLinkSaturationNOC0);
-    const showLinkSaturationNOC1 = useSelector(getShowLinkSaturationNOC0);
+    const showLinkSaturationNOC1 = useSelector(getShowLinkSaturationNOC1);
 
     const detailedViewZoom = useSelector(getDetailedViewZoom);
     const gridZoom = useSelector(getGridZoom);
 
     const showEmptyLinks = useSelector(getShowEmptyLinks);
-    const showOperationColors = useSelector(getShowOperationPerformanceGrid);
-    const showNodeLocation = useSelector(getShowOperationPerformanceGrid);
+    const showOperationColors = useSelector(getShowOperationColors);
+    const showNodeLocation = useSelector(getShowNodeLocation);
 
     const isHC: boolean = useSelector(getHighContrastState);
 
@@ -172,7 +181,7 @@ export const GridSidebar: FC = () => {
                 />
                 <hr />
 
-                {chip?.hasPipes && (
+                {hasPipes && (
                     <Collapsible
                         label='Congestion'
                         isOpen
