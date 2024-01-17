@@ -21,7 +21,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 AICLK (MHz)
             </label>
             <NumericInput
-                //
                 id='clkMHzInput'
                 value={clkMHz}
                 stepSize={10}
@@ -49,7 +48,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 DRAM channel BW (GB/s)
             </label>
             <NumericInput
-                //
                 id='dramBandwidthInput'
                 value={dramBandwidth}
                 stepSize={0.5}
@@ -76,7 +74,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 PCIe channel BW (GB/s)
             </label>
             <NumericInput
-                //
                 id='pcieBandwidthInput'
                 value={PCIeBandwidth}
                 stepSize={0.5}
