@@ -12,6 +12,7 @@ import {
 import { RootState } from '../../../data/store/createStore';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
 import DataSource, { GridContext } from '../../../data/DataSource';
+import Collapsible from '../Collapsible';
 
 interface DRAMBandwidthControlsProps {}
 
@@ -25,7 +26,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const [opCycles, setOpCycles] = useState<number>(chip?.totalOpCycles || 0);
 
     return (
-        <>
+        <Collapsible label='CLK Controls' isOpen>
             {opCycles !== 0 && (
                 <>
                     <div>
@@ -145,7 +146,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                     />
                 }
             />
-        </>
+        </Collapsible>
     );
 };
 
