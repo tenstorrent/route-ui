@@ -248,6 +248,7 @@ function OperationsTable() {
                 sortDirection,
                 sortingColumn,
                 nodesSelectionState.operations,
+                nodesSelectionState.nodeList,
                 tableFields,
                 coreView,
                 opTableFields,
