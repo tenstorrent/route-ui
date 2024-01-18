@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { recalculateLinkSaturation } from 'data/Chip';
 import { NetworkCongestionState, LinkState } from 'data/StateTypes';
-import { LinkType, NOC } from 'data/Types';
+import { LinkType } from 'data/Types';
 import {
     LINK_SATURATION_INITIAIL_PERCENT,
     AICLK_INITIAL_MHZ,
@@ -12,14 +12,6 @@ import {
 
 const networkCongestionInitialState: NetworkCongestionState = {
     linkSaturationTreshold: LINK_SATURATION_INITIAIL_PERCENT,
-    showLinkSaturation: false,
-    showLinkSaturationNOC0: true,
-    showLinkSaturationNOC1: true,
-    showEmptyLinks: false,
-    showOperationColors: false,
-    showNodeLocation: false,
-    gridZoom: 1,
-    detailedViewZoom: 1,
     links: {},
     totalOps: 0,
     CLKMHz: AICLK_INITIAL_MHZ,
@@ -33,32 +25,6 @@ const linkSaturationSlice = createSlice({
     reducers: {
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturationTreshold = action.payload;
-        },
-        updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
-            state.showLinkSaturation = action.payload;
-        },
-        updateShowLinkSaturationForNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
-            if (action.payload.noc === NOC.NOC0) {
-                state.showLinkSaturationNOC0 = action.payload.selected;
-            }
-            if (action.payload.noc === NOC.NOC1) {
-                state.showLinkSaturationNOC1 = action.payload.selected;
-            }
-        },
-        updateShowEmptyLinks: (state, action: PayloadAction<boolean>) => {
-            state.showEmptyLinks = action.payload;
-        },
-        updateShowOperationColors: (state, action: PayloadAction<boolean>) => {
-            state.showOperationColors = action.payload;
-        },
-        updateShowNodeLocation: (state, action: PayloadAction<boolean>) => {
-            state.showNodeLocation = action.payload;
-        },
-        updateGridZoom: (state, action: PayloadAction<number>) => {
-            state.gridZoom = action.payload;
-        },
-        updateDetailedViewZoom: (state, action: PayloadAction<number>) => {
-            state.detailedViewZoom = action.payload;
         },
         updateTotalOPs: (state, action: PayloadAction<number>) => {
             state.totalOps = action.payload;
@@ -124,13 +90,6 @@ export const {
     loadLinkData,
     updateTotalOPs,
     updateLinkSaturation,
-    updateShowLinkSaturation,
-    updateShowLinkSaturationForNOC,
-    updateShowEmptyLinks,
-    updateShowOperationColors,
-    updateShowNodeLocation,
-    updateGridZoom,
-    updateDetailedViewZoom,
     updateCLK,
     updateDRAMBandwidth,
     updatePCIBandwidth,

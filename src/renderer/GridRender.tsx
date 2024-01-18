@@ -13,12 +13,12 @@ import { GridSidebar } from './components/grid-sidebar/GridSidebar';
 import {
     getDetailedViewZoom,
     getGridZoom,
-    getLinkSaturation,
     getShowEmptyLinks,
     getShowLinkSaturation,
     getShowNodeLocation,
     getShowOperationColors,
-} from '../data/store/selectors/linkSaturation.selectors';
+} from '../data/store/selectors/uiState.selectors';
+import { getLinkSaturation } from '../data/store/selectors/linkSaturation.selectors';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);

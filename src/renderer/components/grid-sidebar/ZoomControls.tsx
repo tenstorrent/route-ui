@@ -1,8 +1,8 @@
 import { Slider } from '@blueprintjs/core';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateDetailedViewZoom, updateGridZoom } from '../../../data/store/slices/linkSaturation.slice';
-import { getDetailedViewZoom, getGridZoom } from '../../../data/store/selectors/linkSaturation.selectors';
+import { updateDetailedViewZoom, updateGridZoom } from '../../../data/store/slices/uiState.slice';
+import { getDetailedViewZoom, getGridZoom } from '../../../data/store/selectors/uiState.selectors';
 
 export const ZoomControls: FC = () => {
     const dispatch = useDispatch();

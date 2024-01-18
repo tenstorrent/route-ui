@@ -7,12 +7,12 @@ import {
     getShowEmptyLinks,
     getShowNodeLocation,
     getShowOperationColors,
-} from '../../../data/store/selectors/linkSaturation.selectors';
+} from '../../../data/store/selectors/uiState.selectors';
 import {
     updateShowEmptyLinks,
     updateShowNodeLocation,
     updateShowOperationColors,
-} from '../../../data/store/slices/linkSaturation.slice';
+} from '../../../data/store/slices/uiState.slice';
 
 export const GridControls: FC = () => {
     const dispatch = useDispatch();
