@@ -23,7 +23,8 @@ function OperationsTable() {
     const { operationsTableColumns, opTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable(tableFields);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-    const { selected, selectOperation, disabledOperation } = useSelectableGraphVertex();
+
+    const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
 
     const resetOpTableDetails = () => {
@@ -193,6 +194,7 @@ function OperationsTable() {
         const slowOpString = tableFields[rowIndex].slowest_operand;
         const slowestOperand = tableFields[rowIndex].slowestOperandRef;
         if (slowestOperand) {
+            const type: GraphVertexType = slowestOperand.vertexType;
             return (
                 <Cell className='table-cell-interactive table-operation-cell'>
                     {slowOpString.includes('output') ? (
@@ -201,13 +203,17 @@ function OperationsTable() {
                         <Icon size={12} icon={IconNames.IMPORT} title={slowOpString} />
                     )}
                     <SelectableOperationPerformance
-                        operation={slowestOperand.vertexType === GraphVertexType.OPERATION ? slowestOperand as Operation : null}
+                        operation={type === GraphVertexType.OPERATION ? (slowestOperand as Operation) : null}
                     >
                         <SelectableOperation
-                            disabled={disabledOperation(slowestOperand.name)}
+                            disabled={
+                                type === GraphVertexType.OPERATION
+                                    ? disabledOperation(slowestOperand.name)
+                                    : disabledQueue(slowestOperand.name)
+                            }
                             opName={slowestOperand.name}
                             value={selected(slowestOperand.name)}
-                            selectFunc={selectOperation}
+                            selectFunc={type === GraphVertexType.OPERATION ? selectOperation : selectQueue}
                             stringFilter=''
                             type={slowestOperand.vertexType}
                         />
@@ -248,6 +254,7 @@ function OperationsTable() {
                 sortDirection,
                 sortingColumn,
                 nodesSelectionState.operations,
+                nodesSelectionState.queues,
                 nodesSelectionState.nodeList,
                 tableFields,
                 coreView,
