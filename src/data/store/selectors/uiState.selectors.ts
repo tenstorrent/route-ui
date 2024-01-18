@@ -10,9 +10,9 @@ export const getApplicationMode = (state: RootState) => state.uiState.applicatio
 
 export const getShowLinkSaturation = (state: RootState) => state.uiState.showLinkSaturation;
 
-export const getShowLinkSaturationNOC0 = (state: RootState) => state.uiState.showLinkSaturationNOC0;
+export const getShowNOC0 = (state: RootState) => state.uiState.showNOC0;
 
-export const getShowLinkSaturationNOC1 = (state: RootState) => state.uiState.showLinkSaturationNOC1;
+export const getShowNOC1 = (state: RootState) => state.uiState.showNOC1;
 
 export const getShowEmptyLinks = (state: RootState) => state.uiState.showEmptyLinks;
 

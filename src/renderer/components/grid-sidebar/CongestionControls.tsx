@@ -17,8 +17,8 @@ import { clearAllOperations } from '../../../data/store/slices/nodeSelection.sli
 import {
     getHighContrastState,
     getShowLinkSaturation,
-    getShowLinkSaturationNOC0,
-    getShowLinkSaturationNOC1,
+    getShowNOC0,
+    getShowNOC1,
 } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../../utils/DrawingAPI';
 import DataSource, { GridContext } from '../../../data/DataSource';
@@ -26,7 +26,7 @@ import { NOC } from '../../../data/Types';
 import { getLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
 import Collapsible from '../Collapsible';
 import { updateLinkSaturation } from '../../../data/store/slices/linkSaturation.slice';
-import { updateShowLinkSaturation, updateShowLinkSaturationForNOC } from '../../../data/store/slices/uiState.slice';
+import { updateShowLinkSaturation, updateShowNOC } from '../../../data/store/slices/uiState.slice';
 
 export const CongestionControls: FC = () => {
     const { chip } = useContext<GridContext>(DataSource);
@@ -38,8 +38,8 @@ export const CongestionControls: FC = () => {
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
 
-    const showLinkSaturationNOC0 = useSelector(getShowLinkSaturationNOC0);
-    const showLinkSaturationNOC1 = useSelector(getShowLinkSaturationNOC1);
+    const showNOC0 = useSelector(getShowNOC0);
+    const showNOC1 = useSelector(getShowNOC1);
 
     const isHC: boolean = useSelector(getHighContrastState);
 
@@ -109,11 +109,11 @@ export const CongestionControls: FC = () => {
                             </Tooltip2>
                             <Switch
                                 disabled={!showLinkSaturation}
-                                checked={showLinkSaturationNOC0}
+                                checked={showNOC0}
                                 label='noc0'
                                 onChange={(event) =>
                                     dispatch(
-                                        updateShowLinkSaturationForNOC({
+                                        updateShowNOC({
                                             noc: NOC.NOC0,
                                             selected: event.currentTarget.checked,
                                         }),
@@ -122,11 +122,11 @@ export const CongestionControls: FC = () => {
                             />
                             <Switch
                                 disabled={!showLinkSaturation}
-                                checked={showLinkSaturationNOC1}
+                                checked={showNOC1}
                                 label='noc1'
                                 onChange={(event) =>
                                     dispatch(
-                                        updateShowLinkSaturationForNOC({
+                                        updateShowNOC({
                                             noc: NOC.NOC1,
                                             selected: event.currentTarget.checked,
                                         }),

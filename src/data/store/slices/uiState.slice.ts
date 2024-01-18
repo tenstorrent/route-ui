@@ -12,8 +12,8 @@ interface UIState {
     availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
     showLinkSaturation: boolean;
-    showLinkSaturationNOC0: boolean;
-    showLinkSaturationNOC1: boolean;
+    showNOC0: boolean;
+    showNOC1: boolean;
     showEmptyLinks: boolean;
     showOperationColors: boolean;
     showNodeLocation: boolean;
@@ -30,8 +30,8 @@ const uiStateInitialState: UIState = {
     availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
     showLinkSaturation: false,
-    showLinkSaturationNOC0: true,
-    showLinkSaturationNOC1: true,
+    showNOC0: true,
+    showNOC1: true,
     showEmptyLinks: false,
     showOperationColors: false,
     showNodeLocation: false,
@@ -77,12 +77,12 @@ const uiStateSlice = createSlice({
         updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
             state.showLinkSaturation = action.payload;
         },
-        updateShowLinkSaturationForNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
+        updateShowNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
             if (action.payload.noc === NOC.NOC0) {
-                state.showLinkSaturationNOC0 = action.payload.selected;
+                state.showNOC0 = action.payload.selected;
             }
             if (action.payload.noc === NOC.NOC1) {
-                state.showLinkSaturationNOC1 = action.payload.selected;
+                state.showNOC1 = action.payload.selected;
             }
         },
         updateShowEmptyLinks: (state, action: PayloadAction<boolean>) => {
@@ -116,7 +116,7 @@ export const {
     setApplicationMode,
     clearSelectedApplication,
     updateShowLinkSaturation,
-    updateShowLinkSaturationForNOC,
+    updateShowNOC,
     updateShowEmptyLinks,
     updateShowOperationColors,
     updateShowNodeLocation,
