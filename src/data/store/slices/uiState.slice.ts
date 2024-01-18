@@ -11,6 +11,13 @@ interface UIState {
     architecture: Architecture;
     availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
+    showEmptyLinks: boolean;
+    /** @deprecated Should be called operation names in the future */
+    showOperationColors: boolean;
+    // TODO: Rename to `snowNodeUID`
+    showNodeLocation: boolean;
+    gridZoom: number;
+    detailedViewZoom: number;
 }
 
 const uiStateInitialState: UIState = {
@@ -21,6 +28,11 @@ const uiStateInitialState: UIState = {
     architecture: Architecture.NONE,
     availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
+    showEmptyLinks: false,
+    showOperationColors: false,
+    showNodeLocation: false,
+    gridZoom: 1,
+    detailedViewZoom: 1,
 };
 
 const uiStateSlice = createSlice({
@@ -58,6 +70,21 @@ const uiStateSlice = createSlice({
         clearSelectedApplication(state) {
             state.applicationMode = ApplicationMode.NONE;
         },
+        updateShowEmptyLinks: (state, action: PayloadAction<boolean>) => {
+            state.showEmptyLinks = action.payload;
+        },
+        updateShowOperationColors: (state, action: PayloadAction<boolean>) => {
+            state.showOperationColors = action.payload;
+        },
+        updateShowNodeLocation: (state, action: PayloadAction<boolean>) => {
+            state.showNodeLocation = action.payload;
+        },
+        updateGridZoom: (state, action: PayloadAction<number>) => {
+            state.gridZoom = action.payload;
+        },
+        updateDetailedViewZoom: (state, action: PayloadAction<number>) => {
+            state.detailedViewZoom = action.payload;
+        },
     },
 });
 
@@ -73,4 +100,9 @@ export const {
     clearAvailableGraphs,
     setApplicationMode,
     clearSelectedApplication,
+    updateShowEmptyLinks,
+    updateShowOperationColors,
+    updateShowNodeLocation,
+    updateGridZoom,
+    updateDetailedViewZoom,
 } = uiStateSlice.actions;

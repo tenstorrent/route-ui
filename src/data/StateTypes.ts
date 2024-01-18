@@ -51,15 +51,15 @@ export interface LinkState {
 }
 
 export interface NetworkCongestionState {
-    linkSaturation: number;
-    showLinkSaturation: boolean;
-    showNOC0: boolean;
-    showNOC1: boolean;
+    linkSaturationTreshold: number;
     links: Record<string, LinkState>;
     totalOps: number;
     CLKMHz: number;
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;
+    showLinkSaturation: boolean;
+    showNOC0: boolean;
+    showNOC1: boolean;
 }
 
 export enum IoType {

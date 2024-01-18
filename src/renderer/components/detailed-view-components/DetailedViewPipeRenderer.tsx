@@ -25,12 +25,12 @@ type DetailedViewPipeRendererProps = {
 const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const showLinkSaturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturation);
-    const linkSaturationTreshold = useSelector((state: RootState) => state.linkSaturation.linkSaturation);
+    const linkSaturationTreshold = useSelector((state: RootState) => state.linkSaturation.linkSaturationTreshold);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
-    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
-    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
+    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturationNOC0);
+    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturationNOC1);
 
     // TODO: see if useLayoutEffect is better in a future
     useEffect(() => {
@@ -90,7 +90,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         noc1Saturation,
         isHighContrast,
     ]);
-    
+
     const linkNames = links.map((link) => link.name).join(' ');
     return (
         <div className='pipe-renderer' data-links={linkNames}>

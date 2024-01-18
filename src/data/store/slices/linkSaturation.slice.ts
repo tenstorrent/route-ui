@@ -11,15 +11,15 @@ import {
 } from 'data/constants';
 
 const networkCongestionInitialState: NetworkCongestionState = {
-    linkSaturation: LINK_SATURATION_INITIAIL_PERCENT,
-    showLinkSaturation: false,
-    showNOC0: true,
-    showNOC1: true,
+    linkSaturationTreshold: LINK_SATURATION_INITIAIL_PERCENT,
     links: {},
     totalOps: 0,
     CLKMHz: AICLK_INITIAL_MHZ,
     DRAMBandwidthGBs: DRAM_BANDWIDTH_INITIAL_GBS,
     PCIBandwidthGBs: PCIE_BANDWIDTH_INITIAL_GBS,
+    showLinkSaturation: false,
+    showNOC0: true,
+    showNOC1: true,
 };
 
 const linkSaturationSlice = createSlice({
@@ -27,18 +27,7 @@ const linkSaturationSlice = createSlice({
     initialState: networkCongestionInitialState,
     reducers: {
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
-            state.linkSaturation = action.payload;
-        },
-        updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
-            state.showLinkSaturation = action.payload;
-        },
-        updateShowLinkSaturationForNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
-            if (action.payload.noc === NOC.NOC0) {
-                state.showNOC0 = action.payload.selected;
-            }
-            if (action.payload.noc === NOC.NOC1) {
-                state.showNOC1 = action.payload.selected;
-            }
+            state.linkSaturationTreshold = action.payload;
         },
         updateTotalOPs: (state, action: PayloadAction<number>) => {
             state.totalOps = action.payload;
@@ -65,6 +54,17 @@ const linkSaturationSlice = createSlice({
         updatePCIBandwidth: (state, action: PayloadAction<number>) => {
             state.PCIBandwidthGBs = action.payload;
             updatePCILinks(state);
+        },
+        updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
+            state.showLinkSaturation = action.payload;
+        },
+        updateShowNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
+            if (action.payload.noc === NOC.NOC0) {
+                state.showNOC0 = action.payload.selected;
+            }
+            if (action.payload.noc === NOC.NOC1) {
+                state.showNOC1 = action.payload.selected;
+            }
         },
     },
 });
@@ -104,11 +104,11 @@ export const {
     loadLinkData,
     updateTotalOPs,
     updateLinkSaturation,
-    updateShowLinkSaturation,
-    updateShowLinkSaturationForNOC,
     updateCLK,
     updateDRAMBandwidth,
     updatePCIBandwidth,
+    updateShowLinkSaturation,
+    updateShowNOC,
 } = linkSaturationSlice.actions;
 
 export const linkSaturationReducer = linkSaturationSlice.reducer;
