@@ -80,17 +80,18 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         [
             'Slowest Operand',
             <div className='slowest-operand-render'>
-                {metrics?.type === OperandDirection.OUTPUT ? (
+                {metrics?.type === OperandDirection.OUTPUT && (
                     <Icon size={12} icon={IconNames.EXPORT} title={node.perfAnalyzerResults.slowest_operand} />
-                ) : (
+                )}
+                {metrics?.type === OperandDirection.INPUT && (
                     <Icon size={12} icon={IconNames.IMPORT} title={node.perfAnalyzerResults.slowest_operand} />
                 )}
-                {<span title={slowestOperand?.name}>{slowestOperand?.name}</span> || 'n/a'}
+                {slowestOperand?.name ? <span title={slowestOperand?.name}>{slowestOperand?.name}</span> : 'n/a'}
             </div>,
         ],
 
         ['Math utilisation', node.perfAnalyzerResults.bw_bound_math_utilization, '%'],
-        ['BW a / r', `${metrics?.actual || 'n/a'} / ${metrics?.required || 'n/a'}`],
+        ['BW a / r', slowestOperand?.name ? `${metrics?.actual || 'n/a'} / ${metrics?.required || 'n/a'}` : 'n/a'],
     ];
     return (
         <div className='core-runtime-metrics'>
