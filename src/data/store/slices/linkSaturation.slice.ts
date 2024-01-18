@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { recalculateLinkSaturation } from 'data/Chip';
 import { NetworkCongestionState, LinkState } from 'data/StateTypes';
-import { LinkType } from 'data/Types';
+import { LinkType, NOC } from 'data/Types';
 import {
     LINK_SATURATION_INITIAIL_PERCENT,
     AICLK_INITIAL_MHZ,
@@ -17,6 +17,9 @@ const networkCongestionInitialState: NetworkCongestionState = {
     CLKMHz: AICLK_INITIAL_MHZ,
     DRAMBandwidthGBs: DRAM_BANDWIDTH_INITIAL_GBS,
     PCIBandwidthGBs: PCIE_BANDWIDTH_INITIAL_GBS,
+    showLinkSaturation: false,
+    showNOC0: true,
+    showNOC1: true,
 };
 
 const linkSaturationSlice = createSlice({
@@ -51,6 +54,17 @@ const linkSaturationSlice = createSlice({
         updatePCIBandwidth: (state, action: PayloadAction<number>) => {
             state.PCIBandwidthGBs = action.payload;
             updatePCILinks(state);
+        },
+        updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
+            state.showLinkSaturation = action.payload;
+        },
+        updateShowNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
+            if (action.payload.noc === NOC.NOC0) {
+                state.showNOC0 = action.payload.selected;
+            }
+            if (action.payload.noc === NOC.NOC1) {
+                state.showNOC1 = action.payload.selected;
+            }
         },
     },
 });
@@ -93,6 +107,8 @@ export const {
     updateCLK,
     updateDRAMBandwidth,
     updatePCIBandwidth,
+    updateShowLinkSaturation,
+    updateShowNOC,
 } = linkSaturationSlice.actions;
 
 export const linkSaturationReducer = linkSaturationSlice.reducer;

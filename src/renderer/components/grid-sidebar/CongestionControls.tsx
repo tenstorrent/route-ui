@@ -14,19 +14,22 @@ import {
 } from '../../../data/store/slices/operationPerf.slice';
 import { clearAllPipes, selectAllPipes } from '../../../data/store/slices/pipeSelection.slice';
 import { clearAllOperations } from '../../../data/store/slices/nodeSelection.slice';
-import {
-    getHighContrastState,
-    getShowLinkSaturation,
-    getShowNOC0,
-    getShowNOC1,
-} from '../../../data/store/selectors/uiState.selectors';
+import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../../utils/DrawingAPI';
 import DataSource, { GridContext } from '../../../data/DataSource';
 import { NOC } from '../../../data/Types';
-import { getLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
+import {
+    getLinkSaturation,
+    getShowLinkSaturation,
+    getShowNOC0,
+    getShowNOC1,
+} from '../../../data/store/selectors/linkSaturation.selectors';
 import Collapsible from '../Collapsible';
-import { updateLinkSaturation } from '../../../data/store/slices/linkSaturation.slice';
-import { updateShowLinkSaturation, updateShowNOC } from '../../../data/store/slices/uiState.slice';
+import {
+    updateLinkSaturation,
+    updateShowLinkSaturation,
+    updateShowNOC,
+} from '../../../data/store/slices/linkSaturation.slice';
 
 export const CongestionControls: FC = () => {
     const { chip } = useContext<GridContext>(DataSource);

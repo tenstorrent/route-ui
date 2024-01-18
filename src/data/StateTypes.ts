@@ -57,6 +57,9 @@ export interface NetworkCongestionState {
     CLKMHz: number;
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;
+    showLinkSaturation: boolean;
+    showNOC0: boolean;
+    showNOC1: boolean;
 }
 
 export enum IoType {

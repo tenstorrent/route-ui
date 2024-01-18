@@ -14,11 +14,10 @@ import {
     getDetailedViewZoom,
     getGridZoom,
     getShowEmptyLinks,
-    getShowLinkSaturation,
     getShowNodeLocation,
     getShowOperationColors,
 } from '../data/store/selectors/uiState.selectors';
-import { getLinkSaturation } from '../data/store/selectors/linkSaturation.selectors';
+import { getLinkSaturation, getShowLinkSaturation } from '../data/store/selectors/linkSaturation.selectors';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);

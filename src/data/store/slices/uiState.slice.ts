@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ApplicationMode, Architecture, NOC } from 'data/Types';
+import { ApplicationMode, Architecture } from 'data/Types';
 import path from 'path';
 import { GraphRelationshipState } from '../../StateTypes';
 
@@ -11,11 +11,10 @@ interface UIState {
     architecture: Architecture;
     availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
-    showLinkSaturation: boolean;
-    showNOC0: boolean;
-    showNOC1: boolean;
     showEmptyLinks: boolean;
+    /** @deprecated Should be called operation names in the future */
     showOperationColors: boolean;
+    // TODO: Rename to `snowNodeUID`
     showNodeLocation: boolean;
     gridZoom: number;
     detailedViewZoom: number;
@@ -29,9 +28,6 @@ const uiStateInitialState: UIState = {
     architecture: Architecture.NONE,
     availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
-    showLinkSaturation: false,
-    showNOC0: true,
-    showNOC1: true,
     showEmptyLinks: false,
     showOperationColors: false,
     showNodeLocation: false,
@@ -74,17 +70,6 @@ const uiStateSlice = createSlice({
         clearSelectedApplication(state) {
             state.applicationMode = ApplicationMode.NONE;
         },
-        updateShowLinkSaturation: (state, action: PayloadAction<boolean>) => {
-            state.showLinkSaturation = action.payload;
-        },
-        updateShowNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
-            if (action.payload.noc === NOC.NOC0) {
-                state.showNOC0 = action.payload.selected;
-            }
-            if (action.payload.noc === NOC.NOC1) {
-                state.showNOC1 = action.payload.selected;
-            }
-        },
         updateShowEmptyLinks: (state, action: PayloadAction<boolean>) => {
             state.showEmptyLinks = action.payload;
         },
@@ -115,8 +100,6 @@ export const {
     clearAvailableGraphs,
     setApplicationMode,
     clearSelectedApplication,
-    updateShowLinkSaturation,
-    updateShowNOC,
     updateShowEmptyLinks,
     updateShowOperationColors,
     updateShowNodeLocation,
