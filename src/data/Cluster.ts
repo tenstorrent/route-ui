@@ -9,8 +9,10 @@ export class ClusterCoordinates {
 
     readonly y: number;
 
+    /** rack */
     readonly r: number;
 
+    /** shelf */
     readonly s: number;
 
     constructor([x, y, r, s]: [number, number, number, number]) {
