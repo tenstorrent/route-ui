@@ -12,8 +12,7 @@ interface UIState {
     availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
     showEmptyLinks: boolean;
-    /** @deprecated Should be called operation names in the future */
-    showOperationColors: boolean;
+    showOperationNames: boolean;
     // TODO: Rename to `snowNodeUID`
     showNodeLocation: boolean;
     gridZoom: number;
@@ -29,7 +28,7 @@ const uiStateInitialState: UIState = {
     availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
     showEmptyLinks: false,
-    showOperationColors: false,
+    showOperationNames: false,
     showNodeLocation: false,
     gridZoom: 1,
     detailedViewZoom: 1,
@@ -73,8 +72,8 @@ const uiStateSlice = createSlice({
         updateShowEmptyLinks: (state, action: PayloadAction<boolean>) => {
             state.showEmptyLinks = action.payload;
         },
-        updateShowOperationColors: (state, action: PayloadAction<boolean>) => {
-            state.showOperationColors = action.payload;
+        updateShowOperationNames: (state, action: PayloadAction<boolean>) => {
+            state.showOperationNames = action.payload;
         },
         updateShowNodeLocation: (state, action: PayloadAction<boolean>) => {
             state.showNodeLocation = action.payload;
@@ -101,7 +100,7 @@ export const {
     setApplicationMode,
     clearSelectedApplication,
     updateShowEmptyLinks,
-    updateShowOperationColors,
+    updateShowOperationNames,
     updateShowNodeLocation,
     updateGridZoom,
     updateDetailedViewZoom,

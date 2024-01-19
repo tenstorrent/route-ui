@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux';
 
 import { ComputeNode } from '../../../data/Chip';
 
-import { getShowOperationColors } from '../../../data/store/selectors/uiState.selectors';
+import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';
 import { getGroupColor } from '../../../data/ColorGenerator';
 import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
 import { RootState } from '../../../data/store/createStore';
 
 export const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
-    const showOperationColors = useSelector(getShowOperationColors);
+    const showOperationNames = useSelector(getShowOperationNames);
     const { data: selectedGroupData, selected = false } =
         useSelector((state: RootState) => getOperation(state, node.opName)) ?? {};
     const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
@@ -20,7 +20,7 @@ export const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
 
     return (
         node.opName !== '' &&
-        showOperationColors &&
+        showOperationNames &&
         selected &&
         shouldShowLabel && (
             <div
