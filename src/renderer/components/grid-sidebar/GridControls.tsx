@@ -38,10 +38,10 @@ export const GridControls: FC = () => {
                         onChange={(event) => dispatch(updateShowEmptyLinks(event.currentTarget.checked))}
                     />
                 </Tooltip2>
-                <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
+                <Tooltip2 content='Show all selected operation labels' position={Position.RIGHT}>
                     <Switch
                         checked={showOperationColors}
-                        label='operations'
+                        label='operation labels'
                         onChange={(event) => dispatch(updateShowOperationColors(event.currentTarget.checked))}
                     />
                 </Tooltip2>
