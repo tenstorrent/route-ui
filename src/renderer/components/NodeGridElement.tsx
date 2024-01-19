@@ -27,11 +27,11 @@ import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
 } from '../../data/store/selectors/operationPerf.selectors';
+import { NodeOperationLabel } from './node-grid/NodeOperationLabel';
 
 interface NodeGridElementProps {
     node: ComputeNode;
     showEmptyLinks: boolean;
-    showOperationColors: boolean;
     showNodeLocation: boolean;
     showLinkSaturation: boolean;
     linkSaturationTreshold: number;
@@ -41,7 +41,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     //
     node,
     showEmptyLinks,
-    showOperationColors,
     showNodeLocation,
     showLinkSaturation,
     linkSaturationTreshold,
@@ -91,15 +90,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             <QueueHighlightRenderer node={node} />
             <div className='node-border' />
             <div className='core-highlight' />
-            {node.opName !== '' && showOperationColors && (
-                <div className='op-color-swatch' style={{ backgroundColor: getGroupColor(node.opName) }} />
-            )}
-            {showNodeLocation && (
-                <div className='node-location'>
-                    {/* {node.loc.x},{node.loc.y} */}
-                    {node.uid}
-                </div>
-            )}
             <NodeFocusPipeRenderer node={node} />
             <NodePipeRenderer
                 node={node}
@@ -107,7 +97,14 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
                 showLinkSaturation={showLinkSaturation}
                 linkSaturationTreshold={linkSaturationTreshold}
             />
+            {showNodeLocation && (
+                <div className='node-location'>
+                    {/* {node.loc.x},{node.loc.y} */}
+                    {node.uid}
+                </div>
+            )}
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
+            <NodeOperationLabel node={node} />
         </button>
     );
 };

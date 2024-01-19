@@ -15,14 +15,12 @@ import {
     getGridZoom,
     getShowEmptyLinks,
     getShowNodeLocation,
-    getShowOperationColors,
 } from '../data/store/selectors/uiState.selectors';
 import { getLinkSaturation, getShowLinkSaturation } from '../data/store/selectors/linkSaturation.selectors';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
     const showEmptyLinks = useSelector(getShowEmptyLinks);
-    const showOperationColors = useSelector(getShowOperationColors);
     const showNodeLocation = useSelector(getShowNodeLocation);
     const gridZoom = useSelector(getGridZoom);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
@@ -57,7 +55,6 @@ export default function GridRender() {
                                         node={node}
                                         showEmptyLinks={showEmptyLinks}
                                         showNodeLocation={showNodeLocation}
-                                        showOperationColors={showOperationColors}
                                         showLinkSaturation={showLinkSaturation}
                                         linkSaturationTreshold={linkSaturationTreshold}
                                         key={node.uid}
