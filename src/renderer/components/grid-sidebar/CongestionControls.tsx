@@ -40,7 +40,9 @@ export const CongestionControls: FC = () => {
 
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
+    const operationPerformanceTreshold = useSelector(getOperationPerformanceTreshold);
 
+    const showOperationPerformanceGrid = useSelector(getShowOperationPerformanceGrid);
     const showNOC0 = useSelector(getShowNOC0);
     const showNOC1 = useSelector(getShowNOC1);
 
@@ -65,14 +67,14 @@ export const CongestionControls: FC = () => {
     return (
         <>
             <Switch
-                checked={useSelector(getShowOperationPerformanceGrid)}
+                checked={showOperationPerformanceGrid}
                 label='Op Perf'
                 onChange={(event) => dispatch(updateShowOperationPerformanceGrid(event.currentTarget.checked))}
             />
             <div
                 className='congestion-legend'
                 style={{
-                    ...(useSelector(getShowOperationPerformanceGrid) ? opCongestionLegendStyle : null),
+                    ...(showOperationPerformanceGrid ? opCongestionLegendStyle : null),
                     width: '100%',
                     height: '3px',
                 }}
@@ -81,9 +83,9 @@ export const CongestionControls: FC = () => {
                 className='link-saturation-slider'
                 min={0}
                 max={maxBwLimitedFactor || 10}
-                disabled={!useSelector(getShowOperationPerformanceGrid)}
-                labelStepSize={Math.max(5, maxBwLimitedFactor / 5)}
-                value={useSelector(getOperationPerformanceTreshold)}
+                disabled={!showOperationPerformanceGrid}
+                labelStepSize={maxBwLimitedFactor > 5 ? Math.max(5, maxBwLimitedFactor / 5) : 1}
+                value={Math.min(operationPerformanceTreshold, maxBwLimitedFactor)}
                 onChange={(value: number) => dispatch(updateOperationPerformanceThreshold(value))}
                 labelRenderer={(value) => `${value.toFixed(0)}`}
             />
