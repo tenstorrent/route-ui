@@ -137,7 +137,7 @@ const OperationCongestionLayer: React.FC<{ node: ComputeNode }> = ({ node }) => 
             </div>
         );
     }
-    return <div className='operation-congestion'></div>;
+    return <div className='operation-congestion' />;
 };
 
 interface DramModuleBorderProps {
@@ -327,8 +327,8 @@ const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
 
-    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturationNOC0);
-    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturationNOC1);
+    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
+    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
 
     svg.selectAll('*').remove();
     if (showEmptyLinks) {
