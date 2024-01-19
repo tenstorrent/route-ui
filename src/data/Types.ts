@@ -105,22 +105,6 @@ export enum ApplicationMode {
     PERF_UI = 'perf-ui',
 }
 
-/** cluster descriptor format
- * from clusterhack */
-export class ClusterCoordinates {
-    x: number;
-
-    y: number;
-
-    r: number;
-
-    s: number;
-
-    get coords(): [number, number, number, number] {
-        return [this.x, this.y, this.r, this.s];
-    }
-}
-
 export enum LogLevel {
     INFO = 'info',
     ERROR = 'error',

@@ -22,6 +22,8 @@ import fs, { Dirent } from 'fs';
 import path from 'path';
 import { parse } from 'yaml';
 import { GraphRelationshipState } from '../data/StateTypes';
+import { ClusterDescriptorJSON, DeviceDescriptorJSON } from '../data/sources/ClusterDescriptor';
+import Cluster from '../data/Cluster';
 
 export const readFile = async (filename: string): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -137,10 +139,23 @@ export const getAvailableGraphNames = async (perfResultsPath: string): Promise<G
     }
 
     return getAvailableGraphNamesFromNetlistAnalyzer(perfResultsPath);
+};
 
-    // const graphDescriptorsPath = path.join(perfResultsPath, 'graph_descriptor');
-    // const graphDirEntries = await readDirEntries(graphDescriptorsPath);
-    // return graphDirEntries.map((graphDirEntry) => graphDirEntry.name).filter((name) => !name.startsWith('.'));
+export const loadCluster = async (perfResultsPath: string): Promise<Cluster | null> => {
+    try {
+        const clusterDescFilePath = path.join(perfResultsPath, 'cluster_desc.yaml');
+        const clusterDescYaml = await readFile(clusterDescFilePath);
+        const clusterDescriptor = parse(clusterDescYaml) as ClusterDescriptorJSON;
+
+        const deviceDescFilePath = path.join(perfResultsPath, 'device_desc.yaml');
+        const deviceDescYaml = await readFile(deviceDescFilePath);
+        const deviceDescriptor = parse(deviceDescYaml) as DeviceDescriptorJSON;
+
+        return new Cluster(clusterDescriptor, deviceDescriptor);
+    } catch (err) {
+        console.error('Failed to read cluster_desc.yaml', err);
+    }
+    return null;
 };
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
@@ -240,7 +255,7 @@ const loadChipFromNetlistAnalyzer = async (
                     return chip;
                 }
             }
-        }else{
+        } else {
             console.error('Failed to read netlist analyzer file');
         }
     } catch (err) {
@@ -257,7 +272,9 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
 
     if (chip === null) {
         try {
-            const metadata = (await loadJsonFile(path.join(folderPath, 'perf_results', 'metadata', `${name}.json`))) as MetadataJSON;
+            const metadata = (await loadJsonFile(
+                path.join(folderPath, 'perf_results', 'metadata', `${name}.json`),
+            )) as MetadataJSON;
             const arch = metadata.arch_name;
             if (arch.includes(Architecture.GRAYSKULL)) {
                 architecture = Architecture.GRAYSKULL;
