@@ -12,7 +12,7 @@ import {
     setSelectedGraphName,
 } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAvailableGraphNames, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
+import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
 
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
@@ -76,6 +76,10 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
             logging.error(`Failed to read graph names from folder: ${err.message}`);
             setError(err.message ?? 'Unknown Error');
         }
+
+        const cluster = await loadCluster(folderPath);
+
+        console.log(cluster);
     };
 
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
