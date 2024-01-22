@@ -544,19 +544,21 @@ export const getNodeOpBorderStyles = (
     isSelected = false,
 ) => {
     const borderSize = 2;
+    const borderStyle = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+
     const newStyles: Partial<CSSStyleDeclaration> = { ...styles };
 
     if (border.left) {
-        newStyles.borderLeft = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+        newStyles.borderLeft = borderStyle;
     }
     if (border.right) {
-        newStyles.borderRight = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+        newStyles.borderRight = borderStyle;
     }
     if (border.top) {
-        newStyles.borderTop = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+        newStyles.borderTop = borderStyle;
     }
     if (border.bottom) {
-        newStyles.borderBottom = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+        newStyles.borderBottom = borderStyle;
     }
 
     return newStyles;
