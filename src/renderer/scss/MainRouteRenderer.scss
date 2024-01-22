@@ -213,7 +213,7 @@ $dock-height: 420px;
             &.core-highlight-input,
             &.core-highlight-output {
                 .core-highlight {
-                    $inset: 7px;
+                    $inset: 8px;
                     position: absolute;
                     top: $inset;
                     left: $inset;
@@ -224,13 +224,13 @@ $dock-height: 420px;
 
             &.core-highlight-input {
                 .core-highlight {
-                    border: 2px solid $core-highlight-inout;
+                    border: 2px dashed $core-highlight-inout;
                 }
             }
 
             &.core-highlight-output {
                 .core-highlight {
-                    border: 2px solid $core-highlight-output;
+                    border: 2px dashed $core-highlight-output;
                 }
             }
 
