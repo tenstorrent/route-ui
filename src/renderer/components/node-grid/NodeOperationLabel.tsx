@@ -23,11 +23,7 @@ export const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
         showOperationNames &&
         selected &&
         shouldShowLabel && (
-            <div
-                className='op-color-swatch'
-                style={{ backgroundColor: getGroupColor(node.opName) }}
-                title={node.opName}
-            >
+            <div className='op-label' style={{ backgroundColor: getGroupColor(node.opName) }} title={node.opName}>
                 {node.opName}
             </div>
         )
