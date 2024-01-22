@@ -461,11 +461,7 @@ export const drawNOCRouter = (
         .attr('stroke', '#9e9e9e');
 };
 
-export const calculateOpCongestionColor = (
-    value: number,
-    min: number = 0,
-    isHC: boolean = false,
-): string => {
+export const calculateOpCongestionColor = (value: number, min: number = 0, isHC: boolean = false): string => {
     const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
@@ -541,25 +537,32 @@ export const getOffChipCongestionStyles = (color: string): {} => {
     return { background: gradient };
 };
 
-export const getNodeOpStyles = (
-    styles: {},
+export const getNodeOpBorderStyles = (
+    styles: Partial<CSSStyleDeclaration>,
     color: string | undefined,
     border: { left: boolean; right: boolean; top: boolean; bottom: boolean },
-): {} => {
+    isSelected = false,
+) => {
     const borderSize = 2;
+    const newStyles: Partial<CSSStyleDeclaration> = { ...styles };
+
     if (border.left) {
-        styles = { ...styles, borderLeft: `${borderSize}px solid ${color}` };
+        newStyles.borderLeft = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
     }
     if (border.right) {
-        styles = { ...styles, borderRight: `${borderSize}px solid ${color}` };
+        newStyles.borderRight = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
     }
     if (border.top) {
-        styles = { ...styles, borderTop: `${borderSize}px solid ${color}` };
+        newStyles.borderTop = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
     }
     if (border.bottom) {
-        styles = { ...styles, borderBottom: `${borderSize}px solid ${color}` };
+        newStyles.borderBottom = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
     }
 
+    return newStyles;
+};
+
+export const getNodeOpBackgroundStyles = (styles: Partial<CSSStyleDeclaration>, color: string | undefined) => {
     const gradientColor = color?.replace(')', ', 0.25)').replace('rgb', 'rgba');
     const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
 

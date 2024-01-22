@@ -10,8 +10,7 @@ import { RootState } from '../../../data/store/createStore';
 
 export const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
     const showOperationNames = useSelector(getShowOperationNames);
-    const { data: selectedGroupData, selected = false } =
-        useSelector((state: RootState) => getOperation(state, node.opName)) ?? {};
+    const { data: selectedGroupData } = useSelector((state: RootState) => getOperation(state, node.opName)) ?? {};
     const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -21,7 +20,6 @@ export const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
     return (
         node.opName !== '' &&
         showOperationNames &&
-        selected &&
         shouldShowLabel && (
             <div className='op-label' style={{ backgroundColor: getGroupColor(node.opName) }} title={node.opName}>
                 {node.opName}

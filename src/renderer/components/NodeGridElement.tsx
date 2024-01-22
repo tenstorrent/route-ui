@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import { getDramGroup, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
-import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
+import { getHighContrastState, getShowOperationNames } from 'data/store/selectors/uiState.selectors';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { RootState } from 'data/store/createStore';
@@ -14,7 +14,8 @@ import {
     drawNOCRouter,
     drawSelections,
     getDramGroupingStyles,
-    getNodeOpStyles,
+    getNodeOpBackgroundStyles,
+    getNodeOpBorderStyles,
     getOffChipCongestionStyles,
     NOC_CONFIGURATION,
     NODE_SIZE,
@@ -252,12 +253,19 @@ const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
     //
 }) => {
     const selectedGroup = useSelector((state: RootState) => getOperation(state, node.opName));
+    const showOperationNames = useSelector(getShowOperationNames);
+
     let operationStyles = {};
-    if (node.opName !== '' && selectedGroup?.selected) {
+
+    if (node.opName !== '' && (selectedGroup?.selected || showOperationNames)) {
         const color = getGroupColor(node.opName);
         operationStyles = { borderColor: getGroupColor(node.opName) };
         const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
-        operationStyles = getNodeOpStyles(operationStyles, color, border);
+        operationStyles = getNodeOpBorderStyles(operationStyles, color, border, selectedGroup.selected);
+
+        if (selectedGroup.selected) {
+            operationStyles = getNodeOpBackgroundStyles(operationStyles, color);
+        }
     }
 
     return <div className='group-border' style={operationStyles} />;
