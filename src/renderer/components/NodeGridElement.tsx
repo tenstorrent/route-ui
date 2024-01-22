@@ -6,15 +6,15 @@ import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { RootState } from 'data/store/createStore';
 import { ComputeNode } from '../../data/Chip';
 import { HighlightType } from '../../data/Types';
-import { NodeOperationLabel } from './node-grid-elements-components/NodeOperationLabel';
-import { OperationCongestionLayer } from './node-grid-elements-components/OperationCongestionLayer';
-import { DramModuleBorder } from './node-grid-elements-components/DramModuleBorder';
-import { OffChipNodeLinkCongestionLayer } from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
-import { OperationGroupRender } from './node-grid-elements-components/OperationGroupRender';
-import { NodeFocusPipeRenderer } from './node-grid-elements-components/NodeFocusPipeRenderer';
-import { NodePipeRenderer } from './node-grid-elements-components/NodePipeRenderer';
-import { QueueHighlightRenderer } from './node-grid-elements-components/QueueHighlightRenderer';
-import { NodeLocation } from './node-grid-elements-components/NodeLocation';
+import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
+import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
+import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
+import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
+import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
+import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
+import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
+import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
+import NodeLocation from './node-grid-elements-components/NodeLocation';
 
 interface NodeGridElementProps {
     node: ComputeNode;

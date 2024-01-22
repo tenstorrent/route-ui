@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/Chip';
 import { getShowNodeLocation } from '../../../data/store/selectors/uiState.selectors';
 
-export const NodeLocation: FC<{ node: ComputeNode }> = ({ node }) => {
+const NodeLocation: FC<{ node: ComputeNode }> = ({ node }) => {
     const showNodeLocation = useSelector(getShowNodeLocation);
 
     return (

@@ -8,7 +8,7 @@ import { getGroupColor } from '../../../data/ColorGenerator';
 import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
 import { RootState } from '../../../data/store/createStore';
 
-export const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
+const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
     const showOperationNames = useSelector(getShowOperationNames);
     const { data: selectedGroupData } = useSelector((state: RootState) => getOperation(state, node.opName)) ?? {};
     const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];

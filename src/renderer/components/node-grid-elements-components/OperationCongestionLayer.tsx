@@ -10,7 +10,7 @@ import { getHighContrastState } from '../../../data/store/selectors/uiState.sele
 import { ComputeNodeType } from '../../../data/Types';
 import { calculateOpCongestionColor, toRGBA } from '../../../utils/DrawingAPI';
 
-export const OperationCongestionLayer: FC<{ node: ComputeNode }> = ({ node }) => {
+const OperationCongestionLayer: FC<{ node: ComputeNode }> = ({ node }) => {
     const render = useSelector((state: RootState) => getShowOperationPerformanceGrid(state));
     const threshold = useSelector((state: RootState) => getOperationPerformanceTreshold(state));
     const isHighContrast: boolean = useSelector(getHighContrastState);

@@ -20,7 +20,7 @@ interface NodePipeRendererProps {
     node: ComputeNode;
 }
 
-export const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
+const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
