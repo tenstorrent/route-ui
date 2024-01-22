@@ -14,7 +14,7 @@ interface OperationGroupRenderProps {
 /**
  * Adds a highlight layer to a Core node element when the core's operation ("operation group") is selected.
  */
-export const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
+const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
     const selectedGroup = useSelector((state: RootState) => getOperation(state, node.opName));
     const showOperationNames = useSelector(getShowOperationNames);
 

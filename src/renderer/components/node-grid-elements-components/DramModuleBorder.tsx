@@ -10,7 +10,7 @@ interface DramModuleBorderProps {
 }
 
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
-export const DramModuleBorder: FC<DramModuleBorderProps> = ({ node }) => {
+const DramModuleBorder: FC<DramModuleBorderProps> = ({ node }) => {
     const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannelId));
     let dramStyles = {};
 

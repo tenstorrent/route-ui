@@ -4,7 +4,7 @@ import { ComputeNode } from '../../../data/Chip';
 import { RootState } from '../../../data/store/createStore';
 import { getGroupColor } from '../../../data/ColorGenerator';
 
-export const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
+const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
     const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
     return (
         <div className='queue-highlighter-content'>

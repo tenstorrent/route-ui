@@ -10,7 +10,7 @@ interface NodeFocusPipeRendererProps {
     node: ComputeNode;
 }
 
-export const NodeFocusPipeRenderer: FC<NodeFocusPipeRendererProps> = ({ node }) => {
+const NodeFocusPipeRenderer: FC<NodeFocusPipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);

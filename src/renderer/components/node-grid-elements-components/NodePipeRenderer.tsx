@@ -2,7 +2,7 @@ import { FC, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import { ComputeNode } from '../../../data/Chip';
-import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
+import { getHighContrastState, getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
 import { RootState } from '../../../data/store/createStore';
 import { PipeSelection } from '../../../data/StateTypes';
 import {
@@ -14,23 +14,17 @@ import {
     drawSelections,
 } from '../../../utils/DrawingAPI';
 import { NOC, NOCLinkName } from '../../../data/Types';
+import { getLinkSaturation, getShowLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface NodePipeRendererProps {
     node: ComputeNode;
-    showEmptyLinks: boolean;
-    showLinkSaturation: boolean;
-    linkSaturationTreshold: number;
 }
 
-export const NodePipeRenderer: FC<NodePipeRendererProps> = ({
-    node,
-    showEmptyLinks,
-    showLinkSaturation,
-    linkSaturationTreshold,
-}) => {
+const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
+
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const selectedPipeIds = Object.values(allPipes)
@@ -40,10 +34,16 @@ export const NodePipeRenderer: FC<NodePipeRendererProps> = ({
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
 
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
+    const linkSaturationTreshold = useSelector(getLinkSaturation);
+
     const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
     const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
 
+    const showEmptyLinks = useSelector(getShowEmptyLinks);
+
     svg.selectAll('*').remove();
+
     if (showEmptyLinks) {
         drawLink(svg, NOCLinkName.NOC1_NORTH_OUT);
         drawLink(svg, NOCLinkName.NOC0_NORTH_IN);
