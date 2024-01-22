@@ -543,8 +543,7 @@ export const getNodeOpBorderStyles = (
     border: { left: boolean; right: boolean; top: boolean; bottom: boolean },
     isSelected = false,
 ) => {
-    const borderSize = 2;
-    const borderStyle = `${borderSize}px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+    const borderStyle = `2px ${isSelected ? 'solid' : 'dotted'} ${color}`;
 
     const newStyles: Partial<CSSStyleDeclaration> = { ...styles };
 
