@@ -201,6 +201,7 @@ $dock-height: 420px;
                     left: $inset;
                     bottom: $inset;
                     right: $inset;
+                    pointer-events: none;
                 }
 
                 &.detailed-view {
@@ -219,6 +220,7 @@ $dock-height: 420px;
                     left: $inset;
                     bottom: $inset;
                     right: $inset;
+                    pointer-events: none;
                 }
             }
 
