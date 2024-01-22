@@ -10,21 +10,11 @@ import { ComputeNode } from '../data/Chip';
 import DetailedView from './components/DetailedView';
 import { mapIterable } from '../utils/IterableHelpers';
 import { GridSidebar } from './components/grid-sidebar/GridSidebar';
-import {
-    getDetailedViewZoom,
-    getGridZoom,
-    getShowEmptyLinks,
-    getShowNodeLocation,
-} from '../data/store/selectors/uiState.selectors';
-import { getLinkSaturation, getShowLinkSaturation } from '../data/store/selectors/linkSaturation.selectors';
+import { getDetailedViewZoom, getGridZoom } from '../data/store/selectors/uiState.selectors';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
-    const showEmptyLinks = useSelector(getShowEmptyLinks);
-    const showNodeLocation = useSelector(getShowNodeLocation);
     const gridZoom = useSelector(getGridZoom);
-    const showLinkSaturation = useSelector(getShowLinkSaturation);
-    const linkSaturationTreshold = useSelector(getLinkSaturation);
     const detailedViewZoom = useSelector(getDetailedViewZoom);
 
     const dispatch = useDispatch();
@@ -50,16 +40,7 @@ export default function GridRender() {
                     >
                         {[
                             ...mapIterable(chip.nodes, (node: ComputeNode) => {
-                                return (
-                                    <NodeGridElement
-                                        node={node}
-                                        showEmptyLinks={showEmptyLinks}
-                                        showNodeLocation={showNodeLocation}
-                                        showLinkSaturation={showLinkSaturation}
-                                        linkSaturationTreshold={linkSaturationTreshold}
-                                        key={node.uid}
-                                    />
-                                );
+                                return <NodeGridElement node={node} key={node.uid} />;
                             }),
                         ]}
                     </div>

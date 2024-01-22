@@ -14,22 +14,13 @@ import { OperationGroupRender } from './node-grid-elements-components/OperationG
 import { NodeFocusPipeRenderer } from './node-grid-elements-components/NodeFocusPipeRenderer';
 import { NodePipeRenderer } from './node-grid-elements-components/NodePipeRenderer';
 import { QueueHighlightRenderer } from './node-grid-elements-components/QueueHighlightRenderer';
+import { NodeLocation } from './node-grid-elements-components/NodeLocation';
 
 interface NodeGridElementProps {
     node: ComputeNode;
-    showEmptyLinks: boolean;
-    showNodeLocation: boolean;
-    showLinkSaturation: boolean;
-    linkSaturationTreshold: number;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({
-    node,
-    showEmptyLinks,
-    showNodeLocation,
-    showLinkSaturation,
-    linkSaturationTreshold,
-}) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
@@ -66,27 +57,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             <OperationCongestionLayer node={node} />
             <OperationGroupRender node={node} />
             <DramModuleBorder node={node} />
-            <OffChipNodeLinkCongestionLayer
-                node={node}
-                showLinkSaturation={showLinkSaturation}
-                linkSaturationTreshold={linkSaturationTreshold}
-            />
+            <OffChipNodeLinkCongestionLayer node={node} />
             <QueueHighlightRenderer node={node} />
             <div className='node-border' />
             <div className='core-highlight' />
             <NodeFocusPipeRenderer node={node} />
-            <NodePipeRenderer
-                node={node}
-                showEmptyLinks={showEmptyLinks}
-                showLinkSaturation={showLinkSaturation}
-                linkSaturationTreshold={linkSaturationTreshold}
-            />
-            {showNodeLocation && (
-                <div className='node-location'>
-                    {/* {node.loc.x},{node.loc.y} */}
-                    {node.uid}
-                </div>
-            )}
+            <NodePipeRenderer node={node} />
+            <NodeLocation node={node} />
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
             <NodeOperationLabel node={node} />
         </button>

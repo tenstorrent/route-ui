@@ -5,23 +5,20 @@ import { getHighContrastState } from '../../../data/store/selectors/uiState.sele
 import { RootState } from '../../../data/store/createStore';
 import { ComputeNodeType } from '../../../data/Types';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
+import { getLinkSaturation, getShowLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;
-    showLinkSaturation: boolean;
-    linkSaturationTreshold: number;
 }
 
 /**
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
-export const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({
-    node,
-    showLinkSaturation,
-    linkSaturationTreshold,
-}) => {
+export const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node }) => {
     const linksData = useSelector((state: RootState) => state.linkSaturation.links);
     const isHighContrast = useSelector(getHighContrastState);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
+    const linkSaturationTreshold = useSelector(getLinkSaturation);
 
     if (!showLinkSaturation) {
         return null;
