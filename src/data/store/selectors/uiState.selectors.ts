@@ -10,7 +10,7 @@ export const getApplicationMode = (state: RootState) => state.uiState.applicatio
 
 export const getShowEmptyLinks = (state: RootState) => state.uiState.showEmptyLinks;
 
-export const getShowOperationColors = (state: RootState) => state.uiState.showOperationColors;
+export const getShowOperationNames = (state: RootState) => state.uiState.showOperationNames;
 
 export const getShowNodeLocation = (state: RootState) => state.uiState.showNodeLocation;
 

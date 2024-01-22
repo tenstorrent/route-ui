@@ -6,19 +6,19 @@ import Collapsible from '../Collapsible';
 import {
     getShowEmptyLinks,
     getShowNodeLocation,
-    getShowOperationColors,
+    getShowOperationNames,
 } from '../../../data/store/selectors/uiState.selectors';
 import {
     updateShowEmptyLinks,
     updateShowNodeLocation,
-    updateShowOperationColors,
+    updateShowOperationNames,
 } from '../../../data/store/slices/uiState.slice';
 
 export const GridControls: FC = () => {
     const dispatch = useDispatch();
 
     const showEmptyLinks = useSelector(getShowEmptyLinks);
-    const showOperationColors = useSelector(getShowOperationColors);
+    const showOperationNames = useSelector(getShowOperationNames);
     const showNodeLocation = useSelector(getShowNodeLocation);
 
     return (
@@ -38,11 +38,11 @@ export const GridControls: FC = () => {
                         onChange={(event) => dispatch(updateShowEmptyLinks(event.currentTarget.checked))}
                     />
                 </Tooltip2>
-                <Tooltip2 content='Show all operations colors' position={Position.RIGHT}>
+                <Tooltip2 content='Show all selected operation labels' position={Position.RIGHT}>
                     <Switch
-                        checked={showOperationColors}
-                        label='operations'
-                        onChange={(event) => dispatch(updateShowOperationColors(event.currentTarget.checked))}
+                        checked={showOperationNames}
+                        label='operation labels'
+                        onChange={(event) => dispatch(updateShowOperationNames(event.currentTarget.checked))}
                     />
                 </Tooltip2>
                 <Tooltip2 content='Show Compute Node locations' position={Position.RIGHT}>
