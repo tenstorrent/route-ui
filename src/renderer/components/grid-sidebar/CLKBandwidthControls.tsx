@@ -13,7 +13,7 @@ import { RootState } from '../../../data/store/createStore';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
 import DataSource, { GridContext } from '../../../data/DataSource';
 import Collapsible from '../Collapsible';
-import { ParsingErrors } from '../../../data/Parsing';
+import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
 import '../../scss/GridControls.scss';
 
@@ -41,7 +41,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
         </Tooltip2>
     );
 
-    if (chip?.hasParsingError(ParsingErrors.TOTAL_OP_CYCLES_IS_ZERO)) {
+    if (chip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
         aiclkRightElement = (
             <Tooltip2 content='Cycles per input cannot be 0'>
                 <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />

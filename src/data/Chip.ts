@@ -37,9 +37,9 @@ import {
 } from './sources/GraphDescriptor';
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
-import { MeasurementDetails, OperandDirection, OpPerfDetails } from './OpPerfDetails';
+import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
-import { ParsingError, ParsingErrors } from './Parsing';
+import { DataIntegrityErrorType, DataIntegrityError } from './DataIntegrity';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -273,11 +273,7 @@ export default class Chip {
         maxBwLimitedFactor: 0,
     };
 
-    private _parsingErrors: ParsingError[] = [];
-
-    public get parsingErrors() {
-        return this._parsingErrors;
-    }
+    private dataIntergrityErrors: DataIntegrityError[] = [];
 
     constructor(chipId: number) {
         this.chipId = chipId;
@@ -303,8 +299,8 @@ export default class Chip {
         chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
 
         if (chip.totalOpCycles === 0) {
-            chip.pushParsingError({
-                type: ParsingErrors.TOTAL_OP_CYCLES_IS_ZERO,
+            chip.addDataIntegrityError({
+                type: DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO,
                 message: 'Total OP Cycles is zero',
             });
         }
@@ -702,14 +698,6 @@ export default class Chip {
         return links;
     }
 
-    pushParsingError(error: ParsingError) {
-        this._parsingErrors.push(error);
-    }
-
-    hasParsingError(error: ParsingErrors): boolean {
-        return this._parsingErrors.some((e) => e.type === error);
-    }
-
     get allUniquePipes(): PipeSegment[] {
         if (!this.uniquePipeSegmentList.length) {
             this.uniquePipeSegmentList = [...this.pipes.values()]
@@ -725,6 +713,14 @@ export default class Chip {
                 });
         }
         return this.uniquePipeSegmentList;
+    }
+
+    addDataIntegrityError(error: DataIntegrityError) {
+        this.dataIntergrityErrors.push(error);
+    }
+
+    hasDataIntegrityError(type: DataIntegrityErrorType): boolean {
+        return this.dataIntergrityErrors.some((e) => e.type === type);
     }
 }
 
