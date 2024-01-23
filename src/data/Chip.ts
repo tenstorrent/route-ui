@@ -39,6 +39,7 @@ import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescrip
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { MeasurementDetails, OperandDirection, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
+import { ParsingError, ParsingErrors } from './Parsing';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -272,6 +273,12 @@ export default class Chip {
         maxBwLimitedFactor: 0,
     };
 
+    _parsingErrors: ParsingError[] = [];
+
+    public get parsingErrors() {
+        return this._parsingErrors;
+    }
+
     constructor(chipId: number) {
         this.chipId = chipId;
         this.operationsByName = new Map();
@@ -294,6 +301,15 @@ export default class Chip {
         }
 
         chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
+
+        if (chip.totalOpCycles === 0) {
+            chip.totalOpCycles = 1;
+
+            chip.pushParsingError({
+                type: ParsingErrors.TOTAL_OP_CYCLES_IS_ZERO,
+                message: 'Total OP Cycles is zero',
+            });
+        }
 
         if (data.dram_channels) {
             chip.dramChannels = data.dram_channels.map((dramChannel) => {
@@ -686,6 +702,14 @@ export default class Chip {
             });
         });
         return links;
+    }
+
+    pushParsingError(error: ParsingError) {
+        this._parsingErrors.push(error);
+    }
+
+    hasParsingError(error: ParsingErrors): boolean {
+        return this._parsingErrors.some((e) => e.type === error);
     }
 
     get allUniquePipes(): PipeSegment[] {
