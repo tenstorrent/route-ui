@@ -54,18 +54,31 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             }`}
             onClick={triggerSelection}
         >
-            <OperationCongestionLayer node={node} />
+            {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />
             <DramModuleBorder node={node} />
-            <OffChipNodeLinkCongestionLayer node={node} />
+
+            {/* Queues */}
             <QueueHighlightRenderer node={node} />
-            <div className='node-border' />
+
+            {/* Highlights and selections */}
             <div className='core-highlight' />
-            <NodeFocusPipeRenderer node={node} />
-            <NodePipeRenderer node={node} />
+            <div className='node-border' />
+
+            {/* Labels for location and operation */}
             <NodeLocation node={node} />
-            <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
             <NodeOperationLabel node={node} />
+
+            {/* Congestion information */}
+            <OperationCongestionLayer node={node} />
+            <OffChipNodeLinkCongestionLayer node={node} />
+
+            {/* Pipes */}
+            <NodePipeRenderer node={node} />
+            <NodeFocusPipeRenderer node={node} />
+
+            {/* Node type label */}
+            <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
         </button>
     );
 };
