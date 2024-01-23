@@ -303,8 +303,6 @@ export default class Chip {
         chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
 
         if (chip.totalOpCycles === 0) {
-            chip.totalOpCycles = 1;
-
             chip.pushParsingError({
                 type: ParsingErrors.TOTAL_OP_CYCLES_IS_ZERO,
                 message: 'Total OP Cycles is zero',
