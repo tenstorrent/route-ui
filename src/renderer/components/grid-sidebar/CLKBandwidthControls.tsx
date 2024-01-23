@@ -51,7 +51,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
 
     return (
         <Collapsible label='CLK Controls' isOpen>
-            {/* TODO: check if we should re-introduce the condition to hide AICLK and what default we should have */}
             <div>
                 {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
