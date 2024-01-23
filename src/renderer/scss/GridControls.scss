@@ -1,5 +1,12 @@
 @import 'variables';
 
-.warning-button svg {
-    fill: $tt-yellow !important;
+.warning-button {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+
+    svg {
+        fill: $tt-yellow !important;
+    }
 }

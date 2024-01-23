@@ -1,4 +1,4 @@
-import { Button, Classes, NumericInput } from '@blueprintjs/core';
+import { Button, Classes, Icon, NumericInput } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
 import { FC, useContext } from 'react';
@@ -44,7 +44,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     if (chip?.hasParsingError(ParsingErrors.TOTAL_OP_CYCLES_IS_ZERO)) {
         aiclkRightElement = (
             <Tooltip2 content='Cycles per input cannot be 0'>
-                <Button minimal icon={IconNames.WARNING_SIGN} className='warning-button' />
+                <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
             </Tooltip2>
         );
     }
