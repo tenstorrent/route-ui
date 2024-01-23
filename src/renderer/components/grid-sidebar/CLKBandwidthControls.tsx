@@ -13,6 +13,9 @@ import { RootState } from '../../../data/store/createStore';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
 import DataSource, { GridContext } from '../../../data/DataSource';
 import Collapsible from '../Collapsible';
+import { ParsingErrors } from '../../../data/Parsing';
+
+import '../../scss/GridControls.scss';
 
 interface DRAMBandwidthControlsProps {}
 
@@ -23,6 +26,28 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
     const PCIeBandwidth = useSelector((state: RootState) => state.linkSaturation.PCIBandwidthGBs);
     const opCycles = useSelector((state: RootState) => state.linkSaturation.totalOps);
+
+    let aiclkRightElement = (
+        <Tooltip2 content='Reset Total OP Cycles'>
+            <Button
+                minimal
+                onClick={() => {
+                    const resetValue = chip?.totalOpCycles || 1;
+
+                    dispatch(updateTotalOPs(resetValue));
+                }}
+                icon={IconNames.RESET}
+            />
+        </Tooltip2>
+    );
+
+    if (chip?.hasParsingError(ParsingErrors.TOTAL_OP_CYCLES_IS_ZERO)) {
+        aiclkRightElement = (
+            <Tooltip2 content='Cycles per input cannot be 0'>
+                <Button minimal icon={IconNames.WARNING_SIGN} className='warning-button' />
+            </Tooltip2>
+        );
+    }
 
     return (
         <Collapsible label='CLK Controls' isOpen>
@@ -52,19 +77,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
 
                         dispatch(updateTotalOPs(newValue));
                     }}
-                    rightElement={
-                        <Tooltip2 content='Reset Total OP Cycles'>
-                            <Button
-                                minimal
-                                onClick={() => {
-                                    const resetValue = chip?.totalOpCycles || 1;
-
-                                    dispatch(updateTotalOPs(resetValue));
-                                }}
-                                icon={IconNames.RESET}
-                            />
-                        </Tooltip2>
-                    }
+                    rightElement={aiclkRightElement}
                 />
             </div>
             <hr />
