@@ -37,8 +37,9 @@ import {
 } from './sources/GraphDescriptor';
 import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
-import { MeasurementDetails, OperandDirection, OpPerfDetails } from './OpPerfDetails';
+import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
+import { DataIntegrityErrorType, DataIntegrityError } from './DataIntegrity';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -272,6 +273,8 @@ export default class Chip {
         maxBwLimitedFactor: 0,
     };
 
+    private dataIntergrityErrors: DataIntegrityError[] = [];
+
     constructor(chipId: number) {
         this.chipId = chipId;
         this.operationsByName = new Map();
@@ -294,6 +297,13 @@ export default class Chip {
         }
 
         chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
+
+        if (chip.totalOpCycles === 0) {
+            chip.addDataIntegrityError({
+                type: DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO,
+                message: 'Total OP Cycles is zero',
+            });
+        }
 
         if (data.dram_channels) {
             chip.dramChannels = data.dram_channels.map((dramChannel) => {
@@ -703,6 +713,14 @@ export default class Chip {
                 });
         }
         return this.uniquePipeSegmentList;
+    }
+
+    addDataIntegrityError(error: DataIntegrityError) {
+        this.dataIntergrityErrors.push(error);
+    }
+
+    hasDataIntegrityError(type: DataIntegrityErrorType): boolean {
+        return this.dataIntergrityErrors.some((e) => e.type === type);
     }
 }
 

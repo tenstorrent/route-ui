@@ -1,0 +1,12 @@
+@import 'variables';
+
+.warning-button {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+
+    svg {
+        fill: $alert-color !important;
+    }
+}
