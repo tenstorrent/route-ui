@@ -1,7 +1,7 @@
 import { Button, Classes, NumericInput } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
-import { FC, useContext, useState } from 'react';
+import { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     updateCLK,
@@ -22,53 +22,52 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
     const PCIeBandwidth = useSelector((state: RootState) => state.linkSaturation.PCIBandwidthGBs);
-
-    const [opCycles, setOpCycles] = useState<number>(chip?.totalOpCycles || 0);
+    const opCycles = useSelector((state: RootState) => state.linkSaturation.totalOps);
 
     return (
         <Collapsible label='CLK Controls' isOpen>
-            {opCycles !== 0 && (
-                <>
-                    <div>
-                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                        <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
-                            AICLK cycles/input
-                        </label>
-                        <NumericInput
-                            id='opCyclesInput'
-                            value={opCycles}
-                            stepSize={10000}
-                            minorStepSize={100}
-                            majorStepSize={100000}
-                            min={1}
-                            onValueChange={(value) => {
-                                if (value === 0) {
-                                    return;
-                                }
-                                if (Number.isNaN(value)) {
-                                    return;
-                                }
-                                setOpCycles(value);
-                                dispatch(updateTotalOPs(value));
-                            }}
-                            rightElement={
-                                <Tooltip2 content='Reset Total OP Cycles'>
-                                    <Button
-                                        minimal
-                                        onClick={() => {
-                                            const resetValue = chip?.totalOpCycles || 0;
-                                            setOpCycles(resetValue);
-                                            dispatch(updateTotalOPs(resetValue));
-                                        }}
-                                        icon={IconNames.RESET}
-                                    />
-                                </Tooltip2>
-                            }
-                        />
-                    </div>
-                    <hr />
-                </>
-            )}
+            {/* TODO: check if we should re-introduce the condition to hide AICLK and what default we should have */}
+            <div>
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
+                    AICLK cycles/input
+                </label>
+                <NumericInput
+                    id='opCyclesInput'
+                    value={opCycles}
+                    stepSize={10000}
+                    minorStepSize={100}
+                    majorStepSize={100000}
+                    min={1}
+                    onValueChange={(value) => {
+                        let newValue = value;
+
+                        if (value === 0) {
+                            newValue = 1;
+                        }
+
+                        if (Number.isNaN(value)) {
+                            newValue = 1;
+                        }
+
+                        dispatch(updateTotalOPs(newValue));
+                    }}
+                    rightElement={
+                        <Tooltip2 content='Reset Total OP Cycles'>
+                            <Button
+                                minimal
+                                onClick={() => {
+                                    const resetValue = chip?.totalOpCycles || 1;
+
+                                    dispatch(updateTotalOPs(resetValue));
+                                }}
+                                icon={IconNames.RESET}
+                            />
+                        </Tooltip2>
+                    }
+                />
+            </div>
+            <hr />
 
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className={Classes.LABEL} htmlFor='clkMHzInput' style={{ marginBottom: '5px' }}>
@@ -82,7 +81,17 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 majorStepSize={100}
                 min={1}
                 onValueChange={(value) => {
-                    dispatch(updateCLK(value));
+                    let newValue = value;
+
+                    if (value === 0) {
+                        newValue = 1;
+                    }
+
+                    if (Number.isNaN(value)) {
+                        newValue = 1;
+                    }
+
+                    dispatch(updateCLK(newValue));
                 }}
                 rightElement={
                     <Button
@@ -108,7 +117,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 majorStepSize={10}
                 min={0}
                 onValueChange={(value) => {
-                    dispatch(updateDRAMBandwidth(value));
+                    let newValue = value;
+
+                    if (Number.isNaN(value)) {
+                        newValue = 0;
+                    }
+
+                    dispatch(updateDRAMBandwidth(newValue));
                 }}
                 rightElement={
                     <Button
@@ -134,7 +149,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 majorStepSize={10}
                 min={0}
                 onValueChange={(value) => {
-                    dispatch(updatePCIBandwidth(value));
+                    let newValue = value;
+
+                    if (Number.isNaN(value)) {
+                        newValue = 0;
+                    }
+
+                    dispatch(updatePCIBandwidth(newValue));
                 }}
                 rightElement={
                     <Button

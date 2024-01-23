@@ -100,7 +100,6 @@ const updatePCILinks = (state: NetworkCongestionState) => {
 };
 
 export const {
-    //
     loadLinkData,
     updateTotalOPs,
     updateLinkSaturation,
