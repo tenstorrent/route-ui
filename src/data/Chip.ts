@@ -273,7 +273,7 @@ export default class Chip {
         maxBwLimitedFactor: 0,
     };
 
-    _parsingErrors: ParsingError[] = [];
+    private _parsingErrors: ParsingError[] = [];
 
     public get parsingErrors() {
         return this._parsingErrors;
