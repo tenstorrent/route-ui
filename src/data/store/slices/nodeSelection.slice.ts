@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
+import { ComputeNodeState, ComputeNodeLocation, NodeSelectionState } from 'data/StateTypes';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
@@ -8,19 +8,38 @@ const nodesInitialState: NodeSelectionState = {
     dram: [],
 };
 
-const setBorders = (nodes: ComputeNodeState[]) => {
-    const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
+interface NeighborNodes {
+    top?: ComputeNodeLocation;
+    bottom?: ComputeNodeLocation;
+    left?: ComputeNodeLocation;
+    right?: ComputeNodeLocation;
+}
+
+function findSiblingNodeLocations(node: ComputeNodeState, nodes: ComputeNodeState[]): NeighborNodes {
+    const top = nodes
+        .filter((n) => n.loc.x === node.loc.x && n.loc.y <= node.loc.y - 1)
+        .sort((a, b) => b.loc.y - a.loc.y)[0]?.loc;
+    const bottom = nodes
+        .filter((n) => n.loc.x === node.loc.x && n.loc.y >= node.loc.y + 1)
+        .sort((a, b) => a.loc.y - b.loc.y)[0]?.loc;
+    const left = nodes
+        .filter((n) => n.loc.y === node.loc.y && n.loc.x <= node.loc.x - 1)
+        .sort((a, b) => b.loc.x - a.loc.x)[0]?.loc;
+    const right = nodes
+        .filter((n) => n.loc.y === node.loc.y && n.loc.x >= node.loc.x + 1)
+        .sort((a, b) => a.loc.x - b.loc.x)[0]?.loc;
+
+    return {
+        top,
+        bottom,
+        left,
+        right,
+    };
+}
+
+const setSiblings = (nodes: ComputeNodeState[]) => {
     nodes.forEach((node) => {
-        const leftLoc = { x: node.loc.x - 1, y: node.loc.y };
-        const rightLoc = { x: node.loc.x + 1, y: node.loc.y };
-        const topLoc = { x: node.loc.x, y: node.loc.y - 1 };
-        const bottomLoc = { x: node.loc.x, y: node.loc.y + 1 };
-        node.border = {
-            left: !locations.has(JSON.stringify(leftLoc)),
-            right: !locations.has(JSON.stringify(rightLoc)),
-            top: !locations.has(JSON.stringify(topLoc)),
-            bottom: !locations.has(JSON.stringify(bottomLoc)),
-        };
+        node.siblings = findSiblingNodeLocations(node, nodes);
     });
 };
 
@@ -33,6 +52,7 @@ const nodeSelectionSlice = createSlice({
             state.nodeList = {};
             state.dram = [];
             state.queues = {};
+
             action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
                 if (item.opName !== '') {
@@ -56,16 +76,20 @@ const nodeSelectionSlice = createSlice({
                     });
                 }
             });
+
             Object.values(state.operations).forEach((operation) => {
-                setBorders(operation.data);
+                setSiblings(operation.data);
             });
+
             Object.values(state.queues).forEach((queue) => {
-                setBorders(queue.data);
+                setSiblings(queue.data);
             });
+
             state.dram.forEach((dramElement) => {
-                setBorders(dramElement.data);
+                setSiblings(dramElement.data);
             });
         },
+
         updateNodeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
             const { id, selected } = action.payload;
             const node: ComputeNodeState | undefined = state.nodeList[id];
@@ -105,7 +129,7 @@ const nodeSelectionSlice = createSlice({
             Object.values(state.queues).forEach((queue) => {
                 queue.selected = false;
             });
-        }
+        },
     },
 });
 
