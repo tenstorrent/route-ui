@@ -10,6 +10,7 @@ import {
     PCIeLinkName,
 } from '../data/Types';
 import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../data/constants';
+import { ComputeNodeSiblings } from '../data/StateTypes';
 
 export const NODE_SIZE = 100;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
@@ -496,37 +497,35 @@ export const toRGBA = (rgb: string, alpha: number = 1): string => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 
-export const getDramGroupingStyles = (
-    border: {
-        left: boolean;
-        right: boolean;
-        top: boolean;
-        bottom: boolean;
-    },
-    colorOverride: string | undefined = undefined,
-): {} => {
-    const color = 'rgba(248,226,112,.25)';
-    const gradientColor = colorOverride || 'rgba(248,226,112,0.2)';
-    let dramStyles = {};
-    dramStyles = { borderColor: color };
-    const borderSize = 2;
-    if (border.left) {
-        dramStyles = { ...dramStyles, borderLeft: `${borderSize}px solid ${color}` };
+export const getDramGroupingStyles = (siblings: ComputeNodeSiblings, node: ComputeNode, colorOverride?: string) => {
+    const dramStyles: Partial<CSSStyleDeclaration & { [key in `--${string}`]: string }> = {
+        '--gradient-size': '6px',
+        '--gradient-color': colorOverride || 'rgba(248,226,112,0.2)',
+        background: `repeating-linear-gradient(
+            45deg,
+            var(--gradient-color),
+            var(--gradient-color) var(--gradient-size),
+            transparent var(--gradient-size),
+            transparent calc(var(--gradient-size) * 2)
+        )`,
+    };
+
+    const borderStyle = `2px solid rgba(248,226,112,.25)`;
+
+    if (!siblings.left || siblings.left.x < node.loc.x - 1) {
+        dramStyles.borderLeft = borderStyle;
     }
-    if (border.right) {
-        dramStyles = { ...dramStyles, borderRight: `${borderSize}px solid ${color}` };
+    if (!siblings.right || siblings.right.x > node.loc.x + 1) {
+        dramStyles.borderRight = borderStyle;
     }
-    if (border.top) {
-        dramStyles = { ...dramStyles, borderTop: `${borderSize}px solid ${color}` };
+    if (!siblings.top || siblings.top.y < node.loc.y - 1) {
+        dramStyles.borderTop = borderStyle;
     }
-    if (border.bottom) {
-        dramStyles = { ...dramStyles, borderBottom: `${borderSize}px solid ${color}` };
+    if (!siblings.bottom || siblings.bottom.y > node.loc.y + 1) {
+        dramStyles.borderBottom = borderStyle;
     }
-    const gradientSize = 6;
-    const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${
-        gradientSize * 2
-    }px)`;
-    return { ...dramStyles, background: gradient };
+
+    return dramStyles;
 };
 export const getOffChipCongestionStyles = (color: string): {} => {
     const gradientColor = color;
@@ -537,27 +536,57 @@ export const getOffChipCongestionStyles = (color: string): {} => {
     return { background: gradient };
 };
 
-export const getNodeOpBorderStyles = (
-    styles: Partial<CSSStyleDeclaration>,
-    color: string | undefined,
-    border: { left: boolean; right: boolean; top: boolean; bottom: boolean },
+export const getNodeOpBorderStyles = ({
+    node,
+    styles,
+    color,
+    siblings,
     isSelected = false,
-) => {
-    const borderStyle = `2px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+}: {
+    node: ComputeNode;
+    siblings: ComputeNodeSiblings;
+    styles: Partial<CSSStyleDeclaration>;
+    color: string | undefined;
+    isSelected: boolean;
+}) => {
+    const newStyles: Partial<CSSStyleDeclaration & { [key in `--${string}`]: string }> = {
+        '--border-size': '2px',
+        ...styles,
+    };
 
-    const newStyles: Partial<CSSStyleDeclaration> = { ...styles };
+    const borderStyle = `var(--border-size) ${isSelected ? 'solid' : 'dotted'} ${color}`;
+    const borderDistantStyle = `var(--border-size) dashed ${color}`;
 
-    if (border.left) {
+    if (!siblings.left) {
         newStyles.borderLeft = borderStyle;
     }
-    if (border.right) {
+
+    if (siblings.left && siblings.left.x < node.loc.x - 1) {
+        newStyles.borderLeft = borderDistantStyle;
+    }
+
+    if (!siblings.right) {
         newStyles.borderRight = borderStyle;
     }
-    if (border.top) {
+
+    if (siblings.right && siblings.right.x > node.loc.x + 1) {
+        newStyles.borderRight = borderDistantStyle;
+    }
+
+    if (!siblings.top) {
         newStyles.borderTop = borderStyle;
     }
-    if (border.bottom) {
+
+    if (siblings.top && siblings.top.y < node.loc.y - 1) {
+        newStyles.borderTop = borderDistantStyle;
+    }
+
+    if (!siblings.bottom) {
         newStyles.borderBottom = borderStyle;
+    }
+
+    if (siblings.bottom && siblings.bottom.y > node.loc.y + 1) {
+        newStyles.borderBottom = borderDistantStyle;
     }
 
     return newStyles;
