@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ComputeNodeState, ComputeNodeLocation, NodeSelectionState } from 'data/StateTypes';
+import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
@@ -8,14 +8,7 @@ const nodesInitialState: NodeSelectionState = {
     dram: [],
 };
 
-interface NeighborNodes {
-    top?: ComputeNodeLocation;
-    bottom?: ComputeNodeLocation;
-    left?: ComputeNodeLocation;
-    right?: ComputeNodeLocation;
-}
-
-function findSiblingNodeLocations(node: ComputeNodeState, nodes: ComputeNodeState[]): NeighborNodes {
+const findSiblingNodeLocations = (node: ComputeNodeState, nodes: ComputeNodeState[]) => {
     const top = nodes
         .filter((n) => n.loc.x === node.loc.x && n.loc.y <= node.loc.y - 1)
         .sort((a, b) => b.loc.y - a.loc.y)[0]?.loc;
@@ -35,7 +28,7 @@ function findSiblingNodeLocations(node: ComputeNodeState, nodes: ComputeNodeStat
         left,
         right,
     };
-}
+};
 
 const setSiblings = (nodes: ComputeNodeState[]) => {
     nodes.forEach((node) => {
