@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { type CSSProperties, FC } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/Chip';
 import { RootState } from '../../../data/store/createStore';
@@ -18,13 +18,19 @@ const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
     const selectedGroup = useSelector((state: RootState) => getOperation(state, node.opName));
     const showOperationNames = useSelector(getShowOperationNames);
 
-    let operationStyles = {};
+    let operationStyles: CSSProperties = {};
 
-    if (node.opName !== '' && (selectedGroup?.selected || showOperationNames)) {
+    if (node.opName !== '' && selectedGroup && (selectedGroup?.selected || showOperationNames)) {
         const color = getGroupColor(node.opName);
         operationStyles = { borderColor: getGroupColor(node.opName) };
-        const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
-        operationStyles = getNodeOpBorderStyles(operationStyles, color, border, selectedGroup.selected);
+        const siblings = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.siblings;
+        operationStyles = getNodeOpBorderStyles({
+            node,
+            styles: operationStyles,
+            color,
+            siblings,
+            isSelected: selectedGroup.selected,
+        });
 
         if (selectedGroup.selected) {
             operationStyles = getNodeOpBackgroundStyles(operationStyles, color);

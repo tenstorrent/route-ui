@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
@@ -10,6 +12,7 @@ import {
     PCIeLinkName,
 } from '../data/Types';
 import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../data/constants';
+import { ComputeNodeSiblings } from '../data/StateTypes';
 
 export const NODE_SIZE = 100;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
@@ -537,33 +540,46 @@ export const getOffChipCongestionStyles = (color: string): {} => {
     return { background: gradient };
 };
 
-export const getNodeOpBorderStyles = (
-    styles: Partial<CSSStyleDeclaration>,
-    color: string | undefined,
-    border: { left: boolean; right: boolean; top: boolean; bottom: boolean },
+export const getNodeOpBorderStyles = ({
+    node,
+    styles,
+    color,
+    siblings,
     isSelected = false,
-) => {
-    const borderStyle = `2px ${isSelected ? 'solid' : 'dotted'} ${color}`;
+}: {
+    node: ComputeNode;
+    siblings: ComputeNodeSiblings;
+    styles: CSSProperties;
+    color: string | undefined;
+    isSelected: boolean;
+}) => {
+    const newStyles: CSSProperties & { [key in `--${string}`]: string } = {
+        '--node-op-border-size': '2px',
+        ...styles,
+    };
 
-    const newStyles: Partial<CSSStyleDeclaration> = { ...styles };
+    const borderStyle = `var(--node-op-border-size) ${isSelected ? 'solid' : 'dashed'} ${color}`;
 
-    if (border.left) {
+    if (!siblings.left) {
         newStyles.borderLeft = borderStyle;
     }
-    if (border.right) {
+
+    if (!siblings.right) {
         newStyles.borderRight = borderStyle;
     }
-    if (border.top) {
+
+    if (!siblings.top) {
         newStyles.borderTop = borderStyle;
     }
-    if (border.bottom) {
+
+    if (!siblings.bottom) {
         newStyles.borderBottom = borderStyle;
     }
 
     return newStyles;
 };
 
-export const getNodeOpBackgroundStyles = (styles: Partial<CSSStyleDeclaration>, color: string | undefined) => {
+export const getNodeOpBackgroundStyles = (styles: CSSProperties, color: string | undefined) => {
     const gradientColor = color?.replace(')', ', 0.25)').replace('rgb', 'rgba');
     const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
 
