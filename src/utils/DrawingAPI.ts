@@ -501,14 +501,14 @@ export const toRGBA = (rgb: string, alpha: number = 1): string => {
 
 export const getDramGroupingStyles = (siblings: ComputeNodeSiblings, node: ComputeNode, colorOverride?: string) => {
     const dramStyles: CSSProperties & { [key in `--${string}`]: string } = {
-        '--gradient-size': '6px',
-        '--gradient-color': colorOverride || 'rgba(248,226,112,0.2)',
+        '--dram-gradient-stripes-size': '6px',
+        '--dram-gradient-stripes-color': colorOverride || 'rgba(248,226,112,0.2)',
         background: `repeating-linear-gradient(
             45deg,
-            var(--gradient-color),
-            var(--gradient-color) var(--gradient-size),
-            transparent var(--gradient-size),
-            transparent calc(var(--gradient-size) * 2)
+            var(--dram-gradient-stripes-color),
+            var(--dram-gradient-stripes-color) var(--dram-gradient-stripes-size),
+            transparent var(--dram-gradient-stripes-size),
+            transparent calc(var(--dram-gradient-stripes-size) * 2)
         )`,
     };
 
