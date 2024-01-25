@@ -36,6 +36,13 @@ export interface ComputeNodeState extends NodeSelection {
     loc: ComputeNodeLocation;
     opName: string;
     siblings: ComputeNodeSiblings;
+    /** @deprecated Keeping only for compatibility with DRAM logic */
+    border?: {
+        left: boolean;
+        right: boolean;
+        top: boolean;
+        bottom: boolean;
+    };
     queueNameList: string[];
     dramChannelId: number | -1;
     dramSubchannelId: number | -1;

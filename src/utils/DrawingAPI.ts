@@ -499,35 +499,37 @@ export const toRGBA = (rgb: string, alpha: number = 1): string => {
     return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 
-export const getDramGroupingStyles = (siblings: ComputeNodeSiblings, node: ComputeNode, colorOverride?: string) => {
-    const dramStyles: CSSProperties & { [key in `--${string}`]: string } = {
-        '--dram-gradient-stripes-size': '6px',
-        '--dram-gradient-stripes-color': colorOverride || 'rgba(248,226,112,0.2)',
-        background: `repeating-linear-gradient(
-            45deg,
-            var(--dram-gradient-stripes-color),
-            var(--dram-gradient-stripes-color) var(--dram-gradient-stripes-size),
-            transparent var(--dram-gradient-stripes-size),
-            transparent calc(var(--dram-gradient-stripes-size) * 2)
-        )`,
-    };
-
-    const borderStyle = `2px solid rgba(248,226,112,.25)`;
-
-    if (!siblings.left || siblings.left.x < node.loc.x - 1) {
-        dramStyles.borderLeft = borderStyle;
+export const getDramGroupingStyles = (
+    border: {
+        left: boolean;
+        right: boolean;
+        top: boolean;
+        bottom: boolean;
+    },
+    colorOverride: string | undefined = undefined,
+): {} => {
+    const color = 'rgba(248,226,112,.25)';
+    const gradientColor = colorOverride || 'rgba(248,226,112,0.2)';
+    let dramStyles = {};
+    dramStyles = { borderColor: color };
+    const borderSize = 2;
+    if (border.left) {
+        dramStyles = { ...dramStyles, borderLeft: `${borderSize}px solid ${color}` };
     }
-    if (!siblings.right || siblings.right.x > node.loc.x + 1) {
-        dramStyles.borderRight = borderStyle;
+    if (border.right) {
+        dramStyles = { ...dramStyles, borderRight: `${borderSize}px solid ${color}` };
     }
-    if (!siblings.top || siblings.top.y < node.loc.y - 1) {
-        dramStyles.borderTop = borderStyle;
+    if (border.top) {
+        dramStyles = { ...dramStyles, borderTop: `${borderSize}px solid ${color}` };
     }
-    if (!siblings.bottom || siblings.bottom.y > node.loc.y + 1) {
-        dramStyles.borderBottom = borderStyle;
+    if (border.bottom) {
+        dramStyles = { ...dramStyles, borderBottom: `${borderSize}px solid ${color}` };
     }
-
-    return dramStyles;
+    const gradientSize = 6;
+    const gradient = `repeating-linear-gradient(45deg, ${gradientColor}, ${gradientColor} ${gradientSize}px, transparent ${gradientSize}px, transparent ${
+        gradientSize * 2
+    }px)`;
+    return { ...dramStyles, background: gradient };
 };
 export const getOffChipCongestionStyles = (color: string): {} => {
     const gradientColor = color;

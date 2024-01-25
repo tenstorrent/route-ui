@@ -36,6 +36,22 @@ const setSiblings = (nodes: ComputeNodeState[]) => {
     });
 };
 
+const setBorders = (nodes: ComputeNodeState[]) => {
+    const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
+    nodes.forEach((node) => {
+        const leftLoc = { x: node.loc.x - 1, y: node.loc.y };
+        const rightLoc = { x: node.loc.x + 1, y: node.loc.y };
+        const topLoc = { x: node.loc.x, y: node.loc.y - 1 };
+        const bottomLoc = { x: node.loc.x, y: node.loc.y + 1 };
+        node.border = {
+            left: !locations.has(JSON.stringify(leftLoc)),
+            right: !locations.has(JSON.stringify(rightLoc)),
+            top: !locations.has(JSON.stringify(topLoc)),
+            bottom: !locations.has(JSON.stringify(bottomLoc)),
+        };
+    });
+};
+
 const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
@@ -79,7 +95,7 @@ const nodeSelectionSlice = createSlice({
             });
 
             state.dram.forEach((dramElement) => {
-                setSiblings(dramElement.data);
+                setBorders(dramElement.data);
             });
         },
 
