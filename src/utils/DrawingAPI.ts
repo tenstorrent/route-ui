@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
@@ -498,7 +500,7 @@ export const toRGBA = (rgb: string, alpha: number = 1): string => {
 };
 
 export const getDramGroupingStyles = (siblings: ComputeNodeSiblings, node: ComputeNode, colorOverride?: string) => {
-    const dramStyles: Partial<CSSStyleDeclaration & { [key in `--${string}`]: string }> = {
+    const dramStyles: CSSProperties & { [key in `--${string}`]: string } = {
         '--gradient-size': '6px',
         '--gradient-color': colorOverride || 'rgba(248,226,112,0.2)',
         background: `repeating-linear-gradient(
@@ -545,17 +547,17 @@ export const getNodeOpBorderStyles = ({
 }: {
     node: ComputeNode;
     siblings: ComputeNodeSiblings;
-    styles: Partial<CSSStyleDeclaration>;
+    styles: CSSProperties;
     color: string | undefined;
     isSelected: boolean;
 }) => {
-    const newStyles: Partial<CSSStyleDeclaration & { [key in `--${string}`]: string }> = {
-        '--border-size': '2px',
+    const newStyles: CSSProperties & { [key in `--${string}`]: string } = {
+        '--node-op-border-size': '2px',
         ...styles,
     };
 
-    const borderStyle = `var(--border-size) ${isSelected ? 'solid' : 'dotted'} ${color}`;
-    const borderDistantStyle = `var(--border-size) dashed ${color}`;
+    const borderStyle = `var(--node-op-border-size) ${isSelected ? 'solid' : 'dotted'} ${color}`;
+    const borderDistantStyle = `var(--node-op-border-size) dashed ${color}`;
 
     if (!siblings.left) {
         newStyles.borderLeft = borderStyle;
@@ -592,7 +594,7 @@ export const getNodeOpBorderStyles = ({
     return newStyles;
 };
 
-export const getNodeOpBackgroundStyles = (styles: Partial<CSSStyleDeclaration>, color: string | undefined) => {
+export const getNodeOpBackgroundStyles = (styles: CSSProperties, color: string | undefined) => {
     const gradientColor = color?.replace(')', ', 0.25)').replace('rgb', 'rgba');
     const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
 
