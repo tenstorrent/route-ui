@@ -104,7 +104,19 @@ operationsTableColumns.set('bw_bound_math_utilization', {
     },
 });
 operationsTableColumns.set('model_runtime_per_input', {
-    label: 'Model Estimate (cycles per input)',
+    label: 'Model Estimate (cycles/input)',
+    sortable: true,
+    align: 'right',
+    formatter: (value: number) => {
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(value)) {
+            return 'n/a';
+        }
+        return numberFormatter0.format(value);
+    },
+});
+operationsTableColumns.set('kernel_runtime_per_input', {
+    label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
     formatter: (value: number) => {
