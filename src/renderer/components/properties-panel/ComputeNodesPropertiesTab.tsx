@@ -91,7 +91,14 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         ],
 
         ['Math utilisation', node.perfAnalyzerResults.bw_bound_math_utilization, '%'],
-        ['BW a / r', slowestOperand?.name ? `${metrics?.actual || 'n/a'} / ${metrics?.required || 'n/a'}` : 'n/a'],
+        [
+            'BW a / r',
+            slowestOperand?.name
+                ? `${metrics?.actual ? `${metrics.actual} B/ns` : 'n/a'} / ${
+                      metrics?.required ? `${metrics.required} B/ns` : 'n/a'
+                  }`
+                : 'n/a',
+        ],
     ];
     return (
         <div className='core-runtime-metrics'>
