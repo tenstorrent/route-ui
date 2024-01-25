@@ -279,10 +279,6 @@ function OperationsTable() {
                 />
             )}
             <Column
-                cellRenderer={(rowIndex) => cellRenderer('kernel_total_runtime', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('kernel_total_runtime')}
-            />
-            <Column
                 cellRenderer={(rowIndex) => cellRenderer('kernel_math_utilization', rowIndex)}
                 columnHeaderCellRenderer={() => headerRenderer('kernel_math_utilization')}
             />
@@ -305,6 +301,14 @@ function OperationsTable() {
             <Column
                 cellRenderer={(rowIndex) => cellRenderer('model_runtime_per_input', rowIndex)}
                 columnHeaderCellRenderer={() => headerRenderer('model_runtime_per_input')}
+            />
+            <Column
+                cellRenderer={(rowIndex) => cellRenderer('kernel_runtime_per_input', rowIndex)}
+                columnHeaderCellRenderer={() => headerRenderer('kernel_runtime_per_input')}
+            />
+            <Column
+                cellRenderer={(rowIndex) => cellRenderer('kernel_total_runtime', rowIndex)}
+                columnHeaderCellRenderer={() => headerRenderer('kernel_total_runtime')}
             />
         </Table2>
     );
