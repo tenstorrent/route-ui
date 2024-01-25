@@ -558,43 +558,22 @@ export const getNodeOpBorderStyles = ({
         ...styles,
     };
 
-    const borderStyle = `var(--node-op-border-size) ${isSelected ? 'solid' : 'dotted'} ${color}`;
-    const borderDistantStyle = `var(--node-op-border-size) dotted ${color}`;
+    const borderStyle = `var(--node-op-border-size) ${isSelected ? 'solid' : 'dashed'} ${color}`;
 
     if (!siblings.left) {
         newStyles.borderLeft = borderStyle;
-    }
-
-    const X_POSITION_BEFORE_NODE = node.loc.x - 1;
-    if (siblings.left && siblings.left.x < X_POSITION_BEFORE_NODE) {
-        newStyles.borderLeft = borderDistantStyle;
     }
 
     if (!siblings.right) {
         newStyles.borderRight = borderStyle;
     }
 
-    const X_POSITION_AFTER_NODE = node.loc.x + 1;
-    if (siblings.right && siblings.right.x > X_POSITION_AFTER_NODE) {
-        newStyles.borderRight = borderDistantStyle;
-    }
-
     if (!siblings.top) {
         newStyles.borderTop = borderStyle;
     }
 
-    const Y_POSITION_BEFORE_NODE = node.loc.y - 1;
-    if (siblings.top && siblings.top.y < Y_POSITION_BEFORE_NODE) {
-        newStyles.borderTop = borderDistantStyle;
-    }
-
     if (!siblings.bottom) {
         newStyles.borderBottom = borderStyle;
-    }
-
-    const Y_POSITION_AFTER_NODE = node.loc.y + 1;
-    if (siblings.bottom && siblings.bottom.y > Y_POSITION_AFTER_NODE) {
-        newStyles.borderBottom = borderDistantStyle;
     }
 
     return newStyles;
