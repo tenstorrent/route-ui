@@ -60,6 +60,15 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         ? node.opCycles.toLocaleString()
         : node.perfAnalyzerResults.model_runtime_per_input.toLocaleString();
 
+    let slowestOperandText = 'n/a';
+
+    if (slowestOperand?.name) {
+        const actualText = metrics?.actual ? `${metrics.actual} B/ns` : 'n/a';
+        const requiredText = metrics?.required ? `${metrics.required} B/ns` : 'n/a';
+
+        slowestOperandText = `${actualText} / ${requiredText}`;
+    }
+
     const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
         //  - will likely want to add more organization if more details are added here
@@ -91,7 +100,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         ],
 
         ['Math utilisation', node.perfAnalyzerResults.bw_bound_math_utilization, '%'],
-        ['BW a / r', slowestOperand?.name ? `${metrics?.actual || 'n/a'} / ${metrics?.required || 'n/a'}` : 'n/a'],
+        ['BW a / r', slowestOperandText],
     ];
     return (
         <div className='core-runtime-metrics'>

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
@@ -136,6 +136,7 @@ function OperationsTable() {
         }
         return (
             <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label}>
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
                 <div
                     className='sortable-table-header'
                     role='button'
@@ -159,15 +160,9 @@ function OperationsTable() {
     };
 
     const cellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
-        let cellContent = tableFields[rowIndex][key] || '';
         const definition = operationsTableColumns.get(key);
-        if (definition?.formatter) {
-            cellContent = definition.formatter(cellContent);
-        } else {
-            cellContent = cellContent.toString();
-        }
-        const alignmentClass = definition?.align ? `align-${definition.align}` : '';
-        const units = definition?.units ? `${definition.units}` : '';
+        const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+
         if (key === 'core_id') {
             return (
                 <Cell>
@@ -176,18 +171,13 @@ function OperationsTable() {
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             selectNode(cellContent.toString(), e.target.checked);
                         }}
-                        label={cellContent + units}
+                        label={cellContent}
                     />
                 </Cell>
             );
         }
 
-        return (
-            <Cell className={alignmentClass}>
-                {cellContent}
-                {units}
-            </Cell>
-        );
+        return <Cell className={definition?.align ? `align-${definition?.align}` : ''}>{cellContent}</Cell>;
     };
 
     const slowestOperandCellRenderer = (rowIndex: number): JSX.Element => {
