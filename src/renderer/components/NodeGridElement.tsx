@@ -65,13 +65,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             <div className='core-highlight' />
             <div className='node-border' />
 
-            {/* Labels for location and operation */}
-            <NodeLocation node={node} />
-            <NodeOperationLabel node={node} />
-
             {/* Congestion information */}
             <OperationCongestionLayer node={node} />
             <OffChipNodeLinkCongestionLayer node={node} />
+
+            {/* Labels for location and operation */}
+            <NodeLocation node={node} />
+            <NodeOperationLabel node={node} />
 
             {/* Pipes */}
             <NodePipeRenderer node={node} />
