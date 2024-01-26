@@ -14,6 +14,9 @@ import { RootState } from '../../../data/store/createStore';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import SelectablePipe from '../SelectablePipe';
+import { PipeSegment } from '../../../data/Chip';
+import { NOCLinkName } from '../../../data/Types';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
@@ -80,7 +83,23 @@ function QueuesPropertiesTab() {
                                     isOpen={allOpen}
                                     contentStyles={{ color: '#000' }}
                                 >
-                                    {queue && <GraphVertexDetails graphNode={queue} />}
+                                    <>
+                                        {/* TEMPORARY DEBUG OUTPUT that will be removed next related PR */}
+                                        {queue.uniquePipeIds.length > 0 && (
+                                            <ul className='scrollable-content'>
+                                                {queue.uniquePipeIds.map((pipeId) => (
+                                                    <li>
+                                                        <SelectablePipe
+                                                            pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                                            showBandwidth={false}
+                                                            pipeFilter=''
+                                                        />
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                        {queue && <GraphVertexDetails graphNode={queue} />}
+                                    </>
                                 </Collapsible>
                             }
                         />

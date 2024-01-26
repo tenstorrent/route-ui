@@ -86,30 +86,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                         }
                                         isOpen={allOpen}
                                     >
-                                        <>
-                                            {operation.uniquePipeIds.length > 0 && (
-                                                <Collapsible
-                                                    label={<h5>pipes:</h5>}
-                                                    isOpen={false}
-                                                    styles={{ marginLeft: '20px' }}
-                                                >
-                                                    <ul className='scrollable-content'>
-                                                        {operation.uniquePipeIds.map((pipeId) => (
-                                                            <li>
-                                                                <SelectablePipe
-                                                                    pipeSegment={
-                                                                        new PipeSegment(pipeId, 0, NOCLinkName.NONE)
-                                                                    }
-                                                                    showBandwidth={false}
-                                                                    pipeFilter=''
-                                                                />
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </Collapsible>
-                                            )}
-                                            {operation && <GraphVertexDetails graphNode={operation} />}
-                                        </>
+                                        {operation && <GraphVertexDetails graphNode={operation} />}
                                     </Collapsible>
                                 }
                             />
