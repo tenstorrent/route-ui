@@ -177,7 +177,7 @@ function OperationsTable() {
             );
         }
 
-        return <Cell className={`align-${definition?.align ?? 'left'}`}>{cellContent}</Cell>;
+        return <Cell className={definition?.align ? `align-${definition?.align}` : ''}>{cellContent}</Cell>;
     };
 
     const slowestOperandCellRenderer = (rowIndex: number): JSX.Element => {
