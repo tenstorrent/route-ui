@@ -37,7 +37,7 @@ function QueuesPropertiesTab() {
             }
         });
     };
-
+    
     return (
         <>
             <div className='properties-filter'>
@@ -83,23 +83,7 @@ function QueuesPropertiesTab() {
                                     isOpen={allOpen}
                                     contentStyles={{ color: '#000' }}
                                 >
-                                    <>
-                                        {/* TEMPORARY DEBUG OUTPUT that will be removed next related PR */}
-                                        {queue.uniquePipeIds.length > 0 && (
-                                            <ul className='scrollable-content'>
-                                                {queue.uniquePipeIds.map((pipeId) => (
-                                                    <li>
-                                                        <SelectablePipe
-                                                            pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
-                                                            showBandwidth={false}
-                                                            pipeFilter=''
-                                                        />
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                        {queue && <GraphVertexDetails graphNode={queue} />}
-                                    </>
+                                    {queue && <GraphVertexDetails graphNode={queue} />}
                                 </Collapsible>
                             }
                         />

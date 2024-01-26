@@ -55,6 +55,19 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                             ))}
                         </ul>
                     )}
+                    {graphNode.vertexType === GraphVertexType.QUEUE && (
+                        <ul className='scrollable-content'>
+                            {graphNode.getPipesForOperator(operand.name).map((pipeId) => (
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                        pipeFilter=''
+                                        showBandwidth={false}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
             ))}
 
@@ -65,6 +78,19 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperator(graphNode.name).map((pipeId) => (
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                        pipeFilter=''
+                                        showBandwidth={false}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                    {graphNode.vertexType === GraphVertexType.QUEUE && (
+                        <ul className='scrollable-content'>
+                            {graphNode.getPipesForOperator(operand.name).map((pipeId) => (
                                 <li>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
