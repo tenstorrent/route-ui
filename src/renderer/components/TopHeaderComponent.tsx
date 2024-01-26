@@ -1,6 +1,8 @@
 import React from 'react';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { IconNames } from '@blueprintjs/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { Switch } from '@blueprintjs/core';
+import { Button, Switch } from '@blueprintjs/core';
 import {
     getArchitectureSelector,
     getAvailableGraphsSelector,
@@ -12,6 +14,11 @@ import { setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
 
+const formatFolderPath = (path: string) => {
+    const lastFolder = path.split('/').pop();
+    return `.../${lastFolder ?? 'n/a'}`;
+};
+
 const TopHeaderComponent: React.FC = () => {
     const dispatch = useDispatch();
     const isHighContrast = useSelector(getHighContrastState);
@@ -21,7 +28,6 @@ const TopHeaderComponent: React.FC = () => {
     const folderPath = useSelector(getFolderPathSelector);
 
     const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
-    const selectedGraphInfo = `${selectedGraph}  Chip: ${selectedGraphItem?.chipId} Epoch: ${selectedGraphItem?.temporalEpoch}`;
 
     return (
         <div className='top-header-component'>
@@ -30,30 +36,41 @@ const TopHeaderComponent: React.FC = () => {
                 label='Enable high contrast'
                 onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
             />
-
             <div className='text-content'>
-                {architecture ? (
-                    <span>
-                        Architecture: <span className='architecture-label'>{architecture}</span>
-                    </span>
-                ) : (
-                    ''
+                {folderPath && (
+                    <>
+                        <span>Selected Folder: </span>
+                        <Tooltip2 content={folderPath}>
+                            {/* <Button icon={IconNames.FolderSharedOpen} text={formatFolderPath(folderPath)} /> */}
+                            <span className='path-label'>{formatFolderPath(folderPath)}</span>
+                        </Tooltip2>
+                    </>
                 )}
                 <GraphSelector />
             </div>
-            {folderPath && (
-                <div className='text-content'>
-                    <span>Selected Folder: </span>
-                    <span className='path-label'>{folderPath}</span>
-                    {/* this will need a better layout */}
-                    {selectedGraph && (
-                        <>
-                            <span>Selected graph: </span>
-                            <span className='path-label'>{selectedGraphInfo}</span>
-                        </>
-                    )}
-                </div>
-            )}
+
+            <div className='text-content'>
+                {selectedGraph && architecture && (
+                    <>
+                        <span>Architecture:</span>
+                        <span className='architecture-label'>{architecture}</span>
+                    </>
+                )}
+
+                {selectedGraph && selectedGraphItem?.chipId !== undefined && (
+                    <>
+                        <span>Chip:</span>
+                        <span className='path-label'>{selectedGraphItem?.chipId}</span>
+                    </>
+                )}
+
+                {selectedGraph && selectedGraphItem?.temporalEpoch !== undefined && (
+                    <>
+                        <span>Epoch:</span>
+                        <span className='path-label'>{selectedGraphItem?.temporalEpoch}</span>
+                    </>
+                )}
+            </div>
 
             {/* {process.env.NODE_ENV === 'development' && ( */}
             {/*     <Button */}
