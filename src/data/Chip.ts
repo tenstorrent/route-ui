@@ -1199,6 +1199,10 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
     return `${(bytes / 1024 ** denominationIndex).toFixed(fractionDigits)} ${sizes[denominationIndex]}`;
 };
 
+export const convertBytesPerCycle = (bytes: number, numAfterComma = 0) => {
+    return `${convertBytes(bytes, numAfterComma)}/cycle`;
+};
+
 export const recalculateLinkSaturation = (link: LinkState, totalOpCycles: number) => {
     link.bpc = link.totalDataBytes / totalOpCycles;
     link.saturation = (link.bpc / link.maxBandwidth) * 100;
