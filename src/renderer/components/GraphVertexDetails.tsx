@@ -42,9 +42,9 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {inputs.map((operand) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
-                    <Collapsible label={<h5>pipes:</h5>} isOpen={false}>
+                    {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
-                            {operand.uniquePipeIds.map((pipeId) => (
+                            {operand.getPipesForOperator(graphNode.name).map((pipeId) => (
                                 <li>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
@@ -54,7 +54,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                                 </li>
                             ))}
                         </ul>
-                    </Collapsible>
+                    )}
                 </div>
             ))}
 
@@ -62,12 +62,11 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {outputs.map((operand) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
-                    <Collapsible label={<h5>pipes:</h5>} isOpen={false}>
+                    {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
-                            {operand.uniquePipeIds.map((pipeId) => (
+                            {operand.getPipesForOperator(graphNode.name).map((pipeId) => (
                                 <li>
                                     <SelectablePipe
-                                        key={pipeId}
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                         pipeFilter=''
                                         showBandwidth={false}
@@ -75,7 +74,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                                 </li>
                             ))}
                         </ul>
-                    </Collapsible>
+                    )}
                 </div>
             ))}
         </div>

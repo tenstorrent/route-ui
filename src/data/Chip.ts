@@ -39,7 +39,7 @@ import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescrip
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
-import { DataIntegrityErrorType, DataIntegrityError } from './DataIntegrity';
+import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -222,6 +222,7 @@ export default class Chip {
         name: string,
         type: GraphVertexType,
         pipesByCore?: Map<string, string[]>,
+        pipesPerOperator?: { operator: string; pipes: string[] },
         from?: GraphVertex,
         to?: GraphVertex,
     ): Operand {
@@ -239,6 +240,9 @@ export default class Chip {
             }
             operand = this.operationsByName.get(name) as BuildableOperation;
         }
+        if (pipesPerOperator) {
+            operand?.setPipesForOperator(pipesPerOperator.operator, pipesPerOperator.pipes || []);
+        }
         if (operand === undefined) {
             throw new Error(`Operand ${name} is neither a queue nor an operation`);
         }
@@ -249,9 +253,10 @@ export default class Chip {
                     if (operand!.pipeIdsByCore.has(coreId)) {
                         const existingPipesIds = operand!.pipeIdsByCore.get(coreId) || [];
                         pipesByCore.set(coreId, [...existingPipesIds, ...newPipeIds]);
-                    } else {
-                        pipesByCore.set(coreId, newPipeIds);
                     }
+                });
+                operand.pipeIdsByCore.forEach((pipeIds, coreId) => {
+                    pipesByCore.set(coreId, pipeIds);
                 });
             }
             operand.pipeIdsByCore = pipesByCore;
@@ -424,20 +429,28 @@ export default class Chip {
                     return null;
                 }
 
-                const inputs = opJson.inputs.map((operandJson) =>
-                    augmentedChip.createOperand(
+                const inputs = opJson.inputs.map((operandJson) => {
+                    const operatorPipes: string[] = Object.values(operandJson.pipes)
+                        .map((pipes) => pipes.map((pipe) => pipe.toString()))
+                        .flat();
+                    return augmentedChip.createOperand(
                         operandJson.name,
                         operandJson.type as GraphVertexType,
                         pipesAsMap(operandJson.pipes),
-                    ),
-                );
-                const outputs = opJson.outputs.map((operandJson) =>
-                    augmentedChip.createOperand(
+                        { operator: operation.name, pipes: operatorPipes },
+                    );
+                });
+                const outputs = opJson.outputs.map((operandJson) => {
+                    const operatorPipes: string[] = Object.values(operandJson.pipes)
+                        .map((pipes) => pipes.map((pipe) => pipe.toString()))
+                        .flat();
+                    return augmentedChip.createOperand(
                         operandJson.name,
                         operandJson.type as GraphVertexType,
                         pipesAsMap(operandJson.pipes),
-                    ),
-                );
+                        { operator: operation.name, pipes: operatorPipes },
+                    );
+                });
 
                 // Extract queues from input operands
                 inputs.forEach((operand) => {
@@ -516,7 +529,6 @@ export default class Chip {
                         });
                     });
                 });
-
                 return operation;
             });
 

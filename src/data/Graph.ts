@@ -19,6 +19,22 @@ export abstract class AbstractGraphVertex implements Operand {
 
     private _pipeIdsByCore: Map<string, string[]> = new Map();
 
+    private pipesPerOperator: Map<string, string[]> = new Map();
+
+    public getPipesForOperator(operator: string): string[] {
+        return this.pipesPerOperator.get(operator) || [];
+    }
+
+    public setPipesForOperator(operator: string, pipeIds: string[]) {
+        if (this.pipesPerOperator.has(operator)) {
+            this.pipesPerOperator.get(operator)!.push(...pipeIds);
+        } else {
+            this.pipesPerOperator.set(operator, pipeIds);
+        }
+        const uniquePipeIds = [...new Set(this.pipesPerOperator.get(operator)!.map((pipeId) => pipeId.toString()))];
+        this.pipesPerOperator.set(operator, uniquePipeIds);
+    }
+
     public toString(): string {
         return `${this.name} (${this.vertexType})`;
     }
@@ -181,6 +197,10 @@ export interface Operand {
     pipeIdsByCore: Map<string, string[]>;
     perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
     uniquePipeIds: string[];
+
+    getPipesForOperator(operator: string): string[];
+
+    setPipesForOperator(operator: string, pipeIds: string[]): void;
 
     getPipeIdsForCore(coreId: string): string[];
 
