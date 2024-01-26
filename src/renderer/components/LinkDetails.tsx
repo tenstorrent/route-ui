@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'data/store/createStore';
 import { getLinkData } from 'data/store/selectors/linkSaturation.selectors';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
-import { PipeSegment, NetworkLink, convertBytesPerCycle } from '../../data/Chip';
+import { PipeSegment, NetworkLink, formatToBytesPerCycle } from '../../data/Chip';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';
@@ -30,13 +30,13 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, showEmpty, index }) => 
                 <span>
                     <span>
                         {link.name} - {index && index > -1 ? `${index} - ` : ''}
-                        {convertBytesPerCycle(link.totalDataBytes)}
+                        {formatToBytesPerCycle(link.totalDataBytes)}
                     </span>
                     <br />
                     <span>
-                        {convertBytesPerCycle(linkState?.bpc || 0, 2)}
+                        {formatToBytesPerCycle(linkState?.bpc || 0, 2)}
                         &nbsp;of&nbsp;
-                        {convertBytesPerCycle(linkState?.maxBandwidth)}
+                        {formatToBytesPerCycle(linkState?.maxBandwidth)}
                         <span style={{ color }}> {linkState?.saturation.toFixed(2)}%</span>
                     </span>
                 </span>
