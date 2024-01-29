@@ -13,7 +13,7 @@ import {
     getGraphNameSelector,
     getHighContrastState,
 } from 'data/store/selectors/uiState.selectors';
-import { setHighContrastState, setSelectedGraphName } from 'data/store/slices/uiState.slice';
+import { setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -35,12 +35,9 @@ const TopHeaderComponent: React.FC = () => {
 
     useEffect(() => {
         const isSplashScreen = location.pathname === '/';
-
         const hasAvailableGraphs = availableGraphs && availableGraphs.length > 0;
 
         if (!isSplashScreen && hasAvailableGraphs) {
-            dispatch(setSelectedGraphName(availableGraphs[0].name));
-
             loadPerfAnalyzerGraph(availableGraphs[0].name);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
