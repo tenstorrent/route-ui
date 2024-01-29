@@ -20,7 +20,7 @@ import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks'
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return `.${pathSeparator}${lastFolder ?? 'n/a'}`;
+    return lastFolder ? `${pathSeparator}${lastFolder}` : 'n/a';
 };
 
 const TopHeaderComponent: React.FC = () => {
