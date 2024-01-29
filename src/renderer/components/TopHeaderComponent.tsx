@@ -1,8 +1,7 @@
 import React from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { IconNames } from '@blueprintjs/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Switch } from '@blueprintjs/core';
+import { Switch } from '@blueprintjs/core';
 import {
     getArchitectureSelector,
     getAvailableGraphsSelector,
@@ -41,7 +40,6 @@ const TopHeaderComponent: React.FC = () => {
                     <>
                         <span>Selected Folder: </span>
                         <Tooltip2 content={folderPath}>
-                            {/* <Button icon={IconNames.FolderSharedOpen} text={formatFolderPath(folderPath)} /> */}
                             <span className='path-label'>{formatFolderPath(folderPath)}</span>
                         </Tooltip2>
                     </>
@@ -71,14 +69,6 @@ const TopHeaderComponent: React.FC = () => {
                     </>
                 )}
             </div>
-
-            {/* {process.env.NODE_ENV === 'development' && ( */}
-            {/*     <Button */}
-            {/*         icon={IconNames.APPLICATION} */}
-            {/*         text='Dock' */}
-            {/*         onClick={() => dispatch(setDockOpenState(!isDockOpen))} */}
-            {/*     /> */}
-            {/* )} */}
         </div>
     );
 };
