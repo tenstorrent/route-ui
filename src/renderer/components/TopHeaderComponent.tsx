@@ -1,6 +1,7 @@
 import { sep as pathSeparator } from 'path';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,7 +13,7 @@ import {
     getGraphNameSelector,
     getHighContrastState,
 } from 'data/store/selectors/uiState.selectors';
-import { setHighContrastState } from 'data/store/slices/uiState.slice';
+import { setHighContrastState, setSelectedGraphName } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -29,7 +30,21 @@ const TopHeaderComponent: React.FC = () => {
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const folderPath = useSelector(getFolderPathSelector);
-    const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const location = useLocation();
+
+    useEffect(() => {
+        const isSplashScreen = location.pathname === '/';
+
+        const hasAvailableGraphs = availableGraphs && availableGraphs.length > 0;
+        const isSelectedGraphInList = !availableGraphs.find((graph) => graph?.name === selectedGraph);
+
+        if (!isSplashScreen && hasAvailableGraphs && isSelectedGraphInList) {
+            dispatch(setSelectedGraphName(availableGraphs[0].name));
+
+            loadPerfAnalyzerGraph(availableGraphs[0].name);
+        }
+    }, [selectedGraph, availableGraphs, dispatch, loadPerfAnalyzerGraph, location]);
 
     const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
