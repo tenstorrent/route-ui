@@ -27,9 +27,21 @@
     }
 
     .path-label {
-        max-width: max(150px, 15vw);
+        max-width: clamp(150px, 15vw, 250px);
         display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+}
+
+@media (min-width: 1440px) {
+    .top-header-component .path-label {
+        max-width: max(200px, 25vw);
+    }
+}
+
+@media (min-width: 2560px) {
+    .top-header-component .path-label {
+        max-width: unset;
     }
 }
