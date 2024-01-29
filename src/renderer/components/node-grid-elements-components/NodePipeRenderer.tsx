@@ -63,7 +63,8 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
         node.links.forEach((link) => {
             if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
                 const linkStateData = linksData[link.uid];
-                if (linkStateData.saturation >= linkSaturationTreshold) {
+
+                if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
                     const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
                     drawLink(svg, link.name, color, 5);
                 }
