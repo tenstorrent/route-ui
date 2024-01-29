@@ -16,7 +16,7 @@ import GraphSelector from './graph-selector/GraphSelector';
 
 const formatFolderPath = (path: string) => {
     const lastFolder = path.split('/').pop();
-    return `.../${lastFolder ?? 'n/a'}`;
+    return `./${lastFolder ?? 'n/a'}`;
 };
 
 const TopHeaderComponent: React.FC = () => {
@@ -60,14 +60,14 @@ const TopHeaderComponent: React.FC = () => {
                 {selectedGraph && selectedGraphItem?.chipId !== undefined && (
                     <>
                         <span>Chip:</span>
-                        <span className='path-label'>{selectedGraphItem?.chipId}</span>
+                        <span>{selectedGraphItem?.chipId}</span>
                     </>
                 )}
 
                 {selectedGraph && selectedGraphItem?.temporalEpoch !== undefined && (
                     <>
                         <span>Epoch:</span>
-                        <span className='path-label'>{selectedGraphItem?.temporalEpoch}</span>
+                        <span>{selectedGraphItem?.temporalEpoch}</span>
                     </>
                 )}
             </div>

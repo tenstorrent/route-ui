@@ -20,4 +20,11 @@
             text-transform: uppercase;
         }
     }
+
+    .path-label {
+        max-width: clamp(150px, 15vw, 250px);
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
