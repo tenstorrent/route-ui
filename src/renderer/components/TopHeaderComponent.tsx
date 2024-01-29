@@ -1,3 +1,5 @@
+import { sep as pathSeparator } from 'path';
+
 import React from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,8 +16,8 @@ import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
 
 const formatFolderPath = (path: string) => {
-    const lastFolder = path.split('/').pop();
-    return `./${lastFolder ?? 'n/a'}`;
+    const lastFolder = path.split(pathSeparator).pop();
+    return `.${pathSeparator}${lastFolder ?? 'n/a'}`;
 };
 
 const TopHeaderComponent: React.FC = () => {
