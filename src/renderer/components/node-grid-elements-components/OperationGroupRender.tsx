@@ -23,7 +23,8 @@ const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
     if (node.opName !== '' && selectedGroup && (selectedGroup?.selected || showOperationNames)) {
         const color = getGroupColor(node.opName);
         operationStyles = { borderColor: getGroupColor(node.opName) };
-        const siblings = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.siblings;
+        const siblings = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.siblings ?? {};
+
         operationStyles = getNodeOpBorderStyles({
             node,
             styles: operationStyles,
