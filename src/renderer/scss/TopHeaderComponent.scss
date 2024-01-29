@@ -17,12 +17,17 @@
         gap: 10px;
         .architecture-label{
             //font-weight: bold;
-            text-transform: uppercase;
+            text-transform: capitalize;
         }
     }
 
+    .bp4-popover2-target:has(.path-label) {
+        display: inline-flex;
+        align-items: center;
+    }
+
     .path-label {
-        max-width: clamp(150px, 15vw, 250px);
+        max-width: max(150px, 15vw);
         display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
