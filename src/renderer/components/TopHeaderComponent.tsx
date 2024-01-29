@@ -37,14 +37,14 @@ const TopHeaderComponent: React.FC = () => {
         const isSplashScreen = location.pathname === '/';
 
         const hasAvailableGraphs = availableGraphs && availableGraphs.length > 0;
-        const isSelectedGraphInList = !availableGraphs.find((graph) => graph?.name === selectedGraph);
 
-        if (!isSplashScreen && hasAvailableGraphs && isSelectedGraphInList) {
+        if (!isSplashScreen && hasAvailableGraphs) {
             dispatch(setSelectedGraphName(availableGraphs[0].name));
 
             loadPerfAnalyzerGraph(availableGraphs[0].name);
         }
-    }, [selectedGraph, availableGraphs, dispatch, loadPerfAnalyzerGraph, location]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [availableGraphs]);
 
     const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
