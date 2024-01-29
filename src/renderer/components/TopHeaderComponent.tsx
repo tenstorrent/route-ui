@@ -2,6 +2,7 @@ import { sep as pathSeparator } from 'path';
 
 import React from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
+import { IconNames } from '@blueprintjs/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Switch } from '@blueprintjs/core';
 import {
@@ -42,7 +43,7 @@ const TopHeaderComponent: React.FC = () => {
             <div className='text-content'>
                 {folderPath && (
                     <Tooltip2 content={folderPath}>
-                        <Button icon='folder-open' onClick={loadPerfAnalyzerFolder}>
+                        <Button icon={IconNames.FolderSharedOpen} onClick={loadPerfAnalyzerFolder}>
                             <span className='path-label'>{getTestName(folderPath)}</span>
                         </Button>
                     </Tooltip2>
