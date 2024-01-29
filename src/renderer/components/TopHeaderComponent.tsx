@@ -3,7 +3,7 @@ import { sep as pathSeparator } from 'path';
 import React from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { useDispatch, useSelector } from 'react-redux';
-import { Switch } from '@blueprintjs/core';
+import { Button, Switch } from '@blueprintjs/core';
 import {
     getArchitectureSelector,
     getAvailableGraphsSelector,
@@ -14,6 +14,7 @@ import {
 import { setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
+import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
@@ -27,6 +28,7 @@ const TopHeaderComponent: React.FC = () => {
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const folderPath = useSelector(getFolderPathSelector);
+    const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
 
     const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
@@ -39,12 +41,11 @@ const TopHeaderComponent: React.FC = () => {
             />
             <div className='text-content'>
                 {folderPath && (
-                    <>
-                        <span>Selected Folder: </span>
-                        <Tooltip2 content={folderPath}>
+                    <Tooltip2 content={folderPath}>
+                        <Button icon='folder-open' onClick={loadPerfAnalyzerFolder}>
                             <span className='path-label'>{getTestName(folderPath)}</span>
-                        </Tooltip2>
-                    </>
+                        </Button>
+                    </Tooltip2>
                 )}
                 <GraphSelector />
             </div>

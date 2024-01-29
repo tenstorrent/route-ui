@@ -108,6 +108,8 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         if (folderPath) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
             dispatch(clearAvailableGraphs());
+            dispatch(setSelectedGraphName(''));
+
             await loadFolder(folderPath);
         }
     };
