@@ -1,9 +1,11 @@
 import { sep as pathSeparator } from 'path';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Tooltip2 } from '@blueprintjs/popover2';
+import { IconNames } from '@blueprintjs/icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { Switch } from '@blueprintjs/core';
+import { Button, Switch } from '@blueprintjs/core';
 import {
     getArchitectureSelector,
     getAvailableGraphsSelector,
@@ -14,10 +16,11 @@ import {
 import { setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
+import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return `.${pathSeparator}${lastFolder ?? 'n/a'}`;
+    return lastFolder ? `${pathSeparator}${lastFolder}` : 'n/a';
 };
 
 const TopHeaderComponent: React.FC = () => {
@@ -27,6 +30,18 @@ const TopHeaderComponent: React.FC = () => {
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const folderPath = useSelector(getFolderPathSelector);
+    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const location = useLocation();
+
+    useEffect(() => {
+        const isSplashScreen = location.pathname === '/';
+        const hasAvailableGraphs = availableGraphs && availableGraphs.length > 0;
+
+        if (!isSplashScreen && hasAvailableGraphs) {
+            loadPerfAnalyzerGraph(availableGraphs[0].name);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [availableGraphs]);
 
     const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
@@ -39,12 +54,11 @@ const TopHeaderComponent: React.FC = () => {
             />
             <div className='text-content'>
                 {folderPath && (
-                    <>
-                        <span>Selected Folder: </span>
-                        <Tooltip2 content={folderPath}>
+                    <Tooltip2 content={folderPath}>
+                        <Button icon={IconNames.FolderSharedOpen} onClick={loadPerfAnalyzerFolder}>
                             <span className='path-label'>{getTestName(folderPath)}</span>
-                        </Tooltip2>
-                    </>
+                        </Button>
+                    </Tooltip2>
                 )}
                 <GraphSelector />
             </div>

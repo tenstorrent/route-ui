@@ -4,7 +4,6 @@ import {
     getGraphNameSelector,
 } from 'data/store/selectors/uiState.selectors';
 import {
-    clearAvailableGraphs,
     setAvailableGraphs,
     setApplicationMode,
     setSelectedArchitecture,
@@ -107,7 +106,7 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         const folderPath = await selectFolderDialog();
         if (folderPath) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
-            dispatch(clearAvailableGraphs());
+
             await loadFolder(folderPath);
         }
     };

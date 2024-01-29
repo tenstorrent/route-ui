@@ -110,7 +110,7 @@ export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
     return (
         <div className='sidebar'>
             <Tooltip2 content='Load new dataset'>
-                <Button icon={IconNames.FolderSharedOpen} text='' onClick={reloadAppData} />
+                <Button icon={IconNames.Home} text='' onClick={reloadAppData} />
             </Tooltip2>
             {applicationMode === ApplicationMode.NETLIST_ANALYZER && (
                 <Tooltip2 content='Load ops to pipes mapping'>
