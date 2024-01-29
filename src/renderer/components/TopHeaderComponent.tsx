@@ -15,7 +15,7 @@ import { setHighContrastState } from 'data/store/slices/uiState.slice';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
 
-const formatFolderPath = (path: string) => {
+const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
     return `.${pathSeparator}${lastFolder ?? 'n/a'}`;
 };
@@ -42,7 +42,7 @@ const TopHeaderComponent: React.FC = () => {
                     <>
                         <span>Selected Folder: </span>
                         <Tooltip2 content={folderPath}>
-                            <span className='path-label'>{formatFolderPath(folderPath)}</span>
+                            <span className='path-label'>{getTestName(folderPath)}</span>
                         </Tooltip2>
                     </>
                 )}
