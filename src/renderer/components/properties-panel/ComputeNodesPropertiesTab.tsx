@@ -8,13 +8,6 @@ import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { JSX } from 'react/jsx-runtime';
-import { Intent } from '@blueprintjs/core/src/common/intent';
-import {
-    INTENT_DANGER,
-    INTENT_PRIMARY,
-    INTENT_SUCCESS,
-    INTENT_WARNING,
-} from '@blueprintjs/core/lib/esnext/common/classes';
 import DataSource from '../../../data/DataSource';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
@@ -24,7 +17,7 @@ import LinkDetails from '../LinkDetails';
 import GraphVertexDetails from '../GraphVertexDetails';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import Collapsible from '../Collapsible';
-import { calculateSlowestOperand } from '../../../utils/DataUtils';
+import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 
@@ -138,7 +131,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                     node.uid === detailedViewState.uid && detailedViewState.isOpen ? 'detailed-view' : ''
                 }`}
             >
-                {node.type.toUpperCase()} {node.uid}
+                {node.type.toUpperCase()} {formatNodeUID(node.uid)}
                 <Tooltip2 content='Close ComputeNode'>
                     <Button
                         small
