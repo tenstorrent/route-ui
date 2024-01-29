@@ -122,6 +122,11 @@ const nodeSelectionSlice = createSlice({
                 operation.selected = selected;
             }
         },
+        selectAllOperations(state) {
+            Object.values(state.operations).forEach((operation) => {
+                operation.selected = true;
+            });
+        },
         clearAllOperations(state) {
             Object.values(state.operations).forEach((operation) => {
                 operation.selected = false;
@@ -133,6 +138,11 @@ const nodeSelectionSlice = createSlice({
             if (queue) {
                 queue.selected = selected;
             }
+        },
+        selectAllQueues(state) {
+            Object.values(state.queues).forEach((queue) => {
+                queue.selected = true;
+            });
         },
         clearAllQueues(state) {
             Object.values(state.queues).forEach((queue) => {
@@ -147,8 +157,10 @@ export const {
     loadNodesData,
     updateNodeSelection,
     selectOperation,
+    selectAllOperations,
     clearAllOperations,
     selectQueue,
+    selectAllQueues,
     clearAllQueues,
 } = nodeSelectionSlice.actions;
 
