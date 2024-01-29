@@ -45,18 +45,18 @@ $focus-ring: rgba(142, 243, 47, 0.9);
 $alert-color: #FF6C0A;
 
 /* Media query mixins */
-$desktop-width: 1024px;
-$desktop-large-width: 1440px;
-$desktop-4k-width: 2560px;
+$desktop: 1024px;
+$desktop-large: 1440px;
+$desktop-4k: 2560px;
 
-@mixin desktop {
-    @media (min-width: $desktop-width) { @content; }
+@mixin min-desktop {
+    @media (min-width: $desktop) { @content; }
 }
 
-@mixin desktop-large {
-    @media (min-width: $desktop-large-width) { @content; }
+@mixin min-desktop-large {
+    @media (min-width: $desktop-large) { @content; }
 }
 
-@mixin desktop-4k {
-    @media (min-width: $desktop-4k-width) { @content; }
+@mixin min-desktop-4k {
+    @media (min-width: $desktop-4k) { @content; }
 }

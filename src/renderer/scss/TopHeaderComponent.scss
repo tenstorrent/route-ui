@@ -32,11 +32,11 @@
         overflow: hidden;
         text-overflow: ellipsis;
 
-        @include desktop-large {
+        @include min-desktop-large {
             max-width: max(200px, 25vw);
         }
 
-        @include desktop-4k {
+        @include min-desktop-4k {
             max-width: unset;
         }
     }
