@@ -1,7 +1,7 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alignment, Button, Checkbox, Icon } from '@blueprintjs/core';
+import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
 import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
