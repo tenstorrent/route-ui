@@ -193,50 +193,56 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
             )}
             {node.operation && (
                 <div className='opname theme-dark'>
-                    {inputs && inputs.length && <h4 className='io-label'>Inputs:</h4>}
-                    {inputs &&
-                        inputs.map((operand) => (
-                            <ul className='scrollable-content'>
-                                <div title={operand.name}>
-                                    <div key={operand.name} style={{ fontSize: '12px' }}>
-                                        <GraphVertexDetailsSelectables operand={operand} />
-                                        <ul className='scrollable-content'>
-                                            {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                <li>
-                                                    <SelectablePipe
-                                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
-                                                        pipeFilter=''
-                                                        showBandwidth={false}
-                                                    />
-                                                </li>
-                                            ))}
-                                        </ul>
+                    {inputs && inputs.length > 0 && (
+                        <>
+                            <h4 className='io-label'>Inputs:</h4>
+                            {inputs.map((operand) => (
+                                <ul className='scrollable-content'>
+                                    <div title={operand.name}>
+                                        <div key={operand.name} style={{ fontSize: '12px' }}>
+                                            <GraphVertexDetailsSelectables operand={operand} />
+                                            <ul className='scrollable-content'>
+                                                {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    <li>
+                                                        <SelectablePipe
+                                                            pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                                            pipeFilter=''
+                                                            showBandwidth={false}
+                                                        />
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
-                            </ul>
-                        ))}
-                    {outputs && outputs.length && <h4 className='io-label'>Outputs:</h4>}
-                    {outputs &&
-                        outputs.map((operand) => (
-                            <ul className='scrollable-content'>
-                                <div title={operand.name}>
-                                    <div key={operand.name} style={{ fontSize: '12px' }}>
-                                        <GraphVertexDetailsSelectables operand={operand} />
-                                        <ul className='scrollable-content'>
-                                            {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                <li>
-                                                    <SelectablePipe
-                                                        pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
-                                                        pipeFilter=''
-                                                        showBandwidth={false}
-                                                    />
-                                                </li>
-                                            ))}
-                                        </ul>
+                                </ul>
+                            ))}
+                        </>
+                    )}
+                    {outputs && outputs.length > 0 && (
+                        <>
+                            <h4 className='io-label'>Outputs:</h4>
+                            {outputs.map((operand) => (
+                                <ul className='scrollable-content'>
+                                    <div title={operand.name}>
+                                        <div key={operand.name} style={{ fontSize: '12px' }}>
+                                            <GraphVertexDetailsSelectables operand={operand} />
+                                            <ul className='scrollable-content'>
+                                                {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    <li>
+                                                        <SelectablePipe
+                                                            pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
+                                                            pipeFilter=''
+                                                            showBandwidth={false}
+                                                        />
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
-                            </ul>
-                        ))}
+                                </ul>
+                            ))}
+                        </>
+                    )}
                 </div>
             )}
             <div className='node-controls'>
