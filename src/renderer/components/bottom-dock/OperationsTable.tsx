@@ -1,7 +1,7 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Checkbox, Icon } from '@blueprintjs/core';
+import { Alignment, Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
 import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
@@ -135,21 +135,40 @@ function OperationsTable() {
             return <ColumnHeaderCell2 name={definition?.label ?? column} />;
         }
         return (
-            <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label}>
-                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
-                <div
-                    className='sortable-table-header'
-                    role='button'
-                    onClick={() => changeSorting(column)(targetSortDirection)}
-                >
-                    {sortingColumn === column && (
-                        <span className='sort-icon'>
-                            <Icon
-                                icon={sortDirection === SortingDirection.ASC ? IconNames.SORT_ASC : IconNames.SORT_DESC}
-                            />
-                        </span>
+            <ColumnHeaderCell2
+                className={`${currentSortClass} ${sortDirectionClass}${
+                    definition.canSelectAllRows ? ' can-select-all-rows' : ''
+                }`}
+                name={definition.label}
+            >
+                <>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
+                    <div
+                        className='sortable-table-header'
+                        role='button'
+                        onClick={() => changeSorting(column)(targetSortDirection)}
+                    >
+                        {sortingColumn === column && (
+                            <span className='sort-icon'>
+                                <Icon
+                                    icon={
+                                        sortDirection === SortingDirection.ASC
+                                            ? IconNames.SORT_ASC
+                                            : IconNames.SORT_DESC
+                                    }
+                                />
+                            </span>
+                        )}
+                    </div>
+                    {definition?.canSelectAllRows && (
+                        <Checkbox
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                definition?.selectAllRowsHandler?.(e.target.checked)
+                            }
+                            className='sortable-table-checkbox'
+                        />
                     )}
-                </div>
+                </>
             </ColumnHeaderCell2>
         );
     };
