@@ -207,7 +207,19 @@ function OperationsTable() {
             }
 
             if (column === 'slowest_operand') {
-                tableFields.forEach((row) => {
+                const selectableRows = tableFields.filter((row) => {
+                    if (!row.slowestOperandRef) {
+                        return false;
+                    }
+
+                    if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                        return !disabledOperation(row.slowestOperandRef?.name ?? '');
+                    }
+
+                    return !disabledQueue(row.slowestOperandRef?.name ?? '');
+                });
+
+                selectableRows.forEach((row) => {
                     if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
                         selectOperation(row.slowestOperandRef?.name ?? '', isChecked);
                     } else {
