@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
-import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
+import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
@@ -13,6 +13,8 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
+import { SortingDirection } from './SharedTable';
+
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
