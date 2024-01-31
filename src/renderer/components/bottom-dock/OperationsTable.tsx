@@ -132,7 +132,28 @@ function OperationsTable() {
         const definition = operationsTableColumns.get(column);
 
         if (!definition?.sortable) {
-            return <ColumnHeaderCell2 name={definition?.label ?? column} />;
+            return (
+                <ColumnHeaderCell2
+                    name={definition?.label ?? column}
+                    className={definition?.canSelectAllRows ? ' can-select-all-rows' : ''}
+                >
+                    {definition?.canSelectAllRows && (
+                        <Checkbox
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                const isChecked = e.target.checked;
+
+                                if (column === 'core_id') {
+                                    tableFields.forEach((row) => {
+                                        const cellContent = definition?.formatter(row.core_id || '') ?? '';
+                                        selectNode(cellContent.toString(), isChecked);
+                                    });
+                                }
+                            }}
+                            className='sortable-table-checkbox'
+                        />
+                    )}
+                </ColumnHeaderCell2>
+            );
         }
         return (
             <ColumnHeaderCell2
@@ -162,9 +183,25 @@ function OperationsTable() {
                     </div>
                     {definition?.canSelectAllRows && (
                         <Checkbox
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                definition?.selectAllRowsHandler?.(e.target.checked)
-                            }
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                const isChecked = e.target.checked;
+
+                                if (column === 'operation') {
+                                    tableFields.forEach((row) => {
+                                        selectOperation(row.name, isChecked);
+                                    });
+                                }
+
+                                if (column === 'slowest_operand') {
+                                    tableFields.forEach((row) => {
+                                        if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                                            selectOperation(row.slowestOperandRef?.name ?? '', isChecked);
+                                        } else {
+                                            selectQueue(row.slowestOperandRef?.name ?? '', isChecked);
+                                        }
+                                    });
+                                }
+                            }}
                             className='sortable-table-checkbox'
                         />
                     )}
