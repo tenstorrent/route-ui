@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
-import { clearAllOperations, selectAllOperations } from '../../../data/store/slices/nodeSelection.slice';
 
 export enum SortingDirection {
     ASC = 'asc',
@@ -15,7 +13,6 @@ export interface OperationTableColumnDefinition {
     sortable: boolean;
     align?: 'left' | 'right';
     canSelectAllRows?: boolean;
-    selectAllRowsHandler?: (isSelected: boolean) => void;
     formatter: (value: any) => string;
 }
 
@@ -51,6 +48,7 @@ operationsTableColumns.set('core_id', {
     label: 'Core ID',
     sortable: false,
     align: 'left',
+    canSelectAllRows: true,
     formatter: (value) => value.toString(),
 });
 operationsTableColumns.set('operation', {
@@ -168,16 +166,6 @@ const sortDesc = (a: any, b: any) => {
 function useOperationsTable(opList: OpTableFields[]): OperationsTableHook {
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
-    const dispatch = useDispatch();
-
-    operationsTableColumns.get('operation')!.selectAllRowsHandler = (isSelected) => {
-        if (isSelected) {
-            dispatch(selectAllOperations());
-        } else {
-            dispatch(clearAllOperations());
-        }
-    };
-
     const opTableFields = (() => {
         const tableFields = opList;
 
