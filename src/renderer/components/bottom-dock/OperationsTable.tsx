@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
-import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
+import useOperationsTable, {
+    OpTableFields,
+    OperationTableColumnDefinition,
+    SortingDirection,
+} from './useOperationsTable.hooks';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
@@ -121,6 +125,35 @@ function OperationsTable() {
         );
     };
 
+    const handleSelectAll =
+        (column: keyof OpTableFields | 'operations', definition: OperationTableColumnDefinition) =>
+        (e: ChangeEvent<HTMLInputElement>) => {
+            const isChecked = e.target.checked;
+
+            if (column === 'core_id') {
+                tableFields.forEach((row) => {
+                    const cellContent = definition?.formatter(row.core_id || '') ?? '';
+                    selectNode(cellContent.toString(), isChecked);
+                });
+            }
+
+            if (column === 'operation') {
+                tableFields.forEach((row) => {
+                    selectOperation(row.name, isChecked);
+                });
+            }
+
+            if (column === 'slowest_operand') {
+                tableFields.forEach((row) => {
+                    if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                        selectOperation(row.slowestOperandRef?.name ?? '', isChecked);
+                    } else {
+                        selectQueue(row.slowestOperandRef?.name ?? '', isChecked);
+                    }
+                });
+            }
+        };
+
     const headerRenderer = (column: keyof OpTableFields | 'operation') => {
         const currentSortClass = sortingColumn === column ? 'current-sort' : '';
         const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
@@ -138,19 +171,7 @@ function OperationsTable() {
                     className={definition?.canSelectAllRows ? ' can-select-all-rows' : ''}
                 >
                     {definition?.canSelectAllRows && (
-                        <Checkbox
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                const isChecked = e.target.checked;
-
-                                if (column === 'core_id') {
-                                    tableFields.forEach((row) => {
-                                        const cellContent = definition?.formatter(row.core_id || '') ?? '';
-                                        selectNode(cellContent.toString(), isChecked);
-                                    });
-                                }
-                            }}
-                            className='sortable-table-checkbox'
-                        />
+                        <Checkbox onChange={handleSelectAll(column, definition)} className='sortable-table-checkbox' />
                     )}
                 </ColumnHeaderCell2>
             );
@@ -182,28 +203,7 @@ function OperationsTable() {
                         )}
                     </div>
                     {definition?.canSelectAllRows && (
-                        <Checkbox
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                const isChecked = e.target.checked;
-
-                                if (column === 'operation') {
-                                    tableFields.forEach((row) => {
-                                        selectOperation(row.name, isChecked);
-                                    });
-                                }
-
-                                if (column === 'slowest_operand') {
-                                    tableFields.forEach((row) => {
-                                        if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
-                                            selectOperation(row.slowestOperandRef?.name ?? '', isChecked);
-                                        } else {
-                                            selectQueue(row.slowestOperandRef?.name ?? '', isChecked);
-                                        }
-                                    });
-                                }
-                            }}
-                            className='sortable-table-checkbox'
-                        />
+                        <Checkbox onChange={handleSelectAll(column, definition)} className='sortable-table-checkbox' />
                     )}
                 </>
             </ColumnHeaderCell2>
