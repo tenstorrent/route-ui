@@ -12,6 +12,7 @@ export interface OperationTableColumnDefinition {
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
+    canSelectAllRows?: boolean;
     formatter: (value: any) => string;
 }
 
@@ -47,12 +48,14 @@ operationsTableColumns.set('core_id', {
     label: 'Core ID',
     sortable: false,
     align: 'left',
+    canSelectAllRows: true,
     formatter: (value) => value.toString(),
 });
 operationsTableColumns.set('operation', {
     label: 'Operation',
     sortable: true,
     align: 'left',
+    canSelectAllRows: true,
     formatter: (value) => value.toString(),
 });
 
@@ -137,6 +140,7 @@ operationsTableColumns.set('slowest_operand', {
     label: 'Slowest Operand',
     sortable: true,
     align: 'left',
+    canSelectAllRows: true,
     formatter: (value: Operand) => value.name,
 });
 
@@ -162,7 +166,6 @@ const sortDesc = (a: any, b: any) => {
 function useOperationsTable(opList: OpTableFields[]): OperationsTableHook {
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
-
     const opTableFields = (() => {
         const tableFields = opList;
 

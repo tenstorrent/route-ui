@@ -105,6 +105,22 @@
 
     }
 
+    .bp4-table-column-name-text {
+        padding-right: 30px;
+    }
+
+    .can-select-all-rows .bp4-table-column-name-text {
+        padding-left: 30px;
+    }
+
+    .sortable-table-checkbox {
+        width: 0;
+        margin: 0;
+        position: absolute;
+        left: 5px;
+        top: -30px;
+    }
+
     .sortable-table-header {
         cursor: pointer;
         position: absolute;

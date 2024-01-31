@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
-import useOperationsTable, { OpTableFields, SortingDirection } from './useOperationsTable.hooks';
+import useOperationsTable, {
+    OpTableFields,
+    OperationTableColumnDefinition,
+    SortingDirection,
+} from './useOperationsTable.hooks';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
@@ -121,6 +125,110 @@ function OperationsTable() {
         );
     };
 
+    const getCheckboxState = (column: keyof OpTableFields | 'operations') => {
+        if (column === 'core_id') {
+            const selectedRows = tableFields.filter((row) => {
+                const cellContent = row.core_id || '';
+                return nodesSelectionState.nodeList[cellContent]?.selected;
+            });
+
+            if (selectedRows.length === 0) {
+                return false;
+            }
+
+            if (selectedRows.length === tableFields.length) {
+                return true;
+            }
+        }
+
+        if (column === 'operation') {
+            const selectedRows = tableFields.filter((row) => {
+                return nodesSelectionState.operations[row.name]?.selected;
+            });
+
+            if (selectedRows.length === 0) {
+                return false;
+            }
+
+            if (selectedRows.length === tableFields.length) {
+                return true;
+            }
+        }
+
+        if (column === 'slowest_operand') {
+            const selectableRows = tableFields.filter((row) => {
+                if (!row.slowestOperandRef) {
+                    return false;
+                }
+
+                if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                    return !disabledOperation(row.slowestOperandRef?.name ?? '');
+                }
+
+                return !disabledQueue(row.slowestOperandRef?.name ?? '');
+            });
+
+            const selectedRows = selectableRows.filter((row) => {
+                if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                    return nodesSelectionState.operations[row.slowestOperandRef?.name ?? '']?.selected;
+                }
+
+                return nodesSelectionState.queues[row.slowestOperandRef?.name ?? '']?.selected;
+            });
+
+            if (selectedRows.length === 0) {
+                return false;
+            }
+
+            if (selectedRows.length === selectableRows.length) {
+                return true;
+            }
+        }
+
+        return undefined;
+    };
+
+    const handleSelectAll =
+        (column: keyof OpTableFields | 'operations', definition: OperationTableColumnDefinition) =>
+        (e: ChangeEvent<HTMLInputElement>) => {
+            const isChecked = e.target.checked;
+
+            if (column === 'core_id') {
+                tableFields.forEach((row) => {
+                    const cellContent = definition?.formatter(row.core_id || '') ?? '';
+                    selectNode(cellContent.toString(), isChecked);
+                });
+            }
+
+            if (column === 'operation') {
+                tableFields.forEach((row) => {
+                    selectOperation(row.name, isChecked);
+                });
+            }
+
+            if (column === 'slowest_operand') {
+                const selectableRows = tableFields.filter((row) => {
+                    if (!row.slowestOperandRef) {
+                        return false;
+                    }
+
+                    if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                        return !disabledOperation(row.slowestOperandRef?.name ?? '');
+                    }
+
+                    return !disabledQueue(row.slowestOperandRef?.name ?? '');
+                });
+
+                selectableRows.forEach((row) => {
+                    if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                        selectOperation(row.slowestOperandRef?.name ?? '', isChecked);
+                    } else {
+                        selectQueue(row.slowestOperandRef?.name ?? '', isChecked);
+                    }
+                });
+            }
+        };
+
     const headerRenderer = (column: keyof OpTableFields | 'operation') => {
         const currentSortClass = sortingColumn === column ? 'current-sort' : '';
         const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
@@ -130,26 +238,60 @@ function OperationsTable() {
         }
 
         const definition = operationsTableColumns.get(column);
+        const checkboxState = definition?.canSelectAllRows && getCheckboxState(column);
 
         if (!definition?.sortable) {
-            return <ColumnHeaderCell2 name={definition?.label ?? column} />;
+            return (
+                <ColumnHeaderCell2
+                    name={definition?.label ?? column}
+                    className={definition?.canSelectAllRows ? ' can-select-all-rows' : ''}
+                >
+                    {definition?.canSelectAllRows && (
+                        <Checkbox
+                            checked={checkboxState}
+                            indeterminate={checkboxState === undefined}
+                            onChange={handleSelectAll(column, definition)}
+                            className='sortable-table-checkbox'
+                        />
+                    )}
+                </ColumnHeaderCell2>
+            );
         }
         return (
-            <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label}>
-                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
-                <div
-                    className='sortable-table-header'
-                    role='button'
-                    onClick={() => changeSorting(column)(targetSortDirection)}
-                >
-                    {sortingColumn === column && (
-                        <span className='sort-icon'>
-                            <Icon
-                                icon={sortDirection === SortingDirection.ASC ? IconNames.SORT_ASC : IconNames.SORT_DESC}
-                            />
-                        </span>
+            <ColumnHeaderCell2
+                className={`${currentSortClass} ${sortDirectionClass}${
+                    definition.canSelectAllRows ? ' can-select-all-rows' : ''
+                }`}
+                name={definition.label}
+            >
+                <>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
+                    <div
+                        className='sortable-table-header'
+                        role='button'
+                        onClick={() => changeSorting(column)(targetSortDirection)}
+                    >
+                        {sortingColumn === column && (
+                            <span className='sort-icon'>
+                                <Icon
+                                    icon={
+                                        sortDirection === SortingDirection.ASC
+                                            ? IconNames.SORT_ASC
+                                            : IconNames.SORT_DESC
+                                    }
+                                />
+                            </span>
+                        )}
+                    </div>
+                    {definition?.canSelectAllRows && (
+                        <Checkbox
+                            checked={checkboxState}
+                            indeterminate={checkboxState === undefined}
+                            onChange={handleSelectAll(column, definition)}
+                            className='sortable-table-checkbox'
+                        />
                     )}
-                </div>
+                </>
             </ColumnHeaderCell2>
         );
     };
