@@ -1,6 +1,7 @@
 import { Menu, MenuItem } from '@blueprintjs/core';
 import React from 'react';
-import { SortingDirection } from '../useOperationsTable.hooks';
+
+import { SortingDirection } from '../useCommonTable.hook';
 
 type SortingMenuProps = {
     sortFunction: (direction: SortingDirection) => void;

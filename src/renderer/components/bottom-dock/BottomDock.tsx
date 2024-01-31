@@ -7,6 +7,7 @@ import { setDockOpenState } from 'data/store/slices/uiState.slice';
 import OperationsTable from './OperationsTable';
 import LogsOutput from '../LogsOutput';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
+import QueuesTable from './QueuesTable';
 
 const BottomDock: React.FC = () => {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
@@ -18,6 +19,7 @@ const BottomDock: React.FC = () => {
         <div className='dock bottom-dock'>
             <Tabs id='dock-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className={Classes.TABS}>
                 <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
+                <Tab id='tab2' title='Queues' panel={<QueuesTable />} />
                 {/* <Tab */}
                 {/*     id='tab2' */}
                 {/*     title='Operands' */}

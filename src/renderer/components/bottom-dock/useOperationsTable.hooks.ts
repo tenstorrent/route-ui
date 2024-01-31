@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
-
-export enum SortingDirection {
-    ASC = 'asc',
-    DESC = 'desc',
-}
+import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
 
 export interface OperationTableColumnDefinition {
     label: string;
@@ -29,7 +25,7 @@ type OperationsTableHook = {
     changeSorting: (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => void;
     sortingColumn: OperationTableColumn;
     sortDirection: SortingDirection;
-    operationsTableColumns: Map<OperationTableColumn, OperationTableColumnDefinition>;
+    operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition>;
 };
 
 type OperationTableColumn = keyof OpTableFields | 'operation';
@@ -37,7 +33,7 @@ type OperationTableColumn = keyof OpTableFields | 'operation';
 const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
-const operationsTableColumns: Map<OperationTableColumn, OperationTableColumnDefinition> = new Map();
+const operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition> = new Map();
 
 operationsTableColumns.set('grid_size', {
     label: 'Grid size',
@@ -144,26 +140,7 @@ operationsTableColumns.set('slowest_operand', {
     formatter: (value: Operand) => value.name,
 });
 
-const sortAsc = (a: any, b: any) => {
-    if (typeof a === 'string' && typeof b === 'number') {
-        return 1;
-    }
-    if (a === b) {
-        return 0;
-    }
-    return a > b ? 1 : -1;
-};
-const sortDesc = (a: any, b: any) => {
-    if (typeof a === 'string' && typeof b === 'number') {
-        return 1;
-    }
-    if (a === b) {
-        return 0;
-    }
-    return a < b ? 1 : -1;
-};
-
-function useOperationsTable(opList: OpTableFields[]): OperationsTableHook {
+const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
     const opTableFields = (() => {
@@ -185,6 +162,6 @@ function useOperationsTable(opList: OpTableFields[]): OperationsTableHook {
         setSortingColumn(selectedColumn);
     };
     return { opTableFields, changeSorting, sortingColumn, sortDirection, operationsTableColumns };
-}
+};
 
 export default useOperationsTable;
