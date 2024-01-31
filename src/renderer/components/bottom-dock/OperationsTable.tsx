@@ -125,6 +125,69 @@ function OperationsTable() {
         );
     };
 
+    const getCheckboxState = (column: keyof OpTableFields | 'operations') => {
+        if (column === 'core_id') {
+            const selectedRows = tableFields.filter((row) => {
+                const cellContent = row.core_id || '';
+                return nodesSelectionState.nodeList[cellContent]?.selected;
+            });
+
+            if (selectedRows.length === 0) {
+                return false;
+            }
+
+            if (selectedRows.length === tableFields.length) {
+                return true;
+            }
+        }
+
+        if (column === 'operation') {
+            const selectedRows = tableFields.filter((row) => {
+                return nodesSelectionState.operations[row.name]?.selected;
+            });
+
+            if (selectedRows.length === 0) {
+                return false;
+            }
+
+            if (selectedRows.length === tableFields.length) {
+                return true;
+            }
+        }
+
+        if (column === 'slowest_operand') {
+            const selectableRows = tableFields.filter((row) => {
+                if (!row.slowestOperandRef) {
+                    return false;
+                }
+
+                if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                    return !disabledOperation(row.slowestOperandRef?.name ?? '');
+                }
+
+                return !disabledQueue(row.slowestOperandRef?.name ?? '');
+            });
+
+            const selectedRows = selectableRows.filter((row) => {
+                if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                    return nodesSelectionState.operations[row.slowestOperandRef?.name ?? '']?.selected;
+                }
+
+                return nodesSelectionState.queues[row.slowestOperandRef?.name ?? '']?.selected;
+            });
+
+            if (selectedRows.length === 0) {
+                return false;
+            }
+
+            if (selectedRows.length === selectableRows.length) {
+                return true;
+            }
+        }
+
+        return undefined;
+    };
+
     const handleSelectAll =
         (column: keyof OpTableFields | 'operations', definition: OperationTableColumnDefinition) =>
         (e: ChangeEvent<HTMLInputElement>) => {
@@ -163,6 +226,7 @@ function OperationsTable() {
         }
 
         const definition = operationsTableColumns.get(column);
+        const checkboxState = definition?.canSelectAllRows && getCheckboxState(column);
 
         if (!definition?.sortable) {
             return (
@@ -171,7 +235,12 @@ function OperationsTable() {
                     className={definition?.canSelectAllRows ? ' can-select-all-rows' : ''}
                 >
                     {definition?.canSelectAllRows && (
-                        <Checkbox onChange={handleSelectAll(column, definition)} className='sortable-table-checkbox' />
+                        <Checkbox
+                            checked={checkboxState}
+                            indeterminate={checkboxState === undefined}
+                            onChange={handleSelectAll(column, definition)}
+                            className='sortable-table-checkbox'
+                        />
                     )}
                 </ColumnHeaderCell2>
             );
@@ -203,7 +272,12 @@ function OperationsTable() {
                         )}
                     </div>
                     {definition?.canSelectAllRows && (
-                        <Checkbox onChange={handleSelectAll(column, definition)} className='sortable-table-checkbox' />
+                        <Checkbox
+                            checked={checkboxState}
+                            indeterminate={checkboxState === undefined}
+                            onChange={handleSelectAll(column, definition)}
+                            className='sortable-table-checkbox'
+                        />
                     )}
                 </>
             </ColumnHeaderCell2>
