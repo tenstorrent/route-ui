@@ -96,6 +96,8 @@
         }
     }
 
+    .slowest-operand-direction-icon { margin-left: 2px; }
+
     .table-operation-cell > div {
         display: flex;
         flex-direction: row;
@@ -106,19 +108,19 @@
     }
 
     .bp4-table-column-name-text {
-        padding-right: 30px;
+        padding-right: 25px;
     }
 
     .can-select-all-rows .bp4-table-column-name-text {
-        padding-left: 30px;
+        padding-left: 35px;
     }
 
     .sortable-table-checkbox {
         width: 0;
         margin: 0;
         position: absolute;
-        left: 5px;
-        top: -30px;
+        left: 10px;
+        top: -29.5px;
     }
 
     .sortable-table-header {

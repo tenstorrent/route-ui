@@ -328,9 +328,19 @@ function OperationsTable() {
             return (
                 <Cell className='table-cell-interactive table-operation-cell'>
                     {slowOpString.includes('output') ? (
-                        <Icon size={12} icon={IconNames.EXPORT} title={slowOpString} />
+                        <Icon
+                            size={12}
+                            icon={IconNames.EXPORT}
+                            className='slowest-operand-direction-icon'
+                            title={slowOpString}
+                        />
                     ) : (
-                        <Icon size={12} icon={IconNames.IMPORT} title={slowOpString} />
+                        <Icon
+                            size={12}
+                            icon={IconNames.IMPORT}
+                            className='slowest-operand-direction-icon'
+                            title={slowOpString}
+                        />
                     )}
                     <SelectableOperationPerformance
                         operation={type === GraphVertexType.OPERATION ? (slowestOperand as Operation) : null}
