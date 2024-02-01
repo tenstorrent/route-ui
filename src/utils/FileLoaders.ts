@@ -20,7 +20,7 @@ import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 // ref: https://nodejs.org/dist/latest-v20.x/docs/api/fs.html#fspromisesopendirpath-options
 import fs, { Dirent } from 'fs';
 import path from 'path';
-import { parse } from 'yaml';
+import { load } from 'js-yaml';
 import { GraphRelationshipState } from '../data/StateTypes';
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from '../data/sources/ClusterDescriptor';
 import Cluster from '../data/Cluster';
@@ -123,7 +123,7 @@ export const getAvailableGraphNames = async (perfResultsPath: string): Promise<G
     try {
         const runtimeDataPath = path.join(perfResultsPath, 'runtime_data.yaml');
         const runtimeDataYaml = await readFile(runtimeDataPath);
-        const runtimeData = parse(runtimeDataYaml);
+        const runtimeData = load(runtimeDataYaml) as any;
 
         return Object.entries(runtimeData.graph_to_epoch_map as GraphnameToEpochToDeviceJSON).map(
             ([graphName, mapping]) => {
@@ -145,15 +145,19 @@ export const loadCluster = async (perfResultsPath: string): Promise<Cluster | nu
     try {
         const clusterDescFilePath = path.join(perfResultsPath, 'cluster_desc.yaml');
         const clusterDescYaml = await readFile(clusterDescFilePath);
-        const clusterDescriptor = parse(clusterDescYaml) as ClusterDescriptorJSON;
+        const clusterDescriptor = load(clusterDescYaml) as ClusterDescriptorJSON;
 
-        const deviceDescFilePath = path.join(perfResultsPath, 'device_desc.yaml');
-        const deviceDescYaml = await readFile(deviceDescFilePath);
-        const deviceDescriptor = parse(deviceDescYaml) as DeviceDescriptorJSON;
-
-        return new Cluster(clusterDescriptor, deviceDescriptor);
+        const deviceDescFolder = path.join(perfResultsPath, 'device_descs');
+        const deviceDescFiles = await readDirEntries(deviceDescFolder);
+        const deviceDescriptorResults = deviceDescFiles.map(async (file) => {
+            const descriptorPath = path.join(deviceDescFolder, file.name);
+            const descriptorYaml = await readFile(descriptorPath);
+            return load(descriptorYaml) as DeviceDescriptorJSON;
+        });
+        const deviceDescriptorList = await Promise.all(deviceDescriptorResults);
+        return new Cluster(clusterDescriptor, deviceDescriptorList);
     } catch (err) {
-        console.error('Failed to read cluster_desc.yaml', err);
+        console.error('Failed to load cluster description', err);
     }
     return null;
 };
@@ -240,11 +244,11 @@ const loadChipFromNetlistAnalyzer = async (
         }
         if (netlistAnalyzerFilepath !== '') {
             const data = await readFile(netlistAnalyzerFilepath);
-            let chip = Chip.CREATE_FROM_NETLIST_JSON(parse(data) as NetlistAnalyzerDataJSON);
+            let chip = Chip.CREATE_FROM_NETLIST_JSON(load(data) as NetlistAnalyzerDataJSON);
             if (netlistAnalyzerOptoPipeFilepath !== '') {
                 try {
                     const opsData = await readFile(netlistAnalyzerOptoPipeFilepath);
-                    chip = Chip.AUGMENT_FROM_OPS_JSON(chip, parse(opsData).ops);
+                    chip = Chip.AUGMENT_FROM_OPS_JSON(chip, (load(opsData) as any).ops);
                     if (chip) {
                         return chip;
                     }

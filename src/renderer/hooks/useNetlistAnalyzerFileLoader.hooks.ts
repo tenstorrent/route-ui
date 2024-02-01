@@ -1,20 +1,11 @@
-import {
-    clearAvailableGraphs,
-    setAvailableGraphs,
-    setApplicationMode,
-    setSelectedFile,
-} from 'data/store/slices/uiState.slice';
-
+import { clearAvailableGraphs, setApplicationMode, setSelectedFile } from 'data/store/slices/uiState.slice';
 import { ApplicationMode } from 'data/Types';
 import Chip from 'data/Chip';
 import { NetlistAnalyzerDataJSON } from 'data/JSONDataTypes';
 import { dialog } from '@electron/remote';
 import fs from 'node:fs/promises';
-import { getAvailableNetlistFiles } from 'utils/FileLoaders';
-import { parse } from 'yaml';
-import path from 'path';
 import { useDispatch } from 'react-redux';
-import { sortNetlistAnalyzerFiles } from 'utils/FilenameSorters';
+import { load } from 'js-yaml';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import useLogging from './useLogging.hook';
 
@@ -50,7 +41,7 @@ const useNetlistAnalyzerFileLoader = (): NetlistAnalyzerFileLoaderHook => {
     const loadNetlistFile = async (filename: string): Promise<void> => {
         try {
             const data = await fs.readFile(filename, 'utf-8');
-            const doc = parse(data);
+            const doc = load(data);
             const chip = Chip.CREATE_FROM_NETLIST_JSON(doc as NetlistAnalyzerDataJSON);
             populateChipData(chip);
             dispatch(setSelectedFile(filename));
