@@ -14,7 +14,7 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { SortingDirection } from './SharedTable';
+import { DataTableColumnDefinition, SortingDirection } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -187,7 +187,7 @@ function OperationsTable() {
     };
 
     const handleSelectAll =
-        (column: keyof OpTableFields | 'operations', definition: OperationTableColumnDefinition) =>
+        (column: keyof OpTableFields | 'operations', definition: DataTableColumnDefinition) =>
         (e: ChangeEvent<HTMLInputElement>) => {
             const isChecked = e.target.checked;
 
