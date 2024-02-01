@@ -1,8 +1,13 @@
+import type { NodeSelectionState } from '../../../data/StateTypes';
+import type { OpTableFields } from './useOperationsTable.hooks';
+
 export interface DataTableColumnDefinition {
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
     canSelectAllRows?: boolean;
+    getSelectedState?: (rows: OpTableFields[], nodesSelectionState: NodeSelectionState) => boolean | undefined;
+    handleSelectAll?: (rows: OpTableFields[], selected: boolean) => void;
     formatter: (value: any) => string;
 }
 

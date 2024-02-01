@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import { GraphVertexType } from '../../../data/GraphNames';
 
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
@@ -133,6 +137,8 @@ operationsTableColumns.set('slowest_operand', {
 });
 
 const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
+    const dispatch = useDispatch();
+    const { selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
     const sortedTableFields = (() => {
@@ -148,6 +154,105 @@ const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
             ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
             : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
     })();
+
+    operationsTableColumns.get('core_id')!.handleSelectAll = (rows, selected) => {
+        rows.forEach((row) => {
+            dispatch(updateNodeSelection({ id: row.core_id || '', selected }));
+        });
+    };
+
+    operationsTableColumns.get('core_id')!.getSelectedState = (rows, nodesSelectionState) => {
+        const selectedRows = rows.filter((row) => {
+            const cellContent = row.core_id || '';
+            return nodesSelectionState.nodeList[cellContent]?.selected;
+        });
+
+        if (selectedRows.length === 0) {
+            return false;
+        }
+
+        if (selectedRows.length === rows.length) {
+            return true;
+        }
+
+        return undefined;
+    };
+
+    operationsTableColumns.get('operation')!.handleSelectAll = (rows: OpTableFields[], selected: boolean) => {
+        rows.forEach((row) => {
+            selectOperation(row.name, selected);
+        });
+    };
+
+    operationsTableColumns.get('operation')!.getSelectedState = (rows: OpTableFields[], nodesSelectionState) => {
+        const selectedRows = rows.filter((row) => {
+            return nodesSelectionState.operations[row.name]?.selected;
+        });
+
+        if (selectedRows.length === 0) {
+            return false;
+        }
+
+        if (selectedRows.length === rows.length) {
+            return true;
+        }
+
+        return undefined;
+    };
+
+    operationsTableColumns.get('slowest_operand')!.handleSelectAll = (rows: OpTableFields[], selected: boolean) => {
+        const selectableRows = rows.filter((row) => {
+            if (!row.slowestOperandRef) {
+                return false;
+            }
+
+            if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                return !disabledOperation(row.slowestOperandRef?.name ?? '');
+            }
+
+            return !disabledQueue(row.slowestOperandRef?.name ?? '');
+        });
+
+        selectableRows.forEach((row) => {
+            if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                selectOperation(row.slowestOperandRef?.name ?? '', selected);
+            } else {
+                selectQueue(row.slowestOperandRef?.name ?? '', selected);
+            }
+        });
+    };
+
+    operationsTableColumns.get('slowest_operand')!.getSelectedState = (rows: OpTableFields[], nodesSelectionState) => {
+        const selectableRows = rows.filter((row) => {
+            if (!row.slowestOperandRef) {
+                return false;
+            }
+
+            if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                return !disabledOperation(row.slowestOperandRef?.name ?? '');
+            }
+
+            return !disabledQueue(row.slowestOperandRef?.name ?? '');
+        });
+
+        const selectedRows = selectableRows.filter((row) => {
+            if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
+                return nodesSelectionState.operations[row.slowestOperandRef?.name ?? '']?.selected;
+            }
+
+            return nodesSelectionState.queues[row.slowestOperandRef?.name ?? '']?.selected;
+        });
+
+        if (selectedRows.length === 0) {
+            return false;
+        }
+
+        if (selectedRows.length === selectableRows.length) {
+            return true;
+        }
+
+        return undefined;
+    };
 
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {
         setSortDirection(direction);
