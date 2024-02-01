@@ -2,6 +2,7 @@ export interface DataTableColumnDefinition {
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
+    canSelectAllRows?: boolean;
     formatter: (value: any) => string;
 }
 

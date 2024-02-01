@@ -4,13 +4,6 @@ import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
 
-export interface OperationTableColumnDefinition {
-    label: string;
-    sortable: boolean;
-    align?: 'left' | 'right';
-    canSelectAllRows?: boolean;
-    formatter: (value: any) => string;
-}
 
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
