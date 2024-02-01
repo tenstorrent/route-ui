@@ -179,7 +179,7 @@
   },
   "build": {
     "productName": "Route UI",
-    "appId": "org.erb.ElectronReact",
+    "appId": "com.tenstorrent.route-ui",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
