@@ -12,7 +12,13 @@ type QueueusTableColumn = keyof QueuesTableFields | 'queue';
 
 const queuesTableColumns: Map<QueueusTableColumn, DataTableColumnDefinition> = new Map();
 
-
+queuesTableColumns.set('queue', {
+    label: 'Queue',
+    sortable: true,
+    align: 'left',
+    canSelectAllRows: true,
+    formatter: (value) => value.toString(),
+});
 
 queuesTableColumns.set('entries', {
     label: 'Entries',

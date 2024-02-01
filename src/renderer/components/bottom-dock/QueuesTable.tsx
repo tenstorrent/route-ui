@@ -1,5 +1,5 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { Cell, Column, ColumnHeaderCell2, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useSelector } from 'react-redux';
 import { Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -64,7 +64,7 @@ function QueuesTable() {
         );
     };
 
-    const headerRenderer = (column: keyof QueuesTableFields | 'queue') => {
+    const headerRenderer = (column: keyof QueuesTableFields) => {
         const currentSortClass = sortingColumn === column ? 'current-sort' : '';
         const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
         let targetSortDirection = sortDirection;
@@ -108,6 +108,28 @@ function QueuesTable() {
         return <pre>No data available</pre>;
     }
 
+    const getColumn = (
+        key: keyof QueuesTableFields,
+    ): ReactElement<IColumnProps, string | JSXElementConstructor<any>> => {
+        if (key === 'queue') {
+            return (
+                <Column
+                    id='queue'
+                    cellRenderer={(rowIndex) => queueCellRenderer(rowIndex)}
+                    columnHeaderCellRenderer={() => headerRenderer('queue')}
+                />
+            );
+        }
+        return (
+            <Column
+                key={key}
+                id={key}
+                cellRenderer={(rowIndex) => cellRenderer(key, rowIndex)}
+                columnHeaderCellRenderer={() => headerRenderer(key)}
+            />
+        );
+    };
+
     return (
         <Table2
             ref={table}
@@ -129,20 +151,9 @@ function QueuesTable() {
                 tableFields.length,
             ]}
         >
-            <Column
-                id='queue'
-                cellRenderer={(rowIndex) => queueCellRenderer(rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('queue')}
-            />
-            {/* @ts-ignore */}
-            {[...queuesTableColumns.keys()].map((key) => (
-                <Column
-                    key={key}
-                    id={key}
-                    cellRenderer={(rowIndex) => cellRenderer(key, rowIndex)}
-                    columnHeaderCellRenderer={() => headerRenderer(key)}
-                />
-            ))}
+            {[...queuesTableColumns.keys()].map((key) => {
+                return getColumn(key);
+            })}
         </Table2>
     );
 }
