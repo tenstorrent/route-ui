@@ -14,7 +14,7 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { SortingDirection } from './SharedTable';
+import { DataTableColumnDefinition, SortingDirection } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -22,7 +22,7 @@ function OperationsTable() {
     const dispatch = useDispatch();
     const [tableFields, setTableFields] = useState<OpTableFields[]>([]);
     const [coreView, setCoreView] = useState(false);
-    const { operationsTableColumns, opTableFields, changeSorting, sortDirection, sortingColumn } =
+    const { operationsTableColumns, sortedTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable(tableFields);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
 
@@ -74,11 +74,11 @@ function OperationsTable() {
     };
 
     const operationCellRenderer = (rowIndex: number) => {
-        const opName = opTableFields[rowIndex].name;
+        const opName = sortedTableFields[rowIndex].name;
         return (
             <Cell interactive className='table-cell-interactive table-operation-cell'>
                 {opName ? (
-                    <SelectableOperationPerformance operation={opTableFields[rowIndex].operation || null}>
+                    <SelectableOperationPerformance operation={sortedTableFields[rowIndex].operation || null}>
                         <SelectableOperation
                             disabled={disabledOperation(opName)}
                             opName={opName}
@@ -187,7 +187,7 @@ function OperationsTable() {
     };
 
     const handleSelectAll =
-        (column: keyof OpTableFields | 'operations', definition: OperationTableColumnDefinition) =>
+        (column: keyof OpTableFields | 'operations', definition: DataTableColumnDefinition) =>
         (e: ChangeEvent<HTMLInputElement>) => {
             const isChecked = e.target.checked;
 
@@ -388,7 +388,7 @@ function OperationsTable() {
                 nodesSelectionState.nodeList,
                 tableFields,
                 coreView,
-                opTableFields,
+                sortedTableFields,
                 tableFields.length,
             ]}
         >

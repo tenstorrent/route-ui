@@ -4,7 +4,6 @@ import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
 
-
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
     name: string;
@@ -14,7 +13,7 @@ export interface OpTableFields extends MeasurementDetails {
 }
 
 type OperationsTableHook = {
-    opTableFields: OpTableFields[];
+    sortedTableFields: OpTableFields[];
     changeSorting: (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => void;
     sortingColumn: OperationTableColumn;
     sortDirection: SortingDirection;
@@ -136,7 +135,7 @@ operationsTableColumns.set('slowest_operand', {
 const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
-    const opTableFields = (() => {
+    const sortedTableFields = (() => {
         const tableFields = opList;
 
         if (sortingColumn === 'operation') {
@@ -154,7 +153,13 @@ const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
         setSortDirection(direction);
         setSortingColumn(selectedColumn);
     };
-    return { opTableFields, changeSorting, sortingColumn, sortDirection, operationsTableColumns };
+    return {
+        sortedTableFields,
+        changeSorting,
+        sortingColumn,
+        sortDirection,
+        operationsTableColumns,
+    };
 };
 
 export default useOperationsTable;
