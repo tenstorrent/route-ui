@@ -145,7 +145,7 @@ function OperationsTable() {
                             checked={checkboxState}
                             indeterminate={checkboxState === undefined}
                             onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                definition.handleSelectAll!(tableFields, e.target.checked)
+                                definition.handleSelectAll?.(tableFields, e.target.checked)
                             }
                             className='sortable-table-checkbox'
                         />
