@@ -494,12 +494,6 @@ export default class Chip {
                                         }
                                     }
                                 }
-                            } else {
-                                // this might be a normal course of things, as per Xander those pipes are preexisting befor the graph is executed.
-                                // we might want to remove those segments alltogether if they are proven irrelevant or have a way to mark them in UI
-                                console.warn(
-                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${augmentedChip.chipId}`,
-                                );
                             }
                         });
                     });
@@ -520,11 +514,6 @@ export default class Chip {
                                         }
                                     }
                                 }
-                            } else {
-                                // ditto as above
-                                console.warn(
-                                    `Pipe ${pipeId} exists in op-to-pipe but not found on chip ${augmentedChip.chipId}`,
-                                );
                             }
                         });
                     });

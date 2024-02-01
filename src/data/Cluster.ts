@@ -49,18 +49,19 @@ export class ClusterChip {
 export default class Cluster {
     public readonly chips: ClusterChip[] = [];
 
-    constructor(clusterDescriptor: ClusterDescriptorJSON, deviceDescriptor: DeviceDescriptorJSON) {
+    constructor(clusterDescriptor: ClusterDescriptorJSON, deviceDescriptorList: DeviceDescriptorJSON[]) {
         const connections = clusterDescriptor.ethernet_connections;
         const mmioChips = clusterDescriptor.chips_with_mmio.map((obj) => {
             return Object.values(obj)[0];
         });
 
         this.chips = Object.entries(clusterDescriptor.chips).map(([ClusterChipId, coordinates]) => {
+            const chipId = parseInt(ClusterChipId, 10);
             return new ClusterChip(
-                parseInt(ClusterChipId, 10),
+                chipId,
                 new ClusterCoordinates(coordinates),
-                mmioChips.includes(parseInt(ClusterChipId, 10)),
-                deviceDescriptor.eth.map((coreId) => `${ClusterChipId}-${coreId}`),
+                mmioChips.includes(chipId),
+                deviceDescriptorList[chipId].eth.map((coreId) => `${ClusterChipId}-${coreId}`),
             );
         });
         connections.forEach((connection) => {
