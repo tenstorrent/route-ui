@@ -14,7 +14,7 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, SortingDirection } from './SharedTable';
+import { SortingDirection } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -123,110 +123,6 @@ function OperationsTable() {
         );
     };
 
-    const getCheckboxState = (column: keyof OpTableFields | 'operations') => {
-        if (column === 'core_id') {
-            const selectedRows = tableFields.filter((row) => {
-                const cellContent = row.core_id || '';
-                return nodesSelectionState.nodeList[cellContent]?.selected;
-            });
-
-            if (selectedRows.length === 0) {
-                return false;
-            }
-
-            if (selectedRows.length === tableFields.length) {
-                return true;
-            }
-        }
-
-        if (column === 'operation') {
-            const selectedRows = tableFields.filter((row) => {
-                return nodesSelectionState.operations[row.name]?.selected;
-            });
-
-            if (selectedRows.length === 0) {
-                return false;
-            }
-
-            if (selectedRows.length === tableFields.length) {
-                return true;
-            }
-        }
-
-        if (column === 'slowest_operand') {
-            const selectableRows = tableFields.filter((row) => {
-                if (!row.slowestOperandRef) {
-                    return false;
-                }
-
-                if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
-                    return !disabledOperation(row.slowestOperandRef?.name ?? '');
-                }
-
-                return !disabledQueue(row.slowestOperandRef?.name ?? '');
-            });
-
-            const selectedRows = selectableRows.filter((row) => {
-                if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
-                    return nodesSelectionState.operations[row.slowestOperandRef?.name ?? '']?.selected;
-                }
-
-                return nodesSelectionState.queues[row.slowestOperandRef?.name ?? '']?.selected;
-            });
-
-            if (selectedRows.length === 0) {
-                return false;
-            }
-
-            if (selectedRows.length === selectableRows.length) {
-                return true;
-            }
-        }
-
-        return undefined;
-    };
-
-    const handleSelectAll =
-        (column: keyof OpTableFields | 'operations', definition: DataTableColumnDefinition) =>
-        (e: ChangeEvent<HTMLInputElement>) => {
-            const isChecked = e.target.checked;
-
-            if (column === 'core_id') {
-                tableFields.forEach((row) => {
-                    const cellContent = definition?.formatter(row.core_id || '') ?? '';
-                    selectNode(cellContent.toString(), isChecked);
-                });
-            }
-
-            if (column === 'operation') {
-                tableFields.forEach((row) => {
-                    selectOperation(row.name, isChecked);
-                });
-            }
-
-            if (column === 'slowest_operand') {
-                const selectableRows = tableFields.filter((row) => {
-                    if (!row.slowestOperandRef) {
-                        return false;
-                    }
-
-                    if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
-                        return !disabledOperation(row.slowestOperandRef?.name ?? '');
-                    }
-
-                    return !disabledQueue(row.slowestOperandRef?.name ?? '');
-                });
-
-                selectableRows.forEach((row) => {
-                    if (row.slowestOperandRef?.vertexType === GraphVertexType.OPERATION) {
-                        selectOperation(row.slowestOperandRef?.name ?? '', isChecked);
-                    } else {
-                        selectQueue(row.slowestOperandRef?.name ?? '', isChecked);
-                    }
-                });
-            }
-        };
-
     const headerRenderer = (column: keyof OpTableFields | 'operation') => {
         const currentSortClass = sortingColumn === column ? 'current-sort' : '';
         const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
@@ -236,7 +132,7 @@ function OperationsTable() {
         }
 
         const definition = operationsTableColumns.get(column);
-        const checkboxState = definition?.canSelectAllRows && getCheckboxState(column);
+        const checkboxState = definition?.getSelectedState?.(tableFields, nodesSelectionState);
 
         if (!definition?.sortable) {
             return (
@@ -248,7 +144,9 @@ function OperationsTable() {
                         <Checkbox
                             checked={checkboxState}
                             indeterminate={checkboxState === undefined}
-                            onChange={handleSelectAll(column, definition)}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                definition.handleSelectAll?.(tableFields, e.target.checked)
+                            }
                             className='sortable-table-checkbox'
                         />
                     )}
@@ -285,7 +183,9 @@ function OperationsTable() {
                         <Checkbox
                             checked={checkboxState}
                             indeterminate={checkboxState === undefined}
-                            onChange={handleSelectAll(column, definition)}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                definition.handleSelectAll!(tableFields, e.target.checked)
+                            }
                             className='sortable-table-checkbox'
                         />
                     )}
@@ -328,19 +228,9 @@ function OperationsTable() {
             return (
                 <Cell className='table-cell-interactive table-operation-cell'>
                     {slowOpString.includes('output') ? (
-                        <Icon
-                            size={12}
-                            icon={IconNames.EXPORT}
-                            className='slowest-operand-direction-icon'
-                            title={slowOpString}
-                        />
+                        <Icon size={12} icon={IconNames.EXPORT} title={slowOpString} />
                     ) : (
-                        <Icon
-                            size={12}
-                            icon={IconNames.IMPORT}
-                            className='slowest-operand-direction-icon'
-                            title={slowOpString}
-                        />
+                        <Icon size={12} icon={IconNames.IMPORT} title={slowOpString} />
                     )}
                     <SelectableOperationPerformance
                         operation={type === GraphVertexType.OPERATION ? (slowestOperand as Operation) : null}
