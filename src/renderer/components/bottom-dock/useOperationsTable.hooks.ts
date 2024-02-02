@@ -2,16 +2,8 @@ import { useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
-import {
-    DataTableColumnDefinition,
-    getSelectedState,
-    handleSelectAll,
-    sortAsc,
-    sortDesc,
-    SortingDirection,
-} from './SharedTable';
-import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
-import { GraphVertexType } from '../../../data/GraphNames';
+import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
@@ -143,14 +135,13 @@ operationsTableColumns.set('slowest_operand', {
 
 const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
     const {
-        disabledSlowestOperand,
-        selectOperation,
-        selectCore,
-        selectSlowestOperand,
-        selectedNode: selectedCore,
-        selectedOperation,
-        selectedSlowestOperand,
-    } = useSelectableGraphVertex();
+        handleSelectAllCores,
+        handleSelectAllOperations,
+        handleSelectAllSlowestOperands,
+        getCoreSelectedState,
+        getOperationSelectedState,
+        getSlowestOperandSelectedState,
+    } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
     const sortedTableFields = (() => {
@@ -167,48 +158,14 @@ const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
             : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
     })();
 
-    operationsTableColumns.get('core_id')!.handleSelectAll = handleSelectAll((row, selected) => {
-        selectCore(row.core_id, selected);
-    });
+    operationsTableColumns.get('core_id')!.handleSelectAll = handleSelectAllCores;
+    operationsTableColumns.get('core_id')!.getSelectedState = getCoreSelectedState;
 
-    operationsTableColumns.get('core_id')!.getSelectedState = getSelectedState((row) => selectedCore(row.core_id));
+    operationsTableColumns.get('operation')!.handleSelectAll = handleSelectAllOperations;
+    operationsTableColumns.get('operation')!.getSelectedState = getOperationSelectedState;
 
-    operationsTableColumns.get('operation')!.handleSelectAll = handleSelectAll((row, selected) => {
-        selectOperation(row.name, selected);
-    });
-
-    operationsTableColumns.get('operation')!.getSelectedState = getSelectedState((row) => selectedOperation(row.name));
-
-    operationsTableColumns.get('slowest_operand')!.handleSelectAll = handleSelectAll(
-        (row, selected) => {
-            selectSlowestOperand(
-                row.slowestOperandRef?.name ?? '',
-                row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION,
-                selected,
-            );
-        },
-        (row) => {
-            return !disabledSlowestOperand(
-                row.slowestOperandRef?.name ?? '',
-                row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION,
-            );
-        },
-    );
-
-    operationsTableColumns.get('slowest_operand')!.getSelectedState = getSelectedState(
-        (row) => {
-            return selectedSlowestOperand(
-                row.slowestOperandRef?.name ?? '',
-                row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION,
-            );
-        },
-        (row) => {
-            return !disabledSlowestOperand(
-                row.slowestOperandRef?.name ?? '',
-                row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION,
-            );
-        },
-    );
+    operationsTableColumns.get('slowest_operand')!.handleSelectAll = handleSelectAllSlowestOperands;
+    operationsTableColumns.get('slowest_operand')!.getSelectedState = getSlowestOperandSelectedState;
 
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {
         setSortDirection(direction);
