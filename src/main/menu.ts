@@ -76,7 +76,7 @@ export default class MenuBuilder {
                         checked: false,
                         accelerator: 'Alt+Command+L',
                         click: (menuItem) => {
-                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOGGING_PANEL, menuItem.checked);
+                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
                         },
                     },
                     ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
@@ -149,7 +149,7 @@ export default class MenuBuilder {
                         click: (menuItem) => {
                             menuItem.checked = !menuItem.checked;
 
-                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOGGING_PANEL, menuItem.checked);
+                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
                         },
                     },
                     ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
