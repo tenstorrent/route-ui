@@ -55,7 +55,7 @@ export default class MenuBuilder {
                     { type: 'separator' },
                     { role: 'services' },
                     { type: 'separator' },
-                    { role: 'hide' },
+                    { role: 'hide', label: 'Hide RouteUI' },
                     { role: 'hideOthers' },
                     { role: 'unhide' },
                     { type: 'separator' },
