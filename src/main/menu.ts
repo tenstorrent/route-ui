@@ -117,20 +117,10 @@ export default class MenuBuilder {
 
     buildDefaultTemplate() {
         const subMenuViewDev: Array<MenuItemConstructorOptions> = [
-            {
-                label: '&Reload',
-                accelerator: 'Ctrl+R',
-                click: () => {
-                    this.mainWindow.webContents.reload();
-                },
-            },
-            {
-                label: 'Toggle &Developer Tools',
-                accelerator: 'Alt+Ctrl+I',
-                click: () => {
-                    this.mainWindow.webContents.toggleDevTools();
-                },
-            },
+            { type: 'separator' },
+            { role: 'reload' },
+            { role: 'forceReload' },
+            { role: 'toggleDevTools' },
         ];
 
         const templateDefault: Array<MenuItemConstructorOptions> = [
