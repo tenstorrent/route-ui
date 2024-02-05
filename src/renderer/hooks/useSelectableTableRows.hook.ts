@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import type { OpTableFields } from '../components/bottom-dock/useOperationsTable.hooks';
+import type { QueuesTableFields } from '../components/bottom-dock/useQueuesTable.hook';
 import { GraphVertexType } from '../../data/GraphNames';
 import { selectOperation, selectQueue, updateNodeSelection } from '../../data/store/slices/nodeSelection.slice';
 import { RootState } from '../../data/store/createStore';
@@ -43,6 +44,9 @@ const useSelectedTableRows = () => {
             },
             (row) => !getDisabledSlowestOperand(row),
         ),
+        handleSelectAllQueues: handleSelectAll<QueuesTableFields>((row, selected) => {
+            dispatch(selectQueue({ queueName: row.name, selected }));
+        }),
         getCoreSelectedState: getSelectedState<OpTableFields>(
             (row) => nodesSelectionState[row.core_id]?.selected ?? false,
         ),
@@ -61,6 +65,9 @@ const useSelectedTableRows = () => {
                 return queuesSelectionState[name]?.selected ?? false;
             },
             (row) => !getDisabledSlowestOperand(row),
+        ),
+        getQueuesSelectedState: getSelectedState<QueuesTableFields>(
+            (row) => queuesSelectionState[row.name]?.selected ?? false,
         ),
     };
 };
