@@ -1,13 +1,19 @@
 import type { NodeSelectionState } from '../../../data/StateTypes';
 import type { OpTableFields } from './useOperationsTable.hooks';
+import type { QueuesTableFields } from './useQueuesTable.hook';
+
+export type TableFields = OpTableFields | QueuesTableFields;
 
 export interface DataTableColumnDefinition {
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
     canSelectAllRows?: boolean;
-    getSelectedState?: (rows: OpTableFields[], nodesSelectionState: NodeSelectionState) => boolean | undefined;
-    handleSelectAll?: (rows: OpTableFields[], selected: boolean) => void;
+    getSelectedState?: <T extends TableFields>(
+        rows: T[],
+        nodesSelectionState: NodeSelectionState,
+    ) => boolean | undefined;
+    handleSelectAll?: <T extends TableFields>(rows: T[], selected: boolean) => void;
     formatter: (value: any) => string;
 }
 
@@ -35,11 +41,11 @@ export const sortDesc = (a: any, b: any) => {
     return a < b ? 1 : -1;
 };
 
-export const handleSelectAll = (
-    selectRow: (row: OpTableFields, selected: boolean) => void,
-    getEnabledState?: (row: OpTableFields) => boolean,
+export const handleSelectAll = <T extends TableFields>(
+    selectRow: (row: T, selected: boolean) => void,
+    getEnabledState?: (row: T) => boolean,
 ) => {
-    return (rows: OpTableFields[], selected: boolean) => {
+    return (rows: T[], selected: boolean) => {
         let selectableRows = rows;
 
         if (getEnabledState) {
@@ -54,11 +60,11 @@ export const handleSelectAll = (
     };
 };
 
-export const getSelectedState = (
-    getSelectionState: (row: OpTableFields) => boolean,
-    getEnabledState?: (row: OpTableFields) => boolean,
+export const getSelectedState = <T extends TableFields>(
+    getSelectionState: (row: T) => boolean,
+    getEnabledState?: (row: T) => boolean,
 ) => {
-    return (rows: OpTableFields[]) => {
+    return (rows: T[]) => {
         let selectableRows = rows;
 
         if (getEnabledState) {

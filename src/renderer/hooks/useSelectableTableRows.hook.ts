@@ -24,13 +24,13 @@ const useSelectedTableRows = () => {
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection.nodeList);
 
     return {
-        handleSelectAllCores: handleSelectAll((row, selected) =>
+        handleSelectAllCores: handleSelectAll<OpTableFields>((row, selected) =>
             dispatch(updateNodeSelection({ id: row.core_id, selected })),
         ),
-        handleSelectAllOperations: handleSelectAll((row, selected) =>
+        handleSelectAllOperations: handleSelectAll<OpTableFields>((row, selected) =>
             dispatch(selectOperation({ opName: row.name, selected })),
         ),
-        handleSelectAllSlowestOperands: handleSelectAll(
+        handleSelectAllSlowestOperands: handleSelectAll<OpTableFields>(
             (row, selected) => {
                 const name = row.slowestOperandRef?.name ?? '';
                 const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
@@ -43,14 +43,14 @@ const useSelectedTableRows = () => {
             },
             (row) => !getDisabledSlowestOperand(row),
         ),
-        getCoreSelectedState: getSelectedState(
-            (row: OpTableFields) => nodesSelectionState[row.core_id]?.selected ?? false,
+        getCoreSelectedState: getSelectedState<OpTableFields>(
+            (row) => nodesSelectionState[row.core_id]?.selected ?? false,
         ),
-        getOperationSelectedState: getSelectedState(
-            (row: OpTableFields) => operationsSelectionState[row.name]?.selected ?? false,
+        getOperationSelectedState: getSelectedState<OpTableFields>(
+            (row) => operationsSelectionState[row.name]?.selected ?? false,
         ),
-        getSlowestOperandSelectedState: getSelectedState(
-            (row: OpTableFields) => {
+        getSlowestOperandSelectedState: getSelectedState<OpTableFields>(
+            (row) => {
                 const name = row.slowestOperandRef?.name ?? '';
                 const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
 
