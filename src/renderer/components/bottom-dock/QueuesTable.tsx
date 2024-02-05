@@ -1,7 +1,7 @@
-import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
 import { Cell, Column, ColumnHeaderCell2, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useSelector } from 'react-redux';
-import { Icon } from '@blueprintjs/core';
+import { Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
 import SelectableOperation from '../SelectableOperation';
@@ -68,17 +68,41 @@ function QueuesTable() {
         const currentSortClass = sortingColumn === column ? 'current-sort' : '';
         const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
         let targetSortDirection = sortDirection;
+
         if (sortingColumn === column) {
             targetSortDirection = sortDirection === SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
         }
 
         const definition = queuesTableColumns.get(column);
+        const checkboxState = definition?.getSelectedState?.(tableFields, nodesSelectionState);
 
         if (!definition?.sortable) {
-            return <ColumnHeaderCell2 name={definition?.label ?? column} />;
+            return (
+                <ColumnHeaderCell2
+                    name={definition?.label ?? column}
+                    className={definition?.canSelectAllRows ? ' can-select-all-rows' : ''}
+                >
+                    {definition?.canSelectAllRows && (
+                        <Checkbox
+                            checked={checkboxState}
+                            indeterminate={checkboxState === undefined}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                definition.handleSelectAll?.(tableFields, e.target.checked)
+                            }
+                            className='sortable-table-checkbox'
+                        />
+                    )}
+                </ColumnHeaderCell2>
+            );
         }
+
         return (
-            <ColumnHeaderCell2 className={`${currentSortClass} ${sortDirectionClass}`} name={definition.label}>
+            <ColumnHeaderCell2
+                className={`${currentSortClass} ${sortDirectionClass}${
+                    definition?.canSelectAllRows ? ' can-select-all-rows' : ''
+                }`}
+                name={definition.label}
+            >
                 {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
                 <div
                     className='sortable-table-header'
@@ -93,6 +117,16 @@ function QueuesTable() {
                         </span>
                     )}
                 </div>
+                {definition?.canSelectAllRows && (
+                    <Checkbox
+                        checked={checkboxState}
+                        indeterminate={checkboxState === undefined}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            definition.handleSelectAll?.(tableFields, e.target.checked)
+                        }
+                        className='sortable-table-checkbox'
+                    />
+                )}
             </ColumnHeaderCell2>
         );
     };
@@ -120,6 +154,7 @@ function QueuesTable() {
                 />
             );
         }
+
         return (
             <Column
                 key={key}
