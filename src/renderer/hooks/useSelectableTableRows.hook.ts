@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import type { OpTableFields } from '../components/bottom-dock/useOperationsTable.hooks';
+import type { QueuesTableFields } from '../components/bottom-dock/useQueuesTable.hook';
 import { GraphVertexType } from '../../data/GraphNames';
 import { selectOperation, selectQueue, updateNodeSelection } from '../../data/store/slices/nodeSelection.slice';
 import { RootState } from '../../data/store/createStore';
@@ -24,13 +25,13 @@ const useSelectedTableRows = () => {
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection.nodeList);
 
     return {
-        handleSelectAllCores: handleSelectAll((row, selected) =>
+        handleSelectAllCores: handleSelectAll<OpTableFields>((row, selected) =>
             dispatch(updateNodeSelection({ id: row.core_id, selected })),
         ),
-        handleSelectAllOperations: handleSelectAll((row, selected) =>
+        handleSelectAllOperations: handleSelectAll<OpTableFields>((row, selected) =>
             dispatch(selectOperation({ opName: row.name, selected })),
         ),
-        handleSelectAllSlowestOperands: handleSelectAll(
+        handleSelectAllSlowestOperands: handleSelectAll<OpTableFields>(
             (row, selected) => {
                 const name = row.slowestOperandRef?.name ?? '';
                 const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
@@ -43,14 +44,17 @@ const useSelectedTableRows = () => {
             },
             (row) => !getDisabledSlowestOperand(row),
         ),
-        getCoreSelectedState: getSelectedState(
-            (row: OpTableFields) => nodesSelectionState[row.core_id]?.selected ?? false,
+        handleSelectAllQueues: handleSelectAll<QueuesTableFields>((row, selected) => {
+            dispatch(selectQueue({ queueName: row.name, selected }));
+        }),
+        getCoreSelectedState: getSelectedState<OpTableFields>(
+            (row) => nodesSelectionState[row.core_id]?.selected ?? false,
         ),
-        getOperationSelectedState: getSelectedState(
-            (row: OpTableFields) => operationsSelectionState[row.name]?.selected ?? false,
+        getOperationSelectedState: getSelectedState<OpTableFields>(
+            (row) => operationsSelectionState[row.name]?.selected ?? false,
         ),
-        getSlowestOperandSelectedState: getSelectedState(
-            (row: OpTableFields) => {
+        getSlowestOperandSelectedState: getSelectedState<OpTableFields>(
+            (row) => {
                 const name = row.slowestOperandRef?.name ?? '';
                 const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
 
@@ -61,6 +65,9 @@ const useSelectedTableRows = () => {
                 return queuesSelectionState[name]?.selected ?? false;
             },
             (row) => !getDisabledSlowestOperand(row),
+        ),
+        getQueuesSelectedState: getSelectedState<QueuesTableFields>(
+            (row) => queuesSelectionState[row.name]?.selected ?? false,
         ),
     };
 };

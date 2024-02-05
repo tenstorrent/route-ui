@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { QueueDetailsJson } from '../../../data/sources/QueueDescriptor';
 import { Queue } from '../../../data/GraphTypes';
 import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 
 export interface QueuesTableFields extends QueueDetailsJson {
     queue?: Queue;
@@ -69,7 +70,8 @@ queuesTableColumns.set('processedLocation', {
     formatter: (value) => value.toString(),
 });
 
-const useQueuesTable = (queuesList: QueuesTableFields[])  => {
+const useQueuesTable = (queuesList: QueuesTableFields[]) => {
+    const { handleSelectAllQueues, getQueuesSelectedState } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<QueueusTableColumn>('entries');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
 
@@ -90,6 +92,10 @@ const useQueuesTable = (queuesList: QueuesTableFields[])  => {
         setSortDirection(direction);
         setSortingColumn(selectedColumn);
     };
+
+    queuesTableColumns.get('queue')!.handleSelectAll<QueuesTableFields> = handleSelectAllQueues;
+    queuesTableColumns.get('queue')!.getSelectedState<QueuesTableFields> = getQueuesSelectedState;
+
     return { sortedTableFields, changeSorting, sortingColumn, sortDirection, queuesTableColumns };
 };
 
