@@ -1,0 +1,234 @@
+import { ChangeEvent, JSXElementConstructor, ReactElement } from 'react';
+
+import { Cell, Column, ColumnHeaderCell2, IColumnProps } from '@blueprintjs/table';
+import { Checkbox, Icon } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+
+import type { NodeSelectionState } from '../../../data/StateTypes';
+import type { OpTableFields } from './useOperationsTable.hooks';
+import type { QueuesTableFields } from './useQueuesTable.hook';
+
+export type TableFields = OpTableFields | QueuesTableFields;
+
+export interface DataTableColumnDefinition {
+    label: string;
+    sortable: boolean;
+    align?: 'left' | 'right';
+    canSelectAllRows?: boolean;
+    getSelectedState?: <T extends TableFields>(
+        rows: T[],
+        nodesSelectionState: NodeSelectionState,
+    ) => boolean | undefined;
+    handleSelectAll?: <T extends TableFields>(rows: T[], selected: boolean) => void;
+    // TODO: make it output an Element or string
+    formatter: (value: any) => string;
+}
+
+export enum SortingDirection {
+    ASC = 'asc',
+    DESC = 'desc',
+}
+
+export const sortAsc = (a: any, b: any) => {
+    if (typeof a === 'string' && typeof b === 'number') {
+        return 1;
+    }
+    if (a === b) {
+        return 0;
+    }
+    return a > b ? 1 : -1;
+};
+export const sortDesc = (a: any, b: any) => {
+    if (typeof a === 'string' && typeof b === 'number') {
+        return 1;
+    }
+    if (a === b) {
+        return 0;
+    }
+    return a < b ? 1 : -1;
+};
+
+export const handleSelectAll = <T extends TableFields>(
+    selectRow: (row: T, selected: boolean) => void,
+    getEnabledState?: (row: T) => boolean,
+) => {
+    return (rows: T[], selected: boolean) => {
+        let selectableRows = rows;
+
+        if (getEnabledState) {
+            selectableRows = rows.filter((row) => {
+                return getEnabledState(row);
+            });
+        }
+
+        selectableRows.forEach((row) => {
+            selectRow(row, selected);
+        });
+    };
+};
+
+export const getSelectedState = <T extends TableFields>(
+    getSelectionState: (row: T) => boolean,
+    getEnabledState?: (row: T) => boolean,
+) => {
+    return (rows: T[]) => {
+        let selectableRows = rows;
+
+        if (getEnabledState) {
+            selectableRows = rows.filter((row) => {
+                return getEnabledState(row);
+            });
+        }
+
+        const selectedRows = selectableRows.filter((row) => {
+            return getSelectionState(row);
+        });
+
+        if (selectedRows.length === 0) {
+            return false;
+        }
+
+        if (selectedRows.length === selectableRows.length) {
+            return true;
+        }
+
+        return undefined;
+    };
+};
+
+interface HeaderRenderingProps<T extends TableFields> {
+    definition?: DataTableColumnDefinition;
+    sortDirection: SortingDirection;
+    sortingColumn: keyof T;
+    column: keyof T;
+    tableFields: T[];
+    nodesSelectionState: NodeSelectionState;
+    changeSorting: (column: keyof T) => (direction: SortingDirection) => void;
+}
+
+export const headerRenderer = <T extends TableFields>({
+    definition,
+    sortDirection,
+    sortingColumn,
+    column,
+    tableFields,
+    nodesSelectionState,
+    changeSorting,
+}: HeaderRenderingProps<T>) => {
+    const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
+    const sortClass = `${sortingColumn === column ? 'current-sort' : ''} ${sortDirectionClass}`;
+    let targetSortDirection = sortDirection;
+
+    if (sortingColumn === column) {
+        targetSortDirection = sortDirection === SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
+    }
+
+    const checkboxState = definition?.getSelectedState?.(tableFields, nodesSelectionState);
+    const selectableClass = definition?.canSelectAllRows ? 'can-select-all-rows' : '';
+
+    return (
+        <ColumnHeaderCell2
+            className={`${definition?.sortable ? sortClass : ''} ${selectableClass}`}
+            name={definition?.label ?? (column as string)}
+        >
+            <>
+                {definition?.sortable && (
+                    <>
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
+                        <div
+                            className='sortable-table-header'
+                            role='button'
+                            onClick={() => changeSorting(column)(targetSortDirection)}
+                        >
+                            {sortingColumn === column && (
+                                <span className='sort-icon'>
+                                    <Icon
+                                        icon={
+                                            sortDirection === SortingDirection.ASC
+                                                ? IconNames.SORT_ASC
+                                                : IconNames.SORT_DESC
+                                        }
+                                    />
+                                </span>
+                            )}
+                        </div>
+                    </>
+                )}
+                {definition?.canSelectAllRows && (
+                    <Checkbox
+                        checked={checkboxState}
+                        indeterminate={checkboxState === undefined}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            definition.handleSelectAll?.(tableFields, e.target.checked)
+                        }
+                        className='sortable-table-checkbox'
+                    />
+                )}
+            </>
+        </ColumnHeaderCell2>
+    );
+};
+
+interface CellRenderingProps<T extends TableFields> {
+    definition?: DataTableColumnDefinition;
+    key: keyof T;
+    rowIndex: number;
+    tableFields: T[];
+}
+
+export const cellRenderer = <T extends TableFields>({
+    definition,
+    key,
+    rowIndex,
+    tableFields,
+}: CellRenderingProps<T>) => {
+    const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+
+    return <Cell className={definition?.align ? `align-${definition?.align}` : ''}>{cellContent}</Cell>;
+};
+
+export interface ColumnRendererProps<T extends TableFields> {
+    key: keyof T;
+    columnDefinition: Map<keyof T, DataTableColumnDefinition>;
+    changeSorting: (column: keyof T) => (direction: SortingDirection) => void;
+    sortDirection: SortingDirection;
+    sortingColumn: keyof T;
+    tableFields: T[];
+    nodesSelectionState: NodeSelectionState;
+}
+
+export const columnRenderer = <T extends TableFields>({
+    key,
+    columnDefinition,
+    changeSorting,
+    sortDirection,
+    sortingColumn,
+    tableFields,
+    nodesSelectionState,
+}: ColumnRendererProps<T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
+    return (
+        <Column
+            key={key as string}
+            id={key as string}
+            cellRenderer={(rowIndex) =>
+                cellRenderer({
+                    definition: columnDefinition.get(key),
+                    key,
+                    rowIndex,
+                    tableFields,
+                })
+            }
+            columnHeaderCellRenderer={() =>
+                headerRenderer({
+                    definition: columnDefinition.get(key),
+                    column: key,
+                    changeSorting,
+                    sortDirection,
+                    sortingColumn,
+                    tableFields,
+                    nodesSelectionState,
+                })
+            }
+        />
+    );
+};

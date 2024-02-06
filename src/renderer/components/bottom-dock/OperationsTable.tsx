@@ -1,5 +1,5 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
-import { Cell, Column, ColumnHeaderCell2, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { Cell, Column, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -14,7 +14,7 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { SortingDirection } from './SharedTable';
+import { columnRenderer, headerRenderer } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -123,85 +123,26 @@ function OperationsTable() {
         );
     };
 
-    const headerRenderer = (column: keyof OpTableFields | 'operation') => {
-        const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
-        const sortClass = `${sortingColumn === column ? 'current-sort' : ''} ${sortDirectionClass}`;
-        let targetSortDirection = sortDirection;
-        if (sortingColumn === column) {
-            targetSortDirection = sortDirection === SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
-        }
-
-        const definition = operationsTableColumns.get(column);
-        const checkboxState = definition?.getSelectedState?.(tableFields, nodesSelectionState);
-        const selectableClass = definition?.canSelectAllRows ? 'can-select-all-rows' : '';
-
-        return (
-            <ColumnHeaderCell2
-                className={`${definition?.sortable ? sortClass : ''} ${selectableClass}`}
-                name={definition?.label ?? column}
-            >
-                <>
-                    {definition?.sortable && (
-                        <>
-                            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
-                            <div
-                                className='sortable-table-header'
-                                role='button'
-                                onClick={() => changeSorting(column)(targetSortDirection)}
-                            >
-                                {sortingColumn === column && (
-                                    <span className='sort-icon'>
-                                        <Icon
-                                            icon={
-                                                sortDirection === SortingDirection.ASC
-                                                    ? IconNames.SORT_ASC
-                                                    : IconNames.SORT_DESC
-                                            }
-                                        />
-                                    </span>
-                                )}
-                            </div>
-                        </>
-                    )}
-                    {definition?.canSelectAllRows && (
-                        <Checkbox
-                            checked={checkboxState}
-                            indeterminate={checkboxState === undefined}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                definition.handleSelectAll?.(tableFields, e.target.checked)
-                            }
-                            className='sortable-table-checkbox'
-                        />
-                    )}
-                </>
-            </ColumnHeaderCell2>
-        );
-    };
-
     // TODO: value is not a good name, isSelected either, shoudl reveisit when a better name becomes available
     const selectNode = (id: string, value: boolean) => {
         dispatch(updateNodeSelection({ id, selected: value }));
     };
 
-    const cellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
+    const coreIdCellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
         const definition = operationsTableColumns.get(key);
         const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
 
-        if (key === 'core_id') {
-            return (
-                <Cell>
-                    <Checkbox
-                        checked={nodesSelectionState.nodeList[cellContent]?.selected}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                            selectNode(cellContent.toString(), e.target.checked);
-                        }}
-                        label={cellContent}
-                    />
-                </Cell>
-            );
-        }
-
-        return <Cell className={definition?.align ? `align-${definition?.align}` : ''}>{cellContent}</Cell>;
+        return (
+            <Cell>
+                <Checkbox
+                    checked={nodesSelectionState.nodeList[cellContent]?.selected}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                        selectNode(cellContent.toString(), e.target.checked);
+                    }}
+                    label={cellContent}
+                />
+            </Cell>
+        );
     };
 
     const slowestOperandCellRenderer = (rowIndex: number): JSX.Element => {
@@ -279,51 +220,121 @@ function OperationsTable() {
             <Column
                 id='operation'
                 cellRenderer={operationCellRenderer}
-                columnHeaderCellRenderer={() => headerRenderer('operation')}
+                columnHeaderCellRenderer={() =>
+                    headerRenderer({
+                        definition: operationsTableColumns.get('operation'),
+                        column: 'operation',
+                        changeSorting,
+                        sortDirection,
+                        sortingColumn,
+                        tableFields,
+                        nodesSelectionState,
+                    })
+                }
             />
             {!coreView ? (
-                <Column
-                    cellRenderer={(rowIndex) => cellRenderer('grid_size', rowIndex)}
-                    columnHeaderCellRenderer={() => headerRenderer('grid_size')}
-                />
+                columnRenderer({
+                    key: 'grid_size',
+                    columnDefinition: operationsTableColumns,
+                    changeSorting,
+                    sortDirection,
+                    sortingColumn,
+                    tableFields,
+                    nodesSelectionState,
+                })
             ) : (
                 <Column
-                    cellRenderer={(rowIndex) => cellRenderer('core_id', rowIndex)}
-                    columnHeaderCellRenderer={() => headerRenderer('core_id')}
+                    cellRenderer={(rowIndex) => coreIdCellRenderer('core_id', rowIndex)}
+                    columnHeaderCellRenderer={() =>
+                        headerRenderer({
+                            definition: operationsTableColumns.get('core_id'),
+                            column: 'core_id',
+                            changeSorting,
+                            sortDirection,
+                            sortingColumn,
+                            tableFields,
+                            nodesSelectionState,
+                        })
+                    }
                 />
             )}
-            <Column
-                cellRenderer={(rowIndex) => cellRenderer('kernel_math_utilization', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('kernel_math_utilization')}
-            />
-            <Column
-                cellRenderer={(rowIndex) => cellRenderer('bw_limited_factor', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('bw_limited_factor')}
-            />
+            {columnRenderer({
+                key: 'kernel_math_utilization',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+            })}
+            {columnRenderer({
+                key: 'bw_limited_factor',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+            })}
             <Column
                 cellRenderer={(rowIndex) => slowestOperandCellRenderer(rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('slowest_operand')}
+                columnHeaderCellRenderer={() =>
+                    headerRenderer({
+                        definition: operationsTableColumns.get('slowest_operand'),
+                        column: 'slowest_operand',
+                        changeSorting,
+                        sortDirection,
+                        sortingColumn,
+                        tableFields,
+                        nodesSelectionState,
+                    })
+                }
             />
-            <Column
-                cellRenderer={(rowIndex) => cellRenderer('bw_bound_total_runtime', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('bw_bound_total_runtime')}
-            />
-            <Column
-                cellRenderer={(rowIndex) => cellRenderer('bw_bound_math_utilization', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('bw_bound_math_utilization')}
-            />
-            <Column
-                cellRenderer={(rowIndex) => cellRenderer('model_runtime_per_input', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('model_runtime_per_input')}
-            />
-            <Column
-                cellRenderer={(rowIndex) => cellRenderer('kernel_runtime_per_input', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('kernel_runtime_per_input')}
-            />
-            <Column
-                cellRenderer={(rowIndex) => cellRenderer('kernel_total_runtime', rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer('kernel_total_runtime')}
-            />
+            {columnRenderer({
+                key: 'bw_bound_total_runtime',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+            })}
+            {columnRenderer({
+                key: 'bw_bound_math_utilization',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+            })}
+            {columnRenderer({
+                key: 'model_runtime_per_input',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+            })}
+            {columnRenderer({
+                key: 'kernel_runtime_per_input',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+            })}
+            {columnRenderer({
+                key: 'kernel_total_runtime',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+            })}
         </Table2>
     );
 }
