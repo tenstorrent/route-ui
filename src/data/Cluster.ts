@@ -83,7 +83,6 @@ export default class Cluster {
             const coords: ClusterCoordinates = new ClusterCoordinates(coordinates);
             this._totalCols = Math.max(this._totalCols, coords.x);
             this._totalRows = Math.max(this._totalRows, coords.y);
-            // console.log(deviceDescriptorList[chipId]);
             const chip = new ClusterChip(
                 chipId,
                 coords,
@@ -91,7 +90,6 @@ export default class Cluster {
                 deviceDescriptorList[chipId].eth.map((coreId) => `${ClusterChipId}-${coreId}`),
             );
             chip.design = new ChipDesign(deviceDescriptorList[chipId] as ChipDesignJSON, chipId);
-            // console.log(chip.design);
             return chip;
         });
 
