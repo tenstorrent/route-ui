@@ -18,7 +18,7 @@ export interface DataTableColumnDefinition {
     getSelectedState?: <T extends TableFields>(
         rows: T[],
         nodesSelectionState: NodeSelectionState,
-    ) => boolean | undefined;
+    ) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
     handleSelectAll?: <T extends TableFields>(rows: T[], selected: boolean) => void;
     // TODO: make it output an Element or string
     formatter: (value: any) => string;
@@ -80,19 +80,23 @@ export const getSelectedState = <T extends TableFields>(
             });
         }
 
+        if (selectableRows.length === 0) {
+            return 'disabled';
+        }
+
         const selectedRows = selectableRows.filter((row) => {
             return getSelectionState(row);
         });
 
         if (selectedRows.length === 0) {
-            return false;
+            return 'unchecked';
         }
 
         if (selectedRows.length === selectableRows.length) {
-            return true;
+            return 'checked';
         }
 
-        return undefined;
+        return 'indeterminate';
     };
 };
 
@@ -156,8 +160,9 @@ export const headerRenderer = <T extends TableFields>({
                 )}
                 {definition?.canSelectAllRows && (
                     <Checkbox
-                        checked={checkboxState}
-                        indeterminate={checkboxState === undefined}
+                        checked={checkboxState === 'checked'}
+                        indeterminate={checkboxState === 'indeterminate'}
+                        disabled={checkboxState === 'disabled'}
                         onChange={(e: ChangeEvent<HTMLInputElement>) =>
                             definition.handleSelectAll?.(tableFields, e.target.checked)
                         }
