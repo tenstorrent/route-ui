@@ -1,5 +1,5 @@
-import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
-import { Cell, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { Cell, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -128,9 +128,9 @@ function OperationsTable() {
         );
     };
 
-    const coreIdCellRenderer = (rowIndex: number) => {
-        const definition = operationsTableColumns.get('core_id');
-        const cellContent = definition?.formatter(tableFields[rowIndex].core_id || '') ?? '';
+    const coreIdCellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
+        const definition = operationsTableColumns.get(key);
+        const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
 
         return (
             <Cell>
@@ -192,10 +192,6 @@ function OperationsTable() {
 
     const getCustomCellRenderer = (key: string) => {
         switch (key) {
-            case 'operation':
-                return operationCellRenderer;
-            case 'core_id':
-                return coreIdCellRenderer;
             case 'slowest_operand':
                 return slowestOperandCellRenderer;
             default:
@@ -204,9 +200,6 @@ function OperationsTable() {
     };
 
     const columns = [
-        'operation',
-        'grid_size',
-        coreView ? 'grid_size' : 'core_id',
         'kernel_math_utilization',
         'bw_limited_factor',
         'slowest_operand',
@@ -239,18 +232,50 @@ function OperationsTable() {
                 tableFields.length,
             ]}
         >
-            {columns.map((key) =>
-                columnRenderer({
-                    key: key as keyof OpTableFields,
-                    columnDefinition: operationsTableColumns,
-                    changeSorting,
-                    sortDirection,
-                    sortingColumn,
-                    tableFields,
-                    nodesSelectionState,
-                    customCellRenderer: getCustomCellRenderer(key),
-                }),
-            )}
+            {columnRenderer({
+                key: 'operation',
+                columnDefinition: operationsTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+                customCellRenderer: operationCellRenderer,
+            })}
+            {!coreView
+                ? columnRenderer({
+                      key: 'grid_size',
+                      columnDefinition: operationsTableColumns,
+                      changeSorting,
+                      sortDirection,
+                      sortingColumn,
+                      tableFields,
+                      nodesSelectionState,
+                  })
+                : columnRenderer({
+                      key: 'core_id',
+                      columnDefinition: operationsTableColumns,
+                      changeSorting,
+                      sortDirection,
+                      sortingColumn,
+                      tableFields,
+                      nodesSelectionState,
+                      customCellRenderer: (rowIndex) => coreIdCellRenderer('core_id', rowIndex),
+                  })}
+            {
+                columns.map((key) =>
+                    columnRenderer({
+                        key: key as keyof OpTableFields,
+                        columnDefinition: operationsTableColumns,
+                        changeSorting,
+                        sortDirection,
+                        sortingColumn,
+                        tableFields,
+                        nodesSelectionState,
+                        customCellRenderer: getCustomCellRenderer(key),
+                    }),
+                ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+            }
         </Table2>
     );
 }
