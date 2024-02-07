@@ -1,5 +1,5 @@
 import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
-import { Cell, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useSelector } from 'react-redux';
 import SelectableOperation from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
@@ -37,33 +37,26 @@ function QueuesTable() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
-    if (!chip) {
+    if (!chip || !tableFields.length) {
         return <pre>No data available</pre>;
     }
 
     const queueCellRenderer = (rowIndex: number) => {
         const queueName = sortedTableFields[rowIndex].name;
-        return (
-            <Cell interactive className='table-cell-interactive table-operation-cell'>
-                {queueName ? (
-                    <SelectableOperation
-                        disabled={disabledQueue(queueName)}
-                        opName={queueName}
-                        value={selected(queueName)}
-                        selectFunc={selectQueue}
-                        stringFilter=''
-                        type={GraphVertexType.QUEUE}
-                    />
-                ) : (
-                    ''
-                )}
-            </Cell>
+
+        return queueName ? (
+            <SelectableOperation
+                disabled={disabledQueue(queueName)}
+                opName={queueName}
+                value={selected(queueName)}
+                selectFunc={selectQueue}
+                stringFilter=''
+                type={GraphVertexType.QUEUE}
+            />
+        ) : (
+            ''
         );
     };
-
-    if (!tableFields.length) {
-        return <pre>No data available</pre>;
-    }
 
     return (
         <Table2
@@ -94,7 +87,7 @@ function QueuesTable() {
                 sortingColumn,
                 tableFields,
                 nodesSelectionState,
-                customCellRenderer: queueCellRenderer,
+                customCellContentRenderer: queueCellRenderer,
             })}
             {
                 [...queuesTableColumns.keys()]

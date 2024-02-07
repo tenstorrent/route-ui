@@ -174,6 +174,9 @@ interface CellRenderingProps<T extends TableFields> {
     key: keyof T;
     rowIndex: number;
     tableFields: T[];
+    isInteractive?: boolean;
+    className?: string;
+    customContent?: string | ReactElement;
 }
 
 export const cellRenderer = <T extends TableFields>({
@@ -181,12 +184,21 @@ export const cellRenderer = <T extends TableFields>({
     key,
     rowIndex,
     tableFields,
+    isInteractive,
+    className,
+    customContent,
 }: CellRenderingProps<T>) => {
-    const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+    const stringContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+
+    const alignClass = definition?.align && `align-${definition?.align}`;
 
     return (
-        <Cell key={`${key.toString()}-${rowIndex}`} className={definition?.align ? `align-${definition?.align}` : ''}>
-            {cellContent}
+        <Cell
+            interactive={isInteractive === true}
+            key={`${key.toString()}-${rowIndex}`}
+            className={[alignClass, className].join(' ')}
+        >
+            {customContent || stringContent}
         </Cell>
     );
 };
@@ -199,7 +211,9 @@ export interface ColumnRendererProps<T extends TableFields> {
     sortingColumn: keyof T;
     tableFields: T[];
     nodesSelectionState: NodeSelectionState;
-    customCellRenderer?: (rowIndex: number) => ReactElement;
+    isInteractive?: boolean;
+    cellClassName?: string;
+    customCellContentRenderer?: (rowIndex: number) => ReactElement | string;
 }
 
 export const columnRenderer = <T extends TableFields>({
@@ -210,21 +224,27 @@ export const columnRenderer = <T extends TableFields>({
     sortingColumn,
     tableFields,
     nodesSelectionState,
-    customCellRenderer,
+    isInteractive,
+    cellClassName,
+    customCellContentRenderer,
 }: ColumnRendererProps<T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
     return (
         <Column
             key={key as string}
             id={key as string}
-            cellRenderer={
-                customCellRenderer ??
-                ((rowIndex) =>
-                    cellRenderer({
-                        definition: columnDefinition.get(key),
-                        key,
-                        rowIndex,
-                        tableFields,
-                    }))
+            cellRenderer={(rowIndex) =>
+                cellRenderer({
+                    definition: columnDefinition.get(key),
+                    key,
+                    rowIndex,
+                    tableFields,
+                    isInteractive,
+                    className: [
+                        cellClassName,
+                        customCellContentRenderer ? 'table-cell-interactive table-operation-cell' : undefined,
+                    ].join(' '),
+                    customContent: customCellContentRenderer?.(rowIndex),
+                })
             }
             columnHeaderCellRenderer={() =>
                 headerRenderer({

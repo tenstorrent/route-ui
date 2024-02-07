@@ -1,9 +1,8 @@
 import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
-import { Cell, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { JSX } from 'react/jsx-runtime';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
@@ -52,11 +51,7 @@ function OperationsTable() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
-    if (!chip) {
-        return <pre>No data available</pre>;
-    }
-
-    if (!tableFields.length) {
+    if (!chip || !tableFields.length) {
         return <pre>No data available</pre>;
     }
 
@@ -81,7 +76,7 @@ function OperationsTable() {
     const operationCellRenderer = (rowIndex: number) => {
         const opName = sortedTableFields[rowIndex].name;
         return (
-            <Cell interactive className='table-cell-interactive table-operation-cell'>
+            <>
                 {opName ? (
                     <SelectableOperationPerformance operation={sortedTableFields[rowIndex].operation || null}>
                         <SelectableOperation
@@ -97,21 +92,7 @@ function OperationsTable() {
                     ''
                 )}
 
-                {!coreView && (
-                    <Button
-                        style={{ height: '18px' }}
-                        small
-                        minimal
-                        disabled={nodesSelectionState.operations[opName] === undefined}
-                        icon={IconNames.ARROW_RIGHT}
-                        onClick={() => {
-                            expandOperationCores(opName);
-                        }}
-                        title='View operation cores'
-                    />
-                )}
-
-                {coreView && (
+                {coreView ? (
                     <Button
                         style={{ height: '18px' }}
                         small
@@ -123,35 +104,49 @@ function OperationsTable() {
                             setCoreView(false);
                         }}
                     />
+                ) : (
+                    <Button
+                        style={{ height: '18px' }}
+                        small
+                        minimal
+                        disabled={nodesSelectionState.operations[opName] === undefined}
+                        title='View operation cores'
+                        icon={IconNames.ARROW_RIGHT}
+                        onClick={() => {
+                            expandOperationCores(opName);
+                        }}
+                    />
                 )}
-            </Cell>
+            </>
         );
     };
 
-    const coreIdCellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
-        const definition = operationsTableColumns.get(key);
-        const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+    const coreIdCellRenderer = (rowIndex: number) => {
+        const definition = operationsTableColumns.get('core_id');
+        const cellContent = definition?.formatter(tableFields[rowIndex].core_id || '') ?? '';
 
         return (
-            <Cell>
+            <div className='op-element'>
                 <Checkbox
                     checked={nodesSelectionState.nodeList[cellContent]?.selected}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         dispatch(updateNodeSelection({ id: cellContent.toString(), selected: e.target.checked }));
                     }}
-                    label={cellContent}
                 />
-            </Cell>
+                {cellContent}
+            </div>
         );
     };
 
-    const slowestOperandCellRenderer = (rowIndex: number): JSX.Element => {
+    const slowestOperandCellRenderer = (rowIndex: number) => {
         const slowOpString = tableFields[rowIndex].slowest_operand;
         const slowestOperand = tableFields[rowIndex].slowestOperandRef;
+
         if (slowestOperand) {
             const type: GraphVertexType = slowestOperand.vertexType;
+            // <Cell className='table-cell-interactive table-operation-cell'>
             return (
-                <Cell className='table-cell-interactive table-operation-cell'>
+                <>
                     {slowOpString.includes('output') ? (
                         <Icon size={12} icon={IconNames.EXPORT} title={slowOpString} />
                     ) : (
@@ -184,10 +179,11 @@ function OperationsTable() {
                         }}
                         title='View operation cores'
                     />
-                </Cell>
+                </>
             );
         }
-        return <Cell>{slowOpString}</Cell>;
+
+        return slowOpString;
     };
 
     const getCustomCellRenderer = (key: string) => {
@@ -240,7 +236,8 @@ function OperationsTable() {
                 sortingColumn,
                 tableFields,
                 nodesSelectionState,
-                customCellRenderer: operationCellRenderer,
+                isInteractive: true,
+                customCellContentRenderer: operationCellRenderer,
             })}
             {!coreView
                 ? columnRenderer({
@@ -260,7 +257,7 @@ function OperationsTable() {
                       sortingColumn,
                       tableFields,
                       nodesSelectionState,
-                      customCellRenderer: (rowIndex) => coreIdCellRenderer('core_id', rowIndex),
+                      customCellContentRenderer: coreIdCellRenderer,
                   })}
             {
                 columns.map((key) =>
@@ -272,7 +269,7 @@ function OperationsTable() {
                         sortingColumn,
                         tableFields,
                         nodesSelectionState,
-                        customCellRenderer: getCustomCellRenderer(key),
+                        customCellContentRenderer: getCustomCellRenderer(key),
                     }),
                 ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
             }
