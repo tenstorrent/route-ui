@@ -195,6 +195,7 @@ export interface ColumnRendererProps<T extends TableFields> {
     sortingColumn: keyof T;
     tableFields: T[];
     nodesSelectionState: NodeSelectionState;
+    customCellRenderer?: (rowIndex: number) => ReactElement;
 }
 
 export const columnRenderer = <T extends TableFields>({
@@ -205,18 +206,21 @@ export const columnRenderer = <T extends TableFields>({
     sortingColumn,
     tableFields,
     nodesSelectionState,
+    customCellRenderer,
 }: ColumnRendererProps<T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
     return (
         <Column
             key={key as string}
             id={key as string}
-            cellRenderer={(rowIndex) =>
-                cellRenderer({
-                    definition: columnDefinition.get(key),
-                    key,
-                    rowIndex,
-                    tableFields,
-                })
+            cellRenderer={
+                customCellRenderer ??
+                ((rowIndex) =>
+                    cellRenderer({
+                        definition: columnDefinition.get(key),
+                        key,
+                        rowIndex,
+                        tableFields,
+                    }))
             }
             columnHeaderCellRenderer={() =>
                 headerRenderer({

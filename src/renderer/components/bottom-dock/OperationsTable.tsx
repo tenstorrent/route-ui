@@ -1,5 +1,5 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
-import { Cell, Column, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { Cell, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -14,7 +14,7 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { columnRenderer, headerRenderer } from './SharedTable';
+import { columnRenderer } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -55,6 +55,11 @@ function OperationsTable() {
     if (!chip) {
         return <pre>No data available</pre>;
     }
+
+    if (!tableFields.length) {
+        return <pre>No data available</pre>;
+    }
+
     const expandOperationCores = (opName: string) => {
         const operation = chip.getOperation(opName);
         if (operation === undefined) {
@@ -123,21 +128,16 @@ function OperationsTable() {
         );
     };
 
-    // TODO: value is not a good name, isSelected either, shoudl reveisit when a better name becomes available
-    const selectNode = (id: string, value: boolean) => {
-        dispatch(updateNodeSelection({ id, selected: value }));
-    };
-
-    const coreIdCellRenderer = (key: keyof OpTableFields, rowIndex: number): JSX.Element => {
-        const definition = operationsTableColumns.get(key);
-        const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+    const coreIdCellRenderer = (rowIndex: number) => {
+        const definition = operationsTableColumns.get('core_id');
+        const cellContent = definition?.formatter(tableFields[rowIndex].core_id || '') ?? '';
 
         return (
             <Cell>
                 <Checkbox
                     checked={nodesSelectionState.nodeList[cellContent]?.selected}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        selectNode(cellContent.toString(), e.target.checked);
+                        dispatch(updateNodeSelection({ id: cellContent.toString(), selected: e.target.checked }));
                     }}
                     label={cellContent}
                 />
@@ -190,11 +190,33 @@ function OperationsTable() {
         return <Cell>{slowOpString}</Cell>;
     };
 
-    if (!tableFields.length) {
-        return <pre>No data available</pre>;
-    }
+    const getCustomCellRenderer = (key: string) => {
+        switch (key) {
+            case 'operation':
+                return operationCellRenderer;
+            case 'core_id':
+                return coreIdCellRenderer;
+            case 'slowest_operand':
+                return slowestOperandCellRenderer;
+            default:
+                return undefined;
+        }
+    };
 
-    // TODO: i would like to automate iteration over the columns in the near future
+    const columns = [
+        'operation',
+        'grid_size',
+        coreView ? 'grid_size' : 'core_id',
+        'kernel_math_utilization',
+        'bw_limited_factor',
+        'slowest_operand',
+        'bw_bound_total_runtime',
+        'bw_bound_math_utilization',
+        'model_runtime_per_input',
+        'kernel_runtime_per_input',
+        'kernel_total_runtime',
+    ];
+
     return (
         <Table2
             ref={table}
@@ -217,124 +239,18 @@ function OperationsTable() {
                 tableFields.length,
             ]}
         >
-            <Column
-                id='operation'
-                cellRenderer={operationCellRenderer}
-                columnHeaderCellRenderer={() =>
-                    headerRenderer({
-                        definition: operationsTableColumns.get('operation'),
-                        column: 'operation',
-                        changeSorting,
-                        sortDirection,
-                        sortingColumn,
-                        tableFields,
-                        nodesSelectionState,
-                    })
-                }
-            />
-            {!coreView ? (
+            {columns.map((key) =>
                 columnRenderer({
-                    key: 'grid_size',
+                    key: key as keyof OpTableFields,
                     columnDefinition: operationsTableColumns,
                     changeSorting,
                     sortDirection,
                     sortingColumn,
                     tableFields,
                     nodesSelectionState,
-                })
-            ) : (
-                <Column
-                    cellRenderer={(rowIndex) => coreIdCellRenderer('core_id', rowIndex)}
-                    columnHeaderCellRenderer={() =>
-                        headerRenderer({
-                            definition: operationsTableColumns.get('core_id'),
-                            column: 'core_id',
-                            changeSorting,
-                            sortDirection,
-                            sortingColumn,
-                            tableFields,
-                            nodesSelectionState,
-                        })
-                    }
-                />
+                    customCellRenderer: getCustomCellRenderer(key),
+                }),
             )}
-            {columnRenderer({
-                key: 'kernel_math_utilization',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-            })}
-            {columnRenderer({
-                key: 'bw_limited_factor',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-            })}
-            <Column
-                cellRenderer={(rowIndex) => slowestOperandCellRenderer(rowIndex)}
-                columnHeaderCellRenderer={() =>
-                    headerRenderer({
-                        definition: operationsTableColumns.get('slowest_operand'),
-                        column: 'slowest_operand',
-                        changeSorting,
-                        sortDirection,
-                        sortingColumn,
-                        tableFields,
-                        nodesSelectionState,
-                    })
-                }
-            />
-            {columnRenderer({
-                key: 'bw_bound_total_runtime',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-            })}
-            {columnRenderer({
-                key: 'bw_bound_math_utilization',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-            })}
-            {columnRenderer({
-                key: 'model_runtime_per_input',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-            })}
-            {columnRenderer({
-                key: 'kernel_runtime_per_input',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-            })}
-            {columnRenderer({
-                key: 'kernel_total_runtime',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-            })}
         </Table2>
     );
 }

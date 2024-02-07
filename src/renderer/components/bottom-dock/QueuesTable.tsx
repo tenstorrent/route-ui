@@ -1,12 +1,12 @@
 import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
-import { Cell, Column, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { Cell, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useSelector } from 'react-redux';
 import SelectableOperation from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
 import DataSource from '../../../data/DataSource';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
-import { columnRenderer, headerRenderer } from './SharedTable';
+import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
 
 /**
@@ -86,22 +86,16 @@ function QueuesTable() {
                 tableFields.length,
             ]}
         >
-            <Column
-                key='queue'
-                id='queue'
-                cellRenderer={(rowIndex) => queueCellRenderer(rowIndex)}
-                columnHeaderCellRenderer={() =>
-                    headerRenderer({
-                        definition: queuesTableColumns.get('queue'),
-                        column: 'queue',
-                        changeSorting,
-                        sortDirection,
-                        sortingColumn,
-                        tableFields,
-                        nodesSelectionState,
-                    })
-                }
-            />
+            {columnRenderer({
+                key: 'queue',
+                columnDefinition: queuesTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+                customCellRenderer: queueCellRenderer,
+            })}
             {
                 [...queuesTableColumns.keys()]
                     .filter((key) => key !== 'queue')
