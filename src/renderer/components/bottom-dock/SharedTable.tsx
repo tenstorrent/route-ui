@@ -184,7 +184,11 @@ export const cellRenderer = <T extends TableFields>({
 }: CellRenderingProps<T>) => {
     const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
 
-    return <Cell className={definition?.align ? `align-${definition?.align}` : ''}>{cellContent}</Cell>;
+    return (
+        <Cell key={`${key.toString()}-${rowIndex}`} className={definition?.align ? `align-${definition?.align}` : ''}>
+            {cellContent}
+        </Cell>
+    );
 };
 
 export interface ColumnRendererProps<T extends TableFields> {
