@@ -6,6 +6,7 @@ import { nodeSelectionReducer } from './slices/nodeSelection.slice';
 import { linkSaturationReducer } from './slices/linkSaturation.slice';
 import { operationPerformanceReducer } from './slices/operationPerf.slice';
 import { loggingReducer } from './slices/logging.slice';
+import { clusterViewReducer } from './slices/clusterView.slice';
 
 const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
         detailedView: detailedViewReducer,
         operationPerformance: operationPerformanceReducer,
         logging: loggingReducer,
+        clusterView: clusterViewReducer,
     },
 });
 

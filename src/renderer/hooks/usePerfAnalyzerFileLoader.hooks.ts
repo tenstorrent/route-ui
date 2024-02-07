@@ -15,11 +15,13 @@ import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFold
 
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import { GraphRelationshipState } from '../../data/StateTypes';
 import useLogging from './useLogging.hook';
+import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
+import Cluster from '../../data/Cluster';
 
 type PerfAnalyzerFileLoaderHook = {
     loadPerfAnalyzerFolder: () => Promise<void>;
@@ -40,6 +42,7 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
     const [error, setError] = useState<string | null>(null);
     const [enableGraphSelect, setEnableGraphSelect] = useState(false);
     const logging = useLogging();
+    const {cluster, setCluster} = useContext<ClusterContext>(ClusterDataSource);
 
     const selectFolderDialog = async (): Promise<string | null> => {
         const folderList = dialog.showOpenDialogSync({
@@ -76,9 +79,7 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
             setError(err.message ?? 'Unknown Error');
         }
 
-        const cluster = await loadCluster(folderPath);
-
-        console.log(cluster);
+        setCluster(await loadCluster(folderPath));
     };
 
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {

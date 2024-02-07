@@ -147,7 +147,7 @@ export const loadCluster = async (perfResultsPath: string): Promise<Cluster | nu
         const clusterDescYaml = await readFile(clusterDescFilePath);
         const clusterDescriptor = load(clusterDescYaml) as ClusterDescriptorJSON;
 
-        const deviceDescFolder = path.join(perfResultsPath, 'device_descs');
+        const deviceDescFolder = path.join(perfResultsPath, 'device_desc_runtime');
         const deviceDescFiles = await readDirEntries(deviceDescFolder);
         const deviceDescriptorResults = deviceDescFiles.map(async (file) => {
             const descriptorPath = path.join(deviceDescFolder, file.name);
@@ -155,6 +155,7 @@ export const loadCluster = async (perfResultsPath: string): Promise<Cluster | nu
             return load(descriptorYaml) as DeviceDescriptorJSON;
         });
         const deviceDescriptorList = await Promise.all(deviceDescriptorResults);
+
         return new Cluster(clusterDescriptor, deviceDescriptorList);
     } catch (err) {
         console.error('Failed to load cluster description', err);

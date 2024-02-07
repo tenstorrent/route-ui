@@ -92,3 +92,6 @@ export interface GraphRelationshipState {
     temporalEpoch: number;
     chipId: number;
 }
+export interface ClusterViewState {
+    isOpen: boolean;
+}

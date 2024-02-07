@@ -7,6 +7,7 @@ import { getLogEntriesByType, getLogOutputEnabled } from '../data/store/selector
 import { LogLevel } from '../data/Types';
 
 import './scss/SplashScreen.scss';
+import ClusterView from './components/cluster-view/ClusterView';
 
 const SplashScreen: FC = () => {
     const errorLogs = useSelector(getLogEntriesByType(LogLevel.ERROR));
@@ -14,7 +15,6 @@ const SplashScreen: FC = () => {
 
     return (
         <div className='splash-screen'>
-            {/* <FileLoader /> */}
             <PerfDataLoader />
             {logOutputEnabled && errorLogs.length > 0 && (
                 <div id='splash-debug-panel'>

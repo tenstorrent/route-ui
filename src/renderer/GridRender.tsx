@@ -11,6 +11,7 @@ import DetailedView from './components/DetailedView';
 import { mapIterable } from '../utils/IterableHelpers';
 import { GridSidebar } from './components/grid-sidebar/GridSidebar';
 import { getDetailedViewZoom, getGridZoom } from '../data/store/selectors/uiState.selectors';
+import ClusterViewDialog from './components/cluster-view/ClusterViewDialog';
 
 export default function GridRender() {
     const { chip } = useContext<GridContext>(DataSource);
@@ -47,6 +48,7 @@ export default function GridRender() {
                 </div>
             )}
             <DetailedView zoom={detailedViewZoom} />
+            <ClusterViewDialog zoom={1} />
         </>
     );
 }
