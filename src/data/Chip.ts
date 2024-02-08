@@ -222,7 +222,7 @@ export default class Chip {
         name: string,
         type: GraphVertexType,
         pipesByCore?: Map<string, string[]>,
-        pipesPerOperator?: { operator: string; pipes: string[] },
+        pipesPerOperator?: { operator: string; pipes: string[]; index: number },
         from?: GraphVertex,
         to?: GraphVertex,
     ): Operand {
@@ -241,12 +241,15 @@ export default class Chip {
             operand = this.operationsByName.get(name) as BuildableOperation;
         }
         if (pipesPerOperator) {
-            operand?.setPipesForOperator(pipesPerOperator.operator, pipesPerOperator.pipes || []);
+            operand?.setPipesForOperator(
+                pipesPerOperator.operator,
+                pipesPerOperator.pipes || [],
+                pipesPerOperator.index,
+            );
         }
         if (operand === undefined) {
             throw new Error(`Operand ${name} is neither a queue nor an operation`);
         }
-
         if (pipesByCore && pipesByCore.size > 0) {
             if (operand.pipeIdsByCore.size > 0) {
                 pipesByCore.forEach((newPipeIds, coreId) => {
@@ -429,7 +432,7 @@ export default class Chip {
                     return null;
                 }
 
-                const inputs = opJson.inputs.map((operandJson) => {
+                const inputs = opJson.inputs.map((operandJson, index) => {
                     const operatorPipes: string[] = Object.values(operandJson.pipes)
                         .map((pipes) => pipes.map((pipe) => pipe.toString()))
                         .flat();
@@ -437,10 +440,10 @@ export default class Chip {
                         operandJson.name,
                         operandJson.type as GraphVertexType,
                         pipesAsMap(operandJson.pipes),
-                        { operator: operation.name, pipes: operatorPipes },
+                        { operator: operation.name, pipes: operatorPipes, index },
                     );
                 });
-                const outputs = opJson.outputs.map((operandJson) => {
+                const outputs = opJson.outputs.map((operandJson, index) => {
                     const operatorPipes: string[] = Object.values(operandJson.pipes)
                         .map((pipes) => pipes.map((pipe) => pipe.toString()))
                         .flat();
@@ -448,7 +451,7 @@ export default class Chip {
                         operandJson.name,
                         operandJson.type as GraphVertexType,
                         pipesAsMap(operandJson.pipes),
-                        { operator: operation.name, pipes: operatorPipes },
+                        { operator: operation.name, pipes: operatorPipes, index },
                     );
                 });
 
@@ -593,7 +596,9 @@ export default class Chip {
             return new BuildableOperation(opName, cores, inputs, outputs);
         });
 
-        forEach(operations, (operation) => newChip.updateOperation(operation));
+        /** if we have netlist and optopipe we shoudl actively avoid this */
+        // TODO: possible use if netlist isnt available
+        // forEach(operations, (operation) => newChip.updateOperation(operation));
         return newChip;
     }
 

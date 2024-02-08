@@ -1,4 +1,3 @@
-import { process } from '@electron/remote';
 import { ComputeNodeType } from './Types';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
@@ -21,11 +20,13 @@ export abstract class AbstractGraphVertex implements Operand {
 
     private pipesPerOperator: Map<string, string[]> = new Map();
 
+    private pipesPerOperatorIndexed: Map<string, string[][]> = new Map();
+
     public getPipesForOperator(operator: string): string[] {
         return this.pipesPerOperator.get(operator) || [];
     }
 
-    public setPipesForOperator(operator: string, pipeIds: string[]) {
+    public setPipesForOperator(operator: string, pipeIds: string[], index: number): void {
         if (this.pipesPerOperator.has(operator)) {
             this.pipesPerOperator.get(operator)!.push(...pipeIds);
         } else {
@@ -33,6 +34,20 @@ export abstract class AbstractGraphVertex implements Operand {
         }
         const uniquePipeIds = [...new Set(this.pipesPerOperator.get(operator)!.map((pipeId) => pipeId.toString()))];
         this.pipesPerOperator.set(operator, uniquePipeIds);
+
+        if (this.pipesPerOperatorIndexed.has(operator)) {
+            const operatorPipeIdsIndexed = this.pipesPerOperatorIndexed.get(operator)!;
+            const pipesByIndex = operatorPipeIdsIndexed[index] || [];
+            operatorPipeIdsIndexed[index] = [...new Set([...pipesByIndex, ...pipeIds])];
+        } else {
+            const operatorPipeIdsIndexed: string[][] = [];
+            operatorPipeIdsIndexed[index] = [...new Set(pipeIds)];
+            this.pipesPerOperatorIndexed.set(operator, operatorPipeIdsIndexed);
+        }
+    }
+
+    public getPipesForOperatorIndexed(operator: string, index: number): string[] {
+        return this.pipesPerOperatorIndexed.get(operator)?.[index] || [];
     }
 
     public toString(): string {
@@ -88,23 +103,11 @@ export abstract class AbstractGraphVertex implements Operand {
     }
 
     assignInputs(inputs: Operand[]) {
-        this.inputOperands = [...new Set([...this.inputOperands, ...inputs])];
-        if (process.env.NODE_ENV === 'development') {
-            const inputNames = this.inputs.map((input) => input.name);
-            if (inputNames.length !== new Set(inputNames).size) {
-                throw new Error(`Operation ${this.name} has duplicate input operands`);
-            }
-        }
+        this.inputOperands = [...this.inputOperands, ...inputs];
     }
 
     assignOutputs(outputs: Operand[]) {
-        this.outputOperands = [...new Set([...this.outputOperands, ...outputs])];
-        if (process.env.NODE_ENV === 'development') {
-            const outputNames = this.outputs.map((output) => output.name);
-            if (outputNames.length !== new Set(outputNames).size) {
-                throw new Error(`Operation ${this.name} has duplicate output operands`);
-            }
-        }
+        this.outputOperands = [...this.outputOperands, ...outputs];
     }
 
     get uniquePipeIds(): string[] {
@@ -200,11 +203,15 @@ export interface Operand {
 
     getPipesForOperator(operator: string): string[];
 
-    setPipesForOperator(operator: string, pipeIds: string[]): void;
+    setPipesForOperator(operator: string, pipeIds: string[], index: number): void;
+
+    getPipesForOperatorIndexed(operator: string, index: number): string[];
 
     getPipeIdsForCore(coreId: string): string[];
 
     getAllPipeIds(): Iterable<string[]>;
 
     isConnected(): boolean;
+
+    // operrandIds: string[];
 }
