@@ -195,6 +195,8 @@ function OperationsTable() {
         }
     };
 
+
+    // TODO: uise definition instead
     const columns = [
         'kernel_math_utilization',
         'bw_limited_factor',
