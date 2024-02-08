@@ -9,6 +9,10 @@ import { getSelectedState, handleSelectAll } from '../components/bottom-dock/Sha
 const useSelectedTableRows = () => {
     const dispatch = useDispatch();
 
+    const getDisabledOperation = (name: string) => {
+        return operationsSelectionState[name]?.selected === undefined;
+    };
+
     const getDisabledSlowestOperand = (row: OpTableFields) => {
         const name = row.slowestOperandRef?.name ?? '';
         const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
@@ -28,8 +32,9 @@ const useSelectedTableRows = () => {
         handleSelectAllCores: handleSelectAll<OpTableFields>((row, selected) =>
             dispatch(updateNodeSelection({ id: row.core_id, selected })),
         ),
-        handleSelectAllOperations: handleSelectAll<OpTableFields>((row, selected) =>
-            dispatch(selectOperation({ opName: row.name, selected })),
+        handleSelectAllOperations: handleSelectAll<OpTableFields>(
+            (row, selected) => dispatch(selectOperation({ opName: row.name, selected })),
+            (row) => !getDisabledOperation(row.name),
         ),
         handleSelectAllSlowestOperands: handleSelectAll<OpTableFields>(
             (row, selected) => {
@@ -52,6 +57,7 @@ const useSelectedTableRows = () => {
         ),
         getOperationSelectedState: getSelectedState<OpTableFields>(
             (row) => operationsSelectionState[row.name]?.selected ?? false,
+            (row) => !getDisabledOperation(row.name),
         ),
         getSlowestOperandSelectedState: getSelectedState<OpTableFields>(
             (row) => {

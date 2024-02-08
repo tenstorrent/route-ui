@@ -1,15 +1,12 @@
-import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
-import { Cell, Column, ColumnHeaderCell2, IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { useSelector } from 'react-redux';
-import { Checkbox, Icon } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
-import { JSX } from 'react/jsx-runtime';
 import SelectableOperation from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
 import DataSource from '../../../data/DataSource';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
-import { SortingDirection } from './SharedTable';
+import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
 
 /**
@@ -40,117 +37,24 @@ function QueuesTable() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
-    if (!chip) {
+    if (!chip || !tableFields.length) {
         return <pre>No data available</pre>;
     }
 
     const queueCellRenderer = (rowIndex: number) => {
         const queueName = sortedTableFields[rowIndex].name;
-        return (
-            <Cell interactive className='table-cell-interactive table-operation-cell'>
-                {queueName ? (
-                    <SelectableOperation
-                        disabled={disabledQueue(queueName)}
-                        opName={queueName}
-                        value={selected(queueName)}
-                        selectFunc={selectQueue}
-                        stringFilter=''
-                        type={GraphVertexType.QUEUE}
-                    />
-                ) : (
-                    ''
-                )}
-            </Cell>
-        );
-    };
 
-    const headerRenderer = (column: keyof QueuesTableFields) => {
-        const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
-        const sortClass = `${sortingColumn === column ? 'current-sort' : ''} ${sortDirectionClass}`;
-        let targetSortDirection = sortDirection;
-
-        if (sortingColumn === column) {
-            targetSortDirection = sortDirection === SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
-        }
-
-        const definition = queuesTableColumns.get(column);
-        const checkboxState = definition?.getSelectedState?.(tableFields, nodesSelectionState);
-        const selectableClass = definition?.canSelectAllRows ? 'can-select-all-rows' : '';
-
-        return (
-            <ColumnHeaderCell2
-                className={`${definition?.sortable ? sortClass : ''} ${selectableClass}`}
-                name={definition?.label ?? column}
-            >
-                <>
-                    {definition?.sortable && (
-                        <>
-                            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
-                            <div
-                                className='sortable-table-header'
-                                role='button'
-                                onClick={() => changeSorting(column)(targetSortDirection)}
-                            >
-                                {sortingColumn === column && (
-                                    <span className='sort-icon'>
-                                        <Icon
-                                            icon={
-                                                sortDirection === SortingDirection.ASC
-                                                    ? IconNames.SORT_ASC
-                                                    : IconNames.SORT_DESC
-                                            }
-                                        />
-                                    </span>
-                                )}
-                            </div>
-                        </>
-                    )}
-                    {definition?.canSelectAllRows && (
-                        <Checkbox
-                            checked={checkboxState}
-                            indeterminate={checkboxState === undefined}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                definition.handleSelectAll?.(tableFields, e.target.checked)
-                            }
-                            className='sortable-table-checkbox'
-                        />
-                    )}
-                </>
-            </ColumnHeaderCell2>
-        );
-    };
-
-    const cellRenderer = (key: keyof QueuesTableFields, rowIndex: number): JSX.Element => {
-        const definition = queuesTableColumns.get(key);
-        const cellContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
-
-        return <Cell className={definition?.align ? `align-${definition?.align}` : ''}>{cellContent}</Cell>;
-    };
-
-    if (!tableFields.length) {
-        return <pre>No data available</pre>;
-    }
-
-    const getColumn = (
-        key: keyof QueuesTableFields,
-    ): ReactElement<IColumnProps, string | JSXElementConstructor<any>> => {
-        if (key === 'queue') {
-            return (
-                <Column
-                    id='queue'
-                    cellRenderer={(rowIndex) => queueCellRenderer(rowIndex)}
-                    columnHeaderCellRenderer={() => headerRenderer('queue')}
-                />
-            );
-        }
-
-        return (
-            <Column
-                key={key}
-                id={key}
-                cellRenderer={(rowIndex) => cellRenderer(key, rowIndex)}
-                columnHeaderCellRenderer={() => headerRenderer(key)}
+        return queueName ? (
+            <SelectableOperation
+                disabled={disabledQueue(queueName)}
+                opName={queueName}
+                value={selected(queueName)}
+                selectFunc={selectQueue}
+                stringFilter=''
+                type={GraphVertexType.QUEUE}
             />
+        ) : (
+            ''
         );
     };
 
@@ -175,9 +79,31 @@ function QueuesTable() {
                 tableFields.length,
             ]}
         >
-            {[...queuesTableColumns.keys()].map((key) => {
-                return getColumn(key);
+            {columnRenderer({
+                key: 'queue',
+                columnDefinition: queuesTableColumns,
+                changeSorting,
+                sortDirection,
+                sortingColumn,
+                tableFields,
+                nodesSelectionState,
+                customCellContentRenderer: queueCellRenderer,
             })}
+            {
+                [...queuesTableColumns.keys()]
+                    .filter((key) => key !== 'queue')
+                    .map((key) =>
+                        columnRenderer({
+                            key,
+                            columnDefinition: queuesTableColumns,
+                            changeSorting,
+                            sortDirection,
+                            sortingColumn,
+                            tableFields,
+                            nodesSelectionState,
+                        }),
+                    ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+            }
         </Table2>
     );
 }
