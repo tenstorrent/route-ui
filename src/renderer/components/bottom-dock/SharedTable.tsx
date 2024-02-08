@@ -30,6 +30,9 @@ export enum SortingDirection {
 }
 
 export const sortAsc = (a: any, b: any) => {
+    if(a === undefined || b === undefined) {
+        return 0;
+    }
     if (typeof a === 'string' && typeof b === 'number') {
         return 1;
     }
@@ -39,6 +42,9 @@ export const sortAsc = (a: any, b: any) => {
     return a > b ? 1 : -1;
 };
 export const sortDesc = (a: any, b: any) => {
+    if(a === undefined || b === undefined) {
+        return 0;
+    }
     if (typeof a === 'string' && typeof b === 'number') {
         return 1;
     }
