@@ -596,7 +596,7 @@ export default class Chip {
             return new BuildableOperation(opName, cores, inputs, outputs);
         });
 
-        /** if we have netlist and optopipe we shoudl actively avoid this */
+        /** if we have netlist and optopipe we should actively avoid this */
         // TODO: possible use if netlist isnt available
         // forEach(operations, (operation) => newChip.updateOperation(operation));
         return newChip;
