@@ -19,7 +19,7 @@ const BottomDock: React.FC = () => {
         <div className='dock bottom-dock'>
             <Tabs id='dock-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className={Classes.TABS}>
                 <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
-                <Tab id='tab2' title='Queues' panel={<QueuesTable />} />
+                {process.env.NODE_ENV === 'development' && <Tab id='tab2' title='Queues' panel={<QueuesTable />} />}
                 {/* <Tab */}
                 {/*     id='tab2' */}
                 {/*     title='Operands' */}
