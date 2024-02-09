@@ -39,12 +39,12 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                 </div>
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
-            {inputs.map((operand) => (
+            {inputs.map((operand, index) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
-                            {operand.getPipesForOperator(graphNode.name).map((pipeId) => (
+                            {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
                                 <li>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
@@ -72,12 +72,12 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             ))}
 
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
-            {outputs.map((operand) => (
+            {outputs.map((operand, index) => (
                 <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
-                            {operand.getPipesForOperator(graphNode.name).map((pipeId) => (
+                            {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
                                 <li>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
