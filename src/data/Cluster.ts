@@ -1,4 +1,6 @@
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from './sources/ClusterDescriptor';
+import ChipDesign from './ChipDesign';
+import { ChipDesignJSON } from './JSONDataTypes';
 
 type ClusterChipId = number;
 
@@ -36,7 +38,10 @@ export class ClusterChip {
 
     readonly eth: string[] = [];
 
-    connectedChips: Map<string, ClusterChip> = new Map();
+    connectedChipsByEthId: Map<string, ClusterChip> = new Map();
+
+    // TODO: not the ideal way to hold the data and we dont need all of it, consider sampling down
+    design: ChipDesign;
 
     constructor(id: ClusterChipId, coordinates: ClusterCoordinates, mmio = false, eth: string[] = []) {
         this.id = id;
@@ -49,7 +54,25 @@ export class ClusterChip {
 export default class Cluster {
     public readonly chips: ClusterChip[] = [];
 
+    _totalCols = 0;
+
+    _totalRows = 0;
+
+    get totalCols(): number {
+        return this._totalCols + 1;
+    }
+
+    get totalRows(): number {
+        return this._totalRows + 1;
+    }
+
     constructor(clusterDescriptor: ClusterDescriptorJSON, deviceDescriptorList: DeviceDescriptorJSON[]) {
+        if (!clusterDescriptor) {
+            return;
+        }
+        if (!deviceDescriptorList || deviceDescriptorList.length === 0) {
+            return;
+        }
         const connections = clusterDescriptor.ethernet_connections;
         const mmioChips = clusterDescriptor.chips_with_mmio.map((obj) => {
             return Object.values(obj)[0];
@@ -57,19 +80,26 @@ export default class Cluster {
 
         this.chips = Object.entries(clusterDescriptor.chips).map(([ClusterChipId, coordinates]) => {
             const chipId = parseInt(ClusterChipId, 10);
-            return new ClusterChip(
+            const coords: ClusterCoordinates = new ClusterCoordinates(coordinates);
+            this._totalCols = Math.max(this._totalCols, coords.x);
+            this._totalRows = Math.max(this._totalRows, coords.y);
+            const chip = new ClusterChip(
                 chipId,
-                new ClusterCoordinates(coordinates),
+                coords,
                 mmioChips.includes(chipId),
                 deviceDescriptorList[chipId].eth.map((coreId) => `${ClusterChipId}-${coreId}`),
             );
+            chip.design = new ChipDesign(deviceDescriptorList[chipId] as ChipDesignJSON, chipId);
+            return chip;
         });
+
+        // TODO: we need to retain connection details or module orders as we will need to render connected pairs and it is currently working accidentally
         connections.forEach((connection) => {
             const chip1 = this.chips[connection[0].chip];
             const chip2 = this.chips[connection[1].chip];
             if (chip1 && chip2) {
-                chip1.connectedChips.set(chip1.eth[connection[0].chan], chip2);
-                chip2.connectedChips.set(chip2.eth[connection[1].chan], chip1);
+                chip1.connectedChipsByEthId.set(chip1.eth[connection[0].chan], chip2);
+                chip2.connectedChipsByEthId.set(chip2.eth[connection[1].chan], chip1);
             }
         });
     }

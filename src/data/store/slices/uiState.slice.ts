@@ -84,6 +84,7 @@ const uiStateSlice = createSlice({
         updateDetailedViewZoom: (state, action: PayloadAction<number>) => {
             state.detailedViewZoom = action.payload;
         },
+
     },
 });
 

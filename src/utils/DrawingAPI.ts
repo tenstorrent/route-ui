@@ -15,6 +15,7 @@ import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../da
 import { ComputeNodeSiblings } from '../data/StateTypes';
 
 export const NODE_SIZE = 100;
+export const CHIP_SIZE = 150;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
 const CENTER_DISPERSION = 10; // dispersion from the starting point
 const NOC_0_X_OFFSET = -CENTER_DISPERSION;
