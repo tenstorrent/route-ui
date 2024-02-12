@@ -20,7 +20,6 @@ export const PerfDataLoader = (): React.ReactElement => {
 
     return (
         <div className='folder-load-container'>
-            {/* <h3>Load Folder</h3> */}
             <FolderPicker disabled={false} onSelectFolder={loadPerfAnalyzerFolder} disabledText='' />
             <PopoverMenu // Graph picker
                 label='Select Graph'
@@ -53,7 +52,6 @@ const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerPr
                 content={
                     <div className={Classes.POPOVER2_DISMISS}>
                         <Button icon={IconNames.FOLDER_OPEN} text='Local' onClick={onSelectFolder} />
-                        <Button icon={IconNames.CLOUD_DOWNLOAD} text='Remote' disabled />
                     </div>
                 }
                 disabled={disabled}
