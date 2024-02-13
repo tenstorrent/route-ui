@@ -9,6 +9,8 @@ import path from 'path';
 import { promisify } from 'util';
 import { SpawnSyncOptionsWithBufferEncoding, exec, spawnSync } from 'child_process';
 
+import type { RemoteConnection } from './folder-picker/RemoteConnectionOptions';
+
 export interface Workspace {
     remote: boolean;
     sshHost?: string;
@@ -17,9 +19,11 @@ export interface Workspace {
     outputPath: string;
 }
 
-export interface IPerfResults {
-    testname: string; // name of the test that the perf results folder belongs to
-    path: string; // absolute path to the perf results folder
+export interface RemoteFolder {
+    /** Name of the test results folder */
+    testName: string;
+    /** Remote absolute path to the test results folder */
+    path: string;
 }
 
 /** Runs a shell command and returns the output buffers on success (status=0).
@@ -116,7 +120,7 @@ export const testWorkspaceConnection = async (w: Workspace): Promise<void> => {
     }
 };
 
-const verifyWorkspacePath = async (w: Workspace): Promise<void> => {
+export const verifyWorkspacePath = async (w: Workspace): Promise<void> => {
     try {
         await runShellCommand('ssh', sshWrapCmd(w, `ls ${w.path}`));
     } catch (e: any) {
@@ -127,97 +131,80 @@ const verifyWorkspacePath = async (w: Workspace): Promise<void> => {
 };
 
 /** Fetches a list of directories in the given workspace which contain `perf_results` subdirectories */
-export async function findWorkspacePerfDumpDirectories(workspace: Workspace): Promise<IPerfResults[]> {
-    const parseResults = (results: string): IPerfResults[] =>
+export async function findRemoteDirectories(remoteConnection: RemoteConnection) {
+    const parseResults = (results: string) =>
         results
             .split('\n')
             .filter((s) => s.length > 0)
-            .map((directory) => ({
-                testname: directory.split('/').slice(-2, -1)[0],
-                path: directory,
+            .map((fullPath) => ({
+                testName: fullPath.split('/').reverse()[1],
+                path: fullPath.split('/').slice(0, -1).join('/'),
             }));
-    console.log('Finding remote perf dump directories');
+
     const findParams = [
         '-L',
-        workspace.outputPath,
+        remoteConnection.path,
         '-mindepth',
         '1',
         '-maxdepth',
         '3',
         '-type',
-        'd',
+        'f',
         '-name',
-        'perf_results',
+        // TODO: consider `device_description.yaml` or `cluster_description.yaml`
+        'device_desc.yaml',
     ];
-    let stdout: Buffer | null;
-    if (workspace.remote) {
-        if (!workspace.sshHost || !workspace.sshPort) {
-            throw Error('Workspace does not have ssh host/port set');
-        }
-        [stdout] = await runShellCommand('ssh', sshWrapCmd(workspace, `find ${findParams.join(' ')}`));
-    } else {
-        [stdout] = await runShellCommand('find', findParams);
-    }
+
+    const sshParams = [
+        remoteConnection.host,
+        '-p',
+        remoteConnection.port.toString(),
+        'bash',
+        '-c',
+        `'find ${findParams.join(' ')}'`,
+    ];
+
+    const [stdout] = await runShellCommand('ssh', sshParams);
+
     return stdout ? parseResults(stdout.toString()) : [];
 }
 
-/** Syncs the remote directory containing a perf dump.
- *
+/**
+ * Syncs the remote directory containing a perf dump.
  * Deletes the local copy of the previously loaded perf dump if it is different from the new directory.
+ * Implemented with rsync, only works on MacOS/Linux. Can only be called from Renderer process.
  *
- * Implemented with rsync, only works on MacOS/Linux. Can only be called from Renderer process. */
-export async function syncRemotePerfDump(workspace: Workspace, perfResults: IPerfResults): Promise<string> {
+ * @param remoteConnection: Object containing the connection details
+ * @param testFolder: The **remote and absolute** path to the test folder
+ */
+export async function syncRemoteTest(remoteConnection: RemoteConnection, testFolder: RemoteFolder) {
     const remote = await import('@electron/remote');
-    if (!workspace) {
-        throw Error('Workspace not set');
-    }
-
-    if (!workspace.remote) {
-        throw Error('Workspace is not remote');
-    }
-
-    const testId = `${getWorkspaceId(workspace)}-${perfResults.testname.replace(/\s/g, '_')}`;
-    console.log('SYNC REMOTE PERF DUMP', testId);
 
     const configDir = remote.app.getPath('userData');
-    const localCopyPath = path.join(configDir, 'perfdatatmp/');
+    const localCopyPath = path.join(configDir, 'remote-tests/');
+
     if (!fs.existsSync(localCopyPath)) {
         await fsPromises.mkdir(localCopyPath);
     }
 
-    const dirContents = await fsPromises.readdir(localCopyPath);
-    if (dirContents.length && !dirContents.includes(testId)) {
-        // Purge the remote copy directory
-        await Promise.all(
-            dirContents.map(async (file) =>
-                fsPromises.rm(path.join(localCopyPath, file), {
-                    recursive: true,
-                    force: true,
-                }),
-            ),
-        );
-    }
-
-    const destinationPath = path.join(localCopyPath, testId);
-    console.log('PATH BEFORE:', perfResults.path);
-    const sourcePath = perfResults.path;
-    console.log('PATH AFTER:', sourcePath);
+    const sourcePath = `${remoteConnection.host}:${escapeWhitespace(testFolder.path)}`;
     const baseOptions = [
         '-s',
         '-az',
         '-e',
-        `'ssh -p ${workspace.sshPort}'`,
+        `'ssh -p ${remoteConnection.port.toString()}'`,
         '--delete',
-        `${workspace.sshHost}:${escapeWhitespace(sourcePath)}`,
-        escapeWhitespace(destinationPath),
+        sourcePath,
+        escapeWhitespace(localCopyPath),
     ];
     try {
         await runShellCommand('rsync', baseOptions, { shell: true });
     } catch (e: any) {
         console.log('Initial RSYNC attempt failed: ', e.toString());
         // Try again, this time without `-s` option & quotes around source path
-        baseOptions[4] = `'${baseOptions[4]}'`;
+        baseOptions[5] = `'${baseOptions[5]}'`;
         await runShellCommand('rsync', baseOptions.slice(1), { shell: true });
     }
-    return destinationPath;
+
+    return path.join(localCopyPath, testFolder.testName);
 }

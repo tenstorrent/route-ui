@@ -21,16 +21,7 @@ import usePopulateChipData from './usePopulateChipData.hooks';
 import { GraphRelationshipState } from '../../data/StateTypes';
 import useLogging from './useLogging.hook';
 
-type PerfAnalyzerFileLoaderHook = {
-    loadPerfAnalyzerFolder: () => Promise<void>;
-    loadPerfAnalyzerGraph: (graphName: string) => Promise<void>;
-    error: string | null;
-    selectedGraph: string;
-    availableGraphs: GraphRelationshipState[];
-    enableGraphSelect: boolean;
-};
-
-const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
+const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
 
     const dispatch = useDispatch();
@@ -102,12 +93,17 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         }
     };
 
-    const loadPerfAnalyzerFolder = async (): Promise<void> => {
-        const folderPath = await selectFolderDialog();
-        if (folderPath) {
+    const loadPerfAnalyzerFolder = async (folderPath?: string | null): Promise<void> => {
+        let folderToLoad = folderPath;
+
+        if (!folderToLoad) {
+            folderToLoad = await selectFolderDialog();
+        }
+
+        if (folderToLoad) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
 
-            await loadFolder(folderPath);
+            await loadFolder(folderToLoad);
         }
     };
 
