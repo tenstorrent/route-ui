@@ -9,11 +9,10 @@ import RemoteFolderDialog from './RemoteFolderDialog';
 import useAppConfig from '../../hooks/useAppConfig.hook';
 
 import '../../scss/RemoteConnectionOptions.scss';
-import useRemoteConnection from '../../hooks/useRemoteConnection.hook';
+import useRemoteConnection, { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
-import type { RemoteFolder } from '../Network';
 
 export interface RemoteConnection {
     name: string;
