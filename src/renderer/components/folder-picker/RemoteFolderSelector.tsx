@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Button, MenuItem } from '@blueprintjs/core';
+import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2 } from '@blueprintjs/select';
 import { IconNames } from '@blueprintjs/icons';
@@ -58,7 +58,7 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 />
             </Select2>
             <Tooltip2 content='Sync remote folder'>
-                <Button
+                <AnchorButton
                     icon={IconNames.REFRESH}
                     loading={loading}
                     disabled={loading || !remoteFolder || remoteFolders?.length === 0}

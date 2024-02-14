@@ -1,4 +1,4 @@
-import { Button, MenuItem } from '@blueprintjs/core';
+import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2 } from '@blueprintjs/select';
 import { IconNames } from '@blueprintjs/icons';
@@ -67,14 +67,14 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                 />
             </Select2>
             <Tooltip2 content='Edit selected connection'>
-                <Button
+                <AnchorButton
                     icon={IconNames.EDIT}
                     disabled={disabled || !selectedConnection}
                     onClick={() => setIsEditDialogOpen(true)}
                 />
             </Tooltip2>
             <Tooltip2 content='Remove selected connection'>
-                <Button
+                <AnchorButton
                     icon={IconNames.TRASH}
                     disabled={disabled || !selectedConnection}
                     onClick={() => onRemoveConnection(selectedConnection)}
