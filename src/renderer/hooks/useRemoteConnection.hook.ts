@@ -35,42 +35,45 @@ export interface RemoteFolder {
     path: string;
 }
 
-export const escapeWhitespace = (str: string) => str.replace(/(\s)/g, '\\$1');
-
-export async function runShellCommand(cmd: string, params: string[]) {
-    const command = spawn(cmd, params, {
-        stdio: ['ignore', 'pipe', 'pipe'],
-        shell: true,
-        windowsHide: true,
-    });
-
-    let stdout = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const data of command.stdout) {
-        stdout += data;
-    }
-
-    let stderr = '';
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const data of command.stderr) {
-        stderr += data;
-    }
-
-    const exitCode = await new Promise<number>((resolve) => {
-        command.on('close', (code) => {
-            resolve(code ?? 0);
-        });
-    });
-
-    if (exitCode !== 0 || stderr.length > 0) {
-        throw Error(`Command failed: ${cmd} ${params.join(' ')}\n${stderr}`);
-    }
-
-    return stdout;
-}
+const escapeWhitespace = (str: string) => str.replace(/(\s)/g, '\\$1');
 
 const useRemoteConnection = () => {
     const logging = useLogging();
+    const defaultSshOptions = ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=60'];
+
+    const runShellCommand = async (cmd: string, params: string[]) => {
+        return new Promise<string>((resolve, reject) => {
+            logging.info(`Running command: ${cmd} ${params.join(' ')}`);
+
+            const command = spawn(cmd, params, {
+                stdio: ['ignore', 'pipe', 'pipe'],
+                shell: true,
+                windowsHide: true,
+            });
+
+            let stdout = '';
+            command.stdout.on('data', (data) => {
+                stdout += data.toString();
+            });
+
+            let stderr = '';
+            command.stderr.on('data', (data) => {
+                stderr += data.toString();
+            });
+
+            command.on('close', (code) => {
+                logging.info(`Command exited with code ${code}`);
+
+                if (code !== 0 || stderr.length > 0) {
+                    reject(Error(`Command failed: ${cmd} ${params.join(' ')}\n${stderr}`));
+                }
+                resolve(stdout);
+            });
+
+            command.on('error', (err) => reject(err));
+            command.on('disconnect', () => reject(Error('Command disconnected')));
+        });
+    };
 
     const testConnection = async (connection: RemoteConnection) => {
         const connectionStatus: ConnectionStatus = {
@@ -81,7 +84,9 @@ const useRemoteConnection = () => {
         connectionStatus.status = ConnectionTestStates.PROGRESS;
 
         try {
-            await runShellCommand('ssh', [connection.host, '-p', connection.port.toString(), 'echo "connected"']);
+            const sshParams = [...defaultSshOptions, connection.host, '-p', connection.port.toString(), 'exit'];
+
+            await runShellCommand('ssh', sshParams);
 
             connectionStatus.status = ConnectionTestStates.OK;
             connectionStatus.message = 'Connection successful';
@@ -104,14 +109,15 @@ const useRemoteConnection = () => {
         connectionStatus.status = ConnectionTestStates.PROGRESS;
 
         try {
-            await runShellCommand('ssh', [
+            const sshParams = [
+                ...defaultSshOptions,
                 connection.host,
                 '-p',
                 connection.port.toString(),
-                'bash',
-                '-c',
-                `'ls ${connection.path}'`,
-            ]);
+                `'test -d ${connection.path}'`,
+            ];
+
+            await runShellCommand('ssh', sshParams);
 
             connectionStatus.status = ConnectionTestStates.OK;
             connectionStatus.message = 'Remote folder path exists';
@@ -139,30 +145,11 @@ const useRemoteConnection = () => {
                     path: fullPath.split('/').slice(0, -1).join('/'),
                 }));
 
-        const findParams = [
-            '-L',
-            connection.path,
-            '-mindepth',
-            '1',
-            '-maxdepth',
-            '3',
-            '-type',
-            'f',
-            '-name',
-            // TODO: consider `device_description.yaml` or `cluster_description.yaml`
-            'device_desc.yaml',
-        ];
+        // TODO: consider `device_description.yaml` or `cluster_description.yaml`
+        const findCommand = `'find -L ${connection.path} -mindepth 1 -maxdepth 3 -type f -name device_desc.yaml'`;
+        const sshParams = [...defaultSshOptions, connection.host, '-p', connection.port.toString(), findCommand];
 
-        const sshParams = [
-            connection.host,
-            '-p',
-            connection.port.toString(),
-            'bash',
-            '-c',
-            `'find ${findParams.join(' ')}'`,
-        ];
-
-        const [stdout] = await runShellCommand('ssh', sshParams);
+        const stdout = await runShellCommand('ssh', sshParams);
 
         return stdout ? parseResults(stdout.toString()) : [];
     };
@@ -186,25 +173,18 @@ const useRemoteConnection = () => {
         }
 
         const sourcePath = `${connection.host}:${escapeWhitespace(remoteFolder.path)}`;
-        const baseOptions = [
-            '-s',
-            '-az',
-            '-e',
-            `'ssh -p ${connection.port.toString()}'`,
-            '--delete',
-            sourcePath,
-            escapeWhitespace(localCopyPath),
-        ];
+        const baseOptions = ['-az', '-e', `'ssh -p ${connection.port.toString()}'`];
+        const pathOptions = ['--delete', `'${sourcePath}'`, escapeWhitespace(localCopyPath)];
         try {
-            await runShellCommand('rsync', baseOptions);
+            // Try first with the `-s` option
+            await runShellCommand('rsync', ['-s', ...baseOptions, ...pathOptions]);
         } catch (err: any) {
             logging.info(
                 `Initial RSYNC attempt failed: ${(err as Error)?.message ?? err?.toString() ?? 'Unknown error'}`,
             );
 
-            // Try again, this time without `-s` option & quotes around source path
-            baseOptions[5] = `'${baseOptions[5]}'`;
-            await runShellCommand('rsync', baseOptions.slice(1));
+            // Try again, this time without `-s` option
+            await runShellCommand('rsync', [...baseOptions, ...pathOptions]);
         }
 
         return path.join(localCopyPath, remoteFolder.testName);
