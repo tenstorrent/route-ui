@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Button } from '@blueprintjs/core';
+import { Button, FormGroup, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
 import usePerfAnalyzerFileLoader from 'renderer/hooks/usePerfAnalyzerFileLoader.hooks';
@@ -19,27 +19,42 @@ export const PerfDataLoader = (): React.ReactElement => {
         usePerfAnalyzerFileLoader();
 
     return (
-        <>
-            <div className='folder-load-container'>
-                <h3>Local folder</h3>
-                <FolderPicker disabled={false} onSelectFolder={() => loadPerfAnalyzerFolder()} />
-                <PopoverMenu // Graph picker
-                    label='Select Graph'
-                    options={availableGraphs.map((graph) => graph.name)}
-                    selectedItem={selectedGraph}
-                    onSelectItem={loadPerfAnalyzerGraph}
-                    disabled={!enableGraphSelect}
-                />
-                {error && (
-                    <div className='loading-error'>
-                        <p>{error.toString()}</p>
-                    </div>
-                )}
-            </div>
-            <div>
-                <RemoteConnectionOptions />
-            </div>
-        </>
+        <div className='folder-picker-options'>
+            <fieldset>
+                <legend>Local folder</legend>
+                <Icon icon={IconNames.FOLDER_OPEN} size={150} />
+                <div className='folder-picker-wrapper'>
+                    <FormGroup
+                        label={<h3>Open a local folder</h3>}
+                        labelFor='text-input'
+                        subLabel='Select a local folder to load the performance data from.'
+                    >
+                        <div className='buttons-container'>
+                            <FolderPicker disabled={false} onSelectFolder={() => loadPerfAnalyzerFolder()} />
+                            <PopoverMenu // Graph picker
+                                label='Select Graph'
+                                options={availableGraphs.map((graph) => graph.name)}
+                                selectedItem={selectedGraph}
+                                onSelectItem={loadPerfAnalyzerGraph}
+                                disabled={!enableGraphSelect}
+                            />
+                            {error && (
+                                <div className='loading-error'>
+                                    <p>{error.toString()}</p>
+                                </div>
+                            )}
+                        </div>
+                    </FormGroup>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Remote Connection</legend>
+                <Icon icon={IconNames.CLOUD} size={150} />
+                <div className='folder-picker-wrapper'>
+                    <RemoteConnectionOptions />
+                </div>
+            </fieldset>
+        </div>
     );
 };
 

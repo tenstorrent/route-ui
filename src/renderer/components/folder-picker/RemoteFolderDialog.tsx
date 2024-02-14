@@ -27,6 +27,7 @@ const ConnectionTestMessage: FC<ConnectionStatus> = ({ status, message }) => {
 
 interface RemoteFolderDialogProps {
     title?: string;
+    buttonLabel?: string;
     open: boolean;
     onClose: () => void;
     onAddConnection: (connection: RemoteConnection) => void;
@@ -38,13 +39,16 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
     onClose,
     onAddConnection,
     title = 'Add new remote connection',
+    buttonLabel = 'Add connection',
     remoteConnection,
 }) => {
-    const [connection, setConnection] = useState(remoteConnection ?? { name: '', host: '', port: 22, path: '' });
-    const [connectionTests, setConnectionTests] = useState<ConnectionStatus[]>([
+    const defaultConnection = remoteConnection ?? { name: '', host: '', port: 22, path: '' };
+    const defaultConnectionTests: ConnectionStatus[] = [
         { status: ConnectionTestStates.IDLE, message: 'Test connection' },
         { status: ConnectionTestStates.IDLE, message: 'Test remote folder path' },
-    ]);
+    ];
+    const [connection, setConnection] = useState(defaultConnection);
+    const [connectionTests, setConnectionTests] = useState<ConnectionStatus[]>(defaultConnectionTests);
     const { testConnection, testRemoteFolder } = useRemoteConnection();
     const logging = useLogging();
 
@@ -81,6 +85,12 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
         }
     };
 
+    const closeDialog = () => {
+        setConnection(defaultConnection);
+        setConnectionTests(defaultConnectionTests);
+        onClose();
+    };
+
     return (
         <Dialog
             className='bp4-dark'
@@ -88,7 +98,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
             icon='info-sign'
             canOutsideClickClose={false}
             isOpen={open}
-            onClose={onClose}
+            onClose={closeDialog}
         >
             <DialogBody>
                 <FormGroup
@@ -160,14 +170,15 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 minimal
                 actions={
                     <>
-                        <Button intent='danger' text='Close' onClick={onClose} />
+                        <Button intent='danger' text='Close' onClick={closeDialog} />
                         <Button
                             intent='primary'
-                            text='Add connection'
+                            text={buttonLabel}
+                            disabled={!isValidConnection}
                             onClick={() => {
                                 if (isValidConnection) {
                                     onAddConnection(connection);
-                                    onClose();
+                                    closeDialog();
                                 }
                             }}
                         />
@@ -180,6 +191,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
 
 RemoteFolderDialog.defaultProps = {
     title: 'Add new remote connection',
+    buttonLabel: 'Add connection',
     remoteConnection: undefined,
 };
 

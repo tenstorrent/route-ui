@@ -4,6 +4,8 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2 } from '@blueprintjs/select';
 import { IconNames } from '@blueprintjs/icons';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
+import PopoverMenu from '../PopoverMenu';
+import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 
 const formatRemoteFolderName = (folder: RemoteFolder) => {
     return folder.testName;
@@ -40,10 +42,12 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
     onSelectFolder,
     onSyncFolder,
 }) => {
+    const { loadPerfAnalyzerGraph, selectedGraph, availableGraphs, enableGraphSelect } = usePerfAnalyzerFileLoader();
+
     return (
-        <div>
+        <div className='buttons-container'>
             <Select2
-                className='perf-results-remote-select'
+                className='remote-folder-select'
                 items={remoteFolders ?? []}
                 itemRenderer={remoteFolderRenderer}
                 filterable
@@ -65,6 +69,14 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                     onClick={() => onSyncFolder()}
                 />
             </Tooltip2>
+
+            <PopoverMenu
+                label='Select Graph'
+                options={availableGraphs.map((graph) => graph.name)}
+                selectedItem={selectedGraph}
+                onSelectItem={loadPerfAnalyzerGraph}
+                disabled={!enableGraphSelect}
+            />
         </div>
     );
 };

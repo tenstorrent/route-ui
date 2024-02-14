@@ -11,7 +11,7 @@ const formatConnectionString = (connection?: RemoteConnection) => {
         return '(No connection)';
     }
 
-    return `ssh://${connection.host}:${connection.port}/${connection.path.replace(/^\//gi, '')}`;
+    return `${connection.name} - ssh://${connection.host}:${connection.port}/${connection.path.replace(/^\//gi, '')}`;
 };
 
 const renderRemoteConnection: ItemRenderer<RemoteConnection> = (connection, { handleClick, modifiers }) => {
@@ -51,8 +51,9 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
     const selectedConnection = connection ?? connections[0];
 
     return (
-        <div>
+        <div className='buttons-container'>
             <Select2
+                className='remote-connection-select'
                 items={connections}
                 itemRenderer={renderRemoteConnection}
                 disabled={disabled}
@@ -91,6 +92,7 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                     setIsEditDialogOpen(false);
                 }}
                 title='Edit remote connection'
+                buttonLabel='Save connection'
                 remoteConnection={selectedConnection}
             />
         </div>
