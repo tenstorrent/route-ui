@@ -1,8 +1,11 @@
 import { FC, useState } from 'react';
 import { Button, Dialog, DialogBody, DialogFooter, FormGroup, Icon, IconName, InputGroup } from '@blueprintjs/core';
 
-import type { RemoteConnection } from './RemoteConnectionOptions';
-import useRemoteConnection, { ConnectionStatus, ConnectionTestStates } from '../../hooks/useRemoteConnection.hook';
+import useRemoteConnection, {
+    ConnectionStatus,
+    ConnectionTestStates,
+    RemoteConnection,
+} from '../../hooks/useRemoteConnection.hook';
 import useLogging from '../../hooks/useLogging.hook';
 
 const ConnectionTestMessage: FC<ConnectionStatus> = ({ status, message }) => {

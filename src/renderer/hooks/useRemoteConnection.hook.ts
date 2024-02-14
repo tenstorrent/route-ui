@@ -4,12 +4,17 @@ import { mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import dns from 'dns';
 
-import type { RemoteConnection } from '../components/folder-picker/RemoteConnectionOptions';
-
 import useLogging from './useLogging.hook';
 
 // Required for connecting to a socket on localhost
 dns.setDefaultResultOrder('ipv4first');
+
+export interface RemoteConnection {
+    name: string;
+    host: string;
+    port: number;
+    path: string;
+}
 
 export enum ConnectionTestStates {
     IDLE,
