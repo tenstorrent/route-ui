@@ -7,10 +7,11 @@ import RemoteFolderDialog from './RemoteFolderDialog';
 import { RemoteConnection } from '../../hooks/useRemoteConnection.hook';
 
 interface AddRemoteConnectionProps {
+    disabled: boolean;
     onAddConnection: (connection: RemoteConnection) => void;
 }
 
-const AddRemoteConnection: FC<AddRemoteConnectionProps> = ({ onAddConnection }) => {
+const AddRemoteConnection: FC<AddRemoteConnectionProps> = ({ disabled, onAddConnection }) => {
     const [isAddConnectionDialogOpen, setIsAddConnectionDialogOpen] = useState(false);
 
     return (
@@ -18,6 +19,7 @@ const AddRemoteConnection: FC<AddRemoteConnectionProps> = ({ onAddConnection }) 
             <Button
                 icon={IconNames.PLUS}
                 text='Add new connection'
+                disabled={disabled}
                 onClick={() => setIsAddConnectionDialogOpen(true)}
             />
             <RemoteFolderDialog

@@ -32,6 +32,7 @@ const RemoteConnectionOptions: FC = () => {
         <div className='remote-connection-options'>
             <h3>Remote connection</h3>
             <AddRemoteConnection
+                disabled={isLoadingFolderList || isSyncingRemoteFolder}
                 onAddConnection={(newConnection) => {
                     const newConnections = [...savedConnections, newConnection];
 
@@ -43,6 +44,7 @@ const RemoteConnectionOptions: FC = () => {
             <RemoteConnectionSelector
                 connection={selectedConnection}
                 connections={savedConnections}
+                disabled={isLoadingFolderList || isSyncingRemoteFolder}
                 onEditConnection={(newConnection) => {
                     const newConnections = savedConnections.map((c) => {
                         const isSameName = c.name === newConnection.name;

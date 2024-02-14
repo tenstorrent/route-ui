@@ -33,6 +33,7 @@ const renderRemoteConnection: ItemRenderer<RemoteConnection> = (connection, { ha
 interface RemoteConnectionSelectorProps {
     connections: RemoteConnection[];
     connection?: RemoteConnection;
+    disabled: boolean;
     onSelectConnection: (connection: RemoteConnection) => void;
     onEditConnection: (connection: RemoteConnection) => void;
     onRemoveConnection: (connection: RemoteConnection) => void;
@@ -41,6 +42,7 @@ interface RemoteConnectionSelectorProps {
 const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
     connections,
     connection,
+    disabled,
     onSelectConnection,
     onEditConnection,
     onRemoveConnection,
@@ -53,26 +55,28 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
             <Select2
                 items={connections}
                 itemRenderer={renderRemoteConnection}
+                disabled={disabled}
                 filterable
                 onItemSelect={onSelectConnection}
             >
                 <Button
                     icon={IconNames.CLOUD}
                     rightIcon={IconNames.CARET_DOWN}
+                    disabled={disabled}
                     text={formatConnectionString(selectedConnection)}
                 />
             </Select2>
             <Tooltip2 content='Edit selected connection'>
                 <Button
                     icon={IconNames.EDIT}
-                    disabled={!selectedConnection}
+                    disabled={disabled || !selectedConnection}
                     onClick={() => setIsEditDialogOpen(true)}
                 />
             </Tooltip2>
             <Tooltip2 content='Remove selected connection'>
                 <Button
                     icon={IconNames.TRASH}
-                    disabled={!selectedConnection}
+                    disabled={disabled || !selectedConnection}
                     onClick={() => onRemoveConnection(selectedConnection)}
                 />
             </Tooltip2>

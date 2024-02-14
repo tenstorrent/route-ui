@@ -40,7 +40,6 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
     onSelectFolder,
     onSyncFolder,
 }) => {
-    console.log(loading);
     return (
         <div>
             <Select2
@@ -48,13 +47,13 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 items={remoteFolders ?? []}
                 itemRenderer={remoteFolderRenderer}
                 filterable
-                disabled={remoteFolders?.length === 0}
+                disabled={loading || remoteFolders?.length === 0}
                 onItemSelect={onSelectFolder}
             >
                 <Button
                     icon={IconNames.FOLDER_OPEN}
                     rightIcon={IconNames.CARET_DOWN}
-                    disabled={remoteFolders?.length === 0}
+                    disabled={loading || remoteFolders?.length === 0}
                     text={remoteFolder ? formatRemoteFolderName(remoteFolder) : '(No selection)'}
                 />
             </Select2>
@@ -62,7 +61,7 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 <Button
                     icon={IconNames.REFRESH}
                     loading={loading}
-                    disabled={!remoteFolder || remoteFolders?.length === 0 || loading}
+                    disabled={loading || !remoteFolder || remoteFolders?.length === 0}
                     onClick={() => onSyncFolder()}
                 />
             </Tooltip2>
