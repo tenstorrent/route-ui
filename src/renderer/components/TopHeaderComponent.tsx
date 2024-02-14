@@ -55,7 +55,7 @@ const TopHeaderComponent: React.FC = () => {
             <div className='text-content'>
                 {folderPath && (
                     <Tooltip2 content={folderPath}>
-                        <Button icon={IconNames.FolderSharedOpen} onClick={loadPerfAnalyzerFolder}>
+                        <Button icon={IconNames.FolderSharedOpen} onClick={() => loadPerfAnalyzerFolder()}>
                             <span className='path-label'>{getTestName(folderPath)}</span>
                         </Button>
                     </Tooltip2>

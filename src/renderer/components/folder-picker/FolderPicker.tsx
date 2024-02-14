@@ -22,7 +22,7 @@ export const PerfDataLoader = (): React.ReactElement => {
         <>
             <div className='folder-load-container'>
                 <h3>Local folder</h3>
-                <FolderPicker disabled={false} onSelectFolder={loadPerfAnalyzerFolder} />
+                <FolderPicker disabled={false} onSelectFolder={() => loadPerfAnalyzerFolder()} />
                 <PopoverMenu // Graph picker
                     label='Select Graph'
                     options={availableGraphs.map((graph) => graph.name)}
