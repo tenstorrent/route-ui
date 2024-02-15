@@ -29,7 +29,6 @@ const usePerfAnalyzerFileLoader = () => {
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const [error, setError] = useState<string | null>(null);
-    const [enableGraphSelect, setEnableGraphSelect] = useState(false);
     const logging = useLogging();
 
     const selectFolderDialog = async (): Promise<string | null> => {
@@ -51,16 +50,17 @@ const usePerfAnalyzerFileLoader = () => {
 
     const loadFolder = async (folderPath: string): Promise<void> => {
         setError(null);
-        setEnableGraphSelect(false);
+
         try {
             const graphs = await getAvailableGraphNames(folderPath);
+
             if (!graphs.length) {
                 throw new Error(`No graphs found in\n${folderPath}`);
             }
+
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
-            setEnableGraphSelect(true);
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
@@ -79,7 +79,6 @@ const usePerfAnalyzerFileLoader = () => {
                     selectedFolder,
                     availableGraphs.find((g) => g.name === graphName) as GraphRelationshipState,
                 );
-                setEnableGraphSelect(false);
                 populateChipData(chip);
                 dispatch(setSelectedGraphName(graphName));
                 dispatch(setSelectedArchitecture(chip.architecture));
@@ -113,7 +112,6 @@ const usePerfAnalyzerFileLoader = () => {
         error,
         selectedGraph,
         availableGraphs,
-        enableGraphSelect,
     };
 };
 

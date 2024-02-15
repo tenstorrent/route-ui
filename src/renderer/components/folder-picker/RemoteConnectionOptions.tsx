@@ -115,9 +115,12 @@ const RemoteConnectionOptions: FC = () => {
                         try {
                             const localFolder = await syncRemoteFolder(selectedConnection, selectedFolder);
 
-                            loadPerfAnalyzerFolder(localFolder);
+                            await loadPerfAnalyzerFolder(localFolder);
                         } catch (err) {
                             logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+
+                            // eslint-disable-next-line no-alert
+                            alert('Unable to sync remote folder');
                         } finally {
                             setIsSyncingRemoteFolder(false);
                         }

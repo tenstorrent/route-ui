@@ -42,7 +42,7 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
     onSelectFolder,
     onSyncFolder,
 }) => {
-    const { loadPerfAnalyzerGraph, selectedGraph, availableGraphs, enableGraphSelect } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerGraph, selectedGraph, availableGraphs } = usePerfAnalyzerFileLoader();
 
     return (
         <div className='buttons-container'>
@@ -75,7 +75,7 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 options={availableGraphs.map((graph) => graph.name)}
                 selectedItem={selectedGraph}
                 onSelectItem={loadPerfAnalyzerGraph}
-                disabled={!enableGraphSelect}
+                disabled={loading || availableGraphs?.length === 0}
             />
         </div>
     );

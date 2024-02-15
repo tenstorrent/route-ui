@@ -15,7 +15,7 @@ import RemoteConnectionOptions from './RemoteConnectionOptions';
  * */
 
 export const PerfDataLoader = (): React.ReactElement => {
-    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs, enableGraphSelect } =
+    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs } =
         usePerfAnalyzerFileLoader();
 
     return (
@@ -36,7 +36,7 @@ export const PerfDataLoader = (): React.ReactElement => {
                                 options={availableGraphs.map((graph) => graph.name)}
                                 selectedItem={selectedGraph}
                                 onSelectItem={loadPerfAnalyzerGraph}
-                                disabled={!enableGraphSelect}
+                                disabled={availableGraphs?.length === 0}
                             />
                             {error && (
                                 <div className='loading-error'>
