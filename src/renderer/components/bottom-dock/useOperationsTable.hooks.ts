@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import { DataTableColumnDefinition, simpleStringFormatter, sortAsc, sortDesc, SortingDirection } from './SharedTable';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 
 export interface OpTableFields extends MeasurementDetails {
@@ -31,21 +31,21 @@ const operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinitio
 operationsTableColumns.set('grid_size', {
     label: 'Grid size',
     sortable: false,
-    formatter: (value) => value.toString(),
+    formatter: simpleStringFormatter,
 });
 operationsTableColumns.set('core_id', {
     label: 'Core ID',
     sortable: false,
     align: 'left',
     canSelectAllRows: true,
-    formatter: (value) => value.toString(),
+    formatter: simpleStringFormatter,
 });
 operationsTableColumns.set('operation', {
     label: 'Operation',
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: (value) => value.toString(),
+    formatter: simpleStringFormatter,
 });
 
 operationsTableColumns.set('bw_bound_total_runtime', {

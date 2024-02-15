@@ -1,4 +1,4 @@
-import { ChangeEvent, JSXElementConstructor, ReactElement } from 'react';
+import { ChangeEvent, JSXElementConstructor, ReactElement, JSX } from 'react';
 
 import { Cell, Column, ColumnHeaderCell2, IColumnProps } from '@blueprintjs/table';
 import { Checkbox, Icon } from '@blueprintjs/core';
@@ -20,9 +20,12 @@ export interface DataTableColumnDefinition {
         nodesSelectionState: NodeSelectionState,
     ) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
     handleSelectAll?: <T extends TableFields>(rows: T[], selected: boolean) => void;
-    // TODO: make it output an Element or string
-    formatter: (value: any) => string;
+    formatter: <T extends TableFields, K extends keyof T>(key: K, index: number, rows: T[]) => string | JSX.Element;
 }
+
+export const simpleStringFormatter = <T extends TableFields, K extends keyof T>(key: K, index: number, rows: T[]) => {
+    return rows[index][key]?.toString() ?? '';
+};
 
 export enum SortingDirection {
     ASC = 'asc',
@@ -30,7 +33,7 @@ export enum SortingDirection {
 }
 
 export const sortAsc = (a: any, b: any) => {
-    if(a === undefined || b === undefined) {
+    if (a === undefined || b === undefined) {
         return 0;
     }
     if (typeof a === 'string' && typeof b === 'number') {
@@ -42,7 +45,7 @@ export const sortAsc = (a: any, b: any) => {
     return a > b ? 1 : -1;
 };
 export const sortDesc = (a: any, b: any) => {
-    if(a === undefined || b === undefined) {
+    if (a === undefined || b === undefined) {
         return 0;
     }
     if (typeof a === 'string' && typeof b === 'number') {
@@ -199,7 +202,7 @@ export const cellRenderer = <T extends TableFields>({
     className,
     customContent,
 }: CellRenderingProps<T>) => {
-    const stringContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+    const stringContent = definition?.formatter(key, rowIndex, tableFields) ?? '';
 
     const alignClass = definition?.align && `align-${definition?.align}`;
 
