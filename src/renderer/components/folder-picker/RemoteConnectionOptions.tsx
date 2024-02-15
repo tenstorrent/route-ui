@@ -1,7 +1,6 @@
 import { FC, useState } from 'react';
 
-import { Button, FormGroup } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
+import { FormGroup } from '@blueprintjs/core';
 import useAppConfig from '../../hooks/useAppConfig.hook';
 
 import '../../scss/RemoteConnectionOptions.scss';
@@ -53,6 +52,7 @@ const RemoteConnectionOptions: FC = () => {
                     connection={selectedConnection}
                     connections={savedConnections}
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
+                    loading={isLoadingFolderList}
                     onEditConnection={(newConnection) => {
                         const newConnections = savedConnections.map((c) => {
                             const isSameName = c.name === newConnection.name;
@@ -82,28 +82,23 @@ const RemoteConnectionOptions: FC = () => {
                         setSelectedConnection(newConnections[0]);
                     }}
                     onSelectConnection={(connection) => setSelectedConnection(connection)}
+                    onSyncRemoteFolders={async () => {
+                        setIsLoadingFolderList(true);
+                        try {
+                            const remoteFolder = await listRemoteFolders(selectedConnection);
+                            setRemoteFolders(remoteFolder);
+                            setSelectedFolder(remoteFolder[0]);
+                        } catch (err) {
+                            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+
+                            // eslint-disable-next-line no-alert
+                            alert('Unable to connect to remote server.');
+                        } finally {
+                            setIsLoadingFolderList(false);
+                        }
+                    }}
                 />
             </FormGroup>
-
-            <Button
-                icon={IconNames.LOG_IN}
-                disabled={!selectedConnection || isLoadingFolderList || isSyncingRemoteFolder}
-                loading={isLoadingFolderList}
-                text='Open connection'
-                intent='primary'
-                onClick={async () => {
-                    setIsLoadingFolderList(true);
-                    try {
-                        const remoteFolder = await listRemoteFolders(selectedConnection);
-                        setRemoteFolders(remoteFolder);
-                        setSelectedFolder(remoteFolder[0]);
-                    } catch (err) {
-                        logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
-                    } finally {
-                        setIsLoadingFolderList(false);
-                    }
-                }}
-            />
 
             <FormGroup
                 label={<h3>Select a remote folder</h3>}

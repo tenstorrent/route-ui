@@ -34,18 +34,22 @@ interface RemoteConnectionSelectorProps {
     connections: RemoteConnection[];
     connection?: RemoteConnection;
     disabled: boolean;
+    loading: boolean;
     onSelectConnection: (connection: RemoteConnection) => void;
     onEditConnection: (connection: RemoteConnection) => void;
     onRemoveConnection: (connection: RemoteConnection) => void;
+    onSyncRemoteFolders: (connection: RemoteConnection) => void;
 }
 
 const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
     connections,
     connection,
     disabled,
+    loading,
     onSelectConnection,
     onEditConnection,
     onRemoveConnection,
+    onSyncRemoteFolders,
 }) => {
     const [isEditdialogOpen, setIsEditDialogOpen] = useState(false);
     const selectedConnection = connection ?? connections[0];
@@ -94,6 +98,13 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                 title='Edit remote connection'
                 buttonLabel='Save connection'
                 remoteConnection={selectedConnection}
+            />
+            <Button
+                icon={IconNames.LOG_IN}
+                disabled={disabled || !selectedConnection}
+                loading={loading}
+                text='Get remote folders list'
+                onClick={() => onSyncRemoteFolders(selectedConnection)}
             />
         </div>
     );
