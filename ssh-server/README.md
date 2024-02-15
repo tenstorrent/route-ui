@@ -1,18 +1,18 @@
-# Running the SSH server on your local
+# Running the SSH server on your local, or connecting to the remote server
 
-## Prerequisites
+## Table of contents
 
-Install docker on your machine. You can find the installation instructions [here](https://docs.docker.com/get-docker/).
+## Create an SSH key pair
 
 Create an SSH key pair if you don't have one already. You can do this by running the following command in your terminal:
 
 ```bash
-ssh-keygen -t ed25519 -C "Local SSH server" -f ~/.ssh/<NAME OF THE KEY PAIR>
+ssh-keygen -t ed25519 -C "<LABEL FOR THE KEY>" -f ~/.ssh/<NAME OF THE KEY PAIR>
 ```
 
 This will create a new SSH key pair in the `~/.ssh` folder. If you have multiple files there, you will need to find the one you just created. The key pair will be named `<NAME OF THE KEY PAIR>` for the private key and `<NAME OF THE KEY PAIR>.pub` for the public key.
 
-Copy the **public key** to the same folder as the `Dockerfile` and name it `id_ed25519.pub`. This is the key that will be used to authenticate you to the server.
+Replace `<LABEL FOR THE KEY>` with a label for the key. This is just a comment that will be added to the key file to help identifying the key.
 
 ## Update your ssh config
 
@@ -21,12 +21,24 @@ You will have to add the permissions to use the key you created to your `~/.ssh/
 Add the following lines to the file:
 
 ```
-Host localhost
+Host <SERVER HOST>
   PreferredAuthentications publickey
-  IdentityFile ~/.ssh/<NAME OF THE PUBLIC KEY>
+  IdentityFile ~/.ssh/<NAME OF THE PRIVATE KEY>
 ```
 
-## Running the server
+Replace `<SERVER HOST>` with the host of the server you want to connect to, like `localhost` for connecting to the local server.
+
+`<NAME OF THE PRIVATE KEY>` should be the name of your private key file. It doesn't have an extension.
+
+## Local server
+
+### Prerequisites
+
+Install docker on your machine. You can find the installation instructions [here](https://docs.docker.com/get-docker/).
+
+Copy the **public key** generated on the [Create an SSH key pair](#create-an-ssh-key-pair) section to the same folder as the `Dockerfile` and name it `id_ed25519.pub`. This is the key that will be used to authenticate you to the server.
+
+### Build and run the server
 
 Build the image using docker:
 
@@ -46,7 +58,7 @@ This will create a new container with the name `local-ssh-server` and the latest
 
 The server will be running on port `2222` of your local machine.
 
-## Connecting to the server
+### Connecting to the server
 
 You can now connect to the server using the following command:
 
@@ -58,9 +70,9 @@ You should see a message asking you to confirm the authenticity of the server. T
 
 If you see a bash prompt, you have successfully connected to the server.
 
-## Advanced build configuration
+### Advanced build configuration
 
-### Username
+#### Username
 
 You can set the **username** that will be created on the docker image by passing the `username` argument to the `docker build` command. For example:
 
@@ -76,7 +88,7 @@ docker build --build-arg username=$(logname) -t local-ssh-image .
 
 The default value for this argument is: `sshuser`.
 
-### SSH key file
+#### SSH key file
 
 You can set the **ssh key file** that will be used to authenticate the user by passing the `keypath` argument to the `docker build` command. For example:
 
@@ -86,7 +98,7 @@ docker build --build-arg keypath=/path/to/your/key -t local-ssh-image .
 
 The default value for this argument is: `./id_ed25519.pub`.
 
-### Data folder
+#### Data folder
 
 You can set the **data folder** containing all the tests data that will be copied to the server with the `datafolder` argument. For example:
 
@@ -96,7 +108,7 @@ docker build --build-arg datafolder=/path/to/your/data -t local-ssh-image .
 
 The default value for this argument is: `./data`.
 
-### Combining all arguments
+#### Combining all arguments
 
 You can combine all the arguments to build the image with the following command:
 
@@ -104,7 +116,9 @@ You can combine all the arguments to build the image with the following command:
 docker build --build-arg username=<YOUR USERNAME> --build-arg keypath=/path/to/your/key --build-arg datafolder=/path/to/your/data -t local-ssh-image .
 ```
 
-## Accessing the remote SSH server
+## remote server
+
+### Fisrt time setup
 
 You can access the remote SSH server using the following command:
 
@@ -126,7 +140,7 @@ echo "<YOUR PUBLIC KEY>" >> ~/.ssh/authorized_keys
 
 Once that is done, you can now access the SSH server using your private key instead of your password.
 
-## Creating the remote folder for the data
+### Creating the remote folder for the data
 
 On the SSH server, create the folder where the data will be copied to. You can do this by running the following command:
 
