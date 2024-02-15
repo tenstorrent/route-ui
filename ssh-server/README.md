@@ -28,7 +28,7 @@ Host <SERVER HOST>
 
 Replace `<SERVER HOST>` with the host of the server you want to connect to, like `localhost` for connecting to the local server.
 
-`<NAME OF THE PRIVATE KEY>` should be the name of your private key file. It doesn't have an extension.
+`<NAME OF THE PRIVATE KEY>` should be the name of your private key file, without a file extension.
 
 ## Local server
 
@@ -131,10 +131,15 @@ Your username will be the same one used by your email/VPN access.
 The first time you login to the SSH server it will ask for your password, then you will need to create a ssh key pair and add it there.
 You can generate the key pair on your local machine, as per [Prerequisites](#prerequisites). Then [Update your ssh config](#update-your-ssh-config) to add the generated keys.
 
-On the remote server you will need to add the public key to the `~/.ssh/authorized_keys` file. You can do this by running the following commands:
+On the remote server create the `~/.ssh` folder if it doesn't exist:
 
 ```bash
 mkdir -p ~/.ssh
+```
+
+Then add the public key to the `~/.ssh/authorized_keys` file, you can do this by running the following commands:
+
+```bash
 echo "<YOUR PUBLIC KEY>" >> ~/.ssh/authorized_keys
 ```
 
@@ -148,9 +153,11 @@ On the SSH server, create the folder where the data will be copied to. You can d
 mkdir -p /proj_sw/user_dev/<YOUR USERNAME>/tt_build
 ```
 
-**NOTE:** The `tt_build` folder is required by `perf-ui`.
-
 **NOTE:** The convention is to use the `/proj_sw/user_dev/<YOUR USERNAME>` folder to store your data.
+
+**NOTE:** The `tt_build` sub-folder is required by `perf-ui`. It automatically appends it to the folder name, but `route-ui` does not.
+
+### Copying the data to the server
 
 You can then copy the files to the server using the `scp` command. For example:
 ```bash
