@@ -48,7 +48,7 @@ export const PerfDataLoader = (): React.ReactElement => {
                 </div>
             </fieldset>
             <fieldset>
-                <legend>Remote Connection</legend>
+                <legend>Remote Sync</legend>
                 <Icon icon={IconNames.CLOUD} size={150} />
                 <div className='folder-picker-wrapper'>
                     <RemoteConnectionOptions />
