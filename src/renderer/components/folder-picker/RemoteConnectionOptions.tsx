@@ -3,7 +3,6 @@ import { FC, useState } from 'react';
 import { FormGroup } from '@blueprintjs/core';
 import useAppConfig from '../../hooks/useAppConfig.hook';
 
-import '../../scss/RemoteConnectionOptions.scss';
 import useRemoteConnection, { RemoteConnection, RemoteFolder } from '../../hooks/useRemoteConnection.hook';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';

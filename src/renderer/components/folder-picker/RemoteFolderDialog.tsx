@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { Button, Dialog, DialogBody, DialogFooter, FormGroup, Icon, IconName, InputGroup } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 
 import useRemoteConnection, {
     ConnectionStatus,
@@ -8,19 +9,21 @@ import useRemoteConnection, {
 } from '../../hooks/useRemoteConnection.hook';
 import useLogging from '../../hooks/useLogging.hook';
 
+import '../../scss/RemoteConnectionDialog.scss';
+
 const ConnectionTestMessage: FC<ConnectionStatus> = ({ status, message }) => {
-    const iconMap: Record<ConnectionTestStates, { icon: IconName; color: string }> = {
-        [ConnectionTestStates.IDLE]: { icon: 'dot', color: 'grey' },
-        [ConnectionTestStates.PROGRESS]: { icon: 'dot', color: 'yellow' },
-        [ConnectionTestStates.FAILED]: { icon: 'cross', color: 'red' },
-        [ConnectionTestStates.OK]: { icon: 'tick', color: 'green' },
+    const iconMap: Record<ConnectionTestStates, IconName> = {
+        [ConnectionTestStates.IDLE]: IconNames.DOT,
+        [ConnectionTestStates.PROGRESS]: IconNames.DOT,
+        [ConnectionTestStates.FAILED]: IconNames.CROSS,
+        [ConnectionTestStates.OK]: IconNames.TICK,
     };
-    const icon = iconMap[status] || { icon: 'dot', color: 'blue' };
+    const icon = iconMap[status];
 
     return (
-        <div className='verify-connection-item'>
-            <Icon icon={icon.icon} color={icon.color} size={20} />
-            <span className='verify-text'>{message}</span>
+        <div className={`verify-connection-item status-${ConnectionTestStates[status]}`}>
+            <Icon className='connection-status-icon' icon={icon} size={20} />
+            <span className='connection-status-text'>{message}</span>
         </div>
     );
 };
@@ -50,11 +53,14 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
     const [connection, setConnection] = useState(defaultConnection);
     const [connectionTests, setConnectionTests] = useState<ConnectionStatus[]>(defaultConnectionTests);
     const { testConnection, testRemoteFolder } = useRemoteConnection();
+    const [isTestingConnection, setIsTestingconnection] = useState(false);
     const logging = useLogging();
 
     const isValidConnection = connectionTests.every((status) => status.status === ConnectionTestStates.OK);
 
     const testConnectionStatus = async () => {
+        setIsTestingconnection(true);
+
         const sshProgressStatus = { status: ConnectionTestStates.PROGRESS, message: 'Testing connection' };
         const folderProgressStatus = { status: ConnectionTestStates.PROGRESS, message: 'Testing remote folder path' };
 
@@ -82,6 +88,8 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 { status: ConnectionTestStates.FAILED, message: 'Connection failed' },
                 { status: ConnectionTestStates.FAILED, message: 'Remote folder path failed' },
             ]);
+        } finally {
+            setIsTestingconnection(false);
         }
     };
 
@@ -93,7 +101,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
 
     return (
         <Dialog
-            className='bp4-dark'
+            className='remote-connection-dialog'
             title={title}
             icon='info-sign'
             canOutsideClickClose={false}
@@ -101,24 +109,15 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
             onClose={closeDialog}
         >
             <DialogBody>
-                <FormGroup
-                    label='Name'
-                    labelFor='text-input'
-                    labelInfo='(Required)'
-                    subLabel='The name for this connection.'
-                >
+                <FormGroup label='Name' labelFor='text-input' subLabel='The name for this connection.'>
                     <InputGroup
+                        className='bp4-light'
                         key='name'
                         value={connection.name}
                         onChange={(e) => setConnection({ ...connection, name: e.target.value })}
                     />
                 </FormGroup>
-                <FormGroup
-                    label='SSH Host'
-                    labelFor='text-input'
-                    labelInfo='(Required)'
-                    subLabel='The SSH host name, like: localhost.'
-                >
+                <FormGroup label='SSH Host' labelFor='text-input' subLabel='The SSH host name, like: localhost.'>
                     <InputGroup
                         key='host'
                         value={connection.host}
@@ -128,7 +127,6 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 <FormGroup
                     label='SSH Port'
                     labelFor='text-input'
-                    labelInfo='(Required)'
                     subLabel='The port to use for the SSH connection. Usually port 22.'
                 >
                     <InputGroup
@@ -148,7 +146,6 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 <FormGroup
                     label='Remote Folder path'
                     labelFor='text-input'
-                    labelInfo='(Required)'
                     subLabel='The path to the remote folder, typically $HOME/work/ll-sw.\nThis is the folder where the tests data is stored.'
                 >
                     <InputGroup
@@ -163,26 +160,28 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                     <ConnectionTestMessage status={connectionTests[0].status} message={connectionTests[0].message} />
                     <ConnectionTestMessage status={connectionTests[1].status} message={connectionTests[1].message} />
 
-                    <Button intent='primary' text='Test Connection' onClick={testConnectionStatus} />
+                    <br />
+                    <Button
+                        text='Test Connection'
+                        disabled={isTestingConnection}
+                        loading={isTestingConnection}
+                        onClick={testConnectionStatus}
+                    />
                 </fieldset>
             </DialogBody>
             <DialogFooter
                 minimal
                 actions={
-                    <>
-                        <Button intent='danger' text='Close' onClick={closeDialog} />
-                        <Button
-                            intent='primary'
-                            text={buttonLabel}
-                            disabled={!isValidConnection}
-                            onClick={() => {
-                                if (isValidConnection) {
-                                    onAddConnection(connection);
-                                    closeDialog();
-                                }
-                            }}
-                        />
-                    </>
+                    <Button
+                        text={buttonLabel}
+                        disabled={!isValidConnection}
+                        onClick={() => {
+                            if (isValidConnection) {
+                                onAddConnection(connection);
+                                closeDialog();
+                            }
+                        }}
+                    />
                 }
             />
         </Dialog>
