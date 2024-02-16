@@ -5,23 +5,19 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import { RootState } from 'data/store/createStore';
-
-import DataSource from '../../../data/DataSource';
 import FilterableComponent from '../FilterableComponent';
 import SelectableOperation from '../SelectableOperation';
 import SearchField from '../SearchField';
 import GraphVertexDetails from '../GraphVertexDetails';
 import Collapsible from '../Collapsible';
-import SelectablePipe from '../SelectablePipe';
-import { PipeSegment } from '../../../data/Chip';
-import { NOCLinkName } from '../../../data/Types';
 import { Operation } from '../../../data/GraphTypes';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
+    const chip = useContext(ChipContext).getActiveChip();
 
-    const { chip } = useContext(DataSource);
     const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);

@@ -9,27 +9,18 @@ import {
     setSelectedFile,
     setSelectedFolder,
 } from 'data/store/slices/uiState.slice';
-import React, { useContext } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
 import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import { process } from '@electron/remote';
-import Chip from '../../data/Chip';
-import DataSource, { ClusterDataSource } from '../../data/DataSource';
-import useLogging from '../hooks/useLogging.hook';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
-import { openDetailedView } from '../../data/store/slices/detailedView.slice';
 
-export interface SideBarProps {
-    updateData: (data: Chip) => void;
-}
+export interface SideBarProps {}
 
-export const SideBar: React.FC<SideBarProps> = ({ updateData }) => {
+export const SideBar: React.FC<SideBarProps> = ({  }) => {
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
-    const { chip } = useContext(DataSource);
-    const { cluster } = useContext(ClusterDataSource);
     const dispatch = useDispatch();
     const reloadAppData = () => {
         dispatch(clearAvailableGraphs());

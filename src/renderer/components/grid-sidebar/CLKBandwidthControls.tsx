@@ -11,16 +11,16 @@ import {
 } from 'data/store/slices/linkSaturation.slice';
 import { RootState } from '../../../data/store/createStore';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
-import DataSource, { GridContext } from '../../../data/DataSource';
 import Collapsible from '../Collapsible';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
 import '../../scss/GridControls.scss';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
-    const { chip } = useContext<GridContext>(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);

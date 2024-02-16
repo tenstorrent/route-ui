@@ -3,18 +3,16 @@ import React, { useContext, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { updatePipeSelection, clearAllPipes } from 'data/store/slices/pipeSelection.slice';
-
-import DataSource from '../../../data/DataSource';
+import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { PipeSegment } from '../../../data/Chip';
 import FilterableComponent from '../FilterableComponent';
 import SelectablePipe from '../SelectablePipe';
 import SearchField from '../SearchField';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 const PipesPropertiesTab = () => {
     const dispatch = useDispatch();
-
-    const { chip } = useContext(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
 
     const [pipeFilter, setPipeFilter] = useState<string>('');
 
@@ -59,7 +57,11 @@ const PipesPropertiesTab = () => {
                                     filterQuery={pipeFilter}
                                     component={
                                         <li>
-                                            <SelectablePipe pipeSegment={pipeSegment} pipeFilter={pipeFilter} showBandwidth={false} />
+                                            <SelectablePipe
+                                                pipeSegment={pipeSegment}
+                                                pipeFilter={pipeFilter}
+                                                showBandwidth={false}
+                                            />
                                         </li>
                                     }
                                 />

@@ -1,22 +1,20 @@
 import React, { FC, useContext, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { CHIP_SIZE } from '../../../utils/DrawingAPI';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { ComputeNodeType } from '../../../data/Types';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import { getAvailableGraphsSelector } from '../../../data/store/selectors/uiState.selectors';
 
 export interface ClusterViewDialog {}
 
 const ClusterView: FC<ClusterViewDialog> = () => {
     const { cluster } = useContext(ClusterDataSource);
+    const { chipState } = useContext(ChipContext);
+    const graphInformation = useSelector(getAvailableGraphsSelector);
 
-    useEffect(() => {}, [cluster]);
-    if (cluster) {
-        console.log(
-            'Cluster:',
-            cluster.chips[0].design?.nodes.map((node) => {
-                return `${node.loc.x}-${node.loc.y}`;
-            }),
-        );
-    }
+    // console.log(chipState);
+    // console.log(graphInformation);
 
     return (
         <div

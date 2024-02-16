@@ -6,18 +6,18 @@ import { IconNames } from '@blueprintjs/icons';
 import { JSX } from 'react/jsx-runtime';
 import SelectableOperation from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
-import DataSource from '../../../data/DataSource';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { SortingDirection } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 /**
  * QueuesTable - temporary component to display queues
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const { chip } = useContext(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
     const [tableFields, setTableFields] = useState<QueuesTableFields[]>([]);
     const { queuesTableColumns, sortedTableFields, changeSorting, sortDirection, sortingColumn } =
         useQueuesTableHook(tableFields);

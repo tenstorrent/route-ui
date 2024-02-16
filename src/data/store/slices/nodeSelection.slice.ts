@@ -114,7 +114,14 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-
+        clearAllNodes(state) {
+            Object.values(state.nodeList).forEach((node) => {
+                node.selected = false;
+            });
+            state.dram.forEach((dramGroup) => {
+                dramGroup.selected = false;
+            });
+        },
         selectOperation(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
             const { opName, selected } = action.payload;
             const operation = state.operations[opName];
@@ -162,6 +169,7 @@ export const {
     selectQueue,
     selectAllQueues,
     clearAllQueues,
+    clearAllNodes,
 } = nodeSelectionSlice.actions;
 
 export const nodeSelectionReducer = nodeSelectionSlice.reducer;

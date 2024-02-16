@@ -41,7 +41,7 @@ export class ClusterChip {
     connectedChipsByEthId: Map<string, ClusterChip> = new Map();
 
     // TODO: not the ideal way to hold the data and we dont need all of it, consider sampling down
-    design: ChipDesign;
+    design: ChipDesign | undefined;
 
     constructor(id: ClusterChipId, coordinates: ClusterCoordinates, mmio = false, eth: string[] = []) {
         this.id = id;

@@ -1,8 +1,6 @@
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
-
-import DataSource, { GridContext } from '../data/DataSource';
 import { NODE_SIZE } from '../utils/DrawingAPI';
 
 import NodeGridElement from './components/NodeGridElement';
@@ -12,11 +10,12 @@ import { mapIterable } from '../utils/IterableHelpers';
 import { GridSidebar } from './components/grid-sidebar/GridSidebar';
 import { getDetailedViewZoom, getGridZoom } from '../data/store/selectors/uiState.selectors';
 import ClusterViewDialog from './components/cluster-view/ClusterViewDialog';
+import { ChipContext } from '../data/ChipDataProvider';
 
 export default function GridRender() {
-    const { chip } = useContext<GridContext>(DataSource);
     const gridZoom = useSelector(getGridZoom);
     const detailedViewZoom = useSelector(getDetailedViewZoom);
+    const chip = useContext(ChipContext).getActiveChip();
 
     const dispatch = useDispatch();
 

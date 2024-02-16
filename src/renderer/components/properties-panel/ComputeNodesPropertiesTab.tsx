@@ -8,7 +8,6 @@ import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { JSX } from 'react/jsx-runtime';
-import DataSource from '../../../data/DataSource';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import SelectableOperation from '../SelectableOperation';
@@ -20,6 +19,7 @@ import Collapsible from '../Collapsible';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -300,10 +300,8 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const { chip } = useContext(DataSource);
-
+    const chip = useContext(ChipContext).getActiveChip();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!chip) {
             return [];
@@ -318,7 +316,7 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
             <div className='properties-panel-nodes'>
                 {selectedNodes.map((node: ComputeNode) => (
-                    <ComputeNodePropertiesCard key={node.uid} node={node} />
+                    <ComputeNodePropertiesCard key={node?.uid} node={node} />
                 ))}
             </div>
         </>
