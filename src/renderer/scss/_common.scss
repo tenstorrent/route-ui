@@ -106,11 +106,11 @@ $footer-height: 20px;
 }
 
 .splash-screen {
-    display: grid;
+    display: flex;
     width: 100vw;
     height: calc(100vh - 50px);
     grid-template-columns: 1fr;
-    justify-items: center;
+    justify-content: center;
     align-items: center;
     align-content: center;
     gap: 40px;

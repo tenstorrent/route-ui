@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Button } from '@blueprintjs/core';
+import { Button, FormGroup, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Classes, Popover2, Tooltip2 } from '@blueprintjs/popover2';
 
 import usePerfAnalyzerFileLoader from 'renderer/hooks/usePerfAnalyzerFileLoader.hooks';
 import '../../scss/FolderPicker.scss';
 import PopoverMenu from '../PopoverMenu';
+import RemoteConnectionOptions from './RemoteConnectionOptions';
 
 /** Implements a temporary wrapper around the Folder Loading component & Graph selection component, to provide state
  * and context that is not yet present in the App's higher-level components.
@@ -15,58 +15,64 @@ import PopoverMenu from '../PopoverMenu';
  * */
 
 export const PerfDataLoader = (): React.ReactElement => {
-    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs, enableGraphSelect } =
+    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs } =
         usePerfAnalyzerFileLoader();
 
     return (
-        <div className='folder-load-container'>
-            {/* <h3>Load Folder</h3> */}
-            <FolderPicker disabled={false} onSelectFolder={loadPerfAnalyzerFolder} disabledText='' />
-            <PopoverMenu // Graph picker
-                label='Select Graph'
-                options={availableGraphs.map((graph) => graph.name)}
-                selectedItem={selectedGraph}
-                onSelectItem={loadPerfAnalyzerGraph}
-                disabled={!enableGraphSelect}
-            />
-            {error && (
-                <div className='loading-error'>
-                    <p>{error.toString()}</p>
+        <div className='folder-picker-options'>
+            <fieldset>
+                <legend>Local folder</legend>
+                <Icon icon={IconNames.FOLDER_OPEN} size={150} />
+                <div className='folder-picker-wrapper'>
+                    <FormGroup
+                        label={<h3>Open a local folder</h3>}
+                        labelFor='text-input'
+                        subLabel='Select a local folder to load the performance data from.'
+                    >
+                        <div className='buttons-container'>
+                            <FolderPicker disabled={false} onSelectFolder={() => loadPerfAnalyzerFolder()} />
+                            <PopoverMenu // Graph picker
+                                label='Select Graph'
+                                options={availableGraphs.map((graph) => graph.name)}
+                                selectedItem={selectedGraph}
+                                onSelectItem={loadPerfAnalyzerGraph}
+                                disabled={availableGraphs?.length === 0}
+                            />
+                            {error && (
+                                <div className='loading-error'>
+                                    <p>{error.toString()}</p>
+                                </div>
+                            )}
+                        </div>
+                    </FormGroup>
                 </div>
-            )}
+            </fieldset>
+            <fieldset>
+                <legend>Remote Sync</legend>
+                <Icon icon={IconNames.CLOUD} size={150} />
+                <div className='folder-picker-wrapper'>
+                    <RemoteConnectionOptions />
+                </div>
+            </fieldset>
         </div>
     );
 };
 
 interface FolderPickerProps {
     disabled: boolean;
-    disabledText: string;
     onSelectFolder: () => void;
 }
 
-const FolderPicker = ({ disabled, disabledText, onSelectFolder }: FolderPickerProps): React.ReactElement => {
+const FolderPicker = ({ disabled, onSelectFolder }: FolderPickerProps): React.ReactElement => {
     return (
         <div className='folder-picker'>
-            <Popover2
-                autoFocus
-                position='right'
-                content={
-                    <div className={Classes.POPOVER2_DISMISS}>
-                        <Button icon={IconNames.FOLDER_OPEN} text='Local' onClick={onSelectFolder} />
-                        <Button icon={IconNames.CLOUD_DOWNLOAD} text='Remote' disabled />
-                    </div>
-                }
+            <Button
+                className='load-folder-button'
                 disabled={disabled}
-            >
-                <Tooltip2 disabled={!disabled} content={disabledText} placement='bottom'>
-                    <Button
-                        className='load-folder-button'
-                        disabled={disabled}
-                        icon={IconNames.FOLDER_SHARED}
-                        text='Select a folder'
-                    />
-                </Tooltip2>
-            </Popover2>
+                icon={IconNames.FOLDER_SHARED}
+                onClick={onSelectFolder}
+                text='Select a local folder'
+            />
         </div>
     );
 };
