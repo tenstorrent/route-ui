@@ -3,6 +3,7 @@ import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
@@ -133,6 +134,14 @@ operationsTableColumns.set('slowest_operand', {
 });
 
 const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
+    const {
+        handleSelectAllCores,
+        handleSelectAllOperations,
+        handleSelectAllSlowestOperands,
+        getCoreSelectedState,
+        getOperationSelectedState,
+        getSlowestOperandSelectedState,
+    } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
     const sortedTableFields = (() => {
@@ -148,11 +157,20 @@ const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
             ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
             : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
     })();
-
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {
         setSortDirection(direction);
         setSortingColumn(selectedColumn);
     };
+
+    operationsTableColumns.get('core_id')!.handleSelectAll<OpTableFields> = handleSelectAllCores;
+    operationsTableColumns.get('core_id')!.getSelectedState<OpTableFields> = getCoreSelectedState;
+
+    operationsTableColumns.get('operation')!.handleSelectAll<OpTableFields> = handleSelectAllOperations;
+    operationsTableColumns.get('operation')!.getSelectedState<OpTableFields> = getOperationSelectedState;
+
+    operationsTableColumns.get('slowest_operand')!.handleSelectAll<OpTableFields> = handleSelectAllSlowestOperands;
+    operationsTableColumns.get('slowest_operand')!.getSelectedState<OpTableFields> = getSlowestOperandSelectedState;
+
     return {
         sortedTableFields,
         changeSorting,

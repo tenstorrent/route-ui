@@ -19,6 +19,7 @@ import Collapsible from '../Collapsible';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import { GraphVertexType } from '../../../data/GraphNames';
 import { ChipContext } from '../../../data/ChipDataProvider';
 
 interface ComputeNodeProps {
@@ -158,18 +159,6 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         />
                     </div>
                     {node.type === ComputeNodeType.CORE && <CoreOperationRuntimeMetrics node={node} />}
-                    {/* <Collapsible label={<h5>Op pipes:</h5>} isOpen styles={{ marginLeft: '20px' }}> */}
-                    {/*     <ul className="scrollable-content"> */}
-                    {/*         {node.operation.uniquePipeIds.map((pipeId) => ( */}
-                    {/*             <li> */}
-                    {/*                 <SelectablePipe */}
-                    {/*                     pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)} */}
-                    {/*                     pipeFilter='' */}
-                    {/*                 /> */}
-                    {/*             </li> */}
-                    {/*         ))} */}
-                    {/*     </ul> */}
-                    {/* </Collapsible> */}
                 </div>
             )}
 
@@ -196,22 +185,46 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                     {inputs && inputs.length > 0 && (
                         <>
                             <h4 className='io-label'>Inputs:</h4>
-                            {inputs.map((operand) => (
+                            {inputs.map((operand, index) => (
                                 <ul className='scrollable-content'>
                                     <div title={operand.name}>
                                         <div key={operand.name} style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables operand={operand} />
-                                            <ul className='scrollable-content'>
-                                                {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                    <li>
-                                                        <SelectablePipe
-                                                            pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
-                                                            pipeFilter=''
-                                                            showBandwidth={false}
-                                                        />
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            {operand.vertexType === GraphVertexType.OPERATION && (
+                                                <ul className='scrollable-content'>
+                                                    {operand
+                                                        .getPipesForOperatorIndexed(node.operation!.name, index)
+                                                        .filter((pipeId) =>
+                                                            node.getInternalPipeIDsForNode().includes(pipeId),
+                                                        )
+                                                        .map((pipeId) => (
+                                                            <li>
+                                                                <SelectablePipe
+                                                                    pipeSegment={
+                                                                        new PipeSegment(pipeId, 0, NOCLinkName.NONE)
+                                                                    }
+                                                                    pipeFilter=''
+                                                                    showBandwidth={false}
+                                                                />
+                                                            </li>
+                                                        ))}
+                                                </ul>
+                                            )}
+                                            {operand.vertexType === GraphVertexType.QUEUE && (
+                                                <ul className=' scrollable-content pipe-ids-for-core'>
+                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                        <li>
+                                                            <SelectablePipe
+                                                                pipeSegment={
+                                                                    new PipeSegment(pipeId, 0, NOCLinkName.NONE)
+                                                                }
+                                                                pipeFilter=''
+                                                                showBandwidth={false}
+                                                            />
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
                                         </div>
                                     </div>
                                 </ul>
@@ -221,22 +234,46 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                     {outputs && outputs.length > 0 && (
                         <>
                             <h4 className='io-label'>Outputs:</h4>
-                            {outputs.map((operand) => (
+                            {outputs.map((operand, index) => (
                                 <ul className='scrollable-content'>
                                     <div title={operand.name}>
                                         <div key={operand.name} style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables operand={operand} />
-                                            <ul className='scrollable-content'>
-                                                {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                    <li>
-                                                        <SelectablePipe
-                                                            pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
-                                                            pipeFilter=''
-                                                            showBandwidth={false}
-                                                        />
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                            {operand.vertexType === GraphVertexType.OPERATION && (
+                                                <ul className='scrollable-content'>
+                                                    {operand
+                                                        .getPipesForOperatorIndexed(node.operation!.name, index)
+                                                        .filter((pipeId) =>
+                                                            node.getInternalPipeIDsForNode().includes(pipeId),
+                                                        )
+                                                        .map((pipeId) => (
+                                                            <li>
+                                                                <SelectablePipe
+                                                                    pipeSegment={
+                                                                        new PipeSegment(pipeId, 0, NOCLinkName.NONE)
+                                                                    }
+                                                                    pipeFilter=''
+                                                                    showBandwidth={false}
+                                                                />
+                                                            </li>
+                                                        ))}
+                                                </ul>
+                                            )}
+                                            {operand.vertexType === GraphVertexType.QUEUE && (
+                                                <ul className=' scrollable-content pipe-ids-for-core'>
+                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                        <li>
+                                                            <SelectablePipe
+                                                                pipeSegment={
+                                                                    new PipeSegment(pipeId, 0, NOCLinkName.NONE)
+                                                                }
+                                                                pipeFilter=''
+                                                                showBandwidth={false}
+                                                            />
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
                                         </div>
                                     </div>
                                 </ul>
