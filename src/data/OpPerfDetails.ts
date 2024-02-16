@@ -1,7 +1,8 @@
 import { MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { GraphName, OperationName } from './GraphNames';
-
+/*  eslint-disable no-undef */
 export class MeasurementDetails implements MeasurementsJSON {
+
     [key: `input_pipe_bw_${number}`]: number; // available bandwidth (hole size)
 
     [key: `output_pipe_bw_${number}`]: number;
@@ -87,7 +88,9 @@ export class MeasurementDetails implements MeasurementsJSON {
             return {
                 type: this.slowestOperandPerformance?.direction,
                 index: this.slowestOperandPerformance?.index,
+                // @ts-expect-error
                 actual: this[`${actual}${this.slowestOperandPerformance?.index}`],
+                // @ts-expect-error
                 required: this[`${required}${this.slowestOperandPerformance?.index}`],
                 bw_limited_factor: this.bw_limited_factor,
             };
@@ -111,6 +114,7 @@ export class MeasurementDetails implements MeasurementsJSON {
     }
 
     public getRequiredOutputBw(index: number): number {
+        // @ts-expect-error
         return this[`${OpPerfDynamicProperties.REQUIRED_OUTPUT_BW}${index}`];
     }
 }
