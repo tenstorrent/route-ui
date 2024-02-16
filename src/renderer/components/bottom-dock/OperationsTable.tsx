@@ -123,7 +123,7 @@ function OperationsTable() {
 
     const coreIdCellRenderer = (rowIndex: number) => {
         const definition = operationsTableColumns.get('core_id');
-        const cellContent = (definition?.formatter(tableFields[rowIndex].core_id || '') ?? '') as string;
+        const cellContent = definition?.formatter(rowIndex, tableFields) as string;
 
         return (
             <div className='op-element'>

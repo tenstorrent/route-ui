@@ -10,22 +10,24 @@ import type { QueuesTableFields } from './useQueuesTable.hook';
 
 export type TableFields = OpTableFields | QueuesTableFields;
 
-export interface DataTableColumnDefinition {
+export interface DataTableColumnDefinition<T extends TableFields> {
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
     canSelectAllRows?: boolean;
-    getSelectedState?: <T extends TableFields>(
+    getSelectedState?: (
         rows: T[],
         nodesSelectionState: NodeSelectionState,
     ) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
-    handleSelectAll?: <T extends TableFields>(rows: T[], selected: boolean) => void;
-    formatter: <T extends TableFields, K extends keyof T>(key: K, index: number, rows: T[]) => string | JSX.Element;
+    handleSelectAll?: (rows: T[], selected: boolean) => void;
+    formatter: (index: number, rows: T[]) => string | JSX.Element;
 }
 
-export const simpleStringFormatter = <T extends TableFields, K extends keyof T>(key: K, index: number, rows: T[]) => {
-    return rows[index][key]?.toString() ?? '';
-};
+export const simpleStringFormatter =
+    <T extends TableFields, K extends keyof T>(key: K) =>
+    (index: number, rows: T[]) => {
+        return rows[index][key as keyof T]?.toString() ?? '';
+    };
 
 export enum SortingDirection {
     ASC = 'asc',
@@ -110,7 +112,7 @@ export const getSelectedState = <T extends TableFields>(
 };
 
 interface HeaderRenderingProps<T extends TableFields> {
-    definition?: DataTableColumnDefinition;
+    definition?: DataTableColumnDefinition<T>;
     sortDirection: SortingDirection;
     sortingColumn: keyof T;
     column: keyof T;
@@ -184,7 +186,7 @@ export const headerRenderer = <T extends TableFields>({
 };
 
 interface CellRenderingProps<T extends TableFields> {
-    definition?: DataTableColumnDefinition;
+    definition?: DataTableColumnDefinition<T>;
     key: keyof T;
     rowIndex: number;
     tableFields: T[];
@@ -202,7 +204,7 @@ export const cellRenderer = <T extends TableFields>({
     className,
     customContent,
 }: CellRenderingProps<T>) => {
-    const stringContent = definition?.formatter(key, rowIndex, tableFields) ?? '';
+    const stringContent = definition?.formatter(rowIndex, tableFields) ?? '';
 
     const alignClass = definition?.align && `align-${definition?.align}`;
 
@@ -219,7 +221,7 @@ export const cellRenderer = <T extends TableFields>({
 
 export interface ColumnRendererProps<T extends TableFields> {
     key: keyof T;
-    columnDefinition: Map<keyof T, DataTableColumnDefinition>;
+    columnDefinition: Map<keyof T, DataTableColumnDefinition<T>>;
     changeSorting: (column: keyof T) => (direction: SortingDirection) => void;
     sortDirection: SortingDirection;
     sortingColumn: keyof T;

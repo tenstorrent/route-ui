@@ -18,7 +18,7 @@ type OperationsTableHook = {
     changeSorting: (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => void;
     sortingColumn: OperationTableColumn;
     sortDirection: SortingDirection;
-    operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition>;
+    operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition<OpTableFields>>;
 };
 
 type OperationTableColumn = keyof OpTableFields | 'operation';
@@ -26,58 +26,60 @@ type OperationTableColumn = keyof OpTableFields | 'operation';
 const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
-const operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition> = new Map();
+const operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition<OpTableFields>> = new Map();
 
 operationsTableColumns.set('grid_size', {
     label: 'Grid size',
     sortable: false,
-    formatter: simpleStringFormatter,
+    formatter: simpleStringFormatter('grid_size'),
 });
 operationsTableColumns.set('core_id', {
     label: 'Core ID',
     sortable: false,
     align: 'left',
     canSelectAllRows: true,
-    formatter: simpleStringFormatter,
+    formatter: simpleStringFormatter('core_id'),
 });
 operationsTableColumns.set('operation', {
     label: 'Operation',
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: simpleStringFormatter,
+    formatter: simpleStringFormatter('name'),
 });
 
 operationsTableColumns.set('bw_bound_total_runtime', {
     label: 'BW Bound Total Runtime',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (index, rows) => `${numberFormatter0.format(rows[index].bw_bound_total_runtime)} cycles`,
 });
 operationsTableColumns.set('kernel_total_runtime', {
     label: 'Kernel Total Runtime',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (index, rows) => `${numberFormatter0.format(rows[index].kernel_total_runtime)} cycles`,
 });
 
 operationsTableColumns.set('bw_bound_runtime_per_input', {
     label: 'BW Bound Runtime (cycles per input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (index, rows) => `${numberFormatter0.format(rows[index].bw_bound_runtime_per_input)} cycles`,
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles per input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (index, rows) => `${numberFormatter0.format(rows[index].kernel_runtime_per_input)} cycles`,
 });
 operationsTableColumns.set('model_runtime_per_input', {
     label: 'Model Estimate (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => {
+    formatter: (index, rows) => {
+        const value = rows[index].model_runtime_per_input;
+
         // eslint-disable-next-line no-restricted-globals
         if (isNaN(value)) {
             return 'n/a';
@@ -89,7 +91,9 @@ operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => {
+    formatter: (index, rows) => {
+        const value = rows[index].kernel_runtime_per_input;
+
         // eslint-disable-next-line no-restricted-globals
         if (isNaN(value)) {
             return 'n/a';
@@ -103,26 +107,26 @@ operationsTableColumns.set('bw_bound_math_utilization', {
     label: 'BW Bound Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => `${numberFormatter2.format(value)}%`,
+    formatter: (index, rows) => `${numberFormatter2.format(rows[index].bw_bound_math_utilization)}%`,
 });
 operationsTableColumns.set('kernel_math_utilization', {
     label: 'Kernel Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => `${numberFormatter2.format(value)}%`,
+    formatter: (index, rows) => `${numberFormatter2.format(rows[index].kernel_math_utilization)}%`,
 });
 operationsTableColumns.set('model_math_utilization', {
     label: 'Model Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => `${numberFormatter2.format(value)}%`,
+    formatter: (index, rows) => `${numberFormatter2.format(rows[index].model_math_utilization)}%`,
 });
 
 operationsTableColumns.set('bw_limited_factor', {
     label: 'BW Limited Factor',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => numberFormatter2.format(value),
+    formatter: (index, rows) => numberFormatter2.format(rows[index].bw_limited_factor),
 });
 
 operationsTableColumns.set('slowest_operand', {
@@ -130,7 +134,7 @@ operationsTableColumns.set('slowest_operand', {
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: (value: Operand) => value.name,
+    formatter: (index, rows) => rows[index].slowestOperandRef?.name ?? '',
 });
 
 const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
@@ -162,14 +166,14 @@ const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
         setSortingColumn(selectedColumn);
     };
 
-    operationsTableColumns.get('core_id')!.handleSelectAll<OpTableFields> = handleSelectAllCores;
-    operationsTableColumns.get('core_id')!.getSelectedState<OpTableFields> = getCoreSelectedState;
+    operationsTableColumns.get('core_id')!.handleSelectAll = handleSelectAllCores;
+    operationsTableColumns.get('core_id')!.getSelectedState = getCoreSelectedState;
 
-    operationsTableColumns.get('operation')!.handleSelectAll<OpTableFields> = handleSelectAllOperations;
-    operationsTableColumns.get('operation')!.getSelectedState<OpTableFields> = getOperationSelectedState;
+    operationsTableColumns.get('operation')!.handleSelectAll = handleSelectAllOperations;
+    operationsTableColumns.get('operation')!.getSelectedState = getOperationSelectedState;
 
-    operationsTableColumns.get('slowest_operand')!.handleSelectAll<OpTableFields> = handleSelectAllSlowestOperands;
-    operationsTableColumns.get('slowest_operand')!.getSelectedState<OpTableFields> = getSlowestOperandSelectedState;
+    operationsTableColumns.get('slowest_operand')!.handleSelectAll = handleSelectAllSlowestOperands;
+    operationsTableColumns.get('slowest_operand')!.getSelectedState = getSlowestOperandSelectedState;
 
     return {
         sortedTableFields,
