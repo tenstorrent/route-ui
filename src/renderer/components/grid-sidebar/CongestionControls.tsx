@@ -21,7 +21,6 @@ import {
 } from '../../../data/store/slices/nodeSelection.slice';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../../utils/DrawingAPI';
-import DataSource, { GridContext } from '../../../data/DataSource';
 import { NOC } from '../../../data/Types';
 import {
     getLinkSaturation,
@@ -37,9 +36,11 @@ import {
 } from '../../../data/store/slices/linkSaturation.slice';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 export const CongestionControls: FC = () => {
-    const { chip } = useContext<GridContext>(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
+
     const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor || 10;
     const hasPipes = chip?.hasPipes || false;
 

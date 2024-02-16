@@ -2,8 +2,8 @@ import React, { FC, useContext, useEffect, useState } from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { Position } from '@blueprintjs/core';
 import { JSX } from 'react/jsx-runtime';
-import DataSource from '../../data/DataSource';
 import { Pipe } from '../../data/Chip';
+import { ChipContext } from '../../data/ChipDataProvider';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;
@@ -17,7 +17,8 @@ export interface PipeInfoDialogProps {
  */
 const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => {
     const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);
-    const { chip } = useContext(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
+
     const setupData = () => {
         const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
         const output: JSX.Element[] = [];

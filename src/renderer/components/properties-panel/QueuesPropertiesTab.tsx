@@ -3,7 +3,6 @@ import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import DataSource from '../../../data/DataSource';
 import SearchField from '../SearchField';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
@@ -14,13 +13,12 @@ import { RootState } from '../../../data/store/createStore';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
-import SelectablePipe from '../SelectablePipe';
-import { PipeSegment } from '../../../data/Chip';
-import { NOCLinkName } from '../../../data/Types';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
-    const { chip } = useContext(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
+
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
@@ -37,7 +35,7 @@ function QueuesPropertiesTab() {
             }
         });
     };
-    
+
     return (
         <>
             <div className='properties-filter'>

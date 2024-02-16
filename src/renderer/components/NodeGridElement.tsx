@@ -38,11 +38,12 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
     const triggerSelection = () => {
-        const selectedState = nodeState.selected;
+        console.log('triggerSelection', node.uid, nodeState)
+        const selectedState = nodeState?.selected;
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));
         } else {
-            dispatch(updateNodeSelection({ id: node.uid, selected: !nodeState.selected }));
+            dispatch(updateNodeSelection({ id: node.uid, selected: !nodeState?.selected }));
         }
     };
 

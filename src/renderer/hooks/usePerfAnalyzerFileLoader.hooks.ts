@@ -4,8 +4,8 @@ import {
     getGraphNameSelector,
 } from 'data/store/selectors/uiState.selectors';
 import {
-    setAvailableGraphs,
     setApplicationMode,
+    setAvailableGraphs,
     setSelectedArchitecture,
     setSelectedFolder,
     setSelectedGraphName,
@@ -15,24 +15,37 @@ import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFold
 
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
+import { useNavigate } from 'react-router-dom';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import { GraphRelationshipState } from '../../data/StateTypes';
 import useLogging from './useLogging.hook';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
-import Cluster from '../../data/Cluster';
+import { ChipContext } from '../../data/ChipDataProvider';
+import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
-
     const dispatch = useDispatch();
     const selectedFolder = useSelector(getFolderPathSelector);
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
-    const {cluster, setCluster} = useContext<ClusterContext>(ClusterDataSource);
+    const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
+    const { getActiveChip, setActiveChip, addChip, resetChips } = useContext(ChipContext);
+
+    const chip = getActiveChip();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (chip) {
+            dispatch(setSelectedArchitecture(chip.architecture));
+            populateChipData(chip);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chip]);
 
     const selectFolderDialog = async (): Promise<string | null> => {
         const folderList = dialog.showOpenDialogSync({
@@ -52,6 +65,7 @@ const usePerfAnalyzerFileLoader = () => {
     };
 
     const loadFolder = async (folderPath: string): Promise<void> => {
+        resetChips();
         setError(null);
 
         try {
@@ -64,25 +78,28 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
+            // TODO: ensure this is not needed
+            // setEnableGraphSelect(true);
+
+            sortedGraphs.forEach(async (graph) => {
+                const graphOnChip = await loadGraph(folderPath, graph);
+                addChip(graphOnChip, graph.name);
+            });
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
             setError(err.message ?? 'Unknown Error');
         }
-
         setCluster(await loadCluster(folderPath));
     };
 
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
         if (selectedFolder) {
             try {
-                const chip = await loadGraph(
-                    selectedFolder,
-                    availableGraphs.find((g) => g.name === graphName) as GraphRelationshipState,
-                );
-                populateChipData(chip);
+                dispatch(clearAllNodes());
+                setActiveChip(graphName);
+                navigate('/render');
                 dispatch(setSelectedGraphName(graphName));
-                dispatch(setSelectedArchitecture(chip.architecture));
             } catch (e) {
                 const err = e as Error;
                 logging.error(`error loading and populating chip ${err.message}`);

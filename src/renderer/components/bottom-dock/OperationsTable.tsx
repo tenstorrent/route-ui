@@ -8,16 +8,17 @@ import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
-import DataSource from '../../../data/DataSource';
 import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
+import { DataTableColumnDefinition, SortingDirection } from './SharedTable';
+import { ChipContext } from '../../../data/ChipDataProvider';
 import { columnRenderer } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
-    const { chip } = useContext(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
     const dispatch = useDispatch();
     const [tableFields, setTableFields] = useState<OpTableFields[]>([]);
     const [coreView, setCoreView] = useState(false);

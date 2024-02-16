@@ -3,18 +3,18 @@ import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/t
 import { useSelector } from 'react-redux';
 import SelectableOperation from '../SelectableOperation';
 import { RootState } from '../../../data/store/createStore';
-import DataSource from '../../../data/DataSource';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 /**
  * QueuesTable - temporary component to display queues
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const { chip } = useContext(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
     const [tableFields, setTableFields] = useState<QueuesTableFields[]>([]);
     const { queuesTableColumns, sortedTableFields, changeSorting, sortDirection, sortingColumn } =
         useQueuesTableHook(tableFields);

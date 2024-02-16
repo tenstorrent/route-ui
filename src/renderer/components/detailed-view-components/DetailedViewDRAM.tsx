@@ -9,17 +9,17 @@ import { ComputeNode, NOCLink } from '../../../data/Chip';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import LinkDetails from '../LinkDetails';
 import { filterIterable } from '../../../utils/IterableHelpers';
-import DataSource, { GridContext } from '../../../data/DataSource';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node }) => {
-    const { chip } = useContext<GridContext>(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
     const architecture = useSelector(getArchitectureSelector);
     const dispatch = useDispatch();
 
