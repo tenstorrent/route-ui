@@ -23,16 +23,7 @@ import useLogging from './useLogging.hook';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import Cluster from '../../data/Cluster';
 
-type PerfAnalyzerFileLoaderHook = {
-    loadPerfAnalyzerFolder: () => Promise<void>;
-    loadPerfAnalyzerGraph: (graphName: string) => Promise<void>;
-    error: string | null;
-    selectedGraph: string;
-    availableGraphs: GraphRelationshipState[];
-    enableGraphSelect: boolean;
-};
-
-const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
+const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
 
     const dispatch = useDispatch();
@@ -40,7 +31,6 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const [error, setError] = useState<string | null>(null);
-    const [enableGraphSelect, setEnableGraphSelect] = useState(false);
     const logging = useLogging();
     const {cluster, setCluster} = useContext<ClusterContext>(ClusterDataSource);
 
@@ -63,16 +53,17 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
 
     const loadFolder = async (folderPath: string): Promise<void> => {
         setError(null);
-        setEnableGraphSelect(false);
+
         try {
             const graphs = await getAvailableGraphNames(folderPath);
+
             if (!graphs.length) {
                 throw new Error(`No graphs found in\n${folderPath}`);
             }
+
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
-            setEnableGraphSelect(true);
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
@@ -89,7 +80,6 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
                     selectedFolder,
                     availableGraphs.find((g) => g.name === graphName) as GraphRelationshipState,
                 );
-                setEnableGraphSelect(false);
                 populateChipData(chip);
                 dispatch(setSelectedGraphName(graphName));
                 dispatch(setSelectedArchitecture(chip.architecture));
@@ -103,12 +93,17 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         }
     };
 
-    const loadPerfAnalyzerFolder = async (): Promise<void> => {
-        const folderPath = await selectFolderDialog();
-        if (folderPath) {
+    const loadPerfAnalyzerFolder = async (folderPath?: string | null): Promise<void> => {
+        let folderToLoad = folderPath;
+
+        if (!folderToLoad) {
+            folderToLoad = await selectFolderDialog();
+        }
+
+        if (folderToLoad) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
 
-            await loadFolder(folderPath);
+            await loadFolder(folderToLoad);
         }
     };
 
@@ -118,7 +113,6 @@ const usePerfAnalyzerFileLoader = (): PerfAnalyzerFileLoaderHook => {
         error,
         selectedGraph,
         availableGraphs,
-        enableGraphSelect,
     };
 };
 
