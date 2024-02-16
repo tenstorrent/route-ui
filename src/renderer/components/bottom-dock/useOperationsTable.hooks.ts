@@ -5,6 +5,8 @@ import { Operation } from '../../../data/GraphTypes';
 import { DataTableColumnDefinition, simpleStringFormatter, sortAsc, sortDesc, SortingDirection } from './SharedTable';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 
+const valueDelta = (a: number, b: number) => Math.abs(b - a);
+
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
     name: string;
@@ -84,7 +86,10 @@ operationsTableColumns.set('model_runtime_per_input', {
         if (isNaN(value)) {
             return 'n/a';
         }
-        return numberFormatter0.format(value);
+
+        const delta = valueDelta(rows[index].kernel_runtime_per_input, value);
+
+        return `${numberFormatter0.format(value)} (${numberFormatter0.format(delta)} diff.)`;
     },
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
@@ -99,7 +104,9 @@ operationsTableColumns.set('kernel_runtime_per_input', {
             return 'n/a';
         }
 
-        return numberFormatter0.format(value);
+        const delta = valueDelta(rows[index].model_runtime_per_input, value);
+
+        return `${numberFormatter0.format(value)} (${numberFormatter0.format(delta)} diff.)`;
     },
 });
 
