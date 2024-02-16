@@ -30,7 +30,7 @@ export enum SortingDirection {
 }
 
 export const sortAsc = (a: any, b: any) => {
-    if(a === undefined || b === undefined) {
+    if (a === undefined || b === undefined) {
         return 0;
     }
     if (typeof a === 'string' && typeof b === 'number') {
@@ -42,7 +42,7 @@ export const sortAsc = (a: any, b: any) => {
     return a > b ? 1 : -1;
 };
 export const sortDesc = (a: any, b: any) => {
-    if(a === undefined || b === undefined) {
+    if (a === undefined || b === undefined) {
         return 0;
     }
     if (typeof a === 'string' && typeof b === 'number') {
@@ -125,6 +125,7 @@ export const headerRenderer = <T extends TableFields>({
     nodesSelectionState,
     changeSorting,
 }: HeaderRenderingProps<T>) => {
+    const columnLabel = definition?.label ?? (column as string);
     const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
     const sortClass = `${sortingColumn === column ? 'current-sort' : ''} ${sortDirectionClass}`;
     let targetSortDirection = sortDirection;
@@ -137,10 +138,7 @@ export const headerRenderer = <T extends TableFields>({
     const selectableClass = definition?.canSelectAllRows ? 'can-select-all-rows' : '';
 
     return (
-        <ColumnHeaderCell2
-            className={`${definition?.sortable ? sortClass : ''} ${selectableClass}`}
-            name={definition?.label ?? (column as string)}
-        >
+        <ColumnHeaderCell2 className={`${definition?.sortable ? sortClass : ''} ${selectableClass}`} name={columnLabel}>
             <>
                 {definition?.sortable && (
                     <>
@@ -149,6 +147,7 @@ export const headerRenderer = <T extends TableFields>({
                             className='sortable-table-header'
                             role='button'
                             onClick={() => changeSorting(column)(targetSortDirection)}
+                            title={columnLabel}
                         >
                             {sortingColumn === column && (
                                 <span className='sort-icon'>
