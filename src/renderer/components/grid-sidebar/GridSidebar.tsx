@@ -14,6 +14,7 @@ export const GridSidebar: FC = () => {
                 <GridControls />
                 <CongestionControls />
                 <CLKBandwidthControls />
+                <hr />
                 <ModelControls />
             </div>
         </div>
