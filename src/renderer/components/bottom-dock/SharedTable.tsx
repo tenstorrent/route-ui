@@ -42,24 +42,10 @@ const valueRatio = (a: number, b: number) => {
 export const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 export const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
-const calculateRatioIconColor = (value: number, threshold: number, isHC: boolean = false): string => {
-    const max = threshold || 1;
-    const min = 0;
-    const normalizedVal = Math.min(value, max);
-    const ratio = (normalizedVal - min) / (max - min);
-    const intensity = Math.round(ratio * 255);
-
-    if (isHC) {
-        return `rgb(${intensity}, ${intensity}, ${255 - intensity})`;
-    }
-
-    return `rgb(${intensity}, ${255 - intensity}, 0)`;
-};
-
 export const ratioNumberFormatter =
     <T extends TableFields, K extends keyof T>(mainKey: K, compareKey: K) =>
-    (index: number, rows: T[], state: { threshold: number; isHighContrast: boolean }) => {
-        const { threshold, isHighContrast } = state;
+    (index: number, rows: T[], state: { threshold: number }) => {
+        const { threshold } = state;
 
         // eslint-disable-next-line react/destructuring-assignment
         const value = rows[index][mainKey] as number;
@@ -70,24 +56,23 @@ export const ratioNumberFormatter =
         }
 
         // eslint-disable-next-line react/destructuring-assignment
-        const ratio = valueRatio(rows[index][compareKey] as number, value);
+        const ratio = valueRatio(value, rows[index][compareKey] as number);
 
         // eslint-disable-next-line no-restricted-globals
         if (isNaN(ratio)) {
             return numberFormatter0.format(value);
         }
 
-        let icon = ratio > threshold ? IconNames.SYMBOL_TRIANGLE_UP : IconNames.SYMBOL_TRIANGLE_DOWN;
-        let iconColor = calculateRatioIconColor(ratio, threshold, isHighContrast);
-
-        if (ratio === 0) {
-            icon = IconNames.SYMBOL_RECTANGLE;
-            iconColor = 'grey';
-        }
-
         return (
             <span className='ratio-number'>
-                <Icon size={10} icon={icon} color={iconColor} title={`${numberFormatter2.format(ratio)} ratio`} />
+                {ratio > threshold && (
+                    <Icon
+                        size={10}
+                        icon={IconNames.SYMBOL_TRIANGLE_UP}
+                        color='red'
+                        title={`${numberFormatter2.format(ratio)}x difference from "${compareKey.toString()}"`}
+                    />
+                )}
                 <span>{numberFormatter0.format(value)}</span>
             </span>
         );
