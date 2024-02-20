@@ -87,6 +87,7 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
             </Tooltip2>
 
             <RemoteFolderDialog
+                key={`${selectedConnection?.name}${selectedConnection?.host}${selectedConnection?.port}${selectedConnection?.path}`}
                 open={isEditdialogOpen}
                 onAddConnection={(updatedconnection) => {
                     setIsEditDialogOpen(false);
