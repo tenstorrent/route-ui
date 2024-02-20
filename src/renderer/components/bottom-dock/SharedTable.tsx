@@ -42,8 +42,8 @@ const valueRatio = (a: number, b: number) => {
 export const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 export const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
-const calculateDiffIconColor = (value: number, threshold: number, isHC: boolean = false): string => {
-    const max = threshold * 2 || 1;
+const calculateRatioIconColor = (value: number, threshold: number, isHC: boolean = false): string => {
+    const max = threshold || 1;
     const min = 0;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
@@ -78,7 +78,7 @@ export const ratioNumberFormatter =
         }
 
         let icon = ratio > threshold ? IconNames.SYMBOL_TRIANGLE_UP : IconNames.SYMBOL_TRIANGLE_DOWN;
-        let iconColor = calculateDiffIconColor(ratio, threshold, isHighContrast);
+        let iconColor = calculateRatioIconColor(ratio, threshold, isHighContrast);
 
         if (ratio === 0) {
             icon = IconNames.SYMBOL_RECTANGLE;
