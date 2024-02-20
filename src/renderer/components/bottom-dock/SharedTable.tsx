@@ -25,52 +25,8 @@ export interface DataTableColumnDefinition<T extends TableFields> {
     formatter: (value: any) => string;
 }
 
-const valueRatio = (a: number, b: number) => {
-    if (a === 0) {
-        return 0;
-    }
-
-    return Math.abs(b / a);
-};
-
 export const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 export const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
-
-export const ratioNumberFormatter =
-    <T extends TableFields, K extends keyof T>(mainKey: K, compareKey: K) =>
-    (index: number, rows: T[], state: { threshold: number }) => {
-        const { threshold } = state;
-
-        // eslint-disable-next-line react/destructuring-assignment
-        const value = rows[index][mainKey] as number;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(value)) {
-            return 'n/a';
-        }
-
-        // eslint-disable-next-line react/destructuring-assignment
-        const ratio = valueRatio(value, rows[index][compareKey] as number);
-
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(ratio)) {
-            return numberFormatter0.format(value);
-        }
-
-        return (
-            <span className='ratio-number'>
-                {ratio > threshold && (
-                    <Icon
-                        size={10}
-                        icon={IconNames.SYMBOL_TRIANGLE_UP}
-                        color='red'
-                        title={`${numberFormatter2.format(ratio)}x difference from "${compareKey.toString()}"`}
-                    />
-                )}
-                <span>{numberFormatter0.format(value)}</span>
-            </span>
-        );
-    };
 
 export enum SortingDirection {
     ASC = 'asc',

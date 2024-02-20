@@ -13,8 +13,17 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { columnRenderer } from './SharedTable';
+import { columnRenderer, numberFormatter0, numberFormatter2 } from './SharedTable';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
+
+
+const valueRatio = (a: number, b: number) => {
+    if (a === 0) {
+        return 0;
+    }
+
+    return Math.abs(b / a);
+};
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -188,26 +197,49 @@ function OperationsTable() {
         return slowOpString;
     };
 
+    const modelRuntimeCellRenderer = (rowIndex: number) => {
+        const value = tableFields[rowIndex].model_runtime_per_input;
+
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(value)) {
+            return 'n/a';
+        }
+
+        const ratio = valueRatio(value, tableFields[rowIndex].kernel_runtime_per_input);
+
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(ratio)) {
+            return numberFormatter0.format(value);
+        }
+
+        return (
+            <span className='ratio-number'>
+                {ratio > operationRatioThreshold && (
+                    <Icon
+                        size={10}
+                        icon={IconNames.SYMBOL_TRIANGLE_UP}
+                        color='red'
+                        title={`${numberFormatter2.format(ratio)}x difference from "Kernel Runtime per Input"`}
+                    />
+                )}
+                <span>{numberFormatter0.format(value)}</span>
+            </span>
+        );
+    };
+
     const getCustomCellRenderer = (key: string) => {
         switch (key) {
             case 'slowest_operand':
                 return slowestOperandCellRenderer;
+            case 'model_runtime_per_input':
+                return modelRuntimeCellRenderer;
             default:
                 return undefined;
         }
     };
 
-    // TODO: uise definition instead
-    const columns = [
-        'kernel_math_utilization',
-        'bw_limited_factor',
-        'slowest_operand',
-        'bw_bound_total_runtime',
-        'bw_bound_math_utilization',
-        'model_runtime_per_input',
-        'kernel_runtime_per_input',
-        'kernel_total_runtime',
-    ];
+    const excludedColumns = ['operation', 'grid_size', 'core_id'];
+    const columns = Array.from(operationsTableColumns.keys()).filter((key) => !excludedColumns.includes(key));
 
     return (
         <Table2

@@ -101,11 +101,13 @@
     .table-operation-cell > div {
         display: flex;
         flex-direction: row;
-        justify-content: flex-start;
+        justify-content: start;
         align-items: center;
         gap: 5px;
 
     }
+
+    .table-operation-cell.align-right > div { justify-content: end; }
 
     .bp4-table-column-name-text {
         padding-right: 25px;
