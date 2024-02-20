@@ -300,7 +300,6 @@ function OperationsTable() {
                         tableFields,
                         nodesSelectionState,
                         customCellContentRenderer: getCustomCellRenderer(key),
-                        state: { threshold: operationRatioThreshold },
                     }),
                 ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
             }

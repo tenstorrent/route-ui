@@ -200,7 +200,6 @@ interface CellRenderingProps<T extends TableFields> {
     isInteractive?: boolean;
     className?: string;
     customContent?: string | ReactElement;
-    state?: any;
 }
 
 export const cellRenderer = <T extends TableFields>({
@@ -237,8 +236,7 @@ export interface ColumnRendererProps<T extends TableFields> {
     nodesSelectionState: NodeSelectionState;
     isInteractive?: boolean;
     cellClassName?: string;
-    customCellContentRenderer?: (rowIndex: number, state?: any) => ReactElement | string;
-    state?: any;
+    customCellContentRenderer?: (rowIndex: number) => ReactElement | string;
 }
 
 export const columnRenderer = <T extends TableFields>({
@@ -252,7 +250,6 @@ export const columnRenderer = <T extends TableFields>({
     isInteractive,
     cellClassName,
     customCellContentRenderer,
-    state,
 }: ColumnRendererProps<T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
     return (
         <Column
@@ -269,8 +266,7 @@ export const columnRenderer = <T extends TableFields>({
                         cellClassName,
                         customCellContentRenderer ? 'table-cell-interactive table-operation-cell' : undefined,
                     ].join(' '),
-                    customContent: customCellContentRenderer?.(rowIndex, state),
-                    state,
+                    customContent: customCellContentRenderer?.(rowIndex),
                 })
             }
             columnHeaderCellRenderer={() =>
