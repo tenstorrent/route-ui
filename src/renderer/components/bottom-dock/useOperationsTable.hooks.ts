@@ -2,10 +2,17 @@ import { useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, simpleStringFormatter, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import {
+    DataTableColumnDefinition,
+    simpleStringFormatter,
+    numberFormatter0,
+    numberFormatter2,
+    diffNumberFormatter,
+    sortAsc,
+    sortDesc,
+    SortingDirection,
+} from './SharedTable';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
-
-const valueDelta = (a: number, b: number) => Math.abs(b - a);
 
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
@@ -24,9 +31,6 @@ type OperationsTableHook = {
 };
 
 type OperationTableColumn = keyof OpTableFields | 'operation';
-
-const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
-const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
 const operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition<OpTableFields>> = new Map();
 
@@ -79,43 +83,13 @@ operationsTableColumns.set('model_runtime_per_input', {
     label: 'Model Estimate (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => {
-        const value = rows[index].model_runtime_per_input;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(value)) {
-            return 'n/a';
-        }
-
-        const delta = valueDelta(rows[index].kernel_runtime_per_input, value);
-
-        if (Number.isNaN(delta)) {
-            return numberFormatter0.format(value);
-        }
-
-        return `${numberFormatter0.format(value)} (${numberFormatter0.format(delta)} diff.)`;
-    },
+    formatter: diffNumberFormatter('model_runtime_per_input', 'kernel_runtime_per_input'),
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => {
-        const value = rows[index].kernel_runtime_per_input;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(value)) {
-            return 'n/a';
-        }
-
-        const delta = valueDelta(rows[index].model_runtime_per_input, value);
-
-        if (Number.isNaN(delta)) {
-            return numberFormatter0.format(value);
-        }
-
-        return `${numberFormatter0.format(value)} (${numberFormatter0.format(delta)} diff.)`;
-    },
+    formatter: diffNumberFormatter('kernel_runtime_per_input', 'model_runtime_per_input'),
 });
 
 operationsTableColumns.set('bw_bound_math_utilization', {

@@ -29,6 +29,50 @@ export const simpleStringFormatter =
         return rows[index][key as keyof T]?.toString() ?? '';
     };
 
+const valueDelta = (a: number, b: number) => Math.abs(b - a);
+
+export const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+export const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+
+export const diffNumberFormatter =
+    <T extends TableFields, K extends keyof T>(mainKey: K, compareKey: K) =>
+    (index: number, rows: T[]) => {
+        // eslint-disable-next-line react/destructuring-assignment
+        const value = rows[index][mainKey] as number;
+
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(value)) {
+            return 'n/a';
+        }
+
+        // eslint-disable-next-line react/destructuring-assignment
+        const delta = valueDelta(rows[index][compareKey] as number, value);
+
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(delta)) {
+            return numberFormatter0.format(value);
+        }
+
+        // TODO: get value from redux
+        const treshold = 0;
+        let icon = delta > treshold ? IconNames.SYMBOL_TRIANGLE_UP : IconNames.SYMBOL_TRIANGLE_DOWN;
+        let iconColor = delta > treshold ? 'red' : 'green';
+
+        if (delta === 0) {
+            icon = IconNames.SYMBOL_RECTANGLE;
+            iconColor = 'grey';
+        }
+
+        return (
+            <>
+                {numberFormatter0.format(value)}
+                <span title={`${numberFormatter0.format(delta)} difference`}>
+                    <Icon icon={icon} color={iconColor} />
+                </span>
+            </>
+        );
+    };
+
 export enum SortingDirection {
     ASC = 'asc',
     DESC = 'desc',
