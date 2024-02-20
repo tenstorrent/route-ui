@@ -51,7 +51,7 @@ export default class MenuBuilder {
                 label: 'RouteUI',
                 role: 'appMenu',
                 submenu: [
-                    { role: 'about' },
+                    { role: 'about', label: 'About RouteUI' },
                     { type: 'separator' },
                     { role: 'services' },
                     { type: 'separator' },
@@ -59,7 +59,7 @@ export default class MenuBuilder {
                     { role: 'hideOthers' },
                     { role: 'unhide' },
                     { type: 'separator' },
-                    { role: 'quit' },
+                    { role: 'quit', label: 'Quit RouteUI' },
                 ],
             },
             {
