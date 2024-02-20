@@ -8,6 +8,8 @@ import type { NodeSelectionState } from '../../../data/StateTypes';
 import type { OpTableFields } from './useOperationsTable.hooks';
 import type { QueuesTableFields } from './useQueuesTable.hook';
 
+import '../../scss/SharedTable.scss';
+
 export type TableFields = OpTableFields | QueuesTableFields;
 
 export interface DataTableColumnDefinition<T extends TableFields> {
@@ -20,7 +22,7 @@ export interface DataTableColumnDefinition<T extends TableFields> {
         nodesSelectionState: NodeSelectionState,
     ) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
     handleSelectAll?: (rows: T[], selected: boolean) => void;
-    formatter: (index: number, rows: T[]) => string | JSX.Element;
+    formatter: (index: number, rows: T[], state?: any) => string | JSX.Element;
 }
 
 export const simpleStringFormatter =
@@ -29,14 +31,36 @@ export const simpleStringFormatter =
         return rows[index][key as keyof T]?.toString() ?? '';
     };
 
-const valueDelta = (a: number, b: number) => Math.abs(b - a);
+const valueRatio = (a: number, b: number) => {
+    if (a === 0) {
+        return 0;
+    }
+
+    return Math.abs(b / a);
+};
 
 export const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 export const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
-export const diffNumberFormatter =
+const calculateDiffIconColor = (value: number, threshold: number, isHC: boolean = false): string => {
+    const max = threshold * 2 || 1;
+    const min = 0;
+    const normalizedVal = Math.min(value, max);
+    const ratio = (normalizedVal - min) / (max - min);
+    const intensity = Math.round(ratio * 255);
+
+    if (isHC) {
+        return `rgb(${intensity}, ${intensity}, ${255 - intensity})`;
+    }
+
+    return `rgb(${intensity}, ${255 - intensity}, 0)`;
+};
+
+export const ratioNumberFormatter =
     <T extends TableFields, K extends keyof T>(mainKey: K, compareKey: K) =>
-    (index: number, rows: T[]) => {
+    (index: number, rows: T[], state: { threshold: number; isHighContrast: boolean }) => {
+        const { threshold, isHighContrast } = state;
+
         // eslint-disable-next-line react/destructuring-assignment
         const value = rows[index][mainKey] as number;
 
@@ -46,30 +70,26 @@ export const diffNumberFormatter =
         }
 
         // eslint-disable-next-line react/destructuring-assignment
-        const delta = valueDelta(rows[index][compareKey] as number, value);
+        const ratio = valueRatio(rows[index][compareKey] as number, value);
 
         // eslint-disable-next-line no-restricted-globals
-        if (isNaN(delta)) {
+        if (isNaN(ratio)) {
             return numberFormatter0.format(value);
         }
 
-        // TODO: get value from redux
-        const treshold = 0;
-        let icon = delta > treshold ? IconNames.SYMBOL_TRIANGLE_UP : IconNames.SYMBOL_TRIANGLE_DOWN;
-        let iconColor = delta > treshold ? 'red' : 'green';
+        let icon = ratio > threshold ? IconNames.SYMBOL_TRIANGLE_UP : IconNames.SYMBOL_TRIANGLE_DOWN;
+        let iconColor = calculateDiffIconColor(ratio, threshold, isHighContrast);
 
-        if (delta === 0) {
+        if (ratio === 0) {
             icon = IconNames.SYMBOL_RECTANGLE;
             iconColor = 'grey';
         }
 
         return (
-            <>
-                {numberFormatter0.format(value)}
-                <span title={`${numberFormatter0.format(delta)} difference`}>
-                    <Icon icon={icon} color={iconColor} />
-                </span>
-            </>
+            <span className='ratio-number'>
+                <Icon size={10} icon={icon} color={iconColor} title={`${numberFormatter2.format(ratio)} ratio`} />
+                <span>{numberFormatter0.format(value)}</span>
+            </span>
         );
     };
 
@@ -237,6 +257,7 @@ interface CellRenderingProps<T extends TableFields> {
     isInteractive?: boolean;
     className?: string;
     customContent?: string | ReactElement;
+    state?: any;
 }
 
 export const cellRenderer = <T extends TableFields>({
@@ -247,8 +268,9 @@ export const cellRenderer = <T extends TableFields>({
     isInteractive,
     className,
     customContent,
+    state,
 }: CellRenderingProps<T>) => {
-    const stringContent = definition?.formatter(rowIndex, tableFields) ?? '';
+    const stringContent = definition?.formatter(rowIndex, tableFields, state) ?? '';
 
     const alignClass = definition?.align && `align-${definition?.align}`;
 
@@ -273,7 +295,8 @@ export interface ColumnRendererProps<T extends TableFields> {
     nodesSelectionState: NodeSelectionState;
     isInteractive?: boolean;
     cellClassName?: string;
-    customCellContentRenderer?: (rowIndex: number) => ReactElement | string;
+    customCellContentRenderer?: (rowIndex: number, state?: any) => ReactElement | string;
+    state?: any;
 }
 
 export const columnRenderer = <T extends TableFields>({
@@ -287,6 +310,7 @@ export const columnRenderer = <T extends TableFields>({
     isInteractive,
     cellClassName,
     customCellContentRenderer,
+    state,
 }: ColumnRendererProps<T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
     return (
         <Column
@@ -303,7 +327,8 @@ export const columnRenderer = <T extends TableFields>({
                         cellClassName,
                         customCellContentRenderer ? 'table-cell-interactive table-operation-cell' : undefined,
                     ].join(' '),
-                    customContent: customCellContentRenderer?.(rowIndex),
+                    customContent: customCellContentRenderer?.(rowIndex, state),
+                    state,
                 })
             }
             columnHeaderCellRenderer={() =>

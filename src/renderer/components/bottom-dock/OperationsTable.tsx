@@ -14,6 +14,8 @@ import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook'
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
 import { columnRenderer } from './SharedTable';
+import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
+import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -27,6 +29,8 @@ function OperationsTable() {
 
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
+    const operationRatioThreshold = useSelector(getOperationRatioThreshold);
+    const isHighContrast = useSelector(getHighContrastState);
 
     const resetOpTableDetails = () => {
         if (!chip) {
@@ -227,6 +231,8 @@ function OperationsTable() {
                 coreView,
                 sortedTableFields,
                 tableFields.length,
+                isHighContrast,
+                operationRatioThreshold,
             ]}
         >
             {columnRenderer({
@@ -271,6 +277,7 @@ function OperationsTable() {
                         tableFields,
                         nodesSelectionState,
                         customCellContentRenderer: getCustomCellRenderer(key),
+                        state: { threshold: operationRatioThreshold, isHighContrast },
                     }),
                 ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
             }

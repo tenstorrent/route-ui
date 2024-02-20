@@ -7,7 +7,7 @@ import {
     simpleStringFormatter,
     numberFormatter0,
     numberFormatter2,
-    diffNumberFormatter,
+    ratioNumberFormatter,
     sortAsc,
     sortDesc,
     SortingDirection,
@@ -83,13 +83,13 @@ operationsTableColumns.set('model_runtime_per_input', {
     label: 'Model Estimate (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: diffNumberFormatter('model_runtime_per_input', 'kernel_runtime_per_input'),
+    formatter: ratioNumberFormatter('model_runtime_per_input', 'kernel_runtime_per_input'),
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: diffNumberFormatter('kernel_runtime_per_input', 'model_runtime_per_input'),
+    formatter: ratioNumberFormatter('kernel_runtime_per_input', 'model_runtime_per_input'),
 });
 
 operationsTableColumns.set('bw_bound_math_utilization', {
