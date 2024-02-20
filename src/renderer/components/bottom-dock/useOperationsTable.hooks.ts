@@ -4,8 +4,7 @@ import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import {
     DataTableColumnDefinition,
-    numberFormatter0,
-    numberFormatter2,
+    numberFormatter,
     sortAsc,
     sortDesc,
     SortingDirection,
@@ -55,7 +54,7 @@ operationsTableColumns.set('bw_limited_factor', {
     label: 'BW Limited Factor',
     sortable: true,
     align: 'right',
-    formatter: (value) => numberFormatter2.format(value),
+    formatter: (value) => numberFormatter(value),
 });
 operationsTableColumns.set('slowest_operand', {
     label: 'Slowest Operand',
@@ -68,73 +67,55 @@ operationsTableColumns.set('bw_bound_total_runtime', {
     label: 'BW Bound Total Runtime',
     sortable: true,
     align: 'right',
-    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 operationsTableColumns.set('bw_bound_math_utilization', {
     label: 'BW Bound Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (value) => `${numberFormatter2.format(value)}%`,
+    formatter: (value) => numberFormatter(value, '%'),
 });
 operationsTableColumns.set('model_runtime_per_input', {
     label: 'Model Estimate (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => {
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(value)) {
-            return 'N/A';
-        }
-        return numberFormatter0.format(value);
-    },
+    formatter: (value: number) => numberFormatter(value, '', 0)
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => {
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(value)) {
-            return 'N/A';
-        }
-        return numberFormatter0.format(value);
-    },
+    formatter: (value: number) => numberFormatter(value, '', 0)
 });
 operationsTableColumns.set('model_math_utilization', {
     label: 'Model Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => {
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(value)) {
-            return 'N/A';
-        }
-        return `${numberFormatter2.format(value)}%`;
-    },
+    formatter: (value) => numberFormatter(value, '%'),
 });
 operationsTableColumns.set('kernel_math_utilization', {
     label: 'Kernel Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (value) => `${numberFormatter2.format(value)}%`,
+    formatter: (value) => numberFormatter(value, '%'),
 });
 operationsTableColumns.set('kernel_total_runtime', {
     label: 'Kernel Total Runtime',
     sortable: true,
     align: 'right',
-    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 operationsTableColumns.set('bw_bound_runtime_per_input', {
     label: 'BW Bound Runtime (cycles per input)',
     sortable: true,
     align: 'right',
-    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles per input)',
     sortable: true,
     align: 'right',
-    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
+    formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 
 const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {

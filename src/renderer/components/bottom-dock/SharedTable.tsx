@@ -25,8 +25,16 @@ export interface DataTableColumnDefinition<T extends TableFields> {
     formatter: (value: any) => string;
 }
 
-export const numberFormatter0 = Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
-export const numberFormatter2 = Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+export const numberFormatter = (value: any, unit = '', fractionDigits = 2) => {
+    const formatter = Intl.NumberFormat('en-US', { maximumFractionDigits: fractionDigits });
+    const parsedValue = Number.parseFloat(value);
+
+    if (Number.isNaN(parsedValue)) {
+        return 'N/A';
+    }
+
+    return `${formatter.format(parsedValue)}${unit}`;
+};
 
 export enum SortingDirection {
     ASC = 'asc',

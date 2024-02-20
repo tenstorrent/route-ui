@@ -13,7 +13,7 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { columnRenderer, numberFormatter0, numberFormatter2 } from './SharedTable';
+import { columnRenderer, numberFormatter } from './SharedTable';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 
 
@@ -199,17 +199,11 @@ function OperationsTable() {
 
     const modelRuntimeCellRenderer = (rowIndex: number) => {
         const value = tableFields[rowIndex].model_runtime_per_input;
-
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(value)) {
-            return 'n/a';
-        }
-
         const ratio = valueRatio(value, tableFields[rowIndex].kernel_runtime_per_input);
 
         // eslint-disable-next-line no-restricted-globals
         if (isNaN(ratio)) {
-            return numberFormatter0.format(value);
+            return numberFormatter(value, '', 0);
         }
 
         return (
@@ -219,10 +213,10 @@ function OperationsTable() {
                         size={10}
                         icon={IconNames.SYMBOL_TRIANGLE_UP}
                         color='red'
-                        title={`${numberFormatter2.format(ratio)}x difference from "Kernel Runtime per Input"`}
+                        title={`${numberFormatter(ratio)}x difference from "Kernel Runtime per Input"`}
                     />
                 )}
-                <span>{numberFormatter0.format(value)}</span>
+                <span>{numberFormatter(value, '', 0)}</span>
             </span>
         );
     };
