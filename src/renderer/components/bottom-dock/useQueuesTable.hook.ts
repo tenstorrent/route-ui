@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { QueueDetailsJson } from '../../../data/sources/QueueDescriptor';
 import { Queue } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, simpleStringFormatter, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 
 export interface QueuesTableFields extends QueueDetailsJson {
@@ -18,56 +18,56 @@ queuesTableColumns.set('queue', {
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: simpleStringFormatter('queue'),
+    formatter: (value) => value.toString(),
 });
 
 queuesTableColumns.set('entries', {
     label: 'Entries',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('entries'),
+    formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('input', {
     label: 'Input',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('input'),
+    formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('layout', {
     label: 'Layout',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('layout'),
+    formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('data-format', {
     label: 'Data Format',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('data-format'),
+    formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('block-dim', {
     label: 'Block Dim',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('block-dim'),
+    formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('tile-dim', {
     label: 'Tile Dim',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('tile-dim'),
+    formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('grid-size', {
     label: 'Grid Size',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('grid-size'),
+    formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('processedLocation', {
     label: 'Processed Location',
     sortable: true,
     align: 'left',
-    formatter: simpleStringFormatter('processedLocation'),
+    formatter: (value) => value.toString(),
 });
 
 const useQueuesTable = (queuesList: QueuesTableFields[]) => {

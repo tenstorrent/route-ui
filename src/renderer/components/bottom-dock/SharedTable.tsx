@@ -1,4 +1,4 @@
-import { ChangeEvent, JSXElementConstructor, ReactElement, JSX } from 'react';
+import { ChangeEvent, JSXElementConstructor, ReactElement } from 'react';
 
 import { Cell, Column, ColumnHeaderCell2, IColumnProps } from '@blueprintjs/table';
 import { Checkbox, Icon } from '@blueprintjs/core';
@@ -22,14 +22,8 @@ export interface DataTableColumnDefinition<T extends TableFields> {
         nodesSelectionState: NodeSelectionState,
     ) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
     handleSelectAll?: (rows: T[], selected: boolean) => void;
-    formatter: (index: number, rows: T[], state?: any) => string | JSX.Element;
+    formatter: (value: any) => string;
 }
-
-export const simpleStringFormatter =
-    <T extends TableFields, K extends keyof T>(key: K) =>
-    (index: number, rows: T[]) => {
-        return rows[index][key as keyof T]?.toString() ?? '';
-    };
 
 const valueRatio = (a: number, b: number) => {
     if (a === 0) {
@@ -253,9 +247,8 @@ export const cellRenderer = <T extends TableFields>({
     isInteractive,
     className,
     customContent,
-    state,
 }: CellRenderingProps<T>) => {
-    const stringContent = definition?.formatter(rowIndex, tableFields, state) ?? '';
+    const stringContent = definition?.formatter(tableFields[rowIndex][key] ?? '');
 
     const alignClass = definition?.align && `align-${definition?.align}`;
 

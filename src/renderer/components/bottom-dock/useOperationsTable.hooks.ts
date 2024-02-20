@@ -4,10 +4,8 @@ import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import {
     DataTableColumnDefinition,
-    simpleStringFormatter,
     numberFormatter0,
     numberFormatter2,
-    ratioNumberFormatter,
     sortAsc,
     sortDesc,
     SortingDirection,
@@ -37,85 +35,97 @@ const operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinitio
 operationsTableColumns.set('grid_size', {
     label: 'Grid size',
     sortable: false,
-    formatter: simpleStringFormatter('grid_size'),
+    formatter: (value) => value.toString(),
 });
 operationsTableColumns.set('core_id', {
     label: 'Core ID',
     sortable: false,
     align: 'left',
     canSelectAllRows: true,
-    formatter: simpleStringFormatter('core_id'),
+    formatter: (value) => value.toString(),
 });
 operationsTableColumns.set('operation', {
     label: 'Operation',
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: simpleStringFormatter('name'),
+    formatter: (value) => value.toString(),
 });
 
 operationsTableColumns.set('bw_bound_total_runtime', {
     label: 'BW Bound Total Runtime',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => `${numberFormatter0.format(rows[index].bw_bound_total_runtime)} cycles`,
+    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
 });
 operationsTableColumns.set('kernel_total_runtime', {
     label: 'Kernel Total Runtime',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => `${numberFormatter0.format(rows[index].kernel_total_runtime)} cycles`,
+    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
 });
 
 operationsTableColumns.set('bw_bound_runtime_per_input', {
     label: 'BW Bound Runtime (cycles per input)',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => `${numberFormatter0.format(rows[index].bw_bound_runtime_per_input)} cycles`,
+    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles per input)',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => `${numberFormatter0.format(rows[index].kernel_runtime_per_input)} cycles`,
+    formatter: (value) => `${numberFormatter0.format(value)} cycles`,
 });
 operationsTableColumns.set('model_runtime_per_input', {
     label: 'Model Estimate (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: ratioNumberFormatter('model_runtime_per_input', 'kernel_runtime_per_input'),
+    formatter: (value: number) => {
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(value)) {
+            return 'n/a';
+        }
+        return numberFormatter0.format(value);
+    },
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: ratioNumberFormatter('kernel_runtime_per_input', 'model_runtime_per_input'),
+    formatter: (value: number) => {
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(value)) {
+            return 'n/a';
+        }
+        return numberFormatter0.format(value);
+    },
 });
 
 operationsTableColumns.set('bw_bound_math_utilization', {
     label: 'BW Bound Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => `${numberFormatter2.format(rows[index].bw_bound_math_utilization)}%`,
+    formatter: (value) => `${numberFormatter2.format(value)}%`,
 });
 operationsTableColumns.set('kernel_math_utilization', {
     label: 'Kernel Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => `${numberFormatter2.format(rows[index].kernel_math_utilization)}%`,
+    formatter: (value) => `${numberFormatter2.format(value)}%`,
 });
 operationsTableColumns.set('model_math_utilization', {
     label: 'Model Math Utilization',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => `${numberFormatter2.format(rows[index].model_math_utilization)}%`,
+    formatter: (value) => `${numberFormatter2.format(value)}%`,
 });
 
 operationsTableColumns.set('bw_limited_factor', {
     label: 'BW Limited Factor',
     sortable: true,
     align: 'right',
-    formatter: (index, rows) => numberFormatter2.format(rows[index].bw_limited_factor),
+    formatter: (value) => numberFormatter2.format(value),
 });
 
 operationsTableColumns.set('slowest_operand', {
@@ -123,7 +133,7 @@ operationsTableColumns.set('slowest_operand', {
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: (index, rows) => rows[index].slowestOperandRef?.name ?? '',
+    formatter: (value: Operand) => value?.name ?? '',
 });
 
 const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
