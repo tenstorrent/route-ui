@@ -89,6 +89,10 @@ operationsTableColumns.set('model_runtime_per_input', {
 
         const delta = valueDelta(rows[index].kernel_runtime_per_input, value);
 
+        if (Number.isNaN(delta)) {
+            return numberFormatter0.format(value);
+        }
+
         return `${numberFormatter0.format(value)} (${numberFormatter0.format(delta)} diff.)`;
     },
 });
@@ -105,6 +109,10 @@ operationsTableColumns.set('kernel_runtime_per_input', {
         }
 
         const delta = valueDelta(rows[index].model_runtime_per_input, value);
+
+        if (Number.isNaN(delta)) {
+            return numberFormatter0.format(value);
+        }
 
         return `${numberFormatter0.format(value)} (${numberFormatter0.format(delta)} diff.)`;
     },
