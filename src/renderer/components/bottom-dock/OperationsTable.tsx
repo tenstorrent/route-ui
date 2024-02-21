@@ -211,8 +211,7 @@ function OperationsTable() {
                 {ratio > operationRatioThreshold && (
                     <Icon
                         size={10}
-                        icon={IconNames.SYMBOL_TRIANGLE_UP}
-                        color='red'
+                        icon={IconNames.WARNING_SIGN}
                         title={`${numberFormatter(ratio)}x difference from "Kernel Runtime per Input"`}
                     />
                 )}
