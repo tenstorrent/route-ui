@@ -8,7 +8,9 @@ export const AICLK_INITIAL_MHZ = 1000;
 export const MAX_CONGESTION_VALUE = 120;
 export const INITIAL_OPERATION_PERFORMANCE_THRESHOLD = 1;
 export const MAX_OPERATION_PERFORMANCE_THRESHOLD = 5; // this is a where everything is red, not an actual limit
-export const MAX_OPERATION_RATIO_THRESHOLD = 2;
+export const MAX_MODEL_RATIO_THRESHOLD = 10;
+export const MIN_MODEL_RATIO_THRESHOLD = 0;
+
 
 export const INTERNAL_LINK_NAMES = [
     NOCLinkName.NOC0_IN,

@@ -13,17 +13,8 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { columnRenderer, numberFormatter } from './SharedTable';
+import { columnRenderer, numberFormatter, valueRatio } from './SharedTable';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
-
-
-const valueRatio = (a: number, b: number) => {
-    if (a === 0) {
-        return 0;
-    }
-
-    return Math.abs(b / a);
-};
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {

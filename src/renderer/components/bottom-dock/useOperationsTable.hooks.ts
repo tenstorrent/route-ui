@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
@@ -8,6 +8,7 @@ import {
     sortAsc,
     sortDesc,
     SortingDirection,
+    valueRatio,
 } from './SharedTable';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 
@@ -18,14 +19,6 @@ export interface OpTableFields extends MeasurementDetails {
     core_id: string;
     slowestOperandRef?: Operand;
 }
-
-type OperationsTableHook = {
-    sortedTableFields: OpTableFields[];
-    changeSorting: (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => void;
-    sortingColumn: OperationTableColumn;
-    sortDirection: SortingDirection;
-    operationsTableColumns: Map<OperationTableColumn, DataTableColumnDefinition<OpTableFields>>;
-};
 
 type OperationTableColumn = keyof OpTableFields | 'operation';
 
@@ -118,7 +111,7 @@ operationsTableColumns.set('kernel_runtime_per_input', {
     formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 
-const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
+const useOperationsTable = (opList: OpTableFields[]) => {
     const {
         handleSelectAllCores,
         handleSelectAllOperations,
@@ -147,6 +140,12 @@ const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
         setSortingColumn(selectedColumn);
     };
 
+    const maxModelEstimateRatio = useMemo(() => {
+        const modelEstimates = opList.map((op) => valueRatio(op.model_runtime_per_input, op.kernel_runtime_per_input));
+
+        return Math.ceil(Math.max(...modelEstimates));
+    }, [opList]);
+
     operationsTableColumns.get('core_id')!.handleSelectAll = handleSelectAllCores;
     operationsTableColumns.get('core_id')!.getSelectedState = getCoreSelectedState;
 
@@ -162,6 +161,7 @@ const useOperationsTable = (opList: OpTableFields[]): OperationsTableHook => {
         sortingColumn,
         sortDirection,
         operationsTableColumns,
+        maxModelEstimateRatio,
     };
 };
 

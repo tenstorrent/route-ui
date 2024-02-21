@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
     INITIAL_OPERATION_PERFORMANCE_THRESHOLD,
-    MAX_OPERATION_RATIO_THRESHOLD,
+    MAX_MODEL_RATIO_THRESHOLD,
     MAX_OPERATION_PERFORMANCE_THRESHOLD,
 } from '../../constants';
 
@@ -16,7 +16,7 @@ const operationPerformanceInitialState: OperationPerformanceState = {
     operationPerformanceTreshold: INITIAL_OPERATION_PERFORMANCE_THRESHOLD,
     showOperationPerformanceGrid: false,
     maxBwLimitedFactor: MAX_OPERATION_PERFORMANCE_THRESHOLD,
-    operationRatioThreshold: MAX_OPERATION_RATIO_THRESHOLD,
+    operationRatioThreshold: MAX_MODEL_RATIO_THRESHOLD,
 };
 
 const operationPerformanceSlice = createSlice({
