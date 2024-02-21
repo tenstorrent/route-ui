@@ -135,6 +135,9 @@ $dock-height: 420px;
         flex-direction: column;
         margin-inline: 10px;
 
+        .bp4-slider {
+            width: calc(100% - 10px);
+        }
     }
 
     hr {

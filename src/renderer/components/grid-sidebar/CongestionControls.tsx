@@ -82,7 +82,7 @@ export const CongestionControls: FC = () => {
                 className='congestion-legend'
                 style={{
                     ...(showOperationPerformanceGrid ? opCongestionLegendStyle : null),
-                    width: '100%',
+                    width: 'calc(100% - 10px)',
                     height: '3px',
                 }}
             />
@@ -149,7 +149,7 @@ export const CongestionControls: FC = () => {
                                 className='congestion-legend'
                                 style={{
                                     ...(showLinkSaturation ? congestionLegendStyle : null),
-                                    width: '100%',
+                                    width: 'calc(100% - 10px)',
                                     height: '3px',
                                 }}
                             />
