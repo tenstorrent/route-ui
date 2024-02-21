@@ -1,6 +1,7 @@
 import { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Slider } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import Collapsible from '../Collapsible';
 import type { RootState } from '../../../data/store/createStore';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
@@ -14,14 +15,15 @@ const ModelControls: FC = () => {
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector((state: RootState) => getOperationRatioThreshold(state));
     const { maxModelEstimateRatio } = useOperationsTable(
-        [...chip?.operations ?? []].map((op) => {
+        [...(chip?.operations ?? [])].map((op) => {
             return {
                 operation: op,
                 name: op.name,
                 ...op.details,
                 slowestOperandRef: op.slowestOperand,
             } as unknown as OpTableFields;
-        }));
+        }),
+    );
 
     const clampNumber = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
@@ -31,7 +33,7 @@ const ModelControls: FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
             }}
-            label='Model Estimate Controls'
+            label={<Tooltip2 content='Model estimate difference with runtime'>Model Estimate Diff.</Tooltip2>}
             isOpen={false}
         >
             <Slider

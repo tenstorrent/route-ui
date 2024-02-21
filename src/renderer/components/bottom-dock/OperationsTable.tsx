@@ -203,7 +203,7 @@ function OperationsTable() {
                     <Icon
                         size={10}
                         icon={IconNames.WARNING_SIGN}
-                        title={`${numberFormatter(ratio)}x difference from "Kernel Runtime per Input"`}
+                        title={`${numberFormatter(ratio)}x difference with "Kernel Runtime"`}
                     />
                 )}
                 <span>{numberFormatter(value, '', 0)}</span>

@@ -99,13 +99,13 @@ operationsTableColumns.set('kernel_total_runtime', {
     formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 operationsTableColumns.set('bw_bound_runtime_per_input', {
-    label: 'BW Bound Runtime (cycles per input)',
+    label: 'BW Bound Runtime (cycles/input)',
     sortable: true,
     align: 'right',
     formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
-    label: 'Kernel Runtime (cycles per input)',
+    label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
     formatter: (value) => numberFormatter(value, ' cycles', 0),
