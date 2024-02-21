@@ -38,9 +38,12 @@ const ModelControls: FC = () => {
                 min={MIN_MODEL_RATIO_THRESHOLD}
                 max={maxModelEstimateRatio || MAX_MODEL_RATIO_THRESHOLD}
                 labelStepSize={maxModelEstimateRatio > 5 ? Math.max(5, maxModelEstimateRatio / 5) : 1}
+                stepSize={0.2}
                 value={clampNumber(opperationRatioThreshold, MIN_MODEL_RATIO_THRESHOLD, maxModelEstimateRatio)}
                 onChange={(value: number) => dispatch(updateOperationRatioThreshold(value))}
-                labelRenderer={(value) => clampNumber(value, MIN_MODEL_RATIO_THRESHOLD, maxModelEstimateRatio).toFixed(0)}
+                labelRenderer={(value) =>
+                    clampNumber(value, MIN_MODEL_RATIO_THRESHOLD, maxModelEstimateRatio).toFixed(1)
+                }
             />
         </Collapsible>
     );
