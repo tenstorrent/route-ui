@@ -202,13 +202,13 @@ export const cellRenderer = <T extends TableFields>({
 }: CellRenderingProps<T>) => {
     const stringContent = definition?.formatter(tableFields[rowIndex][key] ?? '');
 
-    const alignClass = definition?.align && `align-${definition?.align}`;
+    const alignClass = (definition?.align && `align-${definition?.align}`) || '';
 
     return (
         <Cell
             interactive={isInteractive === true}
             key={`${key.toString()}-${rowIndex}`}
-            className={[alignClass, className].filter((c) => c).join(' ')}
+            className={[alignClass, className].join(' ')}
         >
             {customContent || stringContent}
         </Cell>
