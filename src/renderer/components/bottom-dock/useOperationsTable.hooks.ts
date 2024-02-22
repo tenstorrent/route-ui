@@ -2,15 +2,9 @@ import { useMemo, useState } from 'react';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
-import {
-    DataTableColumnDefinition,
-    numberFormatter,
-    sortAsc,
-    sortDesc,
-    SortingDirection,
-    valueRatio,
-} from './SharedTable';
+import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
+import { numberFormatter, valueRatio } from '../../utils/numbers';
 
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
@@ -72,13 +66,13 @@ operationsTableColumns.set('model_runtime_per_input', {
     label: 'Model Estimate (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => numberFormatter(value, '', 0)
+    formatter: (value: number) => numberFormatter(value, '', 0),
 });
 operationsTableColumns.set('kernel_runtime_per_input', {
     label: 'Kernel Runtime (cycles/input)',
     sortable: true,
     align: 'right',
-    formatter: (value: number) => numberFormatter(value, '', 0)
+    formatter: (value: number) => numberFormatter(value, '', 0),
 });
 operationsTableColumns.set('model_math_utilization', {
     label: 'Model Math Utilization',

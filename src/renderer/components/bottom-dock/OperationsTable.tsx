@@ -13,8 +13,9 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { columnRenderer, numberFormatter, valueRatio } from './SharedTable';
+import { columnRenderer } from './SharedTable';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
+import { numberFormatter, valueRatio } from '../../utils/numbers';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
