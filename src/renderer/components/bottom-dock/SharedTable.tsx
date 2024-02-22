@@ -208,7 +208,7 @@ export const cellRenderer = <T extends TableFields>({
         <Cell
             interactive={isInteractive === true}
             key={`${key.toString()}-${rowIndex}`}
-            className={`${alignClass} ${className}`}
+            className={`${alignClass} ${className ?? ''}`}
         >
             {customContent || stringContent}
         </Cell>
@@ -251,7 +251,7 @@ export const columnRenderer = <T extends TableFields>({
                     rowIndex,
                     tableFields,
                     isInteractive,
-                    className: `${cellClassName} ${customCellContentRenderer ? 'table-cell-interactive table-operation-cell' : undefined}`,
+                    className: `${cellClassName ?? ''} ${customCellContentRenderer && 'table-cell-interactive table-operation-cell'}`,
                     customContent: customCellContentRenderer?.(rowIndex),
                 })
             }
