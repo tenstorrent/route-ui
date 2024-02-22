@@ -208,7 +208,7 @@ export const cellRenderer = <T extends TableFields>({
         <Cell
             interactive={isInteractive === true}
             key={`${key.toString()}-${rowIndex}`}
-            className={[alignClass, className].join(' ')}
+            className={[alignClass, className].filter((c) => c).join(' ')}
         >
             {customContent || stringContent}
         </Cell>
