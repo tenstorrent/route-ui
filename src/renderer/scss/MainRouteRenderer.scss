@@ -135,6 +135,14 @@ $dock-height: 420px;
         flex-direction: column;
         margin-inline: 10px;
 
+        .congestion-legend {
+            width: calc(100% - 10px);
+            height: 3px;
+        }
+
+        .bp4-slider {
+            width: calc(100% - 10px);
+        }
     }
 
     hr {

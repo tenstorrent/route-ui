@@ -15,6 +15,8 @@ import { Operation } from '../../../data/GraphTypes';
 import { DataTableColumnDefinition, SortingDirection } from './SharedTable';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { columnRenderer } from './SharedTable';
+import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
+import { numberFormatter, valueRatio } from '../../utils/numbers';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -28,6 +30,7 @@ function OperationsTable() {
 
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
+    const operationRatioThreshold = useSelector(getOperationRatioThreshold);
 
     const resetOpTableDetails = () => {
         if (!chip) {
@@ -124,7 +127,7 @@ function OperationsTable() {
 
     const coreIdCellRenderer = (rowIndex: number) => {
         const definition = operationsTableColumns.get('core_id');
-        const cellContent = definition?.formatter(tableFields[rowIndex].core_id || '') ?? '';
+        const cellContent = definition?.formatter(tableFields[rowIndex].core_id) ?? '';
 
         return (
             <div className='op-element'>
@@ -187,27 +190,42 @@ function OperationsTable() {
         return slowOpString;
     };
 
+    const modelRuntimeCellRenderer = (rowIndex: number) => {
+        const value = tableFields[rowIndex].model_runtime_per_input;
+        const ratio = valueRatio(value, tableFields[rowIndex].kernel_runtime_per_input);
+
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(ratio)) {
+            return numberFormatter(value, '', 0);
+        }
+
+        return (
+            <span className='ratio-number'>
+                {ratio > operationRatioThreshold && (
+                    <Icon
+                        size={10}
+                        icon={IconNames.WARNING_SIGN}
+                        title={`${numberFormatter(ratio)}x difference with "Kernel Runtime"`}
+                    />
+                )}
+                <span>{numberFormatter(value, '', 0)}</span>
+            </span>
+        );
+    };
+
     const getCustomCellRenderer = (key: string) => {
         switch (key) {
             case 'slowest_operand':
                 return slowestOperandCellRenderer;
+            case 'model_runtime_per_input':
+                return modelRuntimeCellRenderer;
             default:
                 return undefined;
         }
     };
 
-
-    // TODO: uise definition instead
-    const columns = [
-        'kernel_math_utilization',
-        'bw_limited_factor',
-        'slowest_operand',
-        'bw_bound_total_runtime',
-        'bw_bound_math_utilization',
-        'model_runtime_per_input',
-        'kernel_runtime_per_input',
-        'kernel_total_runtime',
-    ];
+    const excludedColumns = ['operation', 'grid_size', 'core_id'];
+    const columns = Array.from(operationsTableColumns.keys()).filter((key) => !excludedColumns.includes(key));
 
     return (
         <Table2
@@ -229,6 +247,7 @@ function OperationsTable() {
                 coreView,
                 sortedTableFields,
                 tableFields.length,
+                operationRatioThreshold,
             ]}
         >
             {columnRenderer({

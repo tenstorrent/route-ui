@@ -11,7 +11,7 @@ export interface QueuesTableFields extends QueueDetailsJson {
 
 type QueueusTableColumn = keyof QueuesTableFields | 'queue';
 
-const queuesTableColumns: Map<QueueusTableColumn, DataTableColumnDefinition> = new Map();
+const queuesTableColumns: Map<QueueusTableColumn, DataTableColumnDefinition<QueuesTableFields>> = new Map();
 
 queuesTableColumns.set('queue', {
     label: 'Queue',
@@ -93,8 +93,8 @@ const useQueuesTable = (queuesList: QueuesTableFields[]) => {
         setSortingColumn(selectedColumn);
     };
 
-    queuesTableColumns.get('queue')!.handleSelectAll<QueuesTableFields> = handleSelectAllQueues;
-    queuesTableColumns.get('queue')!.getSelectedState<QueuesTableFields> = getQueuesSelectedState;
+    queuesTableColumns.get('queue')!.handleSelectAll = handleSelectAllQueues;
+    queuesTableColumns.get('queue')!.getSelectedState = getQueuesSelectedState;
 
     return { sortedTableFields, changeSorting, sortingColumn, sortDirection, queuesTableColumns };
 };

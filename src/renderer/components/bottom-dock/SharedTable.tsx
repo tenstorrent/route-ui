@@ -8,19 +8,20 @@ import type { NodeSelectionState } from '../../../data/StateTypes';
 import type { OpTableFields } from './useOperationsTable.hooks';
 import type { QueuesTableFields } from './useQueuesTable.hook';
 
+import '../../scss/SharedTable.scss';
+
 export type TableFields = OpTableFields | QueuesTableFields;
 
-export interface DataTableColumnDefinition {
+export interface DataTableColumnDefinition<T extends TableFields> {
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
     canSelectAllRows?: boolean;
-    getSelectedState?: <T extends TableFields>(
+    getSelectedState?: (
         rows: T[],
         nodesSelectionState: NodeSelectionState,
     ) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
-    handleSelectAll?: <T extends TableFields>(rows: T[], selected: boolean) => void;
-    // TODO: make it output an Element or string
+    handleSelectAll?: (rows: T[], selected: boolean) => void;
     formatter: (value: any) => string;
 }
 
@@ -107,7 +108,7 @@ export const getSelectedState = <T extends TableFields>(
 };
 
 interface HeaderRenderingProps<T extends TableFields> {
-    definition?: DataTableColumnDefinition;
+    definition?: DataTableColumnDefinition<T>;
     sortDirection: SortingDirection;
     sortingColumn: keyof T;
     column: keyof T;
@@ -180,7 +181,7 @@ export const headerRenderer = <T extends TableFields>({
 };
 
 interface CellRenderingProps<T extends TableFields> {
-    definition?: DataTableColumnDefinition;
+    definition?: DataTableColumnDefinition<T>;
     key: keyof T;
     rowIndex: number;
     tableFields: T[];
@@ -198,15 +199,15 @@ export const cellRenderer = <T extends TableFields>({
     className,
     customContent,
 }: CellRenderingProps<T>) => {
-    const stringContent = definition?.formatter(tableFields[rowIndex][key] || '') ?? '';
+    const stringContent = definition?.formatter(tableFields[rowIndex][key] ?? '');
 
-    const alignClass = definition?.align && `align-${definition?.align}`;
+    const alignClass = (definition?.align && `align-${definition?.align}`) || '';
 
     return (
         <Cell
             interactive={isInteractive === true}
             key={`${key.toString()}-${rowIndex}`}
-            className={[alignClass, className].join(' ')}
+            className={`${alignClass} ${className ?? ''}`}
         >
             {customContent || stringContent}
         </Cell>
@@ -215,7 +216,7 @@ export const cellRenderer = <T extends TableFields>({
 
 export interface ColumnRendererProps<T extends TableFields> {
     key: keyof T;
-    columnDefinition: Map<keyof T, DataTableColumnDefinition>;
+    columnDefinition: Map<keyof T, DataTableColumnDefinition<T>>;
     changeSorting: (column: keyof T) => (direction: SortingDirection) => void;
     sortDirection: SortingDirection;
     sortingColumn: keyof T;
@@ -249,10 +250,7 @@ export const columnRenderer = <T extends TableFields>({
                     rowIndex,
                     tableFields,
                     isInteractive,
-                    className: [
-                        cellClassName,
-                        customCellContentRenderer ? 'table-cell-interactive table-operation-cell' : undefined,
-                    ].join(' '),
+                    className: `${cellClassName ?? ''} ${customCellContentRenderer && 'table-cell-interactive table-operation-cell'}`,
                     customContent: customCellContentRenderer?.(rowIndex),
                 })
             }
