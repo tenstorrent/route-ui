@@ -80,11 +80,7 @@ export const CongestionControls: FC = () => {
             />
             <div
                 className='congestion-legend'
-                style={{
-                    ...(showOperationPerformanceGrid ? opCongestionLegendStyle : null),
-                    width: 'calc(100% - 10px)',
-                    height: '3px',
-                }}
+                style={{ ...(showOperationPerformanceGrid ? opCongestionLegendStyle : null) }}
             />
             <Slider
                 className='link-saturation-slider'
@@ -147,11 +143,7 @@ export const CongestionControls: FC = () => {
                             />
                             <div
                                 className='congestion-legend'
-                                style={{
-                                    ...(showLinkSaturation ? congestionLegendStyle : null),
-                                    width: 'calc(100% - 10px)',
-                                    height: '3px',
-                                }}
+                                style={{ ...(showLinkSaturation ? congestionLegendStyle : null) }}
                             />
                             <Slider
                                 className='link-saturation-slider'
