@@ -104,12 +104,6 @@ operationsTableColumns.set('bw_bound_runtime_per_input', {
     align: 'right',
     formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
-operationsTableColumns.set('kernel_runtime_per_input', {
-    label: 'Kernel Runtime (cycles/input)',
-    sortable: true,
-    align: 'right',
-    formatter: (value) => numberFormatter(value, ' cycles', 0),
-});
 
 const useOperationsTable = (opList: OpTableFields[]) => {
     const {
