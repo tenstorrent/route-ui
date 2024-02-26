@@ -1,11 +1,12 @@
 import { FC } from 'react';
-import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
+import { AnchorButton, Button, Icon, MenuItem } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
 import { IconNames } from '@blueprintjs/icons';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
 import PopoverMenu from '../PopoverMenu';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
+import { getRelativeTimeString } from '../../../utils/DateAndTime';
 
 const formatRemoteFolderName = (folder: RemoteFolder) => {
     return folder.testName;
@@ -13,6 +14,14 @@ const formatRemoteFolderName = (folder: RemoteFolder) => {
 
 const filterFolders: ItemPredicate<RemoteFolder> = (query, folder) => {
     return formatRemoteFolderName(folder).toLowerCase().includes(query.toLowerCase());
+};
+
+const shouldReSyncFolder = (folder: RemoteFolder) => {
+    const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+    const lastSynced = new Date(folder.lastSynced ?? 0);
+    const millisecondsSinceLastSync = Date.now() - lastSynced.getTime();
+
+    return millisecondsSinceLastSync > ONE_HOUR_IN_MS;
 };
 
 const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick, modifiers }) => {
@@ -27,6 +36,20 @@ const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick,
             key={`${formatRemoteFolderName(folder)}${folder.lastSynced ?? folder.lastFetched}`}
             onClick={handleClick}
             text={formatRemoteFolderName(folder)}
+            // @ts-expect-error - Hack abusing label, it actually works.
+            label={
+                shouldReSyncFolder(folder) ? (
+                    <Tooltip2 content={`Folder may be stale, last sync: ${getRelativeTimeString(folder.lastSynced)}`}>
+                        <Icon icon={IconNames.HISTORY} color='goldenrod' />
+                    </Tooltip2>
+                ) : (
+                    <Tooltip2
+                        content={`Folder is probably up to date, last sync: ${getRelativeTimeString(folder.lastSynced)}`}
+                    >
+                        <Icon icon={IconNames.UPDATED} color='green' />
+                    </Tooltip2>
+                )
+            }
         />
     );
 };
