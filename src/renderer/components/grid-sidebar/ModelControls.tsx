@@ -7,11 +7,11 @@ import type { RootState } from '../../../data/store/createStore';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 import { updateOperationRatioThreshold } from '../../../data/store/slices/operationPerf.slice';
 import useOperationsTable, { type OpTableFields } from '../bottom-dock/useOperationsTable.hooks';
-import DataSource from '../../../data/DataSource';
-import { MIN_MODEL_RATIO_THRESHOLD, MAX_MODEL_RATIO_THRESHOLD } from '../../../data/constants';
+import { MAX_MODEL_RATIO_THRESHOLD, MIN_MODEL_RATIO_THRESHOLD } from '../../../data/constants';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 const ModelControls: FC = () => {
-    const { chip } = useContext(DataSource);
+    const chip = useContext(ChipContext).getActiveChip();
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector((state: RootState) => getOperationRatioThreshold(state));
     const { maxModelEstimateRatio } = useOperationsTable(
