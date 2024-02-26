@@ -12,5 +12,4 @@ const root = createRoot(container);
 root.render(<App />);
 
 updateStateOnEvent(ElectronEvents.TOGGLE_LOG_OUTPUT, setLogOutputEnabled);
-updateStateOnEvent(ElectronEvents.TOGGLE_QUEUES_TABLE, toggleQueuesTable);
-// TODO: Get initial saved state for feature flags
+updateStateOnEvent(ElectronEvents.TOGGLE_QUEUES_TABLE, toggleQueuesTable, true);
