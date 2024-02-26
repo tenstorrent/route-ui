@@ -12,12 +12,13 @@ const pipeSelectionSlice = createSlice({
     initialState: pipesInitialState,
     reducers: {
         loadPipeSelection(state, action: PayloadAction<PipeSelection[]>) {
-            state.pipes = {};
-            state.pipeIds = [];
+            // state.pipes = {};
+            // state.pipeIds = [];
             action.payload.forEach((item) => {
                 state.pipes[item.id] = item;
                 state.pipeIds.push(item.id);
             });
+            state.pipeIds = [...new Set(state.pipeIds)];
         },
         updateFocusPipe(state, action: PayloadAction<string | null>) {
             state.focusPipe = action.payload;
@@ -38,6 +39,10 @@ const pipeSelectionSlice = createSlice({
                 state.pipes[id].selected = true;
             });
         },
+        resetPipeSelection(state) {
+            state.pipes = {};
+            state.pipeIds = [];
+        },
     },
 });
 export const {
@@ -47,6 +52,7 @@ export const {
     clearAllPipes,
     selectAllPipes,
     updateFocusPipe,
+    resetPipeSelection,
 } = pipeSelectionSlice.actions;
 
 export const pipeSelectionReducer = pipeSelectionSlice.reducer;

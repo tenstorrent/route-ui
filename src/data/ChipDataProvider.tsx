@@ -15,6 +15,7 @@ interface ChipContextType {
     setGraphName: (graphName: string) => void;
     getActiveChip: () => Chip | undefined;
     setActiveChip: (graphName: string) => void;
+    getChipByGraphName: (graphName: string) => Chip | undefined;
 }
 
 const initialChipsState: ChipsState = {
@@ -29,6 +30,7 @@ const ChipContext = createContext<ChipContextType>({
     setGraphName: () => {},
     getActiveChip: () => undefined,
     setActiveChip: () => {},
+    getChipByGraphName: () => undefined,
 });
 
 const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -44,6 +46,10 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             graphName,
         }));
     }, []);
+
+    const getChipByGraphName = useCallback((graphName: string) => {
+        return chipsState.chips[graphName];
+    }, [chipsState.chips]);
 
     const resetChips = useCallback(() => {
         setChipsState(initialChipsState);
@@ -75,8 +81,9 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             setGraphName,
             getActiveChip,
             setActiveChip,
+            getChipByGraphName,
         }),
-        [chipsState, addChip, resetChips, setGraphName, getActiveChip, setActiveChip],
+        [chipsState, addChip, resetChips, setGraphName, getActiveChip, setActiveChip, getChipByGraphName],
     );
 
     return <ChipContext.Provider value={value}>{children}</ChipContext.Provider>;

@@ -15,7 +15,7 @@ const usePopulateChipData = () => {
         dispatch(updateMaxBwLimitedFactor(selectedChip.details.maxBwLimitedFactor));
         dispatch(closeDetailedView());
         dispatch(setSelectedArchitecture(selectedChip.architecture));
-        dispatch(loadPipeSelection(selectedChip.generateInitialPipesSelectionState()));
+        // dispatch(loadPipeSelection(selectedChip.generateInitialPipesSelectionState()));
         dispatch(loadNodesData([...mapIterable(selectedChip.nodes, (node) => node.generateInitialState())]));
         dispatch(loadLinkData(selectedChip.getAllLinks().map((link) => link.generateInitialState())));
         dispatch(updateTotalOPs(selectedChip.totalOpCycles));

@@ -704,6 +704,23 @@ export default class Chip {
         return links;
     }
 
+    get ethernetPipes(): PipeSegment[] {
+        return [...this.nodes]
+            .filter((node) => node.type === ComputeNodeType.ETHERNET)
+            .map((node) => {
+                return (
+                    node
+                        .getInternalLinksForNode()
+                        .filter(
+                            (link) => link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT,
+                        )
+                        .map((link) => link.pipes)
+                        .flat() || []
+                );
+            })
+            .flat();
+    }
+
     get allUniquePipes(): PipeSegment[] {
         if (!this.uniquePipeSegmentList.length) {
             this.uniquePipeSegmentList = [...this.pipes.values()]
