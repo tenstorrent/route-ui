@@ -14,6 +14,10 @@ const formatConnectionString = (connection?: RemoteConnection) => {
     return `${connection.name} - ssh://${connection.host}:${connection.port}/${connection.path.replace(/^\//gi, '')}`;
 };
 
+const filterRemoteConnections = (query: string, connection: RemoteConnection) => {
+    return formatConnectionString(connection).toLowerCase().includes(query.toLowerCase());
+};
+
 const renderRemoteConnection: ItemRenderer<RemoteConnection> = (connection, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
@@ -62,6 +66,8 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                 itemRenderer={renderRemoteConnection}
                 disabled={disabled}
                 filterable
+                itemPredicate={filterRemoteConnections}
+                noResults={<MenuItem disabled text='No results.' roleStructure='listoption' />}
                 onItemSelect={onSelectConnection}
             >
                 <Button
@@ -104,7 +110,7 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                 icon={IconNames.LOG_IN}
                 disabled={disabled || !selectedConnection}
                 loading={loading}
-                text='Get remote folders list'
+                text='Fetch remote folders list'
                 onClick={() => onSyncRemoteFolders(selectedConnection)}
             />
         </div>
