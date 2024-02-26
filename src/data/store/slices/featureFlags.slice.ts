@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { FeatureFlagsState } from 'data/StateTypes';
 
 const featureFlagsInitialState: FeatureFlagsState = {
@@ -9,8 +9,8 @@ export const featureflagsSlice = createSlice({
     name: 'featureFlags',
     initialState: featureFlagsInitialState,
     reducers: {
-        toggleQueuesTable: (state) => {
-            state.showQueuesTable = !state.showQueuesTable;
+        toggleQueuesTable: (state, action: PayloadAction<boolean | undefined>) => {
+            state.showQueuesTable = action.payload ?? !state.showQueuesTable;
         },
     },
 });
