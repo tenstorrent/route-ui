@@ -29,7 +29,7 @@ const ClusterViewDialog: React.FC<DetailedViewProps> = ({ zoom }) => {
         >
 
             <div className={'cluster-view-wrap'}>
-                <div className='cluster-view-container'>
+                <div className=''>
                     <div className='cluster-view-header'>
                         <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeClusterView())} />
                     </div>

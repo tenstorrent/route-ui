@@ -24,6 +24,7 @@ import useLogging from './useLogging.hook';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
+import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -66,6 +67,7 @@ const usePerfAnalyzerFileLoader = () => {
 
     const loadFolder = async (folderPath: string): Promise<void> => {
         resetChips();
+        dispatch(resetPipeSelection());
         setError(null);
 
         try {
@@ -84,6 +86,7 @@ const usePerfAnalyzerFileLoader = () => {
             sortedGraphs.forEach(async (graph) => {
                 const graphOnChip = await loadGraph(folderPath, graph);
                 addChip(graphOnChip, graph.name);
+                dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
             });
         } catch (e) {
             const err = e as Error;

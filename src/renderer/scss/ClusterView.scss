@@ -28,7 +28,14 @@
 }
 
 .cluster-view-container {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 31px;
+    margin-bottom: 50px;
+}
 
+.cluster-view-pipelist {
+    //display: flex;
 }
 
 .cluster-view-wrap {
@@ -37,7 +44,24 @@
     display: flex;
     justify-items: center;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 
+    .eth {
+        border-color: #99c4ff;
+        border-width: 1px;
+        border-style: solid;
+        &.eth-position-top {
+            border-top-color: transparent;
+        }
+        &.eth-position-bottom {
+            border-bottom-color: transparent;
+        }
+        &.eth-position-left {
+            border-left-color: transparent;
+        }
+        &.eth-position-right {
+            border-right-color: transparent;
+        }
+    }
 
 }

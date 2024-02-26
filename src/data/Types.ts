@@ -111,3 +111,10 @@ export enum LogLevel {
     WARNING = 'warning',
     LOG = 'log',
 }
+
+export enum CLUSTER_ETH_POSITION {
+    TOP = 'top',
+    BOTTOM = 'bottom',
+    LEFT = 'left',
+    RIGHT = 'right',
+}

@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
 import {
+    CLUSTER_ETH_POSITION,
     DramBankLinkName,
     EthernetLinkName,
     NetworkLinkName,
@@ -15,7 +16,7 @@ import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../da
 import { ComputeNodeSiblings } from '../data/StateTypes';
 
 export const NODE_SIZE = 100;
-export const CHIP_SIZE = 150;
+export const CHIP_SIZE = 200;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
 const CENTER_DISPERSION = 10; // dispersion from the starting point
 const NOC_0_X_OFFSET = -CENTER_DISPERSION;
@@ -102,6 +103,47 @@ export const drawLink = (
             .attr('fill', color || '#7e7e7e');
     }
 };
+
+export const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, size: number) => {
+    let lineStartX: number = 0;
+    let lineEndX: number = 0;
+    let lineStartY: number = 0;
+    let lineEndY: number = 0;
+
+    // const arrowHeadHeight = 5;
+    // const arrowHeadWidth = 5;
+    // let arrowOffset = 5;
+
+    const arrow = { p1: '', p2: '', p3: '' };
+
+    switch (ethPosition) {
+        case CLUSTER_ETH_POSITION.TOP:
+        case CLUSTER_ETH_POSITION.BOTTOM:
+            // arrowOffset = 5;
+            lineStartX = size / 2;
+            lineStartY = 0
+            lineEndX = size / 2;
+            lineEndY = size;
+            break;
+        case CLUSTER_ETH_POSITION.LEFT:
+        case CLUSTER_ETH_POSITION.RIGHT:
+            // arrowOffset = 5;
+            lineStartX = 0;
+            lineStartY = size / 2;
+            lineEndX = size;
+            lineEndY = size / 2;
+        // arrow = {
+        //     p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+        //     p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+        //     p3: `${lineEndX},${lineEndY + arrowOffset}`,
+        // };
+            break;
+        default:
+            console.error('Invalid eth position');
+    }
+    return { lineEndX, lineEndY, lineStartX, lineStartY, arrow };
+};
+
 export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderType = LinkRenderType.GRID) => {
     let lineStartX: number = 0;
     let lineEndX: number = 0;
