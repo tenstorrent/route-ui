@@ -1,12 +1,12 @@
-import { FC } from 'react';
 import { AnchorButton, Button, Icon, MenuItem } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
-import { IconNames } from '@blueprintjs/icons';
+import { FC } from 'react';
+import { getRelativeTimeString } from '../../../utils/DateAndTime';
+import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
 import PopoverMenu from '../PopoverMenu';
-import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
-import { getRelativeTimeString } from '../../../utils/DateAndTime';
 
 const formatRemoteFolderName = (folder: RemoteFolder) => {
     return folder.testName;
@@ -17,11 +17,14 @@ const filterFolders: ItemPredicate<RemoteFolder> = (query, folder) => {
 };
 
 const shouldReSyncFolder = (folder: RemoteFolder) => {
-    const ONE_HOUR_IN_MS = 60 * 60 * 1000;
-    const lastSynced = new Date(folder.lastSynced ?? 0);
-    const millisecondsSinceLastSync = Date.now() - lastSynced.getTime();
+    if (!folder.lastSynced) {
+        return true;
+    }
 
-    return millisecondsSinceLastSync > ONE_HOUR_IN_MS;
+    const lastSynced = new Date(folder.lastSynced);
+    const lastModified = new Date(folder.lastModified);
+
+    return lastModified > lastSynced;
 };
 
 const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick, modifiers }) => {
@@ -33,19 +36,17 @@ const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick,
         <MenuItem
             active={modifiers.active}
             disabled={modifiers.disabled}
-            key={`${formatRemoteFolderName(folder)}${folder.lastSynced ?? folder.lastFetched}`}
+            key={`${formatRemoteFolderName(folder)}${folder.lastSynced ?? folder.lastModified}`}
             onClick={handleClick}
             text={formatRemoteFolderName(folder)}
             // @ts-expect-error - Hack abusing label, it actually works.
             label={
                 shouldReSyncFolder(folder) ? (
-                    <Tooltip2 content={`Folder may be stale, last sync: ${getRelativeTimeString(folder.lastSynced)}`}>
+                    <Tooltip2 content={`Folder is stale, last sync: ${getRelativeTimeString(folder.lastSynced)}`}>
                         <Icon icon={IconNames.HISTORY} color='goldenrod' />
                     </Tooltip2>
                 ) : (
-                    <Tooltip2
-                        content={`Folder is probably up to date, last sync: ${getRelativeTimeString(folder.lastSynced)}`}
-                    >
+                    <Tooltip2 content={`Folder is up to date, last sync: ${getRelativeTimeString(folder.lastSynced)}`}>
                         <Icon icon={IconNames.UPDATED} color='green' />
                     </Tooltip2>
                 )

@@ -16,15 +16,14 @@ import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFold
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
 import { useContext, useEffect, useState } from 'react';
-import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { useNavigate } from 'react-router-dom';
-import usePopulateChipData from './usePopulateChipData.hooks';
-import { GraphRelationshipState } from '../../data/StateTypes';
-import useLogging from './useLogging.hook';
-import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
+import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ChipContext } from '../../data/ChipDataProvider';
+import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
+import useLogging from './useLogging.hook';
+import usePopulateChipData from './usePopulateChipData.hooks';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -127,9 +126,15 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
+    const resetAvailableGraphs = (): void => {
+        dispatch(setAvailableGraphs([]));
+        dispatch(setSelectedGraphName(''));
+    };
+
     return {
         loadPerfAnalyzerFolder,
         loadPerfAnalyzerGraph,
+        resetAvailableGraphs,
         error,
         selectedGraph,
         availableGraphs,

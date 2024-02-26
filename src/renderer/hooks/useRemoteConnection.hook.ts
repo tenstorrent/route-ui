@@ -1,8 +1,8 @@
 import { spawn } from 'child_process';
-import path from 'path';
-import { mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
 import dns from 'dns';
+import { existsSync } from 'fs';
+import { mkdir } from 'fs/promises';
+import path from 'path';
 
 import useLogging from './useLogging.hook';
 
@@ -32,9 +32,11 @@ export interface RemoteFolder {
     /** Name of the test results folder */
     testName: string;
     /** Remote absolute path to the test results folder */
-    path: string;
-    /** Last time the folder was fetched from remote */
-    lastFetched: string;
+    remotePath: string;
+    /** Local absolute path to the test results folder */
+    localPath: string;
+    /** Last time the folder was modified on remote */
+    lastModified: string;
     /** Last time the folder was synced */
     lastSynced?: string;
 }
@@ -135,28 +137,44 @@ const useRemoteConnection = () => {
         }
     };
 
+    const testLocalFolder = (localPath?: string) => {
+        return localPath && existsSync(localPath);
+    };
+
     const listRemoteFolders = async (connection?: RemoteConnection) => {
         if (!connection || !connection.host || !connection.port) {
             throw new Error('No connection provided');
         }
 
         const parseResults = (results: string) =>
-            results
-                .split('\n')
-                .filter((s) => s.length > 0)
-                .map((fullPath) => ({
-                    testName: fullPath.split('/').reverse()[1],
-                    path: fullPath.split('/').slice(0, -1).join('/'),
-                    lastFetched: new Date().toISOString(),
-                }));
+            Promise.all(
+                results
+                    .split('\n')
+                    .filter((s) => s.length > 0)
+                    .map<Promise<RemoteFolder>>(async (folderInfo) => {
+                        const remote = await import('@electron/remote');
+
+                        const [lastModified, remoteFolderPath] = folderInfo.split(';');
+                        const configDir = remote.app.getPath('userData');
+                        const folderName = path.basename(remoteFolderPath);
+                        const localFolderForRemote = `${connection.name}-${connection.host}${connection.port}`;
+
+                        return {
+                            testName: folderName,
+                            remotePath: remoteFolderPath,
+                            localPath: path.join(configDir, 'remote-tests', localFolderForRemote, folderName),
+                            lastModified: new Date(lastModified).toISOString(),
+                        };
+                    }),
+            );
 
         // TODO: consider `device_description.yaml` or `cluster_description.yaml`
-        const findCommand = `'find -L ${connection.path} -mindepth 1 -maxdepth 3 -type f -name device_desc.yaml'`;
+        const findCommand = `'find -L ${connection.path} -mindepth 1 -maxdepth 3 -type f -name device_desc.yaml -printf "%TFT%TT%Tz;%h\n"'`;
         const sshParams = [...defaultSshOptions, connection.host, '-p', connection.port.toString(), findCommand];
 
         const stdout = await runShellCommand('ssh', sshParams);
 
-        return stdout ? parseResults(stdout.toString()) : [];
+        return stdout ? parseResults(stdout) : ([] as RemoteFolder[]);
     };
 
     const syncRemoteFolder = async (connection?: RemoteConnection, remoteFolder?: RemoteFolder) => {
@@ -168,18 +186,18 @@ const useRemoteConnection = () => {
             throw new Error('No remote folder provided');
         }
 
-        const remote = await import('@electron/remote');
-
-        const configDir = remote.app.getPath('userData');
-        const localCopyPath = path.join(configDir, 'remote-tests/');
-
-        if (!existsSync(localCopyPath)) {
-            await mkdir(localCopyPath);
+        if (!existsSync(remoteFolder.localPath)) {
+            await mkdir(remoteFolder.localPath, { recursive: true });
         }
 
-        const sourcePath = `${connection.host}:${escapeWhitespace(remoteFolder.path)}`;
+        const sourcePath = `${connection.host}:${escapeWhitespace(remoteFolder.remotePath)}`;
         const baseOptions = ['-az', '-e', `'ssh -p ${connection.port.toString()}'`];
-        const pathOptions = ['--delete', `'${sourcePath}'`, escapeWhitespace(localCopyPath)];
+        const pathOptions = [
+            '--delete',
+            `'${sourcePath}'`,
+            escapeWhitespace(remoteFolder.localPath.replace(remoteFolder.testName, '')),
+        ];
+
         try {
             // Try first with the `-s` option
             await runShellCommand('rsync', ['-s', ...baseOptions, ...pathOptions]);
@@ -191,13 +209,12 @@ const useRemoteConnection = () => {
             // Try again, this time without `-s` option
             await runShellCommand('rsync', [...baseOptions, ...pathOptions]);
         }
-
-        return path.join(localCopyPath, remoteFolder.testName);
     };
 
     return {
         testConnection,
         testRemoteFolder,
+        testLocalFolder,
         syncRemoteFolder,
         listRemoteFolders,
     };
