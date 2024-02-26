@@ -1,7 +1,7 @@
 import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
 
 import { ElectronEvents } from './ElectronEvents';
-import { sendEventToWindow } from './utils/bridge';
+import { listenToEventFromWindow, sendEventToWindow } from './utils/bridge';
 
 export default class MenuBuilder {
     mainWindow: BrowserWindow;
@@ -19,6 +19,14 @@ export default class MenuBuilder {
 
         const menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);
+
+        listenToEventFromWindow(ElectronEvents.TOGGLE_QUEUES_TABLE, (isChecked) => {
+            const menuItem = menu.getMenuItemById('toggleQueuesTable');
+
+            if (menuItem) {
+                menuItem.checked = isChecked;
+            }
+        });
 
         return menu;
     }
@@ -85,6 +93,7 @@ export default class MenuBuilder {
                         submenu: [
                             {
                                 label: 'Toggle Queues Table',
+                                id: 'toggleQueuesTable',
                                 type: 'checkbox',
                                 checked: false,
                                 click: (menuItem) => {
@@ -159,6 +168,25 @@ export default class MenuBuilder {
 
                             sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
                         },
+                    },
+                    {
+                        label: 'Feature Flags',
+                        type: 'submenu',
+                        submenu: [
+                            {
+                                label: 'Toggle Queues Table',
+                                id: 'toggleQueuesTable',
+                                type: 'checkbox',
+                                checked: false,
+                                click: (menuItem) => {
+                                    sendEventToWindow(
+                                        this.mainWindow,
+                                        ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        menuItem.checked,
+                                    );
+                                },
+                            },
+                        ],
                     },
                     ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
                         ? subMenuViewDev
