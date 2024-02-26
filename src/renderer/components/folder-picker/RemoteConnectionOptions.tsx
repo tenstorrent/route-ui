@@ -13,9 +13,13 @@ import RemoteFolderSelector from './RemoteFolderSelector';
 const RemoteConnectionOptions: FC = () => {
     const { getAppConfig, setAppConfig } = useAppConfig();
 
+    const getSavedRemoteFolders = (connection: RemoteConnection) => {
+        return JSON.parse(getAppConfig(`${connection.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
+    };
+
     const savedConnections = JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
     const [selectedConnection, setSelectedConnection] = useState<RemoteConnection | undefined>(savedConnections[0]);
-    const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>([]);
+    const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(getSavedRemoteFolders(savedConnections[0]));
     const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
     const { listRemoteFolders, syncRemoteFolder } = useRemoteConnection();
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
@@ -38,6 +42,8 @@ const RemoteConnectionOptions: FC = () => {
 
                         setAppConfig('remoteConnections', JSON.stringify(newConnections));
                         setSelectedConnection(newConnection);
+                        setRemoteFolders([]);
+                        setSelectedFolder(undefined);
                     }}
                 />
             </FormGroup>
@@ -52,21 +58,24 @@ const RemoteConnectionOptions: FC = () => {
                     connections={savedConnections}
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     loading={isLoadingFolderList}
-                    onEditConnection={(newConnection) => {
+                    onEditConnection={(updatedConnection) => {
                         const newConnections = savedConnections.map((c) => {
-                            const isSameName = c.name === newConnection.name;
-                            const isSameHost = c.host === newConnection.host;
-                            const isSamePort = c.port === newConnection.port;
+                            const isSameName = c.name === updatedConnection.name;
+                            const isSameHost = c.host === updatedConnection.host;
+                            const isSamePort = c.port === updatedConnection.port;
 
                             if (isSameName && isSameHost && isSamePort) {
-                                return newConnection;
+                                return updatedConnection;
                             }
 
                             return c;
                         });
+                        const savedRemotefolders = getSavedRemoteFolders(updatedConnection);
 
                         setAppConfig('remoteConnections', JSON.stringify(newConnections));
-                        setSelectedConnection(newConnection);
+                        setSelectedConnection(updatedConnection);
+                        setRemoteFolders(savedRemotefolders);
+                        setSelectedFolder(savedRemotefolders[0]);
                     }}
                     onRemoveConnection={(connection) => {
                         const newConnections = savedConnections.filter((c) => {
@@ -76,17 +85,31 @@ const RemoteConnectionOptions: FC = () => {
 
                             return !(isSameName && isSameHost && isSamePort);
                         });
+                        const savedRemotefolders = getSavedRemoteFolders(newConnections[0]);
 
                         setAppConfig('remoteConnections', JSON.stringify(newConnections));
                         setSelectedConnection(newConnections[0]);
+                        setRemoteFolders(savedRemotefolders);
+                        setSelectedFolder(savedRemotefolders[0]);
                     }}
-                    onSelectConnection={(connection) => setSelectedConnection(connection)}
+                    onSelectConnection={(connection) => {
+                        const savedRemoteFolders = getSavedRemoteFolders(connection);
+
+                        setSelectedConnection(connection);
+                        setRemoteFolders(savedRemoteFolders);
+                        setSelectedFolder(savedRemoteFolders[0]);
+                    }}
                     onSyncRemoteFolders={async () => {
                         setIsLoadingFolderList(true);
                         try {
-                            const remoteFolder = await listRemoteFolders(selectedConnection);
-                            setRemoteFolders(remoteFolder);
-                            setSelectedFolder(remoteFolder[0]);
+                            const savedRemotefolders = await listRemoteFolders(selectedConnection);
+
+                            setAppConfig(
+                                `${selectedConnection?.name}-remoteFolders`,
+                                JSON.stringify(savedRemotefolders),
+                            );
+                            setRemoteFolders(savedRemotefolders);
+                            setSelectedFolder(savedRemotefolders[0]);
                         } catch (err) {
                             logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
@@ -113,6 +136,19 @@ const RemoteConnectionOptions: FC = () => {
                         setIsSyncingRemoteFolder(true);
                         try {
                             const localFolder = await syncRemoteFolder(selectedConnection, selectedFolder);
+                            const savedRemoteFolders = JSON.parse(
+                                getAppConfig(`${selectedConnection?.name}-remoteFolders`) ?? '[]',
+                            ) as RemoteFolder[];
+
+                            const syncDate = new Date().toISOString();
+                            savedRemoteFolders.find((f) => f.path === selectedFolder?.path)!.lastSynced = syncDate;
+
+                            setAppConfig(
+                                `${selectedConnection?.name}-remoteFolders`,
+                                JSON.stringify(savedRemoteFolders),
+                            );
+
+                            setRemoteFolders(savedRemoteFolders);
 
                             await loadPerfAnalyzerFolder(localFolder);
                         } catch (err) {

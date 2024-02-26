@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { ItemRenderer, Select2 } from '@blueprintjs/select';
+import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
 import { IconNames } from '@blueprintjs/icons';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
 import PopoverMenu from '../PopoverMenu';
@@ -24,7 +24,7 @@ const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick,
         <MenuItem
             active={modifiers.active}
             disabled={modifiers.disabled}
-            key={formatRemoteFolderName(folder)}
+            key={`${formatRemoteFolderName(folder)}${folder.lastSynced ?? folder.lastFetched}`}
             onClick={handleClick}
             text={formatRemoteFolderName(folder)}
         />

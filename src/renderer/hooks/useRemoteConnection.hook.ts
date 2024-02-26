@@ -33,6 +33,10 @@ export interface RemoteFolder {
     testName: string;
     /** Remote absolute path to the test results folder */
     path: string;
+    /** Last time the folder was fetched from remote */
+    lastFetched: string;
+    /** Last time the folder was synced */
+    lastSynced?: string;
 }
 
 const escapeWhitespace = (str: string) => str.replace(/(\s)/g, '\\$1');
@@ -143,6 +147,7 @@ const useRemoteConnection = () => {
                 .map((fullPath) => ({
                     testName: fullPath.split('/').reverse()[1],
                     path: fullPath.split('/').slice(0, -1).join('/'),
+                    lastFetched: new Date().toISOString(),
                 }));
 
         // TODO: consider `device_description.yaml` or `cluster_description.yaml`
