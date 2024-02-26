@@ -11,6 +11,10 @@ const formatRemoteFolderName = (folder: RemoteFolder) => {
     return folder.testName;
 };
 
+const filterFolders: ItemPredicate<RemoteFolder> = (query, folder) => {
+    return formatRemoteFolderName(folder).toLowerCase().includes(query.toLowerCase());
+};
+
 const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick, modifiers }) => {
     if (!modifiers.matchesPredicate) {
         return null;
@@ -51,6 +55,8 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 items={remoteFolders ?? []}
                 itemRenderer={remoteFolderRenderer}
                 filterable
+                itemPredicate={filterFolders}
+                noResults={<MenuItem disabled text='No results.' roleStructure='listoption' />}
                 disabled={loading || remoteFolders?.length === 0}
                 onItemSelect={onSelectFolder}
             >
