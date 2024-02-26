@@ -1,7 +1,7 @@
-import { Menu, BrowserWindow, MenuItemConstructorOptions, shell } from 'electron';
+import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
 
-import { sendEventToWindow } from './utils/bridge';
 import { ElectronEvents } from './ElectronEvents';
+import { sendEventToWindow } from './utils/bridge';
 
 export default class MenuBuilder {
     mainWindow: BrowserWindow;
@@ -78,6 +78,24 @@ export default class MenuBuilder {
                         click: (menuItem) => {
                             sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
                         },
+                    },
+                    {
+                        label: 'Feature Flags',
+                        type: 'submenu',
+                        submenu: [
+                            {
+                                label: 'Toggle Queues Table',
+                                type: 'checkbox',
+                                checked: false,
+                                click: (menuItem) => {
+                                    sendEventToWindow(
+                                        this.mainWindow,
+                                        ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        menuItem.checked,
+                                    );
+                                },
+                            },
+                        ],
                     },
                     ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
                         ? subMenuViewDev
