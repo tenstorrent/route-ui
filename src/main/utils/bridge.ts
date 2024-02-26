@@ -14,3 +14,9 @@ export function listenToEventFromWindow<T extends Array<any>>(
 export function sendEventToWindow<T extends Array<any>>(window: BrowserWindow, eventName: ElectronEvents, ...args: T) {
     window.webContents.send(eventName, ...args);
 }
+
+export async function getSavedState<T>(window: BrowserWindow, eventName: ElectronEvents): Promise<T | undefined> {
+    const savedState = await window.webContents.executeJavaScript(`localStorage.getItem('${eventName}');`, true);
+
+    return savedState ? JSON.parse(savedState) : undefined;
+}

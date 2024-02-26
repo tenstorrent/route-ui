@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
 import { Button, Classes, Tab, TabId, Tabs } from '@blueprintjs/core';
-import '../../scss/BottomDock.scss';
 import { IconNames } from '@blueprintjs/icons';
-import { useDispatch, useSelector } from 'react-redux';
 import { setDockOpenState } from 'data/store/slices/uiState.slice';
-import OperationsTable from './OperationsTable';
-import LogsOutput from '../LogsOutput';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getExperimentalFeatures } from '../../../data/store/selectors/experimentalFeatures.selectors';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
+import '../../scss/BottomDock.scss';
+import LogsOutput from '../LogsOutput';
+import OperationsTable from './OperationsTable';
 import QueuesTable from './QueuesTable';
 
 const BottomDock: React.FC = () => {
@@ -14,12 +15,13 @@ const BottomDock: React.FC = () => {
     const dispatch = useDispatch();
 
     const isLogOutputEnabled = useSelector(getLogOutputEnabled);
+    const queuesTableEnabled = useSelector(getExperimentalFeatures('showQueuesTable'));
 
     return (
         <div className='dock bottom-dock'>
             <Tabs id='dock-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className={Classes.TABS}>
                 <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
-                {process.env.NODE_ENV === 'development' && <Tab id='tab2' title='Queues' panel={<QueuesTable />} />}
+                {queuesTableEnabled && <Tab id='tab2' title='Queues' panel={<QueuesTable />} />}
                 {/* <Tab */}
                 {/*     id='tab2' */}
                 {/*     title='Operands' */}

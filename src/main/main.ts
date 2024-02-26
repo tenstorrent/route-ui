@@ -8,10 +8,10 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
-import { app, BrowserWindow, shell, nativeImage } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import { BrowserWindow, app, nativeImage, shell } from 'electron';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import path from 'path';
 // import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -104,7 +104,7 @@ const createWindow = async () => {
 
     const menuBuilder = new MenuBuilder(mainWindow);
 
-    menuBuilder.buildMenu();
+    await menuBuilder.buildMenu();
 
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {

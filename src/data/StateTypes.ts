@@ -1,5 +1,9 @@
 import { LinkType } from './Types';
 
+export interface ExperimentalFeaturesState {
+    showQueuesTable: boolean;
+}
+
 export interface HighContrastState {
     enabled: boolean;
 }
