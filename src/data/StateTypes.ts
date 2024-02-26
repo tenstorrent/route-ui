@@ -1,6 +1,6 @@
 import { LinkType } from './Types';
 
-export interface FeatureFlagsState {
+export interface ExperimentalFeaturesState {
     showQueuesTable: boolean;
 }
 

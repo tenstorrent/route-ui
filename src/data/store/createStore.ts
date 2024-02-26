@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { clusterViewReducer } from './slices/clusterView.slice';
 import { detailedViewReducer } from './slices/detailedView.slice';
-import { featureFlagsReducer } from './slices/featureFlags.slice';
+import { experimentalFeaturesReducer } from './slices/experimentalFeatures.slice';
 import { linkSaturationReducer } from './slices/linkSaturation.slice';
 import { loggingReducer } from './slices/logging.slice';
 import { nodeSelectionReducer } from './slices/nodeSelection.slice';
@@ -19,7 +19,7 @@ const store = configureStore({
         operationPerformance: operationPerformanceReducer,
         logging: loggingReducer,
         clusterView: clusterViewReducer,
-        featureFlags: featureFlagsReducer,
+        experimentalFeatures: experimentalFeaturesReducer,
     },
 });
 

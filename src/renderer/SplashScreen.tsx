@@ -6,7 +6,7 @@ import { getLogEntriesByType, getLogOutputEnabled } from '../data/store/selector
 import LogsOutput from './components/LogsOutput';
 import { PerfDataLoader } from './components/folder-picker/FolderPicker';
 
-import { toggleQueuesTable } from '../data/store/slices/featureFlags.slice';
+import { toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
 import { ElectronEvents } from '../main/ElectronEvents';
 import useAppConfig from './hooks/useAppConfig.hook';
 import './scss/SplashScreen.scss';
@@ -18,7 +18,7 @@ const SplashScreen: FC = () => {
     const { getAppConfig } = useAppConfig();
     const dispatch = useDispatch();
 
-    const updateFeatureFlagsStateInRedux = () => {
+    const updateExperimentalFeaturesStateInRedux = () => {
         const isQueuesTableEnabled = JSON.parse(
             getAppConfig(ElectronEvents.TOGGLE_QUEUES_TABLE) ?? '[false]',
         )[0] as boolean;
@@ -26,7 +26,7 @@ const SplashScreen: FC = () => {
         dispatch(toggleQueuesTable(isQueuesTableEnabled));
     };
 
-    updateFeatureFlagsStateInRedux();
+    updateExperimentalFeaturesStateInRedux();
 
     return (
         <div className='splash-screen'>

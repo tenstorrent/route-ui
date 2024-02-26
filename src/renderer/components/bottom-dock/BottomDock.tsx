@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { setDockOpenState } from 'data/store/slices/uiState.slice';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFeatureFlags } from '../../../data/store/selectors/featureFlags.selectors';
+import { getExperimentalFeatures } from '../../../data/store/selectors/experimentalFeatures.selectors';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
 import '../../scss/BottomDock.scss';
 import LogsOutput from '../LogsOutput';
@@ -15,13 +15,13 @@ const BottomDock: React.FC = () => {
     const dispatch = useDispatch();
 
     const isLogOutputEnabled = useSelector(getLogOutputEnabled);
-    const shouldShowQueuesTable = useSelector(getFeatureFlags('showQueuesTable'));
+    const queuesTableEnabled = useSelector(getExperimentalFeatures('showQueuesTable'));
 
     return (
         <div className='dock bottom-dock'>
             <Tabs id='dock-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className={Classes.TABS}>
                 <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
-                {shouldShowQueuesTable && <Tab id='tab2' title='Queues' panel={<QueuesTable />} />}
+                {queuesTableEnabled && <Tab id='tab2' title='Queues' panel={<QueuesTable />} />}
                 {/* <Tab */}
                 {/*     id='tab2' */}
                 {/*     title='Operands' */}
