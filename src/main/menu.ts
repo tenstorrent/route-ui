@@ -89,7 +89,7 @@ export default class MenuBuilder {
                         },
                     },
                     {
-                        label: 'Feature Flags',
+                        label: 'Experimental Features',
                         type: 'submenu',
                         submenu: [
                             {
@@ -177,7 +177,7 @@ export default class MenuBuilder {
                         },
                     },
                     {
-                        label: 'Feature Flags',
+                        label: 'Experimental Features',
                         type: 'submenu',
                         submenu: [
                             {
