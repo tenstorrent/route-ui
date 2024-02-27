@@ -146,27 +146,25 @@ const useRemoteConnection = () => {
             throw new Error('No connection provided');
         }
 
+        const remote = await import('@electron/remote');
+
         const parseResults = (results: string) =>
-            Promise.all(
-                results
-                    .split('\n')
-                    .filter((s) => s.length > 0)
-                    .map<Promise<RemoteFolder>>(async (folderInfo) => {
-                        const remote = await import('@electron/remote');
+            results
+                .split('\n')
+                .filter((s) => s.length > 0)
+                .map<RemoteFolder>((folderInfo) => {
+                    const [_createdDate, lastModified, remoteFolderPath] = folderInfo.split(';');
+                    const configDir = remote.app.getPath('userData');
+                    const folderName = path.basename(remoteFolderPath);
+                    const localFolderForRemote = `${connection.name}-${connection.host}${connection.port}`;
 
-                        const [_createdDate, lastModified, remoteFolderPath] = folderInfo.split(';');
-                        const configDir = remote.app.getPath('userData');
-                        const folderName = path.basename(remoteFolderPath);
-                        const localFolderForRemote = `${connection.name}-${connection.host}${connection.port}`;
-
-                        return {
-                            testName: folderName,
-                            remotePath: remoteFolderPath,
-                            localPath: path.join(configDir, 'remote-tests', localFolderForRemote, folderName),
-                            lastModified: new Date(lastModified).toISOString(),
-                        };
-                    }),
-            );
+                    return {
+                        testName: folderName,
+                        remotePath: remoteFolderPath,
+                        localPath: path.join(configDir, 'remote-tests', localFolderForRemote, folderName),
+                        lastModified: new Date(lastModified).toISOString(),
+                    };
+                });
 
         /**
          * This command will be executed on the ssh server, and run the foolowing steps:
