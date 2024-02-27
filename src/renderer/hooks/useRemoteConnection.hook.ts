@@ -45,7 +45,7 @@ const escapeWhitespace = (str: string) => str.replace(/(\s)/g, '\\$1');
 
 const useRemoteConnection = () => {
     const logging = useLogging();
-    const defaultSshOptions = ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=60'];
+    const defaultSshOptions = ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=240'];
 
     const runShellCommand = async (cmd: string, params: string[]) => {
         return new Promise<string>((resolve, reject) => {
@@ -154,7 +154,7 @@ const useRemoteConnection = () => {
                     .map<Promise<RemoteFolder>>(async (folderInfo) => {
                         const remote = await import('@electron/remote');
 
-                        const [lastModified, remoteFolderPath] = folderInfo.split(';');
+                        const [_createdDate, lastModified, remoteFolderPath] = folderInfo.split(';');
                         const configDir = remote.app.getPath('userData');
                         const folderName = path.basename(remoteFolderPath);
                         const localFolderForRemote = `${connection.name}-${connection.host}${connection.port}`;
@@ -168,9 +168,20 @@ const useRemoteConnection = () => {
                     }),
             );
 
-        // TODO: consider `device_description.yaml` or `cluster_description.yaml`
-        const findCommand = `'find -L ${connection.path} -mindepth 1 -maxdepth 3 -type f -name device_desc.yaml -printf "%TFT%TT%Tz;%h\n"'`;
-        const sshParams = [...defaultSshOptions, connection.host, '-p', connection.port.toString(), findCommand];
+        // TODO: explain the comment
+        const shellCommand = [
+            `find -L "${connection.path}" -mindepth 1 -maxdepth 3 -type f \\( -name "device_desc.yaml" -o -name "cluster_desc.yaml" \\) -print0`,
+            'xargs -0 -I{} dirname {}',
+            'uniq',
+            `xargs -I{} sh -c "echo \\"\\$(date -d \\"\\$(stat -c %w \\"{}\\")\\" --iso-8601=seconds);\\$(date -d \\"\\$(stat -c %y \\"{}\\")\\" --iso-8601=seconds);$(echo \\"{}\\")\\""`,
+        ].join(' | ');
+        const sshParams = [
+            ...defaultSshOptions,
+            connection.host,
+            '-p',
+            connection.port.toString(),
+            `'${shellCommand}'`,
+        ];
 
         const stdout = await runShellCommand('ssh', sshParams);
 
