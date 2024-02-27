@@ -223,14 +223,23 @@ const useRemoteConnection = () => {
         ];
 
         try {
-            // Try first with the `-s` option
+            /**
+             * First try running with the `-s` option.
+             * This option handles the case where the file path has spaces in it.
+             * This option is not supported on Mac, so if it fails, we will try again without it.
+             *
+             * See: https://linux.die.net/man/1/rsync#:~:text=receiving%20host%27s%20charset.-,%2Ds%2C%20%2D%2Dprotect%2Dargs,-This%20option%20sends
+             */
             await runShellCommand('rsync', ['-s', ...baseOptions, ...pathOptions]);
         } catch (err: any) {
             logging.info(
                 `Initial RSYNC attempt failed: ${(err as Error)?.message ?? err?.toString() ?? 'Unknown error'}`,
             );
 
-            // Try again, this time without `-s` option
+            /**
+             * If the `-s` option fails, try running without it.
+             * On Mac, this will work as expected.
+             */
             await runShellCommand('rsync', [...baseOptions, ...pathOptions]);
         }
     };
