@@ -59,26 +59,26 @@ const RemoteConnectionOptions: FC = () => {
             }
         }
 
+        const savedFolders = getSavedRemoteFolders(connection);
+        const updatedFolders = (folders ?? []).map((updatedFolder) => {
+            const existingFolder = savedFolders?.find((f) => f.localPath === updatedFolder.localPath);
+
+            return {
+                ...existingFolder,
+                ...updatedFolder,
+                ...(folder?.localPath === updatedFolder.localPath && { lastSynced: new Date().toISOString() }),
+            };
+        });
+
         if (!folders) {
             deleteAppConfig(`${connection?.name}-remoteFolders`);
         } else {
-            const savedFolders = getSavedRemoteFolders(connection);
-            const updatedFolders = folders.map((updatedFolder) => {
-                const existingFolder = savedFolders?.find((f) => f.localPath === updatedFolder.localPath);
-
-                return {
-                    ...existingFolder,
-                    ...updatedFolder,
-                    ...(folder?.localPath === updatedFolder.localPath && { lastSynced: new Date().toISOString() }),
-                };
-            });
-
             setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(updatedFolders));
         }
 
-        setRemoteFolders(folders ?? []);
+        setRemoteFolders(updatedFolders);
 
-        await updateSelectedFolder(folder ?? folders?.[0]);
+        await updateSelectedFolder(folder ?? updatedFolders[0]);
     };
 
     const updateSavedConnection = async (connection: RemoteConnection, isDeletingConnection = false) => {
@@ -144,9 +144,9 @@ const RemoteConnectionOptions: FC = () => {
                         await updateSelectedConnection(connection);
 
                         try {
-                            const savedRemoteFolders = await listRemoteFolders(connection);
+                            const fetchedRemoteFolders = await listRemoteFolders(connection);
 
-                            await updateSavedRemoteFolders(connection, savedRemoteFolders);
+                            await updateSavedRemoteFolders(connection, fetchedRemoteFolders);
                         } catch (err) {
                             logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
                         }
