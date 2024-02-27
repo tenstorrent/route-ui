@@ -1,14 +1,34 @@
-import { FC } from 'react';
-import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
-import { ItemRenderer, Select2 } from '@blueprintjs/select';
+import { AnchorButton, Button, Icon, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
+import { FC } from 'react';
+import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
 import PopoverMenu from '../PopoverMenu';
-import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
+
+const formatter = new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'long',
+    timeStyle: 'short',
+});
 
 const formatRemoteFolderName = (folder: RemoteFolder) => {
     return folder.testName;
+};
+
+const filterFolders: ItemPredicate<RemoteFolder> = (query, folder) => {
+    return formatRemoteFolderName(folder).toLowerCase().includes(query.toLowerCase());
+};
+
+const isLocalFolderOutdated = (folder: RemoteFolder) => {
+    if (!folder.lastSynced) {
+        return true;
+    }
+
+    const lastSynced = new Date(folder.lastSynced);
+    const lastModified = new Date(folder.lastModified);
+
+    return lastModified > lastSynced;
 };
 
 const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick, modifiers }) => {
@@ -20,9 +40,25 @@ const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick,
         <MenuItem
             active={modifiers.active}
             disabled={modifiers.disabled}
-            key={formatRemoteFolderName(folder)}
+            key={`${formatRemoteFolderName(folder)}${folder.lastSynced ?? folder.lastModified}`}
             onClick={handleClick}
             text={formatRemoteFolderName(folder)}
+            // @ts-expect-error - Hack abusing label, it actually works.
+            label={
+                isLocalFolderOutdated(folder) ? (
+                    <Tooltip2
+                        content={`Folder is stale, last sync: ${folder.lastSynced ? formatter.format(new Date(folder.lastSynced)) : 'Never'}`}
+                    >
+                        <Icon icon={IconNames.HISTORY} color='goldenrod' />
+                    </Tooltip2>
+                ) : (
+                    <Tooltip2
+                        content={`Folder is up to date, last sync: ${folder.lastSynced ? formatter.format(new Date(folder.lastSynced)) : 'Never'}`}
+                    >
+                        <Icon icon={IconNames.UPDATED} color='green' />
+                    </Tooltip2>
+                )
+            }
         />
     );
 };
@@ -51,6 +87,8 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 items={remoteFolders ?? []}
                 itemRenderer={remoteFolderRenderer}
                 filterable
+                itemPredicate={filterFolders}
+                noResults={<MenuItem disabled text='No results.' roleStructure='listoption' />}
                 disabled={loading || remoteFolders?.length === 0}
                 onItemSelect={onSelectFolder}
             >

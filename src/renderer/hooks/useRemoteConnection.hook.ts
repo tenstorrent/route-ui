@@ -1,8 +1,8 @@
 import { spawn } from 'child_process';
-import path from 'path';
-import { mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
 import dns from 'dns';
+import { existsSync } from 'fs';
+import { mkdir } from 'fs/promises';
+import path from 'path';
 
 import useLogging from './useLogging.hook';
 
@@ -32,14 +32,20 @@ export interface RemoteFolder {
     /** Name of the test results folder */
     testName: string;
     /** Remote absolute path to the test results folder */
-    path: string;
+    remotePath: string;
+    /** Local absolute path to the test results folder */
+    localPath: string;
+    /** Last time the folder was modified on remote */
+    lastModified: string;
+    /** Last time the folder was synced */
+    lastSynced?: string;
 }
 
 const escapeWhitespace = (str: string) => str.replace(/(\s)/g, '\\$1');
 
 const useRemoteConnection = () => {
     const logging = useLogging();
-    const defaultSshOptions = ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=60'];
+    const defaultSshOptions = ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=240'];
 
     const runShellCommand = async (cmd: string, params: string[]) => {
         return new Promise<string>((resolve, reject) => {
@@ -131,27 +137,68 @@ const useRemoteConnection = () => {
         }
     };
 
+    const checkLocalFolderExists = (localPath?: string) => {
+        return (localPath && existsSync(localPath)) || false;
+    };
+
     const listRemoteFolders = async (connection?: RemoteConnection) => {
         if (!connection || !connection.host || !connection.port) {
             throw new Error('No connection provided');
         }
 
+        const remote = await import('@electron/remote');
+
         const parseResults = (results: string) =>
             results
                 .split('\n')
                 .filter((s) => s.length > 0)
-                .map((fullPath) => ({
-                    testName: fullPath.split('/').reverse()[1],
-                    path: fullPath.split('/').slice(0, -1).join('/'),
-                }));
+                .map<RemoteFolder>((folderInfo) => {
+                    const [_createdDate, lastModified, remoteFolderPath] = folderInfo.split(';');
+                    const configDir = remote.app.getPath('userData');
+                    const folderName = path.basename(remoteFolderPath);
+                    const localFolderForRemote = `${connection.name}-${connection.host}${connection.port}`;
 
-        // TODO: consider `device_description.yaml` or `cluster_description.yaml`
-        const findCommand = `'find -L ${connection.path} -mindepth 1 -maxdepth 3 -type f -name device_desc.yaml'`;
-        const sshParams = [...defaultSshOptions, connection.host, '-p', connection.port.toString(), findCommand];
+                    return {
+                        testName: folderName,
+                        remotePath: remoteFolderPath,
+                        localPath: path.join(configDir, 'remote-tests', localFolderForRemote, folderName),
+                        lastModified: new Date(lastModified).toISOString(),
+                    };
+                });
+
+        /**
+         * This command will be executed on the ssh server, and run the foolowing steps:
+         * 1. Find all files named `device_desc.yaml` or `cluster_desc.yaml` in the remote path
+         * 2. Get the directory that contains the files.
+         * 3. Remove duplicates
+         * 4. For each directory, separated by a `;`, print:
+         *   - The creation date (as an ISO timestamp)
+         *   - The last modified date (as an ISO timestamp)
+         *   - The directory absolute path on the server
+         *
+         * The output will look like this:
+         * ```csv
+         * 2000-01-01T00:00:00.000Z;2000-01-01T00:00:00.000Z;/path/to/remote/folder
+         * 2000-01-01T00:00:00.000Z;2000-01-01T00:00:00.000Z;/path/to/remote/folder2
+         * ```
+         */
+        const shellCommand = [
+            `find -L "${connection.path}" -mindepth 1 -maxdepth 3 -type f \\( -name "device_desc.yaml" -o -name "cluster_desc.yaml" \\) -print0`,
+            'xargs -0 -I{} dirname {}',
+            'uniq',
+            `xargs -I{} sh -c "echo \\"\\$(date -d \\"\\$(stat -c %w \\"{}\\")\\" --iso-8601=seconds);\\$(date -d \\"\\$(stat -c %y \\"{}\\")\\" --iso-8601=seconds);$(echo \\"{}\\")\\""`,
+        ].join(' | ');
+        const sshParams = [
+            ...defaultSshOptions,
+            connection.host,
+            '-p',
+            connection.port.toString(),
+            `'${shellCommand}'`,
+        ];
 
         const stdout = await runShellCommand('ssh', sshParams);
 
-        return stdout ? parseResults(stdout.toString()) : [];
+        return stdout ? parseResults(stdout) : ([] as RemoteFolder[]);
     };
 
     const syncRemoteFolder = async (connection?: RemoteConnection, remoteFolder?: RemoteFolder) => {
@@ -163,36 +210,45 @@ const useRemoteConnection = () => {
             throw new Error('No remote folder provided');
         }
 
-        const remote = await import('@electron/remote');
-
-        const configDir = remote.app.getPath('userData');
-        const localCopyPath = path.join(configDir, 'remote-tests/');
-
-        if (!existsSync(localCopyPath)) {
-            await mkdir(localCopyPath);
+        if (!existsSync(remoteFolder.localPath)) {
+            await mkdir(remoteFolder.localPath, { recursive: true });
         }
 
-        const sourcePath = `${connection.host}:${escapeWhitespace(remoteFolder.path)}`;
+        const sourcePath = `${connection.host}:${escapeWhitespace(remoteFolder.remotePath)}`;
         const baseOptions = ['-az', '-e', `'ssh -p ${connection.port.toString()}'`];
-        const pathOptions = ['--delete', `'${sourcePath}'`, escapeWhitespace(localCopyPath)];
+        const pathOptions = [
+            '--delete',
+            `'${sourcePath}'`,
+            escapeWhitespace(remoteFolder.localPath.replace(remoteFolder.testName, '')),
+        ];
+
         try {
-            // Try first with the `-s` option
+            /**
+             * First try running with the `-s` option.
+             * This option handles the case where the file path has spaces in it.
+             * This option is not supported on Mac, so if it fails, we will try again without it.
+             *
+             * See: https://linux.die.net/man/1/rsync#:~:text=receiving%20host%27s%20charset.-,%2Ds%2C%20%2D%2Dprotect%2Dargs,-This%20option%20sends
+             */
+            // TODO: review the need for the `-s` option
             await runShellCommand('rsync', ['-s', ...baseOptions, ...pathOptions]);
         } catch (err: any) {
             logging.info(
                 `Initial RSYNC attempt failed: ${(err as Error)?.message ?? err?.toString() ?? 'Unknown error'}`,
             );
 
-            // Try again, this time without `-s` option
+            /**
+             * If the `-s` option fails, try running without it.
+             * On Mac, this will work as expected.
+             */
             await runShellCommand('rsync', [...baseOptions, ...pathOptions]);
         }
-
-        return path.join(localCopyPath, remoteFolder.testName);
     };
 
     return {
         testConnection,
         testRemoteFolder,
+        checkLocalFolderExists,
         syncRemoteFolder,
         listRemoteFolders,
     };
