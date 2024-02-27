@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 
 import usePerfAnalyzerFileLoader from 'renderer/hooks/usePerfAnalyzerFileLoader.hooks';
 import '../../scss/FolderPicker.scss';
-import PopoverMenu from '../PopoverMenu';
+import GraphSelector from '../graph-selector/GraphSelector';
 import RemoteConnectionOptions from './RemoteConnectionOptions';
 
 /** Implements a temporary wrapper around the Folder Loading component & Graph selection component, to provide state
@@ -15,8 +15,7 @@ import RemoteConnectionOptions from './RemoteConnectionOptions';
  * */
 
 export const PerfDataLoader = (): React.ReactElement => {
-    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs } =
-        usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, error } = usePerfAnalyzerFileLoader();
 
     return (
         <div className='folder-picker-options'>
@@ -31,13 +30,7 @@ export const PerfDataLoader = (): React.ReactElement => {
                     >
                         <div className='buttons-container'>
                             <FolderPicker disabled={false} onSelectFolder={() => loadPerfAnalyzerFolder()} />
-                            <PopoverMenu // Graph picker
-                                label='Select Graph'
-                                options={availableGraphs.map((graph) => graph.name)}
-                                selectedItem={selectedGraph}
-                                onSelectItem={loadPerfAnalyzerGraph}
-                                disabled={availableGraphs?.length === 0}
-                            />
+                            <GraphSelector />
                             {error && (
                                 <div className='loading-error'>
                                     <p>{error.toString()}</p>

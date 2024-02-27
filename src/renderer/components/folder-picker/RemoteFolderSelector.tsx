@@ -3,9 +3,8 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
 import { FC } from 'react';
-import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
-import PopoverMenu from '../PopoverMenu';
+import GraphSelector from '../graph-selector/GraphSelector';
 
 const formatter = new Intl.DateTimeFormat('en-US', {
     dateStyle: 'long',
@@ -78,8 +77,6 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
     onSelectFolder,
     onSyncFolder,
 }) => {
-    const { loadPerfAnalyzerGraph, selectedGraph, availableGraphs } = usePerfAnalyzerFileLoader();
-
     return (
         <div className='buttons-container'>
             <Select2
@@ -108,13 +105,7 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 />
             </Tooltip2>
 
-            <PopoverMenu
-                label='Select Graph'
-                options={availableGraphs.map((graph) => graph.name)}
-                selectedItem={selectedGraph}
-                onSelectItem={loadPerfAnalyzerGraph}
-                disabled={loading || availableGraphs?.length === 0}
-            />
+            <GraphSelector disabled={loading} />
         </div>
     );
 };

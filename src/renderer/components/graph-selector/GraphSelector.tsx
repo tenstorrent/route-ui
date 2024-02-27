@@ -1,20 +1,34 @@
-import useFileLoader from 'renderer/hooks/useFileLoader.hook';
+import { FC } from 'react';
+import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
-function GraphSelector() {
-    const { selectedGraph, handleSelectGraph, availableGraphs } = useFileLoader();
+interface GraphSelectorProps {
+    disabled?: boolean;
+    label?: string;
+    onSelectGraph?: (graph: string) => void;
+}
 
-    return availableGraphs.length ? (
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph }) => {
+    const { selectedGraph, loadPerfAnalyzerGraph, availableGraphs } = usePerfAnalyzerFileLoader();
+
+    return (
         <PopoverMenu // Graph picker
-            label={selectedGraph}
+            label={selectedGraph || (label ?? 'Select graph')}
             options={availableGraphs.map((graph) => graph.name)}
             selectedItem={selectedGraph}
-            onSelectItem={handleSelectGraph}
-            disabled={availableGraphs?.length === 0}
+            onSelectItem={async (graph) => {
+                await loadPerfAnalyzerGraph(graph);
+                onSelectGraph?.(graph);
+            }}
+            disabled={disabled || availableGraphs?.length === 0}
         />
-    ) : (
-        <div>{selectedGraph}</div>
     );
-}
+};
+
+GraphSelector.defaultProps = {
+    disabled: false,
+    label: undefined,
+    onSelectGraph: undefined,
+};
 
 export default GraphSelector;
