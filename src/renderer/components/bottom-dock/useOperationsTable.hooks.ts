@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { MeasurementDetails } from '../../../data/OpPerfDetails';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import { MeasurementDetails } from '../../../data/OpPerfDetails';
+import { MAX_MODEL_RATIO_THRESHOLD } from '../../../data/constants';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 import { numberFormatter, valueRatio } from '../../utils/numbers';
+import { DataTableColumnDefinition, SortingDirection, sortAsc, sortDesc } from './SharedTable';
 
 export interface OpTableFields extends MeasurementDetails {
     operation?: Operation;
@@ -124,6 +125,10 @@ const useOperationsTable = (opList: OpTableFields[]) => {
 
     const maxModelEstimateRatio = useMemo(() => {
         const modelEstimates = opList.map((op) => valueRatio(op.model_runtime_per_input, op.kernel_runtime_per_input));
+
+        if (modelEstimates.length === 0) {
+            return MAX_MODEL_RATIO_THRESHOLD;
+        }
 
         return Math.ceil(Math.max(...modelEstimates));
     }, [opList]);
