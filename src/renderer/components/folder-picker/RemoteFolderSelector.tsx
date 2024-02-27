@@ -3,10 +3,14 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
 import { FC } from 'react';
-import { getRelativeTimeString } from '../../../utils/DateAndTime';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
 import PopoverMenu from '../PopoverMenu';
+
+const formatter = new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'long',
+    timeStyle: 'short',
+});
 
 const formatRemoteFolderName = (folder: RemoteFolder) => {
     return folder.testName;
@@ -42,11 +46,15 @@ const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick,
             // @ts-expect-error - Hack abusing label, it actually works.
             label={
                 shouldReSyncFolder(folder) ? (
-                    <Tooltip2 content={`Folder is stale, last sync: ${getRelativeTimeString(folder.lastSynced)}`}>
+                    <Tooltip2
+                        content={`Folder is stale, last sync: ${folder.lastSynced ? formatter.format(new Date(folder.lastSynced)) : 'Never'}`}
+                    >
                         <Icon icon={IconNames.HISTORY} color='goldenrod' />
                     </Tooltip2>
                 ) : (
-                    <Tooltip2 content={`Folder is up to date, last sync: ${getRelativeTimeString(folder.lastSynced)}`}>
+                    <Tooltip2
+                        content={`Folder is up to date, last sync: ${folder.lastSynced ? formatter.format(new Date(folder.lastSynced)) : 'Never'}`}
+                    >
                         <Icon icon={IconNames.UPDATED} color='green' />
                     </Tooltip2>
                 )
