@@ -21,7 +21,7 @@ const RemoteConnectionOptions: FC = () => {
     const [selectedConnection, setSelectedConnection] = useState<RemoteConnection | undefined>(savedConnections[0]);
     const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(getSavedRemoteFolders(savedConnections[0]));
     const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
-    const { listRemoteFolders, syncRemoteFolder, testLocalFolder } = useRemoteConnection();
+    const { listRemoteFolders, syncRemoteFolder, checkLocalFolderExists } = useRemoteConnection();
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
 
@@ -31,7 +31,7 @@ const RemoteConnectionOptions: FC = () => {
     const updateSelectedFolder = async (folder?: RemoteFolder) => {
         setSelectedFolder(folder);
 
-        if (testLocalFolder(folder?.localPath)) {
+        if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath);
         } else {
             resetAvailableGraphs();

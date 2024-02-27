@@ -137,8 +137,8 @@ const useRemoteConnection = () => {
         }
     };
 
-    const testLocalFolder = (localPath?: string) => {
-        return localPath && existsSync(localPath);
+    const checkLocalFolderExists = (localPath?: string) => {
+        return (localPath && existsSync(localPath)) || false;
     };
 
     const listRemoteFolders = async (connection?: RemoteConnection) => {
@@ -238,7 +238,7 @@ const useRemoteConnection = () => {
     return {
         testConnection,
         testRemoteFolder,
-        testLocalFolder,
+        checkLocalFolderExists,
         syncRemoteFolder,
         listRemoteFolders,
     };
