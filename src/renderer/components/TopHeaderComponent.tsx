@@ -15,6 +15,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import '../scss/TopHeaderComponent.scss';
+import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
 import GraphSelector from './graph-selector/GraphSelector';
 
 const getTestName = (path: string) => {
@@ -50,6 +51,13 @@ const TopHeaderComponent: React.FC = () => {
                 onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
             />
             <div className='text-content'>
+                <RemoteFolderSelector
+                    falbackLabel=''
+                    icon={IconNames.CLOUD_DOWNLOAD}
+                    onSelectFolder={() => {
+                        console.log('onSelectFolder');
+                    }}
+                />
                 {folderPath && (
                     <Tooltip2 content={folderPath}>
                         <Button icon={IconNames.FolderSharedOpen} onClick={() => loadPerfAnalyzerFolder()}>

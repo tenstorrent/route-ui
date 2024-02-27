@@ -1,11 +1,14 @@
 import { FC, useState } from 'react';
 
-import { FormGroup } from '@blueprintjs/core';
+import { AnchorButton, FormGroup } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import useAppConfig from '../../hooks/useAppConfig.hook';
 
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import useRemoteConnection, { RemoteConnection, RemoteFolder } from '../../hooks/useRemoteConnection.hook';
+import GraphSelector from '../graph-selector/GraphSelector';
 import AddRemoteConnection from './AddRemoteConnection';
 import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
@@ -181,26 +184,39 @@ const RemoteConnectionOptions: FC = () => {
                     onSelectFolder={async (folder) => {
                         await updateSelectedFolder(folder);
                     }}
-                    onSyncFolder={async () => {
-                        setIsSyncingRemoteFolder(true);
-                        try {
-                            await syncRemoteFolder(selectedConnection, selectedFolder);
+                >
+                    <Tooltip2 content='Sync remote folder'>
+                        <AnchorButton
+                            icon={IconNames.REFRESH}
+                            loading={isSyncingRemoteFolder}
+                            disabled={isSyncingRemoteFolder || !selectedFolder || remoteFolders?.length === 0}
+                            onClick={async () => {
+                                setIsSyncingRemoteFolder(true);
+                                try {
+                                    await syncRemoteFolder(selectedConnection, selectedFolder);
 
-                            const savedRemoteFolders = JSON.parse(
-                                getAppConfig(`${selectedConnection?.name}-remoteFolders`) ?? '[]',
-                            ) as RemoteFolder[];
+                                    const savedRemoteFolders = JSON.parse(
+                                        getAppConfig(`${selectedConnection?.name}-remoteFolders`) ?? '[]',
+                                    ) as RemoteFolder[];
 
-                            await updateSavedRemoteFolders(selectedConnection, savedRemoteFolders, selectedFolder);
-                        } catch (err) {
-                            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+                                    await updateSavedRemoteFolders(
+                                        selectedConnection,
+                                        savedRemoteFolders,
+                                        selectedFolder,
+                                    );
+                                } catch (err) {
+                                    logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
-                            // eslint-disable-next-line no-alert
-                            alert('Unable to sync remote folder');
-                        } finally {
-                            setIsSyncingRemoteFolder(false);
-                        }
-                    }}
-                />
+                                    // eslint-disable-next-line no-alert
+                                    alert('Unable to sync remote folder');
+                                } finally {
+                                    setIsSyncingRemoteFolder(false);
+                                }
+                            }}
+                        />
+                    </Tooltip2>
+                    <GraphSelector disabled={isSyncingRemoteFolder} />
+                </RemoteFolderSelector>
             </FormGroup>
         </>
     );

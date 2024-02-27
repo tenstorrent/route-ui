@@ -1,10 +1,9 @@
-import { AnchorButton, Button, Icon, MenuItem } from '@blueprintjs/core';
+import { Button, Icon, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
-import { FC } from 'react';
+import { FC, type PropsWithChildren } from 'react';
 import { RemoteFolder } from '../../hooks/useRemoteConnection.hook';
-import GraphSelector from '../graph-selector/GraphSelector';
 
 const formatter = new Intl.DateTimeFormat('en-US', {
     dateStyle: 'long',
@@ -66,16 +65,19 @@ interface RemoteFolderSelectorProps {
     remoteFolder?: RemoteFolder;
     remoteFolders?: RemoteFolder[];
     loading?: boolean;
+    falbackLabel?: string;
+    icon?: string;
     onSelectFolder: (folder: RemoteFolder) => void;
-    onSyncFolder: () => void;
 }
 
-const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
+const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = ({
     remoteFolder,
     remoteFolders,
     loading,
     onSelectFolder,
-    onSyncFolder,
+    children,
+    falbackLabel = '(No selection)',
+    icon = IconNames.FOLDER_OPEN,
 }) => {
     return (
         <div className='buttons-container'>
@@ -90,22 +92,13 @@ const RemoteFolderSelector: FC<RemoteFolderSelectorProps> = ({
                 onItemSelect={onSelectFolder}
             >
                 <Button
-                    icon={IconNames.FOLDER_OPEN}
-                    rightIcon={IconNames.CARET_DOWN}
+                    icon={icon as any}
+                    rightIcon={remoteFolders && remoteFolders?.length > 0 ? IconNames.CARET_DOWN : undefined}
                     disabled={loading || remoteFolders?.length === 0}
-                    text={remoteFolder ? formatRemoteFolderName(remoteFolder) : '(No selection)'}
+                    text={remoteFolder ? formatRemoteFolderName(remoteFolder) : falbackLabel}
                 />
             </Select2>
-            <Tooltip2 content='Sync remote folder'>
-                <AnchorButton
-                    icon={IconNames.REFRESH}
-                    loading={loading}
-                    disabled={loading || !remoteFolder || remoteFolders?.length === 0}
-                    onClick={() => onSyncFolder()}
-                />
-            </Tooltip2>
-
-            <GraphSelector disabled={loading} />
+            {children}
         </div>
     );
 };
@@ -114,6 +107,8 @@ RemoteFolderSelector.defaultProps = {
     loading: false,
     remoteFolders: [],
     remoteFolder: undefined,
+    falbackLabel: undefined,
+    icon: undefined,
 };
 
 export default RemoteFolderSelector;
