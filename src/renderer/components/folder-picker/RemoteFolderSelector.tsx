@@ -20,7 +20,7 @@ const filterFolders: ItemPredicate<RemoteFolder> = (query, folder) => {
     return formatRemoteFolderName(folder).toLowerCase().includes(query.toLowerCase());
 };
 
-const shouldReSyncFolder = (folder: RemoteFolder) => {
+const isLocalFolderOutdated = (folder: RemoteFolder) => {
     if (!folder.lastSynced) {
         return true;
     }
@@ -45,7 +45,7 @@ const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick,
             text={formatRemoteFolderName(folder)}
             // @ts-expect-error - Hack abusing label, it actually works.
             label={
-                shouldReSyncFolder(folder) ? (
+                isLocalFolderOutdated(folder) ? (
                     <Tooltip2
                         content={`Folder is stale, last sync: ${folder.lastSynced ? formatter.format(new Date(folder.lastSynced)) : 'Never'}`}
                     >
