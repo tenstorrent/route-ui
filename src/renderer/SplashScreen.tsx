@@ -8,6 +8,7 @@ import { PerfDataLoader } from './components/folder-picker/FolderPicker';
 
 import { toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
 import { ElectronEvents } from '../main/ElectronEvents';
+import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import useAppConfig from './hooks/useAppConfig.hook';
 import './scss/SplashScreen.scss';
 
@@ -29,14 +30,19 @@ const SplashScreen: FC = () => {
     updateExperimentalFeaturesStateInRedux();
 
     return (
-        <div className='splash-screen'>
-            <PerfDataLoader />
-            {logOutputEnabled && errorLogs.length > 0 && (
-                <div id='splash-debug-panel'>
-                    <LogsOutput />
-                </div>
-            )}
-        </div>
+        <>
+            <div className='header'>
+                <TenstorrentLogo />
+            </div>
+            <div className='splash-screen'>
+                <PerfDataLoader />
+                {logOutputEnabled && errorLogs.length > 0 && (
+                    <div id='splash-debug-panel'>
+                        <LogsOutput />
+                    </div>
+                )}
+            </div>
+        </>
     );
 };
 

@@ -1,11 +1,8 @@
 import { sep as pathSeparator } from 'path';
 
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Tooltip2 } from '@blueprintjs/popover2';
-import { IconNames } from '@blueprintjs/icons';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button, Switch } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     getArchitectureSelector,
     getAvailableGraphsSelector,
@@ -14,9 +11,11 @@ import {
     getHighContrastState,
 } from 'data/store/selectors/uiState.selectors';
 import { setHighContrastState } from 'data/store/slices/uiState.slice';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import '../scss/TopHeaderComponent.scss';
 import GraphSelector from './graph-selector/GraphSelector';
-import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
@@ -31,13 +30,11 @@ const TopHeaderComponent: React.FC = () => {
     const availableGraphs = useSelector(getAvailableGraphsSelector);
     const folderPath = useSelector(getFolderPathSelector);
     const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
-    const location = useLocation();
 
     useEffect(() => {
-        const isSplashScreen = location.pathname === '/';
         const hasAvailableGraphs = availableGraphs && availableGraphs.length > 0;
 
-        if (!isSplashScreen && hasAvailableGraphs) {
+        if (hasAvailableGraphs) {
             loadPerfAnalyzerGraph(availableGraphs[0].name);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
