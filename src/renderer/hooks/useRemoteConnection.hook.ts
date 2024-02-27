@@ -230,6 +230,7 @@ const useRemoteConnection = () => {
              *
              * See: https://linux.die.net/man/1/rsync#:~:text=receiving%20host%27s%20charset.-,%2Ds%2C%20%2D%2Dprotect%2Dargs,-This%20option%20sends
              */
+            // TODO: review the need for the `-s` option
             await runShellCommand('rsync', ['-s', ...baseOptions, ...pathOptions]);
         } catch (err: any) {
             logging.info(
