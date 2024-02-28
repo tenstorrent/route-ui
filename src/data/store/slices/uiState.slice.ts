@@ -1,13 +1,14 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ApplicationMode, Architecture } from 'data/Types';
 import path from 'path';
-import { GraphRelationshipState } from '../../StateTypes';
+import { GraphRelationshipState, type SelectedFolderOrigin } from '../../StateTypes';
 
 interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
     graphName: string;
     folderPath: string;
+    selectedFolderOrigin: SelectedFolderOrigin;
     architecture: Architecture;
     availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
@@ -24,6 +25,7 @@ const uiStateInitialState: UIState = {
     highContrastEnabled: false,
     graphName: '',
     folderPath: '',
+    selectedFolderOrigin: 'local',
     architecture: Architecture.NONE,
     availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
@@ -47,6 +49,9 @@ const uiStateSlice = createSlice({
         setSelectedFile(state, action: PayloadAction<string>) {
             state.folderPath = path.dirname(action.payload);
             state.graphName = path.basename(action.payload);
+        },
+        setSelectedFolderOrigin(state, action: PayloadAction<SelectedFolderOrigin>) {
+            state.selectedFolderOrigin = action.payload;
         },
         setSelectedGraphName(state, action: PayloadAction<string>) {
             state.graphName = action.payload;
@@ -84,7 +89,6 @@ const uiStateSlice = createSlice({
         updateDetailedViewZoom: (state, action: PayloadAction<number>) => {
             state.detailedViewZoom = action.payload;
         },
-
     },
 });
 
@@ -96,6 +100,7 @@ export const {
     setSelectedGraphName,
     setSelectedArchitecture,
     setSelectedFolder,
+    setSelectedFolderOrigin,
     setAvailableGraphs,
     clearAvailableGraphs,
     setApplicationMode,
