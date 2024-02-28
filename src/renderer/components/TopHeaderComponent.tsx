@@ -11,9 +11,8 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import useAppConfig from '../hooks/useAppConfig.hook';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
-import type { RemoteConnection, RemoteFolder } from '../hooks/useRemoteConnection.hook';
+import type { RemoteFolder } from '../hooks/useRemoteConnection.hook';
 import useRemoteConnection from '../hooks/useRemoteConnection.hook';
 import '../scss/TopHeaderComponent.scss';
 import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
@@ -25,10 +24,6 @@ const getTestName = (path: string) => {
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const getSavedRemoteFolders = (connection?: RemoteConnection) => {
-        return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
-    };
-
     const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, resetAvailableGraphs, openPerfAnalyzerFolderDialog } =
         usePerfAnalyzerFileLoader();
 
@@ -38,11 +33,10 @@ const TopHeaderComponent: React.FC = () => {
 
     const localFolderPath = useSelector(getFolderPathSelector);
 
-    const { getAppConfig } = useAppConfig();
-    const { checkLocalFolderExists } = useRemoteConnection();
+    const { checkLocalFolderExists, getSavedRemoteFolders, getSelectedConnection } = useRemoteConnection();
 
-    const savedConnections = JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
-    const availableRemoteFolders = getSavedRemoteFolders(savedConnections[0]).filter((folder) => folder.lastSynced);
+    const selectedConnection = getSelectedConnection();
+    const availableRemoteFolders = getSavedRemoteFolders(selectedConnection).filter((folder) => folder.lastSynced);
     const [selectedRemoteFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(availableRemoteFolders[0]);
 
     const updateSelectedFolder = async (folder?: RemoteFolder | string) => {

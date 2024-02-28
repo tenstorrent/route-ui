@@ -3,7 +3,6 @@ import { FC, useState } from 'react';
 import { AnchorButton, FormGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import useAppConfig from '../../hooks/useAppConfig.hook';
 
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -14,17 +13,23 @@ import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
 const RemoteConnectionOptions: FC = () => {
-    const { getAppConfig, setAppConfig, deleteAppConfig } = useAppConfig();
+    const {
+        listRemoteFolders,
+        syncRemoteFolder,
+        checkLocalFolderExists,
+        getSavedConnections,
+        getSavedRemoteFolders,
+        getSelectedConnection,
+        setSelectedConnection,
+        setSavedConnections,
+        setSavedRemoteFolders,
+        deleteSavedRemoteFolders,
+    } = useRemoteConnection();
 
-    const getSavedRemoteFolders = (connection?: RemoteConnection) => {
-        return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
-    };
-
-    const savedConnections = JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
-    const [selectedConnection, setSelectedConnection] = useState<RemoteConnection | undefined>(savedConnections[0]);
-    const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(getSavedRemoteFolders(savedConnections[0]));
+    const savedConnections = getSavedConnections();
+    const selectedConnection = getSelectedConnection();
+    const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(getSavedRemoteFolders(selectedConnection));
     const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
-    const { listRemoteFolders, syncRemoteFolder, checkLocalFolderExists } = useRemoteConnection();
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
 
@@ -74,9 +79,9 @@ const RemoteConnectionOptions: FC = () => {
         });
 
         if (!folders) {
-            deleteAppConfig(`${connection?.name}-remoteFolders`);
+            deleteSavedRemoteFolders(connection);
         } else {
-            setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(updatedFolders));
+            setSavedRemoteFolders(connection, updatedFolders);
         }
 
         setRemoteFolders(updatedFolders);
@@ -105,7 +110,7 @@ const RemoteConnectionOptions: FC = () => {
             updatedConnections.splice(updatedConnectionIndex, 1);
         }
 
-        setAppConfig('remoteConnections', JSON.stringify(updatedConnections));
+        setSavedConnections(updatedConnections);
 
         await updateSelectedConnection(isDeletingConnection ? updatedConnections[0] : connection);
     };
@@ -122,7 +127,7 @@ const RemoteConnectionOptions: FC = () => {
                     onAddConnection={async (newConnection) => {
                         const newConnections = [...savedConnections, newConnection];
 
-                        setAppConfig('remoteConnections', JSON.stringify(newConnections));
+                        setSavedConnections(newConnections);
                         await updateSelectedConnection(newConnection);
                     }}
                 />
@@ -195,9 +200,7 @@ const RemoteConnectionOptions: FC = () => {
                                 try {
                                     await syncRemoteFolder(selectedConnection, selectedFolder);
 
-                                    const savedRemoteFolders = JSON.parse(
-                                        getAppConfig(`${selectedConnection?.name}-remoteFolders`) ?? '[]',
-                                    ) as RemoteFolder[];
+                                    const savedRemoteFolders = getSavedRemoteFolders(selectedConnection);
 
                                     await updateSavedRemoteFolders(
                                         selectedConnection,
