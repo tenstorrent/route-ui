@@ -168,7 +168,7 @@ const useRemoteConnection = () => {
 
         /**
          * This command will be executed on the ssh server, and run the foolowing steps:
-         * 1. Find all files named `device_desc.yaml` or `cluster_desc.yaml` in the remote path
+         * 1. Find all files named `runtime_data.yaml` or `device_desc.yaml` in the remote path
          * 2. Get the directory that contains the files.
          * 3. Remove duplicates
          * 4. For each directory, separated by a `;`, print:
@@ -183,7 +183,7 @@ const useRemoteConnection = () => {
          * ```
          */
         const shellCommand = [
-            `find -L "${connection.path}" -mindepth 1 -maxdepth 3 -type f \\( -name "device_desc.yaml" -o -name "cluster_desc.yaml" \\) -print0`,
+            `find -L "${connection.path}" -mindepth 1 -maxdepth 3 -type f \\( -name "runtime_data.yaml" -o -name "device_desc.yaml" \\) -print0`,
             'xargs -0 -I{} dirname {}',
             'uniq',
             `xargs -I{} sh -c "echo \\"\\$(date -d \\"\\$(stat -c %w \\"{}\\")\\" --iso-8601=seconds);\\$(date -d \\"\\$(stat -c %y \\"{}\\")\\" --iso-8601=seconds);$(echo \\"{}\\")\\""`,
