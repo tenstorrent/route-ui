@@ -40,7 +40,7 @@ const RemoteConnectionOptions: FC = () => {
         setSelectedFolder(folder);
 
         if (checkLocalFolderExists(folder?.localPath)) {
-            await loadPerfAnalyzerFolder(folder?.localPath);
+            await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
         } else {
             resetAvailableGraphs();
         }

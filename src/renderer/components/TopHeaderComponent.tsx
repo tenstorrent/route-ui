@@ -8,9 +8,11 @@ import {
     getAvailableGraphsSelector,
     getFolderPathSelector,
     getGraphNameSelector,
+    getSelectedFolderOrigin,
 } from 'data/store/selectors/uiState.selectors';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import type { SelectedFolderOrigin } from '../../data/StateTypes';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import type { RemoteFolder } from '../hooks/useRemoteConnection.hook';
 import useRemoteConnection from '../hooks/useRemoteConnection.hook';
@@ -32,6 +34,7 @@ const TopHeaderComponent: React.FC = () => {
     const availableGraphs = useSelector(getAvailableGraphsSelector);
 
     const localFolderPath = useSelector(getFolderPathSelector);
+    const folderOrigin = useSelector(getSelectedFolderOrigin);
 
     const { checkLocalFolderExists, getSavedRemoteFolders, getSelectedConnection } = useRemoteConnection();
 
@@ -39,7 +42,10 @@ const TopHeaderComponent: React.FC = () => {
     const availableRemoteFolders = getSavedRemoteFolders(selectedConnection).filter((folder) => folder.lastSynced);
     const [selectedRemoteFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(availableRemoteFolders[0]);
 
-    const updateSelectedFolder = async (folder?: RemoteFolder | string) => {
+    const updateSelectedFolder = async (
+        folder: RemoteFolder | string | undefined,
+        newFolderOrigin: SelectedFolderOrigin,
+    ) => {
         const folderPath = (folder as RemoteFolder)?.localPath ?? folder;
 
         if (typeof folder === 'string') {
@@ -49,7 +55,7 @@ const TopHeaderComponent: React.FC = () => {
         }
 
         if (checkLocalFolderExists(folderPath)) {
-            await loadPerfAnalyzerFolder(folderPath);
+            await loadPerfAnalyzerFolder(folderPath, newFolderOrigin);
         } else {
             resetAvailableGraphs();
         }
@@ -69,27 +75,27 @@ const TopHeaderComponent: React.FC = () => {
     return (
         <div className='top-header-component'>
             <div className='text-content'>
-                <Tooltip2 content={localFolderPath} disabled={!selectedRemoteFolder}>
+                <Tooltip2 content={localFolderPath} disabled={folderOrigin === 'local'}>
                     <RemoteFolderSelector
                         remoteFolders={availableRemoteFolders}
-                        remoteFolder={selectedRemoteFolder}
+                        remoteFolder={folderOrigin === 'remote' ? selectedRemoteFolder : undefined}
                         falbackLabel=''
                         icon={IconNames.CLOUD_DOWNLOAD}
                         onSelectFolder={(folder) => {
-                            updateSelectedFolder(folder);
+                            updateSelectedFolder(folder, 'remote');
                         }}
                     />
                 </Tooltip2>
-                <Tooltip2 content={localFolderPath} disabled={!!selectedRemoteFolder}>
+                <Tooltip2 content={localFolderPath} disabled={folderOrigin === 'remote'}>
                     <Button
                         icon={IconNames.FolderSharedOpen}
                         onClick={async () => {
                             const folderPath = await openPerfAnalyzerFolderDialog();
 
-                            updateSelectedFolder(folderPath);
+                            updateSelectedFolder(folderPath, 'local');
                         }}
                     >
-                        {!selectedRemoteFolder && <span className='path-label'>{getTestName(localFolderPath)}</span>}
+                        {folderOrigin === 'local' && <span className='path-label'>{getTestName(localFolderPath)}</span>}
                     </Button>
                 </Tooltip2>
                 <GraphSelector />
