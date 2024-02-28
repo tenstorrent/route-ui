@@ -1,6 +1,6 @@
 import { sep as pathSeparator } from 'path';
 
-import { Button, Switch } from '@blueprintjs/core';
+import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
@@ -8,11 +8,9 @@ import {
     getAvailableGraphsSelector,
     getFolderPathSelector,
     getGraphNameSelector,
-    getHighContrastState,
 } from 'data/store/selectors/uiState.selectors';
-import { setHighContrastState } from 'data/store/slices/uiState.slice';
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import '../scss/TopHeaderComponent.scss';
 import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
@@ -24,8 +22,6 @@ const getTestName = (path: string) => {
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const dispatch = useDispatch();
-    const isHighContrast = useSelector(getHighContrastState);
     const architecture = useSelector(getArchitectureSelector);
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
@@ -45,11 +41,6 @@ const TopHeaderComponent: React.FC = () => {
 
     return (
         <div className='top-header-component'>
-            <Switch
-                checked={isHighContrast}
-                label='Enable high contrast'
-                onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
-            />
             <div className='text-content'>
                 <RemoteFolderSelector
                     falbackLabel=''
