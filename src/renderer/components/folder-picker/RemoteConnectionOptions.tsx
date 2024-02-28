@@ -35,6 +35,7 @@ const RemoteConnectionOptions: FC = () => {
     const selectedFolderOrigin = useSelector(getSelectedFolderOrigin);
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
+    const [isFetchingFolderStatus, setIsFetchingFolderStatus] = useState(false);
 
     const logging = useLogging();
     const { loadPerfAnalyzerFolder, resetAvailableGraphs } = usePerfAnalyzerFileLoader();
@@ -121,11 +122,14 @@ const RemoteConnectionOptions: FC = () => {
     useEffect(() => {
         (async () => {
             try {
+                setIsFetchingFolderStatus(true);
                 const updatedRemoteFolders = await listRemoteFolders(selectedConnection);
 
                 await updateSavedRemoteFolders(selectedConnection, updatedRemoteFolders);
             } catch (err) {
                 logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+            } finally {
+                setIsFetchingFolderStatus(false);
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -202,6 +206,7 @@ const RemoteConnectionOptions: FC = () => {
                     remoteFolder={selectedFolder}
                     remoteFolders={remoteFolders}
                     loading={isSyncingRemoteFolder}
+                    updatingFolderList={isFetchingFolderStatus}
                     onSelectFolder={async (folder) => {
                         await updateSelectedFolder(folder);
                     }}

@@ -29,42 +29,61 @@ const isLocalFolderOutdated = (folder: RemoteFolder) => {
     return lastModified > lastSynced;
 };
 
-const remoteFolderRenderer: ItemRenderer<RemoteFolder> = (folder, { handleClick, modifiers }) => {
-    if (!modifiers.matchesPredicate) {
-        return null;
-    }
+const remoteFolderRenderer =
+    (syncingFolderList: boolean): ItemRenderer<RemoteFolder> =>
+    (folder, { handleClick, modifiers }) => {
+        if (!modifiers.matchesPredicate) {
+            return null;
+        }
 
-    return (
-        <MenuItem
-            active={modifiers.active}
-            disabled={modifiers.disabled}
-            key={`${formatRemoteFolderName(folder)}${folder.lastSynced ?? folder.lastModified}`}
-            onClick={handleClick}
-            text={formatRemoteFolderName(folder)}
-            // @ts-expect-error - Hack abusing label, it actually works.
-            label={
-                isLocalFolderOutdated(folder) ? (
+        const { lastSynced, lastModified } = folder;
+
+        let statusIcon = (
+            <Tooltip2
+                content={`Fetching folder status, last sync: ${lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'}`}
+            >
+                <Icon icon={IconNames.UNGROUP_OBJECTS} color='grey' />
+            </Tooltip2>
+        );
+
+        if (!syncingFolderList) {
+            if (isLocalFolderOutdated(folder)) {
+                statusIcon = (
                     <Tooltip2
-                        content={`Folder is stale, last sync: ${folder.lastSynced ? formatter.format(new Date(folder.lastSynced)) : 'Never'}`}
+                        content={`Folder is stale, last sync: ${lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'}`}
                     >
                         <Icon icon={IconNames.HISTORY} color='goldenrod' />
                     </Tooltip2>
-                ) : (
+                );
+            } else {
+                statusIcon = (
                     <Tooltip2
-                        content={`Folder is up to date, last sync: ${folder.lastSynced ? formatter.format(new Date(folder.lastSynced)) : 'Never'}`}
+                        content={`Folder is up to date, last sync: ${lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'}`}
                     >
                         <Icon icon={IconNames.UPDATED} color='green' />
                     </Tooltip2>
-                )
+                );
             }
-        />
-    );
-};
+        }
+
+        return (
+            <MenuItem
+                active={modifiers.active}
+                disabled={modifiers.disabled}
+                key={`${formatRemoteFolderName(folder)}${lastSynced ?? lastModified}`}
+                onClick={handleClick}
+                text={formatRemoteFolderName(folder)}
+                // @ts-expect-error - Hack abusing label, it actually works.
+                label={statusIcon}
+            />
+        );
+    };
 
 interface RemoteFolderSelectorProps {
     remoteFolder?: RemoteFolder;
     remoteFolders?: RemoteFolder[];
     loading?: boolean;
+    updatingFolderList?: boolean;
     falbackLabel?: string;
     icon?: string;
     onSelectFolder: (folder: RemoteFolder) => void;
@@ -74,6 +93,7 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
     remoteFolder,
     remoteFolders,
     loading,
+    updatingFolderList = false,
     onSelectFolder,
     children,
     falbackLabel = '(No selection)',
@@ -84,7 +104,7 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
             <Select2
                 className='remote-folder-select'
                 items={remoteFolders ?? []}
-                itemRenderer={remoteFolderRenderer}
+                itemRenderer={remoteFolderRenderer(updatingFolderList)}
                 filterable
                 itemPredicate={filterFolders}
                 noResults={<MenuItem disabled text='No results.' roleStructure='listoption' />}
@@ -105,6 +125,7 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
 
 RemoteFolderSelector.defaultProps = {
     loading: false,
+    updatingFolderList: false,
     remoteFolders: [],
     remoteFolder: undefined,
     falbackLabel: undefined,
