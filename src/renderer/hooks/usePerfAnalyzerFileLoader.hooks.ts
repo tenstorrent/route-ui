@@ -47,20 +47,23 @@ const usePerfAnalyzerFileLoader = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
-    const selectFolderDialog = async (): Promise<string | null> => {
+    const openPerfAnalyzerFolderDialog = async () => {
         const folderList = dialog.showOpenDialogSync({
             properties: ['openDirectory'],
         });
 
-        const folderPath = folderList?.[0] ?? null;
+        const folderPath = folderList?.[0] ?? undefined;
         if (!folderPath) {
-            return null;
+            return undefined;
         }
+
         const [isValid, err] = await validatePerfResultsFolder(folderPath);
         if (!isValid) {
+            // eslint-disable-next-line no-alert
             alert(`Invalid folder selected: ${err}`);
-            return null;
+            return undefined;
         }
+
         return folderPath;
     };
 
@@ -113,16 +116,10 @@ const usePerfAnalyzerFileLoader = () => {
     };
 
     const loadPerfAnalyzerFolder = async (folderPath?: string | null): Promise<void> => {
-        let folderToLoad = folderPath;
-
-        if (!folderToLoad) {
-            folderToLoad = await selectFolderDialog();
-        }
-
-        if (folderToLoad) {
+        if (folderPath) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
 
-            await loadFolder(folderToLoad);
+            await loadFolder(folderPath);
         }
     };
 
@@ -133,6 +130,7 @@ const usePerfAnalyzerFileLoader = () => {
 
     return {
         loadPerfAnalyzerFolder,
+        openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
         resetAvailableGraphs,
         error,

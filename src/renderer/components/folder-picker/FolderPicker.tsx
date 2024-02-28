@@ -15,7 +15,7 @@ import RemoteConnectionOptions from './RemoteConnectionOptions';
  * */
 
 export const PerfDataLoader = (): React.ReactElement => {
-    const { loadPerfAnalyzerFolder, error } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error } = usePerfAnalyzerFileLoader();
 
     return (
         <div className='folder-picker-options'>
@@ -29,7 +29,14 @@ export const PerfDataLoader = (): React.ReactElement => {
                         subLabel='Select a local folder to load the performance data from.'
                     >
                         <div className='buttons-container'>
-                            <FolderPicker disabled={false} onSelectFolder={() => loadPerfAnalyzerFolder()} />
+                            <FolderPicker
+                                disabled={false}
+                                onSelectFolder={async () => {
+                                    const folderPath = await openPerfAnalyzerFolderDialog();
+
+                                    await loadPerfAnalyzerFolder(folderPath);
+                                }}
+                            />
                             <GraphSelector />
                             {error && (
                                 <div className='loading-error'>
