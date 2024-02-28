@@ -43,7 +43,6 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                 ...prevState.chips,
                 [graphName]: newChipData,
             },
-            graphName,
         }));
     }, []);
 
