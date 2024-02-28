@@ -6,10 +6,15 @@ interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
     onSelectGraph?: (graph: string) => void;
+    autoLoadFistGraph?: boolean;
 }
 
-const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph }) => {
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
     const { selectedGraph, loadPerfAnalyzerGraph, availableGraphs } = usePerfAnalyzerFileLoader();
+
+    if (autoLoadFistGraph && !selectedGraph && availableGraphs?.length > 0) {
+        loadPerfAnalyzerGraph(availableGraphs[0].name);
+    }
 
     return (
         <PopoverMenu // Graph picker
@@ -29,6 +34,7 @@ GraphSelector.defaultProps = {
     disabled: false,
     label: undefined,
     onSelectGraph: undefined,
+    autoLoadFistGraph: false,
 };
 
 export default GraphSelector;

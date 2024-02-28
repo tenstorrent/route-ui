@@ -5,12 +5,10 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     getArchitectureSelector,
-    getAvailableGraphsSelector,
     getFolderPathSelector,
-    getGraphNameSelector,
     getSelectedFolderOrigin,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { SelectedFolderOrigin } from '../../data/StateTypes';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -26,12 +24,15 @@ const getTestName = (path: string) => {
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, resetAvailableGraphs, openPerfAnalyzerFolderDialog } =
-        usePerfAnalyzerFileLoader();
+    const {
+        loadPerfAnalyzerFolder,
+        selectedGraph,
+        availableGraphs,
+        resetAvailableGraphs,
+        openPerfAnalyzerFolderDialog,
+    } = usePerfAnalyzerFileLoader();
 
     const architecture = useSelector(getArchitectureSelector);
-    const selectedGraph = useSelector(getGraphNameSelector);
-    const availableGraphs = useSelector(getAvailableGraphsSelector);
 
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderOrigin = useSelector(getSelectedFolderOrigin);
@@ -40,7 +41,9 @@ const TopHeaderComponent: React.FC = () => {
 
     const selectedConnection = getSelectedConnection();
     const availableRemoteFolders = getSavedRemoteFolders(selectedConnection).filter((folder) => folder.lastSynced);
-    const [selectedRemoteFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(availableRemoteFolders[0]);
+    const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
+        availableRemoteFolders[0],
+    );
 
     const updateSelectedFolder = async (
         folder: RemoteFolder | string | undefined,
@@ -49,26 +52,16 @@ const TopHeaderComponent: React.FC = () => {
         const folderPath = (folder as RemoteFolder)?.localPath ?? folder;
 
         if (typeof folder === 'string') {
-            setSelectedFolder(undefined);
+            setSelectedRemoteFolder(undefined);
         } else {
-            setSelectedFolder(folder);
+            setSelectedRemoteFolder(folder);
         }
 
         if (checkLocalFolderExists(folderPath)) {
-            await loadPerfAnalyzerFolder(folderPath, newFolderOrigin);
-        } else {
             resetAvailableGraphs();
+            await loadPerfAnalyzerFolder(folderPath, newFolderOrigin);
         }
     };
-
-    useEffect(() => {
-        const hasAvailableGraphs = availableGraphs && availableGraphs.length > 0;
-
-        if (hasAvailableGraphs) {
-            loadPerfAnalyzerGraph(availableGraphs[0].name);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [availableGraphs]);
 
     const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
@@ -81,8 +74,8 @@ const TopHeaderComponent: React.FC = () => {
                         remoteFolder={folderOrigin === 'remote' ? selectedRemoteFolder : undefined}
                         falbackLabel=''
                         icon={IconNames.CLOUD_DOWNLOAD}
-                        onSelectFolder={(folder) => {
-                            updateSelectedFolder(folder, 'remote');
+                        onSelectFolder={async (folder) => {
+                            await updateSelectedFolder(folder, 'remote');
                         }}
                     />
                 </Tooltip2>
@@ -92,13 +85,15 @@ const TopHeaderComponent: React.FC = () => {
                         onClick={async () => {
                             const folderPath = await openPerfAnalyzerFolderDialog();
 
-                            updateSelectedFolder(folderPath, 'local');
+                            if (folderPath) {
+                                await updateSelectedFolder(folderPath, 'local');
+                            }
                         }}
                     >
                         {folderOrigin === 'local' && <span className='path-label'>{getTestName(localFolderPath)}</span>}
                     </Button>
                 </Tooltip2>
-                <GraphSelector />
+                <GraphSelector autoLoadFistGraph />
             </div>
 
             <div className='text-content'>
