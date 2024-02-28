@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 import { AnchorButton, FormGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -117,6 +117,19 @@ const RemoteConnectionOptions: FC = () => {
 
         await updateSelectedConnection(isDeletingConnection ? updatedConnections[0] : connection);
     };
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const updatedRemoteFolders = await listRemoteFolders(selectedConnection);
+
+                await updateSavedRemoteFolders(selectedConnection, updatedRemoteFolders);
+            } catch (err) {
+                logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+            }
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
