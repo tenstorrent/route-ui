@@ -1,6 +1,5 @@
 import { sep as pathSeparator } from 'path';
 
-import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
@@ -17,6 +16,7 @@ import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks'
 import type { RemoteConnection, RemoteFolder } from '../hooks/useRemoteConnection.hook';
 import useRemoteConnection from '../hooks/useRemoteConnection.hook';
 import '../scss/TopHeaderComponent.scss';
+import FolderPicker from './folder-picker/FolderPicker';
 import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
 import GraphSelector from './graph-selector/GraphSelector';
 
@@ -96,20 +96,21 @@ const TopHeaderComponent: React.FC = () => {
                     content={folderLocationType === 'remote' ? 'Select local folder' : localFolderPath}
                     placement='bottom'
                 >
-                    <Button
+                    <FolderPicker
                         icon={IconNames.FolderSharedOpen}
-                        onClick={async () => {
+                        onSelectFolder={async () => {
                             const folderPath = await openPerfAnalyzerFolderDialog();
 
                             if (folderPath) {
                                 await updateSelectedFolder(folderPath, 'local');
                             }
                         }}
-                    >
-                        {folderLocationType === 'local' && (
-                            <span className='path-label'>{getTestName(localFolderPath)}</span>
-                        )}
-                    </Button>
+                        text={
+                            folderLocationType === 'local' ? (
+                                <span className='path-label'>{getTestName(localFolderPath)}</span>
+                            ) : undefined
+                        }
+                    />
                 </Tooltip2>
                 <GraphSelector autoLoadFistGraph />
             </div>
