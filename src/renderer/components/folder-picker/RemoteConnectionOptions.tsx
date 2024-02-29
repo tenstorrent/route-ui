@@ -125,9 +125,10 @@ const RemoteConnectionOptions: FC = () => {
                 <AddRemoteConnection
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     onAddConnection={async (newConnection) => {
-                        const newConnections = [...remoteConnection.persistentState.savedConnectionList, newConnection];
-
-                        remoteConnection.persistentState.savedConnectionList = newConnections;
+                        remoteConnection.persistentState.savedConnectionList = [
+                            ...remoteConnection.persistentState.savedConnectionList,
+                            newConnection,
+                        ];
                         await updateSelectedConnection(newConnection);
                     }}
                 />
