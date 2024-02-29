@@ -3,9 +3,11 @@ import React from 'react';
 import { Button, FormGroup, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
+import { useSelector } from 'react-redux';
 import usePerfAnalyzerFileLoader from 'renderer/hooks/usePerfAnalyzerFileLoader.hooks';
+import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
 import '../../scss/FolderPicker.scss';
-import PopoverMenu from '../PopoverMenu';
+import GraphSelector from '../graph-selector/GraphSelector';
 import RemoteConnectionOptions from './RemoteConnectionOptions';
 
 /** Implements a temporary wrapper around the Folder Loading component & Graph selection component, to provide state
@@ -15,8 +17,8 @@ import RemoteConnectionOptions from './RemoteConnectionOptions';
  * */
 
 export const PerfDataLoader = (): React.ReactElement => {
-    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph, error, selectedGraph, availableGraphs } =
-        usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error } = usePerfAnalyzerFileLoader();
+    const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
 
     return (
         <div className='folder-picker-options'>
@@ -30,14 +32,15 @@ export const PerfDataLoader = (): React.ReactElement => {
                         subLabel='Select a local folder to load the performance data from.'
                     >
                         <div className='buttons-container'>
-                            <FolderPicker disabled={false} onSelectFolder={() => loadPerfAnalyzerFolder()} />
-                            <PopoverMenu // Graph picker
-                                label='Select Graph'
-                                options={availableGraphs.map((graph) => graph.name)}
-                                selectedItem={selectedGraph}
-                                onSelectItem={loadPerfAnalyzerGraph}
-                                disabled={availableGraphs?.length === 0}
+                            <FolderPicker
+                                disabled={false}
+                                onSelectFolder={async () => {
+                                    const folderPath = await openPerfAnalyzerFolderDialog();
+
+                                    await loadPerfAnalyzerFolder(folderPath);
+                                }}
                             />
+                            <GraphSelector disabled={selectedFolderLocationType === 'remote'} />
                             {error && (
                                 <div className='loading-error'>
                                     <p>{error.toString()}</p>

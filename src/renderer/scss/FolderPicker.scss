@@ -73,3 +73,11 @@
     word-wrap: break-word;
     padding: 10px;
 }
+
+.remote-folder-item {
+    align-items: center;
+
+    .remote-folder-status-icon {
+        display: contents;
+    }
+}

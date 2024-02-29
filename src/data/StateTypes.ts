@@ -1,5 +1,9 @@
 import { LinkType } from './Types';
 
+export interface ExperimentalFeaturesState {
+    showQueuesTable: boolean;
+}
+
 export interface HighContrastState {
     enabled: boolean;
 }
@@ -95,3 +99,5 @@ export interface GraphRelationshipState {
 export interface ClusterViewState {
     isOpen: boolean;
 }
+
+export type FolderLocationType = 'local' | 'remote';

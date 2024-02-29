@@ -1,34 +1,42 @@
+import { RootState } from 'data/store/createStore';
+import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
-import { RootState } from 'data/store/createStore';
-import './scss/MainRouteRenderer.scss';
+import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import GridRender from './GridRender';
 import PropertiesPanel from './PropertiesPanel';
 import { SideBar } from './components/SideBar';
+import TopHeaderComponent from './components/TopHeaderComponent';
 import BottomDock from './components/bottom-dock/BottomDock';
+import './scss/MainRouteRenderer.scss';
 
 export interface MainRouteRendererProps {}
 
-const MainRouteRenderer: React.FC<MainRouteRendererProps> = ({}) => {
+const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
     const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
     const isDetailedViewOpen = useSelector((state: RootState) => state.detailedView.isOpen);
 
     return (
-        <div
-            className={`outer-wrapper ${isDockOpen ? 'dock-open' : ''} ${
-                isDetailedViewOpen ? 'detailed-view-open' : ''
-            }`}
-        >
-            <div className='main-wrapper'>
-                <SideBar />
-                <div className='main-container'>
-                    <GridRender />
-                    <PropertiesPanel />
-                </div>
+        <>
+            <div className='header'>
+                <TenstorrentLogo />
+                <TopHeaderComponent />
             </div>
-            <BottomDock />
-        </div>
+            <div
+                className={`outer-wrapper ${isDockOpen ? 'dock-open' : ''} ${
+                    isDetailedViewOpen ? 'detailed-view-open' : ''
+                }`}
+            >
+                <div className='main-wrapper'>
+                    <SideBar />
+                    <div className='main-container'>
+                        <GridRender />
+                        <PropertiesPanel />
+                    </div>
+                </div>
+                <BottomDock />
+            </div>
+        </>
     );
 };
 
