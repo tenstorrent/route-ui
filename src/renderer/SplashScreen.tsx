@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { LogLevel } from '../data/Types';
@@ -19,15 +19,15 @@ const SplashScreen: FC = () => {
     const { getAppConfig } = useAppConfig();
     const dispatch = useDispatch();
 
-    const updateExperimentalFeaturesStateInRedux = () => {
+    useEffect(() => {
         const isQueuesTableEnabled = JSON.parse(
             getAppConfig(ElectronEvents.TOGGLE_QUEUES_TABLE) ?? '[false]',
         )[0] as boolean;
 
         dispatch(toggleQueuesTable(isQueuesTableEnabled));
-    };
 
-    updateExperimentalFeaturesStateInRedux();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
