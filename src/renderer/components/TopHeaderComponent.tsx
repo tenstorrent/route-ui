@@ -77,7 +77,7 @@ const TopHeaderComponent: React.FC = () => {
                 <Tooltip2
                     content={
                         folderLocationType === 'local'
-                            ? 'Select a remote folder'
+                            ? 'Select remote folder'
                             : formatRemoteFolderName(selectedConnection, selectedRemoteFolder)
                     }
                     placement='bottom'
@@ -93,7 +93,7 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <Tooltip2
-                    content={folderLocationType === 'remote' ? 'Select a local folder' : localFolderPath}
+                    content={folderLocationType === 'remote' ? 'Select local folder' : localFolderPath}
                     placement='bottom'
                 >
                     <Button

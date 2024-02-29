@@ -138,9 +138,9 @@ const RemoteConnectionOptions: FC = () => {
     return (
         <>
             <FormGroup
-                label={<h3>Add a remote sync server</h3>}
+                label={<h3>Add remote sync server</h3>}
                 labelFor='text-input'
-                subLabel='Add a new server to the list of available ones. Those server will be used for syncing folders locally.'
+                subLabel='Add new server connection details'
             >
                 <AddRemoteConnection
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
@@ -154,9 +154,9 @@ const RemoteConnectionOptions: FC = () => {
             </FormGroup>
 
             <FormGroup
-                label={<h3>Use a remote sync server</h3>}
+                label={<h3>Use remote sync server</h3>}
                 labelFor='text-input'
-                subLabel='Set the remote server that will be used for syncing folders.'
+                subLabel='Select remote server that will be used for syncing folders'
             >
                 <RemoteConnectionSelector
                     connection={selectedConnection}
@@ -198,9 +198,9 @@ const RemoteConnectionOptions: FC = () => {
             </FormGroup>
 
             <FormGroup
-                label={<h3>Select a remote folder</h3>}
+                label={<h3>Select remote folder</h3>}
                 labelFor='text-input'
-                subLabel="Select a folder to sync it's data."
+                subLabel='Select folder to sync data from'
             >
                 <RemoteFolderSelector
                     remoteFolder={selectedFolder}

@@ -1,7 +1,7 @@
 import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2 } from '@blueprintjs/select';
-import { IconNames } from '@blueprintjs/icons';
 import { FC, useState } from 'react';
 import { RemoteConnection } from '../../hooks/useRemoteConnection.hook';
 import RemoteFolderDialog from './RemoteFolderDialog';
@@ -67,7 +67,7 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                 disabled={disabled}
                 filterable
                 itemPredicate={filterRemoteConnections}
-                noResults={<MenuItem disabled text='No results.' roleStructure='listoption' />}
+                noResults={<MenuItem disabled text='No results' roleStructure='listoption' />}
                 onItemSelect={onSelectConnection}
             >
                 <Button

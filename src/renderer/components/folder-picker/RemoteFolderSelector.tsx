@@ -109,7 +109,7 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
                 itemRenderer={remoteFolderRenderer(updatingFolderList)}
                 filterable
                 itemPredicate={filterFolders}
-                noResults={<MenuItem disabled text='No results.' roleStructure='listoption' />}
+                noResults={<MenuItem disabled text='No results' roleStructure='listoption' />}
                 disabled={loading || remoteFolders?.length === 0}
                 onItemSelect={onSelectFolder}
             >

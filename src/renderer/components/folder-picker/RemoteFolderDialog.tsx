@@ -1,13 +1,13 @@
-import { FC, useState } from 'react';
 import { Button, Dialog, DialogBody, DialogFooter, FormGroup, Icon, IconName, InputGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { FC, useState } from 'react';
 
+import useLogging from '../../hooks/useLogging.hook';
 import useRemoteConnection, {
     ConnectionStatus,
     ConnectionTestStates,
     RemoteConnection,
 } from '../../hooks/useRemoteConnection.hook';
-import useLogging from '../../hooks/useLogging.hook';
 
 import '../../scss/RemoteConnectionDialog.scss';
 
@@ -109,7 +109,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
             onClose={closeDialog}
         >
             <DialogBody>
-                <FormGroup label='Name' labelFor='text-input' subLabel='The name for this connection.'>
+                <FormGroup label='Name' labelFor='text-input' subLabel='The name for this connection'>
                     <InputGroup
                         className='bp4-light'
                         key='name'
@@ -117,7 +117,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                         onChange={(e) => setConnection({ ...connection, name: e.target.value })}
                     />
                 </FormGroup>
-                <FormGroup label='SSH Host' labelFor='text-input' subLabel='The SSH host name, like: localhost.'>
+                <FormGroup label='SSH Host' labelFor='text-input' subLabel='The SSH host name, e.g.: localhost'>
                     <InputGroup
                         key='host'
                         value={connection.host}
@@ -127,7 +127,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 <FormGroup
                     label='SSH Port'
                     labelFor='text-input'
-                    subLabel='The port to use for the SSH connection. Usually port 22.'
+                    subLabel='The port to use for the SSH connection. e.g.: port 22'
                 >
                     <InputGroup
                         key='port'
@@ -146,7 +146,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 <FormGroup
                     label='Remote Folder path'
                     labelFor='text-input'
-                    subLabel='The path to the remote folder, typically $HOME/work/ll-sw.\nThis is the folder where the tests data is stored.'
+                    subLabel='The path to the remote folder, e.g.: "$HOME/work/ll-sw".\nThis is the folder where the tests data is stored'
                 >
                     <InputGroup
                         key='path'
