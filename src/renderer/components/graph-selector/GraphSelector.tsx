@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import { useSelector } from 'react-redux';
+import { getAvailableGraphsSelector, getGraphNameSelector } from '../../../data/store/selectors/uiState.selectors';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
@@ -10,7 +12,9 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
-    const { selectedGraph, loadPerfAnalyzerGraph, availableGraphs } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const selectedGraph = useSelector(getGraphNameSelector);
+    const availableGraphs = useSelector(getAvailableGraphsSelector);
 
     if (autoLoadFistGraph && !selectedGraph && availableGraphs?.length > 0) {
         loadPerfAnalyzerGraph(availableGraphs[0].name);

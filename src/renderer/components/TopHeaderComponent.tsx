@@ -5,7 +5,9 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     getArchitectureSelector,
+    getAvailableGraphsSelector,
     getFolderPathSelector,
+    getGraphNameSelector,
     getSelectedFolderLocationType,
 } from 'data/store/selectors/uiState.selectors';
 import React, { useState } from 'react';
@@ -24,13 +26,7 @@ const getTestName = (path: string) => {
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const {
-        loadPerfAnalyzerFolder,
-        selectedGraph,
-        availableGraphs,
-        resetAvailableGraphs,
-        openPerfAnalyzerFolderDialog,
-    } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, resetAvailableGraphs, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
 
     const architecture = useSelector(getArchitectureSelector);
 
@@ -44,6 +40,8 @@ const TopHeaderComponent: React.FC = () => {
     const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
         availableRemoteFolders[0],
     );
+    const selectedGraph = useSelector(getGraphNameSelector);
+    const availableGraphs = useSelector(getAvailableGraphsSelector);
 
     const updateSelectedFolder = async (
         folder: RemoteFolder | string | undefined,

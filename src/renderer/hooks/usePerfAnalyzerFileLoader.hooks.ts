@@ -1,8 +1,4 @@
-import {
-    getAvailableGraphsSelector,
-    getFolderPathSelector,
-    getGraphNameSelector,
-} from 'data/store/selectors/uiState.selectors';
+import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
 import {
     setApplicationMode,
     setAvailableGraphs,
@@ -31,8 +27,6 @@ const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
     const dispatch = useDispatch();
     const selectedFolder = useSelector(getFolderPathSelector);
-    const selectedGraph = useSelector(getGraphNameSelector);
-    const availableGraphs = useSelector(getAvailableGraphsSelector);
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
@@ -140,8 +134,6 @@ const usePerfAnalyzerFileLoader = () => {
         loadPerfAnalyzerGraph,
         resetAvailableGraphs,
         error,
-        selectedGraph,
-        availableGraphs,
     };
 };
 
