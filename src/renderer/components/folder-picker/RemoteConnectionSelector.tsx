@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2 } from '@blueprintjs/select';
 import { FC, useState } from 'react';
-import { RemoteConnection } from '../../hooks/useRemoteConnection.hook';
+import { RemoteConnection } from '../../hooks/useRemote.hook';
 import RemoteFolderDialog from './RemoteConnectionDialog';
 
 const formatConnectionString = (connection?: RemoteConnection) => {

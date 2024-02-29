@@ -10,18 +10,18 @@ import { setSelectedFolderLocationType } from '../../../data/store/slices/uiStat
 import { checkLocalFolderExists } from '../../../utils/FileLoaders';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
-import useRemoteConnection, { RemoteConnection, RemoteFolder } from '../../hooks/useRemoteConnection.hook';
+import useRemote, { RemoteConnection, RemoteFolder } from '../../hooks/useRemote.hook';
 import GraphSelector from '../graph-selector/GraphSelector';
 import AddRemoteConnection from './AddRemoteConnection';
 import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
 const RemoteConnectionOptions: FC = () => {
-    const remoteConnection = useRemoteConnection();
+    const remote = useRemote();
 
     const dispatch = useDispatch();
     const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(
-        remoteConnection.persistentState.getSavedRemoteFolders(remoteConnection.persistentState.selectedConnection),
+        remote.persistentState.getSavedRemoteFolders(remote.persistentState.selectedConnection),
     );
     const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
     const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
@@ -44,10 +44,10 @@ const RemoteConnectionOptions: FC = () => {
     };
 
     const updateSelectedConnection = async (connection: RemoteConnection) => {
-        remoteConnection.persistentState.selectedConnection = connection;
-        setRemoteFolders(remoteConnection.persistentState.getSavedRemoteFolders(connection));
+        remote.persistentState.selectedConnection = connection;
+        setRemoteFolders(remote.persistentState.getSavedRemoteFolders(connection));
 
-        await updateSelectedFolder(remoteConnection.persistentState.getSavedRemoteFolders(connection)[0]);
+        await updateSelectedFolder(remote.persistentState.getSavedRemoteFolders(connection)[0]);
     };
 
     const updateSavedRemoteFolders = (connection: RemoteConnection | undefined, updatedFolders: RemoteFolder[]) => {
@@ -55,7 +55,7 @@ const RemoteConnectionOptions: FC = () => {
             return [];
         }
 
-        const savedFolders = remoteConnection.persistentState.getSavedRemoteFolders(connection);
+        const savedFolders = remote.persistentState.getSavedRemoteFolders(connection);
         const mergedFolders = (updatedFolders ?? []).map((updatedFolder) => {
             const existingFolder = savedFolders?.find((f) => f.localPath === updatedFolder.localPath);
 
@@ -65,16 +65,16 @@ const RemoteConnectionOptions: FC = () => {
             } as RemoteFolder;
         });
 
-        remoteConnection.persistentState.setSavedRemoteFolders(connection, mergedFolders);
+        remote.persistentState.setSavedRemoteFolders(connection, mergedFolders);
         setRemoteFolders(mergedFolders);
 
         return mergedFolders;
     };
 
     const updateSavedConnection = async (connection: RemoteConnection, isDeletingConnection = false) => {
-        const updatedConnections = [...remoteConnection.persistentState.savedConnectionList];
+        const updatedConnections = [...remote.persistentState.savedConnectionList];
 
-        const updatedConnectionIndex = remoteConnection.persistentState.savedConnectionList.findIndex((c) => {
+        const updatedConnectionIndex = remote.persistentState.savedConnectionList.findIndex((c) => {
             const isSameName = c.name === connection?.name;
             const isSameHost = c.host === connection?.host;
             const isSamePort = c.port === connection?.port;
@@ -92,7 +92,7 @@ const RemoteConnectionOptions: FC = () => {
             updatedConnections.splice(updatedConnectionIndex, 1);
         }
 
-        remoteConnection.persistentState.savedConnectionList = updatedConnections;
+        remote.persistentState.savedConnectionList = updatedConnections;
 
         await updateSelectedConnection(isDeletingConnection ? updatedConnections[0] : connection);
     };
@@ -101,11 +101,9 @@ const RemoteConnectionOptions: FC = () => {
         (async () => {
             try {
                 setIsFetchingFolderStatus(true);
-                const updatedRemoteFolders = await remoteConnection.listRemoteFolders(
-                    remoteConnection.persistentState.selectedConnection,
-                );
+                const updatedRemoteFolders = await remote.listRemoteFolders(remote.persistentState.selectedConnection);
 
-                updateSavedRemoteFolders(remoteConnection.persistentState.selectedConnection!, updatedRemoteFolders);
+                updateSavedRemoteFolders(remote.persistentState.selectedConnection!, updatedRemoteFolders);
             } catch (err) {
                 logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
             } finally {
@@ -125,8 +123,8 @@ const RemoteConnectionOptions: FC = () => {
                 <AddRemoteConnection
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     onAddConnection={async (newConnection) => {
-                        remoteConnection.persistentState.savedConnectionList = [
-                            ...remoteConnection.persistentState.savedConnectionList,
+                        remote.persistentState.savedConnectionList = [
+                            ...remote.persistentState.savedConnectionList,
                             newConnection,
                         ];
                         await updateSelectedConnection(newConnection);
@@ -140,21 +138,21 @@ const RemoteConnectionOptions: FC = () => {
                 subLabel='Select remote server that will be used for syncing folders'
             >
                 <RemoteConnectionSelector
-                    connection={remoteConnection.persistentState.selectedConnection}
-                    connections={remoteConnection.persistentState.savedConnectionList}
+                    connection={remote.persistentState.selectedConnection}
+                    connections={remote.persistentState.savedConnectionList}
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     loading={isLoadingFolderList}
                     onEditConnection={(updatedConnection) => updateSavedConnection(updatedConnection)}
                     onRemoveConnection={async (connection) => {
                         await updateSelectedFolder(undefined);
                         await updateSavedConnection(connection, true);
-                        remoteConnection.persistentState.deleteSavedRemoteFolders(connection);
+                        remote.persistentState.deleteSavedRemoteFolders(connection);
                     }}
                     onSelectConnection={async (connection) => {
                         await updateSelectedConnection(connection);
 
                         try {
-                            const fetchedRemoteFolders = await remoteConnection.listRemoteFolders(connection);
+                            const fetchedRemoteFolders = await remote.listRemoteFolders(connection);
                             const updatedFolders = updateSavedRemoteFolders(connection, fetchedRemoteFolders);
 
                             await updateSelectedFolder(updatedFolders[0]);
@@ -165,11 +163,11 @@ const RemoteConnectionOptions: FC = () => {
                     onSyncRemoteFolders={async () => {
                         setIsLoadingFolderList(true);
                         try {
-                            const savedRemotefolders = await remoteConnection.listRemoteFolders(
-                                remoteConnection.persistentState.selectedConnection,
+                            const savedRemotefolders = await remote.listRemoteFolders(
+                                remote.persistentState.selectedConnection,
                             );
                             const updatedfolders = updateSavedRemoteFolders(
-                                remoteConnection.persistentState.selectedConnection,
+                                remote.persistentState.selectedConnection,
                                 savedRemotefolders,
                             );
 
@@ -208,13 +206,13 @@ const RemoteConnectionOptions: FC = () => {
                             onClick={async () => {
                                 setIsSyncingRemoteFolder(true);
                                 try {
-                                    await remoteConnection.syncRemoteFolder(
-                                        remoteConnection.persistentState.selectedConnection,
+                                    await remote.syncRemoteFolder(
+                                        remote.persistentState.selectedConnection,
                                         selectedFolder,
                                     );
 
-                                    const savedRemoteFolders = remoteConnection.persistentState.getSavedRemoteFolders(
-                                        remoteConnection.persistentState.selectedConnection,
+                                    const savedRemoteFolders = remote.persistentState.getSavedRemoteFolders(
+                                        remote.persistentState.selectedConnection,
                                     );
 
                                     savedRemoteFolders.find(
@@ -222,7 +220,7 @@ const RemoteConnectionOptions: FC = () => {
                                     )!.lastSynced = new Date().toISOString();
 
                                     updateSavedRemoteFolders(
-                                        remoteConnection.persistentState.selectedConnection,
+                                        remote.persistentState.selectedConnection,
                                         savedRemoteFolders,
                                     );
 
