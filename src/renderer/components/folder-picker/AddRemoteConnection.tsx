@@ -3,8 +3,8 @@ import { FC, useState } from 'react';
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
-import RemoteFolderDialog from './RemoteFolderDialog';
 import { RemoteConnection } from '../../hooks/useRemoteConnection.hook';
+import RemoteFolderDialog from './RemoteConnectionDialog';
 
 interface AddRemoteConnectionProps {
     disabled: boolean;

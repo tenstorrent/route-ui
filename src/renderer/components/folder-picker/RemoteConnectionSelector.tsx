@@ -4,7 +4,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2 } from '@blueprintjs/select';
 import { FC, useState } from 'react';
 import { RemoteConnection } from '../../hooks/useRemoteConnection.hook';
-import RemoteFolderDialog from './RemoteFolderDialog';
+import RemoteFolderDialog from './RemoteConnectionDialog';
 
 const formatConnectionString = (connection?: RemoteConnection) => {
     if (!connection) {
