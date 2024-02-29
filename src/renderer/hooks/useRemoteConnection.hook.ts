@@ -139,10 +139,6 @@ const useRemoteConnection = () => {
         }
     };
 
-    const checkLocalFolderExists = (localPath?: string) => {
-        return (localPath && existsSync(localPath)) || false;
-    };
-
     const listRemoteFolders = async (connection?: RemoteConnection) => {
         if (!connection || !connection.host || !connection.port) {
             throw new Error('No connection provided');
@@ -281,7 +277,6 @@ const useRemoteConnection = () => {
     return {
         testConnection,
         testRemoteFolder,
-        checkLocalFolderExists,
         syncRemoteFolder,
         listRemoteFolders,
         getSavedRemoteFolders,

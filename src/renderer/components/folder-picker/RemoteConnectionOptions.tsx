@@ -7,6 +7,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
 import { setSelectedFolderLocationType } from '../../../data/store/slices/uiState.slice';
+import { checkLocalFolderExists } from '../../../utils/FileLoaders';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import useRemoteConnection, { RemoteConnection, RemoteFolder } from '../../hooks/useRemoteConnection.hook';
@@ -19,7 +20,6 @@ const RemoteConnectionOptions: FC = () => {
     const {
         listRemoteFolders,
         syncRemoteFolder,
-        checkLocalFolderExists,
         getSavedConnections,
         getSavedRemoteFolders,
         getSelectedConnection,

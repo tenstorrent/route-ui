@@ -12,6 +12,7 @@ import {
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { FolderLocationType } from '../../data/StateTypes';
+import { checkLocalFolderExists } from '../../utils/FileLoaders';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import type { RemoteConnection, RemoteFolder } from '../hooks/useRemoteConnection.hook';
 import useRemoteConnection from '../hooks/useRemoteConnection.hook';
@@ -41,7 +42,7 @@ const TopHeaderComponent: React.FC = () => {
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderLocationType = useSelector(getSelectedFolderLocationType);
 
-    const { checkLocalFolderExists, getSavedRemoteFolders, getSelectedConnection } = useRemoteConnection();
+    const { getSavedRemoteFolders, getSelectedConnection } = useRemoteConnection();
 
     const selectedConnection = getSelectedConnection();
     const availableRemoteFolders = getSavedRemoteFolders(selectedConnection).filter((folder) => folder.lastSynced);
