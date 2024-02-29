@@ -42,7 +42,7 @@ const TopHeaderComponent: React.FC = () => {
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderLocationType = useSelector(getSelectedFolderLocationType);
 
-    const remoteConnectionConfig = useRemoteConnection().config;
+    const remoteConnectionConfig = useRemoteConnection().persistentState;
 
     const { selectedConnection } = remoteConnectionConfig;
     const availableRemoteFolders = remoteConnectionConfig
