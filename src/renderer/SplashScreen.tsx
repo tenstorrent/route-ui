@@ -1,15 +1,20 @@
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Icon } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import { LogLevel } from '../data/Types';
 import { getLogEntriesByType, getLogOutputEnabled } from '../data/store/selectors/logging.selector';
 import LogsOutput from './components/LogsOutput';
-import { PerfDataLoader } from './components/folder-picker/FolderPicker';
 
 import { toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
 import { ElectronEvents } from '../main/ElectronEvents';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
+import RemoteConnectionOptions from './components/folder-picker/RemoteConnectionOptions';
 import useAppConfig from './hooks/useAppConfig.hook';
+
+import LocalFolderOptions from './components/folder-picker/LocalFolderOptions';
+import './scss/FolderPicker.scss';
 import './scss/SplashScreen.scss';
 
 const SplashScreen: FC = () => {
@@ -35,7 +40,22 @@ const SplashScreen: FC = () => {
                 <TenstorrentLogo />
             </div>
             <div className='splash-screen'>
-                <PerfDataLoader />
+                <div className='folder-picker-options'>
+                    <fieldset>
+                        <legend>Local folder</legend>
+                        <Icon icon={IconNames.FOLDER_OPEN} size={150} />
+                        <div className='folder-picker-wrapper'>
+                            <LocalFolderOptions />
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Remote Sync</legend>
+                        <Icon icon={IconNames.CLOUD} size={150} />
+                        <div className='folder-picker-wrapper'>
+                            <RemoteConnectionOptions />
+                        </div>
+                    </fieldset>
+                </div>
                 {logOutputEnabled && errorLogs.length > 0 && (
                     <div id='splash-debug-panel'>
                         <LogsOutput />
