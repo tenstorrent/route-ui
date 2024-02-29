@@ -14,7 +14,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { FolderLocationType } from '../../data/StateTypes';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
-import type { RemoteFolder } from '../hooks/useRemoteConnection.hook';
+import type { RemoteConnection, RemoteFolder } from '../hooks/useRemoteConnection.hook';
 import useRemoteConnection from '../hooks/useRemoteConnection.hook';
 import '../scss/TopHeaderComponent.scss';
 import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
@@ -23,6 +23,14 @@ import GraphSelector from './graph-selector/GraphSelector';
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
     return lastFolder ? `${pathSeparator}${lastFolder}` : 'n/a';
+};
+
+const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFolder) => {
+    if (!connection || !folder) {
+        return 'n/a';
+    }
+
+    return `${connection.name} - ${folder.testName}`;
 };
 
 const TopHeaderComponent: React.FC = () => {
@@ -66,7 +74,14 @@ const TopHeaderComponent: React.FC = () => {
     return (
         <div className='top-header-component'>
             <div className='text-content'>
-                <Tooltip2 content={localFolderPath} disabled={folderLocationType === 'local'}>
+                <Tooltip2
+                    content={
+                        folderLocationType === 'local'
+                            ? 'Pick a remote folder'
+                            : formatRemoteFolderName(selectedConnection, selectedRemoteFolder)
+                    }
+                    placement='bottom'
+                >
                     <RemoteFolderSelector
                         remoteFolders={availableRemoteFolders}
                         remoteFolder={folderLocationType === 'remote' ? selectedRemoteFolder : undefined}
@@ -77,7 +92,10 @@ const TopHeaderComponent: React.FC = () => {
                         }}
                     />
                 </Tooltip2>
-                <Tooltip2 content={localFolderPath} disabled={folderLocationType === 'remote'}>
+                <Tooltip2
+                    content={folderLocationType === 'remote' ? 'Pick a local folder' : localFolderPath}
+                    placement='bottom'
+                >
                     <Button
                         icon={IconNames.FolderSharedOpen}
                         onClick={async () => {
