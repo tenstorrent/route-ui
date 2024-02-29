@@ -81,11 +81,13 @@ const usePerfAnalyzerFileLoader = () => {
             // TODO: ensure this is not needed
             // setEnableGraphSelect(true);
 
-            sortedGraphs.forEach(async (graph) => {
+            // eslint-disable-next-line no-restricted-syntax
+            for (const graph of sortedGraphs) {
+                // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
                 addChip(graphOnChip, graph.name);
                 dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
-            });
+            }
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
