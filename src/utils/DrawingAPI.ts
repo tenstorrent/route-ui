@@ -104,44 +104,129 @@ export const drawLink = (
     }
 };
 
-export const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, size: number) => {
+const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, direction: EthernetLinkName, size: number) => {
+    const offset = 5;
+
     let lineStartX: number = 0;
     let lineEndX: number = 0;
     let lineStartY: number = 0;
     let lineEndY: number = 0;
 
-    // const arrowHeadHeight = 5;
-    // const arrowHeadWidth = 5;
-    // let arrowOffset = 5;
+    const arrowHeadHeight = 7;
+    const arrowHeadWidth = 7;
+    let arrowOffset = 10;
 
-    const arrow = { p1: '', p2: '', p3: '' };
+    let arrow = { p1: '', p2: '', p3: '' };
 
     switch (ethPosition) {
         case CLUSTER_ETH_POSITION.TOP:
-        case CLUSTER_ETH_POSITION.BOTTOM:
-            // arrowOffset = 5;
-            lineStartX = size / 2;
-            lineStartY = 0
-            lineEndX = size / 2;
+            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -25 : 4;
+            lineStartX = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
+            lineStartY = 0;
+            lineEndX = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
             lineEndY = size;
             break;
+        case CLUSTER_ETH_POSITION.BOTTOM:
+            arrowOffset = direction === EthernetLinkName.ETH_IN ? -25 : 4;
+            lineStartX = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            lineStartY = 0;
+            lineEndX = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            lineEndY = size;
+
+            break;
         case CLUSTER_ETH_POSITION.LEFT:
-        case CLUSTER_ETH_POSITION.RIGHT:
-            // arrowOffset = 5;
+            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -25 : 5;
             lineStartX = 0;
-            lineStartY = size / 2;
+            lineStartY = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
             lineEndX = size;
-            lineEndY = size / 2;
-        // arrow = {
-        //     p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-        //     p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-        //     p3: `${lineEndX},${lineEndY + arrowOffset}`,
-        // };
+            lineEndY = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
+            break;
+        case CLUSTER_ETH_POSITION.RIGHT:
+            arrowOffset = direction === EthernetLinkName.ETH_IN ? -25 : 5;
+            lineStartX = 0;
+            lineStartY = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            lineEndX = size;
+            lineEndY = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            break;
+        default:
+            console.error('Invalid eth position');
+    }
+    const arrowUp = {
+        p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+        p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+        p3: `${lineEndX},${lineEndY + arrowOffset}`,
+    };
+    const arrowDown = {
+        p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+        p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+        p3: `${lineEndX},${lineEndY - arrowOffset}`,
+    };
+    const arrowLeft = {
+        p1: `${lineEndX + arrowHeadHeight + arrowOffset},${lineEndY - arrowHeadWidth / 2}`,
+        p2: `${lineEndX + arrowHeadHeight + arrowOffset},${lineEndY + arrowHeadWidth / 2}`,
+        p3: `${lineEndX + arrowOffset},${lineEndY}`,
+    };
+    const arrowRight = {
+        p1: `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY - arrowHeadWidth / 2}`,
+        p2: `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY + arrowHeadWidth / 2}`,
+        p3: `${lineEndX - arrowOffset},${lineEndY}`,
+    };
+
+    switch (ethPosition) {
+        case CLUSTER_ETH_POSITION.TOP:
+            arrow = direction === EthernetLinkName.ETH_IN ? arrowDown : arrowUp;
+            break;
+        case CLUSTER_ETH_POSITION.BOTTOM:
+            arrow = direction === EthernetLinkName.ETH_OUT ? arrowDown : arrowUp;
+            break;
+        case CLUSTER_ETH_POSITION.LEFT:
+            arrow = direction === EthernetLinkName.ETH_IN ? arrowRight : arrowLeft;
+            break;
+        case CLUSTER_ETH_POSITION.RIGHT:
+            arrow = direction === EthernetLinkName.ETH_OUT ? arrowRight : arrowLeft;
             break;
         default:
             console.error('Invalid eth position');
     }
     return { lineEndX, lineEndY, lineStartX, lineStartY, arrow };
+};
+
+export const drawEthPipes = (
+    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+    ethPosition: CLUSTER_ETH_POSITION,
+    pipeIds: string[],
+    direction: EthernetLinkName,
+    size: number,
+) => {
+    const {
+        //
+        lineEndX,
+        lineEndY,
+        lineStartX,
+        lineStartY,
+        arrow,
+    } = getEthLinkPoints(ethPosition, direction, size);
+
+    if (pipeIds.length > 0) {
+        svg
+            // prettier
+            .append('polygon')
+            .attr('points', `${arrow.p1} ${arrow.p2} ${arrow.p3}`)
+            .attr('fill', '#ffffff');
+    }
+    const strokeLength = 4;
+    const dashArray = [strokeLength, (pipeIds.length - 1) * strokeLength];
+    pipeIds.forEach((pipeId: string, index: number) => {
+        svg.append('line')
+            .attr('x1', lineStartX)
+            .attr('y1', lineStartY)
+            .attr('x2', lineEndX)
+            .attr('y2', lineEndY)
+            .attr('stroke-width', 2)
+            .attr('stroke', getPipeColor(pipeId))
+            .attr('stroke-dasharray', dashArray.join(','))
+            .attr('stroke-dashoffset', index * dashArray[0]);
+    });
 };
 
 export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderType = LinkRenderType.GRID) => {

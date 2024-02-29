@@ -20,9 +20,10 @@ import {
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
     className?: string;
+    size?: number;
 };
 
-const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className }) => {
+const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className, size = 80 }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const showLinkSaturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturation);
     const linkSaturationTreshold = useSelector((state: RootState) => state.linkSaturation.linkSaturationTreshold);
@@ -104,9 +105,9 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
             {/*   </div> */}
             {/* ))} */}
             <svg
-                width='80'
-                height='80'
-                viewBox='0 0 80 80'
+                width={size}
+                height={size}
+                viewBox={`0 0 ${size} ${size}`}
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
                 className={`svg ${className}`}

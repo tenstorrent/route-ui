@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import { Button, MenuItem } from '@blueprintjs/core';
 import * as d3 from 'd3';
-import { CHIP_SIZE, getEthLinkPoints } from '../../../utils/DrawingAPI';
+import { CHIP_SIZE, drawEthPipes } from '../../../utils/DrawingAPI';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { getAvailableGraphsSelector, getGraphNameSelector } from '../../../data/store/selectors/uiState.selectors';
@@ -11,9 +11,7 @@ import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes'
 import SelectablePipe from '../SelectablePipe';
 import Chip, { ComputeNode, PipeSegment } from '../../../data/Chip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
-import getPipeColor from '../../../data/ColorGenerator';
 import { RootState } from '../../../data/store/createStore';
-import DetailedViewPipeRenderer from '../detailed-view-components/DetailedViewPipeRenderer';
 
 export interface ClusterViewDialog {}
 
@@ -39,7 +37,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     const { chipState, getChipByGraphName } = useContext(ChipContext);
 
     const graphInformation = useSelector(getAvailableGraphsSelector);
-    const selectedGraph = useSelector(getGraphNameSelector);
+    const selectedGraph = chipState.graphName;
     const availableTemporalEpochs: GraphRelationshipState[][] = []; // = graphInformation.filter((graphRelationship) => graphRelationship.temporalEpoch);
     graphInformation.forEach((item) => {
         if (availableTemporalEpochs[item.temporalEpoch]) {
@@ -67,12 +65,10 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     pipeList.sort((a, b) => {
         return a.id.localeCompare(b.id);
     });
-    // const start = performance.now();
+
     const uniquePipeList: PipeSegment[] = pipeList.filter((pipeSegment, index, self) => {
         return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
     });
-    // const end = performance.now();
-    // console.log(`uniquePipeList took ${end - start} ms`);
 
     return (
         <div className='cluster-view-container'>
@@ -234,44 +230,6 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     );
 };
 
-const drawEthPipes = (
-    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
-    ethPosition: CLUSTER_ETH_POSITION,
-    pipeIds: string[],
-    size: number,
-) => {
-    const {
-        //
-        lineEndX,
-        lineEndY,
-        lineStartX,
-        lineStartY,
-        arrow,
-    } = getEthLinkPoints(ethPosition, size);
-
-    if (pipeIds.length) {
-        svg
-            //
-            .append('polygon')
-            .attr('points', `${arrow.p1} ${arrow.p2} ${arrow.p3}`)
-            .attr('fill', '#9e9e9e');
-    }
-    const strokeLength = 5;
-    const dashArray = [strokeLength, (pipeIds.length - 1) * strokeLength];
-    pipeIds.forEach((pipeId: string, index: number) => {
-        svg.append('line')
-            // keep prettier at bay
-            .attr('x1', lineStartX)
-            .attr('y1', lineStartY)
-            .attr('x2', lineEndX)
-            .attr('y2', lineEndY)
-            .attr('stroke-width', 2)
-            .attr('stroke', getPipeColor(pipeId))
-            .attr('stroke-dasharray', dashArray.join(','))
-            .attr('stroke-dashoffset', index * dashArray[0]);
-    });
-};
-
 interface EthPipeRendererProps {
     id: string;
     node: ComputeNode | undefined;
@@ -287,28 +245,36 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, x, y
         .filter((pipe: PipeSelection) => pipe.selected)
         .map((pipe: PipeSelection) => pipe.id);
 
-    // TODO: get pipes separately for in and out
-    const nodePipes = !node
+    const nodePipeIn = !node
         ? []
         : node
               .getInternalLinksForNode()
-              .filter((link) => link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT)
+              .filter((link) => link.name === EthernetLinkName.ETH_IN)
               .map((link) => link.pipes)
               .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
-              .flat() || [];
+              .flat()
+              .filter((pipeId) => selectedPipeIds.includes(pipeId)) || [];
+    const nodePipeOut = !node
+        ? []
+        : node
+              .getInternalLinksForNode()
+              .filter((link) => link.name === EthernetLinkName.ETH_OUT)
+              .map((link) => link.pipes)
+              .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
+              .flat()
+              .filter((pipeId) => selectedPipeIds.includes(pipeId)) || [];
 
-    const pipeIds = nodePipes.filter((pipeId) => selectedPipeIds.includes(pipeId));
-
-    const size = CHIP_SIZE / 6 - 5;
+    const size = CHIP_SIZE / 6 - 5; // 6 grid, 5 gap
 
     useEffect(() => {
         if (svgRef.current) {
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
 
-            drawEthPipes(svg, ethPosition, pipeIds, size);
+            drawEthPipes(svg, ethPosition, nodePipeIn, EthernetLinkName.ETH_IN, size);
+            drawEthPipes(svg, ethPosition, nodePipeOut, EthernetLinkName.ETH_OUT, size);
         }
-    }, [ethPosition, pipeIds]);
+    }, [ethPosition, nodePipeIn, nodePipeOut, selectedPipeIds]);
 
     return (
         <div
@@ -327,7 +293,6 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, x, y
                 height: `${size}px`,
             }}
         >
-            {/* {id} */}
             <svg className='eth-svg' ref={svgRef} width={`${size}px`} height={`${size}px`} />
         </div>
     );
