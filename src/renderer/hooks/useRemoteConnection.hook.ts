@@ -243,7 +243,7 @@ const useRemoteConnection = () => {
         }
     };
 
-    const config = {
+    const persistentState = {
         get savedConnectionList() {
             return JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
         },
@@ -277,7 +277,7 @@ const useRemoteConnection = () => {
         testRemoteFolder,
         syncRemoteFolder,
         listRemoteFolders,
-        config,
+        persistentState,
     };
 };
 
