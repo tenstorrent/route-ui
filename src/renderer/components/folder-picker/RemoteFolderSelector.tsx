@@ -1,4 +1,4 @@
-import { Button, Icon, MenuItem } from '@blueprintjs/core';
+import { Button, Icon, MenuItem, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
@@ -42,7 +42,7 @@ const remoteFolderRenderer =
             <Tooltip2
                 content={`Fetching folder status, last sync: ${lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'}`}
             >
-                <Icon icon={IconNames.UNGROUP_OBJECTS} color='grey' />
+                <Spinner size={16} />
             </Tooltip2>
         );
 
@@ -68,6 +68,7 @@ const remoteFolderRenderer =
 
         return (
             <MenuItem
+                className='remote-folder-item'
                 active={modifiers.active}
                 disabled={modifiers.disabled}
                 key={`${formatRemoteFolderName(folder)}${lastSynced ?? lastModified}`}
@@ -75,6 +76,7 @@ const remoteFolderRenderer =
                 text={formatRemoteFolderName(folder)}
                 // @ts-expect-error - Hack abusing label, it actually works.
                 label={statusIcon}
+                labelClassName='remote-folder-status-icon'
             />
         );
     };
