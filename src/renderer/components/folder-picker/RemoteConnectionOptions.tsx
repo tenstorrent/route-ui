@@ -62,7 +62,7 @@ const RemoteConnectionOptions: FC = () => {
             return {
                 ...existingFolder,
                 ...updatedFolder,
-            };
+            } as RemoteFolder;
         });
 
         remoteConnection.config.setSavedRemoteFolders(connection, mergedFolders);
