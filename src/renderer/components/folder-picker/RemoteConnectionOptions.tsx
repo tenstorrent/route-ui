@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useSelector } from 'react-redux';
-import { getSelectedFolderOrigin } from '../../../data/store/selectors/uiState.selectors';
+import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import useRemoteConnection, { RemoteConnection, RemoteFolder } from '../../hooks/useRemoteConnection.hook';
@@ -32,7 +32,7 @@ const RemoteConnectionOptions: FC = () => {
     const selectedConnection = getSelectedConnection();
     const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(getSavedRemoteFolders(selectedConnection));
     const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
-    const selectedFolderOrigin = useSelector(getSelectedFolderOrigin);
+    const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
     const [isFetchingFolderStatus, setIsFetchingFolderStatus] = useState(false);
@@ -239,7 +239,7 @@ const RemoteConnectionOptions: FC = () => {
                             }}
                         />
                     </Tooltip2>
-                    <GraphSelector disabled={selectedFolderOrigin === 'local' || isSyncingRemoteFolder} />
+                    <GraphSelector disabled={selectedFolderLocationType === 'local' || isSyncingRemoteFolder} />
                 </RemoteFolderSelector>
             </FormGroup>
         </>

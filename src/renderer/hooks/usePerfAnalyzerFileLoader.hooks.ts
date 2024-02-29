@@ -8,7 +8,7 @@ import {
     setAvailableGraphs,
     setSelectedArchitecture,
     setSelectedFolder,
-    setSelectedFolderOrigin,
+    setSelectedFolderLocationType,
     setSelectedGraphName,
 } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
-import type { SelectedFolderOrigin } from '../../data/StateTypes';
+import type { FolderLocationType } from '../../data/StateTypes';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
@@ -119,11 +119,11 @@ const usePerfAnalyzerFileLoader = () => {
 
     const loadPerfAnalyzerFolder = async (
         folderPath?: string | null,
-        folderOrigin: SelectedFolderOrigin = 'local',
+        folderLocationType: FolderLocationType = 'local',
     ): Promise<void> => {
         if (folderPath) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
-            dispatch(setSelectedFolderOrigin(folderOrigin));
+            dispatch(setSelectedFolderLocationType(folderLocationType));
 
             await loadFolder(folderPath);
         }

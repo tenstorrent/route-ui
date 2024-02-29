@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 
 import { useSelector } from 'react-redux';
 import usePerfAnalyzerFileLoader from 'renderer/hooks/usePerfAnalyzerFileLoader.hooks';
-import { getSelectedFolderOrigin } from '../../../data/store/selectors/uiState.selectors';
+import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
 import '../../scss/FolderPicker.scss';
 import GraphSelector from '../graph-selector/GraphSelector';
 import RemoteConnectionOptions from './RemoteConnectionOptions';
@@ -18,7 +18,7 @@ import RemoteConnectionOptions from './RemoteConnectionOptions';
 
 export const PerfDataLoader = (): React.ReactElement => {
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error } = usePerfAnalyzerFileLoader();
-    const selectedFolderOrigin = useSelector(getSelectedFolderOrigin);
+    const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
 
     return (
         <div className='folder-picker-options'>
@@ -40,7 +40,7 @@ export const PerfDataLoader = (): React.ReactElement => {
                                     await loadPerfAnalyzerFolder(folderPath);
                                 }}
                             />
-                            <GraphSelector disabled={selectedFolderOrigin === 'remote'} />
+                            <GraphSelector disabled={selectedFolderLocationType === 'remote'} />
                             {error && (
                                 <div className='loading-error'>
                                     <p>{error.toString()}</p>

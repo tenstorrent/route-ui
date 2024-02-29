@@ -100,4 +100,4 @@ export interface ClusterViewState {
     isOpen: boolean;
 }
 
-export type SelectedFolderOrigin = 'local' | 'remote';
+export type FolderLocationType = 'local' | 'remote';

@@ -1,14 +1,14 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ApplicationMode, Architecture } from 'data/Types';
 import path from 'path';
-import { GraphRelationshipState, type SelectedFolderOrigin } from '../../StateTypes';
+import { GraphRelationshipState, type FolderLocationType } from '../../StateTypes';
 
 interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
     graphName: string;
     folderPath: string;
-    selectedFolderOrigin: SelectedFolderOrigin;
+    selectedFolderLocationType: FolderLocationType;
     architecture: Architecture;
     availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
@@ -25,7 +25,7 @@ const uiStateInitialState: UIState = {
     highContrastEnabled: false,
     graphName: '',
     folderPath: '',
-    selectedFolderOrigin: 'local',
+    selectedFolderLocationType: 'local',
     architecture: Architecture.NONE,
     availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
@@ -50,8 +50,8 @@ const uiStateSlice = createSlice({
             state.folderPath = path.dirname(action.payload);
             state.graphName = path.basename(action.payload);
         },
-        setSelectedFolderOrigin(state, action: PayloadAction<SelectedFolderOrigin>) {
-            state.selectedFolderOrigin = action.payload;
+        setSelectedFolderLocationType(state, action: PayloadAction<FolderLocationType>) {
+            state.selectedFolderLocationType = action.payload;
         },
         setSelectedGraphName(state, action: PayloadAction<string>) {
             state.graphName = action.payload;
@@ -100,7 +100,7 @@ export const {
     setSelectedGraphName,
     setSelectedArchitecture,
     setSelectedFolder,
-    setSelectedFolderOrigin,
+    setSelectedFolderLocationType,
     setAvailableGraphs,
     clearAvailableGraphs,
     setApplicationMode,
