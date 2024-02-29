@@ -20,10 +20,8 @@ const RemoteConnectionOptions: FC = () => {
     const remoteConnection = useRemoteConnection();
 
     const dispatch = useDispatch();
-    const savedConnections = remoteConnection.getSavedConnections();
-    const selectedConnection = remoteConnection.getSelectedConnection();
     const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(
-        remoteConnection.getSavedRemoteFolders(selectedConnection),
+        remoteConnection.config.getSavedRemoteFolders(remoteConnection.config.selectedConnection),
     );
     const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
     const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
@@ -46,10 +44,10 @@ const RemoteConnectionOptions: FC = () => {
     };
 
     const updateSelectedConnection = async (connection: RemoteConnection) => {
-        remoteConnection.setSelectedConnection(connection);
-        setRemoteFolders(remoteConnection.getSavedRemoteFolders(connection));
+        remoteConnection.config.selectedConnection = connection;
+        setRemoteFolders(remoteConnection.config.getSavedRemoteFolders(connection));
 
-        await updateSelectedFolder(remoteConnection.getSavedRemoteFolders(connection)[0]);
+        await updateSelectedFolder(remoteConnection.config.getSavedRemoteFolders(connection)[0]);
     };
 
     const updateSavedRemoteFolders = (connection: RemoteConnection | undefined, updatedFolders: RemoteFolder[]) => {
@@ -57,7 +55,7 @@ const RemoteConnectionOptions: FC = () => {
             return [];
         }
 
-        const savedFolders = remoteConnection.getSavedRemoteFolders(connection);
+        const savedFolders = remoteConnection.config.getSavedRemoteFolders(connection);
         const mergedFolders = (updatedFolders ?? []).map((updatedFolder) => {
             const existingFolder = savedFolders?.find((f) => f.localPath === updatedFolder.localPath);
 
@@ -67,16 +65,16 @@ const RemoteConnectionOptions: FC = () => {
             };
         });
 
-        remoteConnection.setSavedRemoteFolders(connection, mergedFolders);
+        remoteConnection.config.setSavedRemoteFolders(connection, mergedFolders);
         setRemoteFolders(mergedFolders);
 
         return mergedFolders;
     };
 
     const updateSavedConnection = async (connection: RemoteConnection, isDeletingConnection = false) => {
-        const updatedConnections = [...savedConnections];
+        const updatedConnections = [...remoteConnection.config.savedConnectionList];
 
-        const updatedConnectionIndex = savedConnections.findIndex((c) => {
+        const updatedConnectionIndex = remoteConnection.config.savedConnectionList.findIndex((c) => {
             const isSameName = c.name === connection?.name;
             const isSameHost = c.host === connection?.host;
             const isSamePort = c.port === connection?.port;
@@ -94,7 +92,7 @@ const RemoteConnectionOptions: FC = () => {
             updatedConnections.splice(updatedConnectionIndex, 1);
         }
 
-        remoteConnection.setSavedConnections(updatedConnections);
+        remoteConnection.config.savedConnectionList = updatedConnections;
 
         await updateSelectedConnection(isDeletingConnection ? updatedConnections[0] : connection);
     };
@@ -103,9 +101,11 @@ const RemoteConnectionOptions: FC = () => {
         (async () => {
             try {
                 setIsFetchingFolderStatus(true);
-                const updatedRemoteFolders = await remoteConnection.listRemoteFolders(selectedConnection);
+                const updatedRemoteFolders = await remoteConnection.listRemoteFolders(
+                    remoteConnection.config.selectedConnection,
+                );
 
-                updateSavedRemoteFolders(selectedConnection!, updatedRemoteFolders);
+                updateSavedRemoteFolders(remoteConnection.config.selectedConnection!, updatedRemoteFolders);
             } catch (err) {
                 logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
             } finally {
@@ -125,9 +125,9 @@ const RemoteConnectionOptions: FC = () => {
                 <AddRemoteConnection
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     onAddConnection={async (newConnection) => {
-                        const newConnections = [...savedConnections, newConnection];
+                        const newConnections = [...remoteConnection.config.savedConnectionList, newConnection];
 
-                        remoteConnection.setSavedConnections(newConnections);
+                        remoteConnection.config.savedConnectionList = newConnections;
                         await updateSelectedConnection(newConnection);
                     }}
                 />
@@ -139,15 +139,15 @@ const RemoteConnectionOptions: FC = () => {
                 subLabel='Select remote server that will be used for syncing folders'
             >
                 <RemoteConnectionSelector
-                    connection={selectedConnection}
-                    connections={savedConnections}
+                    connection={remoteConnection.config.selectedConnection}
+                    connections={remoteConnection.config.savedConnectionList}
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     loading={isLoadingFolderList}
                     onEditConnection={(updatedConnection) => updateSavedConnection(updatedConnection)}
                     onRemoveConnection={async (connection) => {
                         await updateSelectedFolder(undefined);
                         await updateSavedConnection(connection, true);
-                        remoteConnection.deleteSavedRemoteFolders(connection);
+                        remoteConnection.config.deleteSavedRemoteFolders(connection);
                     }}
                     onSelectConnection={async (connection) => {
                         await updateSelectedConnection(connection);
@@ -164,8 +164,13 @@ const RemoteConnectionOptions: FC = () => {
                     onSyncRemoteFolders={async () => {
                         setIsLoadingFolderList(true);
                         try {
-                            const savedRemotefolders = await remoteConnection.listRemoteFolders(selectedConnection);
-                            const updatedfolders = updateSavedRemoteFolders(selectedConnection, savedRemotefolders);
+                            const savedRemotefolders = await remoteConnection.listRemoteFolders(
+                                remoteConnection.config.selectedConnection,
+                            );
+                            const updatedfolders = updateSavedRemoteFolders(
+                                remoteConnection.config.selectedConnection,
+                                savedRemotefolders,
+                            );
 
                             await updateSelectedFolder(updatedfolders[0]);
                         } catch (err) {
@@ -202,16 +207,23 @@ const RemoteConnectionOptions: FC = () => {
                             onClick={async () => {
                                 setIsSyncingRemoteFolder(true);
                                 try {
-                                    await remoteConnection.syncRemoteFolder(selectedConnection, selectedFolder);
+                                    await remoteConnection.syncRemoteFolder(
+                                        remoteConnection.config.selectedConnection,
+                                        selectedFolder,
+                                    );
 
-                                    const savedRemoteFolders =
-                                        remoteConnection.getSavedRemoteFolders(selectedConnection);
+                                    const savedRemoteFolders = remoteConnection.config.getSavedRemoteFolders(
+                                        remoteConnection.config.selectedConnection,
+                                    );
 
                                     savedRemoteFolders.find(
                                         (f) => f.localPath === selectedFolder?.localPath,
                                     )!.lastSynced = new Date().toISOString();
 
-                                    updateSavedRemoteFolders(selectedConnection, savedRemoteFolders);
+                                    updateSavedRemoteFolders(
+                                        remoteConnection.config.selectedConnection,
+                                        savedRemoteFolders,
+                                    );
 
                                     await updateSelectedFolder(selectedFolder);
                                 } catch (err) {

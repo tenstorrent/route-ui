@@ -243,35 +243,33 @@ const useRemoteConnection = () => {
         }
     };
 
-    const getSavedRemoteFolders = (connection?: RemoteConnection) => {
-        return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
-    };
+    const config = {
+        get savedConnectionList() {
+            return JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
+        },
+        set savedConnectionList(connections: RemoteConnection[]) {
+            setAppConfig('remoteConnections', JSON.stringify(connections));
+        },
 
-    const getSavedConnections = () => {
-        return JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
-    };
+        get selectedConnection() {
+            const savedSelectedConnection = JSON.parse(getAppConfig('selectedConnection') ?? 'null');
 
-    const getSelectedConnection = () => {
-        const savedConnections = getSavedConnections();
-        const savedSelectedConnection = JSON.parse(getAppConfig('selectedConnection') ?? 'null');
+            return (savedSelectedConnection ?? this.savedConnectionList[0]) as RemoteConnection | undefined;
+        },
 
-        return (savedSelectedConnection ?? savedConnections[0]) as RemoteConnection | undefined;
-    };
+        set selectedConnection(connection: RemoteConnection | undefined) {
+            setAppConfig('selectedConnection', JSON.stringify(connection));
+        },
 
-    const setSavedRemoteFolders = (connection: RemoteConnection | undefined, folders: RemoteFolder[]) => {
-        setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(folders));
-    };
-
-    const setSavedConnections = (connections: RemoteConnection[]) => {
-        setAppConfig('remoteConnections', JSON.stringify(connections));
-    };
-
-    const setSelectedConnection = (connection: RemoteConnection) => {
-        setAppConfig('selectedConnection', JSON.stringify(connection));
-    };
-
-    const deleteSavedRemoteFolders = (connection?: RemoteConnection) => {
-        deleteAppConfig(`${connection?.name}-remoteFolders`);
+        getSavedRemoteFolders: (connection?: RemoteConnection) => {
+            return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
+        },
+        setSavedRemoteFolders: (connection: RemoteConnection | undefined, folders: RemoteFolder[]) => {
+            setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(folders));
+        },
+        deleteSavedRemoteFolders: (connection?: RemoteConnection) => {
+            deleteAppConfig(`${connection?.name}-remoteFolders`);
+        },
     };
 
     return {
@@ -279,13 +277,7 @@ const useRemoteConnection = () => {
         testRemoteFolder,
         syncRemoteFolder,
         listRemoteFolders,
-        getSavedRemoteFolders,
-        getSavedConnections,
-        getSelectedConnection,
-        setSavedRemoteFolders,
-        setSavedConnections,
-        setSelectedConnection,
-        deleteSavedRemoteFolders,
+        config,
     };
 };
 
