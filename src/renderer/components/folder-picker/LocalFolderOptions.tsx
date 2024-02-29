@@ -10,7 +10,7 @@ import FolderPicker from './FolderPicker';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return lastFolder ? `${pathSeparator}${lastFolder}` : 'n/a';
+    return lastFolder ? `${pathSeparator}${lastFolder}` : '';
 };
 
 const LocalFolderOptions: FC = () => {
@@ -30,9 +30,7 @@ const LocalFolderOptions: FC = () => {
 
                         await loadPerfAnalyzerFolder(folderPath);
                     }}
-                    text={
-                        selectedFolderLocationType === 'remote' ? 'Select local folder' : getTestName(localFolderPath)
-                    }
+                    text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : ''}
                 />
                 <GraphSelector disabled={selectedFolderLocationType === 'remote'} />
                 {error && (

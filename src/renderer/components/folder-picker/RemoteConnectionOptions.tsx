@@ -93,7 +93,7 @@ const RemoteConnectionOptions: FC = () => {
 
         setRemoteFolders(updatedFolders);
 
-        await updateSelectedFolder(folder ?? updatedFolders[0]);
+        return updatedFolders;
     };
 
     const updateSavedConnection = async (connection: RemoteConnection, isDeletingConnection = false) => {
@@ -169,6 +169,7 @@ const RemoteConnectionOptions: FC = () => {
                     onEditConnection={(updatedConnection) => updateSavedConnection(updatedConnection)}
                     onRemoveConnection={async (connection) => {
                         await updateSavedRemoteFolders(connection);
+                        await updateSelectedFolder(undefined);
                         await updateSavedConnection(connection, true);
                     }}
                     onSelectConnection={async (connection) => {
@@ -176,8 +177,9 @@ const RemoteConnectionOptions: FC = () => {
 
                         try {
                             const fetchedRemoteFolders = await listRemoteFolders(connection);
+                            const updatedFolders = await updateSavedRemoteFolders(connection, fetchedRemoteFolders);
 
-                            await updateSavedRemoteFolders(connection, fetchedRemoteFolders);
+                            await updateSelectedFolder(updatedFolders[0]);
                         } catch (err) {
                             logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
                         }
@@ -186,8 +188,12 @@ const RemoteConnectionOptions: FC = () => {
                         setIsLoadingFolderList(true);
                         try {
                             const savedRemotefolders = await listRemoteFolders(selectedConnection);
+                            const updatedfolders = await updateSavedRemoteFolders(
+                                selectedConnection,
+                                savedRemotefolders,
+                            );
 
-                            await updateSavedRemoteFolders(selectedConnection, savedRemotefolders);
+                            await updateSelectedFolder(updatedfolders[0]);
                         } catch (err) {
                             logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
@@ -231,6 +237,8 @@ const RemoteConnectionOptions: FC = () => {
                                         savedRemoteFolders,
                                         selectedFolder,
                                     );
+
+                                    await updateSelectedFolder(selectedFolder);
                                 } catch (err) {
                                     logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
