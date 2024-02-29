@@ -4,8 +4,9 @@ import { AnchorButton, FormGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
+import { setSelectedFolderLocationType } from '../../../data/store/slices/uiState.slice';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import useRemoteConnection, { RemoteConnection, RemoteFolder } from '../../hooks/useRemoteConnection.hook';
@@ -28,6 +29,7 @@ const RemoteConnectionOptions: FC = () => {
         deleteSavedRemoteFolders,
     } = useRemoteConnection();
 
+    const dispatch = useDispatch();
     const savedConnections = getSavedConnections();
     const selectedConnection = getSelectedConnection();
     const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(getSavedRemoteFolders(selectedConnection));
@@ -42,6 +44,7 @@ const RemoteConnectionOptions: FC = () => {
 
     const updateSelectedFolder = async (folder?: RemoteFolder) => {
         setSelectedFolder(folder);
+        dispatch(setSelectedFolderLocationType('remote'));
 
         if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
