@@ -27,9 +27,9 @@ export const PerfDataLoader = (): React.ReactElement => {
                 <Icon icon={IconNames.FOLDER_OPEN} size={150} />
                 <div className='folder-picker-wrapper'>
                     <FormGroup
-                        label={<h3>Open local folder</h3>}
+                        label={<h3>Select local folder</h3>}
                         labelFor='text-input'
-                        subLabel='Select local folder to load the performance data from'
+                        subLabel='Select local folder to load netlist analyzer output and performance data from'
                     >
                         <div className='buttons-container'>
                             <FolderPicker
