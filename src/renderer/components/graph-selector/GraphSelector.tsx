@@ -1,20 +1,44 @@
-import useFileLoader from 'renderer/hooks/useFileLoader.hook';
+import { FC } from 'react';
+import { useSelector } from 'react-redux';
+import { getAvailableGraphsSelector, getGraphNameSelector } from '../../../data/store/selectors/uiState.selectors';
+import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
-function GraphSelector() {
-    const { selectedGraph, handleSelectGraph, availableGraphs } = useFileLoader();
+interface GraphSelectorProps {
+    disabled?: boolean;
+    label?: string;
+    onSelectGraph?: (graph: string) => void;
+    autoLoadFistGraph?: boolean;
+}
 
-    return availableGraphs.length ? (
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
+    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const selectedGraph = useSelector(getGraphNameSelector);
+    const availableGraphs = useSelector(getAvailableGraphsSelector);
+
+    if (autoLoadFistGraph && !selectedGraph && availableGraphs?.length > 0) {
+        loadPerfAnalyzerGraph(availableGraphs[0].name);
+    }
+
+    return (
         <PopoverMenu // Graph picker
-            label={selectedGraph}
+            label={selectedGraph || (label ?? 'Select graph')}
             options={availableGraphs.map((graph) => graph.name)}
             selectedItem={selectedGraph}
-            onSelectItem={handleSelectGraph}
-            disabled={availableGraphs?.length === 0}
+            onSelectItem={async (graph) => {
+                await loadPerfAnalyzerGraph(graph);
+                onSelectGraph?.(graph);
+            }}
+            disabled={disabled || availableGraphs?.length === 0}
         />
-    ) : (
-        <div>{selectedGraph}</div>
     );
-}
+};
+
+GraphSelector.defaultProps = {
+    disabled: false,
+    label: undefined,
+    onSelectGraph: undefined,
+    autoLoadFistGraph: false,
+};
 
 export default GraphSelector;

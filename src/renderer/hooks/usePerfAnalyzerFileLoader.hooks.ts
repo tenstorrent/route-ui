@@ -1,13 +1,10 @@
-import {
-    getAvailableGraphsSelector,
-    getFolderPathSelector,
-    getGraphNameSelector,
-} from 'data/store/selectors/uiState.selectors';
+import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
 import {
     setApplicationMode,
     setAvailableGraphs,
     setSelectedArchitecture,
     setSelectedFolder,
+    setSelectedFolderLocationType,
     setSelectedGraphName,
 } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
+import type { FolderLocationType } from '../../data/StateTypes';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
@@ -29,8 +27,6 @@ const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
     const dispatch = useDispatch();
     const selectedFolder = useSelector(getFolderPathSelector);
-    const selectedGraph = useSelector(getGraphNameSelector);
-    const availableGraphs = useSelector(getAvailableGraphsSelector);
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
@@ -47,20 +43,23 @@ const usePerfAnalyzerFileLoader = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
-    const selectFolderDialog = async (): Promise<string | null> => {
+    const openPerfAnalyzerFolderDialog = async () => {
         const folderList = dialog.showOpenDialogSync({
             properties: ['openDirectory'],
         });
 
-        const folderPath = folderList?.[0] ?? null;
+        const folderPath = folderList?.[0] ?? undefined;
         if (!folderPath) {
-            return null;
+            return undefined;
         }
+
         const [isValid, err] = await validatePerfResultsFolder(folderPath);
         if (!isValid) {
+            // eslint-disable-next-line no-alert
             alert(`Invalid folder selected: ${err}`);
-            return null;
+            return undefined;
         }
+
         return folderPath;
     };
 
@@ -112,17 +111,15 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
-    const loadPerfAnalyzerFolder = async (folderPath?: string | null): Promise<void> => {
-        let folderToLoad = folderPath;
-
-        if (!folderToLoad) {
-            folderToLoad = await selectFolderDialog();
-        }
-
-        if (folderToLoad) {
+    const loadPerfAnalyzerFolder = async (
+        folderPath?: string | null,
+        folderLocationType: FolderLocationType = 'local',
+    ): Promise<void> => {
+        if (folderPath) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
+            dispatch(setSelectedFolderLocationType(folderLocationType));
 
-            await loadFolder(folderToLoad);
+            await loadFolder(folderPath);
         }
     };
 
@@ -133,11 +130,10 @@ const usePerfAnalyzerFileLoader = () => {
 
     return {
         loadPerfAnalyzerFolder,
+        openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
         resetAvailableGraphs,
         error,
-        selectedGraph,
-        availableGraphs,
     };
 };
 

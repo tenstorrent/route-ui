@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { LogLevel } from '../data/Types';
@@ -8,6 +8,7 @@ import { PerfDataLoader } from './components/folder-picker/FolderPicker';
 
 import { toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
 import { ElectronEvents } from '../main/ElectronEvents';
+import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import useAppConfig from './hooks/useAppConfig.hook';
 import './scss/SplashScreen.scss';
 
@@ -18,25 +19,30 @@ const SplashScreen: FC = () => {
     const { getAppConfig } = useAppConfig();
     const dispatch = useDispatch();
 
-    const updateExperimentalFeaturesStateInRedux = () => {
+    useEffect(() => {
         const isQueuesTableEnabled = JSON.parse(
             getAppConfig(ElectronEvents.TOGGLE_QUEUES_TABLE) ?? '[false]',
         )[0] as boolean;
 
         dispatch(toggleQueuesTable(isQueuesTableEnabled));
-    };
 
-    updateExperimentalFeaturesStateInRedux();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
-        <div className='splash-screen'>
-            <PerfDataLoader />
-            {logOutputEnabled && errorLogs.length > 0 && (
-                <div id='splash-debug-panel'>
-                    <LogsOutput />
-                </div>
-            )}
-        </div>
+        <>
+            <div className='header'>
+                <TenstorrentLogo />
+            </div>
+            <div className='splash-screen'>
+                <PerfDataLoader />
+                {logOutputEnabled && errorLogs.length > 0 && (
+                    <div id='splash-debug-panel'>
+                        <LogsOutput />
+                    </div>
+                )}
+            </div>
+        </>
     );
 };
 

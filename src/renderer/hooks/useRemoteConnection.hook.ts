@@ -4,6 +4,7 @@ import { existsSync } from 'fs';
 import { mkdir } from 'fs/promises';
 import path from 'path';
 
+import useAppConfig from './useAppConfig.hook';
 import useLogging from './useLogging.hook';
 
 // Required for connecting to a socket on localhost
@@ -45,6 +46,7 @@ const escapeWhitespace = (str: string) => str.replace(/(\s)/g, '\\$1');
 
 const useRemoteConnection = () => {
     const logging = useLogging();
+    const { getAppConfig, setAppConfig, deleteAppConfig } = useAppConfig();
     const defaultSshOptions = ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=240'];
 
     const runShellCommand = async (cmd: string, params: string[]) => {
@@ -245,12 +247,50 @@ const useRemoteConnection = () => {
         }
     };
 
+    const getSavedRemoteFolders = (connection?: RemoteConnection) => {
+        return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
+    };
+
+    const getSavedConnections = () => {
+        return JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
+    };
+
+    const getSelectedConnection = () => {
+        const savedConnections = getSavedConnections();
+        const savedSelectedConnection = JSON.parse(getAppConfig('selectedConnection') ?? 'null');
+
+        return (savedSelectedConnection ?? savedConnections[0]) as RemoteConnection | undefined;
+    };
+
+    const setSavedRemoteFolders = (connection: RemoteConnection | undefined, folders: RemoteFolder[]) => {
+        setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(folders));
+    };
+
+    const setSavedConnections = (connections: RemoteConnection[]) => {
+        setAppConfig('remoteConnections', JSON.stringify(connections));
+    };
+
+    const setSelectedConnection = (connection: RemoteConnection) => {
+        setAppConfig('selectedConnection', JSON.stringify(connection));
+    };
+
+    const deleteSavedRemoteFolders = (connection?: RemoteConnection) => {
+        deleteAppConfig(`${connection?.name}-remoteFolders`);
+    };
+
     return {
         testConnection,
         testRemoteFolder,
         checkLocalFolderExists,
         syncRemoteFolder,
         listRemoteFolders,
+        getSavedRemoteFolders,
+        getSavedConnections,
+        getSelectedConnection,
+        setSavedRemoteFolders,
+        setSavedConnections,
+        setSelectedConnection,
+        deleteSavedRemoteFolders,
     };
 };
 

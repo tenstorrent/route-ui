@@ -1,66 +1,117 @@
 import { sep as pathSeparator } from 'path';
 
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Tooltip2 } from '@blueprintjs/popover2';
+import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button, Switch } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     getArchitectureSelector,
     getAvailableGraphsSelector,
     getFolderPathSelector,
     getGraphNameSelector,
-    getHighContrastState,
+    getSelectedFolderLocationType,
 } from 'data/store/selectors/uiState.selectors';
-import { setHighContrastState } from 'data/store/slices/uiState.slice';
-import '../scss/TopHeaderComponent.scss';
-import GraphSelector from './graph-selector/GraphSelector';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import type { FolderLocationType } from '../../data/StateTypes';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
+import type { RemoteConnection, RemoteFolder } from '../hooks/useRemoteConnection.hook';
+import useRemoteConnection from '../hooks/useRemoteConnection.hook';
+import '../scss/TopHeaderComponent.scss';
+import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
+import GraphSelector from './graph-selector/GraphSelector';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
     return lastFolder ? `${pathSeparator}${lastFolder}` : 'n/a';
 };
 
+const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFolder) => {
+    if (!connection || !folder) {
+        return 'n/a';
+    }
+
+    return `${connection.name} - ${folder.testName}`;
+};
+
 const TopHeaderComponent: React.FC = () => {
-    const dispatch = useDispatch();
-    const isHighContrast = useSelector(getHighContrastState);
+    const { loadPerfAnalyzerFolder, resetAvailableGraphs, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
+
     const architecture = useSelector(getArchitectureSelector);
+
+    const localFolderPath = useSelector(getFolderPathSelector);
+    const folderLocationType = useSelector(getSelectedFolderLocationType);
+
+    const { checkLocalFolderExists, getSavedRemoteFolders, getSelectedConnection } = useRemoteConnection();
+
+    const selectedConnection = getSelectedConnection();
+    const availableRemoteFolders = getSavedRemoteFolders(selectedConnection).filter((folder) => folder.lastSynced);
+    const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
+        availableRemoteFolders[0],
+    );
     const selectedGraph = useSelector(getGraphNameSelector);
     const availableGraphs = useSelector(getAvailableGraphsSelector);
-    const folderPath = useSelector(getFolderPathSelector);
-    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
-    const location = useLocation();
 
-    useEffect(() => {
-        const isSplashScreen = location.pathname === '/';
-        const hasAvailableGraphs = availableGraphs && availableGraphs.length > 0;
+    const updateSelectedFolder = async (
+        folder: RemoteFolder | string | undefined,
+        newFolderLocationType: FolderLocationType,
+    ) => {
+        const folderPath = (folder as RemoteFolder)?.localPath ?? folder;
 
-        if (!isSplashScreen && hasAvailableGraphs) {
-            loadPerfAnalyzerGraph(availableGraphs[0].name);
+        if (typeof folder === 'string') {
+            setSelectedRemoteFolder(undefined);
+        } else {
+            setSelectedRemoteFolder(folder);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [availableGraphs]);
+
+        if (checkLocalFolderExists(folderPath)) {
+            resetAvailableGraphs();
+            await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
+        }
+    };
 
     const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
     return (
         <div className='top-header-component'>
-            <Switch
-                checked={isHighContrast}
-                label='Enable high contrast'
-                onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
-            />
             <div className='text-content'>
-                {folderPath && (
-                    <Tooltip2 content={folderPath}>
-                        <Button icon={IconNames.FolderSharedOpen} onClick={() => loadPerfAnalyzerFolder()}>
-                            <span className='path-label'>{getTestName(folderPath)}</span>
-                        </Button>
-                    </Tooltip2>
-                )}
-                <GraphSelector />
+                <Tooltip2
+                    content={
+                        folderLocationType === 'local'
+                            ? 'Pick a remote folder'
+                            : formatRemoteFolderName(selectedConnection, selectedRemoteFolder)
+                    }
+                    placement='bottom'
+                >
+                    <RemoteFolderSelector
+                        remoteFolders={availableRemoteFolders}
+                        remoteFolder={folderLocationType === 'remote' ? selectedRemoteFolder : undefined}
+                        falbackLabel=''
+                        icon={IconNames.CLOUD_DOWNLOAD}
+                        onSelectFolder={async (folder) => {
+                            await updateSelectedFolder(folder, 'remote');
+                        }}
+                    />
+                </Tooltip2>
+                <Tooltip2
+                    content={folderLocationType === 'remote' ? 'Pick a local folder' : localFolderPath}
+                    placement='bottom'
+                >
+                    <Button
+                        icon={IconNames.FolderSharedOpen}
+                        onClick={async () => {
+                            const folderPath = await openPerfAnalyzerFolderDialog();
+
+                            if (folderPath) {
+                                await updateSelectedFolder(folderPath, 'local');
+                            }
+                        }}
+                    >
+                        {folderLocationType === 'local' && (
+                            <span className='path-label'>{getTestName(localFolderPath)}</span>
+                        )}
+                    </Button>
+                </Tooltip2>
+                <GraphSelector autoLoadFistGraph />
             </div>
 
             <div className='text-content'>

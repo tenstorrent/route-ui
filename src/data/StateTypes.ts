@@ -99,3 +99,5 @@ export interface GraphRelationshipState {
 export interface ClusterViewState {
     isOpen: boolean;
 }
+
+export type FolderLocationType = 'local' | 'remote';
