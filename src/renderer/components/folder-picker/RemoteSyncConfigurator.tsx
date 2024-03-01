@@ -149,20 +149,23 @@ const RemoteSyncConfigurator: FC = () => {
                         remote.persistentState.deleteSavedRemoteFolders(connection);
                     }}
                     onSelectConnection={async (connection) => {
-                        await updateSelectedConnection(connection);
-
                         try {
+                            setIsFetchingFolderStatus(true);
+                            await updateSelectedConnection(connection);
+
                             const fetchedRemoteFolders = await remote.listRemoteFolders(connection);
                             const updatedFolders = updateSavedRemoteFolders(connection, fetchedRemoteFolders);
 
                             await updateSelectedFolder(updatedFolders[0]);
                         } catch (err) {
                             logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+                        } finally {
+                            setIsFetchingFolderStatus(false);
                         }
                     }}
                     onSyncRemoteFolders={async () => {
-                        setIsLoadingFolderList(true);
                         try {
+                            setIsLoadingFolderList(true);
                             const savedRemotefolders = await remote.listRemoteFolders(
                                 remote.persistentState.selectedConnection,
                             );
@@ -192,7 +195,7 @@ const RemoteSyncConfigurator: FC = () => {
                 <RemoteFolderSelector
                     remoteFolder={selectedFolder}
                     remoteFolders={remoteFolders}
-                    loading={isSyncingRemoteFolder}
+                    loading={isSyncingRemoteFolder || isLoadingFolderList}
                     updatingFolderList={isFetchingFolderStatus}
                     onSelectFolder={async (folder) => {
                         await updateSelectedFolder(folder);
@@ -202,10 +205,15 @@ const RemoteSyncConfigurator: FC = () => {
                         <AnchorButton
                             icon={IconNames.REFRESH}
                             loading={isSyncingRemoteFolder}
-                            disabled={isSyncingRemoteFolder || !selectedFolder || remoteFolders?.length === 0}
+                            disabled={
+                                isSyncingRemoteFolder ||
+                                isLoadingFolderList ||
+                                !selectedFolder ||
+                                remoteFolders?.length === 0
+                            }
                             onClick={async () => {
-                                setIsSyncingRemoteFolder(true);
                                 try {
+                                    setIsSyncingRemoteFolder(true);
                                     await remote.syncRemoteFolder(
                                         remote.persistentState.selectedConnection,
                                         selectedFolder,
@@ -236,7 +244,11 @@ const RemoteSyncConfigurator: FC = () => {
                             }}
                         />
                     </Tooltip2>
-                    <GraphSelector disabled={selectedFolderLocationType === 'local' || isSyncingRemoteFolder} />
+                    <GraphSelector
+                        disabled={
+                            selectedFolderLocationType === 'local' || isSyncingRemoteFolder || isLoadingFolderList
+                        }
+                    />
                 </RemoteFolderSelector>
             </FormGroup>
         </>
