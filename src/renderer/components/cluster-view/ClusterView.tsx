@@ -3,10 +3,10 @@ import { useSelector } from 'react-redux';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import { Button, MenuItem } from '@blueprintjs/core';
 import * as d3 from 'd3';
-import { CHIP_SIZE, drawEthPipes } from '../../../utils/DrawingAPI';
+import { CLUSTER_CHIP_SIZE, drawEthPipes } from '../../../utils/DrawingAPI';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { ChipContext } from '../../../data/ChipDataProvider';
-import { getAvailableGraphsSelector, getGraphNameSelector } from '../../../data/store/selectors/uiState.selectors';
+import { getAvailableGraphsSelector } from '../../../data/store/selectors/uiState.selectors';
 import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';
 import SelectablePipe from '../SelectablePipe';
 import Chip, { ComputeNode, PipeSegment } from '../../../data/Chip';
@@ -15,14 +15,17 @@ import { RootState } from '../../../data/store/createStore';
 
 export interface ClusterViewDialog {}
 
+const NODE_GRID_SIZE = 6;
+
 const renderItem: ItemRenderer<GraphRelationshipState[]> = (
     item,
     //
     { handleClick, modifiers },
 ) => {
-    // if (!modifiers.matchesPredicate) {
-    //     return null;
-    // }
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+
     return (
         <MenuItem
             active={modifiers.active}
@@ -38,7 +41,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
 
     const graphInformation = useSelector(getAvailableGraphsSelector);
     const selectedGraph = chipState.graphName;
-    const availableTemporalEpochs: GraphRelationshipState[][] = []; // = graphInformation.filter((graphRelationship) => graphRelationship.temporalEpoch);
+    const availableTemporalEpochs: GraphRelationshipState[][] = [];
     graphInformation.forEach((item) => {
         if (availableTemporalEpochs[item.temporalEpoch]) {
             availableTemporalEpochs[item.temporalEpoch].push(item);
@@ -77,6 +80,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                     items={availableTemporalEpochs}
                     itemRenderer={renderItem}
                     onItemSelect={setSelectedEpoch}
+                    activeItem={null}
                     filterable={false}
                 >
                     <Button type='button'>Temporal epoch {selectesEpoch[0]?.temporalEpoch}</Button>
@@ -110,7 +114,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                 style={{
                     display: 'grid',
                     gap: '5px',
-                    gridTemplateColumns: `repeat(${cluster?.totalCols || 0}, ${CHIP_SIZE}px)`,
+                    gridTemplateColumns: `repeat(${cluster?.totalCols || 0}, ${CLUSTER_CHIP_SIZE}px)`,
                 }}
             >
                 {cluster?.chips.map((clusterChip) => {
@@ -122,31 +126,23 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                             chip = chipByGraphName;
                         }
                     });
-                    const getEthModule = (ethPosition: CLUSTER_ETH_POSITION, x: number, y: number, uid: string) => {
-                        const node = chip?.getNode(uid);
-                        return <EthPipeRenderer key={uid} id={uid} ethPosition={ethPosition} node={node} x={x} y={y} />;
-                    };
 
                     const ethPosition: Map<CLUSTER_ETH_POSITION, string[]> = new Map();
+
                     clusterChip.design?.nodes.forEach((node) => {
                         const connectedChip = clusterChip.connectedChipsByEthId.get(node.uid);
-                        let arrow = '';
                         let position: CLUSTER_ETH_POSITION | null = null;
                         if (connectedChip) {
                             if (connectedChip?.coordinates.x < clusterChip.coordinates.x) {
-                                arrow = '←';
                                 position = CLUSTER_ETH_POSITION.LEFT;
                             }
                             if (connectedChip?.coordinates.x > clusterChip.coordinates.x) {
-                                arrow = '→';
                                 position = CLUSTER_ETH_POSITION.RIGHT;
                             }
                             if (connectedChip?.coordinates.y < clusterChip.coordinates.y) {
-                                arrow = '↑';
                                 position = CLUSTER_ETH_POSITION.TOP;
                             }
                             if (connectedChip?.coordinates.y > clusterChip.coordinates.y) {
-                                arrow = '↓';
                                 position = CLUSTER_ETH_POSITION.BOTTOM;
                             }
                         }
@@ -164,15 +160,15 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                             className='chip'
                             key={clusterChip.id}
                             style={{
-                                width: `${CHIP_SIZE}px`,
-                                height: `${CHIP_SIZE}px`,
+                                width: `${CLUSTER_CHIP_SIZE}px`,
+                                height: `${CLUSTER_CHIP_SIZE}px`,
                                 gridColumn: clusterChip.coordinates.x + 1,
                                 gridRow: clusterChip.coordinates.y + 1,
                                 backgroundColor: '#646464',
                                 display: 'grid',
                                 gap: '5px',
-                                gridTemplateColumns: `repeat(6, 1fr)`,
-                                gridTemplateRows: `repeat(6, 1fr)`,
+                                gridTemplateColumns: `repeat(${NODE_GRID_SIZE}, 1fr)`,
+                                gridTemplateRows: `repeat(${NODE_GRID_SIZE}, 1fr)`,
                                 position: 'relative',
                             }}
                         >
@@ -184,7 +180,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                                     width: '100%',
                                     height: '100%',
                                     fontSize: '44px',
-                                    lineHeight: `${CHIP_SIZE}px`,
+                                    lineHeight: `${CLUSTER_CHIP_SIZE}px`,
                                     textAlign: 'center',
                                     pointerEvents: 'none',
                                 }}
@@ -192,19 +188,20 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                                 {clusterChip.id}
                             </div>
 
-                            {ethPosition
-                                .get(CLUSTER_ETH_POSITION.TOP)
-                                ?.map((uid, index) => getEthModule(CLUSTER_ETH_POSITION.TOP, index + 2, 1, uid))}
-                            {ethPosition
-                                .get(CLUSTER_ETH_POSITION.BOTTOM)
-                                ?.map((uid, index) => getEthModule(CLUSTER_ETH_POSITION.BOTTOM, index + 2, 6, uid))}
-                            {ethPosition
-                                .get(CLUSTER_ETH_POSITION.LEFT)
-                                ?.map((uid, index) => getEthModule(CLUSTER_ETH_POSITION.LEFT, 1, index + 2, uid))}
-                            {ethPosition
-                                .get(CLUSTER_ETH_POSITION.RIGHT)
-                                ?.map((uid, index) => getEthModule(CLUSTER_ETH_POSITION.RIGHT, 6, index + 2, uid))}
-
+                            {[...ethPosition.entries()].map(([position, value]) => {
+                                return value.map((uid: string, index: number) => {
+                                    const node = chip?.getNode(uid);
+                                    return (
+                                        <EthPipeRenderer
+                                            key={uid}
+                                            id={uid}
+                                            ethPosition={position}
+                                            node={node}
+                                            index={index}
+                                        />
+                                    );
+                                });
+                            })}
                             {clusterChip.mmio && (
                                 <div
                                     style={{
@@ -234,16 +231,17 @@ interface EthPipeRendererProps {
     id: string;
     node: ComputeNode | undefined;
     ethPosition: CLUSTER_ETH_POSITION;
-    x: number;
-    y: number;
+    index: number;
 }
 
-const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, x, y }) => {
+const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, index }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const pipeSelection = useSelector((state: RootState) => state.pipeSelection.pipes);
     const selectedPipeIds = Object.values(pipeSelection)
         .filter((pipe: PipeSelection) => pipe.selected)
         .map((pipe: PipeSelection) => pipe.id);
+
+    const { x, y } = calculateEthPosition(ethPosition, index);
 
     const nodePipeIn = !node
         ? []
@@ -252,8 +250,8 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, x, y
               .filter((link) => link.name === EthernetLinkName.ETH_IN)
               .map((link) => link.pipes)
               .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
-              .flat()
-              .filter((pipeId) => selectedPipeIds.includes(pipeId)) || [];
+              .flat();
+
     const nodePipeOut = !node
         ? []
         : node
@@ -261,20 +259,49 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, x, y
               .filter((link) => link.name === EthernetLinkName.ETH_OUT)
               .map((link) => link.pipes)
               .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
-              .flat()
-              .filter((pipeId) => selectedPipeIds.includes(pipeId)) || [];
+              .flat();
+    const size = CLUSTER_CHIP_SIZE / NODE_GRID_SIZE - 5; // grid, 5 gap
 
-    const size = CHIP_SIZE / 6 - 5; // 6 grid, 5 gap
+    const focusPipeId = useSelector((state: RootState) => state.pipeSelection.focusPipe);
 
     useEffect(() => {
         if (svgRef.current) {
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
-
-            drawEthPipes(svg, ethPosition, nodePipeIn, EthernetLinkName.ETH_IN, size);
-            drawEthPipes(svg, ethPosition, nodePipeOut, EthernetLinkName.ETH_OUT, size);
+            if (focusPipeId) {
+                drawEthPipes(
+                    svg,
+                    ethPosition,
+                    nodePipeIn.filter((pipe) => pipe === focusPipeId),
+                    EthernetLinkName.ETH_IN,
+                    size,
+                );
+                drawEthPipes(
+                    svg,
+                    ethPosition,
+                    nodePipeOut.filter((pipe) => pipe === focusPipeId),
+                    EthernetLinkName.ETH_OUT,
+                    size,
+                );
+            } else {
+                drawEthPipes(
+                    svg,
+                    ethPosition,
+                    nodePipeIn.filter((pipeId) => selectedPipeIds.includes(pipeId)) || [],
+                    EthernetLinkName.ETH_IN,
+                    size,
+                );
+                drawEthPipes(
+                    svg,
+                    ethPosition,
+                    nodePipeOut.filter((pipeId) => selectedPipeIds.includes(pipeId)) || [],
+                    EthernetLinkName.ETH_OUT,
+                    size,
+                );
+            }
         }
-    }, [ethPosition, nodePipeIn, nodePipeOut, selectedPipeIds]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [nodePipeIn, nodePipeOut, focusPipeId, selectedPipeIds]);
 
     return (
         <div
@@ -296,5 +323,31 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, x, y
             <svg className='eth-svg' ref={svgRef} width={`${size}px`} height={`${size}px`} />
         </div>
     );
+};
+
+const calculateEthPosition = (ethPosition: CLUSTER_ETH_POSITION, index: number) => {
+    let x = 0;
+    let y = 0;
+    switch (ethPosition) {
+        case CLUSTER_ETH_POSITION.TOP:
+            x = index + 2;
+            y = 1;
+            break;
+        case CLUSTER_ETH_POSITION.BOTTOM:
+            x = index + 2;
+            y = NODE_GRID_SIZE;
+            break;
+        case CLUSTER_ETH_POSITION.LEFT:
+            x = 1;
+            y = index + 2;
+            break;
+        case CLUSTER_ETH_POSITION.RIGHT:
+            x = NODE_GRID_SIZE;
+            y = index + 2;
+            break;
+        default:
+            return { x, y };
+    }
+    return { x, y };
 };
 export default ClusterView;
