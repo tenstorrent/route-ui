@@ -16,7 +16,7 @@ import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../da
 import { ComputeNodeSiblings } from '../data/StateTypes';
 
 export const NODE_SIZE = 100;
-export const CHIP_SIZE = 200;
+export const CLUSTER_CHIP_SIZE = 150;
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
 const CENTER_DISPERSION = 10; // dispersion from the starting point
 const NOC_0_X_OFFSET = -CENTER_DISPERSION;
@@ -105,7 +105,7 @@ export const drawLink = (
 };
 
 const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, direction: EthernetLinkName, size: number) => {
-    const offset = 5;
+    const offset = size * 0.17;
 
     let lineStartX: number = 0;
     let lineEndX: number = 0;
@@ -114,20 +114,21 @@ const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, direction: Ethernet
 
     const arrowHeadHeight = 7;
     const arrowHeadWidth = 7;
-    let arrowOffset = 10;
-
+    let arrowOffset = 0;
     let arrow = { p1: '', p2: '', p3: '' };
+
+    const arrowShift = size * 0.9;
 
     switch (ethPosition) {
         case CLUSTER_ETH_POSITION.TOP:
-            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -25 : 4;
+            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -arrowShift : size - arrowShift;
             lineStartX = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
             lineStartY = 0;
             lineEndX = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
             lineEndY = size;
             break;
         case CLUSTER_ETH_POSITION.BOTTOM:
-            arrowOffset = direction === EthernetLinkName.ETH_IN ? -25 : 4;
+            arrowOffset = direction === EthernetLinkName.ETH_IN ? -arrowShift : size - arrowShift;
             lineStartX = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
             lineStartY = 0;
             lineEndX = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
@@ -135,14 +136,14 @@ const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, direction: Ethernet
 
             break;
         case CLUSTER_ETH_POSITION.LEFT:
-            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -25 : 5;
+            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -arrowShift : size - arrowShift;
             lineStartX = 0;
             lineStartY = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
             lineEndX = size;
             lineEndY = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
             break;
         case CLUSTER_ETH_POSITION.RIGHT:
-            arrowOffset = direction === EthernetLinkName.ETH_IN ? -25 : 5;
+            arrowOffset = direction === EthernetLinkName.ETH_IN ? -arrowShift : size - arrowShift;
             lineStartX = 0;
             lineStartY = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
             lineEndX = size;
