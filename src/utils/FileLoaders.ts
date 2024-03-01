@@ -18,12 +18,12 @@ import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 // Node 20 supports FS using promises instead of callbacks
 // update this to use the new pattern
 // ref: https://nodejs.org/dist/latest-v20.x/docs/api/fs.html#fspromisesopendirpath-options
-import fs, { Dirent } from 'fs';
-import path from 'path';
+import fs, { Dirent, existsSync } from 'fs';
 import { load } from 'js-yaml';
+import path from 'path';
+import Cluster from '../data/Cluster';
 import { GraphRelationshipState } from '../data/StateTypes';
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from '../data/sources/ClusterDescriptor';
-import Cluster from '../data/Cluster';
 
 export const readFile = async (filename: string): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -354,4 +354,8 @@ export const getAvailableNetlistFiles = async (folderPath: string): Promise<stri
     const netlistAnalyzerFileMask = /^analyzer_output_.*.yaml$/;
     const allFilesList = await readDirEntries(folderPath);
     return allFilesList.map((file) => file.name).filter((file) => netlistAnalyzerFileMask.test(file));
+};
+
+export const checkLocalFolderExists = (localPath?: string) => {
+    return (localPath && existsSync(localPath)) || false;
 };

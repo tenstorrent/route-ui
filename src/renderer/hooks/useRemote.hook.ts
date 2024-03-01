@@ -139,10 +139,6 @@ const useRemoteConnection = () => {
         }
     };
 
-    const checkLocalFolderExists = (localPath?: string) => {
-        return (localPath && existsSync(localPath)) || false;
-    };
-
     const listRemoteFolders = async (connection?: RemoteConnection) => {
         if (!connection || !connection.host || !connection.port) {
             throw new Error('No connection provided');
@@ -247,50 +243,38 @@ const useRemoteConnection = () => {
         }
     };
 
-    const getSavedRemoteFolders = (connection?: RemoteConnection) => {
-        return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
-    };
+    const persistentState = {
+        get savedConnectionList() {
+            return JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
+        },
+        set savedConnectionList(connections: RemoteConnection[]) {
+            setAppConfig('remoteConnections', JSON.stringify(connections));
+        },
+        get selectedConnection() {
+            const savedSelectedConnection = JSON.parse(getAppConfig('selectedConnection') ?? 'null');
 
-    const getSavedConnections = () => {
-        return JSON.parse(getAppConfig('remoteConnections') ?? '[]') as RemoteConnection[];
-    };
-
-    const getSelectedConnection = () => {
-        const savedConnections = getSavedConnections();
-        const savedSelectedConnection = JSON.parse(getAppConfig('selectedConnection') ?? 'null');
-
-        return (savedSelectedConnection ?? savedConnections[0]) as RemoteConnection | undefined;
-    };
-
-    const setSavedRemoteFolders = (connection: RemoteConnection | undefined, folders: RemoteFolder[]) => {
-        setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(folders));
-    };
-
-    const setSavedConnections = (connections: RemoteConnection[]) => {
-        setAppConfig('remoteConnections', JSON.stringify(connections));
-    };
-
-    const setSelectedConnection = (connection: RemoteConnection) => {
-        setAppConfig('selectedConnection', JSON.stringify(connection));
-    };
-
-    const deleteSavedRemoteFolders = (connection?: RemoteConnection) => {
-        deleteAppConfig(`${connection?.name}-remoteFolders`);
+            return (savedSelectedConnection ?? this.savedConnectionList[0]) as RemoteConnection | undefined;
+        },
+        set selectedConnection(connection: RemoteConnection | undefined) {
+            setAppConfig('selectedConnection', JSON.stringify(connection));
+        },
+        getSavedRemoteFolders: (connection?: RemoteConnection) => {
+            return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
+        },
+        setSavedRemoteFolders: (connection: RemoteConnection | undefined, folders: RemoteFolder[]) => {
+            setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(folders));
+        },
+        deleteSavedRemoteFolders: (connection?: RemoteConnection) => {
+            deleteAppConfig(`${connection?.name}-remoteFolders`);
+        },
     };
 
     return {
         testConnection,
         testRemoteFolder,
-        checkLocalFolderExists,
         syncRemoteFolder,
         listRemoteFolders,
-        getSavedRemoteFolders,
-        getSavedConnections,
-        getSelectedConnection,
-        setSavedRemoteFolders,
-        setSavedConnections,
-        setSelectedConnection,
-        deleteSavedRemoteFolders,
+        persistentState,
     };
 };
 

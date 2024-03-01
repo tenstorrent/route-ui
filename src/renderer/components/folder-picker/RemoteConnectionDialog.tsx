@@ -7,7 +7,7 @@ import useRemoteConnection, {
     ConnectionStatus,
     ConnectionTestStates,
     RemoteConnection,
-} from '../../hooks/useRemoteConnection.hook';
+} from '../../hooks/useRemote.hook';
 
 import '../../scss/RemoteConnectionDialog.scss';
 
