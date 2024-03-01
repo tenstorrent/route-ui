@@ -1,8 +1,10 @@
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ItemRenderer, Select } from '@blueprintjs/select';
-import { Button, MenuItem } from '@blueprintjs/core';
+import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { IconNames } from '@blueprintjs/icons';
 import { CLUSTER_CHIP_SIZE, drawEthPipes } from '../../../utils/DrawingAPI';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { ChipContext } from '../../../data/ChipDataProvider';
@@ -12,6 +14,9 @@ import SelectablePipe from '../SelectablePipe';
 import Chip, { ComputeNode, PipeSegment } from '../../../data/Chip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
+import { updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
+import SearchField from '../SearchField';
+import FilterableComponent from '../FilterableComponent';
 
 export interface ClusterViewDialog {}
 
@@ -38,10 +43,11 @@ const renderItem: ItemRenderer<GraphRelationshipState[]> = (
 const ClusterView: FC<ClusterViewDialog> = () => {
     const { cluster } = useContext(ClusterDataSource);
     const { chipState, getChipByGraphName } = useContext(ChipContext);
-
+    const dispatch = useDispatch();
     const graphInformation = useSelector(getAvailableGraphsSelector);
     const selectedGraph = chipState.graphName;
     const availableTemporalEpochs: GraphRelationshipState[][] = [];
+    const [pipeFilter, setPipeFilter] = useState<string>('');
     graphInformation.forEach((item) => {
         if (availableTemporalEpochs[item.temporalEpoch]) {
             availableTemporalEpochs[item.temporalEpoch].push(item);
@@ -73,18 +79,69 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
     });
 
+    const pipeIds = uniquePipeList.map((pipe) => pipe.id);
+    const selectFilteredPipes = () => {
+        const filtered = pipeIds.filter((id) => id.toLowerCase().includes(pipeFilter.toLowerCase()));
+        dispatch(
+            updateMultiplePipeSelection({
+                ids: filtered,
+                selected: true,
+            }),
+        );
+    };
+
     return (
         <div className='cluster-view-container'>
             <div className='cluster-view-pipelist'>
-                <Select
-                    items={availableTemporalEpochs}
-                    itemRenderer={renderItem}
-                    onItemSelect={setSelectedEpoch}
-                    activeItem={null}
-                    filterable={false}
-                >
-                    <Button type='button'>Temporal epoch {selectesEpoch[0]?.temporalEpoch}</Button>
-                </Select>
+                {availableTemporalEpochs.length > 1 && (
+                    <Select
+                        items={availableTemporalEpochs}
+                        itemRenderer={renderItem}
+                        onItemSelect={setSelectedEpoch}
+                        activeItem={null}
+                        filterable={false}
+                    >
+                        <Button type='button'>Temporal epoch {selectesEpoch[0]?.temporalEpoch}</Button>
+                    </Select>
+                )}
+                <SearchField
+                    disabled={uniquePipeList.length === 0}
+                    searchQuery={pipeFilter}
+                    onQueryChanged={setPipeFilter}
+                    controls={[
+                        <Tooltip2
+                            disabled={uniquePipeList.length === 0}
+                            content='Select filtered pipes'
+                            position={PopoverPosition.RIGHT}
+                            key='select-all-pipes'
+                        >
+                            <Button
+                                disabled={uniquePipeList.length === 0}
+                                icon={IconNames.FILTER_LIST}
+                                onClick={() => selectFilteredPipes()}
+                            />
+                        </Tooltip2>,
+                        <Tooltip2
+                            disabled={uniquePipeList.length === 0}
+                            content='Deselect ETH pipes'
+                            position={PopoverPosition.RIGHT}
+                            key='deselect-all-pipes'
+                        >
+                            <Button
+                                disabled={uniquePipeList.length === 0}
+                                icon={IconNames.FILTER_REMOVE}
+                                onClick={() =>
+                                    dispatch(
+                                        updateMultiplePipeSelection({
+                                            ids: pipeIds,
+                                            selected: false,
+                                        }),
+                                    )
+                                }
+                            />
+                        </Tooltip2>,
+                    ]}
+                />
                 <div
                     className='pipes'
                     style={{
@@ -94,18 +151,23 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                     }}
                 >
                     <ul className='scrollable-content' style={{ paddingLeft: 0 }}>
-                        {uniquePipeList.map((pipe) => {
-                            return (
-                                <li>
-                                    <SelectablePipe
-                                        pipeSegment={pipe}
-                                        pipeFilter=''
-                                        key={pipe.id}
-                                        showBandwidth={false}
-                                    />
-                                </li>
-                            );
-                        })}
+                        {uniquePipeList.map((pipe) => (
+                            <FilterableComponent
+                                key={pipe.id}
+                                filterableString={pipe.id}
+                                filterQuery={pipeFilter}
+                                component={
+                                    <li>
+                                        <SelectablePipe
+                                            pipeSegment={pipe}
+                                            pipeFilter={pipeFilter}
+                                            key={pipe.id}
+                                            showBandwidth={false}
+                                        />
+                                    </li>
+                                }
+                            />
+                        ))}
                     </ul>
                 </div>
             </div>
@@ -301,13 +363,14 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, inde
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [nodePipeIn, nodePipeOut, focusPipeId, selectedPipeIds]);
+    }, [pipeSelection, nodePipeIn, nodePipeOut, focusPipeId, selectedPipeIds]);
 
     return (
         <div
-            title={`${id}:${node?.uid || ''}`}
+            title={`${id}`}
             className={`eth eth-position-${ethPosition}`}
             style={{
+                opacity: nodePipeIn.length > 0 || nodePipeOut.length > 0 ? 1 : 0.2,
                 gridColumn: x,
                 gridRow: y,
                 fontSize: '10px',
