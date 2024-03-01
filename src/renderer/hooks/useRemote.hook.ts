@@ -256,7 +256,7 @@ const useRemoteConnection = () => {
             return (savedSelectedConnection ?? this.savedConnectionList[0]) as RemoteConnection | undefined;
         },
         set selectedConnection(connection: RemoteConnection | undefined) {
-            setAppConfig('selectedConnection', JSON.stringify(connection));
+            setAppConfig('selectedConnection', JSON.stringify(connection ?? null));
         },
         getSavedRemoteFolders: (connection?: RemoteConnection) => {
             return JSON.parse(getAppConfig(`${connection?.name}-remoteFolders`) ?? '[]') as RemoteFolder[];
