@@ -6,15 +6,17 @@ interface SearchFieldProps {
     searchQuery: string;
     onQueryChanged: (query: string) => void;
     controls: React.ReactElement[];
+    disabled?: boolean;
 }
 
 /**
  * Renders a search field. Controlled component.
  */
-function SearchField({ searchQuery, onQueryChanged, controls }: SearchFieldProps): React.ReactElement {
+function SearchField({ searchQuery, onQueryChanged, controls, disabled }: SearchFieldProps): React.ReactElement {
     return (
         <div className='search-field'>
             <InputGroup
+                disabled={disabled}
                 rightElement={
                     searchQuery ? (
                         <Button
@@ -35,6 +37,10 @@ function SearchField({ searchQuery, onQueryChanged, controls }: SearchFieldProps
             {controls}
         </div>
     );
+}
+
+SearchField.defaultProps = {
+    disabled : false
 }
 
 export default SearchField;

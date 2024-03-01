@@ -29,6 +29,14 @@ const pipeSelectionSlice = createSlice({
                 state.pipes[id].selected = selected;
             }
         },
+        updateMultiplePipeSelection(state, action: PayloadAction<{ ids: string[]; selected: boolean }>) {
+            const { ids, selected } = action.payload;
+            ids.forEach((id) => {
+                if (state.pipes[id]) {
+                    state.pipes[id].selected = selected;
+                }
+            });
+        },
         clearAllPipes(state) {
             state.pipeIds.forEach((id) => {
                 state.pipes[id].selected = false;
@@ -53,6 +61,7 @@ export const {
     selectAllPipes,
     updateFocusPipe,
     resetPipeSelection,
+    updateMultiplePipeSelection,
 } = pipeSelectionSlice.actions;
 
 export const pipeSelectionReducer = pipeSelectionSlice.reducer;

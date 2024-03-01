@@ -9808,311 +9808,311 @@ nodes:
           {}
         max_link_bw: 32
 dram_channels:
-  - channel_id: 0
-    subchannels:
-      - noc0_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            659000000000: 8320
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            614000000000: 8320
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            624000000000: 8320
-          max_link_bw: 32
-    dram0_inout:
-      num_occupants: 3
-      total_data_in_bytes: 24960
-      mapped_pipes:
-        659000000000: 8320
-        624000000000: 8320
-        614000000000: 8320
-      max_link_bw: 32
-    dram1_inout:
-      num_occupants: 0
-      total_data_in_bytes: 0
-      mapped_pipes:
-        {}
-      max_link_bw: 32
-  - channel_id: 1
-    subchannels:
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            629000000000: 8320
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 33280
-          mapped_pipes:
-            664000000000: 33280
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            470000000000: 8320
-          max_link_bw: 32
-    dram0_inout:
-      num_occupants: 3
-      total_data_in_bytes: 49920
-      mapped_pipes:
-        664000000000: 33280
-        629000000000: 8320
-        470000000000: 8320
-      max_link_bw: 32
-    dram1_inout:
-      num_occupants: 0
-      total_data_in_bytes: 0
-      mapped_pipes:
-        {}
-      max_link_bw: 32
-  - channel_id: 2
-    subchannels:
-      - noc0_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            644000000000: 8320
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 33280
-          mapped_pipes:
-            604000000000: 33280
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-    dram0_inout:
-      num_occupants: 2
-      total_data_in_bytes: 41600
-      mapped_pipes:
-        644000000000: 8320
-        604000000000: 33280
-      max_link_bw: 32
-    dram1_inout:
-      num_occupants: 0
-      total_data_in_bytes: 0
-      mapped_pipes:
-        {}
-      max_link_bw: 32
-  - channel_id: 3
-    subchannels:
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            654000000000: 8320
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            649000000000: 8320
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-    dram0_inout:
-      num_occupants: 2
-      total_data_in_bytes: 16640
-      mapped_pipes:
-        654000000000: 8320
-        649000000000: 8320
-      max_link_bw: 32
-    dram1_inout:
-      num_occupants: 0
-      total_data_in_bytes: 0
-      mapped_pipes:
-        {}
-      max_link_bw: 32
-  - channel_id: 4
-    subchannels:
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            634000000000: 8320
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 33280
-          mapped_pipes:
-            639000000000: 33280
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-    dram0_inout:
-      num_occupants: 2
-      total_data_in_bytes: 41600
-      mapped_pipes:
-        639000000000: 33280
-        634000000000: 8320
-      max_link_bw: 32
-    dram1_inout:
-      num_occupants: 0
-      total_data_in_bytes: 0
-      mapped_pipes:
-        {}
-      max_link_bw: 32
-  - channel_id: 5
-    subchannels:
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            619000000000: 8320
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 1
-          total_data_in_bytes: 8320
-          mapped_pipes:
-            609000000000: 8320
-          max_link_bw: 32
-      - noc0_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-        noc1_noc2axi:
-          num_occupants: 0
-          total_data_in_bytes: 0
-          mapped_pipes:
-            {}
-          max_link_bw: 32
-    dram0_inout:
-      num_occupants: 2
-      total_data_in_bytes: 16640
-      mapped_pipes:
-        619000000000: 8320
-        609000000000: 8320
-      max_link_bw: 32
-    dram1_inout:
-      num_occupants: 0
-      total_data_in_bytes: 0
-      mapped_pipes:
-        {}
-      max_link_bw: 32
+    -   channel_id: 0
+        subchannels:
+            -   noc0_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        659000000000: 8320
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        614000000000: 8320
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        624000000000: 8320
+                    max_link_bw: 32
+        dram0_inout:
+            num_occupants: 3
+            total_data_in_bytes: 24960
+            mapped_pipes:
+                659000000000: 8320
+                624000000000: 8320
+                614000000000: 8320
+            max_link_bw: 32
+        dram1_inout:
+            num_occupants: 0
+            total_data_in_bytes: 0
+            mapped_pipes:
+              { }
+            max_link_bw: 32
+    -   channel_id: 1
+        subchannels:
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        629000000000: 8320
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 33280
+                    mapped_pipes:
+                        664000000000: 33280
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        470000000000: 8320
+                    max_link_bw: 32
+        dram0_inout:
+            num_occupants: 3
+            total_data_in_bytes: 49920
+            mapped_pipes:
+                664000000000: 33280
+                629000000000: 8320
+                470000000000: 8320
+            max_link_bw: 32
+        dram1_inout:
+            num_occupants: 0
+            total_data_in_bytes: 0
+            mapped_pipes:
+              { }
+            max_link_bw: 32
+    -   channel_id: 2
+        subchannels:
+            -   noc0_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        644000000000: 8320
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 33280
+                    mapped_pipes:
+                        604000000000: 33280
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+        dram0_inout:
+            num_occupants: 2
+            total_data_in_bytes: 41600
+            mapped_pipes:
+                644000000000: 8320
+                604000000000: 33280
+            max_link_bw: 32
+        dram1_inout:
+            num_occupants: 0
+            total_data_in_bytes: 0
+            mapped_pipes:
+              { }
+            max_link_bw: 32
+    -   channel_id: 3
+        subchannels:
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        654000000000: 8320
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        649000000000: 8320
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+        dram0_inout:
+            num_occupants: 2
+            total_data_in_bytes: 16640
+            mapped_pipes:
+                654000000000: 8320
+                649000000000: 8320
+            max_link_bw: 32
+        dram1_inout:
+            num_occupants: 0
+            total_data_in_bytes: 0
+            mapped_pipes:
+              { }
+            max_link_bw: 32
+    -   channel_id: 4
+        subchannels:
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        634000000000: 8320
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 33280
+                    mapped_pipes:
+                        639000000000: 33280
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+        dram0_inout:
+            num_occupants: 2
+            total_data_in_bytes: 41600
+            mapped_pipes:
+                639000000000: 33280
+                634000000000: 8320
+            max_link_bw: 32
+        dram1_inout:
+            num_occupants: 0
+            total_data_in_bytes: 0
+            mapped_pipes:
+              { }
+            max_link_bw: 32
+    -   channel_id: 5
+        subchannels:
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        619000000000: 8320
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 1
+                    total_data_in_bytes: 8320
+                    mapped_pipes:
+                        609000000000: 8320
+                    max_link_bw: 32
+            -   noc0_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+                noc1_noc2axi:
+                    num_occupants: 0
+                    total_data_in_bytes: 0
+                    mapped_pipes:
+                      { }
+                    max_link_bw: 32
+        dram0_inout:
+            num_occupants: 2
+            total_data_in_bytes: 16640
+            mapped_pipes:
+                619000000000: 8320
+                609000000000: 8320
+            max_link_bw: 32
+        dram1_inout:
+            num_occupants: 0
+            total_data_in_bytes: 0
+            mapped_pipes:
+              { }
+            max_link_bw: 32

@@ -26,6 +26,10 @@ const ClusterViewDialog: React.FC<DetailedViewProps> = ({ zoom }) => {
             hasBackdrop
             usePortal
             lazy
+            canEscapeKeyClose
+            canOutsideClickClose
+            onClose={() => dispatch(closeClusterView())}
+            transitionDuration={0}
         >
 
             <div className={'cluster-view-wrap'}>
