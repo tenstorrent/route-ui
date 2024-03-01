@@ -71,30 +71,14 @@ const RemoteSyncConfigurator: FC = () => {
         return mergedFolders;
     };
 
-    const updateSavedConnection = async (connection: RemoteConnection, isDeletingConnection = false) => {
-        const updatedConnections = [...remote.persistentState.savedConnectionList];
-
-        const updatedConnectionIndex = remote.persistentState.savedConnectionList.findIndex((c) => {
+    const findConnectionIndex = (connection?: RemoteConnection) => {
+        return remote.persistentState.savedConnectionList.findIndex((c) => {
             const isSameName = c.name === connection?.name;
             const isSameHost = c.host === connection?.host;
             const isSamePort = c.port === connection?.port;
 
             return isSameName && isSameHost && isSamePort;
         });
-
-        if (updatedConnectionIndex === -1) {
-            updatedConnections.push(connection);
-        } else {
-            updatedConnections[updatedConnectionIndex] = connection;
-        }
-
-        if (isDeletingConnection) {
-            updatedConnections.splice(updatedConnectionIndex, 1);
-        }
-
-        remote.persistentState.savedConnectionList = updatedConnections;
-
-        await updateSelectedConnection(isDeletingConnection ? updatedConnections[0] : connection);
     };
 
     useEffect(() => {
@@ -142,11 +126,24 @@ const RemoteSyncConfigurator: FC = () => {
                     connections={remote.persistentState.savedConnectionList}
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     loading={isLoadingFolderList}
-                    onEditConnection={(updatedConnection) => updateSavedConnection(updatedConnection)}
+                    onEditConnection={async (updatedConnection, oldConnection) => {
+                        const updatedConnections = [...remote.persistentState.savedConnectionList];
+
+                        updatedConnections[findConnectionIndex(oldConnection)] = updatedConnection;
+                        remote.persistentState.savedConnectionList = updatedConnections;
+                        remote.persistentState.updateSavedRemoteFoldersConnection(oldConnection, updatedConnection);
+
+                        await updateSelectedConnection(updatedConnection);
+                    }}
                     onRemoveConnection={async (connection) => {
-                        await updateSelectedFolder(undefined);
-                        await updateSavedConnection(connection, true);
+                        const updatedConnections = [...remote.persistentState.savedConnectionList];
+
+                        updatedConnections.splice(findConnectionIndex(connection), 1);
+                        remote.persistentState.savedConnectionList = updatedConnections;
                         remote.persistentState.deleteSavedRemoteFolders(connection);
+
+                        await updateSelectedConnection(updatedConnections[0]);
+                        await updateSelectedFolder(undefined);
                     }}
                     onSelectConnection={async (connection) => {
                         try {

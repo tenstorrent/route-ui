@@ -272,6 +272,12 @@ const useRemoteConnection = () => {
         setSavedRemoteFolders: (connection: RemoteConnection | undefined, folders: RemoteFolder[]) => {
             setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(folders));
         },
+        updateSavedRemoteFoldersConnection(oldConnection?: RemoteConnection, newConnection?: RemoteConnection) {
+            const folders = this.getSavedRemoteFolders(oldConnection);
+
+            this.deleteSavedRemoteFolders(oldConnection);
+            this.setSavedRemoteFolders(newConnection, folders);
+        },
         deleteSavedRemoteFolders: (connection?: RemoteConnection) => {
             deleteAppConfig(`${connection?.name}-remoteFolders`);
         },
