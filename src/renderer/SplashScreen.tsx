@@ -10,7 +10,7 @@ import LogsOutput from './components/LogsOutput';
 import { toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
 import { ElectronEvents } from '../main/ElectronEvents';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
-import RemoteConnectionOptions from './components/folder-picker/RemoteConnectionOptions';
+import RemoteSyncConfigurator from './components/folder-picker/RemoteSyncConfigurator';
 import useAppConfig from './hooks/useAppConfig.hook';
 
 import LocalFolderSelector from './components/folder-picker/LocalFolderSelector';
@@ -52,7 +52,7 @@ const SplashScreen: FC = () => {
                         <legend>Remote Sync</legend>
                         <Icon icon={IconNames.CLOUD} size={150} />
                         <div className='folder-picker-wrapper'>
-                            <RemoteConnectionOptions />
+                            <RemoteSyncConfigurator />
                         </div>
                     </fieldset>
                 </div>

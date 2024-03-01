@@ -16,7 +16,7 @@ import AddRemoteConnection from './AddRemoteConnection';
 import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
-const RemoteConnectionOptions: FC = () => {
+const RemoteSyncConfigurator: FC = () => {
     const remote = useRemote();
 
     const dispatch = useDispatch();
@@ -243,4 +243,4 @@ const RemoteConnectionOptions: FC = () => {
     );
 };
 
-export default RemoteConnectionOptions;
+export default RemoteSyncConfigurator;
