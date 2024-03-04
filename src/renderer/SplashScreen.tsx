@@ -30,11 +30,7 @@ const SplashScreen: FC = () => {
         )[0] as boolean;
 
         dispatch(toggleQueuesTable(isQueuesTableEnabled));
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
+        
         dispatch(
             toggleClusterView(JSON.parse(getAppConfig(ElectronEvents.TOGGLE_CLUSTER_VIEW) ?? '[false]')[0] as boolean),
         );
