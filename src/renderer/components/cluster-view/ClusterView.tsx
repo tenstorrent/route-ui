@@ -5,7 +5,7 @@ import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
-import { CLUSTER_CHIP_SIZE, drawEthPipes } from '../../../utils/DrawingAPI';
+import { drawEthPipes } from '../../../utils/DrawingAPI';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { getAvailableGraphsSelector } from '../../../data/store/selectors/uiState.selectors';
@@ -14,7 +14,7 @@ import SelectablePipe from '../SelectablePipe';
 import Chip, { ComputeNode, PipeSegment } from '../../../data/Chip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
-import { updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
+import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import SearchField from '../SearchField';
 import FilterableComponent from '../FilterableComponent';
 
@@ -61,6 +61,18 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         availableTemporalEpochs[selectedGraphItem?.temporalEpoch || 0] || [],
     );
 
+    /** we want explisit control over the size of chips based on cluster size */
+    let clusterChipSize = 150;
+    const numberOfChips = cluster?.chips.length || 0;
+    // single galaxy
+    if (numberOfChips === 32) {
+        clusterChipSize = 150;
+    }
+    // nebula
+    if (numberOfChips === 2) {
+        clusterChipSize = 400;
+    }
+
     const pipeList: PipeSegment[] = selectesEpoch
         .map((graph) => {
             return (
@@ -92,7 +104,13 @@ const ClusterView: FC<ClusterViewDialog> = () => {
 
     return (
         <div className='cluster-view-container'>
-            <div className='cluster-view-pipelist'>
+            <div
+                className='cluster-view-pipelist'
+                // this is to address the bug with a sticking focus pipe
+                onMouseOut={() => {
+                    dispatch(updateFocusPipe(null));
+                }}
+            >
                 {availableTemporalEpochs.length > 1 && (
                     <Select
                         items={availableTemporalEpochs}
@@ -142,14 +160,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                         </Tooltip2>,
                     ]}
                 />
-                <div
-                    className='pipes'
-                    style={{
-                        maxHeight: 'calc(100vh - 100px)',
-                        minWidth: '150px',
-                        overflowY: 'scroll',
-                    }}
-                >
+                <div className='pipe-list'>
                     <ul className='scrollable-content' style={{ paddingLeft: 0 }}>
                         {uniquePipeList.map((pipe) => (
                             <FilterableComponent
@@ -176,7 +187,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                 style={{
                     display: 'grid',
                     gap: '5px',
-                    gridTemplateColumns: `repeat(${cluster?.totalCols || 0}, ${CLUSTER_CHIP_SIZE}px)`,
+                    gridTemplateColumns: `repeat(${cluster?.totalCols || 0}, ${clusterChipSize}px)`,
                 }}
             >
                 {cluster?.chips.map((clusterChip) => {
@@ -222,33 +233,24 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                             className='chip'
                             key={clusterChip.id}
                             style={{
-                                width: `${CLUSTER_CHIP_SIZE}px`,
-                                height: `${CLUSTER_CHIP_SIZE}px`,
+                                width: `${clusterChipSize}px`,
+                                height: `${clusterChipSize}px`,
                                 gridColumn: clusterChip.coordinates.x + 1,
                                 gridRow: clusterChip.coordinates.y + 1,
-                                backgroundColor: '#646464',
-                                display: 'grid',
-                                gap: '5px',
                                 gridTemplateColumns: `repeat(${NODE_GRID_SIZE}, 1fr)`,
                                 gridTemplateRows: `repeat(${NODE_GRID_SIZE}, 1fr)`,
-                                position: 'relative',
                             }}
                         >
-                            <div
+                            <span
+                                className='chip-id'
                                 style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    fontSize: '44px',
-                                    lineHeight: `${CLUSTER_CHIP_SIZE}px`,
-                                    textAlign: 'center',
-                                    pointerEvents: 'none',
+                                    lineHeight: `${clusterChipSize}px`,
+                                    paddingRight: `${clusterChipSize / 4}px`,
+                                    paddingTop: `${clusterChipSize / 5}px`,
                                 }}
                             >
                                 {clusterChip.id}
-                            </div>
+                            </span>
 
                             {[...ethPosition.entries()].map(([position, value]) => {
                                 return value.map((uid: string, index: number) => {
@@ -260,6 +262,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                                             ethPosition={position}
                                             node={node}
                                             index={index}
+                                            clusterChipSize={clusterChipSize}
                                         />
                                     );
                                 });
@@ -294,9 +297,10 @@ interface EthPipeRendererProps {
     node: ComputeNode | undefined;
     ethPosition: CLUSTER_ETH_POSITION;
     index: number;
+    clusterChipSize: number;
 }
 
-const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, index }) => {
+const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, index, clusterChipSize }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const pipeSelection = useSelector((state: RootState) => state.pipeSelection.pipes);
     const selectedPipeIds = Object.values(pipeSelection)
@@ -322,7 +326,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, inde
               .map((link) => link.pipes)
               .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
               .flat();
-    const size = CLUSTER_CHIP_SIZE / NODE_GRID_SIZE - 5; // grid, 5 gap
+    const size = clusterChipSize / NODE_GRID_SIZE - 5; // grid, 5 gap
 
     const focusPipeId = useSelector((state: RootState) => state.pipeSelection.focusPipe);
 

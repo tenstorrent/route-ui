@@ -20,7 +20,7 @@ const ClusterViewDialog: React.FC<DetailedViewProps> = ({ zoom }) => {
 
     return (
         <Overlay
-            className={Classes.OVERLAY_SCROLL_CONTAINER}
+            className={Classes.OVERLAY}
             isOpen={isOpen}
             enforceFocus={false}
             hasBackdrop
