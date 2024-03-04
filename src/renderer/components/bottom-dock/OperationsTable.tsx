@@ -1,22 +1,23 @@
-import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
-import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button, Checkbox, Icon } from '@blueprintjs/core';
+import { AnchorButton, Button, Checkbox, Icon, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
-import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
-import { RootState } from '../../../data/store/createStore';
-import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import { ComputeNode } from '../../../data/Chip';
-import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import { ChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, SortingDirection } from './SharedTable';
-import { ChipContext } from '../../../data/ChipDataProvider';
-import { columnRenderer } from './SharedTable';
+import { RootState } from '../../../data/store/createStore';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
+import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { numberFormatter, valueRatio } from '../../utils/numbers';
+import SearchField from '../SearchField';
+import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
+import { columnRenderer } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -31,6 +32,7 @@ function OperationsTable() {
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
+    const [filterQuery, setFilterQuery] = useState<string>('');
 
     const resetOpTableDetails = () => {
         if (!chip) {
@@ -55,8 +57,12 @@ function OperationsTable() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
-    if (!chip || !tableFields.length) {
-        return <pre>No data available</pre>;
+    if (!chip) {
+        return (
+            <div className='no-data-available'>
+                <pre>No data available</pre>
+            </div>
+        );
     }
 
     const expandOperationCores = (opName: string) => {
@@ -77,6 +83,22 @@ function OperationsTable() {
         setTableFields(list);
     };
 
+    const returnToOperationsView = () => {
+        const list = [...chip.operations]
+            .map((op) => {
+                return {
+                    operation: op,
+                    name: op.name,
+                    ...op.details,
+                    slowestOperandRef: op.slowestOperand,
+                } as unknown as OpTableFields;
+            })
+            .filter(({ operation }) => operation?.name.toLowerCase().includes(filterQuery.toLowerCase()));
+
+        setTableFields(list);
+        setCoreView(false);
+    };
+
     const operationCellRenderer = (rowIndex: number) => {
         const opName = sortedTableFields[rowIndex].name;
         return (
@@ -88,7 +110,7 @@ function OperationsTable() {
                             opName={opName}
                             value={selected(opName)}
                             selectFunc={selectOperation}
-                            stringFilter=''
+                            stringFilter={filterQuery}
                             type={GraphVertexType.OPERATION}
                         />
                     </SelectableOperationPerformance>
@@ -104,8 +126,7 @@ function OperationsTable() {
                         title='Back to operations view'
                         icon={IconNames.ARROW_LEFT}
                         onClick={() => {
-                            resetOpTableDetails();
-                            setCoreView(false);
+                            returnToOperationsView();
                         }}
                     />
                 ) : (
@@ -127,7 +148,7 @@ function OperationsTable() {
 
     const coreIdCellRenderer = (rowIndex: number) => {
         const definition = operationsTableColumns.get('core_id');
-        const cellContent = definition?.formatter(tableFields[rowIndex].core_id) ?? '';
+        const cellContent = definition?.formatter(tableFields[rowIndex].core_id ?? '') ?? '';
 
         return (
             <div className='op-element'>
@@ -228,74 +249,115 @@ function OperationsTable() {
     const columns = Array.from(operationsTableColumns.keys()).filter((key) => !excludedColumns.includes(key));
 
     return (
-        <Table2
-            ref={table}
-            renderMode={RenderMode.NONE}
-            forceRerenderOnSelectionChange
-            selectionModes={SelectionModes.NONE}
-            className='operations-table'
-            numRows={tableFields.length}
-            enableColumnHeader
-            numFrozenColumns={1}
-            cellRendererDependencies={[
-                sortDirection,
-                sortingColumn,
-                nodesSelectionState.operations,
-                nodesSelectionState.queues,
-                nodesSelectionState.nodeList,
-                tableFields,
-                coreView,
-                sortedTableFields,
-                tableFields.length,
-                operationRatioThreshold,
-            ]}
-        >
-            {columnRenderer({
-                key: 'operation',
-                columnDefinition: operationsTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                nodesSelectionState,
-                isInteractive: true,
-                customCellContentRenderer: operationCellRenderer,
-            })}
-            {!coreView
-                ? columnRenderer({
-                      key: 'grid_size',
-                      columnDefinition: operationsTableColumns,
-                      changeSorting,
-                      sortDirection,
-                      sortingColumn,
-                      tableFields,
-                      nodesSelectionState,
-                  })
-                : columnRenderer({
-                      key: 'core_id',
-                      columnDefinition: operationsTableColumns,
-                      changeSorting,
-                      sortDirection,
-                      sortingColumn,
-                      tableFields,
-                      nodesSelectionState,
-                      customCellContentRenderer: coreIdCellRenderer,
-                  })}
-            {
-                columns.map((key) =>
-                    columnRenderer({
-                        key: key as keyof OpTableFields,
+        <>
+            <div>
+                <SearchField
+                    disabled={coreView}
+                    searchQuery={filterQuery}
+                    onQueryChanged={(query) => {
+                        setFilterQuery(query);
+
+                        if (query === '') {
+                            resetOpTableDetails();
+                        } else {
+                            setTableFields(
+                                tableFields.filter(({ operation }) =>
+                                    operation?.name.toLowerCase().includes(query.toLowerCase()),
+                                ),
+                            );
+                        }
+                    }}
+                    controls={[
+                        <Tooltip2 content='Reset filter' position={PopoverPosition.BOTTOM}>
+                            <AnchorButton
+                                key='reset-ops-table-filter'
+                                icon={IconNames.REFRESH}
+                                disabled={coreView || filterQuery === ''}
+                                title='Reset filter'
+                                onClick={() => {
+                                    resetOpTableDetails();
+                                }}
+                            />
+                        </Tooltip2>,
+                    ]}
+                />
+            </div>
+            {tableFields.length > 0 ? (
+                <Table2
+                    ref={table}
+                    renderMode={RenderMode.NONE}
+                    forceRerenderOnSelectionChange
+                    selectionModes={SelectionModes.NONE}
+                    className='operations-table'
+                    numRows={tableFields.length}
+                    enableColumnHeader
+                    numFrozenColumns={1}
+                    cellRendererDependencies={[
+                        sortDirection,
+                        sortingColumn,
+                        nodesSelectionState.operations,
+                        nodesSelectionState.queues,
+                        nodesSelectionState.nodeList,
+                        tableFields,
+                        coreView,
+                        sortedTableFields,
+                        tableFields.length,
+                        operationRatioThreshold,
+                        filterQuery,
+                    ]}
+                >
+                    {columnRenderer({
+                        key: 'operation',
                         columnDefinition: operationsTableColumns,
                         changeSorting,
                         sortDirection,
                         sortingColumn,
                         tableFields,
                         nodesSelectionState,
-                        customCellContentRenderer: getCustomCellRenderer(key),
-                    }),
-                ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
-            }
-        </Table2>
+                        isInteractive: true,
+                        customCellContentRenderer: operationCellRenderer,
+                    })}
+                    {!coreView
+                        ? columnRenderer({
+                              key: 'grid_size',
+                              columnDefinition: operationsTableColumns,
+                              changeSorting,
+                              sortDirection,
+                              sortingColumn,
+                              tableFields,
+                              nodesSelectionState,
+                          })
+                        : columnRenderer({
+                              key: 'core_id',
+                              columnDefinition: operationsTableColumns,
+                              changeSorting,
+                              sortDirection,
+                              sortingColumn,
+                              tableFields,
+                              nodesSelectionState,
+                              customCellContentRenderer: coreIdCellRenderer,
+                          })}
+                    {
+                        columns.map((key) =>
+                            columnRenderer({
+                                key: key as keyof OpTableFields,
+                                columnDefinition: operationsTableColumns,
+                                changeSorting,
+                                sortDirection,
+                                sortingColumn,
+                                tableFields,
+                                nodesSelectionState,
+                                customCellContentRenderer: getCustomCellRenderer(key),
+                            }),
+                        ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+                    }
+                </Table2>
+            ) : (
+                <div className='no-data-available'>
+                    <pre>No data available</pre>
+                </div>
+            )}
+        </>
     );
 }
 

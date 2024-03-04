@@ -1,6 +1,6 @@
-import React from 'react';
 import { Button, Icon, InputGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import React from 'react';
 
 interface SearchFieldProps {
     searchQuery: string;
@@ -20,6 +20,7 @@ function SearchField({ searchQuery, onQueryChanged, controls, disabled }: Search
                 rightElement={
                     searchQuery ? (
                         <Button
+                            disabled={disabled}
                             minimal
                             onClick={() => {
                                 onQueryChanged('');
@@ -40,7 +41,7 @@ function SearchField({ searchQuery, onQueryChanged, controls, disabled }: Search
 }
 
 SearchField.defaultProps = {
-    disabled : false
-}
+    disabled: false,
+};
 
 export default SearchField;

@@ -44,7 +44,8 @@
 
     .operations-table,
     .operands-table {
-        height: 302px;
+        height: 260px;
+        margin-top: 10px;
 
         .bp4-table-cell-ledger-odd {
             background-color: $tt-extra-light-gray;
@@ -55,6 +56,14 @@
                 text-align: right;
             }
         }
+    }
+
+    .no-data-available {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 260px;
+        color: $tt-dark-gray;
     }
 
     .op-element {
