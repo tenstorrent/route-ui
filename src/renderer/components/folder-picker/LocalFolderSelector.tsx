@@ -10,7 +10,7 @@ import FolderPicker from './FolderPicker';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return lastFolder ? `${pathSeparator}${lastFolder}` : '';
+    return lastFolder ? `${pathSeparator}${lastFolder}` : undefined;
 };
 
 const LocalFolderOptions: FC = () => {
