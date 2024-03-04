@@ -61,7 +61,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         availableTemporalEpochs[selectedGraphItem?.temporalEpoch || 0] || [],
     );
 
-    /** we want explisit control over the size of chips based on cluster size */
+    /** we want explicit control over the size of chips based on cluster size */
     let clusterChipSize = 150;
     const numberOfChips = cluster?.chips.length || 0;
     // single galaxy
