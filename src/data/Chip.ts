@@ -1142,6 +1142,9 @@ export class ComputeNode {
     }
 
     public getNodeLabel(): string {
+        if (this.harvested && this.type === ComputeNodeType.CORE) {
+            return `hc`;
+        }
         if (this.type === ComputeNodeType.CORE) {
             return 'c';
         }
