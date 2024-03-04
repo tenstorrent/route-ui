@@ -30,7 +30,7 @@ const LocalFolderOptions: FC = () => {
 
                         await loadPerfAnalyzerFolder(folderPath);
                     }}
-                    text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : ''}
+                    text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : undefined}
                 />
                 <GraphSelector disabled={selectedFolderLocationType === 'remote'} />
                 {error && (

@@ -12,8 +12,13 @@ interface FolderPickerProps {
 
 const FolderPicker = ({ disabled, onSelectFolder, text, icon }: FolderPickerProps): React.ReactElement => {
     return (
-        <Button disabled={disabled} icon={(icon as any) ?? IconNames.FOLDER_SHARED} onClick={onSelectFolder}>
-            <span className='path-label'>{text || 'Select local folder'}</span>
+        <Button
+            className={!text ? 'no-text' : ''}
+            disabled={disabled}
+            icon={(icon as any) ?? IconNames.FOLDER_SHARED}
+            onClick={onSelectFolder}
+        >
+            <span className='path-label'>{text ?? 'Select local folder'}</span>
         </Button>
     );
 };
