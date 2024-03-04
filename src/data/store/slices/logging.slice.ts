@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import { isDebug } from '../../../renderer/utils/env';
 import { LogLevel } from '../../Types';
 
 export interface LogEntry {
@@ -16,7 +17,7 @@ export interface LoggingState {
 
 const loggingInitialState: LoggingState = {
     entryList: [],
-    outputsToConsole: false,
+    outputsToConsole: isDebug(),
     logOutputEnabled: false,
 };
 
