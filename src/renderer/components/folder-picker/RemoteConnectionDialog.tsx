@@ -71,7 +71,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
             let folderStatus = folderProgressStatus;
 
             if (sshStatus.status === ConnectionTestStates.FAILED) {
-                folderStatus = { status: ConnectionTestStates.FAILED, message: 'Could not connecto SSH server' };
+                folderStatus = { status: ConnectionTestStates.FAILED, message: 'Could not connect to SSH server' };
             }
 
             setConnectionTests([sshStatus, folderStatus]);
@@ -117,7 +117,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                         onChange={(e) => setConnection({ ...connection, name: e.target.value })}
                     />
                 </FormGroup>
-                <FormGroup label='SSH Host' labelFor='text-input' subLabel='SSH host name, e.g.: localhost'>
+                <FormGroup label='SSH Host' labelFor='text-input' subLabel='SSH host name. E.g.: localhost'>
                     <InputGroup
                         key='host'
                         value={connection.host}
@@ -127,7 +127,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 <FormGroup
                     label='SSH Port'
                     labelFor='text-input'
-                    subLabel='Port to use for the SSH connection. e.g.: port 22'
+                    subLabel='Port to use for the SSH connection. E.g.: port 22'
                 >
                     <InputGroup
                         key='port'
@@ -146,7 +146,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 <FormGroup
                     label='Remote Folder path'
                     labelFor='text-input'
-                    subLabel='Path to the remote folder, e.g.: "$HOME/work/ll-sw".\nThis is where the tests data is stored'
+                    subLabel='Path to the remote folder. E.g.: "$HOME/work/ll-sw"'
                 >
                     <InputGroup
                         key='path'

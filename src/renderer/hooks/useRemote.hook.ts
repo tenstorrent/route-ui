@@ -73,7 +73,11 @@ const useRemoteConnection = () => {
                 logging.info(`Command exited with code ${code}`);
 
                 if (code !== 0 || stderr.length > 0) {
-                    reject(Error(`Command failed: ${cmd} ${params.join(' ')}\n${stderr}`));
+                    reject(
+                        Error(
+                            `Command "${cmd} ${params.join(' ')}" failed with status code ${code}.\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`,
+                        ),
+                    );
                 }
                 resolve(stdout);
             });
@@ -102,7 +106,9 @@ const useRemoteConnection = () => {
             return connectionStatus;
         } catch (err: any) {
             connectionStatus.status = ConnectionTestStates.FAILED;
-            connectionStatus.message = `Connection failed: ${err?.message.toString() ?? err?.toString()}`;
+            connectionStatus.message = 'Could not connect to SSH server';
+
+            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
             return connectionStatus;
         }
@@ -133,7 +139,9 @@ const useRemoteConnection = () => {
             return connectionStatus;
         } catch (err: any) {
             connectionStatus.status = ConnectionTestStates.FAILED;
-            connectionStatus.message = `Remote folder path failed: ${err?.message.toString() ?? err?.toString()}`;
+            connectionStatus.message = 'Remote folder path does not exist';
+
+            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
             return connectionStatus;
         }
@@ -263,6 +271,12 @@ const useRemoteConnection = () => {
         },
         setSavedRemoteFolders: (connection: RemoteConnection | undefined, folders: RemoteFolder[]) => {
             setAppConfig(`${connection?.name}-remoteFolders`, JSON.stringify(folders));
+        },
+        updateSavedRemoteFoldersConnection(oldConnection?: RemoteConnection, newConnection?: RemoteConnection) {
+            const folders = this.getSavedRemoteFolders(oldConnection);
+
+            this.deleteSavedRemoteFolders(oldConnection);
+            this.setSavedRemoteFolders(newConnection, folders);
         },
         deleteSavedRemoteFolders: (connection?: RemoteConnection) => {
             deleteAppConfig(`${connection?.name}-remoteFolders`);

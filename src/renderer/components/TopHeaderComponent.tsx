@@ -55,19 +55,20 @@ const TopHeaderComponent: React.FC = () => {
     const availableGraphs = useSelector(getAvailableGraphsSelector);
 
     const updateSelectedFolder = async (
-        folder: RemoteFolder | string | undefined,
+        newFolder: RemoteFolder | string,
         newFolderLocationType: FolderLocationType,
     ) => {
-        const folderPath = (folder as RemoteFolder)?.localPath ?? folder;
+        const folderPath = (newFolder as RemoteFolder)?.localPath ?? newFolder;
 
-        if (typeof folder === 'string') {
+        if (typeof newFolder === 'string') {
             setSelectedRemoteFolder(undefined);
         } else {
-            setSelectedRemoteFolder(folder);
+            setSelectedRemoteFolder(newFolder);
         }
 
+        resetAvailableGraphs();
+
         if (checkLocalFolderExists(folderPath)) {
-            resetAvailableGraphs();
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
         }
     };
@@ -108,11 +109,7 @@ const TopHeaderComponent: React.FC = () => {
                                 await updateSelectedFolder(folderPath, 'local');
                             }
                         }}
-                        text={
-                            folderLocationType === 'local' ? (
-                                <span className='path-label'>{getTestName(localFolderPath)}</span>
-                            ) : undefined
-                        }
+                        text={folderLocationType === 'local' ? getTestName(localFolderPath) : undefined}
                     />
                 </Tooltip2>
                 <GraphSelector autoLoadFistGraph />
