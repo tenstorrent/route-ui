@@ -946,6 +946,7 @@ export class ComputeNode {
         node.opCycles = nodeJSON.op_cycles;
         node.links = new Map();
         node.chipId = chipId;
+        node.harvested = nodeJSON.harvested ?? false;
 
         node.type = nodeJSON.type as ComputeNodeType;
         if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
@@ -1002,6 +1003,8 @@ export class ComputeNode {
     public uid: string;
 
     public type: ComputeNodeType = ComputeNodeType.NONE;
+
+    public harvested: boolean = false;
 
     public loc: Loc = { x: 0, y: 0 };
 
@@ -1139,6 +1142,9 @@ export class ComputeNode {
     }
 
     public getNodeLabel(): string {
+        if (this.harvested && this.type === ComputeNodeType.CORE) {
+            return `hc`;
+        }
         if (this.type === ComputeNodeType.CORE) {
             return 'c';
         }

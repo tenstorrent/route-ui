@@ -16,6 +16,7 @@ export interface NodeDataJSON {
     op_cycles: number;
     dram_channel?: number;
     dram_subchannel?: number;
+    harvested?: boolean;
     links: { [key: string]: NOCLinkJSON };
 }
 
