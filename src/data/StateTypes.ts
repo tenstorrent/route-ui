@@ -2,6 +2,7 @@ import { LinkType } from './Types';
 
 export interface ExperimentalFeaturesState {
     showQueuesTable: boolean;
+    showClusterView: boolean;
 }
 
 export interface HighContrastState {
