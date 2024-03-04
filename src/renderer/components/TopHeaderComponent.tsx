@@ -109,7 +109,7 @@ const TopHeaderComponent: React.FC = () => {
                                 await updateSelectedFolder(folderPath, 'local');
                             }
                         }}
-                        text={folderLocationType === 'local' ? getTestName(localFolderPath) : undefined}
+                        text={folderLocationType === 'local' ? getTestName(localFolderPath) : ''}
                     />
                 </Tooltip2>
                 <GraphSelector autoLoadFistGraph />

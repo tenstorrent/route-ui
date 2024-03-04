@@ -21,6 +21,10 @@
         }
     }
 
+    .bp4-button.no-text .bp4-icon {
+        margin-right: 0;
+    }
+
     .bp4-button-text:has(.path-label) {
         display: inline-flex;
         align-items: center;
