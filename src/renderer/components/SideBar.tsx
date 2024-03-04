@@ -9,18 +9,20 @@ import {
     setSelectedFile,
     setSelectedFolder,
 } from 'data/store/slices/uiState.slice';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import { process } from '@electron/remote';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
+import { ClusterDataSource } from '../../data/DataSource';
 
 export interface SideBarProps {}
 
-export const SideBar: React.FC<SideBarProps> = ({  }) => {
+export const SideBar: React.FC<SideBarProps> = ({}) => {
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
+    const { cluster } = useContext(ClusterDataSource);
     const dispatch = useDispatch();
     const reloadAppData = () => {
         dispatch(clearAvailableGraphs());
@@ -33,10 +35,6 @@ export const SideBar: React.FC<SideBarProps> = ({  }) => {
     const handleOpenClusterView = () => {
         dispatch(openClusterView());
     };
-    // const traceCluster = () => {
-    //     console.log('Cluster:', cluster);
-    //     console.log(cluster?.totalRows, cluster?.totalCols);
-    // };
     const isDockOpen = useSelector(getDockOpenState);
 
     return (
@@ -53,7 +51,7 @@ export const SideBar: React.FC<SideBarProps> = ({  }) => {
                     />
                 </Tooltip2>
             )}
-            {process.env.NODE_ENV === 'development' && (
+            {process.env.NODE_ENV === 'development' && cluster?.chips !== undefined && cluster?.chips.length > 1 && (
                 <Button icon={IconNames.FULL_STACKED_CHART} text='' onClick={handleOpenClusterView} />
             )}
         </div>
