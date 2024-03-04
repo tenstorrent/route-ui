@@ -7,7 +7,7 @@ import { LogLevel } from '../data/Types';
 import { getLogEntriesByType, getLogOutputEnabled } from '../data/store/selectors/logging.selector';
 import LogsOutput from './components/LogsOutput';
 
-import { toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
+import { toggleClusterView, toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
 import { ElectronEvents } from '../main/ElectronEvents';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
 import RemoteSyncConfigurator from './components/folder-picker/RemoteSyncConfigurator';
@@ -30,7 +30,10 @@ const SplashScreen: FC = () => {
         )[0] as boolean;
 
         dispatch(toggleQueuesTable(isQueuesTableEnabled));
-
+        
+        dispatch(
+            toggleClusterView(JSON.parse(getAppConfig(ElectronEvents.TOGGLE_CLUSTER_VIEW) ?? '[false]')[0] as boolean),
+        );
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

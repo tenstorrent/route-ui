@@ -28,6 +28,13 @@ export default class MenuBuilder {
                 menuItem.checked = isChecked;
             }
         });
+        listenToEventFromWindow(ElectronEvents.TOGGLE_CLUSTER_VIEW, (isChecked) => {
+            const menuItem = menu.getMenuItemById('toggleClusterView');
+
+            if (menuItem) {
+                menuItem.checked = isChecked;
+            }
+        });
 
         return menu;
     }
@@ -107,6 +114,25 @@ export default class MenuBuilder {
                                     sendEventToWindow(
                                         this.mainWindow,
                                         ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        menuItem.checked,
+                                    );
+                                },
+                            },
+                            {
+                                label: 'Toggle Cluster View',
+                                id: 'toggleClusterView',
+                                type: 'checkbox',
+                                checked:
+                                    (
+                                        await getSavedState<[boolean]>(
+                                            this.mainWindow,
+                                            ElectronEvents.TOGGLE_CLUSTER_VIEW,
+                                        )
+                                    )?.[0] ?? false,
+                                click: (menuItem) => {
+                                    sendEventToWindow(
+                                        this.mainWindow,
+                                        ElectronEvents.TOGGLE_CLUSTER_VIEW,
                                         menuItem.checked,
                                     );
                                 },
@@ -195,6 +221,25 @@ export default class MenuBuilder {
                                     sendEventToWindow(
                                         this.mainWindow,
                                         ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        menuItem.checked,
+                                    );
+                                },
+                            },
+                            {
+                                label: 'Toggle Cluster View',
+                                id: 'toggleClusterView',
+                                type: 'checkbox',
+                                checked:
+                                    (
+                                        await getSavedState<[boolean]>(
+                                            this.mainWindow,
+                                            ElectronEvents.TOGGLE_CLUSTER_VIEW,
+                                        )
+                                    )?.[0] ?? false,
+                                click: (menuItem) => {
+                                    sendEventToWindow(
+                                        this.mainWindow,
+                                        ElectronEvents.TOGGLE_CLUSTER_VIEW,
                                         menuItem.checked,
                                     );
                                 },
