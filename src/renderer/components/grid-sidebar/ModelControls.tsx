@@ -14,15 +14,21 @@ const ModelControls: FC = () => {
     const chip = useContext(ChipContext).getActiveChip();
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector((state: RootState) => getOperationRatioThreshold(state));
-    const { maxModelEstimateRatio } = useOperationsTable(
-        [...(chip?.operations ?? [])].map((op) => {
-            return {
-                operation: op,
-                name: op.name,
-                ...op.details,
-                slowestOperandRef: op.slowestOperand,
-            } as unknown as OpTableFields;
-        }),
+    const { getMaxModelEstimateRatio } = useOperationsTable();
+    const maxModelEstimateRatio = useMemo(
+        () =>
+            getMaxModelEstimateRatio(
+                [...(chip?.operations ?? [])].map((op) => {
+                    return {
+                        operation: op,
+                        name: op.name,
+                        ...op.details,
+                        slowestOperandRef: op.slowestOperand,
+                    } as unknown as OpTableFields;
+                }),
+            ),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [chip?.operations],
     );
 
     const clampNumber = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
