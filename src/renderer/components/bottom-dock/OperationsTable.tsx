@@ -33,25 +33,33 @@ function OperationsTable() {
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
     const [filterQuery, setFilterQuery] = useState<string>('');
 
-    const resetOpTableDetails = () => {
+    const updateOpTableDetails = (query?: string) => {
         if (!chip) {
             return;
         }
 
-        setTableFields(
-            [...chip.operations].map((op) => {
+        const list = [...chip.operations]
+            .map((op) => {
                 return {
                     operation: op,
                     name: op.name,
                     ...op.details,
                     slowestOperandRef: op.slowestOperand,
                 } as unknown as OpTableFields;
-            }),
-        );
+            })
+            .filter(({ operation }) => {
+                if (!query) {
+                    return true;
+                }
+
+                return operation?.name.toLowerCase().includes(query.toLowerCase()) ?? true;
+            });
+
+        setTableFields(list);
     };
 
     useEffect(() => {
-        resetOpTableDetails();
+        updateOpTableDetails();
         setCoreView(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
@@ -69,33 +77,25 @@ function OperationsTable() {
         if (operation === undefined) {
             return;
         }
-        const list = [...operation.cores].map((core: ComputeNode) => {
-            return {
-                name: core.opName,
-                ...core.perfAnalyzerResults,
-                core_id: core.uid,
-                slowestOperandRef: core.operation?.slowestOperand,
-            } as OpTableFields;
-        });
+        const list = [...operation.cores]
+            .map((core: ComputeNode) => {
+                return {
+                    name: core.opName,
+                    ...core.perfAnalyzerResults,
+                    core_id: core.uid,
+                    slowestOperandRef: core.operation?.slowestOperand,
+                } as OpTableFields;
+            })
+            .filter(({ operation: op }) => {
+                if (!filterQuery) {
+                    return true;
+                }
+
+                return op?.name.toLowerCase().includes(filterQuery.toLowerCase()) ?? true;
+            });
 
         setCoreView(true);
         setTableFields(list);
-    };
-
-    const returnToOperationsView = () => {
-        const list = [...chip.operations]
-            .map((op) => {
-                return {
-                    operation: op,
-                    name: op.name,
-                    ...op.details,
-                    slowestOperandRef: op.slowestOperand,
-                } as unknown as OpTableFields;
-            })
-            .filter(({ operation }) => operation?.name.toLowerCase().includes(filterQuery.toLowerCase()));
-
-        setTableFields(list);
-        setCoreView(false);
     };
 
     const operationCellRenderer = (rowIndex: number) => {
@@ -125,7 +125,8 @@ function OperationsTable() {
                         title='Back to operations view'
                         icon={IconNames.ARROW_LEFT}
                         onClick={() => {
-                            returnToOperationsView();
+                            updateOpTableDetails();
+                            setCoreView(false);
                         }}
                     />
                 ) : (
@@ -255,16 +256,7 @@ function OperationsTable() {
                     searchQuery={filterQuery}
                     onQueryChanged={(query) => {
                         setFilterQuery(query);
-
-                        if (query === '') {
-                            resetOpTableDetails();
-                        } else {
-                            setTableFields(
-                                tableFields.filter(({ operation }) =>
-                                    operation?.name.toLowerCase().includes(query.toLowerCase()),
-                                ),
-                            );
-                        }
+                        updateOpTableDetails(query);
                     }}
                     controls={[]}
                 />
