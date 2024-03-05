@@ -22,6 +22,7 @@ import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
+import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -99,6 +100,7 @@ const usePerfAnalyzerFileLoader = () => {
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
         if (selectedFolder) {
             try {
+                dispatch(closeDetailedView())
                 dispatch(clearAllNodes());
                 setActiveChip(graphName);
                 navigate('/render');
