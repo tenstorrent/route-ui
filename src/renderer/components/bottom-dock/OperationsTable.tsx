@@ -33,7 +33,7 @@ function OperationsTable() {
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
     const [filterQuery, setFilterQuery] = useState<string>('');
 
-    const updateOpTableDetails = (query?: string) => {
+    const updateOpTableDetails = (query: string) => {
         if (!chip) {
             return;
         }
@@ -57,7 +57,7 @@ function OperationsTable() {
     };
 
     useEffect(() => {
-        updateOpTableDetails();
+        updateOpTableDetails('');
         setCoreView(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
@@ -116,7 +116,7 @@ function OperationsTable() {
                         title='Back to operations view'
                         icon={IconNames.ARROW_LEFT}
                         onClick={() => {
-                            updateOpTableDetails();
+                            updateOpTableDetails(filterQuery);
                             setCoreView(false);
                         }}
                     />
