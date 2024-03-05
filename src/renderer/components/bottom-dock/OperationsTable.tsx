@@ -1,6 +1,5 @@
-import { AnchorButton, Button, Checkbox, Icon, PopoverPosition } from '@blueprintjs/core';
+import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -267,20 +266,7 @@ function OperationsTable() {
                             );
                         }
                     }}
-                    controls={[
-                        <Tooltip2 content='Reset filter' position={PopoverPosition.BOTTOM}>
-                            <AnchorButton
-                                key='reset-ops-table-filter'
-                                icon={IconNames.REFRESH}
-                                disabled={coreView || filterQuery === ''}
-                                title='Reset filter'
-                                onClick={() => {
-                                    resetOpTableDetails();
-                                    setFilterQuery('');
-                                }}
-                            />
-                        </Tooltip2>,
-                    ]}
+                    controls={[]}
                 />
             </div>
             {tableFields.length > 0 ? (
