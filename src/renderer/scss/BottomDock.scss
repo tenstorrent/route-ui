@@ -42,6 +42,7 @@
         background-color: $tt-dark-blue;
     }
 
+    .queues-table,
     .operations-table,
     .operands-table {
         height: 260px;
@@ -58,12 +59,15 @@
         }
     }
 
+    .queues-table { height: 290px; }
+
     .no-data-available {
         display: flex;
         justify-content: center;
         align-items: center;
         height: 260px;
         color: $tt-dark-gray;
+        font-weight: bold;
     }
 
     .op-element {
