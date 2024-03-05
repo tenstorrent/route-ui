@@ -76,7 +76,7 @@ function OperationsTable() {
             return;
         }
 
-        let list = [...operation.cores].map((core: ComputeNode) => {
+        const list = [...operation.cores].map((core: ComputeNode) => {
             return {
                 name: core.opName,
                 ...core.perfAnalyzerResults,
@@ -84,12 +84,6 @@ function OperationsTable() {
                 slowestOperandRef: core.operation?.slowestOperand,
             } as OpTableFields;
         });
-
-        if (filterQuery) {
-            list = list.filter(({ operation: op }) => {
-                return op?.name.toLowerCase().includes(filterQuery.toLowerCase()) ?? true;
-            });
-        }
 
         setCoreView(true);
         setTableFields(list);
