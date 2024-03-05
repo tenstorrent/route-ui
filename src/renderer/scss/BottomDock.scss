@@ -6,6 +6,10 @@
     position: relative;
     color-scheme: light;
 
+    .search-field {
+        margin-top: 10px;
+    }
+
     .dock-close-button {
         position: absolute;
         top: 0;
@@ -45,8 +49,8 @@
     .queues-table,
     .operations-table,
     .operands-table {
-        height: 260px;
-        margin-top: 10px;
+        height: 255px;
+        margin-top: 5px;
 
         .bp4-table-cell-ledger-odd {
             background-color: $tt-extra-light-gray;
