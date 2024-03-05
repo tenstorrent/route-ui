@@ -38,22 +38,20 @@ function OperationsTable() {
             return;
         }
 
-        const list = [...chip.operations]
-            .map((op) => {
-                return {
-                    operation: op,
-                    name: op.name,
-                    ...op.details,
-                    slowestOperandRef: op.slowestOperand,
-                } as unknown as OpTableFields;
-            })
-            .filter(({ operation }) => {
-                if (!query) {
-                    return true;
-                }
+        let list = [...chip.operations].map((op) => {
+            return {
+                operation: op,
+                name: op.name,
+                ...op.details,
+                slowestOperandRef: op.slowestOperand,
+            } as unknown as OpTableFields;
+        });
 
+        if (query) {
+            list = list.filter(({ operation }) => {
                 return operation?.name.toLowerCase().includes(query.toLowerCase()) ?? true;
             });
+        }
 
         setTableFields(list);
     };
@@ -77,22 +75,21 @@ function OperationsTable() {
         if (operation === undefined) {
             return;
         }
-        const list = [...operation.cores]
-            .map((core: ComputeNode) => {
-                return {
-                    name: core.opName,
-                    ...core.perfAnalyzerResults,
-                    core_id: core.uid,
-                    slowestOperandRef: core.operation?.slowestOperand,
-                } as OpTableFields;
-            })
-            .filter(({ operation: op }) => {
-                if (!filterQuery) {
-                    return true;
-                }
 
+        let list = [...operation.cores].map((core: ComputeNode) => {
+            return {
+                name: core.opName,
+                ...core.perfAnalyzerResults,
+                core_id: core.uid,
+                slowestOperandRef: core.operation?.slowestOperand,
+            } as OpTableFields;
+        });
+
+        if (filterQuery) {
+            list = list.filter(({ operation: op }) => {
                 return op?.name.toLowerCase().includes(filterQuery.toLowerCase()) ?? true;
             });
+        }
 
         setCoreView(true);
         setTableFields(list);
