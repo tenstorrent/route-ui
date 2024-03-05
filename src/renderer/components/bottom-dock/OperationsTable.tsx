@@ -60,7 +60,7 @@ function OperationsTable() {
     if (!chip) {
         return (
             <div className='no-data-available'>
-                <pre>No data available</pre>
+                <span>No data available</span>
             </div>
         );
     }
@@ -276,6 +276,7 @@ function OperationsTable() {
                                 title='Reset filter'
                                 onClick={() => {
                                     resetOpTableDetails();
+                                    setFilterQuery('');
                                 }}
                             />
                         </Tooltip2>,
@@ -354,7 +355,7 @@ function OperationsTable() {
                 </Table2>
             ) : (
                 <div className='no-data-available'>
-                    <pre>No data available</pre>
+                    <span>No data available</span>
                 </div>
             )}
         </>
