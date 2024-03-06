@@ -113,9 +113,6 @@ const ClusterView: FC<ClusterViewDialog> = () => {
 
     const pciPipeStateList = useSelector((state: RootState) => getSelectedPipes(state, pciPipes));
 
-    console.log(pciPipes);
-    console.log(pciPipeStateList);
-
     return (
         <div className='cluster-view-container'>
             <div
