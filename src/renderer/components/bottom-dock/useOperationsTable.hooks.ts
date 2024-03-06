@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
@@ -94,7 +94,7 @@ operationsTableColumns.set('kernel_total_runtime', {
     formatter: (value) => numberFormatter(value, ' cycles', 0),
 });
 
-const useOperationsTable = (opList: OpTableFields[]) => {
+const useOperationsTable = () => {
     const {
         handleSelectAllCores,
         handleSelectAllOperations,
@@ -105,25 +105,26 @@ const useOperationsTable = (opList: OpTableFields[]) => {
     } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
-    const sortedTableFields = (() => {
-        const tableFields = opList;
+    const sortTableFields = useCallback(
+        (tableFields: OpTableFields[]) => {
+            if (sortingColumn === 'operation') {
+                return sortDirection === SortingDirection.ASC
+                    ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
+                    : tableFields.sort((a, b) => sortDesc(a.name, b.name));
+            }
 
-        if (sortingColumn === 'operation') {
             return sortDirection === SortingDirection.ASC
-                ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
-                : tableFields.sort((a, b) => sortDesc(a.name, b.name));
-        }
-
-        return sortDirection === SortingDirection.ASC
-            ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
-            : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
-    })();
+                ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
+                : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
+        },
+        [sortingColumn, sortDirection],
+    );
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {
         setSortDirection(direction);
         setSortingColumn(selectedColumn);
     };
 
-    const maxModelEstimateRatio = useMemo(() => {
+    const getMaxModelEstimateRatio = (opList: OpTableFields[]) => {
         const modelEstimates = opList.map((op) => valueRatio(op.model_runtime_per_input, op.kernel_runtime_per_input));
 
         if (modelEstimates.length === 0) {
@@ -131,7 +132,7 @@ const useOperationsTable = (opList: OpTableFields[]) => {
         }
 
         return Math.ceil(Math.max(...modelEstimates));
-    }, [opList]);
+    };
 
     operationsTableColumns.get('core_id')!.handleSelectAll = handleSelectAllCores;
     operationsTableColumns.get('core_id')!.getSelectedState = getCoreSelectedState;
@@ -143,12 +144,12 @@ const useOperationsTable = (opList: OpTableFields[]) => {
     operationsTableColumns.get('slowest_operand')!.getSelectedState = getSlowestOperandSelectedState;
 
     return {
-        sortedTableFields,
+        sortTableFields,
         changeSorting,
         sortingColumn,
         sortDirection,
         operationsTableColumns,
-        maxModelEstimateRatio,
+        getMaxModelEstimateRatio,
     };
 };
 

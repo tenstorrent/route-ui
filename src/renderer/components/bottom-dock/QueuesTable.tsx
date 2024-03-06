@@ -1,13 +1,13 @@
-import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
+import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import SelectableOperation from '../SelectableOperation';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphVertexType } from '../../../data/GraphNames';
 import { RootState } from '../../../data/store/createStore';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
-import { GraphVertexType } from '../../../data/GraphNames';
+import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
-import { ChipContext } from '../../../data/ChipDataProvider';
 
 /**
  * QueuesTable - temporary component to display queues
@@ -64,7 +64,7 @@ function QueuesTable() {
             renderMode={RenderMode.NONE}
             forceRerenderOnSelectionChange
             selectionModes={SelectionModes.NONE}
-            className='operations-table'
+            className='queues-table'
             numRows={tableFields.length}
             enableColumnHeader
             numFrozenColumns={1}
