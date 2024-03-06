@@ -156,18 +156,20 @@ $dock-height: 420px;
         margin-inline: 10px;
 
         .congestion-legend {
-            width: calc(100% - 10px);
+            width: calc(100% - 35px);
             height: 3px;
+            align-self: center;
         }
 
         .bp4-slider {
-            width: calc(100% - 10px);
+            width: calc(100% - 35px);
+            align-self: center;
         }
     }
 
     hr {
         border: none;
-        width: 100%;
+        width: calc(100% - 20px);
         border-top: 1px solid $hr;
 
     }
