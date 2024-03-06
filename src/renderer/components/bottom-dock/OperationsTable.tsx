@@ -233,90 +233,82 @@ function OperationsTable() {
 
     return (
         <>
-            {chip && (
-                <div>
-                    <SearchField
-                        disabled={selectedOperationName !== ''}
-                        searchQuery={filterQuery}
-                        onQueryChanged={setFilterQuery}
-                        controls={[]}
-                    />
-                </div>
-            )}
-            {tableFields.length > 0 ? (
-                <Table2
-                    ref={table}
-                    renderMode={RenderMode.NONE}
-                    forceRerenderOnSelectionChange
-                    selectionModes={SelectionModes.NONE}
-                    className='operations-table'
-                    numRows={tableFields.length}
-                    enableColumnHeader
-                    numFrozenColumns={1}
-                    cellRendererDependencies={[
-                        sortDirection,
-                        sortingColumn,
-                        nodesSelectionState.operations,
-                        nodesSelectionState.queues,
-                        nodesSelectionState.nodeList,
-                        tableFields,
-                        selectedOperationName,
-                        tableFields.length,
-                        operationRatioThreshold,
-                        filterQuery,
-                    ]}
-                >
-                    {columnRenderer({
-                        key: 'operation',
-                        columnDefinition: operationsTableColumns,
-                        changeSorting,
-                        sortDirection,
-                        sortingColumn,
-                        tableFields,
-                        nodesSelectionState,
-                        isInteractive: true,
-                        customCellContentRenderer: operationCellRenderer,
-                    })}
-                    {!selectedOperationName
-                        ? columnRenderer({
-                              key: 'grid_size',
-                              columnDefinition: operationsTableColumns,
-                              changeSorting,
-                              sortDirection,
-                              sortingColumn,
-                              tableFields,
-                              nodesSelectionState,
-                          })
-                        : columnRenderer({
-                              key: 'core_id',
-                              columnDefinition: operationsTableColumns,
-                              changeSorting,
-                              sortDirection,
-                              sortingColumn,
-                              tableFields,
-                              nodesSelectionState,
-                              customCellContentRenderer: coreIdCellRenderer,
-                          })}
-                    {
-                        columns.map((key) =>
-                            columnRenderer({
-                                key: key as keyof OpTableFields,
-                                columnDefinition: operationsTableColumns,
-                                changeSorting,
-                                sortDirection,
-                                sortingColumn,
-                                tableFields,
-                                nodesSelectionState,
-                                customCellContentRenderer: getCustomCellRenderer(key),
-                            }),
-                        ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
-                    }
-                </Table2>
-            ) : (
-                <div className='no-data-available'>
-                    <span>No data available</span>
-                </div>
-            )}
+            <div>
+                <SearchField
+                    disabled={!chip || selectedOperationName !== ''}
+                    searchQuery={filterQuery}
+                    onQueryChanged={setFilterQuery}
+                    controls={[]}
+                />
+            </div>
+            <Table2
+                ref={table}
+                renderMode={RenderMode.NONE}
+                forceRerenderOnSelectionChange
+                selectionModes={SelectionModes.NONE}
+                className='operations-table'
+                numRows={tableFields.length}
+                enableColumnHeader
+                numFrozenColumns={1}
+                cellRendererDependencies={[
+                    sortDirection,
+                    sortingColumn,
+                    nodesSelectionState.operations,
+                    nodesSelectionState.queues,
+                    nodesSelectionState.nodeList,
+                    tableFields,
+                    selectedOperationName,
+                    tableFields.length,
+                    operationRatioThreshold,
+                    filterQuery,
+                ]}
+            >
+                {columnRenderer({
+                    key: 'operation',
+                    columnDefinition: operationsTableColumns,
+                    changeSorting,
+                    sortDirection,
+                    sortingColumn,
+                    tableFields,
+                    nodesSelectionState,
+                    isInteractive: true,
+                    customCellContentRenderer: operationCellRenderer,
+                })}
+                {!selectedOperationName
+                    ? columnRenderer({
+                          key: 'grid_size',
+                          columnDefinition: operationsTableColumns,
+                          changeSorting,
+                          sortDirection,
+                          sortingColumn,
+                          tableFields,
+                          nodesSelectionState,
+                      })
+                    : columnRenderer({
+                          key: 'core_id',
+                          columnDefinition: operationsTableColumns,
+                          changeSorting,
+                          sortDirection,
+                          sortingColumn,
+                          tableFields,
+                          nodesSelectionState,
+                          customCellContentRenderer: coreIdCellRenderer,
+                      })}
+                {
+                    columns.map((key) =>
+                        columnRenderer({
+                            key: key as keyof OpTableFields,
+                            columnDefinition: operationsTableColumns,
+                            changeSorting,
+                            sortDirection,
+                            sortingColumn,
+                            tableFields,
+                            nodesSelectionState,
+                            customCellContentRenderer: getCustomCellRenderer(key),
+                        }),
+                    ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+                }
+            </Table2>
         </>
     );
 }
