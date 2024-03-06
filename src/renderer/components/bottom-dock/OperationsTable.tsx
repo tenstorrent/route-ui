@@ -70,8 +70,7 @@ function OperationsTable() {
         }
 
         return sortTableFields(list);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chip, selectedOperationName, filterQuery]);
+    }, [chip, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Operand } from '../../../data/Graph';
 import { Operation } from '../../../data/GraphTypes';
 import { MeasurementDetails } from '../../../data/OpPerfDetails';
@@ -105,17 +105,20 @@ const useOperationsTable = () => {
     } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
-    const sortTableFields = (tableFields: OpTableFields[]) => {
-        if (sortingColumn === 'operation') {
-            return sortDirection === SortingDirection.ASC
-                ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
-                : tableFields.sort((a, b) => sortDesc(a.name, b.name));
-        }
+    const sortTableFields = useCallback(
+        (tableFields: OpTableFields[]) => {
+            if (sortingColumn === 'operation') {
+                return sortDirection === SortingDirection.ASC
+                    ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
+                    : tableFields.sort((a, b) => sortDesc(a.name, b.name));
+            }
 
-        return sortDirection === SortingDirection.ASC
-            ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
-            : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
-    };
+            return sortDirection === SortingDirection.ASC
+                ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
+                : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
+        },
+        [sortingColumn, sortDirection],
+    );
     const changeSorting = (selectedColumn: OperationTableColumn) => (direction: SortingDirection) => {
         setSortDirection(direction);
         setSortingColumn(selectedColumn);
