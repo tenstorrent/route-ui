@@ -1,7 +1,16 @@
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
-import { ChangeEvent, JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import {
+    ChangeEvent,
+    JSXElementConstructor,
+    ReactElement,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
@@ -20,81 +29,66 @@ import { columnRenderer } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
-    const chip = useContext(ChipContext).getActiveChip();
     const dispatch = useDispatch();
-    const [tableFields, setTableFields] = useState<OpTableFields[]>([]);
-    const [coreView, setCoreView] = useState(false);
-    const { operationsTableColumns, sortedTableFields, changeSorting, sortDirection, sortingColumn } =
-        useOperationsTable(tableFields);
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-
-    const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
-    const table = useRef<Table2>(null);
-    const operationRatioThreshold = useSelector(getOperationRatioThreshold);
+    const chip = useContext(ChipContext).getActiveChip();
+    const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
+        useOperationsTable();
+    const [selectedOperationName, setSelectedOperationName] = useState('');
     const [filterQuery, setFilterQuery] = useState<string>('');
-
-    const updateOpTableDetails = (query: string) => {
+    const tableFields = useMemo(() => {
         if (!chip) {
-            return;
+            return [];
         }
 
-        let list = [...chip.operations].map((op) => {
-            return {
-                operation: op,
-                name: op.name,
-                ...op.details,
-                slowestOperandRef: op.slowestOperand,
-            } as unknown as OpTableFields;
-        });
+        let list = [];
+        const selectedOperation = chip.getOperation(selectedOperationName);
 
-        if (query) {
-            list = list.filter(({ operation }) => {
-                return operation?.name.toLowerCase().includes(query.toLowerCase()) ?? true;
+        if (selectedOperation) {
+            list = [...selectedOperation.cores].map((core: ComputeNode) => {
+                return {
+                    name: core.opName,
+                    ...core.perfAnalyzerResults,
+                    core_id: core.uid,
+                    slowestOperandRef: core.operation?.slowestOperand,
+                } as OpTableFields;
+            });
+        } else {
+            list = [...chip.operations].map((op) => {
+                return {
+                    operation: op,
+                    name: op.name,
+                    ...op.details,
+                    slowestOperandRef: op.slowestOperand,
+                } as unknown as OpTableFields;
             });
         }
 
-        setTableFields(list);
-    };
+        if (filterQuery) {
+            list = list.filter(({ operation }) => {
+                return operation?.name.toLowerCase().includes(filterQuery.toLowerCase()) ?? true;
+            });
+        }
+
+        return sortTableFields(list);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [chip, selectedOperationName, filterQuery]);
+    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
+    const table = useRef<Table2>(null);
+    const operationRatioThreshold = useSelector(getOperationRatioThreshold);
 
     useEffect(() => {
-        updateOpTableDetails('');
-        setCoreView(false);
+        setSelectedOperationName('');
+        setFilterQuery('');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chip]);
 
-    if (!chip) {
-        return (
-            <div className='no-data-available'>
-                <span>No data available</span>
-            </div>
-        );
-    }
-
-    const expandOperationCores = (opName: string) => {
-        const operation = chip.getOperation(opName);
-        if (operation === undefined) {
-            return;
-        }
-
-        const list = [...operation.cores].map((core: ComputeNode) => {
-            return {
-                name: core.opName,
-                ...core.perfAnalyzerResults,
-                core_id: core.uid,
-                slowestOperandRef: core.operation?.slowestOperand,
-            } as OpTableFields;
-        });
-
-        setCoreView(true);
-        setTableFields(list);
-    };
-
     const operationCellRenderer = (rowIndex: number) => {
-        const opName = sortedTableFields[rowIndex].name;
+        const opName = tableFields[rowIndex].name;
         return (
             <>
                 {opName ? (
-                    <SelectableOperationPerformance operation={sortedTableFields[rowIndex].operation || null}>
+                    <SelectableOperationPerformance operation={tableFields[rowIndex].operation || null}>
                         <SelectableOperation
                             disabled={disabledOperation(opName)}
                             opName={opName}
@@ -108,7 +102,7 @@ function OperationsTable() {
                     ''
                 )}
 
-                {coreView ? (
+                {selectedOperationName ? (
                     <Button
                         style={{ height: '18px' }}
                         small
@@ -116,8 +110,7 @@ function OperationsTable() {
                         title='Back to operations view'
                         icon={IconNames.ARROW_LEFT}
                         onClick={() => {
-                            updateOpTableDetails(filterQuery);
-                            setCoreView(false);
+                            setSelectedOperationName('');
                         }}
                     />
                 ) : (
@@ -129,7 +122,7 @@ function OperationsTable() {
                         title='View operation cores'
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
-                            expandOperationCores(opName);
+                            setSelectedOperationName(opName);
                         }}
                     />
                 )}
@@ -191,7 +184,7 @@ function OperationsTable() {
                         disabled={nodesSelectionState.operations[slowestOperand.name] === undefined}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
-                            expandOperationCores(slowestOperand.name);
+                            setSelectedOperationName(slowestOperand.name);
                         }}
                         title='View operation cores'
                     />
@@ -241,17 +234,16 @@ function OperationsTable() {
 
     return (
         <>
-            <div>
-                <SearchField
-                    disabled={coreView}
-                    searchQuery={filterQuery}
-                    onQueryChanged={(query) => {
-                        setFilterQuery(query);
-                        updateOpTableDetails(query);
-                    }}
-                    controls={[]}
-                />
-            </div>
+            {chip && (
+                <div>
+                    <SearchField
+                        disabled={selectedOperationName !== ''}
+                        searchQuery={filterQuery}
+                        onQueryChanged={setFilterQuery}
+                        controls={[]}
+                    />
+                </div>
+            )}
             {tableFields.length > 0 ? (
                 <Table2
                     ref={table}
@@ -269,8 +261,7 @@ function OperationsTable() {
                         nodesSelectionState.queues,
                         nodesSelectionState.nodeList,
                         tableFields,
-                        coreView,
-                        sortedTableFields,
+                        selectedOperationName,
                         tableFields.length,
                         operationRatioThreshold,
                         filterQuery,
@@ -287,7 +278,7 @@ function OperationsTable() {
                         isInteractive: true,
                         customCellContentRenderer: operationCellRenderer,
                     })}
-                    {!coreView
+                    {!selectedOperationName
                         ? columnRenderer({
                               key: 'grid_size',
                               columnDefinition: operationsTableColumns,
