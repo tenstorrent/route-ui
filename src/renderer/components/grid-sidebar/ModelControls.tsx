@@ -1,4 +1,4 @@
-import { FC, useContext } from 'react';
+import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Slider } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
