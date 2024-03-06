@@ -17,6 +17,8 @@ body {
     font-family: 'Arial Nova', Arial, sans-serif;
     overflow-y: hidden;
     overflow-x: hidden;
+    height: 100vh;
+    display: flex;
 }
 
 *, *::before, *::after {

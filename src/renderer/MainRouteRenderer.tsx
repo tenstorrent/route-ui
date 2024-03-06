@@ -8,6 +8,7 @@ import PropertiesPanel from './PropertiesPanel';
 import { SideBar } from './components/SideBar';
 import TopHeaderComponent from './components/TopHeaderComponent';
 import BottomDock from './components/bottom-dock/BottomDock';
+import { GridSidebar } from './components/grid-sidebar/GridSidebar';
 import './scss/MainRouteRenderer.scss';
 
 export interface MainRouteRendererProps {}
@@ -17,26 +18,19 @@ const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
     const isDetailedViewOpen = useSelector((state: RootState) => state.detailedView.isOpen);
 
     return (
-        <>
+        <div
+            className={`main-route ${isDockOpen ? 'dock-open' : ''} ${isDetailedViewOpen ? 'detailed-view-open' : ''}`}
+        >
             <div className='header'>
                 <TenstorrentLogo />
                 <TopHeaderComponent />
             </div>
-            <div
-                className={`outer-wrapper ${isDockOpen ? 'dock-open' : ''} ${
-                    isDetailedViewOpen ? 'detailed-view-open' : ''
-                }`}
-            >
-                <div className='main-wrapper'>
-                    <SideBar />
-                    <div className='main-container'>
-                        <GridRender />
-                        <PropertiesPanel />
-                    </div>
-                </div>
-                <BottomDock />
-            </div>
-        </>
+            <SideBar />
+            <GridSidebar />
+            <GridRender />
+            <PropertiesPanel />
+            <BottomDock />
+        </div>
     );
 };
 
