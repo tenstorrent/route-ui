@@ -94,6 +94,16 @@ $dock-height: 420px;
 
         .properties-panel {
             margin-block-end: 10px;
+
+            .operations-wrap .collapsible-component {
+                .op-element {
+                    margin-bottom: 0;
+                }
+
+                .bp4-icon svg {
+                    fill: $tt-dark-gray;
+                }
+            }
         }
 
         .properties-panel-nodes {
