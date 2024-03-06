@@ -18,6 +18,7 @@ import { ComputeNode } from '../../../data/Chip';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
+import { columnRenderer } from './SharedTable';
 import { RootState } from '../../../data/store/createStore';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
@@ -25,7 +26,6 @@ import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook'
 import { numberFormatter, valueRatio } from '../../utils/numbers';
 import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
-import { columnRenderer } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {

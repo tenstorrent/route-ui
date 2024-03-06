@@ -721,6 +721,23 @@ export default class Chip {
             .flat();
     }
 
+    get pciePipes(): PipeSegment[] {
+        return [...this.nodes]
+            .filter((node) => node.type === ComputeNodeType.PCIE)
+            .map((node) => {
+                return (
+                    node
+                        .getInternalLinksForNode()
+                        .filter(
+                            (link) => link.name === PCIeLinkName.PCIE_INOUT
+                        )
+                        .map((link) => link.pipes)
+                        .flat() || []
+                );
+            })
+            .flat();
+    }
+
     get allUniquePipes(): PipeSegment[] {
         if (!this.uniquePipeSegmentList.length) {
             this.uniquePipeSegmentList = [...this.pipes.values()]
