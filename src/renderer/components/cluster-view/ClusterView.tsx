@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useRef, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
@@ -17,6 +17,8 @@ import { RootState } from '../../../data/store/createStore';
 import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import SearchField from '../SearchField';
 import FilterableComponent from '../FilterableComponent';
+import getPipeColor from '../../../data/ColorGenerator';
+import { getSelectedPipes, selectPipeSelectionById } from '../../../data/store/selectors/pipeSelection.selectors';
 
 export interface ClusterViewDialog {}
 
@@ -47,6 +49,8 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     const graphInformation = useSelector(getAvailableGraphsSelector);
     const selectedGraph = chipState.graphName;
     const availableTemporalEpochs: GraphRelationshipState[][] = [];
+    const [pciPipes, setPciPipes] = useState<string[]>([]);
+
     const [pipeFilter, setPipeFilter] = useState<string>('');
     graphInformation.forEach((item) => {
         if (availableTemporalEpochs[item.temporalEpoch]) {
@@ -57,7 +61,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     });
     const selectedGraphItem = graphInformation.find((graph) => graph.name === selectedGraph);
 
-    const [selectesEpoch, setSelectedEpoch] = useState<GraphRelationshipState[]>(
+    const [selectedEpoch, setSelectedEpoch] = useState<GraphRelationshipState[]>(
         availableTemporalEpochs[selectedGraphItem?.temporalEpoch || 0] || [],
     );
 
@@ -73,25 +77,30 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         clusterChipSize = 400;
     }
 
-    const pipeList: PipeSegment[] = selectesEpoch
-        .map((graph) => {
-            return (
-                getChipByGraphName(graph.name)?.ethernetPipes.map((pipe) => {
-                    return pipe;
-                }) || []
-            );
-        })
-        .flat();
+    const uniquePipeList = useMemo(() => {
+        const pciList: string[] = [];
+        const pipeList = selectedEpoch
+            .map((graph) => {
+                return [
+                    ...(getChipByGraphName(graph.name)?.ethernetPipes.map((pipe) => pipe) || []),
+                    ...(getChipByGraphName(graph.name)?.pciePipes.map((pipe) => {
+                        pciList.push(pipe.id);
+                        return pipe;
+                    }) || []),
+                ];
+            })
+            .flat()
+            .sort((a, b) => a.id.localeCompare(b.id));
 
-    pipeList.sort((a, b) => {
-        return a.id.localeCompare(b.id);
-    });
+        setPciPipes(pciList);
 
-    const uniquePipeList: PipeSegment[] = pipeList.filter((pipeSegment, index, self) => {
-        return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
-    });
+        return pipeList.filter((pipeSegment, index, self) => {
+            return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
+        });
+    }, [selectedEpoch, getChipByGraphName]);
 
     const pipeIds = uniquePipeList.map((pipe) => pipe.id);
+
     const selectFilteredPipes = () => {
         const filtered = pipeIds.filter((id) => id.toLowerCase().includes(pipeFilter.toLowerCase()));
         dispatch(
@@ -101,6 +110,11 @@ const ClusterView: FC<ClusterViewDialog> = () => {
             }),
         );
     };
+
+    const pciPipeStateList = useSelector((state: RootState) => getSelectedPipes(state, pciPipes));
+
+    console.log(pciPipes);
+    console.log(pciPipeStateList);
 
     return (
         <div className='cluster-view-container'>
@@ -119,7 +133,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                         activeItem={null}
                         filterable={false}
                     >
-                        <Button type='button'>Temporal epoch {selectesEpoch[0]?.temporalEpoch}</Button>
+                        <Button type='button'>Temporal epoch {selectedEpoch[0]?.temporalEpoch}</Button>
                     </Select>
                 )}
                 <SearchField
@@ -193,7 +207,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                 {cluster?.chips.map((clusterChip) => {
                     let chip: Chip | undefined;
 
-                    selectesEpoch.forEach((graph) => {
+                    selectedEpoch.forEach((graph) => {
                         const chipByGraphName = getChipByGraphName(graph.name);
                         if (chipByGraphName?.chipId === clusterChip.id) {
                             chip = chipByGraphName;
@@ -279,9 +293,23 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
+                                        gap: '5px',
                                     }}
                                 >
                                     PCIe
+                                    {pciPipeStateList.map((pipeState) => {
+                                        return (
+                                            <span
+                                                key={pipeState.id}
+                                                className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`}
+                                                style={{
+                                                    backgroundColor: pipeState?.selected
+                                                        ? getPipeColor(pipeState.id)
+                                                        : 'transparent',
+                                                }}
+                                            />
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>

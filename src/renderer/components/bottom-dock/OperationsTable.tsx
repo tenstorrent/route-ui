@@ -12,7 +12,6 @@ import { ComputeNode } from '../../../data/Chip';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, SortingDirection } from './SharedTable';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { columnRenderer } from './SharedTable';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
