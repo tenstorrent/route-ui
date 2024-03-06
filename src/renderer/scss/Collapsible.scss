@@ -1,6 +1,8 @@
+@import "variables";
+
 .collapsible-component {
     > [type="button"] {
-        color: #fff;
+        color: $tt-white-text;
         padding: 0;
         margin-bottom: 5px;
 
@@ -9,6 +11,10 @@
         align-items: center;
         justify-content: flex-start;
         flex-wrap: nowrap;
+
+        &:hover {
+            color: $tt-white-text;
+        }
 
         .bp4-button-text {
             overflow: hidden;
@@ -20,6 +26,9 @@
             color: #000;
             margin-bottom: 0;
         }
+
+        .bp4-icon svg {
+            fill: $tt-white-text;
+        }
     }
 }
-
