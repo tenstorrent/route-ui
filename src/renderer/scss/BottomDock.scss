@@ -6,6 +6,10 @@
     position: relative;
     color-scheme: light;
 
+    .search-field {
+        margin-top: 10px;
+    }
+
     .dock-close-button {
         position: absolute;
         top: 0;
@@ -42,9 +46,11 @@
         background-color: $tt-dark-blue;
     }
 
+    .queues-table,
     .operations-table,
     .operands-table {
-        height: 302px;
+        height: 255px;
+        margin-top: 5px;
 
         .bp4-table-cell-ledger-odd {
             background-color: $tt-extra-light-gray;
@@ -55,6 +61,17 @@
                 text-align: right;
             }
         }
+    }
+
+    .queues-table { height: 290px; }
+
+    .no-data-available {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 255px;
+        color: $tt-dark-gray;
+        font-weight: bold;
     }
 
     .op-element {
