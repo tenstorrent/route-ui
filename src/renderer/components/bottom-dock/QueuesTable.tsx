@@ -1,5 +1,5 @@
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
-import { JSXElementConstructor, ReactElement, useContext, useEffect, useRef, useState } from 'react';
+import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
@@ -15,34 +15,27 @@ import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
  */
 function QueuesTable() {
     const chip = useContext(ChipContext).getActiveChip();
-    const [tableFields, setTableFields] = useState<QueuesTableFields[]>([]);
-    const { queuesTableColumns, sortedTableFields, changeSorting, sortDirection, sortingColumn } =
-        useQueuesTableHook(tableFields);
+    const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
-
-    const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
-    const table = useRef<Table2>(null);
-
-    useEffect(() => {
+    const tableFields = useMemo(() => {
         if (!chip) {
-            return;
+            return [];
         }
+
         const list = [...chip.queues].map((queue) => {
             return {
                 name: queue.name,
                 ...queue.details,
             } as unknown as QueuesTableFields;
         });
-        setTableFields(list);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chip]);
 
-    if (!chip || !tableFields.length) {
-        return <pre>No data available</pre>;
-    }
+        return sortTableFields(list);
+    }, [chip, sortTableFields]);
+    const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
+    const table = useRef<Table2>(null);
 
     const queueCellRenderer = (rowIndex: number) => {
-        const queueName = sortedTableFields[rowIndex].name;
+        const queueName = tableFields[rowIndex].name;
 
         return queueName ? (
             <SelectableOperation
@@ -75,7 +68,6 @@ function QueuesTable() {
                 nodesSelectionState.queues,
                 nodesSelectionState.nodeList,
                 tableFields,
-                sortedTableFields,
                 tableFields.length,
             ]}
         >

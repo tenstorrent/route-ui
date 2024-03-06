@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { QueueDetailsJson } from '../../../data/sources/QueueDescriptor';
+import { useCallback, useState } from 'react';
 import { Queue } from '../../../data/GraphTypes';
-import { DataTableColumnDefinition, sortAsc, sortDesc, SortingDirection } from './SharedTable';
+import { QueueDetailsJson } from '../../../data/sources/QueueDescriptor';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
+import { DataTableColumnDefinition, SortingDirection, sortAsc, sortDesc } from './SharedTable';
 
 export interface QueuesTableFields extends QueueDetailsJson {
     queue?: Queue;
@@ -70,24 +70,27 @@ queuesTableColumns.set('processedLocation', {
     formatter: (value) => value.toString(),
 });
 
-const useQueuesTable = (queuesList: QueuesTableFields[]) => {
+const useQueuesTable = () => {
     const { handleSelectAllQueues, getQueuesSelectedState } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<QueueusTableColumn>('entries');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
 
-    const sortedTableFields = (() => {
-        const tableFields = queuesList;
+    const sortTableFields = useCallback(
+        (queuesList: QueuesTableFields[]) => {
+            const tableFields = queuesList;
 
-        if (sortingColumn === 'queue') {
+            if (sortingColumn === 'queue') {
+                return sortDirection === SortingDirection.ASC
+                    ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
+                    : tableFields.sort((a, b) => sortDesc(a.name, b.name));
+            }
+
             return sortDirection === SortingDirection.ASC
-                ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
-                : tableFields.sort((a, b) => sortDesc(a.name, b.name));
-        }
-
-        return sortDirection === SortingDirection.ASC
-            ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
-            : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
-    })();
+                ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
+                : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
+        },
+        [sortingColumn, sortDirection],
+    );
     const changeSorting = (selectedColumn: QueueusTableColumn) => (direction: SortingDirection) => {
         setSortDirection(direction);
         setSortingColumn(selectedColumn);
@@ -96,7 +99,7 @@ const useQueuesTable = (queuesList: QueuesTableFields[]) => {
     queuesTableColumns.get('queue')!.handleSelectAll = handleSelectAllQueues;
     queuesTableColumns.get('queue')!.getSelectedState = getQueuesSelectedState;
 
-    return { sortedTableFields, changeSorting, sortingColumn, sortDirection, queuesTableColumns };
+    return { sortTableFields, changeSorting, sortingColumn, sortDirection, queuesTableColumns };
 };
 
 export default useQueuesTable;
