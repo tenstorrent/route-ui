@@ -153,23 +153,21 @@ $dock-height: 420px;
     .inner-sidebar-wrap {
         display: flex;
         flex-direction: column;
-        margin-inline: 10px;
+        margin-inline: 10px 20px;
 
         .congestion-legend {
-            width: calc(100% - 35px);
+            width: calc(100% - 10px);
             height: 3px;
-            align-self: center;
         }
 
         .bp4-slider {
-            width: calc(100% - 35px);
-            align-self: center;
+            width: calc(100% - 10px);
         }
     }
 
     hr {
         border: none;
-        width: calc(100% - 20px);
+        width: 100%;
         border-top: 1px solid $hr;
 
     }
