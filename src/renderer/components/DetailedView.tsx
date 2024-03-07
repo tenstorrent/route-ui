@@ -19,7 +19,7 @@ interface DetailedViewProps {
 const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
     const dispatch = useDispatch();
     const chip = useContext(ChipContext).getActiveChip();
-
+    const detailedViewElement = useRef<HTMLDivElement>(null);
 
     const architecture = useSelector(getArchitectureSelector);
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
@@ -27,22 +27,24 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
 
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false}>
-            <Card className='detailed-view-card' style={{ zoom }}>
-                <div className='detailed-view-header'>
-                    {node && (
-                        <h3>
-                            {node.type} {node.loc.x},{node.loc.y}
-                        </h3>
-                    )}
-                    <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
-                </div>
-                {node && (
-                    <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
-                        {node.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
-                        {node.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
-                        {node.type === ComputeNodeType.PCIE && <DetailedViewPCIERenderer node={node} />}
+            <Card className='detailed-view-card'>
+                <div style={{ zoom }} ref={detailedViewElement}>
+                    <div className='detailed-view-header'>
+                        {node && (
+                            <h3>
+                                {node.type} {node.loc.x},{node.loc.y}
+                            </h3>
+                        )}
+                        <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                     </div>
-                )}
+                    {node && (
+                        <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
+                            {node.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
+                            {node.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
+                            {node.type === ComputeNodeType.PCIE && <DetailedViewPCIERenderer node={node} />}
+                        </div>
+                    )}
+                </div>
             </Card>
         </Overlay>
     );
