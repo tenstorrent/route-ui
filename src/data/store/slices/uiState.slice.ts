@@ -18,6 +18,7 @@ interface UIState {
     showNodeLocation: boolean;
     gridZoom: number;
     detailedViewZoom: number;
+    detailedViewHeight: number;
 }
 
 const uiStateInitialState: UIState = {
@@ -34,6 +35,7 @@ const uiStateInitialState: UIState = {
     showNodeLocation: false,
     gridZoom: 1,
     detailedViewZoom: 1,
+    detailedViewHeight: 340,
 };
 
 const uiStateSlice = createSlice({
@@ -89,6 +91,9 @@ const uiStateSlice = createSlice({
         updateDetailedViewZoom: (state, action: PayloadAction<number>) => {
             state.detailedViewZoom = action.payload;
         },
+        updateDetailedViewHeight: (state, action: PayloadAction<number>) => {
+            state.detailedViewHeight = action.payload;
+        },
     },
 });
 
@@ -110,4 +115,5 @@ export const {
     updateShowNodeLocation,
     updateGridZoom,
     updateDetailedViewZoom,
+    updateDetailedViewHeight,
 } = uiStateSlice.actions;
