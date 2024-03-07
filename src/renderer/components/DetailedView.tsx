@@ -38,7 +38,7 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
     }, [zoom, isOpen, node]);
 
     return (
-        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false}>
+        <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false} transitionDuration={0}>
             <Card className='detailed-view-card'>
                 <div style={{ zoom }} ref={detailedViewElement}>
                     <div className='detailed-view-header'>
