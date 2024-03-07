@@ -68,15 +68,14 @@ $dock-height: 420px;
     --properties-panel-width: 450px;
 
     --top-bar-height: 50px;
-    --bottom-dock-height: 0;
+    --bottom-dock-height: 340px;
 
     display: grid;
     grid-template-columns: var(--sidebar-width) var(--controls-panel-width) 1fr var(--properties-panel-width);
-    grid-template-rows: var(--top-bar-height) 1fr var(--bottom-dock-height);
+    grid-template-rows: var(--top-bar-height) 1fr;
     grid-template-areas:
         "top-bar top-bar top-bar top-bar"
-        "sidebar controls main properties"
-        "bottom-dock bottom-dock bottom-dock bottom-dock";
+        "sidebar controls main properties";
     gap: 10px;
     padding: 10px;
     height: 100vh;
@@ -101,21 +100,23 @@ $dock-height: 420px;
     }
 
     &.dock-open {
-        --bottom-dock-height: 340px;
-
-        height: calc(100vh - 20px);
+        grid-template-rows: var(--top-bar-height) 1fr var(--bottom-dock-height);
+        grid-template-areas:
+            "top-bar top-bar top-bar top-bar"
+            "sidebar controls main properties"
+            "bottom-dock bottom-dock bottom-dock bottom-dock"
+        ;
 
         .bottom-dock { display: block; }
     }
 
     &.detailed-view-open {
-        --bottom-dock-height: 340px;
-
-        height: calc(100vh - 20px);
+        grid-template-rows: var(--top-bar-height) 1fr var(--bottom-dock-height);
         grid-template-areas:
-        "top-bar top-bar top-bar top-bar"
-        "sidebar controls main properties"
-        "bottom-dock bottom-dock bottom-dock properties";
+            "top-bar top-bar top-bar top-bar"
+            "sidebar controls main properties"
+            "bottom-dock bottom-dock bottom-dock bottom-dock"
+        ;
     }
 }
 
