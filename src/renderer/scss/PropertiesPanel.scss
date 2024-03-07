@@ -31,25 +31,21 @@
 .properties-panel-nodes {
     display: flex;
     flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: auto;
-    scrollbar-gutter: stable;
-    padding: 10px;
-    width: 100%;
+    justify-items: start;
+    width: fit-content;
+    padding-block: 10px;
     gap: 20px;
-    max-height: calc(100vh - 200px);
+    height: fit-content;
 
 
     .node-element {
-        width: 25%;
-        height: 100%;
-        min-width: 260px;
+        width: 260px;
+        height: fit-content;
         display: flex;
         flex-direction: column;
         gap: 10px;
         background-color: $tt-off-background;
         padding: 10px;
-
 
         h3 {
             color: $tt-black;
@@ -146,12 +142,6 @@
         scrollbar-gutter: stable;
         padding-inline: 10px;
         width: 100%;
-
-        li {
-            span {
-                color: $tt-very-dark-gray;
-            }
-        }
     }
 
 
@@ -291,6 +281,7 @@
             display: inline-flex;
             align-items: center;
             font-weight: 100;
+            color: $tt-very-dark-gray;
 
             .bp4-control.bp4-checkbox {
                 margin-bottom: 0;
