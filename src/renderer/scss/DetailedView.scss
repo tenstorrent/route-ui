@@ -2,16 +2,24 @@
 
 
 .detailed-view-card {
-    padding: 15px;
-    padding-bottom: 20px;
-    background-color: $tt-background;
-    color: $tt-white-text;
-    box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);
-    border: 1px solid $tt-medium-gray;
+    padding: 0;
     border-radius: 0;
-    bottom: 10px;
-    left: 10px;
+    bottom: 0;
+    left: 0;
     z-index: 100;
+    border: none;
+    background: none;
+
+    .detailed-view-container {
+        background-color: $tt-background;
+        color: $tt-white-text;
+        box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);
+        border: 1px solid $tt-medium-gray;
+        padding: 15px;
+        padding-bottom: 20px;
+        margin-bottom: 10px;
+        margin-left: 10px;
+    }
 
     .detailed-view-header {
         display: flex;

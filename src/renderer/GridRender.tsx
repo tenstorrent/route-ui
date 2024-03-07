@@ -5,7 +5,7 @@ import { NODE_SIZE } from '../utils/DrawingAPI';
 
 import { ComputeNode } from '../data/Chip';
 import { ChipContext } from '../data/ChipDataProvider';
-import { getDetailedViewZoom, getGridZoom } from '../data/store/selectors/uiState.selectors';
+import { getGridZoom } from '../data/store/selectors/uiState.selectors';
 import { mapIterable } from '../utils/IterableHelpers';
 import DetailedView from './components/DetailedView';
 import NodeGridElement from './components/NodeGridElement';
@@ -13,7 +13,6 @@ import ClusterViewDialog from './components/cluster-view/ClusterViewDialog';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
-    const detailedViewZoom = useSelector(getDetailedViewZoom);
     const chip = useContext(ChipContext).getActiveChip();
 
     const dispatch = useDispatch();
@@ -44,7 +43,7 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
-            <DetailedView zoom={detailedViewZoom} />
+            <DetailedView />
             <ClusterViewDialog zoom={1} />
         </div>
     );

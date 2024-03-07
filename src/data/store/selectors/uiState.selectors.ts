@@ -18,3 +18,5 @@ export const getShowNodeLocation = (state: RootState) => state.uiState.showNodeL
 export const getGridZoom = (state: RootState) => state.uiState.gridZoom;
 
 export const getDetailedViewZoom = (state: RootState) => state.uiState.detailedViewZoom;
+
+export const getDetailedViewHeight = (state: RootState) => state.uiState.detailedViewHeight;

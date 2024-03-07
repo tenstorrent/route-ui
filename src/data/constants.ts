@@ -1,4 +1,4 @@
-import { DramBankLinkName, NOC2AXILinkName, EthernetLinkName, NOCLinkName, PCIeLinkName } from './Types';
+import { DramBankLinkName, EthernetLinkName, NOC2AXILinkName, NOCLinkName, PCIeLinkName } from './Types';
 
 export const LINK_SATURATION_INITIAIL_PERCENT = 75;
 export const DRAM_BANDWIDTH_INITIAL_GBS = 21.5; // adjustable
@@ -11,6 +11,7 @@ export const MAX_OPERATION_PERFORMANCE_THRESHOLD = 5; // this is a where everyth
 export const MAX_MODEL_RATIO_THRESHOLD = 10;
 export const MIN_MODEL_RATIO_THRESHOLD = 0;
 
+export const INITIAL_DETAILS_VIEW_HEIGHT = 340;
 
 export const INTERNAL_LINK_NAMES = [
     NOCLinkName.NOC0_IN,

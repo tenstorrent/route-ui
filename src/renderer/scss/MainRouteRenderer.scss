@@ -97,6 +97,8 @@ $dock-height: 420px;
     .bottom-dock {
         grid-area: bottom-dock;
         display: none;
+        max-height: 340px; // This is the initial dock size. It makes so that the dock does not overgrow and weirdly fill the same space as the details view.
+        align-self: end;
     }
 
     &.dock-open {
