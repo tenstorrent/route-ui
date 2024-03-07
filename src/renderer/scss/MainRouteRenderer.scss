@@ -65,7 +65,7 @@ $dock-height: 420px;
 .main-route {
     --sidebar-width: 30px;
     --controls-panel-width: 230px;
-    --properties-panel-width: 450px;
+    --properties-panel-width: max(450px, 35vw);
 
     --top-bar-height: 50px;
     --bottom-dock-height: 340px;
