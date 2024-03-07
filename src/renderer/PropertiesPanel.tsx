@@ -1,12 +1,14 @@
-import React, { useContext, useState } from 'react';
 import { Icon, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { useContext, useState } from 'react';
+import { ChipContext } from '../data/ChipDataProvider';
+import QueueIcon from '../main/assets/QueueIcon';
 import ComputeNodesPropertiesTab from './components/properties-panel/ComputeNodesPropertiesTab';
 import OperationsPropertiesTab from './components/properties-panel/OperationsPropertiesTab';
 import PipesPropertiesTab from './components/properties-panel/PipesPropertiesTab';
 import QueuesPropertiesTab from './components/properties-panel/QueuesPropertiesTab';
-import QueueIcon from '../main/assets/QueueIcon';
-import { ChipContext } from '../data/ChipDataProvider';
+
+import './scss/PropertiesPanel.scss';
 
 export default function PropertiesPanel() {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');

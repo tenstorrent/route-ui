@@ -1,14 +1,14 @@
-import { useDispatch } from 'react-redux';
-import React, { useContext, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
+import { useContext, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { PipeSegment } from '../../../data/Chip';
-import FilterableComponent from '../FilterableComponent';
-import SelectablePipe from '../SelectablePipe';
-import SearchField from '../SearchField';
 import { ChipContext } from '../../../data/ChipDataProvider';
+import FilterableComponent from '../FilterableComponent';
+import SearchField from '../SearchField';
+import SelectablePipe from '../SelectablePipe';
 
 const PipesPropertiesTab = () => {
     const dispatch = useDispatch();
@@ -29,46 +29,50 @@ const PipesPropertiesTab = () => {
     };
 
     return (
-        <div className='pipe-renderer-panel'>
-            <SearchField
-                searchQuery={pipeFilter}
-                onQueryChanged={setPipeFilter}
-                controls={[
-                    <Tooltip2
-                        content='Select all filtered pipes'
-                        position={PopoverPosition.RIGHT}
-                        key='select-all-pipes'
-                    >
-                        <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
-                    </Tooltip2>,
-                    <Tooltip2 content='Deselect all pipes' position={PopoverPosition.RIGHT} key='deselect-all-pipes'>
-                        <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
-                    </Tooltip2>,
-                ]}
-            />
-            <div className='properties-panel__content'>
-                <div className='pipelist-wrap list-wrap'>
-                    {chip && (
-                        <ul className='scrollable-content'>
-                            {chip.allUniquePipes.map((pipeSegment) => (
-                                <FilterableComponent
-                                    key={pipeSegment.id}
-                                    filterableString={pipeSegment.id}
-                                    filterQuery={pipeFilter}
-                                    component={
-                                        <li>
-                                            <SelectablePipe
-                                                pipeSegment={pipeSegment}
-                                                pipeFilter={pipeFilter}
-                                                showBandwidth={false}
-                                            />
-                                        </li>
-                                    }
-                                />
-                            ))}
-                        </ul>
-                    )}
-                </div>
+        <div className='properties-container'>
+            <div className='properties-filter'>
+                <SearchField
+                    searchQuery={pipeFilter}
+                    onQueryChanged={setPipeFilter}
+                    controls={[
+                        <Tooltip2
+                            content='Select all filtered pipes'
+                            position={PopoverPosition.RIGHT}
+                            key='select-all-pipes'
+                        >
+                            <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
+                        </Tooltip2>,
+                        <Tooltip2
+                            content='Deselect all pipes'
+                            position={PopoverPosition.RIGHT}
+                            key='deselect-all-pipes'
+                        >
+                            <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
+                        </Tooltip2>,
+                    ]}
+                />
+            </div>
+            <div className='properties-list'>
+                {chip && (
+                    <ul className='pipes-list'>
+                        {chip.allUniquePipes.map((pipeSegment) => (
+                            <FilterableComponent
+                                key={pipeSegment.id}
+                                filterableString={pipeSegment.id}
+                                filterQuery={pipeFilter}
+                                component={
+                                    <li>
+                                        <SelectablePipe
+                                            pipeSegment={pipeSegment}
+                                            pipeFilter={pipeFilter}
+                                            showBandwidth={false}
+                                        />
+                                    </li>
+                                }
+                            />
+                        ))}
+                    </ul>
+                )}
             </div>
         </div>
     );

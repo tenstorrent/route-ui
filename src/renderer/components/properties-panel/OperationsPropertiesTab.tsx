@@ -1,18 +1,18 @@
-import { useDispatch, useSelector } from 'react-redux';
-import React, { useContext, useMemo, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import { RootState } from 'data/store/createStore';
-import FilterableComponent from '../FilterableComponent';
-import SelectableOperation from '../SelectableOperation';
-import SearchField from '../SearchField';
-import GraphVertexDetails from '../GraphVertexDetails';
-import Collapsible from '../Collapsible';
+import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import React, { useContext, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChipContext } from '../../../data/ChipDataProvider';
 import { Operation } from '../../../data/GraphTypes';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import Collapsible from '../Collapsible';
+import FilterableComponent from '../FilterableComponent';
+import GraphVertexDetails from '../GraphVertexDetails';
+import SearchField from '../SearchField';
+import SelectableOperation from '../SelectableOperation';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -36,7 +36,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     };
 
     return (
-        <>
+        <div className='properties-container'>
             <div className='properties-filter'>
                 <SearchField
                     searchQuery={filterQuery}
@@ -61,36 +61,34 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                 <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
                 <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
-            <div className='operations-wrap list-wrap'>
-                <div className='scrollable-content'>
-                    {operationsList.map((operation: Operation) => {
-                        return (
-                            <FilterableComponent
-                                key={operation.name}
-                                filterableString={operation.name}
-                                filterQuery={filterQuery}
-                                component={
-                                    <Collapsible
-                                        label={
-                                            <SelectableOperation
-                                                disabled={operation.isOffchip}
-                                                opName={operation.name}
-                                                value={selected(operation.name)}
-                                                selectFunc={selectOperation}
-                                                stringFilter={filterQuery}
-                                            />
-                                        }
-                                        isOpen={allOpen}
-                                    >
-                                        {operation && <GraphVertexDetails graphNode={operation} />}
-                                    </Collapsible>
-                                }
-                            />
-                        );
-                    })}
-                </div>
+            <div className='properties-list'>
+                {operationsList.map((operation: Operation) => {
+                    return (
+                        <FilterableComponent
+                            key={operation.name}
+                            filterableString={operation.name}
+                            filterQuery={filterQuery}
+                            component={
+                                <Collapsible
+                                    label={
+                                        <SelectableOperation
+                                            disabled={operation.isOffchip}
+                                            opName={operation.name}
+                                            value={selected(operation.name)}
+                                            selectFunc={selectOperation}
+                                            stringFilter={filterQuery}
+                                        />
+                                    }
+                                    isOpen={allOpen}
+                                >
+                                    {operation && <GraphVertexDetails graphNode={operation} />}
+                                </Collapsible>
+                            }
+                        />
+                    );
+                })}
             </div>
-        </>
+        </div>
     );
 };
 
