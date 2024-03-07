@@ -1,7 +1,7 @@
 import { Button, Card, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { RootState } from 'data/store/createStore';
-import { getArchitectureSelector } from 'data/store/selectors/uiState.selectors';
+import { getArchitectureSelector, getDetailedViewZoom } from 'data/store/selectors/uiState.selectors';
 import { closeDetailedView } from 'data/store/slices/detailedView.slice';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,14 +13,13 @@ import DetailedViewDRAMRenderer from './detailed-view-components/DetailedViewDRA
 import DetailedViewETHRenderer from './detailed-view-components/DetailedViewETH';
 import DetailedViewPCIERenderer from './detailed-view-components/DetailedViewPCIE';
 
-interface DetailedViewProps {
-    zoom: number;
-}
+interface DetailedViewProps {}
 
-const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
+const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
     const chip = useContext(ChipContext).getActiveChip();
     const detailedViewElement = useRef<HTMLDivElement>(null);
+    const zoom = useSelector(getDetailedViewZoom);
 
     const architecture = useSelector(getArchitectureSelector);
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
