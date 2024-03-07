@@ -97,6 +97,8 @@ $dock-height: 420px;
     .bottom-dock {
         grid-area: bottom-dock;
         display: none;
+        max-height: 340px;
+        align-self: end;
     }
 
     &.dock-open {

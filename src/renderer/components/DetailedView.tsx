@@ -1,16 +1,17 @@
-import React, { useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { closeDetailedView } from 'data/store/slices/detailedView.slice';
 import { RootState } from 'data/store/createStore';
 import { getArchitectureSelector } from 'data/store/selectors/uiState.selectors';
-import '../scss/DetailedView.scss';
+import { closeDetailedView } from 'data/store/slices/detailedView.slice';
+import React, { useContext, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChipContext } from '../../data/ChipDataProvider';
 import { ComputeNodeType } from '../../data/Types';
+import { updateDetailedViewHeight } from '../../data/store/slices/uiState.slice';
+import '../scss/DetailedView.scss';
 import DetailedViewDRAMRenderer from './detailed-view-components/DetailedViewDRAM';
 import DetailedViewETHRenderer from './detailed-view-components/DetailedViewETH';
 import DetailedViewPCIERenderer from './detailed-view-components/DetailedViewPCIE';
-import { ChipContext } from '../../data/ChipDataProvider';
 
 interface DetailedViewProps {
     zoom: number;
@@ -24,6 +25,15 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
     const architecture = useSelector(getArchitectureSelector);
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
     const node = uid ? chip?.getNode(uid) : null;
+
+    useEffect(() => {
+        if (detailedViewElement.current) {
+            const { x, height } = detailedViewElement.current.getBoundingClientRect();
+
+            dispatch(updateDetailedViewHeight((x + height) * zoom));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [zoom, isOpen, node]);
 
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false}>

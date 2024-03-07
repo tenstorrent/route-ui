@@ -1,5 +1,5 @@
 import { RootState } from 'data/store/createStore';
-import { getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import { getDetailedViewHeight, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
@@ -16,10 +16,16 @@ export interface MainRouteRendererProps {}
 const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
     const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
     const isDetailedViewOpen = useSelector((state: RootState) => state.detailedView.isOpen);
+    const detailedViewHeight = useSelector(getDetailedViewHeight);
 
     return (
         <div
             className={`main-route ${isDockOpen ? 'dock-open' : ''} ${isDetailedViewOpen ? 'detailed-view-open' : ''}`}
+            style={
+                {
+                    '--bottom-dock-height': `${isDetailedViewOpen ? detailedViewHeight : '340'}px`,
+                } as React.CSSProperties
+            }
         >
             <div className='header'>
                 <TenstorrentLogo />
