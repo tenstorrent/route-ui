@@ -10,7 +10,7 @@
     border: none;
     background: none;
 
-    & > div {
+    .detailed-view-container {
         background-color: $tt-background;
         color: $tt-white-text;
         box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);

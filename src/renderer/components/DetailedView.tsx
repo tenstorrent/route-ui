@@ -39,7 +39,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false} transitionDuration={0}>
             <Card className='detailed-view-card'>
-                <div style={{ zoom }} ref={detailedViewElement}>
+                <div className='detailed-view-container' style={{ zoom }} ref={detailedViewElement}>
                     <div className='detailed-view-header'>
                         {node && (
                             <h3>
