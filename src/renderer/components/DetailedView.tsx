@@ -28,9 +28,11 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
 
     useEffect(() => {
         if (detailedViewElement.current) {
-            const { x, height } = detailedViewElement.current.getBoundingClientRect();
+            const { marginBottom, height } = window.getComputedStyle(detailedViewElement.current);
+            const parsedHeight = Number.parseFloat(height.replace('px', ''));
+            const parsedMarginBottom = Number.parseFloat(marginBottom.replace('px', ''));
 
-            dispatch(updateDetailedViewHeight((x + height) * zoom));
+            dispatch(updateDetailedViewHeight((parsedHeight + parsedMarginBottom) * zoom));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [zoom, isOpen, node]);
