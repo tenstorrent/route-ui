@@ -450,10 +450,10 @@ $dock-height: 420px;
     list-style: none;
     margin: 0;
     padding: 0;
-    padding-left: 20px;
     padding-bottom: 5px;
     display: flex;
     flex-direction: column;
+    width: 100%;
 
     li {
 
@@ -497,17 +497,6 @@ $dock-height: 420px;
     max-height: calc(100vh - 240px);
     width: 100%;
     margin-top: 20px;
-
-    .scrollable-content {
-        width: 100%;
-        padding-left: 0;
-    }
-
-    li {
-        span {
-            color: $tt-very-dark-gray;
-        }
-    }
 }
 
 .pipe-renderer-panel {
