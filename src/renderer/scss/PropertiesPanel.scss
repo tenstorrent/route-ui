@@ -146,6 +146,12 @@
         scrollbar-gutter: stable;
         padding-inline: 10px;
         width: 100%;
+
+        li {
+            span {
+                color: $tt-very-dark-gray;
+            }
+        }
     }
 
 
@@ -267,6 +273,46 @@
         p {
             margin-bottom: 0;
             font-size: 12px;
+        }
+    }
+
+    .pipes-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+
+        li {
+            padding-top: 4px;
+            padding-left: 5px;
+            font-size: 12px;
+            padding-bottom: 5px;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 100;
+
+            .bp4-control.bp4-checkbox {
+                margin-bottom: 0;
+            }
+
+            .label {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
+        }
+
+        .color-swatch {
+            width: 10px;
+            height: 10px;
+            border: 1px solid $tt-white-text;
+            display: inline-block;
+
+            &.transparent {
+                display: none;
+            }
         }
     }
 }
