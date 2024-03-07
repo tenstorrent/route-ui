@@ -2,6 +2,7 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ApplicationMode, Architecture } from 'data/Types';
 import path from 'path';
 import { GraphRelationshipState, type FolderLocationType } from '../../StateTypes';
+import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 
 interface UIState {
     dockOpen: boolean;
@@ -35,7 +36,7 @@ const uiStateInitialState: UIState = {
     showNodeLocation: false,
     gridZoom: 1,
     detailedViewZoom: 1,
-    detailedViewHeight: 340,
+    detailedViewHeight: INITIAL_DETAILS_VIEW_HEIGHT,
 };
 
 const uiStateSlice = createSlice({
