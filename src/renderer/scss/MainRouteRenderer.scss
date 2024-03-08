@@ -98,7 +98,15 @@
         display: none;
         max-height: $initial-dock-height;
         align-self: end;
-        width: calc(100vw - 20px);
+    }
+
+    &.detailed-view-open {
+        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
+        grid-template-areas:
+            "top-bar top-bar top-bar top-bar"
+            "sidebar controls main properties"
+            "bottom-dock bottom-dock bottom-dock properties"
+        ;
     }
 
     &.dock-open {
@@ -110,15 +118,6 @@
         ;
 
         .bottom-dock { display: block; }
-    }
-
-    &.detailed-view-open {
-        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
-        grid-template-areas:
-            "top-bar top-bar top-bar top-bar"
-            "sidebar controls main properties"
-            "bottom-dock bottom-dock bottom-dock properties"
-        ;
     }
 }
 
