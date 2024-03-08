@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react';
+import { FC, useContext, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
 import { ComputeNode } from '../../../data/Chip';
@@ -14,7 +14,12 @@ import {
     drawSelections,
 } from '../../../utils/DrawingAPI';
 import { NOC, NOCLinkName } from '../../../data/Types';
-import { getLinkSaturation, getShowLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
+import {
+    getAllLinksForGraph,
+    getLinkSaturation,
+    getShowLinkSaturation
+} from '../../../data/store/selectors/linkSaturation.selectors';
+import { ChipContext } from '../../../data/ChipDataProvider';
 
 interface NodePipeRendererProps {
     node: ComputeNode;
@@ -23,7 +28,8 @@ interface NodePipeRendererProps {
 const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
-    const linksData = useSelector((state: RootState) => state.linkSaturation.links);
+    const graphName = useContext(ChipContext).getGraphName();
+    const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));
 
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);

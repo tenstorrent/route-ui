@@ -18,9 +18,9 @@ interface DetailedViewProps {
 
 const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
     const dispatch = useDispatch();
-    const chip = useContext(ChipContext).getActiveChip();
-
-
+    const { getActiveChip, getGraphName } = useContext(ChipContext);
+    const chip = getActiveChip();
+    const graphName = getGraphName();
     const architecture = useSelector(getArchitectureSelector);
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
     const node = uid ? chip?.getNode(uid) : null;
@@ -38,9 +38,15 @@ const DetailedView: React.FC<DetailedViewProps> = ({ zoom }) => {
                 </div>
                 {node && (
                     <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
-                        {node.type === ComputeNodeType.DRAM && <DetailedViewDRAMRenderer node={node} />}
-                        {node.type === ComputeNodeType.ETHERNET && <DetailedViewETHRenderer node={node} />}
-                        {node.type === ComputeNodeType.PCIE && <DetailedViewPCIERenderer node={node} />}
+                        {node.type === ComputeNodeType.DRAM && (
+                            <DetailedViewDRAMRenderer graphName={graphName} node={node} />
+                        )}
+                        {node.type === ComputeNodeType.ETHERNET && (
+                            <DetailedViewETHRenderer graphName={graphName} node={node} />
+                        )}
+                        {node.type === ComputeNodeType.PCIE && (
+                            <DetailedViewPCIERenderer graphName={graphName} node={node} />
+                        )}
                     </div>
                 )}
             </Card>

@@ -12,8 +12,7 @@ import {
 
 const networkCongestionInitialState: NetworkCongestionState = {
     linkSaturationTreshold: LINK_SATURATION_INITIAIL_PERCENT,
-    links: {},
-    totalOps: 0,
+    graphs: {}, // Initialized as an empty record for graph-specific states
     CLKMHz: AICLK_INITIAL_MHZ,
     DRAMBandwidthGBs: DRAM_BANDWIDTH_INITIAL_GBS,
     PCIBandwidthGBs: PCIE_BANDWIDTH_INITIAL_GBS,
@@ -29,19 +28,26 @@ const linkSaturationSlice = createSlice({
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturationTreshold = action.payload;
         },
-        updateTotalOPs: (state, action: PayloadAction<number>) => {
-            state.totalOps = action.payload;
-            Object.values(state.links).forEach((linkState) => {
-                recalculateLinkSaturation(linkState, action.payload);
-            });
+        updateTotalOPs: (state, action: PayloadAction<{ graphName: string; totalOps: number }>) => {
+            const { graphName, totalOps } = action.payload;
+            const graphState = state.graphs[graphName];
+            if (graphState) {
+                graphState.totalOps = totalOps;
+                Object.values(graphState.links).forEach((linkState) => {
+                    recalculateLinkSaturation(linkState, totalOps);
+                });
+
+                updateDRAMLinks(state);
+                updateEthernetLinks(state);
+            }
         },
-        loadLinkData: (state, action: PayloadAction<LinkState[]>) => {
-            state.links = {};
-            action.payload.forEach((item) => {
-                state.links[item.id] = item;
-            });
-            updateDRAMLinks(state);
-            updateEthernetLinks(state);
+        loadLinkData: (state, action: PayloadAction<{ graphName: string; linkData: LinkState[] }>) => {
+            const { graphName, linkData } = action.payload;
+            if (!state.graphs[graphName]) {
+                state.graphs[graphName] = { links: {}, totalOps: 0 };
+            }
+            const graphState = state.graphs[graphName];
+            graphState.links = linkData.reduce((acc, link) => ({ ...acc, [link.id]: link }), {});
         },
         updateCLK: (state, action: PayloadAction<number>) => {
             state.CLKMHz = action.payload;
@@ -59,43 +65,49 @@ const linkSaturationSlice = createSlice({
             state.showLinkSaturation = action.payload;
         },
         updateShowNOC: (state, action: PayloadAction<{ noc: NOC; selected: boolean }>) => {
-            if (action.payload.noc === NOC.NOC0) {
-                state.showNOC0 = action.payload.selected;
-            }
-            if (action.payload.noc === NOC.NOC1) {
-                state.showNOC1 = action.payload.selected;
+            const { noc, selected } = action.payload;
+            if (noc === NOC.NOC0) {
+                state.showNOC0 = selected;
+            } else if (noc === NOC.NOC1) {
+                state.showNOC1 = selected;
             }
         },
     },
 });
-
 const updateEthernetLinks = (state: NetworkCongestionState) => {
-    Object.values(state.links).forEach((linkState: LinkState) => {
-        if (linkState.type === LinkType.ETHERNET) {
-            linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
-            recalculateLinkSaturation(linkState, state.totalOps);
-        }
+    Object.entries(state.graphs).forEach(([graphName, graphState]) => {
+        Object.values(graphState.links).forEach((linkState: LinkState) => {
+            if (linkState.type === LinkType.ETHERNET) {
+                linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
+                recalculateLinkSaturation(linkState, graphState.totalOps);
+            }
+        });
     });
 };
+
 const updateDRAMLinks = (state: NetworkCongestionState) => {
     const DRAMBandwidthBytes = state.DRAMBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
     const CLKHz = state.CLKMHz * 1000 * 1000;
-    Object.values(state.links).forEach((linkState: LinkState) => {
-        if (linkState.type === LinkType.DRAM) {
-            linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
-            recalculateLinkSaturation(linkState, state.totalOps);
-        }
+    Object.entries(state.graphs).forEach(([graphName, graphState]) => {
+        Object.values(graphState.links).forEach((linkState: LinkState) => {
+            if (linkState.type === LinkType.DRAM) {
+                linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
+                recalculateLinkSaturation(linkState, graphState.totalOps);
+            }
+        });
     });
 };
 
 const updatePCILinks = (state: NetworkCongestionState) => {
     const PCIBandwidthGBs = state.PCIBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
     const CLKHz = state.CLKMHz * 1000 * 1000;
-    Object.values(state.links).forEach((linkState: LinkState) => {
-        if (linkState.type === LinkType.PCIE) {
-            linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
-            recalculateLinkSaturation(linkState, state.totalOps);
-        }
+    Object.entries(state.graphs).forEach(([graphName, graphState]) => {
+        Object.values(graphState.links).forEach((linkState: LinkState) => {
+            if (linkState.type === LinkType.PCIE) {
+                linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
+                recalculateLinkSaturation(linkState, graphState.totalOps);
+            }
+        });
     });
 };
 

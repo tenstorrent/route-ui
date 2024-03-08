@@ -16,9 +16,10 @@ import { ChipContext } from '../../../data/ChipDataProvider';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
+    graphName: string;
 }
 
-const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node }) => {
+const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
     const chip = useContext(ChipContext).getActiveChip();
     const architecture = useSelector(getArchitectureSelector);
     const dispatch = useDispatch();
@@ -129,6 +130,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
+                                    graphName={graphName}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
                                 />
@@ -142,12 +144,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
+                                graphName={graphName}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} link={link} showEmpty={false} />
+                        <LinkDetails key={link.name} graphName={graphName} link={link} showEmpty={false} />
                     ))}
                 </div>
             </div>

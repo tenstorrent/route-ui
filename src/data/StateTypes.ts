@@ -74,10 +74,15 @@ export interface LinkState {
     type: LinkType;
 }
 
-export interface NetworkCongestionState {
-    linkSaturationTreshold: number;
+
+export interface LinkGraphState {
     links: Record<string, LinkState>;
     totalOps: number;
+}
+
+export interface NetworkCongestionState {
+    linkSaturationTreshold: number;
+    graphs: Record<string, LinkGraphState>;
     CLKMHz: number;
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;

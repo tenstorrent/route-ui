@@ -23,6 +23,7 @@ import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/p
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
+import { loadLinkData, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -87,7 +88,11 @@ const usePerfAnalyzerFileLoader = () => {
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
                 addChip(graphOnChip, graph.name);
+
                 dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
+                const linkData = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
+                dispatch(loadLinkData({ graphName: graph.name, linkData }));
+                dispatch(updateTotalOPs({ graphName: graph.name, totalOps: graphOnChip.totalOpCycles }));
             }
         } catch (e) {
             const err = e as Error;
@@ -100,7 +105,7 @@ const usePerfAnalyzerFileLoader = () => {
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
         if (selectedFolder) {
             try {
-                dispatch(closeDetailedView())
+                dispatch(closeDetailedView());
                 dispatch(clearAllNodes());
                 setActiveChip(graphName);
                 navigate('/render');

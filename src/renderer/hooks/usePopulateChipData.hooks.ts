@@ -17,8 +17,8 @@ const usePopulateChipData = () => {
         dispatch(setSelectedArchitecture(selectedChip.architecture));
         // dispatch(loadPipeSelection(selectedChip.generateInitialPipesSelectionState()));
         dispatch(loadNodesData([...mapIterable(selectedChip.nodes, (node) => node.generateInitialState())]));
-        dispatch(loadLinkData(selectedChip.getAllLinks().map((link) => link.generateInitialState())));
-        dispatch(updateTotalOPs(selectedChip.totalOpCycles));
+        // dispatch(loadLinkData(selectedChip.getAllLinks().map((link) => link.generateInitialState())));
+        // dispatch(updateTotalOPs(selectedChip.totalOpCycles));
     };
 
     return { populateChipData };

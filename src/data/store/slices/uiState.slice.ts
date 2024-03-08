@@ -6,7 +6,7 @@ import { GraphRelationshipState, type FolderLocationType } from '../../StateType
 interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
-    graphName: string;
+    graphName: string; // TODO: this needs to go
     folderPath: string;
     selectedFolderLocationType: FolderLocationType;
     architecture: Architecture;
