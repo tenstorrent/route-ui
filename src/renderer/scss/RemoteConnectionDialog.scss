@@ -25,16 +25,12 @@
     gap: 2px;
 
     .connection-status-icon {
-        --animation-name: ;
-
         animation: 0.7s steps(2) infinite alternate both;
-        animation-name: var(--animation-name);
     }
 
     &.status-IDLE .connection-status-icon { color: gray; }
     &.status-PROGRESS .connection-status-icon {
-        --animation-name: connection-test-progress;
-
+        animation-name: connection-test-progress;
         color: gold;
     }
     &.status-FAILED .connection-status-icon { color: orangered; }

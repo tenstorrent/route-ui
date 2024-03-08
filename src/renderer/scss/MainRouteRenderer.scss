@@ -22,17 +22,17 @@
     background-color: $hc-core;
 
     &.node-type-label::before {
-        --line-thickness: 1px;
+        $line-thickness: 1px;
 
         content: '';
         position: absolute;
         inset: 0;
         background-image: linear-gradient(
             -45deg,
-            transparent calc(50% - var(--line-thickness)),
-            $tt-very-dark-gray calc(50% - var(--line-thickness)),
-            $tt-very-dark-gray calc(50% + var(--line-thickness)),
-            transparent calc(50% + var(--line-thickness))
+            transparent calc(50% - $line-thickness),
+            $tt-very-dark-gray calc(50% - $line-thickness),
+            $tt-very-dark-gray calc(50% + $line-thickness),
+            transparent calc(50% + $line-thickness)
         );
     }
 }
@@ -63,16 +63,20 @@
 $dock-height: 420px;
 
 .main-route {
-    --sidebar-width: 30px;
-    --controls-panel-width: 230px;
-    --properties-panel-width: max(450px, 35vw);
+    $initial-dock-height: 340px;
 
-    --top-bar-height: 50px;
-    --bottom-dock-height: 340px;
+    $sidebar-width: 30px;
+    $controls-panel-width: 230px;
+    $properties-panel-width: max(450px, 35vw);
+
+    $top-bar-height: 50px;
+
+    // This is a CSS variable because the value is set dynamically in react.
+    --bottom-dock-height: $initial-dock-height;
 
     display: grid;
-    grid-template-columns: var(--sidebar-width) var(--controls-panel-width) 1fr var(--properties-panel-width);
-    grid-template-rows: var(--top-bar-height) 1fr;
+    grid-template-columns: $sidebar-width $controls-panel-width 1fr $properties-panel-width;
+    grid-template-rows: $top-bar-height 1fr;
     grid-template-areas:
         "top-bar top-bar top-bar top-bar"
         "sidebar controls main properties";
@@ -97,12 +101,12 @@ $dock-height: 420px;
     .bottom-dock {
         grid-area: bottom-dock;
         display: none;
-        max-height: 340px; // This is the initial dock size. It makes so that the dock does not overgrow and weirdly fill the same space as the details view.
+        max-height: $initial-dock-height;
         align-self: end;
     }
 
     &.dock-open {
-        grid-template-rows: var(--top-bar-height) 1fr var(--bottom-dock-height);
+        grid-template-rows: $top-bar-height 1fr var(--bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
@@ -113,7 +117,7 @@ $dock-height: 420px;
     }
 
     &.detailed-view-open {
-        grid-template-rows: var(--top-bar-height) 1fr var(--bottom-dock-height);
+        grid-template-rows: $top-bar-height 1fr var(--bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
