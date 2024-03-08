@@ -45,6 +45,15 @@ $focus-ring: rgba(142, 243, 47, 0.9);
 
 $alert-color: #FF6C0A;
 
+/* Layout sizes */
+$top-bar-height: 50px;
+$initial-dock-height: 340px;
+
+$sidebar-width: 30px;
+$controls-panel-width: 230px;
+$compute-node-width: 260px;
+$properties-panel-width: 300px;
+
 /* Media query mixins */
 $desktop: 1024px;
 $desktop-large: 1440px;

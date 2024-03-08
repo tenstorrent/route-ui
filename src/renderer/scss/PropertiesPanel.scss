@@ -39,7 +39,7 @@
 
 
     .node-element {
-        width: 260px;
+        width: $compute-node-width;
         height: fit-content;
         display: flex;
         flex-direction: column;

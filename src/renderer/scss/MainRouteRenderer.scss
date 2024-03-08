@@ -60,17 +60,7 @@
     }
 }
 
-$dock-height: 420px;
-
 .main-route {
-    $initial-dock-height: 340px;
-
-    $sidebar-width: 30px;
-    $controls-panel-width: 230px;
-    $properties-panel-width: max(450px, 35vw);
-
-    $top-bar-height: 50px;
-
     // This is a CSS variable because the value is set dynamically in react.
     --bottom-dock-height: $initial-dock-height;
 
@@ -140,6 +130,8 @@ $dock-height: 420px;
         height: 0px;
         overflow: hidden;
     }
+
+    $dock-height: 420px;
 
     &.dock-open {
         .dock {
