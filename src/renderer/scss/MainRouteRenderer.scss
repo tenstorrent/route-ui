@@ -65,7 +65,7 @@
     --bottom-dock-height: $initial-dock-height;
 
     display: grid;
-    grid-template-columns: $sidebar-width $controls-panel-width 1fr $properties-panel-width;
+    grid-template-columns: $sidebar-width $controls-panel-width minmax(auto, max-content) minmax($properties-panel-width, auto);
     grid-template-rows: $top-bar-height 1fr;
     grid-template-areas:
         "top-bar top-bar top-bar top-bar"
@@ -83,10 +83,14 @@
     .sidebar { grid-area: sidebar; }
     .grid-sidebar { grid-area: controls; }
     .main-content {
+        max-width: 50vw;
         grid-area: main;
         overflow: auto;
     }
-    .properties-panel { grid-area: properties; }
+    .properties-panel {
+        min-width: $properties-panel-width;
+        grid-area: properties;
+    }
 
     .bottom-dock {
         grid-area: bottom-dock;
