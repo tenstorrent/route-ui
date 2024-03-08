@@ -65,8 +65,8 @@
     --bottom-dock-height: $initial-dock-height;
 
     display: grid;
-    grid-template-columns: $sidebar-width $controls-panel-width minmax(auto, max-content) minmax($properties-panel-width, auto);
-    grid-template-rows: $top-bar-height 1fr;
+    grid-template-columns: $sidebar-width $controls-panel-width min-content 1fr;
+    grid-template-rows: $top-bar-height auto;
     grid-template-areas:
         "top-bar top-bar top-bar top-bar"
         "sidebar controls main properties";
@@ -84,6 +84,7 @@
     .grid-sidebar { grid-area: controls; }
     .main-content {
         max-width: 50vw;
+        width: fit-content;
         grid-area: main;
         overflow: auto;
     }
@@ -97,10 +98,11 @@
         display: none;
         max-height: $initial-dock-height;
         align-self: end;
+        width: calc(100vw - 20px);
     }
 
     &.dock-open {
-        grid-template-rows: $top-bar-height 1fr var(--bottom-dock-height);
+        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
@@ -111,7 +113,7 @@
     }
 
     &.detailed-view-open {
-        grid-template-rows: $top-bar-height 1fr var(--bottom-dock-height);
+        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
