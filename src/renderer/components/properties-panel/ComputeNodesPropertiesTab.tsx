@@ -1,26 +1,26 @@
-import React, { useContext, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button, Card, Icon } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import { RootState } from 'data/store/createStore';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
+import React, { useContext, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphVertexType } from '../../../data/GraphNames';
+import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import SelectableOperation from '../SelectableOperation';
-import SelectablePipe from '../SelectablePipe';
-import LinkDetails from '../LinkDetails';
+import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import Collapsible from '../Collapsible';
 import GraphVertexDetails from '../GraphVertexDetails';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
-import Collapsible from '../Collapsible';
-import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
-import { OperandDirection } from '../../../data/OpPerfDetails';
-import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
-import { GraphVertexType } from '../../../data/GraphNames';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import LinkDetails from '../LinkDetails';
+import SelectableOperation from '../SelectableOperation';
+import SelectablePipe from '../SelectablePipe';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -349,14 +349,16 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
     }, [chip, nodesSelectionState]);
 
     return (
-        <>
+        <div className='properties-container'>
             {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
-            <div className='properties-panel-nodes'>
-                {selectedNodes.map((node: ComputeNode) => (
-                    <ComputeNodePropertiesCard key={node?.uid} node={node} />
-                ))}
+            <div className='properties-list'>
+                <div className='properties-panel-nodes'>
+                    {selectedNodes.map((node: ComputeNode) => (
+                        <ComputeNodePropertiesCard key={node?.uid} node={node} />
+                    ))}
+                </div>
             </div>
-        </>
+        </div>
     );
 };
 

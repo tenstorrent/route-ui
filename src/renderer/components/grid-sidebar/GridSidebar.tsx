@@ -13,7 +13,7 @@ export const GridSidebar: FC = () => {
     const dispatch = useDispatch();
     const isHighContrast = useSelector(getHighContrastState);
     return (
-        <div className='inner-sidebar'>
+        <div className='grid-sidebar inner-sidebar'>
             <div className='inner-sidebar-wrap'>
                 <Switch
                     checked={isHighContrast}
