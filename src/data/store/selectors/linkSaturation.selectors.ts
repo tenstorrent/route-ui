@@ -1,9 +1,9 @@
 import { RootState } from '../createStore';
 
 export const getLinkData = (state: RootState, graphName: string, id: string) =>
-    state.linkSaturation.graphs[graphName].links[id];
+    state.linkSaturation.graphs[graphName]?.links[id];
 export const getAllLinksForGraph = (state: RootState, graphName: string) =>
-    state.linkSaturation.graphs[graphName].links;
+    state.linkSaturation.graphs[graphName]?.links || [];
 export const getAllLinks = (state: RootState) => state.linkSaturation.graphs;
 export const getTotalOpsForGraph = (state: RootState, graphName: string) =>
     state.linkSaturation.graphs[graphName]?.totalOps || 0;
