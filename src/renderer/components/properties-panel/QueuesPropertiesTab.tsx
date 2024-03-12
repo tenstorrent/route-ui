@@ -1,19 +1,19 @@
-import React, { useContext, useMemo, useState } from 'react';
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import SearchField from '../SearchField';
+import { useContext, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import { RootState } from '../../../data/store/createStore';
+import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
+import QueueIconMinus from '../../../main/assets/QueueIconMinus';
+import QueueIconPlus from '../../../main/assets/QueueIconPlus';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
-import Collapsible from '../Collapsible';
+import SearchField from '../SearchField';
 import SelectableOperation from '../SelectableOperation';
-import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
-import { RootState } from '../../../data/store/createStore';
-import QueueIconPlus from '../../../main/assets/QueueIconPlus';
-import QueueIconMinus from '../../../main/assets/QueueIconMinus';
-import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
-import { ChipContext } from '../../../data/ChipDataProvider';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
@@ -37,7 +37,7 @@ function QueuesPropertiesTab() {
     };
 
     return (
-        <>
+        <div className='properties-container'>
             <div className='properties-filter'>
                 <SearchField
                     searchQuery={filterQuery}
@@ -59,36 +59,34 @@ function QueuesPropertiesTab() {
                 <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
 
-            <div className='operations-wrap list-wrap'>
-                <div className='scrollable-content'>
-                    {queuesList.map((queue) => (
-                        <FilterableComponent
-                            key={queue.name}
-                            filterableString={queue.name}
-                            filterQuery={filterQuery}
-                            component={
-                                <Collapsible
-                                    key={queue.name}
-                                    label={
-                                        <SelectableOperation
-                                            disabled={disabledQueue(queue.name)}
-                                            opName={queue.name}
-                                            value={selected(queue.name)}
-                                            selectFunc={selectQueue}
-                                            stringFilter={filterQuery}
-                                        />
-                                    }
-                                    isOpen={allOpen}
-                                    contentStyles={{ color: '#000' }}
-                                >
-                                    {queue && <GraphVertexDetails graphNode={queue} />}
-                                </Collapsible>
-                            }
-                        />
-                    ))}
-                </div>
+            <div className='properties-list'>
+                {queuesList.map((queue) => (
+                    <FilterableComponent
+                        key={queue.name}
+                        filterableString={queue.name}
+                        filterQuery={filterQuery}
+                        component={
+                            <Collapsible
+                                key={queue.name}
+                                label={
+                                    <SelectableOperation
+                                        disabled={disabledQueue(queue.name)}
+                                        opName={queue.name}
+                                        value={selected(queue.name)}
+                                        selectFunc={selectQueue}
+                                        stringFilter={filterQuery}
+                                    />
+                                }
+                                isOpen={allOpen}
+                                contentStyles={{ color: '#000' }}
+                            >
+                                {queue && <GraphVertexDetails graphNode={queue} />}
+                            </Collapsible>
+                        }
+                    />
+                ))}
             </div>
-        </>
+        </div>
     );
 }
 

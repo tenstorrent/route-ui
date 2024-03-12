@@ -1,27 +1,24 @@
+import { updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
 import { NODE_SIZE } from '../utils/DrawingAPI';
 
-import NodeGridElement from './components/NodeGridElement';
 import { ComputeNode } from '../data/Chip';
-import DetailedView from './components/DetailedView';
-import { mapIterable } from '../utils/IterableHelpers';
-import { GridSidebar } from './components/grid-sidebar/GridSidebar';
-import { getDetailedViewZoom, getGridZoom } from '../data/store/selectors/uiState.selectors';
-import ClusterViewDialog from './components/cluster-view/ClusterViewDialog';
 import { ChipContext } from '../data/ChipDataProvider';
+import { getGridZoom } from '../data/store/selectors/uiState.selectors';
+import { mapIterable } from '../utils/IterableHelpers';
+import DetailedView from './components/DetailedView';
+import NodeGridElement from './components/NodeGridElement';
+import ClusterViewDialog from './components/cluster-view/ClusterViewDialog';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
-    const detailedViewZoom = useSelector(getDetailedViewZoom);
     const chip = useContext(ChipContext).getActiveChip();
 
     const dispatch = useDispatch();
 
     return (
-        <>
-            <GridSidebar />
+        <div className='main-content'>
             {chip && (
                 <div
                     className='grid-container'
@@ -46,8 +43,8 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
-            <DetailedView zoom={detailedViewZoom} />
+            <DetailedView />
             <ClusterViewDialog zoom={1} />
-        </>
+        </div>
     );
 }

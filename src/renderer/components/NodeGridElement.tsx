@@ -1,20 +1,20 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'data/store/createStore';
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
-import { RootState } from 'data/store/createStore';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/Chip';
 import { HighlightType } from '../../data/Types';
-import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
-import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
 import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
-import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
-import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
-import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
-import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
+import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
+import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
+import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
+import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
+import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
+import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -38,7 +38,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
     const triggerSelection = () => {
-        console.log('triggerSelection', node.uid, nodeState)
         const selectedState = nodeState?.selected;
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));

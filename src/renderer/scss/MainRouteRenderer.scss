@@ -22,17 +22,17 @@
     background-color: $hc-core;
 
     &.node-type-label::before {
-        --line-thickness: 1px;
+        $line-thickness: 1px;
 
         content: '';
         position: absolute;
         inset: 0;
         background-image: linear-gradient(
             -45deg,
-            transparent calc(50% - var(--line-thickness)),
-            $tt-very-dark-gray calc(50% - var(--line-thickness)),
-            $tt-very-dark-gray calc(50% + var(--line-thickness)),
-            transparent calc(50% + var(--line-thickness))
+            transparent calc(50% - $line-thickness),
+            $tt-very-dark-gray calc(50% - $line-thickness),
+            $tt-very-dark-gray calc(50% + $line-thickness),
+            transparent calc(50% + $line-thickness)
         );
     }
 }
@@ -60,7 +60,66 @@
     }
 }
 
-$dock-height: 420px;
+.main-route {
+    // This is a CSS variable because the value is set dynamically in react.
+    --bottom-dock-height: $initial-dock-height;
+
+    display: grid;
+    grid-template-columns: $sidebar-width $controls-panel-width min-content 1fr;
+    grid-template-rows: $top-bar-height auto;
+    grid-template-areas:
+        "top-bar top-bar top-bar top-bar"
+        "sidebar controls main properties";
+    gap: 10px;
+    padding: 10px;
+    height: 100vh;
+    width: 100vw;
+
+    .header {
+        grid-area: top-bar;
+        margin: 0;
+    }
+
+    .sidebar { grid-area: sidebar; }
+    .grid-sidebar { grid-area: controls; }
+    .main-content {
+        max-width: 50vw;
+        width: fit-content;
+        grid-area: main;
+        overflow: auto;
+    }
+    .properties-panel {
+        min-width: $properties-panel-width;
+        grid-area: properties;
+    }
+
+    .bottom-dock {
+        grid-area: bottom-dock;
+        display: none;
+        max-height: $initial-dock-height;
+        align-self: end;
+    }
+
+    &.detailed-view-open {
+        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
+        grid-template-areas:
+            "top-bar top-bar top-bar top-bar"
+            "sidebar controls main properties"
+            "bottom-dock bottom-dock bottom-dock properties"
+        ;
+    }
+
+    &.dock-open {
+        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
+        grid-template-areas:
+            "top-bar top-bar top-bar top-bar"
+            "sidebar controls main properties"
+            "bottom-dock bottom-dock bottom-dock bottom-dock"
+        ;
+
+        .bottom-dock { display: block; }
+    }
+}
 
 .outer-wrapper {
     display: flex;
@@ -76,6 +135,8 @@ $dock-height: 420px;
         height: 0px;
         overflow: hidden;
     }
+
+    $dock-height: 420px;
 
     &.dock-open {
         .dock {
@@ -144,7 +205,7 @@ $dock-height: 420px;
 }
 
 .inner-sidebar {
-    max-height: calc(100vh - 100px);
+    // max-height: calc(100vh - 100px);
     overflow-y: auto;
     scrollbar-gutter: stable;
     min-width: 220px;
@@ -180,10 +241,10 @@ $dock-height: 420px;
 }
 
 .grid-container {
-    flex: none;
-    overflow: auto;
-    height: calc(100vh - 150px);
-    max-width: 50vw;
+    // flex: none;
+    // overflow: auto;
+    // height: calc(100vh - 150px);
+    // max-width: 50vw;
     margin: 0;
     padding: 5px;
 
@@ -358,99 +419,6 @@ $dock-height: 420px;
     overflow-x: hidden;
 }
 
-.properties-panel {
-    background-color: $tt-medium-light-gray;
-    flex-grow: 1;
-    overflow-x: auto;
-    white-space: nowrap;
-    color-scheme: light;
-
-    .properties-panel__content {
-        display: inline-flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .operations-wrap .collapsible-component {
-        .op-element {
-            margin-bottom: 0;
-        }
-
-        .bp4-icon svg {
-            fill: $tt-dark-gray;
-        }
-    }
-}
-
-.properties-filter {
-    padding-inline: 10px;
-}
-
-
-.properties-panel-nodes {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: auto;
-    scrollbar-gutter: stable;
-    padding: 10px;
-    width: 100%;
-    gap: 20px;
-    max-height: calc(100vh - 200px);
-
-
-    .node-element {
-        width: 25%;
-        height: 100%;
-        min-width: 260px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        background-color: $tt-off-background;
-        padding: 10px;
-
-
-        h3 {
-            color: $tt-black;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .io-label {
-            color: $tt-white-text;
-            margin-bottom: 5px;
-        }
-
-        .node-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-    }
-
-    .producer-consumer {
-        margin-bottom: 10px;
-        margin-left: 1px;
-
-        h3 {
-            margin-left: -10px;
-            color: $tt-white-text;
-        }
-
-        h2 {
-            max-width: 50vw;
-            display: inline-block;
-            text-wrap: wrap;
-            word-break: break-word;
-            color: $tt-white-text;
-        }
-    }
-}
-
 .node-links-wrap {
     background-color: $tt-off-background; //#494949;
 
@@ -489,6 +457,7 @@ $dock-height: 420px;
     padding-bottom: 5px;
     display: flex;
     flex-direction: column;
+    width: 100%;
 
     li {
 
@@ -532,17 +501,6 @@ $dock-height: 420px;
     max-height: calc(100vh - 240px);
     width: 100%;
     margin-top: 20px;
-
-    .scrollable-content {
-        width: 100%;
-        padding-left: 0;
-    }
-
-    li {
-        span {
-            color: $tt-very-dark-gray;
-        }
-    }
 }
 
 .pipe-renderer-panel {
@@ -560,35 +518,6 @@ $dock-height: 420px;
 
     .is-selected-pipe {
         background-color: $pipe-select;
-    }
-}
-
-.properties-tabs {
-    .bp4-tab-list {
-        padding-inline: 10px;
-        padding-block-start: 10px;
-    }
-
-    .bp4-tab {
-        background-color: $tt-medium-light-gray;
-        color: $tt-black;
-        font-size: 16px;
-
-        &[aria-selected="true"] {
-            color: $tt-black;
-        }
-
-        &[data-tab-id="tab-ops"] {
-            svg {
-                fill: $tt-dark-gray;
-            }
-        }
-
-        &[data-tab-id="tab-queues"] {
-            svg {
-                stroke: $tt-dark-gray;
-            }
-        }
     }
 }
 
@@ -615,8 +544,7 @@ $dock-height: 420px;
 }
 
 
-.opname,
-.operations-wrap {
+.opname {
     .op-type.icon {
         line-height: 1;
         margin-left: -7px;
@@ -737,9 +665,7 @@ $dock-height: 420px;
             font-size: 12px;
         }
     }
-}
 
-.opname {
     .graph-vertex-details {
         margin-left: 0;
     }

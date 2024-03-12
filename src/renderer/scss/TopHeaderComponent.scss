@@ -35,6 +35,8 @@
         display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
+        text-wrap: nowrap;
 
         @include min-desktop-large {
             max-width: max(200px, 25vw);

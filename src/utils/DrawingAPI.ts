@@ -3,17 +3,17 @@ import type { CSSProperties } from 'react';
 import * as d3 from 'd3';
 import { ComputeNode } from '../data/Chip';
 import getPipeColor from '../data/ColorGenerator';
+import { ComputeNodeSiblings } from '../data/StateTypes';
 import {
     CLUSTER_ETH_POSITION,
     DramBankLinkName,
     EthernetLinkName,
-    NetworkLinkName,
     NOC2AXILinkName,
     NOCLinkName,
+    NetworkLinkName,
     PCIeLinkName,
 } from '../data/Types';
 import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../data/constants';
-import { ComputeNodeSiblings } from '../data/StateTypes';
 
 export const NODE_SIZE = 100;
 
@@ -710,12 +710,8 @@ export const getNodeOpBorderStyles = ({
     color: string | undefined;
     isSelected: boolean;
 }) => {
-    const newStyles: CSSProperties & { [key in `--${string}`]: string } = {
-        '--node-op-border-size': '2px',
-        ...styles,
-    };
-
-    const borderStyle = `var(--node-op-border-size) ${isSelected ? 'solid' : 'dashed'} ${color}`;
+    const newStyles: CSSProperties = { ...styles };
+    const borderStyle = `2px ${isSelected ? 'solid' : 'dashed'} ${color}`;
 
     if (!siblings.left) {
         newStyles.borderLeft = borderStyle;
