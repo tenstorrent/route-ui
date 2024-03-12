@@ -36,7 +36,7 @@ const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
             <GridSidebar />
             <GridRender />
             <PropertiesPanel />
-            <BottomDock />
+            <BottomDock isShown={isDockOpen} />
         </div>
     );
 };
