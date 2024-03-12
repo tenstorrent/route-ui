@@ -37,6 +37,8 @@ const usePerfAnalyzerFileLoader = () => {
     const chip = getActiveChip();
     const navigate = useNavigate();
 
+    const logger = useLogging();
+
     useEffect(() => {
         if (chip) {
             dispatch(setSelectedArchitecture(chip.architecture));
@@ -73,7 +75,7 @@ const usePerfAnalyzerFileLoader = () => {
 
         try {
             // TODO: needs gone once we are happy with performance
-            const tottalstract = performance.now();
+            const entireRunStartTime = performance.now();
             const graphs = await getAvailableGraphNames(folderPath);
 
             if (!graphs.length) {
@@ -102,7 +104,9 @@ const usePerfAnalyzerFileLoader = () => {
                 });
             }
             console.table(times, ['graph', 'time']);
-            console.log('total', performance.now() - tottalstract, 'ms');
+            console.log('total', performance.now() - entireRunStartTime, 'ms');
+            logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
+
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
