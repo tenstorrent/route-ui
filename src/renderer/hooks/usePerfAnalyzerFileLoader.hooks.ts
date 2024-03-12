@@ -72,6 +72,7 @@ const usePerfAnalyzerFileLoader = () => {
         setError(null);
 
         try {
+            // TODO: needs gone once we are happy with performance
             const tottalstract = performance.now();
             const graphs = await getAvailableGraphNames(folderPath);
 
@@ -82,7 +83,7 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
-            
+
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -95,9 +96,12 @@ const usePerfAnalyzerFileLoader = () => {
                 dispatch(loadLinkData({ graphName: graph.name, linkData }));
                 dispatch(updateTotalOPs({ graphName: graph.name, totalOps: graphOnChip.totalOpCycles }));
 
-                times.push(`${`\tgraph ${graph.name} ${performance.now() - start}`} ms`);
+                times.push({
+                    graph: `${graph.name}`,
+                    time: `${performance.now() - start} ms`,
+                });
             }
-            console.log(times.join('\n'));
+            console.table(times, ['graph', 'time']);
             console.log('total', performance.now() - tottalstract, 'ms');
         } catch (e) {
             const err = e as Error;
