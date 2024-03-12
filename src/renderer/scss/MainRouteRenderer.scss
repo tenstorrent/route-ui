@@ -96,7 +96,7 @@
     .bottom-dock {
         grid-area: bottom-dock;
         display: none;
-        max-height: $initial-dock-height;
+        height: $initial-dock-height;
         align-self: end;
     }
 
