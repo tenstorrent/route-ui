@@ -53,10 +53,22 @@
         gap: 10px;
 
         .pipe-list {
-            max-height: calc(100vh - 120px);
+            max-height: calc(100vh - 240px);
             min-width: 150px;
             overflow-y: auto;
         }
+    }
+    .congestion-container {
+        display: flex;
+        flex-direction: column;
+    }
+    .congestion-legend {
+        width: calc(100% - 10px);
+        height: 3px;
+    }
+
+    .bp4-slider {
+        width: calc(100% - 10px);
     }
 
     .cluster {

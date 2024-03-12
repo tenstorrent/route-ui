@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ItemRenderer, Select } from '@blueprintjs/select';
@@ -5,20 +6,26 @@ import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
-import { drawEthPipes } from '../../../utils/DrawingAPI';
+import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { getAvailableGraphsSelector } from '../../../data/store/selectors/uiState.selectors';
 import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';
 import SelectablePipe from '../SelectablePipe';
-import Chip, { ComputeNode, PipeSegment } from '../../../data/Chip';
+import Chip, { ComputeNode } from '../../../data/Chip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
 import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import SearchField from '../SearchField';
 import FilterableComponent from '../FilterableComponent';
 import getPipeColor from '../../../data/ColorGenerator';
-import { getSelectedPipes, selectPipeSelectionById } from '../../../data/store/selectors/pipeSelection.selectors';
+import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
+import {
+    getAllLinksForGraph,
+    getLinkSaturation,
+    getShowLinkSaturation,
+} from '../../../data/store/selectors/linkSaturation.selectors';
+import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
 
 export interface ClusterViewDialog {}
 
@@ -113,18 +120,19 @@ const ClusterView: FC<ClusterViewDialog> = () => {
 
     const pciPipeStateList = useSelector((state: RootState) => getSelectedPipes(state, pciPipes));
 
-    console.log(pciPipes);
-    console.log(pciPipeStateList);
-
     return (
         <div className='cluster-view-container'>
             <div
                 className='cluster-view-pipelist'
                 // this is to address the bug with a sticking focus pipe
+
                 onMouseOut={() => {
                     dispatch(updateFocusPipe(null));
                 }}
             >
+                <div className='congestion-container'>
+                    <LinkCongestionControls showNOCControls={false} />
+                </div>
                 {availableTemporalEpochs.length > 1 && (
                     <Select
                         items={availableTemporalEpochs}
@@ -206,11 +214,12 @@ const ClusterView: FC<ClusterViewDialog> = () => {
             >
                 {cluster?.chips.map((clusterChip) => {
                     let chip: Chip | undefined;
-
+                    let graphName: string | undefined;
                     selectedEpoch.forEach((graph) => {
                         const chipByGraphName = getChipByGraphName(graph.name);
                         if (chipByGraphName?.chipId === clusterChip.id) {
                             chip = chipByGraphName;
+                            graphName = graph.name;
                         }
                     });
 
@@ -273,6 +282,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                                         <EthPipeRenderer
                                             key={uid}
                                             id={uid}
+                                            graphName={graphName}
                                             ethPosition={position}
                                             node={node}
                                             index={index}
@@ -323,12 +333,13 @@ const ClusterView: FC<ClusterViewDialog> = () => {
 interface EthPipeRendererProps {
     id: string;
     node: ComputeNode | undefined;
+    graphName: string | undefined;
     ethPosition: CLUSTER_ETH_POSITION;
     index: number;
     clusterChipSize: number;
 }
 
-const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, index, clusterChipSize }) => {
+const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, graphName, ethPosition, index, clusterChipSize }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const pipeSelection = useSelector((state: RootState) => state.pipeSelection.pipes);
     const selectedPipeIds = Object.values(pipeSelection)
@@ -358,10 +369,25 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, inde
 
     const focusPipeId = useSelector((state: RootState) => state.pipeSelection.focusPipe);
 
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
+    const linkSaturationTreshold = useSelector(getLinkSaturation);
+    const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName || ''));
+    const isHighContrast = useSelector((state: RootState) => state.uiState.highContrastEnabled);
     useEffect(() => {
         if (svgRef.current) {
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
+            if (showLinkSaturation && linksData) {
+                node?.internalLinks.forEach((link) => {
+                    if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
+                        const linkStateData = linksData[link.uid];
+                        if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
+                            const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
+                            drawEthLink(svg, ethPosition, link.name, size, color, 6);
+                        }
+                    }
+                });
+            }
             if (focusPipeId) {
                 drawEthPipes(
                     svg,
@@ -395,7 +421,16 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, ethPosition, inde
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pipeSelection, nodePipeIn, nodePipeOut, focusPipeId, selectedPipeIds]);
+    }, [
+        pipeSelection,
+        nodePipeIn,
+        nodePipeOut,
+        focusPipeId,
+        selectedPipeIds,
+        showLinkSaturation,
+        linkSaturationTreshold,
+        linksData,
+    ]);
 
     return (
         <div
