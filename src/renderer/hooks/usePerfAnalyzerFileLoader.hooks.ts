@@ -23,7 +23,7 @@ import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/p
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
-import { loadLinkData, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
+import { loadLinkData, resetNetworksState, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -68,9 +68,11 @@ const usePerfAnalyzerFileLoader = () => {
     const loadFolder = async (folderPath: string): Promise<void> => {
         resetChips();
         dispatch(resetPipeSelection());
+        dispatch(resetNetworksState());
         setError(null);
 
         try {
+            const tottalstract = performance.now();
             const graphs = await getAvailableGraphNames(folderPath);
 
             if (!graphs.length) {
@@ -80,25 +82,29 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
-            // TODO: ensure this is not needed
-            // setEnableGraphSelect(true);
-
+            
+            const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
+                const start = performance.now();
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
                 addChip(graphOnChip, graph.name);
-
                 dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
                 const linkData = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
                 dispatch(loadLinkData({ graphName: graph.name, linkData }));
                 dispatch(updateTotalOPs({ graphName: graph.name, totalOps: graphOnChip.totalOpCycles }));
+
+                times.push(`${`\tgraph ${graph.name} ${performance.now() - start}`} ms`);
             }
+            console.log(times.join('\n'));
+            console.log('total', performance.now() - tottalstract, 'ms');
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
             setError(err.message ?? 'Unknown Error');
         }
+
         setCluster(await loadCluster(folderPath));
     };
 

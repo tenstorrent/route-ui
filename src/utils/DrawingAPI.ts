@@ -192,6 +192,34 @@ const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, direction: Ethernet
     return { lineEndX, lineEndY, lineStartX, lineStartY, arrow };
 };
 
+
+export const drawEthLink = (
+    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+    ethPosition: CLUSTER_ETH_POSITION,
+    direction: EthernetLinkName,
+    size: number,
+    color?: string,
+    stroke: number = 1,
+) => {
+    const {
+        //
+        lineEndX,
+        lineEndY,
+        lineStartX,
+        lineStartY,
+        arrow,
+    } = getEthLinkPoints(ethPosition, direction, size);
+
+    svg
+        .append('line')
+        .attr('x1', lineStartX)
+        .attr('y1', lineStartY)
+        .attr('x2', lineEndX)
+        .attr('y2', lineEndY)
+        .attr('stroke-width', stroke)
+        .attr('stroke', color || '#4d4d4d');
+    
+}
 export const drawEthPipes = (
     svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
     ethPosition: CLUSTER_ETH_POSITION,
