@@ -11,10 +11,10 @@ import OperationsTable from './OperationsTable';
 import QueuesTable from './QueuesTable';
 
 interface BottomDockProps {
-    isShown: boolean;
+    isActive: boolean;
 }
 
-const BottomDock: FC<BottomDockProps> = ({ isShown }) => {
+const BottomDock: FC<BottomDockProps> = ({ isActive }) => {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
     const dispatch = useDispatch();
 
@@ -24,7 +24,7 @@ const BottomDock: FC<BottomDockProps> = ({ isShown }) => {
     return (
         <div className='dock bottom-dock'>
             <Tabs
-                key={isShown ? 'shown' : 'hidden'}
+                key={isActive ? 'active-dock-tabs-key' : 'inactive-dock-tabs-key'}
                 id='dock-tabs'
                 selectedTabId={selectedTab}
                 onChange={setSelectedTab}
