@@ -13,7 +13,6 @@ interface ChipContextType {
     chipState: ChipsState;
     addChip: (newChip: Chip, graphName: string) => void;
     resetChips: () => void;
-    setGraphName: (graphName: string) => void;
     getAvailableGraphs: () => GraphRelationshipState[];
     getActiveChip: () => Chip | undefined;
     setActiveChip: (graphName: string) => void;
@@ -30,7 +29,6 @@ const ChipContext = createContext<ChipContextType>({
     chipState: initialChipsState,
     addChip: () => {},
     resetChips: () => {},
-    setGraphName: () => {},
     getAvailableGraphs: () => [],
     getActiveChip: () => undefined,
     setActiveChip: () => {},
@@ -60,13 +58,6 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const resetChips = useCallback(() => {
         setChipsState(initialChipsState);
-    }, []);
-
-    const setGraphName = useCallback((graphName: string) => {
-        setChipsState((prevState) => ({
-            ...prevState,
-            graphName,
-        }));
     }, []);
 
     // TODO: create function to get graph architecture, chip id and temporal epochs list
@@ -99,7 +90,6 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             chipState: chipsState,
             addChip,
             resetChips,
-            setGraphName,
             getAvailableGraphs,
             getActiveChip,
             setActiveChip,
@@ -110,7 +100,6 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             chipsState,
             addChip,
             resetChips,
-            setGraphName,
             getActiveChip,
             setActiveChip,
             getChipByGraphName,

@@ -25,7 +25,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveChip, setActiveChip, addChip, resetChips, setGraphName } = useContext(ChipContext);
+    const { getActiveChip, setActiveChip, addChip, resetChips } = useContext(ChipContext);
 
     const chip = getActiveChip();
     const navigate = useNavigate();
@@ -116,7 +116,6 @@ const usePerfAnalyzerFileLoader = () => {
                 dispatch(clearAllNodes());
                 setActiveChip(graphName);
                 navigate('/render');
-                setGraphName(graphName);
             } catch (e) {
                 const err = e as Error;
                 logging.error(`error loading and populating chip ${err.message}`);
