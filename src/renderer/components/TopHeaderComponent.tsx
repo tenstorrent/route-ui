@@ -30,7 +30,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { chipState, resetChips } = useContext(ChipContext);
+    const { chipState, getGraphName, resetChips } = useContext(ChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
 
     const localFolderPath = useSelector(getFolderPathSelector);
@@ -45,9 +45,10 @@ const TopHeaderComponent: React.FC = () => {
     const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
         availableRemoteFolders[0],
     );
-    const selectedGraph = chipState.graphName;
-    const chipId = chipState.chips[chipState.graphName]?.chipId;
-    const architecture = chipState.chips[chipState.graphName]?.architecture;
+    const selectedGraph = getGraphName();
+    const chipId = chipState.chips[selectedGraph]?.chipId;
+    const architecture = chipState.chips[selectedGraph]?.architecture;
+    const temporalEpoch = chipState.chips[selectedGraph]?.temporalEpoch;
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
@@ -123,10 +124,10 @@ const TopHeaderComponent: React.FC = () => {
                     </>
                 )}
 
-                {selectedGraph && selectedGraphItem?.temporalEpoch !== undefined && (
+                {selectedGraph && temporalEpoch !== undefined && (
                     <>
                         <span>Epoch:</span>
-                        <span>{selectedGraphItem?.temporalEpoch}</span>
+                        <span>{temporalEpoch}</span>
                     </>
                 )}
             </div>

@@ -26,8 +26,6 @@ const initialChipsState: ChipsState = {
     chips: {},
 };
 
-// TODO: pull from latest cluster view changes
-// TODO: make graph name, architecture and temporal epoch available as properties
 const ChipContext = createContext<ChipContextType>({
     chipState: initialChipsState,
     addChip: () => {},

@@ -11,9 +11,9 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
-    const { chipState } = useContext(ChipContext);
+    const { getGraphName, chipState } = useContext(ChipContext);
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
-    const selectedGraph = chipState.graphName;
+    const selectedGraph = getGraphName();
     const availableGraphs = Object.keys(chipState.chips);
 
     if (autoLoadFistGraph && !selectedGraph && availableGraphs?.length > 0) {
