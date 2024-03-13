@@ -34,6 +34,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
     const isDockOpen = useSelector(getDockOpenState);
 
     const clusterViewEnabled = useSelector(getExperimentalFeatures('showClusterView'));
+    const clusterViewButtonEnabled = clusterViewEnabled && cluster?.chips !== undefined && cluster?.chips.length > 1;
 
     return (
         <div className='sidebar'>
@@ -50,9 +51,9 @@ export const SideBar: React.FC<SideBarProps> = () => {
                 </Tooltip2>
             )}
 
-            <Tooltip2 content='Cluster view' disabled={!clusterViewEnabled}>
+            <Tooltip2 content='Cluster view' disabled={!clusterViewButtonEnabled}>
                 <Button
-                    disabled={!clusterViewEnabled || !cluster}
+                    disabled={!clusterViewButtonEnabled}
                     icon={IconNames.LAYOUT_GRID}
                     text=''
                     onClick={handleOpenClusterView}
