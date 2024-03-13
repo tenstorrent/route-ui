@@ -6,11 +6,11 @@ import {
     getArchitectureSelector,
     getAvailableGraphsSelector,
     getFolderPathSelector,
-    getGraphNameSelector,
     getSelectedFolderLocationType,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ChipContext } from '../../data/ChipDataProvider';
 import type { FolderLocationType } from '../../data/StateTypes';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -35,6 +35,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
+    const { getActiveGraphName } = useContext(ChipContext);
     const { loadPerfAnalyzerFolder, resetAvailableGraphs, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
 
     const architecture = useSelector(getArchitectureSelector);
@@ -51,7 +52,7 @@ const TopHeaderComponent: React.FC = () => {
     const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
         availableRemoteFolders[0],
     );
-    const selectedGraph = useSelector(getGraphNameSelector);
+    const selectedGraph = getActiveGraphName();
     const availableGraphs = useSelector(getAvailableGraphsSelector);
 
     const updateSelectedFolder = async (

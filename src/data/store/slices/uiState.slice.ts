@@ -25,7 +25,6 @@ interface UIState {
 const uiStateInitialState: UIState = {
     dockOpen: false,
     highContrastEnabled: false,
-    graphName: '',
     folderPath: '',
     selectedFolderLocationType: 'local',
     architecture: Architecture.NONE,
@@ -51,13 +50,9 @@ const uiStateSlice = createSlice({
         },
         setSelectedFile(state, action: PayloadAction<string>) {
             state.folderPath = path.dirname(action.payload);
-            state.graphName = path.basename(action.payload);
         },
         setSelectedFolderLocationType(state, action: PayloadAction<FolderLocationType>) {
             state.selectedFolderLocationType = action.payload;
-        },
-        setSelectedGraphName(state, action: PayloadAction<string>) {
-            state.graphName = action.payload;
         },
         setSelectedFolder(state, action: PayloadAction<string>) {
             state.folderPath = action.payload;
@@ -103,7 +98,6 @@ export const {
     setDockOpenState,
     setHighContrastState,
     setSelectedFile,
-    setSelectedGraphName,
     setSelectedArchitecture,
     setSelectedFolder,
     setSelectedFolderLocationType,

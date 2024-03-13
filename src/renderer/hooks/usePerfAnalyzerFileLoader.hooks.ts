@@ -5,7 +5,6 @@ import {
     setSelectedArchitecture,
     setSelectedFolder,
     setSelectedFolderLocationType,
-    setSelectedGraphName,
 } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
@@ -18,6 +17,7 @@ import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType } from '../../data/StateTypes';
+import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
@@ -32,7 +32,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveChip, setActiveChip, addChip, resetChips } = useContext(ChipContext);
+    const { getActiveChip, setActiveChip, addChip, resetChips, setGraphName } = useContext(ChipContext);
 
     const chip = getActiveChip();
     const navigate = useNavigate();
@@ -106,7 +106,6 @@ const usePerfAnalyzerFileLoader = () => {
             console.table(times, ['graph', 'time']);
             console.log('total', performance.now() - entireRunStartTime, 'ms');
             logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
-
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
@@ -123,7 +122,7 @@ const usePerfAnalyzerFileLoader = () => {
                 dispatch(clearAllNodes());
                 setActiveChip(graphName);
                 navigate('/render');
-                dispatch(setSelectedGraphName(graphName));
+                setGraphName(graphName);
             } catch (e) {
                 const err = e as Error;
                 logging.error(`error loading and populating chip ${err.message}`);
@@ -148,7 +147,7 @@ const usePerfAnalyzerFileLoader = () => {
 
     const resetAvailableGraphs = (): void => {
         dispatch(setAvailableGraphs([]));
-        dispatch(setSelectedGraphName(''));
+        setGraphName('');
     };
 
     return {

@@ -1,6 +1,7 @@
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { getAvailableGraphsSelector, getGraphNameSelector } from '../../../data/store/selectors/uiState.selectors';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import { getAvailableGraphsSelector } from '../../../data/store/selectors/uiState.selectors';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
@@ -12,8 +13,9 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
+    const { getActiveGraphName } = useContext(ChipContext);
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
-    const selectedGraph = useSelector(getGraphNameSelector);
+    const selectedGraph = getActiveGraphName();
     const availableGraphs = useSelector(getAvailableGraphsSelector);
 
     if (autoLoadFistGraph && !selectedGraph && availableGraphs?.length > 0) {
