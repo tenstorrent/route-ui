@@ -1,18 +1,17 @@
-import React, { useContext, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
-import { getArchitectureSelector } from 'data/store/selectors/uiState.selectors';
+import React, { useContext, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 import { ComputeNode, NOCLink } from '../../../data/Chip';
-import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
-import LinkDetails from '../LinkDetails';
-import { filterIterable } from '../../../utils/IterableHelpers';
-import DetailedViewPipeControls from './DetailedViewPipeControls';
-import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
-import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
 import { ChipContext } from '../../../data/ChipDataProvider';
+import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
+import { filterIterable } from '../../../utils/IterableHelpers';
+import LinkDetails from '../LinkDetails';
+import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
+import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
+import DetailedViewPipeControls from './DetailedViewPipeControls';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
@@ -21,7 +20,7 @@ interface DetailedViewDRAMRendererProps {
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
     const chip = useContext(ChipContext).getActiveChip();
-    const architecture = useSelector(getArchitectureSelector);
+    const architecture = chip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
     const nodeList = useMemo(() => {

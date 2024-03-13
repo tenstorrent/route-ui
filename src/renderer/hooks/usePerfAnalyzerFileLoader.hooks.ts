@@ -1,10 +1,5 @@
 import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
-import {
-    setApplicationMode,
-    setSelectedArchitecture,
-    setSelectedFolder,
-    setSelectedFolderLocationType,
-} from 'data/store/slices/uiState.slice';
+import { setApplicationMode, setSelectedFolder, setSelectedFolderLocationType } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
 
@@ -39,7 +34,7 @@ const usePerfAnalyzerFileLoader = () => {
 
     useEffect(() => {
         if (chip) {
-            dispatch(setSelectedArchitecture(chip.architecture));
+            // TODO: should we remove this?
             populateChipData(chip);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

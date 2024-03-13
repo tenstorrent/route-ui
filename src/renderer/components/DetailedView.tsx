@@ -1,7 +1,7 @@
 import { Button, Card, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { RootState } from 'data/store/createStore';
-import { getArchitectureSelector, getDetailedViewZoom } from 'data/store/selectors/uiState.selectors';
+import { getDetailedViewZoom } from 'data/store/selectors/uiState.selectors';
 import { closeDetailedView } from 'data/store/slices/detailedView.slice';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,13 +17,13 @@ interface DetailedViewProps {}
 
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
-    const { getActiveChip, getGraphName } = useContext(ChipContext);
+    const { getActiveChip, getGraphName, chipState } = useContext(ChipContext);
     const chip = getActiveChip();
     const graphName = getGraphName();
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
 
-    const architecture = useSelector(getArchitectureSelector);
+    const architecture = chipState.chips[graphName]?.architecture;
     const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
     const node = uid ? chip?.getNode(uid) : null;
 
@@ -50,19 +50,19 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                         )}
                         <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                     </div>
-                {node && (
-                    <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
-                        {node.type === ComputeNodeType.DRAM && (
-                            <DetailedViewDRAMRenderer graphName={graphName} node={node} />
-                        )}
-                        {node.type === ComputeNodeType.ETHERNET && (
-                            <DetailedViewETHRenderer graphName={graphName} node={node} />
-                        )}
-                        {node.type === ComputeNodeType.PCIE && (
-                            <DetailedViewPCIERenderer graphName={graphName} node={node} />
-                        )}
-                    </div>
-                )}
+                    {node && (
+                        <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
+                            {node.type === ComputeNodeType.DRAM && (
+                                <DetailedViewDRAMRenderer graphName={graphName} node={node} />
+                            )}
+                            {node.type === ComputeNodeType.ETHERNET && (
+                                <DetailedViewETHRenderer graphName={graphName} node={node} />
+                            )}
+                            {node.type === ComputeNodeType.PCIE && (
+                                <DetailedViewPCIERenderer graphName={graphName} node={node} />
+                            )}
+                        </div>
+                    )}
                 </div>
             </Card>
         </Overlay>

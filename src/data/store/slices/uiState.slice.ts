@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ApplicationMode, Architecture } from 'data/Types';
+import { ApplicationMode } from 'data/Types';
 import path from 'path';
 import { type FolderLocationType } from '../../StateTypes';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
@@ -9,7 +9,6 @@ interface UIState {
     highContrastEnabled: boolean;
     folderPath: string;
     selectedFolderLocationType: FolderLocationType;
-    architecture: Architecture;
     applicationMode: ApplicationMode;
     showEmptyLinks: boolean;
     showOperationNames: boolean;
@@ -25,7 +24,6 @@ const uiStateInitialState: UIState = {
     highContrastEnabled: false,
     folderPath: '',
     selectedFolderLocationType: 'local',
-    architecture: Architecture.NONE,
     applicationMode: ApplicationMode.NONE,
     showEmptyLinks: false,
     showOperationNames: false,
@@ -53,9 +51,6 @@ const uiStateSlice = createSlice({
         },
         setSelectedFolder(state, action: PayloadAction<string>) {
             state.folderPath = action.payload;
-        },
-        setSelectedArchitecture(state, action: PayloadAction<Architecture>) {
-            state.architecture = action.payload;
         },
         setApplicationMode(state, action: PayloadAction<ApplicationMode>) {
             state.applicationMode = action.payload;
@@ -89,7 +84,6 @@ export const {
     setDockOpenState,
     setHighContrastState,
     setSelectedFile,
-    setSelectedArchitecture,
     setSelectedFolder,
     setSelectedFolderLocationType,
     setApplicationMode,

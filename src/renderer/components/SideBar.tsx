@@ -1,14 +1,9 @@
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { ApplicationMode, Architecture } from 'data/Types';
+import { ApplicationMode } from 'data/Types';
 import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
-import {
-    setDockOpenState,
-    setSelectedArchitecture,
-    setSelectedFile,
-    setSelectedFolder,
-} from 'data/store/slices/uiState.slice';
+import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +24,6 @@ export const SideBar: React.FC<SideBarProps> = () => {
     const reloadAppData = () => {
         resetChips();
         dispatch(setSelectedFile(''));
-        dispatch(setSelectedArchitecture(Architecture.NONE));
         dispatch(setSelectedFolder(''));
         navigate('/');
     };
