@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ApplicationMode, Architecture } from 'data/Types';
 import path from 'path';
-import { GraphRelationshipState, type FolderLocationType } from '../../StateTypes';
+import { type FolderLocationType } from '../../StateTypes';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 
 interface UIState {
@@ -10,7 +10,6 @@ interface UIState {
     folderPath: string;
     selectedFolderLocationType: FolderLocationType;
     architecture: Architecture;
-    availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
     showEmptyLinks: boolean;
     showOperationNames: boolean;
@@ -27,7 +26,6 @@ const uiStateInitialState: UIState = {
     folderPath: '',
     selectedFolderLocationType: 'local',
     architecture: Architecture.NONE,
-    availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
     showEmptyLinks: false,
     showOperationNames: false,
