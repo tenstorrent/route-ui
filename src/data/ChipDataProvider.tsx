@@ -13,6 +13,7 @@ interface ChipContextType {
     addChip: (newChip: Chip, graphName: string) => void;
     resetChips: () => void;
     setGraphName: (graphName: string) => void;
+    getActiveGraphName: () => string;
     getActiveChip: () => Chip | undefined;
     setActiveChip: (graphName: string) => void;
     getChipByGraphName: (graphName: string) => Chip | undefined;
@@ -29,6 +30,7 @@ const ChipContext = createContext<ChipContextType>({
     addChip: () => {},
     resetChips: () => {},
     setGraphName: () => {},
+    getActiveGraphName: () => '',
     getActiveChip: () => undefined,
     setActiveChip: () => {},
     getChipByGraphName: () => undefined,
@@ -48,9 +50,12 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }));
     }, []);
 
-    const getChipByGraphName = useCallback((graphName: string) => {
-        return chipsState.chips[graphName];
-    }, [chipsState.chips]);
+    const getChipByGraphName = useCallback(
+        (graphName: string) => {
+            return chipsState.chips[graphName];
+        },
+        [chipsState.chips],
+    );
 
     const resetChips = useCallback(() => {
         setChipsState(initialChipsState);
@@ -62,6 +67,10 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             graphName,
         }));
     }, []);
+
+    const getActiveGraphName = useCallback(() => {
+        return chipsState.graphName;
+    }, [chipsState]);
 
     const getActiveChip = useCallback(() => {
         return chipsState.chips[chipsState.graphName];
@@ -84,10 +93,11 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             addChip,
             resetChips,
             setGraphName,
+            getActiveGraphName,
             getActiveChip,
             setActiveChip,
             getChipByGraphName,
-            getGraphName
+            getGraphName,
         }),
         [chipsState, addChip, resetChips, setGraphName, getActiveChip, setActiveChip, getChipByGraphName, getGraphName],
     );
