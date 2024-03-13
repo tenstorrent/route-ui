@@ -285,9 +285,8 @@ export default class Chip {
 
     private dataIntergrityErrors: DataIntegrityError[] = [];
 
-    constructor(chipId: number, temporalEpoch?: number) {
+    constructor(chipId: number) {
         this.chipId = chipId;
-        this.temporalEpoch = temporalEpoch;
         this.operationsByName = new Map();
         this.queuesByName = new Map();
         Chip.GET_NOC_ORDER();
@@ -666,8 +665,9 @@ export default class Chip {
     }
 
     static AUGMENT_WITH_TEMPORAL_EPOCH(chip: Chip, temporalEpoch: number) {
-        const newChip = new Chip(chip.chipId, temporalEpoch);
+        const newChip = new Chip(chip.chipId);
         Object.assign(newChip, chip);
+        newChip.temporalEpoch = temporalEpoch;
 
         return newChip;
     }
