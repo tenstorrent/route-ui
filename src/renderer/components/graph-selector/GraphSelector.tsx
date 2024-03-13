@@ -1,7 +1,5 @@
 import { FC, useContext } from 'react';
-import { useSelector } from 'react-redux';
 import { ChipContext } from '../../../data/ChipDataProvider';
-import { getAvailableGraphsSelector } from '../../../data/store/selectors/uiState.selectors';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
@@ -13,19 +11,19 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
-    const { getActiveGraphName } = useContext(ChipContext);
+    const { chipState } = useContext(ChipContext);
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
-    const selectedGraph = getActiveGraphName();
-    const availableGraphs = useSelector(getAvailableGraphsSelector);
+    const selectedGraph = chipState.graphName;
+    const availableGraphs = Object.keys(chipState.chips);
 
     if (autoLoadFistGraph && !selectedGraph && availableGraphs?.length > 0) {
-        loadPerfAnalyzerGraph(availableGraphs[0].name);
+        loadPerfAnalyzerGraph(availableGraphs[0]);
     }
 
     return (
         <PopoverMenu // Graph picker
             label={selectedGraph || (label ?? 'Select graph')}
-            options={availableGraphs.map((graph) => graph.name)}
+            options={availableGraphs}
             selectedItem={selectedGraph}
             onSelectItem={async (graph) => {
                 await loadPerfAnalyzerGraph(graph);

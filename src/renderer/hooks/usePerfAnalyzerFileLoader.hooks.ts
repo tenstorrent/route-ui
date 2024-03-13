@@ -83,6 +83,7 @@ const usePerfAnalyzerFileLoader = () => {
             }
 
             dispatch(setSelectedFolder(folderPath));
+            // TODO: migrate to context
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
 

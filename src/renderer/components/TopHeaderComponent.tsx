@@ -2,12 +2,7 @@ import { sep as pathSeparator } from 'path';
 
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import {
-    getArchitectureSelector,
-    getAvailableGraphsSelector,
-    getFolderPathSelector,
-    getSelectedFolderLocationType,
-} from 'data/store/selectors/uiState.selectors';
+import { getFolderPathSelector, getSelectedFolderLocationType } from 'data/store/selectors/uiState.selectors';
 import React, { useContext, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ChipContext } from '../../data/ChipDataProvider';
@@ -35,10 +30,8 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { getActiveGraphName } = useContext(ChipContext);
+    const { chipState } = useContext(ChipContext);
     const { loadPerfAnalyzerFolder, resetAvailableGraphs, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
-
-    const architecture = useSelector(getArchitectureSelector);
 
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderLocationType = useSelector(getSelectedFolderLocationType);
@@ -52,8 +45,9 @@ const TopHeaderComponent: React.FC = () => {
     const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
         availableRemoteFolders[0],
     );
-    const selectedGraph = getActiveGraphName();
-    const availableGraphs = useSelector(getAvailableGraphsSelector);
+    const selectedGraph = chipState.graphName;
+    const chipId = chipState.chips[chipState.graphName]?.chipId;
+    const architecture = chipState.chips[chipState.graphName]?.architecture;
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
@@ -73,8 +67,6 @@ const TopHeaderComponent: React.FC = () => {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
         }
     };
-
-    const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
     return (
         <div className='top-header-component'>
@@ -124,10 +116,10 @@ const TopHeaderComponent: React.FC = () => {
                     </>
                 )}
 
-                {selectedGraph && selectedGraphItem?.chipId !== undefined && (
+                {selectedGraph && chipId !== undefined && (
                     <>
                         <span>Chip:</span>
-                        <span>{selectedGraphItem?.chipId}</span>
+                        <span>{chipId}</span>
                     </>
                 )}
 
