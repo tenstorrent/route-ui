@@ -71,11 +71,11 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     // TODO: create function to get graph architecture, chip id and temporal epochs list
     const getAvailableGraphs = useCallback(() => {
-        return Object.entries(chipsState.chips).map(([key, value]) => ({
-            name: key,
-            architecture: value.architecture,
-            chipId: value.chipId,
-            temporalEpoch: value?.temporalEpoch ?? 0,
+        return Object.entries(chipsState.chips).map(([graphName, chip]) => ({
+            name: graphName,
+            architecture: chip.architecture,
+            chipId: chip.chipId,
+            temporalEpoch: chip?.temporalEpoch ?? 0,
         }));
     }, [chipsState]);
 
