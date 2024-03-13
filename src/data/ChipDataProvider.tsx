@@ -71,13 +71,13 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         }));
     }, []);
 
-    // TODO: create function for getting graph names
     // TODO: create function to get graph architecture, chip id and temporal epochs list
     const getAvailableGraphs = useCallback(() => {
         return Object.entries(chipsState.chips).map(([key, value]) => ({
             name: key,
             architecture: value.architecture,
             chipId: value.chipId,
+            temporalEpoch: value?.temporalEpoch ?? 0,
         }));
     }, [chipsState]);
 
@@ -108,7 +108,17 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             getChipByGraphName,
             getGraphName,
         }),
-        [chipsState, addChip, resetChips, setGraphName, getActiveChip, setActiveChip, getChipByGraphName, getGraphName],
+        [
+            chipsState,
+            addChip,
+            resetChips,
+            setGraphName,
+            getActiveChip,
+            setActiveChip,
+            getChipByGraphName,
+            getGraphName,
+            getAvailableGraphs,
+        ],
     );
 
     return <ChipContext.Provider value={value}>{children}</ChipContext.Provider>;

@@ -1,4 +1,12 @@
 /* eslint-disable no-useless-constructor */
+import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
+import ChipDesign from './ChipDesign';
+import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
+import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
+import { BuildableOperation, BuildableQueue, Operand } from './Graph';
+import { GraphVertexType, OperationName, QueueName } from './GraphNames';
+import type { Operation, Queue } from './GraphTypes';
+import { GraphVertex } from './GraphTypes';
 import {
     ChipDesignJSON,
     DramChannelJSON,
@@ -7,8 +15,15 @@ import {
     NodeDataJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
-import { BuildableOperation, BuildableQueue, Operand } from './Graph';
-import ChipDesign from './ChipDesign';
+import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
+import {
+    aggregateCoresByOperation,
+    GraphDescriptorJSON,
+    OperandJSON,
+    OperationDescription,
+} from './sources/GraphDescriptor';
+import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
+import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
 import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
     Architecture,
@@ -25,21 +40,6 @@ import {
     PCIeLinkName,
     QueueLocation,
 } from './Types';
-import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
-import type { Operation, Queue } from './GraphTypes';
-import { GraphVertex } from './GraphTypes';
-import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
-import {
-    aggregateCoresByOperation,
-    GraphDescriptorJSON,
-    OperandJSON,
-    OperationDescription,
-} from './sources/GraphDescriptor';
-import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
-import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
-import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
-import { GraphVertexType, OperationName, QueueName } from './GraphNames';
-import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
 
 export default class Chip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -281,10 +281,13 @@ export default class Chip {
         maxBwLimitedFactor: 0,
     };
 
+    public temporalEpoch?: number;
+
     private dataIntergrityErrors: DataIntegrityError[] = [];
 
-    constructor(chipId: number) {
+    constructor(chipId: number, temporalEpoch?: number) {
         this.chipId = chipId;
+        this.temporalEpoch = temporalEpoch;
         this.operationsByName = new Map();
         this.queuesByName = new Map();
         Chip.GET_NOC_ORDER();
@@ -662,6 +665,13 @@ export default class Chip {
         return newChip;
     }
 
+    static AUGMENT_WITH_TEMPORAL_EPOCH(chip: Chip, temporalEpoch: number) {
+        const newChip = new Chip(chip.chipId, temporalEpoch);
+        Object.assign(newChip, chip);
+
+        return newChip;
+    }
+
     public generateInitialPipesSelectionState(): PipeSelection[] {
         return this.allUniquePipes.map((pipeSegment) => {
             return { id: pipeSegment.id, selected: false } as PipeSelection;
@@ -728,9 +738,7 @@ export default class Chip {
                 return (
                     node
                         .getInternalLinksForNode()
-                        .filter(
-                            (link) => link.name === PCIeLinkName.PCIE_INOUT
-                        )
+                        .filter((link) => link.name === PCIeLinkName.PCIE_INOUT)
                         .map((link) => link.pipes)
                         .flat() || []
                 );
@@ -1248,5 +1256,3 @@ export const convertBytes = (bytes: number, numAfterComma = 0) => {
 export const formatToBytesPerCycle = (bytes: number, numAfterComma = 0) => {
     return `${convertBytes(bytes, numAfterComma)}/cycle`;
 };
-
-

@@ -1,10 +1,11 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 
 import { AnchorButton, FormGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useDispatch, useSelector } from 'react-redux';
+import { ChipContext } from '../../../data/ChipDataProvider';
 import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
 import { setSelectedFolderLocationType } from '../../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../../utils/FileLoaders';
@@ -17,6 +18,7 @@ import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
 const RemoteSyncConfigurator: FC = () => {
+    const { resetChips } = useContext(ChipContext);
     const remote = useRemote();
 
     const dispatch = useDispatch();
@@ -30,7 +32,7 @@ const RemoteSyncConfigurator: FC = () => {
     const [isFetchingFolderStatus, setIsFetchingFolderStatus] = useState(false);
 
     const logging = useLogging();
-    const { loadPerfAnalyzerFolder, resetAvailableGraphs } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
 
     const updateSelectedFolder = async (folder?: RemoteFolder) => {
         setSelectedFolder(folder);
@@ -39,7 +41,7 @@ const RemoteSyncConfigurator: FC = () => {
         if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
         } else {
-            resetAvailableGraphs();
+            resetChips();
         }
     };
 

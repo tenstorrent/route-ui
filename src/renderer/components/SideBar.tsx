@@ -2,8 +2,8 @@ import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ApplicationMode, Architecture } from 'data/Types';
+import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import {
-    clearAvailableGraphs,
     setDockOpenState,
     setSelectedArchitecture,
     setSelectedFile,
@@ -12,21 +12,22 @@ import {
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
-import { openClusterView } from '../../data/store/slices/clusterView.slice';
+import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterDataSource } from '../../data/DataSource';
 import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
+import { openClusterView } from '../../data/store/slices/clusterView.slice';
 
 export interface SideBarProps {}
 
-export const SideBar: React.FC<SideBarProps> = ({}) => {
+export const SideBar: React.FC<SideBarProps> = () => {
+    const { resetChips } = useContext(ChipContext);
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { cluster } = useContext(ClusterDataSource);
     const dispatch = useDispatch();
     // const [clusterViewEnabled, setClusterViewEnabled] = useState(false);
     const reloadAppData = () => {
-        dispatch(clearAvailableGraphs());
+        resetChips();
         dispatch(setSelectedFile(''));
         dispatch(setSelectedArchitecture(Architecture.NONE));
         dispatch(setSelectedFolder(''));
@@ -39,7 +40,6 @@ export const SideBar: React.FC<SideBarProps> = ({}) => {
     const isDockOpen = useSelector(getDockOpenState);
 
     const clusterViewEnabled = useSelector(getExperimentalFeatures('showClusterView'));
-    const clusterViewButtonEnabled = clusterViewEnabled && cluster?.chips !== undefined && cluster?.chips.length > 1;
 
     return (
         <div className='sidebar'>
@@ -56,9 +56,9 @@ export const SideBar: React.FC<SideBarProps> = ({}) => {
                 </Tooltip2>
             )}
 
-            <Tooltip2 content='Cluster view' disabled={!clusterViewButtonEnabled}>
+            <Tooltip2 content='Cluster view' disabled={!clusterViewEnabled}>
                 <Button
-                    disabled={!clusterViewButtonEnabled}
+                    disabled={!clusterViewEnabled || !cluster}
                     icon={IconNames.LAYOUT_GRID}
                     text=''
                     onClick={handleOpenClusterView}

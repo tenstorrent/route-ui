@@ -7,7 +7,6 @@ import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
-    graphName: string; // TODO: this needs to go
     folderPath: string;
     selectedFolderLocationType: FolderLocationType;
     architecture: Architecture;
@@ -60,12 +59,6 @@ const uiStateSlice = createSlice({
         setSelectedArchitecture(state, action: PayloadAction<Architecture>) {
             state.architecture = action.payload;
         },
-        setAvailableGraphs(state, action: PayloadAction<GraphRelationshipState[]>) {
-            state.availableGraphs = action.payload;
-        },
-        clearAvailableGraphs(state) {
-            state.availableGraphs = [];
-        },
         setApplicationMode(state, action: PayloadAction<ApplicationMode>) {
             state.applicationMode = action.payload;
         },
@@ -101,8 +94,6 @@ export const {
     setSelectedArchitecture,
     setSelectedFolder,
     setSelectedFolderLocationType,
-    setAvailableGraphs,
-    clearAvailableGraphs,
     setApplicationMode,
     clearSelectedApplication,
     updateShowEmptyLinks,

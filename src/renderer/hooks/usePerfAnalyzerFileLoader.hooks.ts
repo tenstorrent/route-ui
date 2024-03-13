@@ -1,7 +1,6 @@
 import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
 import {
     setApplicationMode,
-    setAvailableGraphs,
     setSelectedArchitecture,
     setSelectedFolder,
     setSelectedFolderLocationType,
@@ -18,12 +17,11 @@ import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType } from '../../data/StateTypes';
 import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
+import { loadLinkData, resetNetworksState, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
-import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
-import { loadLinkData, resetNetworksState, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -83,9 +81,8 @@ const usePerfAnalyzerFileLoader = () => {
             }
 
             dispatch(setSelectedFolder(folderPath));
-            // TODO: migrate to context
+            // TODO: should we remove/move this to context?
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
-            dispatch(setAvailableGraphs(sortedGraphs));
 
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
@@ -104,6 +101,7 @@ const usePerfAnalyzerFileLoader = () => {
                     time: `${performance.now() - start} ms`,
                 });
             }
+
             console.table(times, ['graph', 'time']);
             console.log('total', performance.now() - entireRunStartTime, 'ms');
             logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
@@ -146,16 +144,10 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
-    const resetAvailableGraphs = (): void => {
-        dispatch(setAvailableGraphs([]));
-        setGraphName('');
-    };
-
     return {
         loadPerfAnalyzerFolder,
         openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
-        resetAvailableGraphs,
         error,
     };
 };
