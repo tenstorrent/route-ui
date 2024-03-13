@@ -37,6 +37,7 @@ import {
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import { ChipContext } from '../../../data/ChipDataProvider';
+import LinkCongestionControl from './LinkCongestionControl';
 
 export const CongestionControls: FC = () => {
     const chip = useContext(ChipContext).getActiveChip();
@@ -46,23 +47,11 @@ export const CongestionControls: FC = () => {
 
     const dispatch = useDispatch();
 
-    const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const showLinkSaturation = useSelector(getShowLinkSaturation);
     const operationPerformanceTreshold = useSelector(getOperationPerformanceTreshold);
 
     const showOperationPerformanceGrid = useSelector(getShowOperationPerformanceGrid);
-    const showNOC0 = useSelector(getShowNOC0);
-    const showNOC1 = useSelector(getShowNOC1);
 
     const isHC: boolean = useSelector(getHighContrastState);
-
-    const congestionLegendStyle = {
-        background: `linear-gradient(to right, ${calculateLinkCongestionColor(
-            0,
-            0,
-            isHC,
-        )}, ${calculateLinkCongestionColor(50, 0, isHC)}, ${calculateLinkCongestionColor(120, 0, isHC)})`,
-    };
 
     const opCongestionLegendStyle = {
         background: `linear-gradient(to right, ${calculateOpCongestionColor(0, 0, isHC)}, ${calculateOpCongestionColor(
@@ -106,56 +95,7 @@ export const CongestionControls: FC = () => {
                 >
                     {
                         <>
-                            {/* Link saturation */}
-                            <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
-                                <Switch
-                                    checked={showLinkSaturation}
-                                    label='link congestion'
-                                    onChange={(event) =>
-                                        dispatch(updateShowLinkSaturation(event.currentTarget.checked))
-                                    }
-                                />
-                            </Tooltip2>
-                            <Switch
-                                disabled={!showLinkSaturation}
-                                checked={showNOC0}
-                                label='noc0'
-                                onChange={(event) =>
-                                    dispatch(
-                                        updateShowNOC({
-                                            noc: NOC.NOC0,
-                                            selected: event.currentTarget.checked,
-                                        }),
-                                    )
-                                }
-                            />
-                            <Switch
-                                disabled={!showLinkSaturation}
-                                checked={showNOC1}
-                                label='noc1'
-                                onChange={(event) =>
-                                    dispatch(
-                                        updateShowNOC({
-                                            noc: NOC.NOC1,
-                                            selected: event.currentTarget.checked,
-                                        }),
-                                    )
-                                }
-                            />
-                            <div
-                                className='congestion-legend'
-                                style={{ ...(showLinkSaturation ? congestionLegendStyle : null) }}
-                            />
-                            <Slider
-                                className='link-saturation-slider'
-                                min={0}
-                                max={125}
-                                disabled={!showLinkSaturation}
-                                labelStepSize={50}
-                                value={linkSaturationTreshold}
-                                onChange={(value: number) => dispatch(updateLinkSaturation(value))}
-                                labelRenderer={(value) => `${value.toFixed(0)}`}
-                            />
+                            <LinkCongestionControl />
                             <hr />
                             <div>
                                 <Tooltip2 content='Select all Pipes'>

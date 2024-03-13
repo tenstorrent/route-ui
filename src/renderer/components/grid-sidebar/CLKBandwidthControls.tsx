@@ -16,16 +16,18 @@ import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
 import '../../scss/GridControls.scss';
 import { ChipContext } from '../../../data/ChipDataProvider';
+import { getTotalOpsForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const chip = useContext(ChipContext).getActiveChip();
+    const graphName = useContext(ChipContext).getGraphName();
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
     const PCIeBandwidth = useSelector((state: RootState) => state.linkSaturation.PCIBandwidthGBs);
-    const opCycles = useSelector((state: RootState) => state.linkSaturation.totalOps);
+    const opCycles = useSelector((state: RootState) => getTotalOpsForGraph(state, graphName));
 
     let aiclkRightElement = (
         <Tooltip2 content='Reset Total OP Cycles'>
@@ -34,7 +36,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 onClick={() => {
                     const resetValue = chip?.totalOpCycles || 1;
 
-                    dispatch(updateTotalOPs(resetValue));
+                    dispatch(updateTotalOPs({ graphName, totalOps: resetValue }));
                 }}
                 icon={IconNames.RESET}
             />
@@ -74,7 +76,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                             newValue = 1;
                         }
 
-                        dispatch(updateTotalOPs(newValue));
+                        dispatch(updateTotalOPs({ graphName, totalOps: newValue }));
                     }}
                     rightElement={aiclkRightElement}
                 />

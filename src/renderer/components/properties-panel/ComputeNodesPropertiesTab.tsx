@@ -114,7 +114,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
 const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
-
+    const {graphName} = useContext(ChipContext).chipState;
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -328,7 +328,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} showEmpty />
+                        <LinkDetails key={link.name} link={link} graphName={graphName} showEmpty />
                     ))}
                 </div>
             )}

@@ -10,13 +10,14 @@ import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';
 
 type LinkDetailsProps = {
     link: NetworkLink;
+    graphName: string;
     index?: number;
     showEmpty?: boolean;
 };
 
-const LinkDetails: React.FC<LinkDetailsProps> = ({ link, showEmpty, index }) => {
+const LinkDetails: React.FC<LinkDetailsProps> = ({ link, graphName, showEmpty, index }) => {
     const isHighContrast = useSelector(getHighContrastState);
-    const linkState = useSelector((state: RootState) => getLinkData(state, link.uid));
+    const linkState = useSelector((state: RootState) => getLinkData(state, graphName, link.uid));
     const color: string = calculateLinkCongestionColor(linkState?.saturation || 0, 0, isHighContrast);
 
     if (!showEmpty) {

@@ -70,3 +70,6 @@ $desktop-4k: 2560px;
 @mixin min-desktop-4k {
     @media (min-width: $desktop-4k) { @content; }
 }
+
+$detailed-view-zindex: 80;
+$cluster-view-zindex: 100;

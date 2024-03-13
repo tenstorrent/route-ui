@@ -7,7 +7,7 @@ import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
-    graphName: string;
+    graphName: string; // TODO: this needs to go
     folderPath: string;
     selectedFolderLocationType: FolderLocationType;
     architecture: Architecture;

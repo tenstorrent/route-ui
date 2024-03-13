@@ -11,14 +11,10 @@ import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.
 const usePopulateChipData = () => {
     const dispatch = useDispatch();
     const populateChipData = (selectedChip: Chip) => {
-        // setChip(selectedChip);
         dispatch(updateMaxBwLimitedFactor(selectedChip.details.maxBwLimitedFactor));
         dispatch(closeDetailedView());
         dispatch(setSelectedArchitecture(selectedChip.architecture));
-        // dispatch(loadPipeSelection(selectedChip.generateInitialPipesSelectionState()));
         dispatch(loadNodesData([...mapIterable(selectedChip.nodes, (node) => node.generateInitialState())]));
-        dispatch(loadLinkData(selectedChip.getAllLinks().map((link) => link.generateInitialState())));
-        dispatch(updateTotalOPs(selectedChip.totalOpCycles));
     };
 
     return { populateChipData };

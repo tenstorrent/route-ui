@@ -23,6 +23,7 @@ import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/p
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
+import { loadLinkData, resetNetworksState, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -35,6 +36,8 @@ const usePerfAnalyzerFileLoader = () => {
 
     const chip = getActiveChip();
     const navigate = useNavigate();
+
+    const logger = useLogging();
 
     useEffect(() => {
         if (chip) {
@@ -67,9 +70,12 @@ const usePerfAnalyzerFileLoader = () => {
     const loadFolder = async (folderPath: string): Promise<void> => {
         resetChips();
         dispatch(resetPipeSelection());
+        dispatch(resetNetworksState());
         setError(null);
 
         try {
+            // TODO: needs gone once we are happy with performance
+            const entireRunStartTime = performance.now();
             const graphs = await getAvailableGraphNames(folderPath);
 
             if (!graphs.length) {
@@ -79,28 +85,41 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
-            // TODO: ensure this is not needed
-            // setEnableGraphSelect(true);
 
+            const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
+                const start = performance.now();
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
                 addChip(graphOnChip, graph.name);
                 dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
+                const linkData = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
+                dispatch(loadLinkData({ graphName: graph.name, linkData }));
+                dispatch(updateTotalOPs({ graphName: graph.name, totalOps: graphOnChip.totalOpCycles }));
+
+                times.push({
+                    graph: `${graph.name}`,
+                    time: `${performance.now() - start} ms`,
+                });
             }
+            console.table(times, ['graph', 'time']);
+            console.log('total', performance.now() - entireRunStartTime, 'ms');
+            logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
+
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
             setError(err.message ?? 'Unknown Error');
         }
+
         setCluster(await loadCluster(folderPath));
     };
 
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
         if (selectedFolder) {
             try {
-                dispatch(closeDetailedView())
+                dispatch(closeDetailedView());
                 dispatch(clearAllNodes());
                 setActiveChip(graphName);
                 navigate('/render');
