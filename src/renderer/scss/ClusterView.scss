@@ -136,3 +136,8 @@
     }
 
 }
+.bp4-overlay {
+    .bp4-transition-container {
+        z-index: $cluster-view-zindex;
+    }
+}
