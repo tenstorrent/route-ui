@@ -27,6 +27,7 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
 
+
 export interface ClusterViewDialog {}
 
 const NODE_GRID_SIZE = 6;
@@ -154,6 +155,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                             content='Select filtered pipes'
                             position={PopoverPosition.RIGHT}
                             key='select-all-pipes'
+                            usePortal={false}
                         >
                             <Button
                                 disabled={uniquePipeList.length === 0}
@@ -163,9 +165,10 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                         </Tooltip2>,
                         <Tooltip2
                             disabled={uniquePipeList.length === 0}
-                            content='Deselect ETH pipes'
+                            content='Deselect ethernet pipes'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-pipes'
+                            usePortal={false}
                         >
                             <Button
                                 disabled={uniquePipeList.length === 0}
