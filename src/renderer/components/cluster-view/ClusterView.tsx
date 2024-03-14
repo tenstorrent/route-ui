@@ -1,30 +1,29 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
-import React, { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ItemRenderer, Select } from '@blueprintjs/select';
 import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
-import * as d3 from 'd3';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
-import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
-import { ClusterDataSource } from '../../../data/DataSource';
-import { ChipContext } from '../../../data/ChipDataProvider';
-import { getAvailableGraphsSelector } from '../../../data/store/selectors/uiState.selectors';
-import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';
-import SelectablePipe from '../SelectablePipe';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { ItemRenderer, Select } from '@blueprintjs/select';
+import * as d3 from 'd3';
+import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Chip, { ComputeNode } from '../../../data/Chip';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import getPipeColor from '../../../data/ColorGenerator';
+import { ClusterDataSource } from '../../../data/DataSource';
+import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
-import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
-import SearchField from '../SearchField';
-import FilterableComponent from '../FilterableComponent';
-import getPipeColor from '../../../data/ColorGenerator';
-import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
 import {
     getAllLinksForGraph,
     getLinkSaturation,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
+import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
+import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
+import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
+import FilterableComponent from '../FilterableComponent';
+import SearchField from '../SearchField';
+import SelectablePipe from '../SelectablePipe';
 import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
 
 
@@ -52,10 +51,10 @@ const renderItem: ItemRenderer<GraphRelationshipState[]> = (
 };
 const ClusterView: FC<ClusterViewDialog> = () => {
     const { cluster } = useContext(ClusterDataSource);
-    const { chipState, getChipByGraphName } = useContext(ChipContext);
+    const { getChipByGraphName, getGraphName, getAvailableGraphs } = useContext(ChipContext);
     const dispatch = useDispatch();
-    const graphInformation = useSelector(getAvailableGraphsSelector);
-    const selectedGraph = chipState.graphName;
+    const graphInformation = getAvailableGraphs();
+    const selectedGraph = getGraphName();
     const availableTemporalEpochs: GraphRelationshipState[][] = [];
     const [pciPipes, setPciPipes] = useState<string[]>([]);
 

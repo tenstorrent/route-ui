@@ -1,12 +1,5 @@
 import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
-import {
-    setApplicationMode,
-    setAvailableGraphs,
-    setSelectedArchitecture,
-    setSelectedFolder,
-    setSelectedFolderLocationType,
-    setSelectedGraphName,
-} from 'data/store/slices/uiState.slice';
+import { setApplicationMode, setSelectedFolder, setSelectedFolderLocationType } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
 
@@ -18,12 +11,12 @@ import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType } from '../../data/StateTypes';
+import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
+import { loadLinkData, resetNetworksState, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
-import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
-import { loadLinkData, resetNetworksState, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -41,7 +34,7 @@ const usePerfAnalyzerFileLoader = () => {
 
     useEffect(() => {
         if (chip) {
-            dispatch(setSelectedArchitecture(chip.architecture));
+            // TODO: should we remove this?
             populateChipData(chip);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,7 +77,6 @@ const usePerfAnalyzerFileLoader = () => {
 
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
-            dispatch(setAvailableGraphs(sortedGraphs));
 
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
@@ -92,7 +84,7 @@ const usePerfAnalyzerFileLoader = () => {
                 const start = performance.now();
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
-                addChip(graphOnChip, graph.name);
+                addChip(graphOnChip, graph);
                 dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
                 const linkData = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
                 dispatch(loadLinkData({ graphName: graph.name, linkData }));
@@ -103,10 +95,10 @@ const usePerfAnalyzerFileLoader = () => {
                     time: `${performance.now() - start} ms`,
                 });
             }
+
             console.table(times, ['graph', 'time']);
             console.log('total', performance.now() - entireRunStartTime, 'ms');
             logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
-
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
@@ -123,7 +115,6 @@ const usePerfAnalyzerFileLoader = () => {
                 dispatch(clearAllNodes());
                 setActiveChip(graphName);
                 navigate('/render');
-                dispatch(setSelectedGraphName(graphName));
             } catch (e) {
                 const err = e as Error;
                 logging.error(`error loading and populating chip ${err.message}`);
@@ -146,16 +137,10 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
-    const resetAvailableGraphs = (): void => {
-        dispatch(setAvailableGraphs([]));
-        dispatch(setSelectedGraphName(''));
-    };
-
     return {
         loadPerfAnalyzerFolder,
         openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
-        resetAvailableGraphs,
         error,
     };
 };

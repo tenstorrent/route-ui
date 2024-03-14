@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import Chip from 'data/Chip';
 import {
     ChipDesignJSON,

@@ -1,17 +1,14 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ApplicationMode, Architecture } from 'data/Types';
+import { ApplicationMode } from 'data/Types';
 import path from 'path';
-import { GraphRelationshipState, type FolderLocationType } from '../../StateTypes';
+import { type FolderLocationType } from '../../StateTypes';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 
 interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
-    graphName: string; // TODO: this needs to go
     folderPath: string;
     selectedFolderLocationType: FolderLocationType;
-    architecture: Architecture;
-    availableGraphs: GraphRelationshipState[];
     applicationMode: ApplicationMode;
     showEmptyLinks: boolean;
     showOperationNames: boolean;
@@ -25,11 +22,8 @@ interface UIState {
 const uiStateInitialState: UIState = {
     dockOpen: false,
     highContrastEnabled: false,
-    graphName: '',
     folderPath: '',
     selectedFolderLocationType: 'local',
-    architecture: Architecture.NONE,
-    availableGraphs: [],
     applicationMode: ApplicationMode.NONE,
     showEmptyLinks: false,
     showOperationNames: false,
@@ -51,25 +45,12 @@ const uiStateSlice = createSlice({
         },
         setSelectedFile(state, action: PayloadAction<string>) {
             state.folderPath = path.dirname(action.payload);
-            state.graphName = path.basename(action.payload);
         },
         setSelectedFolderLocationType(state, action: PayloadAction<FolderLocationType>) {
             state.selectedFolderLocationType = action.payload;
         },
-        setSelectedGraphName(state, action: PayloadAction<string>) {
-            state.graphName = action.payload;
-        },
         setSelectedFolder(state, action: PayloadAction<string>) {
             state.folderPath = action.payload;
-        },
-        setSelectedArchitecture(state, action: PayloadAction<Architecture>) {
-            state.architecture = action.payload;
-        },
-        setAvailableGraphs(state, action: PayloadAction<GraphRelationshipState[]>) {
-            state.availableGraphs = action.payload;
-        },
-        clearAvailableGraphs(state) {
-            state.availableGraphs = [];
         },
         setApplicationMode(state, action: PayloadAction<ApplicationMode>) {
             state.applicationMode = action.payload;
@@ -103,12 +84,8 @@ export const {
     setDockOpenState,
     setHighContrastState,
     setSelectedFile,
-    setSelectedGraphName,
-    setSelectedArchitecture,
     setSelectedFolder,
     setSelectedFolderLocationType,
-    setAvailableGraphs,
-    clearAvailableGraphs,
     setApplicationMode,
     clearSelectedApplication,
     updateShowEmptyLinks,
