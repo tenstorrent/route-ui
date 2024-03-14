@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
-import { GraphVertex, Queue } from '../../data/GraphTypes';
-import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
 import { PipeSegment } from '../../data/Chip';
-import { NOCLinkName } from '../../data/Types';
-import SelectablePipe from './SelectablePipe';
-import Collapsible from './Collapsible';
 import { GraphVertexType } from '../../data/GraphNames';
+import { GraphVertex, Queue } from '../../data/GraphTypes';
+import { NOCLinkName } from '../../data/Types';
+import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
+import SelectablePipe from './SelectablePipe';
 
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;
@@ -40,7 +39,8 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((operand, index) => (
-                <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
+                // eslint-disable-next-line react/no-array-index-key
+                <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
@@ -73,7 +73,8 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
 
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
             {outputs.map((operand, index) => (
-                <div className='operation-operand' key={`${graphNode.name}-${operand.name}`}>
+                // eslint-disable-next-line react/no-array-index-key
+                <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
