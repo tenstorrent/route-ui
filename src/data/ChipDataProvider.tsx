@@ -12,6 +12,7 @@ interface ChipsState {
 
 interface ChipContextType {
     chipState: ChipsState;
+    setChips: (newChips: Chip[], graphs: GraphRelationshipState[]) => void;
     addChip: (newChip: Chip, graph: GraphRelationshipState) => void;
     resetChips: () => void;
     getAvailableGraphs: () => GraphRelationshipState[];
@@ -31,6 +32,7 @@ const initialChipsState: ChipsState = {
 
 const ChipContext = createContext<ChipContextType>({
     chipState: initialChipsState,
+    setChips: () => {},
     addChip: () => {},
     resetChips: () => {},
     getAvailableGraphs: () => [],
@@ -44,6 +46,14 @@ const ChipContext = createContext<ChipContextType>({
 
 const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [chipsState, setChipsState] = useState<ChipsState>(initialChipsState);
+
+    const setChips = useCallback((newChips: Chip[], graphs: GraphRelationshipState[]) => {
+        setChipsState({
+            graphName: '',
+            chips: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
+            graphs: new Map(graphs.map((graph) => [graph.name, graph])),
+        });
+    }, []);
 
     const addChip = useCallback((newChipData: Chip, graph: GraphRelationshipState) => {
         setChipsState((prevState) => {
@@ -105,6 +115,7 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const value = useMemo<ChipContextType>(
         () => ({
+            setChips,
             addChip,
             chipState: chipsState,
             getActiveChip,
@@ -117,6 +128,7 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             setAvailbaleGraphs,
         }),
         [
+            setChips,
             addChip,
             chipsState,
             getActiveChip,
