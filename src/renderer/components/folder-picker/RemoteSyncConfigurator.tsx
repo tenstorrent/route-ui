@@ -6,8 +6,11 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { ChipContext } from '../../../data/ChipDataProvider';
-import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
-import { setSelectedFolderLocationType } from '../../../data/store/slices/uiState.slice';
+import {
+    getSelectedFolderLocationType,
+    getSelectedRemoteFolder,
+} from '../../../data/store/selectors/uiState.selectors';
+import { setSelectedFolderLocationType, setSelectedRemoteFolder } from '../../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../../utils/FileLoaders';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -25,7 +28,7 @@ const RemoteSyncConfigurator: FC = () => {
     const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(
         remote.persistentState.getSavedRemoteFolders(remote.persistentState.selectedConnection),
     );
-    const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
+    const selectedFolder = useSelector(getSelectedRemoteFolder) ?? remoteFolders[0];
     const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
@@ -35,8 +38,9 @@ const RemoteSyncConfigurator: FC = () => {
     const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
 
     const updateSelectedFolder = async (folder?: RemoteFolder) => {
-        setSelectedFolder(folder);
+        dispatch(setSelectedRemoteFolder(folder));
         dispatch(setSelectedFolderLocationType('remote'));
+        dispatch(setSelectedRemoteFolder(folder));
 
         if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
