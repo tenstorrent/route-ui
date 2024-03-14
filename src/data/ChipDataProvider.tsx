@@ -46,17 +46,20 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [chipsState, setChipsState] = useState<ChipsState>(initialChipsState);
 
     const addChip = useCallback((newChipData: Chip, graph: GraphRelationshipState) => {
-        chipsState.graphs.set(graph.name, graph);
+        setChipsState((prevState) => {
+            const graphs = new Map(prevState.graphs);
 
-        setChipsState((prevState) => ({
-            ...prevState,
-            chips: {
-                ...prevState.chips,
-                [graph.name]: newChipData,
-            },
-            graphs: prevState.graphs,
-        }));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+            graphs.set(graph.name, graph);
+
+            return {
+                ...prevState,
+                chips: {
+                    ...prevState.chips,
+                    [graph.name]: newChipData,
+                },
+                graphs,
+            };
+        });
     }, []);
 
     const getChipByGraphName = useCallback(
@@ -67,7 +70,7 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     );
 
     const resetChips = useCallback(() => {
-        setChipsState(initialChipsState);
+        setChipsState({ ...initialChipsState, graphs: new Map() });
     }, []);
 
     const getAvailableGraphs = useCallback(() => {
