@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PipeSelectionState, PipeSelection } from 'data/StateTypes';
+import { PipeSelection, PipeSelectionState } from 'data/StateTypes';
 
 const pipesInitialState: PipeSelectionState = {
     pipes: {},
@@ -18,6 +18,16 @@ const pipeSelectionSlice = createSlice({
                 state.pipes[item.id] = item;
                 state.pipeIds.push(item.id);
             });
+            state.pipeIds = [...new Set(state.pipeIds)];
+        },
+        bulkLoadPipeSelection(state, action: PayloadAction<PipeSelection[][]>) {
+            action.payload.forEach((pipeSelection) => {
+                pipeSelection.forEach((item) => {
+                    state.pipes[item.id] = item;
+                    state.pipeIds.push(item.id);
+                });
+            });
+
             state.pipeIds = [...new Set(state.pipeIds)];
         },
         updateFocusPipe(state, action: PayloadAction<string | null>) {
@@ -56,6 +66,7 @@ const pipeSelectionSlice = createSlice({
 export const {
     //
     loadPipeSelection,
+    bulkLoadPipeSelection,
     updatePipeSelection,
     clearAllPipes,
     selectAllPipes,
