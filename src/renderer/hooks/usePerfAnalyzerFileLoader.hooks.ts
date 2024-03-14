@@ -76,7 +76,6 @@ const usePerfAnalyzerFileLoader = () => {
             }
 
             dispatch(setSelectedFolder(folderPath));
-            // TODO: should we remove/move this to context?
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
 
             const times = [];
@@ -85,7 +84,7 @@ const usePerfAnalyzerFileLoader = () => {
                 const start = performance.now();
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
-                addChip(graphOnChip, graph.name);
+                addChip(graphOnChip, graph);
                 dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
                 const linkData = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
                 dispatch(loadLinkData({ graphName: graph.name, linkData }));

@@ -5,16 +5,18 @@ import type { GraphRelationshipState } from './StateTypes';
 interface ChipsState {
     graphName: string;
     chips: {
-        [chipId: string]: Chip;
+        [graphName: string]: Chip;
     };
-    graphs: Map<string, GraphRelationshipState>
+    graphs: Map<string, GraphRelationshipState>;
 }
 
 interface ChipContextType {
     chipState: ChipsState;
-    addChip: (newChip: Chip, graphName: string) => void;
+    addChip: (newChip: Chip, graph: GraphRelationshipState) => void;
     resetChips: () => void;
     getAvailableGraphs: () => GraphRelationshipState[];
+    setAvailbaleGraphs: (graphs: GraphRelationshipState[]) => void;
+    getActiveGraph: () => GraphRelationshipState;
     getActiveChip: () => Chip | undefined;
     setActiveChip: (graphName: string) => void;
     getChipByGraphName: (graphName: string) => Chip | undefined;
@@ -24,7 +26,7 @@ interface ChipContextType {
 const initialChipsState: ChipsState = {
     graphName: '',
     chips: {},
-    graphs: new Map<string, GraphRelationshipState>
+    graphs: new Map<string, GraphRelationshipState>(),
 };
 
 const ChipContext = createContext<ChipContextType>({
@@ -32,6 +34,8 @@ const ChipContext = createContext<ChipContextType>({
     addChip: () => {},
     resetChips: () => {},
     getAvailableGraphs: () => [],
+    setAvailbaleGraphs: () => {},
+    getActiveGraph: () => undefined as any,
     getActiveChip: () => undefined,
     setActiveChip: () => {},
     getChipByGraphName: () => undefined,
@@ -41,14 +45,18 @@ const ChipContext = createContext<ChipContextType>({
 const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [chipsState, setChipsState] = useState<ChipsState>(initialChipsState);
 
-    const addChip = useCallback((newChipData: Chip, graphName: string) => {
+    const addChip = useCallback((newChipData: Chip, graph: GraphRelationshipState) => {
+        chipsState.graphs.set(graph.name, graph);
+
         setChipsState((prevState) => ({
             ...prevState,
             chips: {
                 ...prevState.chips,
-                [graphName]: newChipData,
+                [graph.name]: newChipData,
             },
+            graphs: prevState.graphs,
         }));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const getChipByGraphName = useCallback(
@@ -62,14 +70,19 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setChipsState(initialChipsState);
     }, []);
 
-    // TODO: create function to get graph architecture, chip id and temporal epochs list
     const getAvailableGraphs = useCallback(() => {
-        return Object.entries(chipsState.chips).map(([graphName, chip]) => ({
-            name: graphName,
-            architecture: chip.architecture,
-            chipId: chip.chipId,
-            temporalEpoch: chip?.temporalEpoch ?? 0,
+        return [...chipsState.graphs.values()];
+    }, [chipsState]);
+
+    const setAvailbaleGraphs = useCallback((graphs: GraphRelationshipState[]) => {
+        setChipsState((prevState) => ({
+            ...prevState,
+            graphs: new Map(graphs.map((graph) => [graph.name, graph])),
         }));
+    }, []);
+
+    const getActiveGraph = useCallback(() => {
+        return chipsState.graphs.get(chipsState.graphName)!;
     }, [chipsState]);
 
     const getActiveChip = useCallback(() => {
@@ -89,24 +102,28 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const value = useMemo<ChipContextType>(
         () => ({
-            chipState: chipsState,
             addChip,
-            resetChips,
-            getAvailableGraphs,
+            chipState: chipsState,
             getActiveChip,
-            setActiveChip,
+            getActiveGraph,
+            getAvailableGraphs,
             getChipByGraphName,
             getGraphName,
+            resetChips,
+            setActiveChip,
+            setAvailbaleGraphs,
         }),
         [
-            chipsState,
             addChip,
-            resetChips,
+            chipsState,
             getActiveChip,
-            setActiveChip,
+            getActiveGraph,
+            getAvailableGraphs,
             getChipByGraphName,
             getGraphName,
-            getAvailableGraphs,
+            resetChips,
+            setActiveChip,
+            setAvailbaleGraphs,
         ],
     );
 
