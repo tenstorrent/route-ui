@@ -281,8 +281,6 @@ export default class Chip {
         maxBwLimitedFactor: 0,
     };
 
-    public temporalEpoch?: number;
-
     private dataIntergrityErrors: DataIntegrityError[] = [];
 
     constructor(chipId: number) {
@@ -660,14 +658,6 @@ export default class Chip {
                 );
             }
         });
-
-        return newChip;
-    }
-
-    static AUGMENT_WITH_TEMPORAL_EPOCH(chip: Chip, temporalEpoch: number) {
-        const newChip = new Chip(chip.chipId);
-        Object.assign(newChip, chip);
-        newChip.temporalEpoch = temporalEpoch;
 
         return newChip;
     }

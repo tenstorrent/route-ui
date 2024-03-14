@@ -349,8 +349,6 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
         console.error('graph_perf_report_per_op.json not found, skipping \n', err);
     }
 
-    chip = Chip.AUGMENT_WITH_TEMPORAL_EPOCH(chip, temporalEpoch);
-
     return chip;
 };
 

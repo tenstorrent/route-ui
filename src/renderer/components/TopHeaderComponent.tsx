@@ -30,7 +30,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { chipState, getGraphName, resetChips } = useContext(ChipContext);
+    const { getGraphName, resetChips, getActiveGraph, getActiveChip } = useContext(ChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
 
     const localFolderPath = useSelector(getFolderPathSelector);
@@ -46,9 +46,9 @@ const TopHeaderComponent: React.FC = () => {
         availableRemoteFolders[0],
     );
     const selectedGraph = getGraphName();
-    const chipId = chipState.chips[selectedGraph]?.chipId;
-    const architecture = chipState.chips[selectedGraph]?.architecture;
-    const temporalEpoch = chipState.chips[selectedGraph]?.temporalEpoch;
+    const chipId = getActiveChip()?.chipId;
+    const architecture = getActiveChip()?.architecture;
+    const temporalEpoch = getActiveGraph()?.temporalEpoch;
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
