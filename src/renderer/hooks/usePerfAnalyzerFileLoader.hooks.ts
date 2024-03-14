@@ -103,8 +103,11 @@ const usePerfAnalyzerFileLoader = () => {
                     time: `${performance.now() - start} ms`,
                 });
             }
-            console.table(times, ['graph', 'time']);
-            console.log('total', performance.now() - entireRunStartTime, 'ms');
+            // TODO: calc normalized ops per temporalEpoch
+            // dispatch(updateNormalizedOPs)
+
+            // console.table(times, ['graph', 'time']);
+            // console.log('total', performance.now() - entireRunStartTime, 'ms');
             logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
 
         } catch (e) {

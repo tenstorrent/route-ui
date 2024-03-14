@@ -49,6 +49,13 @@ const linkSaturationSlice = createSlice({
                 });
             }
         },
+        updateNormalizedOPs: (state, action: PayloadAction<{ graph: string; normalizedOps: number }>) => {
+            Object.values(state.graphs[action.payload.graph].links).forEach((linkState: LinkState) => {
+                if (linkState.type === LinkType.ETHERNET) {
+                    calculateNormalizedSaturation(linkState, action.payload.normalizedOps);
+                }
+            });
+        },
         loadLinkData: (state, action: PayloadAction<{ graphName: string; linkData: LinkState[] }>) => {
             const { graphName, linkData } = action.payload;
             if (!state.graphs[graphName]) {
@@ -119,6 +126,11 @@ const updatePCILinks = (state: NetworkCongestionState) => {
 const recalculateLinkSaturation = (link: LinkState, totalOpCycles: number) => {
     link.bpc = link.totalDataBytes / totalOpCycles;
     link.saturation = (link.bpc / link.maxBandwidth) * 100;
+};
+
+const calculateNormalizedSaturation = (link: LinkState, normalizedOpCycles: number) => {
+    const bpc = link.totalDataBytes / normalizedOpCycles;
+    link.normalizedSaturation = (bpc / link.maxBandwidth) * 100;
 };
 export const {
     loadLinkData,
