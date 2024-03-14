@@ -1,3 +1,5 @@
+/* eslint-disable react/no-array-index-key */
+
 import React, { FC } from 'react';
 import { PipeSegment } from '../../data/Chip';
 import { GraphVertexType } from '../../data/GraphNames';
@@ -39,7 +41,6 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((operand, index) => (
-                // eslint-disable-next-line react/no-array-index-key
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
@@ -73,13 +74,11 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
 
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
             {outputs.map((operand, index) => (
-                // eslint-disable-next-line react/no-array-index-key
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
-                                // eslint-disable-next-line react/no-array-index-key
                                 <li key={`${index}-${pipeId}-${graphNode.name}-${operand.name}`}>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
@@ -93,7 +92,6 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                     {graphNode.vertexType === GraphVertexType.QUEUE && (
                         <ul className='scrollable-content'>
                             {graphNode.getPipesForOperator(operand.name).map((pipeId) => (
-                                // eslint-disable-next-line react/no-array-index-key
                                 <li key={`${index}-${pipeId}-${graphNode.name}-${operand.name}`}>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
