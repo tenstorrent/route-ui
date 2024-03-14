@@ -7,6 +7,7 @@ interface ChipsState {
     chips: {
         [chipId: string]: Chip;
     };
+    graphs: Map<string, GraphRelationshipState>
 }
 
 interface ChipContextType {
@@ -23,6 +24,7 @@ interface ChipContextType {
 const initialChipsState: ChipsState = {
     graphName: '',
     chips: {},
+    graphs: new Map<string, GraphRelationshipState>
 };
 
 const ChipContext = createContext<ChipContextType>({
