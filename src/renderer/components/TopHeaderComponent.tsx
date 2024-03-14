@@ -2,11 +2,16 @@ import { sep as pathSeparator } from 'path';
 
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { getFolderPathSelector, getSelectedFolderLocationType } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useState } from 'react';
-import { useSelector } from 'react-redux';
+import {
+    getFolderPathSelector,
+    getSelectedFolderLocationType,
+    getSelectedRemoteFolder,
+} from 'data/store/selectors/uiState.selectors';
+import React, { useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ChipContext } from '../../data/ChipDataProvider';
 import type { FolderLocationType } from '../../data/StateTypes';
+import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import type { RemoteConnection, RemoteFolder } from '../hooks/useRemote.hook';
@@ -32,6 +37,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 const TopHeaderComponent: React.FC = () => {
     const { getGraphName, resetChips, getActiveGraph, getActiveChip } = useContext(ChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
+    const dispatch = useDispatch();
 
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderLocationType = useSelector(getSelectedFolderLocationType);
@@ -42,9 +48,7 @@ const TopHeaderComponent: React.FC = () => {
     const availableRemoteFolders = remoteConnectionConfig
         .getSavedRemoteFolders(selectedConnection)
         .filter((folder) => folder.lastSynced);
-    const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
-        availableRemoteFolders[0],
-    );
+    const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
     const selectedGraph = getGraphName();
     const chipId = getActiveChip()?.chipId;
     const architecture = getActiveChip()?.architecture;
@@ -57,9 +61,9 @@ const TopHeaderComponent: React.FC = () => {
         const folderPath = (newFolder as RemoteFolder)?.localPath ?? newFolder;
 
         if (typeof newFolder === 'string') {
-            setSelectedRemoteFolder(undefined);
+            dispatch(setSelectedRemoteFolder(undefined));
         } else {
-            setSelectedRemoteFolder(newFolder);
+            dispatch(setSelectedRemoteFolder(newFolder));
         }
 
         resetChips();

@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ApplicationMode } from 'data/Types';
 import path from 'path';
+import type { RemoteFolder } from '../../../renderer/hooks/useRemote.hook';
 import { type FolderLocationType } from '../../StateTypes';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 
@@ -8,6 +9,7 @@ interface UIState {
     dockOpen: boolean;
     highContrastEnabled: boolean;
     folderPath: string;
+    selectedRemoteFolder?: RemoteFolder;
     selectedFolderLocationType: FolderLocationType;
     applicationMode: ApplicationMode;
     showEmptyLinks: boolean;
@@ -23,6 +25,7 @@ const uiStateInitialState: UIState = {
     dockOpen: false,
     highContrastEnabled: false,
     folderPath: '',
+    selectedRemoteFolder: undefined,
     selectedFolderLocationType: 'local',
     applicationMode: ApplicationMode.NONE,
     showEmptyLinks: false,
@@ -45,6 +48,9 @@ const uiStateSlice = createSlice({
         },
         setSelectedFile(state, action: PayloadAction<string>) {
             state.folderPath = path.dirname(action.payload);
+        },
+        setSelectedRemoteFolder(state, action: PayloadAction<RemoteFolder | undefined>) {
+            state.selectedRemoteFolder = action.payload;
         },
         setSelectedFolderLocationType(state, action: PayloadAction<FolderLocationType>) {
             state.selectedFolderLocationType = action.payload;
@@ -85,6 +91,7 @@ export const {
     setHighContrastState,
     setSelectedFile,
     setSelectedFolder,
+    setSelectedRemoteFolder,
     setSelectedFolderLocationType,
     setApplicationMode,
     clearSelectedApplication,
