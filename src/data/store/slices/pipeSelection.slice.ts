@@ -20,16 +20,6 @@ const pipeSelectionSlice = createSlice({
             });
             state.pipeIds = [...new Set(state.pipeIds)];
         },
-        initialLoadPipeSelection(state, action: PayloadAction<PipeSelection[][]>) {
-            action.payload.forEach((pipeSelection) => {
-                pipeSelection.forEach((item) => {
-                    state.pipes[item.id] = item;
-                    state.pipeIds.push(item.id);
-                });
-            });
-
-            state.pipeIds = [...new Set(state.pipeIds)];
-        },
         updateFocusPipe(state, action: PayloadAction<string | null>) {
             state.focusPipe = action.payload;
         },
@@ -66,7 +56,6 @@ const pipeSelectionSlice = createSlice({
 export const {
     //
     loadPipeSelection,
-    initialLoadPipeSelection,
     updatePipeSelection,
     clearAllPipes,
     selectAllPipes,

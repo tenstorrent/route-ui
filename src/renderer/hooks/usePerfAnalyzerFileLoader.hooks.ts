@@ -19,7 +19,7 @@ import {
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
-import { initialLoadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
+import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
 
@@ -85,7 +85,7 @@ const usePerfAnalyzerFileLoader = () => {
 
             const graphOnChipList: Chip[] = [];
             const linkData: [string, LinkState[]][] = [];
-            const pipeSelectionData: PipeSelection[][] = [];
+            const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: { graphName: string; totalOps: number }[] = [];
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
@@ -98,6 +98,7 @@ const usePerfAnalyzerFileLoader = () => {
                 graphOnChipList.push(graphOnChip);
                 linkData.push([graph.name, graphOnChip.getAllLinks().map((link) => link.generateInitialState())]);
                 totalOpsData.push({ graphName: graph.name, totalOps: graphOnChip.totalOpCycles });
+                pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
 
                 times.push({
                     graph: `${graph.name}`,
@@ -107,7 +108,7 @@ const usePerfAnalyzerFileLoader = () => {
 
             setChips(graphOnChipList, sortedGraphs);
             dispatch(initialLoadLinkData(linkData));
-            dispatch(initialLoadPipeSelection(pipeSelectionData));
+            dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
 
             console.table(times, ['graph', 'time']);
