@@ -49,8 +49,8 @@ const linkSaturationSlice = createSlice({
                 });
             }
         },
-        initialLoadTotalOPs: (state, action: PayloadAction<{ graphName: string; totalOps: number }[]>) => {
-            action.payload.forEach(({ graphName, totalOps }) => {
+        initialLoadTotalOPs: (state, action: PayloadAction<Map<string, number>>) => {
+            action.payload.forEach((totalOps, graphName) => {
                 const graphState = state.graphs[graphName];
                 const DRAMBandwidthBytes = state.DRAMBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
                 const PCIBandwidthGBs = state.PCIBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
@@ -81,10 +81,8 @@ const linkSaturationSlice = createSlice({
                 graphState.links[item.id] = item;
             });
         },
-        initialLoadLinkData: (state, action: PayloadAction<[string, LinkState[]][]>) => {
-            const linkData = action.payload;
-
-            linkData.forEach(([graphName, links]) => {
+        initialLoadLinkData: (state, action: PayloadAction<Map<string, LinkState[]>>) => {
+            action.payload.forEach((links, graphName) => {
                 if (!state.graphs[graphName]) {
                     state.graphs[graphName] = { links: {}, totalOps: 0 };
                 }
