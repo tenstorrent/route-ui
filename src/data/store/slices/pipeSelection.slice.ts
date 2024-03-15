@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PipeSelectionState, PipeSelection } from 'data/StateTypes';
+import { PipeSelection, PipeSelectionState } from 'data/StateTypes';
 
 const pipesInitialState: PipeSelectionState = {
     pipes: {},
