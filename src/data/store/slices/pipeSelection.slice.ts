@@ -20,7 +20,7 @@ const pipeSelectionSlice = createSlice({
             });
             state.pipeIds = [...new Set(state.pipeIds)];
         },
-        bulkLoadPipeSelection(state, action: PayloadAction<PipeSelection[][]>) {
+        initialLoadPipeSelection(state, action: PayloadAction<PipeSelection[][]>) {
             action.payload.forEach((pipeSelection) => {
                 pipeSelection.forEach((item) => {
                     state.pipes[item.id] = item;
@@ -66,7 +66,7 @@ const pipeSelectionSlice = createSlice({
 export const {
     //
     loadPipeSelection,
-    bulkLoadPipeSelection,
+    initialLoadPipeSelection,
     updatePipeSelection,
     clearAllPipes,
     selectAllPipes,

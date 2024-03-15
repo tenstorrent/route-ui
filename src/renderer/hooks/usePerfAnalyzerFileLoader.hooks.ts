@@ -13,9 +13,13 @@ import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
 import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
-import { bulkLoadLinkData, bulkUpdateTotalOPs, resetNetworksState } from '../../data/store/slices/linkSaturation.slice';
+import {
+    initialLoadLinkData,
+    initialLoadTotalOPs,
+    resetNetworksState,
+} from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
-import { bulkLoadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
+import { initialLoadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
 
@@ -102,9 +106,9 @@ const usePerfAnalyzerFileLoader = () => {
             }
 
             setChips(graphOnChipList, sortedGraphs);
-            dispatch(bulkLoadLinkData(linkData));
-            dispatch(bulkLoadPipeSelection(pipeSelectionData));
-            dispatch(bulkUpdateTotalOPs(totalOpsData));
+            dispatch(initialLoadLinkData(linkData));
+            dispatch(initialLoadPipeSelection(pipeSelectionData));
+            dispatch(initialLoadTotalOPs(totalOpsData));
 
             console.table(times, ['graph', 'time']);
             console.log('total', performance.now() - entireRunStartTime, 'ms');

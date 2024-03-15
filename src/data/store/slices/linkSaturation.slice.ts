@@ -49,7 +49,7 @@ const linkSaturationSlice = createSlice({
                 });
             }
         },
-        bulkUpdateTotalOPs: (state, action: PayloadAction<{ graphName: string; totalOps: number }[]>) => {
+        initialLoadTotalOPs: (state, action: PayloadAction<{ graphName: string; totalOps: number }[]>) => {
             action.payload.forEach(({ graphName, totalOps }) => {
                 const graphState = state.graphs[graphName];
                 const DRAMBandwidthBytes = state.DRAMBandwidthGBs * 1000 * 1000 * 1000; // there is a reason why this is not 1024
@@ -81,7 +81,7 @@ const linkSaturationSlice = createSlice({
                 graphState.links[item.id] = item;
             });
         },
-        bulkLoadLinkData: (state, action: PayloadAction<[string, LinkState[]][]>) => {
+        initialLoadLinkData: (state, action: PayloadAction<[string, LinkState[]][]>) => {
             const linkData = action.payload;
 
             linkData.forEach(([graphName, links]) => {
@@ -157,9 +157,9 @@ const recalculateLinkSaturation = (link: LinkState, totalOpCycles: number) => {
 };
 export const {
     loadLinkData,
-    bulkLoadLinkData,
+    initialLoadLinkData,
     updateTotalOPs,
-    bulkUpdateTotalOPs,
+    initialLoadTotalOPs,
     updateLinkSaturation,
     updateCLK,
     updateDRAMBandwidth,
