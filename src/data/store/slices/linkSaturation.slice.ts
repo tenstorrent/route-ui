@@ -49,10 +49,10 @@ const linkSaturationSlice = createSlice({
                 });
             }
         },
-        updateNormalizedOPs: (state, action: PayloadAction<{ graph: string; normalizedOps: number }>) => {
+        updateNormalizedOPs: (state, action: PayloadAction<{ graph: string; normalizedOpCycles: number }>) => {
             Object.values(state.graphs[action.payload.graph].links).forEach((linkState: LinkState) => {
                 if (linkState.type === LinkType.ETHERNET) {
-                    calculateNormalizedSaturation(linkState, action.payload.normalizedOps);
+                    calculateNormalizedSaturation(linkState, action.payload.normalizedOpCycles);
                 }
             });
         },
@@ -142,6 +142,7 @@ export const {
     updateShowLinkSaturation,
     updateShowNOC,
     resetNetworksState,
+    updateNormalizedOPs,
 } = linkSaturationSlice.actions;
 
 export const linkSaturationReducer = linkSaturationSlice.reducer;

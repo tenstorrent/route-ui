@@ -16,6 +16,7 @@ import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiSta
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
 import { ClusterDataSource } from '../../data/DataSource';
 import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
+import { ChipContext } from '../../data/ChipDataProvider';
 
 export interface SideBarProps {}
 
@@ -23,6 +24,8 @@ export const SideBar: React.FC<SideBarProps> = ({}) => {
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { cluster } = useContext(ClusterDataSource);
+    const {chipState } = useContext(ChipContext);
+    // const ch
     const dispatch = useDispatch();
     // const [clusterViewEnabled, setClusterViewEnabled] = useState(false);
     const reloadAppData = () => {
@@ -40,6 +43,10 @@ export const SideBar: React.FC<SideBarProps> = ({}) => {
 
     const clusterViewEnabled = useSelector(getExperimentalFeatures('showClusterView'));
     const clusterViewButtonEnabled = clusterViewEnabled && cluster?.chips !== undefined && cluster?.chips.length > 1;
+
+    console.log('clusterViewButtonEnabled', clusterViewButtonEnabled)
+    console.log('clusterViewButtonEnabled', cluster?.chips !== undefined, cluster?.chips.length)
+    console.log(chipState.graphName)
 
     return (
         <div className='sidebar'>

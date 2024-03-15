@@ -23,7 +23,12 @@ import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/p
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
 import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
-import { loadLinkData, resetNetworksState, updateTotalOPs } from '../../data/store/slices/linkSaturation.slice';
+import {
+    loadLinkData,
+    resetNetworksState,
+    updateNormalizedOPs,
+    updateTotalOPs,
+} from '../../data/store/slices/linkSaturation.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
@@ -85,31 +90,42 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             dispatch(setAvailableGraphs(sortedGraphs));
+            const totalOpsPerEpoch: Map<number, number> = new Map();
 
-            const times = [];
+            const debugTimes = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
                 const start = performance.now();
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
                 addChip(graphOnChip, graph.name);
+                const ops = totalOpsPerEpoch.get(graph.temporalEpoch) ?? 1;
+                totalOpsPerEpoch.set(graph.temporalEpoch, Math.max(graphOnChip.totalOpCycles, ops));
                 dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
                 const linkData = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
                 dispatch(loadLinkData({ graphName: graph.name, linkData }));
                 dispatch(updateTotalOPs({ graphName: graph.name, totalOps: graphOnChip.totalOpCycles }));
 
-                times.push({
+                debugTimes.push({
                     graph: `${graph.name}`,
                     time: `${performance.now() - start} ms`,
                 });
             }
-            // TODO: calc normalized ops per temporalEpoch
-            // dispatch(updateNormalizedOPs)
 
-            // console.table(times, ['graph', 'time']);
-            // console.log('total', performance.now() - entireRunStartTime, 'ms');
+            sortedGraphs.forEach((graph) => {
+                const { temporalEpoch, name } = graph;
+                dispatch(
+                    updateNormalizedOPs({
+                        graph: name,
+                        normalizedOpCycles: totalOpsPerEpoch.get(temporalEpoch) ?? 1,
+                    }),
+                );
+            });
+            console.log(totalOpsPerEpoch);
+            // console.table(debugTimes, ['graph', 'time']);
+            console.log('total', performance.now() - entireRunStartTime, 'ms');
+
             logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
-
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);
