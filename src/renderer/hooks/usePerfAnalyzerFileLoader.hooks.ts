@@ -84,9 +84,9 @@ const usePerfAnalyzerFileLoader = () => {
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
 
             const graphOnChipList: Chip[] = [];
-            const linkData = new Map<string, LinkState[]>();
+            const linkData: Record<string, LinkState[]> = {};
             const pipeSelectionData: PipeSelection[] = [];
-            const totalOpsData = new Map<string, number>();
+            const totalOpsData: Record<string, number> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -96,11 +96,8 @@ const usePerfAnalyzerFileLoader = () => {
                 const graphOnChip = await loadGraph(folderPath, graph);
 
                 graphOnChipList.push(graphOnChip);
-                linkData.set(
-                    graph.name,
-                    graphOnChip.getAllLinks().map((link) => link.generateInitialState()),
-                );
-                totalOpsData.set(graph.name, graphOnChip.totalOpCycles);
+                linkData[graph.name] = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
+                totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
 
                 times.push({
