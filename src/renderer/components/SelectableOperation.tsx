@@ -14,7 +14,7 @@ import {
 import { getHighContrastState } from '../../data/store/selectors/uiState.selectors';
 import { Operation } from '../../data/GraphTypes';
 import { calculateOpCongestionColor } from '../../utils/DrawingAPI';
-import '../scss/SelectableOperation.scss';
+import './SelectableOperation.scss';
 
 interface SelectableOperationProps {
     opName: string;

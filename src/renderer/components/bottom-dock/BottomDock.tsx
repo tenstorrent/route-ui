@@ -5,10 +5,11 @@ import { useState, type FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getExperimentalFeatures } from '../../../data/store/selectors/experimentalFeatures.selectors';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
-import '../../scss/BottomDock.scss';
 import LogsOutput from '../LogsOutput';
 import OperationsTable from './OperationsTable';
 import QueuesTable from './QueuesTable';
+
+import './BottomDock.scss';
 
 interface BottomDockProps {
     isActive: boolean;

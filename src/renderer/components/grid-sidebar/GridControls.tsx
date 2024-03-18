@@ -14,6 +14,8 @@ import {
     updateShowOperationNames,
 } from '../../../data/store/slices/uiState.slice';
 
+import './GridControls.scss';
+
 export const GridControls: FC = () => {
     const dispatch = useDispatch();
 

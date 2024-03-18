@@ -8,7 +8,7 @@ import type { NodeSelectionState } from '../../../data/StateTypes';
 import type { OpTableFields } from './useOperationsTable.hooks';
 import type { QueuesTableFields } from './useQueuesTable.hook';
 
-import '../../scss/SharedTable.scss';
+import './SharedTable.scss';
 
 export type TableFields = OpTableFields | QueuesTableFields;
 

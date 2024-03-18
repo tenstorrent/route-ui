@@ -4,12 +4,12 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../data/constants';
 import TenstorrentLogo from '../main/assets/TenstorrentLogo';
-import GridRender from './GridRender';
-import PropertiesPanel from './PropertiesPanel';
+import GridRender from './components/GridRender';
 import { SideBar } from './components/SideBar';
 import TopHeaderComponent from './components/TopHeaderComponent';
 import BottomDock from './components/bottom-dock/BottomDock';
 import { GridSidebar } from './components/grid-sidebar/GridSidebar';
+import PropertiesPanel from './components/properties-panel/PropertiesPanel';
 import './scss/MainRouteRenderer.scss';
 
 export interface MainRouteRendererProps {}

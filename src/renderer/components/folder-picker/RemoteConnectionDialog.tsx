@@ -9,7 +9,7 @@ import useRemoteConnection, {
     RemoteConnection,
 } from '../../hooks/useRemote.hook';
 
-import '../../scss/RemoteConnectionDialog.scss';
+import './RemoteConnectionDialog.scss';
 
 const ConnectionTestMessage: FC<ConnectionStatus> = ({ status, message }) => {
     const iconMap: Record<ConnectionTestStates, IconName> = {

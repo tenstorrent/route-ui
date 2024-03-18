@@ -14,7 +14,6 @@ import RemoteSyncConfigurator from './components/folder-picker/RemoteSyncConfigu
 import useAppConfig from './hooks/useAppConfig.hook';
 
 import LocalFolderSelector from './components/folder-picker/LocalFolderSelector';
-import './scss/FolderPicker.scss';
 import './scss/SplashScreen.scss';
 
 const SplashScreen: FC = () => {
@@ -30,7 +29,7 @@ const SplashScreen: FC = () => {
         )[0] as boolean;
 
         dispatch(toggleQueuesTable(isQueuesTableEnabled));
-        
+
         dispatch(
             toggleClusterView(JSON.parse(getAppConfig(ElectronEvents.TOGGLE_CLUSTER_VIEW) ?? '[false]')[0] as boolean),
         );

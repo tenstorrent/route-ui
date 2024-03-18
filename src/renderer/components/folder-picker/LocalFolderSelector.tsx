@@ -8,6 +8,8 @@ import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hoo
 import GraphSelector from '../graph-selector/GraphSelector';
 import FolderPicker from './FolderPicker';
 
+import './FolderPicker.scss';
+
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
     return lastFolder ? `${pathSeparator}${lastFolder}` : undefined;

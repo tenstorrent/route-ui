@@ -14,7 +14,6 @@ import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_G
 import Collapsible from '../Collapsible';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
-import '../../scss/GridControls.scss';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { getTotalOpsForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
 
