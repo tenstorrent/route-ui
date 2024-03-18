@@ -1,19 +1,20 @@
-import React, { ChangeEvent, FC } from 'react';
 import { Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import React, { ChangeEvent, FC } from 'react';
 import { useSelector } from 'react-redux';
-import HighlightedText from './HighlightedText';
 import { getGroupColor } from '../../data/ColorGenerator';
-import QueueIcon from '../../main/assets/QueueIcon';
 import { GraphVertexType } from '../../data/GraphNames';
+import { Operation } from '../../data/GraphTypes';
 import { RootState } from '../../data/store/createStore';
 import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
 } from '../../data/store/selectors/operationPerf.selectors';
 import { getHighContrastState } from '../../data/store/selectors/uiState.selectors';
-import { Operation } from '../../data/GraphTypes';
+import QueueIcon from '../../main/assets/QueueIcon';
 import { calculateOpCongestionColor } from '../../utils/DrawingAPI';
+import ColorSwatch from './ColorSwatch';
+import HighlightedText from './HighlightedText';
 import './SelectableOperation.scss';
 
 interface SelectableOperationProps {
@@ -52,10 +53,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                 </span>
             )}
             <HighlightedText text={opName} filter={stringFilter} />
-            <span
-                className={`color-swatch ${value ? '' : 'transparent'}`}
-                style={{ backgroundColor: getGroupColor(opName) }}
-            />
+            <ColorSwatch isVisible={value} color={getGroupColor(opName)} />
         </div>
     );
 };

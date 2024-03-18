@@ -92,16 +92,6 @@
             margin-right: -7px;
         }
 
-        .color-swatch {
-            width: 10px;
-            height: 10px;
-            border: 1px solid $tt-white-text;
-            display: inline-block;
-
-            &.transparent {
-                //TODO: i cant remember why this is here and if we wanted some styling.
-            }
-        }
         .op-type.icon {
             line-height: 1;
 

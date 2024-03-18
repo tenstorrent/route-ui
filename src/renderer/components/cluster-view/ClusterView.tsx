@@ -21,6 +21,7 @@ import {
 import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
 import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
+import ColorSwatch from '../ColorSwatch';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
@@ -311,14 +312,10 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                                     PCIe
                                     {pciPipeStateList.map((pipeState) => {
                                         return (
-                                            <span
+                                            <ColorSwatch
                                                 key={pipeState.id}
-                                                className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`}
-                                                style={{
-                                                    backgroundColor: pipeState?.selected
-                                                        ? getPipeColor(pipeState.id)
-                                                        : 'transparent',
-                                                }}
+                                                isVisible={pipeState?.selected}
+                                                color={pipeState?.selected ? getPipeColor(pipeState.id) : 'transparent'}
                                             />
                                         );
                                     })}
