@@ -6,10 +6,11 @@ import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import { ChipProvider } from '../data/ChipDataProvider';
 import Cluster from '../data/Cluster';
 import { ClusterDataSource } from '../data/DataSource';
-import './App.scss';
-import MainRouteRenderer from './MainRouteRenderer';
-import SplashScreen from './SplashScreen';
 import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
+import MainRouteRenderer from './views/MainRouteRenderer';
+import SplashScreen from './views/SplashScreen';
+
+import './scss/App.scss';
 
 export default function App() {
     useKeyboardFocus();
