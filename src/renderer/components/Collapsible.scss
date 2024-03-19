@@ -2,7 +2,6 @@
 
 .collapsible-component {
     > [type="button"] {
-        color: $tt-white-text;
         padding: 0;
         margin-bottom: 5px;
 
@@ -17,6 +16,7 @@
         }
 
         .bp4-button-text {
+            color: $tt-white-text;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
