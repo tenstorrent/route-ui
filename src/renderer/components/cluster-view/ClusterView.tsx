@@ -2,7 +2,7 @@
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select } from '@blueprintjs/select';
-import { Button, Checkbox, MenuItem, PopoverPosition, Position, Switch } from '@blueprintjs/core';
+import { Button, Checkbox, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,7 +25,6 @@ import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
 import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
-import { updateShowLinkSaturation } from '../../../data/store/slices/linkSaturation.slice';
 
 export interface ClusterViewDialog {}
 
@@ -119,7 +118,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     };
 
     const pciPipeStateList = useSelector((state: RootState) => getSelectedPipes(state, pciPipes));
-    const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(true);
+    const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(false);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     return (
         <div className='cluster-view-container'>
@@ -133,14 +132,15 @@ const ClusterView: FC<ClusterViewDialog> = () => {
             >
                 <div className='congestion-container'>
                     <LinkCongestionControls showNOCControls={false} />
-                    <Checkbox
-                        checked={normalizedSaturation}
-                        label='Normalized congestion'
-                        disabled={!showLinkSaturation}
-                        onChange={(event) => {
-                            setNormalizedSaturation(event.currentTarget.checked);
-                        }}
-                    />
+                    {/* TODO: enable or remove once the decisions around normalized ocngestion are made */}
+                    {/* <Checkbox */}
+                    {/*     checked={normalizedSaturation} */}
+                    {/*     label='Normalized congestion' */}
+                    {/*     disabled={!showLinkSaturation} */}
+                    {/*     onChange={(event) => { */}
+                    {/*         setNormalizedSaturation(event.currentTarget.checked); */}
+                    {/*     }} */}
+                    {/* /> */}
                 </div>
                 {availableTemporalEpochs.length > 1 && (
                     <Select
