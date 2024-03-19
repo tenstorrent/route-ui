@@ -24,7 +24,7 @@ const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
             className={`main-route ${isDockOpen ? 'dock-open' : ''} ${isDetailedViewOpen ? 'detailed-view-open' : ''}`}
             style={
                 {
-                    '--bottom-dock-height': `${isDetailedViewOpen ? detailedViewHeight : INITIAL_DETAILS_VIEW_HEIGHT}px`,
+                    '--js-bottom-dock-height': `${isDetailedViewOpen ? detailedViewHeight : INITIAL_DETAILS_VIEW_HEIGHT}px`,
                 } as React.CSSProperties
             }
         >

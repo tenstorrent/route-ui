@@ -61,7 +61,7 @@
 
 .main-route {
     // This is a CSS variable because the value is set dynamically in react.
-    --bottom-dock-height: $initial-dock-height;
+    --js-bottom-dock-height: $initial-dock-height;
 
     display: grid;
     grid-template-columns: $sidebar-width $controls-panel-width min-content 1fr;
@@ -100,7 +100,7 @@
     }
 
     &.detailed-view-open {
-        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
+        grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
@@ -109,7 +109,7 @@
     }
 
     &.dock-open {
-        grid-template-rows: $top-bar-height auto var(--bottom-dock-height);
+        grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
