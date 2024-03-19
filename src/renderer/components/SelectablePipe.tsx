@@ -1,14 +1,15 @@
-import React, { ChangeEvent, FC } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Checkbox } from '@blueprintjs/core';
-import { selectPipeSelectionById } from 'data/store/selectors/pipeSelection.selectors';
-import { updatePipeSelection, updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
 import { RootState } from 'data/store/createStore';
-import HighlightedText from './HighlightedText';
-import { convertBytes, PipeSegment } from '../../data/Chip';
+import { selectPipeSelectionById } from 'data/store/selectors/pipeSelection.selectors';
+import { updateFocusPipe, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
+import { ChangeEvent, FC } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { PipeSegment, convertBytes } from '../../data/Chip';
 import getPipeColor from '../../data/ColorGenerator';
-import ProgressBar from './ProgressBar';
+import ColorSwatch from './ColorSwatch';
+import HighlightedText from './HighlightedText';
 import PipeInfoDialog from './PipeInfoDialog';
+import ProgressBar from './ProgressBar';
 
 interface SelectablePipeProps {
     pipeSegment: PipeSegment;
@@ -17,7 +18,12 @@ interface SelectablePipeProps {
     showBandwidthUse?: boolean;
 }
 
-const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, showBandwidth = true, showBandwidthUse = false }) => {
+const SelectablePipe: FC<SelectablePipeProps> = ({
+    pipeSegment,
+    pipeFilter,
+    showBandwidth = true,
+    showBandwidthUse = false,
+}) => {
     const dispatch = useDispatch();
     const pipeState = useSelector((state: RootState) => selectPipeSelectionById(state, pipeSegment.id));
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
@@ -60,10 +66,7 @@ const SelectablePipe: FC<SelectablePipeProps> = ({ pipeSegment, pipeFilter, show
                                 <HighlightedText text={pipeState.id} filter={pipeFilter} />{' '}
                                 {showBandwidth ? convertBytes(pipeSegment.bandwidth) : ''}
                                 {showBandwidthUse && <span>{pipeSegment.bandwidthUse.toFixed(0)}%</span>}
-                                <span
-                                    className={`color-swatch ${pipeState?.selected ? '' : 'transparent'}`}
-                                    style={{ backgroundColor: getPipeColor(pipeState.id) }}
-                                />
+                                <ColorSwatch isVisible={pipeState?.selected} color={getPipeColor(pipeState.id)} />
                                 <br />
                                 {showBandwidthUse && pipeSegment.bandwidthUse !== null && (
                                     <ProgressBar percent={pipeSegment.bandwidthUse} />

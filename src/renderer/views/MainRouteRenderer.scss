@@ -486,17 +486,6 @@
             gap: 5px;
         }
     }
-
-    .color-swatch {
-        width: 10px;
-        height: 10px;
-        border: 1px solid $tt-white-text;
-        display: inline-block;
-
-        &.transparent {
-            display: none;
-        }
-    }
 }
 
 
@@ -579,17 +568,6 @@
             flex-shrink: 1;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .color-swatch {
-            width: 10px;
-            height: 10px;
-            border: 1px solid $tt-white-text;
-            flex-shrink: 0;
-            display: inline-block;
-
-            &.transparent {
-            }
         }
     }
 
