@@ -1,4 +1,4 @@
-import { Button } from '@blueprintjs/core';
+import { AnchorButton, Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ApplicationMode } from 'data/Types';
@@ -43,7 +43,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
             </Tooltip2>
             {applicationMode === ApplicationMode.PERF_ANALYZER && (
                 <Tooltip2 content='Show/Hide table dock'>
-                    <Button
+                    <AnchorButton
                         disabled={isDetailsViewOpen}
                         icon={IconNames.APPLICATION}
                         text=''
