@@ -1,12 +1,5 @@
 import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
-import {
-    setApplicationMode,
-    setAvailableGraphs,
-    setSelectedArchitecture,
-    setSelectedFolder,
-    setSelectedFolderLocationType,
-    setSelectedGraphName,
-} from 'data/store/slices/uiState.slice';
+import { setApplicationMode, setSelectedFolder, setSelectedFolderLocationType } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
 
@@ -15,9 +8,16 @@ import { ApplicationMode } from 'data/Types';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
+import type Chip from '../../data/Chip';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
-import type { FolderLocationType } from '../../data/StateTypes';
+import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
+import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
+import {
+    initialLoadLinkData,
+    initialLoadTotalOPs,
+    resetNetworksState,
+} from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
@@ -37,7 +37,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveChip, setActiveChip, addChip, resetChips } = useContext(ChipContext);
+    const { getActiveChip, setActiveChip, setChips, resetChips } = useContext(ChipContext);
 
     const chip = getActiveChip();
     const navigate = useNavigate();
@@ -46,7 +46,7 @@ const usePerfAnalyzerFileLoader = () => {
 
     useEffect(() => {
         if (chip) {
-            dispatch(setSelectedArchitecture(chip.architecture));
+            // TODO: should we remove this?
             populateChipData(chip);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,29 +89,42 @@ const usePerfAnalyzerFileLoader = () => {
 
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
-            dispatch(setAvailableGraphs(sortedGraphs));
             const totalOpsPerEpoch: Map<number, number> = new Map();
 
-            const debugTimes = [];
+            const graphOnChipList: Chip[] = [];
+            const linkData: Record<string, LinkState[]> = {};
+            const pipeSelectionData: PipeSelection[] = [];
+            const totalOpsData: Record<string, number> = {};
+            const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
                 const start = performance.now();
+
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
-                addChip(graphOnChip, graph.name);
+
                 const ops = totalOpsPerEpoch.get(graph.temporalEpoch) ?? 1;
                 totalOpsPerEpoch.set(graph.temporalEpoch, Math.max(graphOnChip.totalOpCycles, ops));
-                dispatch(loadPipeSelection(graphOnChip.generateInitialPipesSelectionState()));
-                const linkData = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
-                dispatch(loadLinkData({ graphName: graph.name, linkData }));
-                dispatch(updateTotalOPs({ graphName: graph.name, totalOps: graphOnChip.totalOpCycles }));
 
-                debugTimes.push({
+                graphOnChipList.push(graphOnChip);
+                linkData[graph.name] = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
+                totalOpsData[graph.name] = graphOnChip.totalOpCycles;
+                pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
+
+                times.push({
                     graph: `${graph.name}`,
                     time: `${performance.now() - start} ms`,
                 });
             }
 
+            setChips(graphOnChipList, sortedGraphs);
+            dispatch(initialLoadLinkData(linkData));
+            dispatch(loadPipeSelection(pipeSelectionData));
+            dispatch(initialLoadTotalOPs(totalOpsData));
+
+            console.table(times, ['graph', 'time']);
+
+            // TODO: fix this for performance purposes
             sortedGraphs.forEach((graph) => {
                 const { temporalEpoch, name } = graph;
                 dispatch(
@@ -142,7 +155,6 @@ const usePerfAnalyzerFileLoader = () => {
                 dispatch(clearAllNodes());
                 setActiveChip(graphName);
                 navigate('/render');
-                dispatch(setSelectedGraphName(graphName));
             } catch (e) {
                 const err = e as Error;
                 logging.error(`error loading and populating chip ${err.message}`);
@@ -165,16 +177,10 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
-    const resetAvailableGraphs = (): void => {
-        dispatch(setAvailableGraphs([]));
-        dispatch(setSelectedGraphName(''));
-    };
-
     return {
         loadPerfAnalyzerFolder,
         openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
-        resetAvailableGraphs,
         error,
     };
 };

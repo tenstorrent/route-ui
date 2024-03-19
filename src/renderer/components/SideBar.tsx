@@ -1,26 +1,21 @@
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { ApplicationMode, Architecture } from 'data/Types';
-import {
-    clearAvailableGraphs,
-    setDockOpenState,
-    setSelectedArchitecture,
-    setSelectedFile,
-    setSelectedFolder,
-} from 'data/store/slices/uiState.slice';
+import { ApplicationMode } from 'data/Types';
+import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
-import { openClusterView } from '../../data/store/slices/clusterView.slice';
+import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterDataSource } from '../../data/DataSource';
 import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
-import { ChipContext } from '../../data/ChipDataProvider';
+import { openClusterView } from '../../data/store/slices/clusterView.slice';
 
 export interface SideBarProps {}
 
-export const SideBar: React.FC<SideBarProps> = ({}) => {
+export const SideBar: React.FC<SideBarProps> = () => {
+    const { resetChips } = useContext(ChipContext);
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { cluster } = useContext(ClusterDataSource);
@@ -29,9 +24,8 @@ export const SideBar: React.FC<SideBarProps> = ({}) => {
     const dispatch = useDispatch();
     // const [clusterViewEnabled, setClusterViewEnabled] = useState(false);
     const reloadAppData = () => {
-        dispatch(clearAvailableGraphs());
+        resetChips();
         dispatch(setSelectedFile(''));
-        dispatch(setSelectedArchitecture(Architecture.NONE));
         dispatch(setSelectedFolder(''));
         navigate('/');
     };
@@ -44,9 +38,9 @@ export const SideBar: React.FC<SideBarProps> = ({}) => {
     const clusterViewEnabled = useSelector(getExperimentalFeatures('showClusterView'));
     const clusterViewButtonEnabled = clusterViewEnabled && cluster?.chips !== undefined && cluster?.chips.length > 1;
 
-    console.log('clusterViewButtonEnabled', clusterViewButtonEnabled)
-    console.log('clusterViewButtonEnabled', cluster?.chips !== undefined, cluster?.chips.length)
-    console.log(chipState.graphName)
+    // console.log('clusterViewButtonEnabled', clusterViewButtonEnabled)
+    // console.log('clusterViewButtonEnabled', cluster?.chips !== undefined, cluster?.chips.length)
+    // console.log(chipState.graphName)
 
     return (
         <div className='sidebar'>

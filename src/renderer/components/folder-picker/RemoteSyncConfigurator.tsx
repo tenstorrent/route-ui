@@ -1,12 +1,16 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 
 import { AnchorButton, FormGroup } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { getSelectedFolderLocationType } from '../../../data/store/selectors/uiState.selectors';
-import { setSelectedFolderLocationType } from '../../../data/store/slices/uiState.slice';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import {
+    getSelectedFolderLocationType,
+    getSelectedRemoteFolder,
+} from '../../../data/store/selectors/uiState.selectors';
+import { setSelectedFolderLocationType, setSelectedRemoteFolder } from '../../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../../utils/FileLoaders';
 import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -17,29 +21,31 @@ import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
 const RemoteSyncConfigurator: FC = () => {
+    const { resetChips } = useContext(ChipContext);
     const remote = useRemote();
 
     const dispatch = useDispatch();
     const [remoteFolders, setRemoteFolders] = useState<RemoteFolder[]>(
         remote.persistentState.getSavedRemoteFolders(remote.persistentState.selectedConnection),
     );
-    const [selectedFolder, setSelectedFolder] = useState<RemoteFolder | undefined>(undefined);
+    const selectedFolder = useSelector(getSelectedRemoteFolder) ?? remoteFolders[0];
     const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
     const [isFetchingFolderStatus, setIsFetchingFolderStatus] = useState(false);
 
     const logging = useLogging();
-    const { loadPerfAnalyzerFolder, resetAvailableGraphs } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
 
     const updateSelectedFolder = async (folder?: RemoteFolder) => {
-        setSelectedFolder(folder);
+        dispatch(setSelectedRemoteFolder(folder));
         dispatch(setSelectedFolderLocationType('remote'));
+        dispatch(setSelectedRemoteFolder(folder));
 
         if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
         } else {
-            resetAvailableGraphs();
+            resetChips();
         }
     };
 

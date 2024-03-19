@@ -3,15 +3,15 @@ import { sep as pathSeparator } from 'path';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
-    getArchitectureSelector,
-    getAvailableGraphsSelector,
     getFolderPathSelector,
-    getGraphNameSelector,
     getSelectedFolderLocationType,
+    getSelectedRemoteFolder,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChipContext } from '../../data/ChipDataProvider';
 import type { FolderLocationType } from '../../data/StateTypes';
+import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import type { RemoteConnection, RemoteFolder } from '../hooks/useRemote.hook';
@@ -35,9 +35,9 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { loadPerfAnalyzerFolder, resetAvailableGraphs, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
-
-    const architecture = useSelector(getArchitectureSelector);
+    const { getGraphName, resetChips, getActiveGraph, getActiveChip } = useContext(ChipContext);
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
+    const dispatch = useDispatch();
 
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderLocationType = useSelector(getSelectedFolderLocationType);
@@ -48,11 +48,11 @@ const TopHeaderComponent: React.FC = () => {
     const availableRemoteFolders = remoteConnectionConfig
         .getSavedRemoteFolders(selectedConnection)
         .filter((folder) => folder.lastSynced);
-    const [selectedRemoteFolder, setSelectedRemoteFolder] = useState<RemoteFolder | undefined>(
-        availableRemoteFolders[0],
-    );
-    const selectedGraph = useSelector(getGraphNameSelector);
-    const availableGraphs = useSelector(getAvailableGraphsSelector);
+    const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
+    const selectedGraph = getGraphName();
+    const chipId = getActiveChip()?.chipId;
+    const architecture = getActiveChip()?.architecture;
+    const temporalEpoch = getActiveGraph()?.temporalEpoch;
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
@@ -61,19 +61,17 @@ const TopHeaderComponent: React.FC = () => {
         const folderPath = (newFolder as RemoteFolder)?.localPath ?? newFolder;
 
         if (typeof newFolder === 'string') {
-            setSelectedRemoteFolder(undefined);
+            dispatch(setSelectedRemoteFolder(undefined));
         } else {
-            setSelectedRemoteFolder(newFolder);
+            dispatch(setSelectedRemoteFolder(newFolder));
         }
 
-        resetAvailableGraphs();
+        resetChips();
 
         if (checkLocalFolderExists(folderPath)) {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
         }
     };
-
-    const selectedGraphItem = availableGraphs.find((graph) => graph.name === selectedGraph);
 
     return (
         <div className='top-header-component'>
@@ -123,17 +121,17 @@ const TopHeaderComponent: React.FC = () => {
                     </>
                 )}
 
-                {selectedGraph && selectedGraphItem?.chipId !== undefined && (
+                {selectedGraph && chipId !== undefined && (
                     <>
                         <span>Chip:</span>
-                        <span>{selectedGraphItem?.chipId}</span>
+                        <span>{chipId}</span>
                     </>
                 )}
 
-                {selectedGraph && selectedGraphItem?.temporalEpoch !== undefined && (
+                {selectedGraph && temporalEpoch !== undefined && (
                     <>
                         <span>Epoch:</span>
-                        <span>{selectedGraphItem?.temporalEpoch}</span>
+                        <span>{temporalEpoch}</span>
                     </>
                 )}
             </div>
