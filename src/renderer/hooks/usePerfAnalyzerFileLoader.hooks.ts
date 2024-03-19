@@ -17,18 +17,12 @@ import {
     initialLoadLinkData,
     initialLoadTotalOPs,
     resetNetworksState,
+    updateNormalizedOPs,
 } from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
 import usePopulateChipData from './usePopulateChipData.hooks';
-import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
-import {
-    loadLinkData,
-    resetNetworksState,
-    updateNormalizedOPs,
-    updateTotalOPs,
-} from '../../data/store/slices/linkSaturation.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const { populateChipData } = usePopulateChipData();
