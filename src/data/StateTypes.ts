@@ -72,6 +72,7 @@ export interface LinkState {
     saturation: number;
     maxBandwidth: number;
     type: LinkType;
+    normalizedSaturation: number;
 }
 
 

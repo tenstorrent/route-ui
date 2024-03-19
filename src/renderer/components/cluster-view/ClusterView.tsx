@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
-import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select } from '@blueprintjs/select';
+import { Button, Checkbox, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,7 +25,6 @@ import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
 import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
-
 
 export interface ClusterViewDialog {}
 
@@ -119,7 +118,8 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     };
 
     const pciPipeStateList = useSelector((state: RootState) => getSelectedPipes(state, pciPipes));
-
+    const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(false);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
     return (
         <div className='cluster-view-container'>
             <div
@@ -132,6 +132,15 @@ const ClusterView: FC<ClusterViewDialog> = () => {
             >
                 <div className='congestion-container'>
                     <LinkCongestionControls showNOCControls={false} />
+                    {/* TODO: enable or remove once the decisions around normalized ocngestion are made */}
+                    {/* <Checkbox */}
+                    {/*     checked={normalizedSaturation} */}
+                    {/*     label='Normalized congestion' */}
+                    {/*     disabled={!showLinkSaturation} */}
+                    {/*     onChange={(event) => { */}
+                    {/*         setNormalizedSaturation(event.currentTarget.checked); */}
+                    {/*     }} */}
+                    {/* /> */}
                 </div>
                 {availableTemporalEpochs.length > 1 && (
                     <Select
@@ -289,6 +298,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                                             node={node}
                                             index={index}
                                             clusterChipSize={clusterChipSize}
+                                            normalizedSaturation={normalizedSaturation}
                                         />
                                     );
                                 });
@@ -339,9 +349,18 @@ interface EthPipeRendererProps {
     ethPosition: CLUSTER_ETH_POSITION;
     index: number;
     clusterChipSize: number;
+    normalizedSaturation: boolean;
 }
 
-const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, graphName, ethPosition, index, clusterChipSize }) => {
+const EthPipeRenderer: FC<EthPipeRendererProps> = ({
+    id,
+    node,
+    graphName,
+    ethPosition,
+    index,
+    clusterChipSize,
+    normalizedSaturation,
+}) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const pipeSelection = useSelector((state: RootState) => state.pipeSelection.pipes);
     const selectedPipeIds = Object.values(pipeSelection)
@@ -383,9 +402,20 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({ id, node, graphName, ethPos
                 node?.internalLinks.forEach((link) => {
                     if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
                         const linkStateData = linksData[link.uid];
-                        if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
-                            const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
-                            drawEthLink(svg, ethPosition, link.name, size, color, 6);
+                        if (normalizedSaturation) {
+                            if (linkStateData && linkStateData.normalizedSaturation >= linkSaturationTreshold) {
+                                const color = calculateLinkCongestionColor(
+                                    linkStateData.normalizedSaturation,
+                                    0,
+                                    isHighContrast,
+                                );
+                                drawEthLink(svg, ethPosition, link.name, size, color, 6);
+                            }
+                        } else {
+                            if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
+                                const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
+                                drawEthLink(svg, ethPosition, link.name, size, color, 6);
+                            }
                         }
                     }
                 });

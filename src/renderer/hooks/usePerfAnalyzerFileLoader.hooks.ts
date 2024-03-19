@@ -17,6 +17,7 @@ import {
     initialLoadLinkData,
     initialLoadTotalOPs,
     resetNetworksState,
+    initialLoadNormalizedOPs,
 } from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
@@ -82,6 +83,8 @@ const usePerfAnalyzerFileLoader = () => {
 
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
+            const totalOpsPerEpoch: Map<number, number> = new Map();
+            const totalOpsNormalized: Record<string, number> = {};
 
             const graphOnChipList: Chip[] = [];
             const linkData: Record<string, LinkState[]> = {};
@@ -95,6 +98,9 @@ const usePerfAnalyzerFileLoader = () => {
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
 
+                const ops = totalOpsPerEpoch.get(graph.temporalEpoch) ?? 1;
+                totalOpsPerEpoch.set(graph.temporalEpoch, Math.max(graphOnChip.totalOpCycles, ops));
+
                 graphOnChipList.push(graphOnChip);
                 linkData[graph.name] = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
@@ -106,13 +112,19 @@ const usePerfAnalyzerFileLoader = () => {
                 });
             }
 
+            sortedGraphs.forEach((graph) => {
+                totalOpsNormalized[graph.name] = totalOpsPerEpoch.get(graph.temporalEpoch) ?? 1;
+            });
+
             setChips(graphOnChipList, sortedGraphs);
+
             dispatch(initialLoadLinkData(linkData));
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
+            dispatch(initialLoadNormalizedOPs(totalOpsNormalized));
 
-            console.table(times, ['graph', 'time']);
-            console.log('total', performance.now() - entireRunStartTime, 'ms');
+            // console.table(times, ['graph', 'time']);
+            // console.log('total', performance.now() - entireRunStartTime, 'ms');
             logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
         } catch (e) {
             const err = e as Error;
