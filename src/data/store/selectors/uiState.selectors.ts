@@ -18,3 +18,7 @@ export const getGridZoom = (state: RootState) => state.uiState.gridZoom;
 export const getDetailedViewZoom = (state: RootState) => state.uiState.detailedViewZoom;
 
 export const getDetailedViewHeight = (state: RootState) => state.uiState.detailedViewHeight;
+
+export const getDetailedViewOpenState = (state: RootState) => state.uiState.detailsViewOpen;
+
+export const getSelectedDetailsViewUID = (state: RootState) => state.uiState.selectedDetailsViewUID;

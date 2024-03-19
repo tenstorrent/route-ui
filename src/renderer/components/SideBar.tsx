@@ -2,14 +2,13 @@ import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ApplicationMode } from 'data/Types';
-import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import { getApplicationMode, getDetailedViewOpenState, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterDataSource } from '../../data/DataSource';
-import { getDetailedViewOpenState } from '../../data/store/selectors/detailedView.selectors';
 import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
 

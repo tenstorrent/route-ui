@@ -1,13 +1,12 @@
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { ComputeNode, NOCLink } from '../../../data/Chip';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
-import { setDockOpenState } from '../../../data/store/slices/uiState.slice';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import LinkDetails from '../LinkDetails';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
@@ -72,7 +71,6 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                         }),
                                                     );
                                                     dispatch(openDetailedView(currentNode.uid));
-                                                    dispatch(setDockOpenState(false));
                                                 }}
                                             />
                                         )}

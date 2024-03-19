@@ -1,5 +1,8 @@
-import { RootState } from 'data/store/createStore';
-import { getDetailedViewHeight, getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import {
+    getDetailedViewHeight,
+    getDetailedViewOpenState,
+    getDockOpenState,
+} from 'data/store/selectors/uiState.selectors';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../data/constants';
@@ -15,8 +18,8 @@ import './MainRouteRenderer.scss';
 export interface MainRouteRendererProps {}
 
 const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
-    const isDockOpen = useSelector((state: RootState) => getDockOpenState(state));
-    const isDetailedViewOpen = useSelector((state: RootState) => state.detailedView.isOpen);
+    const isDockOpen = useSelector(getDockOpenState);
+    const isDetailedViewOpen = useSelector(getDetailedViewOpenState);
     const detailedViewHeight = useSelector(getDetailedViewHeight);
 
     return (

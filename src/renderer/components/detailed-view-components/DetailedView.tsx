@@ -1,13 +1,15 @@
 import { Button, Card, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { RootState } from 'data/store/createStore';
-import { getDetailedViewZoom } from 'data/store/selectors/uiState.selectors';
-import { closeDetailedView } from 'data/store/slices/detailedView.slice';
+import {
+    getDetailedViewOpenState,
+    getDetailedViewZoom,
+    getSelectedDetailsViewUID,
+} from 'data/store/selectors/uiState.selectors';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { ComputeNodeType } from '../../../data/Types';
-import { updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
+import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';
 import DetailedViewETHRenderer from './DetailedViewETH';
 import DetailedViewPCIERenderer from './DetailedViewPCIE';
@@ -25,7 +27,8 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const zoom = useSelector(getDetailedViewZoom);
 
     const architecture = chipState.chips[graphName]?.architecture;
-    const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
+    const isOpen = useSelector(getDetailedViewOpenState);
+    const uid = useSelector(getSelectedDetailsViewUID);
     const node = uid ? chip?.getNode(uid) : null;
 
     useEffect(() => {

@@ -1,6 +1,6 @@
 import Chip from 'data/Chip';
-import { closeDetailedView } from 'data/store/slices/detailedView.slice';
 import { loadNodesData } from 'data/store/slices/nodeSelection.slice';
+import { closeDetailedView } from 'data/store/slices/uiState.slice';
 import { useDispatch } from 'react-redux';
 import { mapIterable } from 'utils/IterableHelpers';
 import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
