@@ -2,9 +2,9 @@ import { Button, Card, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { RootState } from 'data/store/createStore';
-import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
+import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
@@ -13,6 +13,7 @@ import { ChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
+import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
@@ -113,8 +114,9 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
 
 const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
-    const detailedViewState = useSelector((state: RootState) => state.detailedView);
-    const {graphName} = useContext(ChipContext).chipState;
+    const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
+    const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
+    const { graphName } = useContext(ChipContext).chipState;
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -129,7 +131,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
         <Card className='node-element'>
             <h3
                 className={`node-type node-type-${node.getNodeLabel()} ${
-                    node.uid === detailedViewState.uid && detailedViewState.isOpen ? 'detailed-view' : ''
+                    node.uid === selectedDetailsViewUID && isDetailsViewOpen ? 'detailed-view' : ''
                 }`}
             >
                 {node.type.toUpperCase()} {formatNodeUID(node.uid)}
@@ -289,8 +291,10 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                     <Button
                         small
                         icon={IconNames.PROPERTIES}
-                        disabled={node.uid === detailedViewState.uid && detailedViewState.isOpen}
-                        onClick={() => dispatch(openDetailedView(node.uid))}
+                        disabled={node.uid === selectedDetailsViewUID && isDetailsViewOpen}
+                        onClick={() => {
+                            dispatch(openDetailedView(node.uid));
+                        }}
                     >
                         Detailed View
                     </Button>

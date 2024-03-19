@@ -7,6 +7,8 @@ import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 
 interface UIState {
     dockOpen: boolean;
+    detailsViewOpen: boolean;
+    selectedDetailsViewUID: string | null;
     highContrastEnabled: boolean;
     folderPath: string;
     selectedRemoteFolder?: RemoteFolder;
@@ -23,6 +25,8 @@ interface UIState {
 
 const uiStateInitialState: UIState = {
     dockOpen: false,
+    detailsViewOpen: false,
+    selectedDetailsViewUID: null,
     highContrastEnabled: false,
     folderPath: '',
     selectedRemoteFolder: undefined,
@@ -82,6 +86,15 @@ const uiStateSlice = createSlice({
         updateDetailedViewHeight: (state, action: PayloadAction<number>) => {
             state.detailedViewHeight = action.payload;
         },
+        openDetailedView: (state, action: PayloadAction<string>) => {
+            state.detailsViewOpen = true;
+            state.dockOpen = false;
+            state.selectedDetailsViewUID = action.payload;
+        },
+        closeDetailedView: (state) => {
+            state.detailsViewOpen = false;
+            state.selectedDetailsViewUID = null;
+        },
     },
 });
 
@@ -101,4 +114,6 @@ export const {
     updateGridZoom,
     updateDetailedViewZoom,
     updateDetailedViewHeight,
+    openDetailedView,
+    closeDetailedView,
 } = uiStateSlice.actions;

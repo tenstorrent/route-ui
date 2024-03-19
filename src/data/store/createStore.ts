@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { clusterViewReducer } from './slices/clusterView.slice';
-import { detailedViewReducer } from './slices/detailedView.slice';
 import { experimentalFeaturesReducer } from './slices/experimentalFeatures.slice';
 import { linkSaturationReducer } from './slices/linkSaturation.slice';
 import { loggingReducer } from './slices/logging.slice';
@@ -15,7 +14,6 @@ const store = configureStore({
         pipeSelection: pipeSelectionReducer,
         nodeSelection: nodeSelectionReducer,
         linkSaturation: linkSaturationReducer,
-        detailedView: detailedViewReducer,
         operationPerformance: operationPerformanceReducer,
         logging: loggingReducer,
         clusterView: clusterViewReducer,

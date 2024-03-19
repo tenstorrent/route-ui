@@ -81,3 +81,18 @@
         display: contents;
     }
 }
+
+.bp4-button-text:has(.path-label) {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+}
+
+.path-label {
+    max-width: clamp(150px, 15vw, 250px);
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-wrap: nowrap;
+}

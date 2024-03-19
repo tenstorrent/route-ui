@@ -1,11 +1,12 @@
 import { RootState } from 'data/store/createStore';
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
-import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/Chip';
 import { HighlightType } from '../../data/Types';
+import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../data/store/selectors/uiState.selectors';
 import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
@@ -23,7 +24,8 @@ interface NodeGridElementProps {
 const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
-    const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
+    const isOpen = useSelector(getDetailedViewOpenState);
+    const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
 
     let coreHighlight = HighlightType.NONE;

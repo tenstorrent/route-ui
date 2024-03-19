@@ -1,5 +1,10 @@
 import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
-import { setApplicationMode, setSelectedFolder, setSelectedFolderLocationType } from 'data/store/slices/uiState.slice';
+import {
+    closeDetailedView,
+    setApplicationMode,
+    setSelectedFolder,
+    setSelectedFolderLocationType,
+} from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
 
@@ -12,7 +17,6 @@ import type Chip from '../../data/Chip';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
-import { closeDetailedView } from '../../data/store/slices/detailedView.slice';
 import {
     initialLoadLinkData,
     initialLoadTotalOPs,

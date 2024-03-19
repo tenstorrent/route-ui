@@ -46,7 +46,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
-                                <li>
+                                <li key={`${index}-${pipeId}-${graphNode.name}-${operand.name}`}>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                         pipeFilter=''
@@ -59,7 +59,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                     {graphNode.vertexType === GraphVertexType.QUEUE && (
                         <ul className='scrollable-content'>
                             {graphNode.getPipesForOperator(operand.name).map((pipeId) => (
-                                <li>
+                                <li key={`${index}-${pipeId}-${graphNode.name}-${operand.name}`}>
                                     <SelectablePipe
                                         pipeSegment={new PipeSegment(pipeId, 0, NOCLinkName.NONE)}
                                         pipeFilter=''

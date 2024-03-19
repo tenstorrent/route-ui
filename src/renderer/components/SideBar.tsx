@@ -1,8 +1,8 @@
-import { Button } from '@blueprintjs/core';
+import { AnchorButton, Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ApplicationMode } from 'data/Types';
-import { getApplicationMode, getDockOpenState } from 'data/store/selectors/uiState.selectors';
+import { getApplicationMode, getDetailedViewOpenState, getDockOpenState } from 'data/store/selectors/uiState.selectors';
 import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,10 +19,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { cluster } = useContext(ClusterDataSource);
-    const {chipState } = useContext(ChipContext);
-    // const ch
     const dispatch = useDispatch();
-    // const [clusterViewEnabled, setClusterViewEnabled] = useState(false);
     const reloadAppData = () => {
         resetChips();
         dispatch(setSelectedFile(''));
@@ -34,13 +31,10 @@ export const SideBar: React.FC<SideBarProps> = () => {
         dispatch(openClusterView());
     };
     const isDockOpen = useSelector(getDockOpenState);
+    const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
 
     const clusterViewEnabled = useSelector(getExperimentalFeatures('showClusterView'));
     const clusterViewButtonEnabled = clusterViewEnabled && cluster?.chips !== undefined && cluster?.chips.length > 1;
-
-    // console.log('clusterViewButtonEnabled', clusterViewButtonEnabled)
-    // console.log('clusterViewButtonEnabled', cluster?.chips !== undefined, cluster?.chips.length)
-    // console.log(chipState.graphName)
 
     return (
         <div className='sidebar'>
@@ -49,7 +43,8 @@ export const SideBar: React.FC<SideBarProps> = () => {
             </Tooltip2>
             {applicationMode === ApplicationMode.PERF_ANALYZER && (
                 <Tooltip2 content='Show/Hide table dock'>
-                    <Button
+                    <AnchorButton
+                        disabled={isDetailsViewOpen}
                         icon={IconNames.APPLICATION}
                         text=''
                         onClick={() => dispatch(setDockOpenState(!isDockOpen))}
