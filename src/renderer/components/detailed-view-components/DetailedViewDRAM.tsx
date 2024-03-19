@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { ComputeNode, NOCLink } from '../../../data/Chip';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
+import { setDockOpenState } from '../../../data/store/slices/uiState.slice';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import LinkDetails from '../LinkDetails';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
@@ -71,6 +72,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                         }),
                                                     );
                                                     dispatch(openDetailedView(currentNode.uid));
+                                                    dispatch(setDockOpenState(false));
                                                 }}
                                             />
                                         )}

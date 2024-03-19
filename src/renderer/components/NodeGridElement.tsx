@@ -15,6 +15,7 @@ import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffC
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
+import { setDockOpenState } from '../../data/store/slices/uiState.slice';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -41,6 +42,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
         const selectedState = nodeState?.selected;
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));
+            dispatch(setDockOpenState(false));
         } else {
             dispatch(updateNodeSelection({ id: node.uid, selected: !nodeState?.selected }));
         }

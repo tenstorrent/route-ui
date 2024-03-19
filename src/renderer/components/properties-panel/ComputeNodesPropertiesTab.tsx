@@ -13,6 +13,7 @@ import { ChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
+import { setDockOpenState } from '../../../data/store/slices/uiState.slice';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
@@ -114,7 +115,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
 const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const detailedViewState = useSelector((state: RootState) => state.detailedView);
-    const {graphName} = useContext(ChipContext).chipState;
+    const { graphName } = useContext(ChipContext).chipState;
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -290,7 +291,10 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         small
                         icon={IconNames.PROPERTIES}
                         disabled={node.uid === detailedViewState.uid && detailedViewState.isOpen}
-                        onClick={() => dispatch(openDetailedView(node.uid))}
+                        onClick={() => {
+                            dispatch(openDetailedView(node.uid));
+                            dispatch(setDockOpenState(false));
+                        }}
                     >
                         Detailed View
                     </Button>
