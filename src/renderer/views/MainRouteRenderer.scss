@@ -118,6 +118,13 @@
 
         .bottom-dock { display: block; }
     }
+
+    @media (max-width: 1280px) {
+        // Make the properties bar have a fixed width on smaller sizes without creating horizontal scrollbars
+        grid-template-columns: $sidebar-width $controls-panel-width auto calc($properties-panel-width + 30px);
+
+        .main-content { width: auto; }
+    }
 }
 
 .outer-wrapper {
