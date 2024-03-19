@@ -25,18 +25,8 @@
         margin-right: 0;
     }
 
-    .bp4-button-text:has(.path-label) {
-        display: inline-flex;
-        align-items: center;
-    }
-
     .path-label {
         max-width: clamp(150px, 15vw, 250px);
-        display: inline-block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        text-wrap: nowrap;
 
         @include min-desktop-large {
             max-width: max(200px, 25vw);
