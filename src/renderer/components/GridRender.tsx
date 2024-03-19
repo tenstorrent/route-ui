@@ -1,15 +1,15 @@
 import { updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { NODE_SIZE } from '../utils/DrawingAPI';
+import { NODE_SIZE } from '../../utils/DrawingAPI';
 
-import { ComputeNode } from '../data/Chip';
-import { ChipContext } from '../data/ChipDataProvider';
-import { getGridZoom } from '../data/store/selectors/uiState.selectors';
-import { mapIterable } from '../utils/IterableHelpers';
-import DetailedView from './components/DetailedView';
-import NodeGridElement from './components/NodeGridElement';
-import ClusterViewDialog from './components/cluster-view/ClusterViewDialog';
+import { ComputeNode } from '../../data/Chip';
+import { ChipContext } from '../../data/ChipDataProvider';
+import { getGridZoom } from '../../data/store/selectors/uiState.selectors';
+import { mapIterable } from '../../utils/IterableHelpers';
+import NodeGridElement from './NodeGridElement';
+import ClusterViewDialog from './cluster-view/ClusterViewDialog';
+import DetailedView from './detailed-view-components/DetailedView';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);

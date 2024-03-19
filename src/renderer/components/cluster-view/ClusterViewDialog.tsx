@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Classes, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { RootState } from 'data/store/createStore';
-import '../../scss/ClusterView.scss';
 import { closeClusterView } from '../../../data/store/slices/clusterView.slice';
 import ClusterView from './ClusterView';
+
+import './ClusterView.scss';
 
 const ClusterViewDialog: React.FC = ({}) => {
     const dispatch = useDispatch();

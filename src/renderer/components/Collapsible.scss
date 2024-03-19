@@ -1,8 +1,7 @@
-@import "variables";
+@import "../scss/variables";
 
 .collapsible-component {
     > [type="button"] {
-        color: $tt-white-text;
         padding: 0;
         margin-bottom: 5px;
 
@@ -12,11 +11,14 @@
         justify-content: flex-start;
         flex-wrap: nowrap;
 
+        &.bp4-button { padding: 0; }
+
         &:hover {
             color: $tt-white-text;
         }
 
         .bp4-button-text {
+            color: $tt-white-text;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

@@ -5,6 +5,8 @@ import { IconNames } from '@blueprintjs/icons';
 import { getLogEntries } from '../../data/store/selectors/logging.selector';
 import { LogLevel } from '../../data/Types';
 
+import './LogsOutput.scss';
+
 const ICON_MAP = {
     [LogLevel.ERROR]: IconNames.ERROR,
     [LogLevel.WARNING]: IconNames.WARNING_SIGN,

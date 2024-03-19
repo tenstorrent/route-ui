@@ -5,13 +5,14 @@ import { getDetailedViewZoom } from 'data/store/selectors/uiState.selectors';
 import { closeDetailedView } from 'data/store/slices/detailedView.slice';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../data/ChipDataProvider';
-import { ComputeNodeType } from '../../data/Types';
-import { updateDetailedViewHeight } from '../../data/store/slices/uiState.slice';
-import '../scss/DetailedView.scss';
-import DetailedViewDRAMRenderer from './detailed-view-components/DetailedViewDRAM';
-import DetailedViewETHRenderer from './detailed-view-components/DetailedViewETH';
-import DetailedViewPCIERenderer from './detailed-view-components/DetailedViewPCIE';
+import { ChipContext } from '../../../data/ChipDataProvider';
+import { ComputeNodeType } from '../../../data/Types';
+import { updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
+import DetailedViewDRAMRenderer from './DetailedViewDRAM';
+import DetailedViewETHRenderer from './DetailedViewETH';
+import DetailedViewPCIERenderer from './DetailedViewPCIE';
+
+import './DetailedView.scss';
 
 interface DetailedViewProps {}
 

@@ -1,4 +1,4 @@
-@import "variables";
+@import "../../scss/variables";
 
 .bottom-dock {
     padding: 0 20px;
@@ -40,7 +40,7 @@
     }
 
 
-    .bp4-tab-indicator {
+    .bp4-tab-indicator-wrapper .bp4-tab-indicator {
         bottom: 2px;
         height: 1px;
         background-color: $tt-dark-blue;

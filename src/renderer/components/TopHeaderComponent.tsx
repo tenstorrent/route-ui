@@ -16,10 +16,11 @@ import { checkLocalFolderExists } from '../../utils/FileLoaders';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import type { RemoteConnection, RemoteFolder } from '../hooks/useRemote.hook';
 import useRemoteConnection from '../hooks/useRemote.hook';
-import '../scss/TopHeaderComponent.scss';
 import FolderPicker from './folder-picker/FolderPicker';
 import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
 import GraphSelector from './graph-selector/GraphSelector';
+
+import './TopHeaderComponent.scss';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();

@@ -3,19 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { LogLevel } from '../data/Types';
-import { getLogEntriesByType, getLogOutputEnabled } from '../data/store/selectors/logging.selector';
-import LogsOutput from './components/LogsOutput';
+import { LogLevel } from '../../data/Types';
+import { getLogEntriesByType, getLogOutputEnabled } from '../../data/store/selectors/logging.selector';
+import LogsOutput from '../components/LogsOutput';
 
-import { toggleClusterView, toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
-import { ElectronEvents } from '../main/ElectronEvents';
-import TenstorrentLogo from '../main/assets/TenstorrentLogo';
-import RemoteSyncConfigurator from './components/folder-picker/RemoteSyncConfigurator';
-import useAppConfig from './hooks/useAppConfig.hook';
+import { toggleClusterView, toggleQueuesTable } from '../../data/store/slices/experimentalFeatures.slice';
+import { ElectronEvents } from '../../main/ElectronEvents';
+import TenstorrentLogo from '../../main/assets/TenstorrentLogo';
+import RemoteSyncConfigurator from '../components/folder-picker/RemoteSyncConfigurator';
+import useAppConfig from '../hooks/useAppConfig.hook';
 
-import LocalFolderSelector from './components/folder-picker/LocalFolderSelector';
-import './scss/FolderPicker.scss';
-import './scss/SplashScreen.scss';
+import LocalFolderSelector from '../components/folder-picker/LocalFolderSelector';
+import './SplashScreen.scss';
 
 const SplashScreen: FC = () => {
     const errorLogs = useSelector(getLogEntriesByType(LogLevel.ERROR));
@@ -30,7 +29,7 @@ const SplashScreen: FC = () => {
         )[0] as boolean;
 
         dispatch(toggleQueuesTable(isQueuesTableEnabled));
-        
+
         dispatch(
             toggleClusterView(JSON.parse(getAppConfig(ElectronEvents.TOGGLE_CLUSTER_VIEW) ?? '[false]')[0] as boolean),
         );
