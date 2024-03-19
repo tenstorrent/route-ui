@@ -11,6 +11,8 @@
         justify-content: flex-start;
         flex-wrap: nowrap;
 
+        &.bp4-button { padding: 0; }
+
         &:hover {
             color: $tt-white-text;
         }
