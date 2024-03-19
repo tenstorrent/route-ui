@@ -6,6 +6,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/Chip';
 import { HighlightType } from '../../data/Types';
+import { setDockOpenState } from '../../data/store/slices/uiState.slice';
 import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
@@ -15,7 +16,6 @@ import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffC
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
-import { setDockOpenState } from '../../data/store/slices/uiState.slice';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -41,8 +41,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const triggerSelection = () => {
         const selectedState = nodeState?.selected;
         if (isOpen && selectedState) {
-            dispatch(openDetailedView(node.uid));
             dispatch(setDockOpenState(false));
+            dispatch(openDetailedView(node.uid));
         } else {
             dispatch(updateNodeSelection({ id: node.uid, selected: !nodeState?.selected }));
         }

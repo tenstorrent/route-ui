@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterDataSource } from '../../data/DataSource';
+import { getDetailedViewOpenState } from '../../data/store/selectors/detailedView.selectors';
 import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
 
@@ -34,6 +35,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
         dispatch(openClusterView());
     };
     const isDockOpen = useSelector(getDockOpenState);
+    const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
 
     const clusterViewEnabled = useSelector(getExperimentalFeatures('showClusterView'));
     const clusterViewButtonEnabled = clusterViewEnabled && cluster?.chips !== undefined && cluster?.chips.length > 1;
@@ -50,6 +52,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
             {applicationMode === ApplicationMode.PERF_ANALYZER && (
                 <Tooltip2 content='Show/Hide table dock'>
                     <Button
+                        disabled={isDetailsViewOpen}
                         icon={IconNames.APPLICATION}
                         text=''
                         onClick={() => dispatch(setDockOpenState(!isDockOpen))}
