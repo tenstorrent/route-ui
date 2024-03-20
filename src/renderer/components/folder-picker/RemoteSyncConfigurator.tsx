@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import {
     getSelectedFolderLocationType,
     getSelectedRemoteFolder,

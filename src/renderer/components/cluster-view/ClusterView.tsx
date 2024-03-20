@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GraphOnChip, { ComputeNode } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import getPipeColor from '../../../data/ColorGenerator';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';

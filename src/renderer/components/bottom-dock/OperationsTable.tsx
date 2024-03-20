@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
 import { ComputeNode } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
 import { columnRenderer } from './SharedTable';

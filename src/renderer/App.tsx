@@ -3,7 +3,7 @@ import store from 'data/store/createStore';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
-import { GraphOnChipProvider } from '../data/ChipDataProvider';
+import { GraphOnChipProvider } from '../data/GraphOnChipDataProvider';
 import Cluster from '../data/Cluster';
 import { ClusterDataSource } from '../data/DataSource';
 import useKeyboardFocus from './hooks/useKeyboardFocus.hook';

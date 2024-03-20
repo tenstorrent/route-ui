@@ -5,7 +5,7 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import LinkDetails from '../LinkDetails';

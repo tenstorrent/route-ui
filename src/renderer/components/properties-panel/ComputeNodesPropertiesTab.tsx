@@ -9,7 +9,7 @@ import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';

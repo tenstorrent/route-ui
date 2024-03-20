@@ -7,7 +7,7 @@ import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { GraphOnChipContext } from '../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../data/GraphOnChipDataProvider';
 import { ClusterDataSource } from '../../data/DataSource';
 import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';

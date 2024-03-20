@@ -5,7 +5,7 @@ import { RootState } from 'data/store/createStore';
 import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import React, { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import { Operation } from '../../../data/GraphTypes';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';

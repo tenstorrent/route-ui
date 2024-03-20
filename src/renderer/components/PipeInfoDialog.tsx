@@ -3,7 +3,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { Position } from '@blueprintjs/core';
 import { JSX } from 'react/jsx-runtime';
 import { Pipe } from '../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../data/GraphOnChipDataProvider';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;

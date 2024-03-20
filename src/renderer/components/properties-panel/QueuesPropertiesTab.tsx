@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import { RootState } from '../../../data/store/createStore';
 import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';

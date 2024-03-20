@@ -14,7 +14,7 @@ import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_G
 import Collapsible from '../Collapsible';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import { getTotalOpsForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface DRAMBandwidthControlsProps {}

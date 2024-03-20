@@ -5,7 +5,7 @@ import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelect
 import { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { PipeSegment } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';

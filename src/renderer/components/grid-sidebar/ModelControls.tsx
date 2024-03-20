@@ -2,7 +2,7 @@ import { Slider } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import { MAX_MODEL_RATIO_THRESHOLD, MIN_MODEL_RATIO_THRESHOLD } from '../../../data/constants';
 import type { RootState } from '../../../data/store/createStore';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
