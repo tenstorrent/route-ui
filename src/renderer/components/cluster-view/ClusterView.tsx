@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GraphOnChip, { ComputeNode } from '../../../data/GraphOnChip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import getPipeColor from '../../../data/ColorGenerator';
 import { ClusterDataSource } from '../../../data/DataSource';
 import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';
@@ -51,7 +51,7 @@ const renderItem: ItemRenderer<GraphRelationshipState[]> = (
 };
 const ClusterView: FC<ClusterViewDialog> = () => {
     const { cluster } = useContext(ClusterDataSource);
-    const { getChipByGraphName, getGraphName, getAvailableGraphs } = useContext(ChipContext);
+    const { getChipByGraphName, getGraphName, getAvailableGraphs } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
     const graphInformation = getAvailableGraphs();
     const selectedGraph = getGraphName();

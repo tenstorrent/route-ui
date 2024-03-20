@@ -1,7 +1,7 @@
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { RootState } from '../../../data/store/createStore';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -14,7 +14,7 @@ import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const tableFields = useMemo(() => {

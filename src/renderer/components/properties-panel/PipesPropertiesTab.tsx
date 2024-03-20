@@ -5,14 +5,14 @@ import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelect
 import { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { PipeSegment } from '../../../data/GraphOnChip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
 
 const PipesPropertiesTab = () => {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
 
     const [pipeFilter, setPipeFilter] = useState<string>('');
 

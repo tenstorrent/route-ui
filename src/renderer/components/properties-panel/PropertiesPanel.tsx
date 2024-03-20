@@ -1,7 +1,7 @@
 import { Icon, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { useContext, useState } from 'react';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import QueueIcon from '../../../main/assets/QueueIcon';
 import ComputeNodesPropertiesTab from './ComputeNodesPropertiesTab';
 import OperationsPropertiesTab from './OperationsPropertiesTab';
@@ -12,7 +12,7 @@ import './PropertiesPanel.scss';
 
 export default function PropertiesPanel() {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
     return (
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>

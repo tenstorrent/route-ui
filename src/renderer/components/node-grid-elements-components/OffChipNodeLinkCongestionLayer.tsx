@@ -10,7 +10,7 @@ import {
     getLinkSaturation,
     getShowLinkSaturation
 } from '../../../data/store/selectors/linkSaturation.selectors';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 
 interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;
@@ -20,7 +20,7 @@ interface OffChipNodeLinkCongestionLayerProps {
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node }) => {
-    const graphName = useContext(ChipContext).getGraphName();
+    const graphName = useContext(GraphOnChipContext).getGraphName();
     const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);

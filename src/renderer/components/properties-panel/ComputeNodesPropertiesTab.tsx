@@ -9,7 +9,7 @@ import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
@@ -116,7 +116,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
-    const { graphName } = useContext(ChipContext).chipState;
+    const { graphName } = useContext(GraphOnChipContext).chipState;
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -341,7 +341,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!graphOnChip) {

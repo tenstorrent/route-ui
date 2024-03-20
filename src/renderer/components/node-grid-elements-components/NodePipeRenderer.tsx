@@ -19,7 +19,7 @@ import {
     getLinkSaturation,
     getShowLinkSaturation
 } from '../../../data/store/selectors/linkSaturation.selectors';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 
 interface NodePipeRendererProps {
     node: ComputeNode;
@@ -28,7 +28,7 @@ interface NodePipeRendererProps {
 const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
-    const graphName = useContext(ChipContext).getGraphName();
+    const graphName = useContext(GraphOnChipContext).getGraphName();
     const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));
 
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);

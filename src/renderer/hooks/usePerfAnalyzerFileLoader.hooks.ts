@@ -14,7 +14,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import type GraphOnChip from '../../data/GraphOnChip';
-import { ChipContext } from '../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
 import {
@@ -35,7 +35,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveChip, setActiveChip, setChips, resetChips } = useContext(ChipContext);
+    const { getActiveChip, setActiveChip, setChips, resetChips } = useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveChip();
     const navigate = useNavigate();

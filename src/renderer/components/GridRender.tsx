@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 
 import { ComputeNode } from '../../data/GraphOnChip';
-import { ChipContext } from '../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../data/ChipDataProvider';
 import { getGridZoom } from '../../data/store/selectors/uiState.selectors';
 import { mapIterable } from '../../utils/IterableHelpers';
 import NodeGridElement from './NodeGridElement';
@@ -13,7 +13,7 @@ import DetailedView from './detailed-view-components/DetailedView';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
 
     const dispatch = useDispatch();
 

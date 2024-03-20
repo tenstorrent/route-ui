@@ -1,5 +1,5 @@
 import { FC, useContext } from 'react';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
@@ -11,7 +11,7 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
-    const { getGraphName, chipState } = useContext(ChipContext);
+    const { getGraphName, chipState } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const selectedGraph = getGraphName();
     const availableGraphs = Object.keys(chipState.chips);

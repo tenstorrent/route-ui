@@ -30,7 +30,7 @@ const initialChipsState: ChipsState = {
     graphs: new Map<string, GraphRelationshipState>(),
 };
 
-const ChipContext = createContext<ChipContextType>({
+const GraphOnChipContext = createContext<ChipContextType>({
     chipState: initialChipsState,
     setChips: () => {},
     addChip: () => {},
@@ -142,7 +142,7 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         ],
     );
 
-    return <ChipContext.Provider value={value}>{children}</ChipContext.Provider>;
+    return <GraphOnChipContext.Provider value={value}>{children}</GraphOnChipContext.Provider>;
 };
 
-export { ChipContext, ChipProvider };
+export { GraphOnChipContext, ChipProvider };

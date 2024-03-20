@@ -9,7 +9,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../data/ChipDataProvider';
 import type { FolderLocationType } from '../../data/StateTypes';
 import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';
@@ -36,7 +36,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { getGraphName, resetChips, getActiveGraph, getActiveChip } = useContext(ChipContext);
+    const { getGraphName, resetChips, getActiveGraph, getActiveChip } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 

@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import { RootState } from '../../../data/store/createStore';
 import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
@@ -17,7 +17,7 @@ import SelectableOperation from '../SelectableOperation';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');

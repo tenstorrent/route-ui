@@ -14,14 +14,14 @@ import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_G
 import Collapsible from '../Collapsible';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import { getTotalOpsForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
-    const graphOnChip = useContext(ChipContext).getActiveChip();
-    const graphName = useContext(ChipContext).getGraphName();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphName = useContext(GraphOnChipContext).getGraphName();
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);

@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import {
     getSelectedFolderLocationType,
     getSelectedRemoteFolder,
@@ -21,7 +21,7 @@ import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
 const RemoteSyncConfigurator: FC = () => {
-    const { resetChips } = useContext(ChipContext);
+    const { resetChips } = useContext(GraphOnChipContext);
     const remote = useRemote();
 
     const dispatch = useDispatch();

@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
 import { ComputeNode } from '../../../data/GraphOnChip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
 import { columnRenderer } from './SharedTable';
@@ -30,7 +30,7 @@ import SelectableOperation, { SelectableOperationPerformance } from '../Selectab
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');

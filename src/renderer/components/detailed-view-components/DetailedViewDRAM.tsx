@@ -5,7 +5,7 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import LinkDetails from '../LinkDetails';
@@ -19,7 +19,7 @@ interface DetailedViewDRAMRendererProps {
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
-    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 

@@ -7,7 +7,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/ChipDataProvider';
 import { ComputeNodeType } from '../../../data/Types';
 import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';
@@ -20,7 +20,7 @@ interface DetailedViewProps {}
 
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
-    const { getActiveChip, getGraphName, chipState } = useContext(ChipContext);
+    const { getActiveChip, getGraphName, chipState } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveChip();
     const graphName = getGraphName();
     const detailedViewElement = useRef<HTMLDivElement>(null);
