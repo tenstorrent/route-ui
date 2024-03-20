@@ -15,7 +15,7 @@ interface ChipContextType {
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => void;
     resetChips: () => void;
     getAvailableGraphs: () => GraphRelationshipState[];
-    getActiveGraph: () => GraphRelationshipState | undefined;
+    getActiveGraphRelationshipState: () => GraphRelationshipState | undefined;
     getActiveChip: () => GraphOnChip | undefined;
     setActiveChip: (graphName: string) => void;
     getChipByGraphName: (graphName: string) => GraphOnChip | undefined;
@@ -33,7 +33,7 @@ const GraphOnChipContext = createContext<ChipContextType>({
     loadGraphOnChips: () => {},
     resetChips: () => {},
     getAvailableGraphs: () => [],
-    getActiveGraph: () => undefined,
+    getActiveGraphRelationshipState: () => undefined,
     getActiveChip: () => undefined,
     setActiveChip: () => {},
     getChipByGraphName: () => undefined,
@@ -68,7 +68,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
 
-    const getActiveGraph = useCallback(() => {
+    const getActiveGraphRelationshipState = useCallback(() => {
         return chipsState.graphs.get(chipsState.activeGraphName);
     }, [chipsState]);
 
@@ -92,7 +92,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             loadGraphOnChips: setChips,
             chipState: chipsState,
             getActiveChip,
-            getActiveGraph,
+            getActiveGraphRelationshipState,
             getAvailableGraphs,
             getChipByGraphName,
             getGraphName,
@@ -103,7 +103,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             setChips,
             chipsState,
             getActiveChip,
-            getActiveGraph,
+            getActiveGraphRelationshipState,
             getAvailableGraphs,
             getChipByGraphName,
             getGraphName,
