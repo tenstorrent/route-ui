@@ -116,7 +116,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
-    const { graphName } = useContext(GraphOnChipContext).chipState;
+    const { activeGraphName } = useContext(GraphOnChipContext).chipState;
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -332,7 +332,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} graphName={graphName} showEmpty />
+                        <LinkDetails key={link.name} link={link} graphName={activeGraphName} showEmpty />
                     ))}
                 </div>
             )}

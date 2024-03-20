@@ -3,7 +3,7 @@ import GraphOnChip from './GraphOnChip';
 import type { GraphRelationshipState } from './StateTypes';
 
 interface ChipsState {
-    graphName: string;
+    activeGraphName: string;
     chips: {
         [graphName: string]: GraphOnChip;
     };
@@ -23,7 +23,7 @@ interface ChipContextType {
 }
 
 const initialChipsState: ChipsState = {
-    graphName: '',
+    activeGraphName: '',
     chips: {},
     graphs: new Map<string, GraphRelationshipState>(),
 };
@@ -45,7 +45,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const setChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => {
         setChipsState({
-            graphName: '',
+            activeGraphName: '',
             chips: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
             graphs: new Map(graphs.map((graph) => [graph.name, graph])),
         });
@@ -69,23 +69,23 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
     const getActiveGraph = useCallback(() => {
-        return chipsState.graphs.get(chipsState.graphName);
+        return chipsState.graphs.get(chipsState.activeGraphName);
     }, [chipsState]);
 
     const getActiveChip = useCallback(() => {
-        return chipsState.chips[chipsState.graphName];
+        return chipsState.chips[chipsState.activeGraphName];
     }, [chipsState]);
 
     const setActiveChip = useCallback((graphName: string) => {
         setChipsState((prevState) => ({
             ...prevState,
-            graphName,
+            activeGraphName: graphName,
         }));
     }, []);
 
     const getGraphName = useCallback(() => {
-        return chipsState.graphName;
-    }, [chipsState.graphName]);
+        return chipsState.activeGraphName;
+    }, [chipsState.activeGraphName]);
 
     const value = useMemo<ChipContextType>(
         () => ({
