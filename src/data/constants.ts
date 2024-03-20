@@ -10,9 +10,8 @@ export const INITIAL_OPERATION_PERFORMANCE_THRESHOLD = 1;
 export const MAX_OPERATION_PERFORMANCE_THRESHOLD = 5; // this is a where everything is red, not an actual limit
 export const MAX_MODEL_RATIO_THRESHOLD = 10;
 export const MIN_MODEL_RATIO_THRESHOLD = 0;
-
 export const INITIAL_DETAILS_VIEW_HEIGHT = 340;
-
+export const CLUSTER_NODE_GRID_SIZE = 6;
 export const INTERNAL_LINK_NAMES = [
     NOCLinkName.NOC0_IN,
     NOCLinkName.NOC1_IN,
