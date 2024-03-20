@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 
 import React, { FC } from 'react';
-import { PipeSegment } from '../../data/Chip';
+import { PipeSegment } from '../../data/GraphOnChip';
 import { GraphVertexType } from '../../data/GraphNames';
 import { GraphVertex, Queue } from '../../data/GraphTypes';
 import { NOCLinkName } from '../../data/Types';

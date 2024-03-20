@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 
 import * as d3 from 'd3';
-import { ComputeNode } from '../data/Chip';
+import { ComputeNode } from '../data/GraphOnChip';
 import getPipeColor from '../data/ColorGenerator';
 import { ComputeNodeSiblings } from '../data/StateTypes';
 import {
@@ -218,7 +218,7 @@ export const drawEthLink = (
         .attr('y2', lineEndY)
         .attr('stroke-width', stroke)
         .attr('stroke', color || '#4d4d4d');
-    
+
 }
 export const drawEthPipes = (
     svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,

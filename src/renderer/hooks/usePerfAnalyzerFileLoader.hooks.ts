@@ -13,7 +13,7 @@ import { ApplicationMode } from 'data/Types';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
-import type Chip from '../../data/Chip';
+import type GraphOnChip from '../../data/GraphOnChip';
 import { ChipContext } from '../../data/ChipDataProvider';
 import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
@@ -90,7 +90,7 @@ const usePerfAnalyzerFileLoader = () => {
             const totalOpsPerEpoch: Map<number, number> = new Map();
             const totalOpsNormalized: Record<string, number> = {};
 
-            const graphOnChipList: Chip[] = [];
+            const graphOnChipList: GraphOnChip[] = [];
             const linkData: Record<string, LinkState[]> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};

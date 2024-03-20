@@ -3,7 +3,7 @@ import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { useDispatch } from 'react-redux';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 
 interface DetailedViewPipeControlsProps {
     node: ComputeNode | undefined;

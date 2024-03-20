@@ -1,6 +1,6 @@
 import { type CSSProperties, FC } from 'react';
 import { useSelector } from 'react-redux';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 import { RootState } from '../../../data/store/createStore';
 import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';

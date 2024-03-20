@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { RootState } from '../../../data/store/createStore';
 import { ComputeNodeType } from '../../../data/Types';

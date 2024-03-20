@@ -41,19 +41,19 @@ import {
     QueueLocation,
 } from './Types';
 
-export default class Chip {
+export default class GraphOnChip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
 
     public static GET_NOC_ORDER(): Map<NOCLinkName, number> {
-        if (!Chip.NOC_ORDER) {
-            Chip.NOC_ORDER = new Map(
+        if (!GraphOnChip.NOC_ORDER) {
+            GraphOnChip.NOC_ORDER = new Map(
                 (Object.keys(NOCLinkName) as Array<keyof typeof NOCLinkName>)
                     .map((key) => NOCLinkName[key])
                     .map((noc, index) => [noc, index]),
             );
         }
 
-        return Chip.NOC_ORDER;
+        return GraphOnChip.NOC_ORDER;
     }
 
     readonly chipId: number;
@@ -287,11 +287,11 @@ export default class Chip {
         this.chipId = chipId;
         this.operationsByName = new Map();
         this.queuesByName = new Map();
-        Chip.GET_NOC_ORDER();
+        GraphOnChip.GET_NOC_ORDER();
     }
 
     public static CREATE_FROM_NETLIST_JSON(data: NetlistAnalyzerDataJSON) {
-        const chip = new Chip(data.chip_id || 0);
+        const chip = new GraphOnChip(data.chip_id || 0);
         chip.slowestOpCycles = data.slowest_op_cycles;
         chip.bwLimitedOpCycles = data.bw_limited_op_cycles;
 
@@ -399,9 +399,9 @@ export default class Chip {
         return chip;
     }
 
-    public static AUGMENT_FROM_OPS_JSON(chip: Chip, operationsJson: Record<string, OperationDataJSON>): Chip {
+    public static AUGMENT_FROM_OPS_JSON(chip: GraphOnChip, operationsJson: Record<string, OperationDataJSON>): GraphOnChip {
         if (chip) {
-            const augmentedChip = new Chip(chip.chipId);
+            const augmentedChip = new GraphOnChip(chip.chipId);
             Object.assign(augmentedChip, chip);
             const regex = /^(\d+)-(\d+)-(\d+)$/;
 
@@ -531,7 +531,7 @@ export default class Chip {
 
     public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON) {
         const chipDesign = new ChipDesign(json);
-        const chip = new Chip(0);
+        const chip = new GraphOnChip(0);
         chip.nodes = chipDesign.nodes.map((simpleNode) => {
             const node = new ComputeNode(`${chip.chipId}-${simpleNode.loc.x}-${simpleNode.loc.y}`);
             node.type = simpleNode.type;
@@ -546,8 +546,8 @@ export default class Chip {
         return chip;
     }
 
-    static AUGMENT_FROM_GRAPH_DESCRIPTOR(chip: Chip, graphDescriptorJson: GraphDescriptorJSON) {
-        const newChip = new Chip(chip.chipId);
+    static AUGMENT_FROM_GRAPH_DESCRIPTOR(chip: GraphOnChip, graphDescriptorJson: GraphDescriptorJSON) {
+        const newChip = new GraphOnChip(chip.chipId);
         Object.assign(newChip, chip);
 
         const opMap: Map<OperationName, OperationDescription> = aggregateCoresByOperation(graphDescriptorJson);
@@ -602,7 +602,7 @@ export default class Chip {
         return newChip;
     }
 
-    static AUGMENT_WITH_QUEUE_DETAILS(chip: Chip, queueDescriptorJson: QueueDescriptorJson) {
+    static AUGMENT_WITH_QUEUE_DETAILS(chip: GraphOnChip, queueDescriptorJson: QueueDescriptorJson) {
         forEach(chip.queuesByName.values(), (queue) => {
             const details = queueDescriptorJson[queue.name];
             details.processedLocation = parsedQueueLocation(details.location);
@@ -618,14 +618,14 @@ export default class Chip {
             });
         });
 
-        const newChip = new Chip(chip.chipId);
+        const newChip = new GraphOnChip(chip.chipId);
         Object.assign(newChip, chip);
 
         return newChip;
     }
 
-    static AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip: Chip, perfAnalyzerJson: PerfAnalyzerResultsJson) {
-        const newChip = new Chip(chip.chipId);
+    static AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip: GraphOnChip, perfAnalyzerJson: PerfAnalyzerResultsJson) {
+        const newChip = new GraphOnChip(chip.chipId);
         Object.assign(newChip, chip);
 
         forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
@@ -644,8 +644,8 @@ export default class Chip {
         return newChip;
     }
 
-    static AUGMENT_WITH_OP_PERFORMANCE(chip: Chip, perfAnalyzerResultsOps: OpPerformanceByOp) {
-        const newChip = new Chip(chip.chipId);
+    static AUGMENT_WITH_OP_PERFORMANCE(chip: GraphOnChip, perfAnalyzerResultsOps: OpPerformanceByOp) {
+        const newChip = new GraphOnChip(chip.chipId);
         Object.assign(newChip, chip);
 
         forEach(perfAnalyzerResultsOps.entries(), ([opName, opDetails]) => {
@@ -1099,8 +1099,8 @@ export class ComputeNode {
      */
     public getNOCLinksForNode = (): NOCLink[] => {
         return [...this.links.values()].sort((a, b) => {
-            const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
-            const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
+            const firstKeyOrder = GraphOnChip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
+            const secondKeyOrder = GraphOnChip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
             return firstKeyOrder - secondKeyOrder;
         });
     };
@@ -1114,8 +1114,8 @@ export class ComputeNode {
                 return INTERNAL_LINK_NAMES.includes(link.name);
             })
             .sort((a, b) => {
-                const firstKeyOrder = Chip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
-                const secondKeyOrder = Chip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
+                const firstKeyOrder = GraphOnChip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
+                const secondKeyOrder = GraphOnChip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
                 return firstKeyOrder - secondKeyOrder;
             });
         links.push(...this.internalLinks.values());

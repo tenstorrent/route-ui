@@ -1,7 +1,7 @@
 import { FC, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 import { RootState } from '../../../data/store/createStore';
 import { NOCLinkName } from '../../../data/Types';
 import { NODE_SIZE, drawSelections } from '../../../utils/DrawingAPI';

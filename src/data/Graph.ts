@@ -1,7 +1,7 @@
 import { ComputeNodeType } from './Types';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
-import { ComputeNode } from './Chip';
+import { ComputeNode } from './GraphOnChip';
 import { OperandDirection, OperandPerformance, OpPerfDetails } from './OpPerfDetails';
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
 

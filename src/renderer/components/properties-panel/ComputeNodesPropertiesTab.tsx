@@ -8,7 +8,7 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
-import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
+import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { OperandDirection } from '../../../data/OpPerfDetails';

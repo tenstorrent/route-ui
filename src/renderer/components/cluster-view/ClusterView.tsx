@@ -6,7 +6,7 @@ import { Button, Checkbox, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Chip, { ComputeNode } from '../../../data/Chip';
+import GraphOnChip, { ComputeNode } from '../../../data/GraphOnChip';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import getPipeColor from '../../../data/ColorGenerator';
 import { ClusterDataSource } from '../../../data/DataSource';
@@ -225,7 +225,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                 }}
             >
                 {cluster?.chips.map((clusterChip) => {
-                    let chip: Chip | undefined;
+                    let chip: GraphOnChip | undefined;
                     let graphName: string | undefined;
                     selectedEpoch.forEach((graph) => {
                         const chipByGraphName = getChipByGraphName(graph.name);

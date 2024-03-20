@@ -1,7 +1,7 @@
 // new component DetailedViewDRAM
 
 import React from 'react';
-import { ComputeNode, NetworkLink, NOCLink } from '../../../data/Chip';
+import { ComputeNode, NetworkLink, NOCLink } from '../../../data/GraphOnChip';
 import { NOCLinkName } from '../../../data/Types';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 import LinkDetails from '../LinkDetails';

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import Chip from 'data/Chip';
+import GraphOnChip from 'data/GraphOnChip';
 import {
     ChipDesignJSON,
     GraphnameToEpochToDeviceJSON,
@@ -165,7 +165,7 @@ export const loadCluster = async (perfResultsPath: string): Promise<Cluster | nu
     return null;
 };
 
-const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
+const loadChipFromArchitecture = async (architecture: Architecture): Promise<GraphOnChip> => {
     if (architecture === Architecture.NONE) {
         throw new Error('No architecture provided.');
     }
@@ -177,7 +177,7 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
         [Architecture.WORMHOLE]: wormholeArch.default,
     }[architecture];
 
-    return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
+    return GraphOnChip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
 /** @description only for netlist analizer files */
@@ -220,7 +220,7 @@ const loadChipFromNetlistAnalyzer = async (
     graphName: string,
     chipId: number | null,
     temporalEpoch: number | null,
-): Promise<Chip | null> => {
+): Promise<GraphOnChip | null> => {
     try {
         const netListAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
         let netlistAnalyzerFilepath: string = '';
@@ -247,11 +247,11 @@ const loadChipFromNetlistAnalyzer = async (
         }
         if (netlistAnalyzerFilepath !== '') {
             const data = await readFile(netlistAnalyzerFilepath);
-            let chip = Chip.CREATE_FROM_NETLIST_JSON(load(data) as NetlistAnalyzerDataJSON);
+            let chip = GraphOnChip.CREATE_FROM_NETLIST_JSON(load(data) as NetlistAnalyzerDataJSON);
             if (netlistAnalyzerOptoPipeFilepath !== '') {
                 try {
                     const opsData = await readFile(netlistAnalyzerOptoPipeFilepath);
-                    chip = Chip.AUGMENT_FROM_OPS_JSON(chip, (load(opsData) as any).ops);
+                    chip = GraphOnChip.AUGMENT_FROM_OPS_JSON(chip, (load(opsData) as any).ops);
                     if (chip) {
                         return chip;
                     }
@@ -270,12 +270,12 @@ const loadChipFromNetlistAnalyzer = async (
     }
     return null;
 };
-export const loadGraph = async (folderPath: string, graph: GraphRelationshipState): Promise<Chip> => {
+export const loadGraph = async (folderPath: string, graph: GraphRelationshipState): Promise<GraphOnChip> => {
     const { name, chipId, temporalEpoch } = graph;
 
     let architecture = Architecture.NONE;
 
-    let chip: Chip | null = await loadChipFromNetlistAnalyzer(path.join(folderPath), name, chipId, temporalEpoch);
+    let chip: GraphOnChip | null = await loadChipFromNetlistAnalyzer(path.join(folderPath), name, chipId, temporalEpoch);
 
     if (chip === null) {
         try {
@@ -299,7 +299,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
         const graphPath = path.join(folderPath, `perf_results`, 'graph_descriptor', name, 'cores_to_ops.json');
         const graphDescriptorJson = await loadJsonFile(graphPath);
 
-        chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+        chip = GraphOnChip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
     } catch (err) {
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
@@ -307,7 +307,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
         const queuesPath = path.join(folderPath, `perf_results`, 'queue_descriptor', 'queue_descriptor.json');
         const queueDescriptorJson = await loadJsonFile(queuesPath);
 
-        chip = Chip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
+        chip = GraphOnChip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
     } catch (err) {
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
@@ -342,9 +342,9 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
                 .flat(),
         );
 
-        chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
+        chip = GraphOnChip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
 
-        chip = Chip.AUGMENT_WITH_OP_PERFORMANCE(chip, opPerformanceByOp);
+        chip = GraphOnChip.AUGMENT_WITH_OP_PERFORMANCE(chip, opPerformanceByOp);
     } catch (err) {
         console.error('graph_perf_report_per_op.json not found, skipping \n', err);
     }

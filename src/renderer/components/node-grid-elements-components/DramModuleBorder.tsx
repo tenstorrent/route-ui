@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 import { getDramGroupingStyles } from '../../../utils/DrawingAPI';
 import { RootState } from '../../../data/store/createStore';
 import { getDramGroup } from '../../../data/store/selectors/nodeSelection.selectors';

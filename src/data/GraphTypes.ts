@@ -1,4 +1,4 @@
-import type { ComputeNode } from './Chip';
+import type { ComputeNode } from './GraphOnChip';
 import type { Operand } from './Graph';
 import type { QueueDetailsJson } from './sources/QueueDescriptor';
 import { OperandPerformance, OpPerfDetails } from './OpPerfDetails';

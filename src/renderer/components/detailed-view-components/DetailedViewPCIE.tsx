@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComputeNode, NetworkLink, NOC2AXILink, NOCLink, PCIeLink } from '../../../data/Chip';
+import { ComputeNode, NetworkLink, NOC2AXILink, NOCLink, PCIeLink } from '../../../data/GraphOnChip';
 import { NOC, NOC2AXILinkName, NOCLinkName, PCIeLinkName } from '../../../data/Types';
 import LinkDetails from '../LinkDetails';
 import DetailedViewPipeControls from './DetailedViewPipeControls';

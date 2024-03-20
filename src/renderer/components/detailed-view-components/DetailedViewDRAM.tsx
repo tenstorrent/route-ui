@@ -4,7 +4,7 @@ import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { ComputeNode, NOCLink } from '../../../data/Chip';
+import { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import { filterIterable } from '../../../utils/IterableHelpers';

@@ -4,7 +4,7 @@ import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ComputeNode } from '../../data/Chip';
+import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../data/store/selectors/uiState.selectors';
 import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';

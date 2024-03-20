@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'data/store/createStore';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
-import { NetworkLink, NOCLink } from '../../../data/Chip';
+import { NetworkLink, NOCLink } from '../../../data/GraphOnChip';
 import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
 import { PipeSelection } from '../../../data/StateTypes';
 import {

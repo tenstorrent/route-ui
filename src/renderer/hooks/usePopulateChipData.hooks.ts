@@ -1,4 +1,4 @@
-import Chip from 'data/Chip';
+import GraphOnChip from 'data/GraphOnChip';
 import { loadNodesData } from 'data/store/slices/nodeSelection.slice';
 import { closeDetailedView } from 'data/store/slices/uiState.slice';
 import { useDispatch } from 'react-redux';
@@ -7,7 +7,7 @@ import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.
 
 const usePopulateChipData = () => {
     const dispatch = useDispatch();
-    const populateChipData = (selectedChip: Chip) => {
+    const populateChipData = (selectedChip: GraphOnChip) => {
         dispatch(updateMaxBwLimitedFactor(selectedChip.details.maxBwLimitedFactor));
         dispatch(closeDetailedView());
         dispatch(loadNodesData([...mapIterable(selectedChip.nodes, (node) => node.generateInitialState())]));

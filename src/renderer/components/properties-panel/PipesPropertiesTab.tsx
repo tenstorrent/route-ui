@@ -4,7 +4,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { PipeSegment } from '../../../data/Chip';
+import { PipeSegment } from '../../../data/GraphOnChip';
 import { ChipContext } from '../../../data/ChipDataProvider';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';

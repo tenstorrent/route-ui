@@ -1,26 +1,26 @@
 import React, { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
-import Chip from './Chip';
+import GraphOnChip from './GraphOnChip';
 import type { GraphRelationshipState } from './StateTypes';
 
 interface ChipsState {
     graphName: string;
     chips: {
-        [graphName: string]: Chip;
+        [graphName: string]: GraphOnChip;
     };
     graphs: Map<string, GraphRelationshipState>;
 }
 
 interface ChipContextType {
     chipState: ChipsState;
-    setChips: (newChips: Chip[], graphs: GraphRelationshipState[]) => void;
-    addChip: (newChip: Chip, graph: GraphRelationshipState) => void;
+    setChips: (newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => void;
+    addChip: (newChip: GraphOnChip, graph: GraphRelationshipState) => void;
     resetChips: () => void;
     getAvailableGraphs: () => GraphRelationshipState[];
     setAvailbaleGraphs: (graphs: GraphRelationshipState[]) => void;
     getActiveGraph: () => GraphRelationshipState | undefined;
-    getActiveChip: () => Chip | undefined;
+    getActiveChip: () => GraphOnChip | undefined;
     setActiveChip: (graphName: string) => void;
-    getChipByGraphName: (graphName: string) => Chip | undefined;
+    getChipByGraphName: (graphName: string) => GraphOnChip | undefined;
     getGraphName: () => string;
 }
 
@@ -47,7 +47,7 @@ const ChipContext = createContext<ChipContextType>({
 const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [chipsState, setChipsState] = useState<ChipsState>(initialChipsState);
 
-    const setChips = useCallback((newChips: Chip[], graphs: GraphRelationshipState[]) => {
+    const setChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => {
         setChipsState({
             graphName: '',
             chips: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
@@ -55,7 +55,7 @@ const ChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         });
     }, []);
 
-    const addChip = useCallback((newChipData: Chip, graph: GraphRelationshipState) => {
+    const addChip = useCallback((newChipData: GraphOnChip, graph: GraphRelationshipState) => {
         setChipsState((prevState) => {
             const graphs = new Map(prevState.graphs);
 
