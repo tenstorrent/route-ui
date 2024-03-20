@@ -2,7 +2,7 @@ import React, { createContext, ReactNode, useCallback, useMemo, useState } from 
 import GraphOnChip from './GraphOnChip';
 import type { GraphRelationship } from './StateTypes';
 
-interface ChipsState {
+interface ApplicationModelState {
     activeGraphName: string;
     graphOnChipList: {
         [graphName: string]: GraphOnChip;
@@ -11,8 +11,6 @@ interface ChipsState {
 }
 
 interface GraphOnChipContextType {
-    chipState: ChipsState;
-    //
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
     resetGraphOnChipState: () => void;
     getGraphRelationshipList: () => GraphRelationship[];
@@ -24,15 +22,13 @@ interface GraphOnChipContextType {
     graphOnChipList: Record<string, GraphOnChip>;
 }
 
-const initialChipsState: ChipsState = {
+const applicationModelState: ApplicationModelState = {
     activeGraphName: '',
     graphOnChipList: {},
     graphs: new Map<string, GraphRelationship>(),
 };
 
 const GraphOnChipContext = createContext<GraphOnChipContextType>({
-    chipState: initialChipsState,
-    //
     loadGraphOnChips: () => {},
     resetGraphOnChipState: () => {},
     getGraphRelationshipList: () => [],
@@ -45,10 +41,10 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [chipsState, setChipsState] = useState<ChipsState>(initialChipsState);
+    const [state, setState] = useState<ApplicationModelState>(applicationModelState);
 
     const loadGraphOnChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationship[]) => {
-        setChipsState({
+        setState({
             activeGraphName: '',
             graphOnChipList: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
             graphs: new Map(graphs.map((graph) => [graph.name, graph])),
@@ -57,42 +53,41 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getGraphOnChip = useCallback(
         (graphName: string) => {
-            return chipsState.graphOnChipList[graphName];
+            return state.graphOnChipList[graphName];
         },
-        [chipsState.graphOnChipList],
+        [state.graphOnChipList],
     );
 
     const reset = useCallback(() => {
-        setChipsState({ ...initialChipsState, graphs: new Map() });
+        setState({ ...applicationModelState, graphs: new Map() });
     }, []);
 
     const getGraphRelationshipList = useCallback(() => {
-        return [...chipsState.graphs.values()];
-    }, [chipsState]);
+        return [...state.graphs.values()];
+    }, [state]);
 
     const getActiveGraphRelationship = useCallback(() => {
-        return chipsState.graphs.get(chipsState.activeGraphName);
-    }, [chipsState]);
+        return state.graphs.get(state.activeGraphName);
+    }, [state]);
 
     const getActiveGraphOnChip = useCallback(() => {
-        return chipsState.graphOnChipList[chipsState.activeGraphName];
-    }, [chipsState]);
+        return state.graphOnChipList[state.activeGraphName];
+    }, [state]);
 
     const setActiveGraph = useCallback((graphName: string) => {
-        setChipsState((prevState) => ({
+        setState((prevState) => ({
             ...prevState,
             activeGraphName: graphName,
         }));
     }, []);
 
     const getActiveGraphName = useCallback(() => {
-        return chipsState.activeGraphName;
-    }, [chipsState.activeGraphName]);
+        return state.activeGraphName;
+    }, [state.activeGraphName]);
 
     const value = useMemo<GraphOnChipContextType>(
         () => ({
             loadGraphOnChips,
-            chipState: chipsState,
             getActiveGraphOnChip,
             getActiveGraphRelationship,
             getGraphRelationshipList,
@@ -100,11 +95,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getActiveGraphName,
             resetGraphOnChipState: reset,
             setActiveGraph,
-            graphOnChipList: chipsState.graphOnChipList,
+            graphOnChipList: state.graphOnChipList,
         }),
         [
             loadGraphOnChips,
-            chipsState,
+            state,
             getActiveGraphOnChip,
             getActiveGraphRelationship,
             getGraphRelationshipList,
