@@ -24,7 +24,7 @@ import fs, { Dirent, existsSync } from 'fs';
 import { load } from 'js-yaml';
 import path from 'path';
 import Cluster from '../data/Cluster';
-import { GraphRelationshipState } from '../data/StateTypes';
+import { GraphRelationship } from '../data/StateTypes';
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from '../data/sources/ClusterDescriptor';
 
 export const readFile = async (filename: string): Promise<string> =>
@@ -100,20 +100,20 @@ export const validatePerfResultsFolder = async (dirPath: string): Promise<[isVal
     }
     return [true, null];
 };
-const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Promise<GraphRelationshipState[]> => {
+const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Promise<GraphRelationship[]> => {
     try {
         const netlistAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
         return netlistAnalyzerFiles
             .filter((file) => file.isFile() && file.name.includes('temporal_epoch'))
             .map((file) => file.name)
             .map((filename) => {
-                const epoch = getTemporalEpochFromGraphName(filename);
-                const chipId = getChipIdFromFilename(filename);
+                const epoch = getTemporalEpochFromGraphName(filename) || 0;
+                const chipId = getChipIdFromFilename(filename) || 0;
                 return {
                     name: filename,
                     temporalEpoch: epoch,
                     chipId,
-                } as GraphRelationshipState;
+                } as GraphRelationship;
             });
     } catch (err) {
         console.error('Failed to read netlist_analyzer folder', err);
@@ -121,7 +121,7 @@ const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Pr
     }
 };
 
-export const getAvailableGraphNames = async (perfResultsPath: string): Promise<GraphRelationshipState[]> => {
+export const getAvailableGraphNames = async (perfResultsPath: string): Promise<GraphRelationship[]> => {
     try {
         const runtimeDataPath = path.join(perfResultsPath, 'runtime_data.yaml');
         const runtimeDataYaml = await readFile(runtimeDataPath);
@@ -133,7 +133,7 @@ export const getAvailableGraphNames = async (perfResultsPath: string): Promise<G
                     name: graphName,
                     temporalEpoch: mapping.epoch_id,
                     chipId: mapping.target_device,
-                } as GraphRelationshipState;
+                } as GraphRelationship;
             },
         );
     } catch (err) {
@@ -270,12 +270,17 @@ const loadChipFromNetlistAnalyzer = async (
     }
     return null;
 };
-export const loadGraph = async (folderPath: string, graph: GraphRelationshipState): Promise<GraphOnChip> => {
+export const loadGraph = async (folderPath: string, graph: GraphRelationship): Promise<GraphOnChip> => {
     const { name, chipId, temporalEpoch } = graph;
 
     let architecture = Architecture.NONE;
 
-    let graphOnChip: GraphOnChip | null = await loadChipFromNetlistAnalyzer(path.join(folderPath), name, chipId, temporalEpoch);
+    let graphOnChip: GraphOnChip | null = await loadChipFromNetlistAnalyzer(
+        path.join(folderPath),
+        name,
+        chipId,
+        temporalEpoch,
+    );
 
     if (graphOnChip === null) {
         try {
@@ -299,7 +304,10 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
         const graphPath = path.join(folderPath, `perf_results`, 'graph_descriptor', name, 'cores_to_ops.json');
         const graphDescriptorJson = await loadJsonFile(graphPath);
 
-        graphOnChip = GraphOnChip.AUGMENT_FROM_GRAPH_DESCRIPTOR(graphOnChip, graphDescriptorJson as GraphDescriptorJSON);
+        graphOnChip = GraphOnChip.AUGMENT_FROM_GRAPH_DESCRIPTOR(
+            graphOnChip,
+            graphDescriptorJson as GraphDescriptorJSON,
+        );
     } catch (err) {
         console.error('graph_descriptor.json not found, skipping \n', err);
     }

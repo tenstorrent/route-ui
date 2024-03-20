@@ -15,13 +15,13 @@ import { openClusterView } from '../../data/store/slices/clusterView.slice';
 export interface SideBarProps {}
 
 export const SideBar: React.FC<SideBarProps> = () => {
-    const { resetGraphOnChipContext } = useContext(GraphOnChipContext);
+    const { resetGraphOnChipState } = useContext(GraphOnChipContext);
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { cluster } = useContext(ClusterDataSource);
     const dispatch = useDispatch();
     const reloadAppData = () => {
-        resetGraphOnChipContext();
+        resetGraphOnChipState();
         dispatch(setSelectedFile(''));
         dispatch(setSelectedFolder(''));
         navigate('/');

@@ -21,7 +21,7 @@ import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
 const RemoteSyncConfigurator: FC = () => {
-    const { resetGraphOnChipContext } = useContext(GraphOnChipContext);
+    const { resetGraphOnChipState } = useContext(GraphOnChipContext);
     const remote = useRemote();
 
     const dispatch = useDispatch();
@@ -45,7 +45,7 @@ const RemoteSyncConfigurator: FC = () => {
         if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
         } else {
-            resetGraphOnChipContext();
+            resetGraphOnChipState();
         }
     };
 

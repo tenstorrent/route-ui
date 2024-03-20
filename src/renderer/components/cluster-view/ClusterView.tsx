@@ -10,7 +10,7 @@ import GraphOnChip, { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import getPipeColor from '../../../data/ColorGenerator';
 import { ClusterDataSource } from '../../../data/DataSource';
-import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';
+import { GraphRelationship, PipeSelection } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
 import {
@@ -31,7 +31,7 @@ export interface ClusterViewDialog {}
 
 const NODE_GRID_SIZE = 6;
 
-const renderItem: ItemRenderer<GraphRelationshipState[]> = (
+const renderItem: ItemRenderer<GraphRelationship[]> = (
     item,
     //
     { handleClick, modifiers },
@@ -51,11 +51,11 @@ const renderItem: ItemRenderer<GraphRelationshipState[]> = (
 };
 const ClusterView: FC<ClusterViewDialog> = () => {
     const { cluster } = useContext(ClusterDataSource);
-    const { getGraphOnChip, getActiveGraphName, getGraphRelationshipStateList } = useContext(GraphOnChipContext);
+    const { getGraphOnChip, getActiveGraphName, getGraphRelationshipList } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
-    const graphInformation = getGraphRelationshipStateList();
+    const graphInformation = getGraphRelationshipList();
     const selectedGraph = getActiveGraphName();
-    const availableTemporalEpochs: GraphRelationshipState[][] = [];
+    const availableTemporalEpochs: GraphRelationship[][] = [];
     const [pciPipes, setPciPipes] = useState<string[]>([]);
 
     const [pipeFilter, setPipeFilter] = useState<string>('');
@@ -68,7 +68,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     });
     const selectedGraphItem = graphInformation.find((graph) => graph.name === selectedGraph);
 
-    const [selectedEpoch, setSelectedEpoch] = useState<GraphRelationshipState[]>(
+    const [selectedEpoch, setSelectedEpoch] = useState<GraphRelationship[]>(
         availableTemporalEpochs[selectedGraphItem?.temporalEpoch || 0] || [],
     );
 

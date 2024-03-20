@@ -1,21 +1,21 @@
 import React, { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
 import GraphOnChip from './GraphOnChip';
-import type { GraphRelationshipState } from './StateTypes';
+import type { GraphRelationship } from './StateTypes';
 
 interface ChipsState {
     activeGraphName: string;
     chips: {
         [graphName: string]: GraphOnChip;
     };
-    graphs: Map<string, GraphRelationshipState>;
+    graphs: Map<string, GraphRelationship>;
 }
 
 interface GraphOnChipContextType {
     chipState: ChipsState;
-    loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => void;
-    resetGraphOnChipContext: () => void;
-    getGraphRelationshipStateList: () => GraphRelationshipState[];
-    getActiveGraphRelationshipState: () => GraphRelationshipState | undefined;
+    loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
+    resetGraphOnChipState: () => void;
+    getGraphRelationshipList: () => GraphRelationship[];
+    getActiveGraphRelationship: () => GraphRelationship | undefined;
     getActiveGraphOnChip: () => GraphOnChip | undefined;
     setActiveGraph: (graphName: string) => void;
     getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
@@ -25,15 +25,15 @@ interface GraphOnChipContextType {
 const initialChipsState: ChipsState = {
     activeGraphName: '',
     chips: {},
-    graphs: new Map<string, GraphRelationshipState>(),
+    graphs: new Map<string, GraphRelationship>(),
 };
 
 const GraphOnChipContext = createContext<GraphOnChipContextType>({
     chipState: initialChipsState,
     loadGraphOnChips: () => {},
-    resetGraphOnChipContext: () => {},
-    getGraphRelationshipStateList: () => [],
-    getActiveGraphRelationshipState: () => undefined,
+    resetGraphOnChipState: () => {},
+    getGraphRelationshipList: () => [],
+    getActiveGraphRelationship: () => undefined,
     getActiveGraphOnChip: () => undefined,
     setActiveGraph: () => {},
     getGraphOnChip: () => undefined,
@@ -43,7 +43,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [chipsState, setChipsState] = useState<ChipsState>(initialChipsState);
 
-    const setChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => {
+    const setChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationship[]) => {
         setChipsState({
             activeGraphName: '',
             chips: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
@@ -92,11 +92,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             loadGraphOnChips: setChips,
             chipState: chipsState,
             getActiveGraphOnChip: getActiveChip,
-            getActiveGraphRelationshipState,
-            getGraphRelationshipStateList: getAvailableGraphs,
+            getActiveGraphRelationship: getActiveGraphRelationshipState,
+            getGraphRelationshipList: getAvailableGraphs,
             getGraphOnChip: getChipByGraphName,
             getActiveGraphName: getGraphName,
-            resetGraphOnChipContext: resetChips,
+            resetGraphOnChipState: resetChips,
             setActiveGraph,
         }),
         [
