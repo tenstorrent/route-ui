@@ -12,7 +12,7 @@ import SelectablePipe from '../SelectablePipe';
 
 const PipesPropertiesTab = () => {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const [pipeFilter, setPipeFilter] = useState<string>('');
 

@@ -30,7 +30,7 @@ import SelectableOperation, { SelectableOperationPerformance } from '../Selectab
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');

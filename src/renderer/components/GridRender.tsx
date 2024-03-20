@@ -13,7 +13,7 @@ import DetailedView from './detailed-view-components/DetailedView';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const dispatch = useDispatch();
 

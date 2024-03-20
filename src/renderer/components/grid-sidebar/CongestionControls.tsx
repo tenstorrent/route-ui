@@ -40,7 +40,7 @@ import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import LinkCongestionControl from './LinkCongestionControl';
 
 export const CongestionControls: FC = () => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const maxBwLimitedFactor = graphOnChip?.details.maxBwLimitedFactor || 10;
     const hasPipes = graphOnChip?.hasPipes || false;

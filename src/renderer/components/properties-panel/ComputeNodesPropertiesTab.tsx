@@ -341,7 +341,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!graphOnChip) {

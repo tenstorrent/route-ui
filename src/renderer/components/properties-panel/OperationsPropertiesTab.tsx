@@ -16,7 +16,7 @@ import SelectableOperation from '../SelectableOperation';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
     const [filterQuery, setFilterQuery] = useState<string>('');

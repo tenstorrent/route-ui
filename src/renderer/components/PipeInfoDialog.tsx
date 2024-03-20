@@ -17,7 +17,7 @@ export interface PipeInfoDialogProps {
  */
 const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => {
     const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const setupData = () => {
         const pipe: Pipe = graphOnChip?.pipes.get(pipeId) as Pipe;

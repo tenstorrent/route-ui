@@ -35,9 +35,9 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveChip, setActiveChip, loadGraphOnChips, resetChips } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip, setActiveChip, loadGraphOnChips, resetChips } = useContext(GraphOnChipContext);
 
-    const activeGraphOnChip = getActiveChip();
+    const activeGraphOnChip = getActiveGraphOnChip();
     const navigate = useNavigate();
 
     const logger = useLogging();

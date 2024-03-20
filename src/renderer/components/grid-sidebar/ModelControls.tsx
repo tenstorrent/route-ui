@@ -11,7 +11,7 @@ import Collapsible from '../Collapsible';
 import useOperationsTable, { type OpTableFields } from '../bottom-dock/useOperationsTable.hooks';
 
 const ModelControls: FC = () => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector((state: RootState) => getOperationRatioThreshold(state));
     const { getMaxModelEstimateRatio } = useOperationsTable();

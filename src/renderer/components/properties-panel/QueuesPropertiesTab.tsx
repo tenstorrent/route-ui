@@ -17,7 +17,7 @@ import SelectableOperation from '../SelectableOperation';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');

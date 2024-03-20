@@ -20,8 +20,8 @@ interface DetailedViewProps {}
 
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
-    const { getActiveChip, getGraphName, chipState } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveChip();
+    const { getActiveGraphOnChip, getGraphName, chipState } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
     const graphName = getGraphName();
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
