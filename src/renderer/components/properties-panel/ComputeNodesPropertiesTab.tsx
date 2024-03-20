@@ -341,16 +341,16 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const selectedNodes: ComputeNode[] = useMemo(() => {
-        if (!chip) {
+        if (!graphOnChip) {
             return [];
         }
         return Object.values(nodesSelectionState.nodeList)
             .filter((n) => n.selected)
-            .map((nodeState) => chip.getNode(nodeState.id));
-    }, [chip, nodesSelectionState]);
+            .map((nodeState) => graphOnChip.getNode(nodeState.id));
+    }, [graphOnChip, nodesSelectionState]);
 
     return (
         <div className='properties-container'>

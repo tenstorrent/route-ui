@@ -14,15 +14,15 @@ import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const tableFields = useMemo(() => {
-        if (!chip) {
+        if (!graphOnChip) {
             return [];
         }
 
-        const list = [...chip.queues].map((queue) => {
+        const list = [...graphOnChip.queues].map((queue) => {
             return {
                 name: queue.name,
                 ...queue.details,
@@ -30,7 +30,7 @@ function QueuesTable() {
         });
 
         return sortTableFields(list);
-    }, [chip, sortTableFields]);
+    }, [graphOnChip, sortTableFields]);
     const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
 

@@ -225,12 +225,12 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                 }}
             >
                 {cluster?.chips.map((clusterChip) => {
-                    let chip: GraphOnChip | undefined;
+                    let graphOnChip: GraphOnChip | undefined;
                     let graphName: string | undefined;
                     selectedEpoch.forEach((graph) => {
                         const chipByGraphName = getChipByGraphName(graph.name);
                         if (chipByGraphName?.chipId === clusterChip.id) {
-                            chip = chipByGraphName;
+                            graphOnChip = chipByGraphName;
                             graphName = graph.name;
                         }
                     });
@@ -289,7 +289,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
 
                             {[...ethPosition.entries()].map(([position, value]) => {
                                 return value.map((uid: string, index: number) => {
-                                    const node = chip?.getNode(uid);
+                                    const node = graphOnChip?.getNode(uid);
                                     return (
                                         <EthPipeRenderer
                                             key={uid}

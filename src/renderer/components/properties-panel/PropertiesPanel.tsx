@@ -12,12 +12,12 @@ import './PropertiesPanel.scss';
 
 export default function PropertiesPanel() {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
     return (
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
                 <Tab id='tab-nodes' title='Nodes' panel={<ComputeNodesPropertiesTab />} />
-                {chip?.hasPipes && (
+                {graphOnChip?.hasPipes && (
                     <Tab
                         id='tab-pipes'
                         title={
@@ -28,7 +28,7 @@ export default function PropertiesPanel() {
                         panel={<PipesPropertiesTab />}
                     />
                 )}
-                {chip?.hasOperations && (
+                {graphOnChip?.hasOperations && (
                     <Tab
                         id='tab-ops'
                         title={
@@ -39,7 +39,7 @@ export default function PropertiesPanel() {
                         panel={<OperationsPropertiesTab />}
                     />
                 )}
-                {chip?.hasQueues && (
+                {graphOnChip?.hasQueues && (
                     <Tab
                         id='tab-queues'
                         title={

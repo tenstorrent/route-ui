@@ -13,13 +13,13 @@ import DetailedView from './detailed-view-components/DetailedView';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
 
     const dispatch = useDispatch();
 
     return (
         <div className='main-content'>
-            {chip && (
+            {graphOnChip && (
                 <div
                     className='grid-container'
                     // this is to address the issue with focus pipe getting stuck because of Popover2
@@ -32,11 +32,11 @@ export default function GridRender() {
                         className='node-container'
                         style={{
                             zoom: `${gridZoom}`,
-                            gridTemplateColumns: `repeat(${chip.totalCols + 1}, ${NODE_SIZE}px)`,
+                            gridTemplateColumns: `repeat(${graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
                         }}
                     >
                         {[
-                            ...mapIterable(chip.nodes, (node: ComputeNode) => {
+                            ...mapIterable(graphOnChip.nodes, (node: ComputeNode) => {
                                 return <NodeGridElement node={node} key={node.uid} />;
                             }),
                         ]}
@@ -44,7 +44,7 @@ export default function GridRender() {
                 </div>
             )}
             <DetailedView />
-            <ClusterViewDialog zoom={1} />
+            <ClusterViewDialog />
         </div>
     );
 }

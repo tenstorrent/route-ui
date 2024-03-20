@@ -40,10 +40,10 @@ import { ChipContext } from '../../../data/ChipDataProvider';
 import LinkCongestionControl from './LinkCongestionControl';
 
 export const CongestionControls: FC = () => {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
 
-    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor || 10;
-    const hasPipes = chip?.hasPipes || false;
+    const maxBwLimitedFactor = graphOnChip?.details.maxBwLimitedFactor || 10;
+    const hasPipes = graphOnChip?.hasPipes || false;
 
     const dispatch = useDispatch();
 

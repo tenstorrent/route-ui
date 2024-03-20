@@ -16,16 +16,16 @@ import SelectableOperation from '../SelectableOperation';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
 
     const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
+    const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);
 
     const { selected, selectOperation } = useSelectableGraphVertex();
     const selectFilteredOperations = () => {
-        if (!chip) {
+        if (!graphOnChip) {
             return;
         }
         Object.keys(groupsSelectionState).forEach((op) => {

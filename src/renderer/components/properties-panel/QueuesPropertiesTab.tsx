@@ -17,16 +17,16 @@ import SelectableOperation from '../SelectableOperation';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
-    const queuesList = useMemo(() => (chip ? [...chip.queues] : []), [chip]);
+    const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
 
     const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const selectFilteredQueue = () => {
-        if (!chip) {
+        if (!graphOnChip) {
             return;
         }
         Object.keys(queueSelectionState).forEach((name) => {

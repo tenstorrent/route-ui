@@ -12,16 +12,16 @@ import SelectablePipe from '../SelectablePipe';
 
 const PipesPropertiesTab = () => {
     const dispatch = useDispatch();
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
 
     const [pipeFilter, setPipeFilter] = useState<string>('');
 
     const selectFilteredPipes = () => {
-        if (!chip) {
+        if (!graphOnChip) {
             return;
         }
 
-        chip.allUniquePipes.forEach((pipeSegment: PipeSegment) => {
+        graphOnChip.allUniquePipes.forEach((pipeSegment: PipeSegment) => {
             if (pipeSegment.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
                 dispatch(updatePipeSelection({ id: pipeSegment.id, selected: true }));
             }
@@ -53,9 +53,9 @@ const PipesPropertiesTab = () => {
                 />
             </div>
             <div className='properties-list'>
-                {chip && (
+                {graphOnChip && (
                     <ul className='pipes-list'>
-                        {chip.allUniquePipes.map((pipeSegment) => (
+                        {graphOnChip.allUniquePipes.map((pipeSegment) => (
                             <FilterableComponent
                                 key={pipeSegment.id}
                                 filterableString={pipeSegment.id}

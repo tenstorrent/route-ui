@@ -37,18 +37,18 @@ const usePerfAnalyzerFileLoader = () => {
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
     const { getActiveChip, setActiveChip, setChips, resetChips } = useContext(ChipContext);
 
-    const chip = getActiveChip();
+    const activeGraphOnChip = getActiveChip();
     const navigate = useNavigate();
 
     const logger = useLogging();
 
     useEffect(() => {
-        if (chip) {
+        if (activeGraphOnChip) {
             // TODO: should we remove this?
-            populateChipData(chip);
+            populateChipData(activeGraphOnChip);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chip]);
+    }, [activeGraphOnChip]);
 
     const openPerfAnalyzerFolderDialog = async () => {
         const folderList = dialog.showOpenDialogSync({

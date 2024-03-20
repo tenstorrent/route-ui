@@ -19,16 +19,16 @@ interface DetailedViewDRAMRendererProps {
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
-    const chip = useContext(ChipContext).getActiveChip();
-    const architecture = chip?.architecture ?? Architecture.NONE;
+    const graphOnChip = useContext(ChipContext).getActiveChip();
+    const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
     const nodeList = useMemo(() => {
-        if (chip && node.dramChannelId > -1) {
-            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === node.dramChannelId)];
+        if (graphOnChip && node.dramChannelId > -1) {
+            return [...filterIterable(graphOnChip?.nodes, (n) => n.dramChannelId === node.dramChannelId)];
         }
         return [];
-    }, [node, chip]);
+    }, [node, graphOnChip]);
 
     const dram = node.dramChannel || null;
 

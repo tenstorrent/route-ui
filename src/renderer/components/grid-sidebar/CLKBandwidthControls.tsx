@@ -20,7 +20,7 @@ import { getTotalOpsForGraph } from '../../../data/store/selectors/linkSaturatio
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
     const graphName = useContext(ChipContext).getGraphName();
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
@@ -33,7 +33,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
             <Button
                 minimal
                 onClick={() => {
-                    const resetValue = chip?.totalOpCycles || 1;
+                    const resetValue = graphOnChip?.totalOpCycles || 1;
 
                     dispatch(updateTotalOPs({ graphName, totalOps: resetValue }));
                 }}
@@ -42,7 +42,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
         </Tooltip2>
     );
 
-    if (chip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
+    if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
         aiclkRightElement = (
             <Tooltip2 content='Cycles per input cannot be 0'>
                 <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />

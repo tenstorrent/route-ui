@@ -11,14 +11,14 @@ import Collapsible from '../Collapsible';
 import useOperationsTable, { type OpTableFields } from '../bottom-dock/useOperationsTable.hooks';
 
 const ModelControls: FC = () => {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(ChipContext).getActiveChip();
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector((state: RootState) => getOperationRatioThreshold(state));
     const { getMaxModelEstimateRatio } = useOperationsTable();
     const maxModelEstimateRatio = useMemo(
         () =>
             getMaxModelEstimateRatio(
-                [...(chip?.operations ?? [])].map((op) => {
+                [...(graphOnChip?.operations ?? [])].map((op) => {
                     return {
                         operation: op,
                         name: op.name,
@@ -28,7 +28,7 @@ const ModelControls: FC = () => {
                 }),
             ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [chip?.operations],
+        [graphOnChip?.operations],
     );
 
     const clampNumber = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));

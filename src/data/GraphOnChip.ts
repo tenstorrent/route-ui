@@ -291,48 +291,48 @@ export default class GraphOnChip {
     }
 
     public static CREATE_FROM_NETLIST_JSON(data: NetlistAnalyzerDataJSON) {
-        const chip = new GraphOnChip(data.chip_id || 0);
-        chip.slowestOpCycles = data.slowest_op_cycles;
-        chip.bwLimitedOpCycles = data.bw_limited_op_cycles;
+        const graphOnChip = new GraphOnChip(data.chip_id || 0);
+        graphOnChip.slowestOpCycles = data.slowest_op_cycles;
+        graphOnChip.bwLimitedOpCycles = data.bw_limited_op_cycles;
 
         if (data.arch) {
             if (data.arch.includes(Architecture.GRAYSKULL)) {
-                chip.architecture = Architecture.GRAYSKULL;
+                graphOnChip.architecture = Architecture.GRAYSKULL;
             }
             if (data.arch.includes(Architecture.WORMHOLE)) {
-                chip.architecture = Architecture.WORMHOLE;
+                graphOnChip.architecture = Architecture.WORMHOLE;
             }
         }
 
-        chip.totalOpCycles = Math.min(chip.slowestOpCycles, chip.bwLimitedOpCycles);
+        graphOnChip.totalOpCycles = Math.min(graphOnChip.slowestOpCycles, graphOnChip.bwLimitedOpCycles);
 
-        if (chip.totalOpCycles === 0) {
-            chip.addDataIntegrityError({
+        if (graphOnChip.totalOpCycles === 0) {
+            graphOnChip.addDataIntegrityError({
                 type: DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO,
                 message: 'Total OP Cycles is zero',
             });
         }
 
         if (data.dram_channels) {
-            chip.dramChannels = data.dram_channels.map((dramChannel) => {
+            graphOnChip.dramChannels = data.dram_channels.map((dramChannel) => {
                 return new DramChannel(dramChannel.channel_id, dramChannel);
             });
         }
 
-        chip.nodes = data.nodes
+        graphOnChip.nodes = data.nodes
             .map((nodeJSON) => {
                 const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
-                chip.totalCols = Math.max(loc.y, chip.totalCols);
-                chip.totalRows = Math.max(loc.x, chip.totalRows);
-                const [node, newOperation] = ComputeNode.fromNetlistJSON(nodeJSON, chip.chipId, (name: OperationName) =>
-                    chip.operationsByName.get(name),
+                graphOnChip.totalCols = Math.max(loc.y, graphOnChip.totalCols);
+                graphOnChip.totalRows = Math.max(loc.x, graphOnChip.totalRows);
+                const [node, newOperation] = ComputeNode.fromNetlistJSON(nodeJSON, graphOnChip.chipId, (name: OperationName) =>
+                    graphOnChip.operationsByName.get(name),
                 );
                 if (newOperation) {
                     // console.log('Adding operation: ', newOperation.name);
-                    chip.addOperation(newOperation);
+                    graphOnChip.addOperation(newOperation);
                 }
-                if (node.dramChannelId !== -1 && chip.dramChannels) {
-                    const dramChannel = chip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
+                if (node.dramChannelId !== -1 && graphOnChip.dramChannels) {
+                    const dramChannel = graphOnChip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
                     if (dramChannel === null) {
                         console.error(`Node ${node.uid} has a missing dram channel ${node.dramChannelId}`);
                     }
@@ -350,11 +350,11 @@ export default class GraphOnChip {
                 node.links.forEach((link) => {
                     link.pipes.forEach((pipeSegment) => {
                         let pipe: Pipe;
-                        if (!chip.pipesById.has(pipeSegment.id)) {
+                        if (!graphOnChip.pipesById.has(pipeSegment.id)) {
                             pipe = new Pipe(pipeSegment.id);
-                            chip.pipesById.set(pipe.id, pipe);
+                            graphOnChip.pipesById.set(pipe.id, pipe);
                         } else {
-                            pipe = chip.pipesById.get(pipeSegment.id) as Pipe;
+                            pipe = graphOnChip.pipesById.get(pipeSegment.id) as Pipe;
                         }
                         if (!pipe.nodes.includes(node)) {
                             pipe.nodes.push(node);
@@ -370,11 +370,11 @@ export default class GraphOnChip {
                 node.internalLinks.forEach((link) => {
                     link.pipes.forEach((pipeSegment) => {
                         let pipe: Pipe;
-                        if (!chip.pipesById.has(pipeSegment.id)) {
+                        if (!graphOnChip.pipesById.has(pipeSegment.id)) {
                             pipe = new Pipe(pipeSegment.id);
-                            chip.pipesById.set(pipe.id, pipe);
+                            graphOnChip.pipesById.set(pipe.id, pipe);
                         } else {
-                            pipe = chip.pipesById.get(pipeSegment.id) as Pipe;
+                            pipe = graphOnChip.pipesById.get(pipeSegment.id) as Pipe;
                         }
                         if (!pipe.nodes.includes(node)) {
                             pipe.nodes.push(node);
@@ -396,13 +396,13 @@ export default class GraphOnChip {
                 return a.loc.x - b.loc.x;
             });
 
-        return chip;
+        return graphOnChip;
     }
 
-    public static AUGMENT_FROM_OPS_JSON(chip: GraphOnChip, operationsJson: Record<string, OperationDataJSON>): GraphOnChip {
-        if (chip) {
-            const augmentedChip = new GraphOnChip(chip.chipId);
-            Object.assign(augmentedChip, chip);
+    public static AUGMENT_FROM_OPS_JSON(graphOnChip: GraphOnChip, operationsJson: Record<string, OperationDataJSON>): GraphOnChip {
+        if (graphOnChip) {
+            const augmentedChip = new GraphOnChip(graphOnChip.chipId);
+            Object.assign(augmentedChip, graphOnChip);
             const regex = /^(\d+)-(\d+)-(\d+)$/;
 
             const pipesAsMap = (coresToPipes: Record<string, string[]>) => {
@@ -423,11 +423,11 @@ export default class GraphOnChip {
                     /** this is perfectly normal, optopipe is a singlefile per temporal epoch and is multichip
                      * we will want to capture ALL information for multichip routing */
                     // console.warn(
-                    //     `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing chip data; no core mapping available.`,
+                    //     `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing graphOnChip data; no core mapping available.`,
                     // );
                     // operation = new BuildableOperation(operationName, [], [], []);
                     // augmentedChip.addOperation(operation);
-                    // TODO: we should add ALL operations but only add the operations that run on this chip to the augmentedChip. likely requires a separate structure (graph?)
+                    // TODO: we should add ALL operations but only add the operations that run on this graphOnChip to the augmentedChip. likely requires a separate structure (graph?)
                     //
                     return null;
                 }
@@ -531,24 +531,24 @@ export default class GraphOnChip {
 
     public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON) {
         const chipDesign = new ChipDesign(json);
-        const chip = new GraphOnChip(0);
-        chip.nodes = chipDesign.nodes.map((simpleNode) => {
-            const node = new ComputeNode(`${chip.chipId}-${simpleNode.loc.x}-${simpleNode.loc.y}`);
+        const graphOnChip = new GraphOnChip(0);
+        graphOnChip.nodes = chipDesign.nodes.map((simpleNode) => {
+            const node = new ComputeNode(`${graphOnChip.chipId}-${simpleNode.loc.x}-${simpleNode.loc.y}`);
             node.type = simpleNode.type;
             node.loc = simpleNode.loc;
             node.dramChannelId = simpleNode.dramChannelId;
             node.dramSubchannelId = simpleNode.dramSubchannelId;
             return node;
         });
-        chip.totalRows = chipDesign.totalRows;
-        chip.totalCols = chipDesign.totalCols;
-        chip.architecture = chipDesign.architecture;
-        return chip;
+        graphOnChip.totalRows = chipDesign.totalRows;
+        graphOnChip.totalCols = chipDesign.totalCols;
+        graphOnChip.architecture = chipDesign.architecture;
+        return graphOnChip;
     }
 
-    static AUGMENT_FROM_GRAPH_DESCRIPTOR(chip: GraphOnChip, graphDescriptorJson: GraphDescriptorJSON) {
-        const newChip = new GraphOnChip(chip.chipId);
-        Object.assign(newChip, chip);
+    static AUGMENT_FROM_GRAPH_DESCRIPTOR(graphOnChip: GraphOnChip, graphDescriptorJson: GraphDescriptorJSON) {
+        const newChip = new GraphOnChip(graphOnChip.chipId);
+        Object.assign(newChip, graphOnChip);
 
         const opMap: Map<OperationName, OperationDescription> = aggregateCoresByOperation(graphDescriptorJson);
 
@@ -559,7 +559,7 @@ export default class GraphOnChip {
             }
             const cores: ComputeNode[] = opDescriptor.cores
                 // `core.id` is only an x-y locations and doesn't include Chip ID
-                .map((core) => newChip.getNode(`${chip.chipId}-${core.id}`));
+                .map((core) => newChip.getNode(`${graphOnChip.chipId}-${core.id}`));
             const inputs = opDescriptor.inputs.map((operandJson) =>
                 newChip.createOperand(operandJson.name, operandJson.type),
             );
@@ -573,7 +573,7 @@ export default class GraphOnChip {
                     let queue = newChip.queuesByName.get(operand.name);
                     if (!queue) {
                         queue = new BuildableQueue(operand.name);
-                        chip.addQueue(queue);
+                        graphOnChip.addQueue(queue);
                     }
                     queue.assignOutputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
                 }
@@ -584,7 +584,7 @@ export default class GraphOnChip {
                     let queue = newChip.queuesByName.get(operand.name);
                     if (!queue) {
                         queue = new BuildableQueue(operand.name);
-                        chip.addQueue(queue);
+                        graphOnChip.addQueue(queue);
                     }
                     queue.assignInputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
                 }
@@ -602,14 +602,14 @@ export default class GraphOnChip {
         return newChip;
     }
 
-    static AUGMENT_WITH_QUEUE_DETAILS(chip: GraphOnChip, queueDescriptorJson: QueueDescriptorJson) {
-        forEach(chip.queuesByName.values(), (queue) => {
+    static AUGMENT_WITH_QUEUE_DETAILS(graphOnChip: GraphOnChip, queueDescriptorJson: QueueDescriptorJson) {
+        forEach(graphOnChip.queuesByName.values(), (queue) => {
             const details = queueDescriptorJson[queue.name];
             details.processedLocation = parsedQueueLocation(details.location);
             queue.details = { ...details };
             details['allocation-info'].forEach((allocationInfo) => {
                 if (details.processedLocation === QueueLocation.DRAM) {
-                    chip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
+                    graphOnChip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
                         if (!node.queueList.includes(queue)) {
                             node.queueList.push(queue);
                         }
@@ -618,18 +618,18 @@ export default class GraphOnChip {
             });
         });
 
-        const newChip = new GraphOnChip(chip.chipId);
-        Object.assign(newChip, chip);
+        const newChip = new GraphOnChip(graphOnChip.chipId);
+        Object.assign(newChip, graphOnChip);
 
         return newChip;
     }
 
-    static AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip: GraphOnChip, perfAnalyzerJson: PerfAnalyzerResultsJson) {
-        const newChip = new GraphOnChip(chip.chipId);
-        Object.assign(newChip, chip);
+    static AUGMENT_WITH_PERF_ANALYZER_RESULTS(graphOnChip: GraphOnChip, perfAnalyzerJson: PerfAnalyzerResultsJson) {
+        const newChip = new GraphOnChip(graphOnChip.chipId);
+        Object.assign(newChip, graphOnChip);
 
         forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
-            const node = chip.getNode(nodeUid);
+            const node = graphOnChip.getNode(nodeUid);
             if (node.type === ComputeNodeType.CORE) {
                 node.perfAnalyzerResults = new MeasurementDetails(perfAnalyzerJson[node.uid]);
                 newChip.details.maxBwLimitedFactor = Math.max(
@@ -644,9 +644,9 @@ export default class GraphOnChip {
         return newChip;
     }
 
-    static AUGMENT_WITH_OP_PERFORMANCE(chip: GraphOnChip, perfAnalyzerResultsOps: OpPerformanceByOp) {
-        const newChip = new GraphOnChip(chip.chipId);
-        Object.assign(newChip, chip);
+    static AUGMENT_WITH_OP_PERFORMANCE(graphOnChip: GraphOnChip, perfAnalyzerResultsOps: OpPerformanceByOp) {
+        const newChip = new GraphOnChip(graphOnChip.chipId);
+        Object.assign(newChip, graphOnChip);
 
         forEach(perfAnalyzerResultsOps.entries(), ([opName, opDetails]) => {
             const operation = newChip.getOperation(opName);

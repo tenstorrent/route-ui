@@ -21,7 +21,7 @@ interface DetailedViewProps {}
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
     const { getActiveChip, getGraphName, chipState } = useContext(ChipContext);
-    const chip = getActiveChip();
+    const graphOnChip = getActiveChip();
     const graphName = getGraphName();
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
@@ -29,7 +29,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const architecture = chipState.chips[graphName]?.architecture;
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
-    const node = uid ? chip?.getNode(uid) : null;
+    const node = uid ? graphOnChip?.getNode(uid) : null;
 
     useEffect(() => {
         if (detailedViewElement.current) {
