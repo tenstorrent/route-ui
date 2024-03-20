@@ -106,14 +106,15 @@ const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Pr
         return netlistAnalyzerFiles
             .filter((file) => file.isFile() && file.name.includes('temporal_epoch'))
             .map((file) => file.name)
-            .map((filename) => {
-                const epoch = getTemporalEpochFromGraphName(filename) || 0;
-                const chipId = getChipIdFromFilename(filename) || 0;
-                return {
-                    name: filename,
-                    temporalEpoch: epoch,
+            .map((name) => {
+                const temporalEpoch = getTemporalEpochFromGraphName(name) || 0;
+                const chipId = getChipIdFromFilename(name) || 0;
+                const graphRelationship: GraphRelationship = {
+                    name,
+                    temporalEpoch,
                     chipId,
-                } as GraphRelationship;
+                };
+                return graphRelationship;
             });
     } catch (err) {
         console.error('Failed to read netlist_analyzer folder', err);
@@ -129,11 +130,12 @@ export const getAvailableGraphNames = async (perfResultsPath: string): Promise<G
 
         return Object.entries(runtimeData.graph_to_epoch_map as GraphnameToEpochToDeviceJSON).map(
             ([graphName, mapping]) => {
-                return {
+                const graphRelationship: GraphRelationship = {
                     name: graphName,
                     temporalEpoch: mapping.epoch_id,
                     chipId: mapping.target_device,
-                } as GraphRelationship;
+                };
+                return graphRelationship;
             },
         );
     } catch (err) {
