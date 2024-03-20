@@ -1,7 +1,7 @@
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { RootState } from '../../../data/store/createStore';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';

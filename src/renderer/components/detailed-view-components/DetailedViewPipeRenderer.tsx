@@ -17,7 +17,7 @@ import {
     PCIeLinkName,
 } from '../../../data/Types';
 import { getAllLinksForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
-import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];

@@ -9,7 +9,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType } from '../../data/StateTypes';
 import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';

@@ -14,7 +14,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import type GraphOnChip from '../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import { ClusterModel, ClusterContext } from '../../data/ClusterContext';
 import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
 import {

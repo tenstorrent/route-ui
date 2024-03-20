@@ -19,7 +19,7 @@ import {
     getLinkSaturation,
     getShowLinkSaturation
 } from '../../../data/store/selectors/linkSaturation.selectors';
-import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 interface NodePipeRendererProps {
     node: ComputeNode;

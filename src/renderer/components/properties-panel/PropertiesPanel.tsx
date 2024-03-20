@@ -1,7 +1,7 @@
 import { Icon, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { useContext, useState } from 'react';
-import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import QueueIcon from '../../../main/assets/QueueIcon';
 import ComputeNodesPropertiesTab from './ComputeNodesPropertiesTab';
 import OperationsPropertiesTab from './OperationsPropertiesTab';

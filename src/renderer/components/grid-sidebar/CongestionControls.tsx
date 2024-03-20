@@ -36,7 +36,7 @@ import {
 } from '../../../data/store/slices/linkSaturation.slice';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
-import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import LinkCongestionControl from './LinkCongestionControl';
 
 export const CongestionControls: FC = () => {

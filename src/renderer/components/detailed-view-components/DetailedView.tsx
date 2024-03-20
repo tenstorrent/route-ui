@@ -7,7 +7,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { ComputeNodeType } from '../../../data/Types';
 import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 
 import { ComputeNode } from '../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import { getGridZoom } from '../../data/store/selectors/uiState.selectors';
 import { mapIterable } from '../../utils/IterableHelpers';
 import NodeGridElement from './NodeGridElement';

@@ -1,5 +1,5 @@
 import { FC, useContext } from 'react';
-import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
