@@ -35,7 +35,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveGraphOnChip, setActiveChip, loadGraphOnChips, resetChips } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetChips } = useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveGraphOnChip();
     const navigate = useNavigate();
@@ -146,7 +146,7 @@ const usePerfAnalyzerFileLoader = () => {
             try {
                 dispatch(closeDetailedView());
                 dispatch(clearAllNodes());
-                setActiveChip(graphName);
+                setActiveGraph(graphName);
                 navigate('/render');
             } catch (e) {
                 const err = e as Error;
