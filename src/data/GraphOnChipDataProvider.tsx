@@ -4,7 +4,7 @@ import type { GraphRelationship } from './StateTypes';
 
 interface ChipsState {
     activeGraphName: string;
-    chips: {
+    graphOnChipList: {
         [graphName: string]: GraphOnChip;
     };
     graphs: Map<string, GraphRelationship>;
@@ -12,6 +12,7 @@ interface ChipsState {
 
 interface GraphOnChipContextType {
     chipState: ChipsState;
+    //
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
     resetGraphOnChipState: () => void;
     getGraphRelationshipList: () => GraphRelationship[];
@@ -20,16 +21,18 @@ interface GraphOnChipContextType {
     setActiveGraph: (graphName: string) => void;
     getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
     getActiveGraphName: () => string;
+    graphOnChipList: Record<string, GraphOnChip>;
 }
 
 const initialChipsState: ChipsState = {
     activeGraphName: '',
-    chips: {},
+    graphOnChipList: {},
     graphs: new Map<string, GraphRelationship>(),
 };
 
 const GraphOnChipContext = createContext<GraphOnChipContextType>({
     chipState: initialChipsState,
+    //
     loadGraphOnChips: () => {},
     resetGraphOnChipState: () => {},
     getGraphRelationshipList: () => [],
@@ -38,6 +41,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     setActiveGraph: () => {},
     getGraphOnChip: () => undefined,
     getActiveGraphName: () => '',
+    graphOnChipList: {},
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -46,16 +50,16 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadGraphOnChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationship[]) => {
         setChipsState({
             activeGraphName: '',
-            chips: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
+            graphOnChipList: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
             graphs: new Map(graphs.map((graph) => [graph.name, graph])),
         });
     }, []);
 
     const getGraphOnChip = useCallback(
         (graphName: string) => {
-            return chipsState.chips[graphName];
+            return chipsState.graphOnChipList[graphName];
         },
-        [chipsState.chips],
+        [chipsState.graphOnChipList],
     );
 
     const reset = useCallback(() => {
@@ -71,7 +75,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [chipsState]);
 
     const getActiveGraphOnChip = useCallback(() => {
-        return chipsState.chips[chipsState.activeGraphName];
+        return chipsState.graphOnChipList[chipsState.activeGraphName];
     }, [chipsState]);
 
     const setActiveGraph = useCallback((graphName: string) => {
@@ -96,6 +100,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getActiveGraphName,
             resetGraphOnChipState: reset,
             setActiveGraph,
+            graphOnChipList: chipsState.graphOnChipList,
         }),
         [
             loadGraphOnChips,
