@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
 import { GraphOnChipProvider } from '../data/GraphOnChipDataProvider';
 import Cluster from '../data/Cluster';
-import { ClusterDataSource } from '../data/DataSource';
+import { ClusterContext } from '../data/ClusterContext';
 import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
 import MainRouteRenderer from './views/MainRouteRenderer';
 import SplashScreen from './views/SplashScreen';
@@ -22,7 +22,7 @@ export default function App() {
     return (
         <Provider store={store}>
             {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-            <ClusterDataSource.Provider value={{ cluster, setCluster }}>
+            <ClusterContext.Provider value={{ cluster, setCluster }}>
                 <GraphOnChipProvider>
                     <Router>
                         <Routes>
@@ -31,7 +31,7 @@ export default function App() {
                         </Routes>
                     </Router>
                 </GraphOnChipProvider>
-            </ClusterDataSource.Provider>
+            </ClusterContext.Provider>
         </Provider>
     );
 }

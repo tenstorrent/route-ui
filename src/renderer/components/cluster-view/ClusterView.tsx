@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import GraphOnChip, { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipDataProvider';
 import getPipeColor from '../../../data/ColorGenerator';
-import { ClusterDataSource } from '../../../data/DataSource';
+import { ClusterContext } from '../../../data/ClusterContext';
 import { GraphRelationship, PipeSelection } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
@@ -50,7 +50,7 @@ const renderItem: ItemRenderer<GraphRelationship[]> = (
     );
 };
 const ClusterView: FC<ClusterViewDialog> = () => {
-    const { cluster } = useContext(ClusterDataSource);
+    const { cluster } = useContext(ClusterContext);
     const { getGraphOnChip, getActiveGraphName, getGraphRelationshipList } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
     const graphInformation = getGraphRelationshipList();

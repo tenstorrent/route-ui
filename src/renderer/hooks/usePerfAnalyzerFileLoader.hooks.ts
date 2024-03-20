@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import type GraphOnChip from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipDataProvider';
-import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
+import { ClusterModel, ClusterContext } from '../../data/ClusterContext';
 import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
@@ -34,7 +34,7 @@ const usePerfAnalyzerFileLoader = () => {
     const selectedFolder = useSelector(getFolderPathSelector);
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
-    const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
+    const { setCluster } = useContext<ClusterModel>(ClusterContext);
     const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveGraphOnChip();
@@ -73,6 +73,8 @@ const usePerfAnalyzerFileLoader = () => {
     };
 
     const loadFolder = async (folderPath: string): Promise<void> => {
+        // TODO: need the below
+        // dispatch(setSelectedFolder(''));
         resetGraphOnChipState();
         dispatch(resetPipeSelection());
         dispatch(resetNetworksState());
