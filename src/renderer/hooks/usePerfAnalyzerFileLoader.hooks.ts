@@ -35,7 +35,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetChips } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipContext } = useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveGraphOnChip();
     const navigate = useNavigate();
@@ -73,7 +73,7 @@ const usePerfAnalyzerFileLoader = () => {
     };
 
     const loadFolder = async (folderPath: string): Promise<void> => {
-        resetChips();
+        resetGraphOnChipContext();
         dispatch(resetPipeSelection());
         dispatch(resetNetworksState());
         setError(null);

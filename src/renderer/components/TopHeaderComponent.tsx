@@ -36,7 +36,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { getActiveGraphName, resetChips, getActiveGraphRelationshipState, getActiveGraphOnChip } = useContext(GraphOnChipContext);
+    const { getActiveGraphName, resetGraphOnChipContext, getActiveGraphRelationshipState, getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
@@ -67,7 +67,7 @@ const TopHeaderComponent: React.FC = () => {
             dispatch(setSelectedRemoteFolder(newFolder));
         }
 
-        resetChips();
+        resetGraphOnChipContext();
 
         if (checkLocalFolderExists(folderPath)) {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
