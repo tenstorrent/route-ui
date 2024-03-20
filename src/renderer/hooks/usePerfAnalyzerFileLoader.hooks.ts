@@ -35,7 +35,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterContext>(ClusterDataSource);
-    const { getActiveChip, setActiveChip, setChips, resetChips } = useContext(GraphOnChipContext);
+    const { getActiveChip, setActiveChip, loadGraphOnChips, resetChips } = useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveChip();
     const navigate = useNavigate();
@@ -122,7 +122,7 @@ const usePerfAnalyzerFileLoader = () => {
                 totalOpsNormalized[graph.name] = totalOpsPerEpoch.get(graph.temporalEpoch) ?? 1;
             });
 
-            setChips(graphOnChipList, sortedGraphs);
+            loadGraphOnChips(graphOnChipList, sortedGraphs);
 
             dispatch(initialLoadLinkData(linkData));
             dispatch(loadPipeSelection(pipeSelectionData));

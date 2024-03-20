@@ -12,10 +12,9 @@ interface ChipsState {
 
 interface ChipContextType {
     chipState: ChipsState;
-    setChips: (newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => void;
+    loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => void;
     resetChips: () => void;
     getAvailableGraphs: () => GraphRelationshipState[];
-    setAvailbaleGraphs: (graphs: GraphRelationshipState[]) => void;
     getActiveGraph: () => GraphRelationshipState | undefined;
     getActiveChip: () => GraphOnChip | undefined;
     setActiveChip: (graphName: string) => void;
@@ -31,10 +30,9 @@ const initialChipsState: ChipsState = {
 
 const GraphOnChipContext = createContext<ChipContextType>({
     chipState: initialChipsState,
-    setChips: () => {},
+    loadGraphOnChips: () => {},
     resetChips: () => {},
     getAvailableGraphs: () => [],
-    setAvailbaleGraphs: () => {},
     getActiveGraph: () => undefined,
     getActiveChip: () => undefined,
     setActiveChip: () => {},
@@ -68,12 +66,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return [...chipsState.graphs.values()];
     }, [chipsState]);
 
-    const setAvailbaleGraphs = useCallback((graphs: GraphRelationshipState[]) => {
-        setChipsState((prevState) => ({
-            ...prevState,
-            graphs: new Map(graphs.map((graph) => [graph.name, graph])),
-        }));
-    }, []);
+
 
     const getActiveGraph = useCallback(() => {
         return chipsState.graphs.get(chipsState.graphName);
@@ -96,7 +89,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const value = useMemo<ChipContextType>(
         () => ({
-            setChips,
+            loadGraphOnChips: setChips,
             chipState: chipsState,
             getActiveChip,
             getActiveGraph,
@@ -105,7 +98,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphName,
             resetChips,
             setActiveChip,
-            setAvailbaleGraphs,
         }),
         [
             setChips,
@@ -117,7 +109,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphName,
             resetChips,
             setActiveChip,
-            setAvailbaleGraphs,
         ],
     );
 

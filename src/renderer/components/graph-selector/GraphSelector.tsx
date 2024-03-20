@@ -10,6 +10,8 @@ interface GraphSelectorProps {
     autoLoadFistGraph?: boolean;
 }
 
+
+// TODO: this is not useing the correct value for data
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
     const { getGraphName, chipState } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
