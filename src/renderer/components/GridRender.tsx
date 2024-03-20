@@ -43,6 +43,10 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
+            {graphOnChip === undefined && (
+                // TODO: need a proper no data view
+                <div />
+            )}
             <DetailedView />
             <ClusterViewDialog />
         </div>

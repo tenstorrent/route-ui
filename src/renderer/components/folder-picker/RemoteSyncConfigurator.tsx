@@ -45,6 +45,7 @@ const RemoteSyncConfigurator: FC = () => {
         if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
         } else {
+            // TODO: fix this
             resetGraphOnChipState();
         }
     };

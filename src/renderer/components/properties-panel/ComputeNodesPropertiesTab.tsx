@@ -353,8 +353,8 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
     }, [graphOnChip, nodesSelectionState]);
 
     return (
-        <div className='properties-container'>
-            {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
+        // TODO: give this a greyed out look when data is not available
+        <div className={`properties-container ${graphOnChip ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
                     {selectedNodes.map((node: ComputeNode) => (
