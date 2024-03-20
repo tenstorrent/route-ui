@@ -19,17 +19,17 @@ import { ClusterContext, ClusterDataSource } from '../../data/DataSource';
 import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
+    initialLoadNormalizedOPs,
     initialLoadTotalOPs,
     resetNetworksState,
-    initialLoadNormalizedOPs,
 } from '../../data/store/slices/linkSaturation.slice';
-import { clearAllNodes } from '../../data/store/slices/nodeSelection.slice';
+import { clearAllNodes, loadNodesData } from '../../data/store/slices/nodeSelection.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import useLogging from './useLogging.hook';
-import usePopulateChipData from './usePopulateChipData.hooks';
+import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
+import { mapIterable } from '../../utils/IterableHelpers';
 
 const usePerfAnalyzerFileLoader = () => {
-    const { populateChipData } = usePopulateChipData();
     const dispatch = useDispatch();
     const selectedFolder = useSelector(getFolderPathSelector);
     const [error, setError] = useState<string | null>(null);
@@ -44,8 +44,10 @@ const usePerfAnalyzerFileLoader = () => {
 
     useEffect(() => {
         if (activeGraphOnChip) {
-            // TODO: should we remove this?
-            populateChipData(activeGraphOnChip);
+            dispatch(closeDetailedView());
+            // TODO: move both to bulk loading
+            dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
+            dispatch(loadNodesData([...mapIterable(activeGraphOnChip.nodes, (node) => node.generateInitialState())]));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeGraphOnChip]);
