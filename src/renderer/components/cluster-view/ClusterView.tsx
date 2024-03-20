@@ -51,10 +51,10 @@ const renderItem: ItemRenderer<GraphRelationshipState[]> = (
 };
 const ClusterView: FC<ClusterViewDialog> = () => {
     const { cluster } = useContext(ClusterDataSource);
-    const { getGraphOnChip, getGraphName, getGraphRelationshipStateList } = useContext(GraphOnChipContext);
+    const { getGraphOnChip, getActiveGraphName, getGraphRelationshipStateList } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
     const graphInformation = getGraphRelationshipStateList();
-    const selectedGraph = getGraphName();
+    const selectedGraph = getActiveGraphName();
     const availableTemporalEpochs: GraphRelationshipState[][] = [];
     const [pciPipes, setPciPipes] = useState<string[]>([]);
 

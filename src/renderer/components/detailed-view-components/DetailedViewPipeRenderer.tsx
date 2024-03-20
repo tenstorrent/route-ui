@@ -29,7 +29,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
     const svgRef = useRef<SVGSVGElement | null>(null);
     const showLinkSaturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturation);
     const linkSaturationTreshold = useSelector((state: RootState) => state.linkSaturation.linkSaturationTreshold);
-    const graphName = useContext(GraphOnChipContext).getGraphName();
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));

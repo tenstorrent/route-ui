@@ -36,7 +36,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { getGraphName, resetChips, getActiveGraphRelationshipState, getActiveGraphOnChip } = useContext(GraphOnChipContext);
+    const { getActiveGraphName, resetChips, getActiveGraphRelationshipState, getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
@@ -50,7 +50,7 @@ const TopHeaderComponent: React.FC = () => {
         .getSavedRemoteFolders(selectedConnection)
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
-    const selectedGraph = getGraphName();
+    const selectedGraph = getActiveGraphName();
     const chipId = getActiveGraphOnChip()?.chipId;
     const architecture = getActiveGraphOnChip()?.architecture;
     const temporalEpoch = getActiveGraphRelationshipState()?.temporalEpoch;

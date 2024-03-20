@@ -21,7 +21,7 @@ interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const graphName = useContext(GraphOnChipContext).getGraphName();
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
