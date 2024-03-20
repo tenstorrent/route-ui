@@ -51,7 +51,7 @@ const renderItem: ItemRenderer<GraphRelationshipState[]> = (
 };
 const ClusterView: FC<ClusterViewDialog> = () => {
     const { cluster } = useContext(ClusterDataSource);
-    const { getChipByGraphName, getGraphName, getGraphRelationshipStateList } = useContext(GraphOnChipContext);
+    const { getGraphOnChip, getGraphName, getGraphRelationshipStateList } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
     const graphInformation = getGraphRelationshipStateList();
     const selectedGraph = getGraphName();
@@ -89,8 +89,8 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         const pipeList = selectedEpoch
             .map((graph) => {
                 return [
-                    ...(getChipByGraphName(graph.name)?.ethernetPipes.map((pipe) => pipe) || []),
-                    ...(getChipByGraphName(graph.name)?.pciePipes.map((pipe) => {
+                    ...(getGraphOnChip(graph.name)?.ethernetPipes.map((pipe) => pipe) || []),
+                    ...(getGraphOnChip(graph.name)?.pciePipes.map((pipe) => {
                         pciList.push(pipe.id);
                         return pipe;
                     }) || []),
@@ -104,7 +104,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         return pipeList.filter((pipeSegment, index, self) => {
             return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
         });
-    }, [selectedEpoch, getChipByGraphName]);
+    }, [selectedEpoch, getGraphOnChip]);
 
     const pipeIds = uniquePipeList.map((pipe) => pipe.id);
 
@@ -228,7 +228,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                     let graphOnChip: GraphOnChip | undefined;
                     let graphName: string | undefined;
                     selectedEpoch.forEach((graph) => {
-                        const chipByGraphName = getChipByGraphName(graph.name);
+                        const chipByGraphName = getGraphOnChip(graph.name);
                         if (chipByGraphName?.chipId === clusterChip.id) {
                             graphOnChip = chipByGraphName;
                             graphName = graph.name;
