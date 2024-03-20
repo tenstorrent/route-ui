@@ -10,7 +10,7 @@ interface ChipsState {
     graphs: Map<string, GraphRelationshipState>;
 }
 
-interface ChipContextType {
+interface GraphOnChipContextType {
     chipState: ChipsState;
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationshipState[]) => void;
     resetChips: () => void;
@@ -28,7 +28,7 @@ const initialChipsState: ChipsState = {
     graphs: new Map<string, GraphRelationshipState>(),
 };
 
-const GraphOnChipContext = createContext<ChipContextType>({
+const GraphOnChipContext = createContext<GraphOnChipContextType>({
     chipState: initialChipsState,
     loadGraphOnChips: () => {},
     resetChips: () => {},
@@ -87,7 +87,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return chipsState.activeGraphName;
     }, [chipsState.activeGraphName]);
 
-    const value = useMemo<ChipContextType>(
+    const value = useMemo<GraphOnChipContextType>(
         () => ({
             loadGraphOnChips: setChips,
             chipState: chipsState,
