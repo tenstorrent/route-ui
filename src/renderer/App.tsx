@@ -3,7 +3,7 @@ import store from 'data/store/createStore';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
-import { ChipProvider } from '../data/ChipDataProvider';
+import { GraphOnChipProvider } from '../data/ChipDataProvider';
 import Cluster from '../data/Cluster';
 import { ClusterDataSource } from '../data/DataSource';
 import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
@@ -23,14 +23,14 @@ export default function App() {
         <Provider store={store}>
             {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
             <ClusterDataSource.Provider value={{ cluster, setCluster }}>
-                <ChipProvider>
+                <GraphOnChipProvider>
                     <Router>
                         <Routes>
                             <Route path='/' element={<SplashScreen />} />
                             <Route path='/render' element={<MainRouteRenderer />} />
                         </Routes>
                     </Router>
-                </ChipProvider>
+                </GraphOnChipProvider>
             </ClusterDataSource.Provider>
         </Provider>
     );
