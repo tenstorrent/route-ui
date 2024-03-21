@@ -77,7 +77,7 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
                 position={Position.BOTTOM_RIGHT}
                 hoverOpenDelay={130}
             >
-                {children}
+                <div className='pipe-info-dialog-wrapper'>{children}</div>
             </Tooltip2>
         </div>
     );
