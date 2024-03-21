@@ -1,15 +1,15 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
+import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select } from '@blueprintjs/select';
-import { Button, Checkbox, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ClusterContext } from '../../../data/ClusterContext';
+import getPipeColor from '../../../data/ColorGenerator';
 import GraphOnChip, { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import getPipeColor from '../../../data/ColorGenerator';
-import { ClusterContext } from '../../../data/ClusterContext';
 import { GraphRelationship, PipeSelection } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
@@ -19,7 +19,7 @@ import {
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
-import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
+import { updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
 import ColorSwatch from '../ColorSwatch';
 import FilterableComponent from '../FilterableComponent';
@@ -126,10 +126,6 @@ const ClusterView: FC<ClusterViewDialog> = () => {
             <div
                 className='cluster-view-pipelist'
                 // this is to address the bug with a sticking focus pipe
-
-                onMouseOut={() => {
-                    dispatch(updateFocusPipe(null));
-                }}
             >
                 <div className='congestion-container'>
                     <LinkCongestionControls showNOCControls={false} />
@@ -408,11 +404,9 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                                 );
                                 drawEthLink(svg, ethPosition, link.name, size, color, 6);
                             }
-                        } else {
-                            if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
-                                const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
-                                drawEthLink(svg, ethPosition, link.name, size, color, 6);
-                            }
+                        } else if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
+                            const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
+                            drawEthLink(svg, ethPosition, link.name, size, color, 6);
                         }
                     }
                 });

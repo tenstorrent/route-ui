@@ -1,6 +1,5 @@
-import { updateFocusPipe } from 'data/store/slices/pipeSelection.slice';
 import { useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 
 import { ComputeNode } from '../../data/GraphOnChip';
@@ -15,18 +14,12 @@ export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
-    const dispatch = useDispatch();
-
     return (
         <div className='main-content'>
             {graphOnChip && (
                 <div
                     className='grid-container'
                     // this is to address the issue with focus pipe getting stuck because of Popover2
-                    // TODO: find a better solution
-                    onMouseEnter={() => {
-                        dispatch(updateFocusPipe(null));
-                    }}
                 >
                     <div
                         className='node-container'
