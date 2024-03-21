@@ -1,8 +1,9 @@
 import { Position } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { FC, useContext, useMemo, type PropsWithChildren } from 'react';
+import React, { FC, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
+import type { Pipe } from '../../data/GraphOnChip';
 import './PipeInfoDialog.scss';
 
 export interface PipeInfoDialogProps {
@@ -18,31 +19,63 @@ export interface PipeInfoDialogProps {
  */
 const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, pipeId, hide, onEnter, onLeave }) => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const producers = useMemo(
-        () => [
-            ...new Set(
-                (graphOnChip?.pipes.get(pipeId)?.producerCores ?? []).map(
-                    (core) => graphOnChip?.getNode(core)?.operation?.name,
-                ),
-            ),
-        ],
-        [graphOnChip, pipeId],
-    );
-    const consumers = useMemo(
-        () => [
-            ...new Set(
-                (graphOnChip?.pipes.get(pipeId)?.consumerCores ?? []).map(
-                    (core) => graphOnChip?.getNode(core)?.operation?.name,
-                ),
-            ),
-        ],
-        [graphOnChip, pipeId],
-    );
+    const [tooltipContent, setTooltipContent] = useState<React.JSX.Element | undefined>(undefined);
+
+    const setupData = () => {
+        const pipe: Pipe = graphOnChip?.pipes.get(pipeId) as Pipe;
+        const output: React.JSX.Element[] = [];
+        if (pipe) {
+            if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
+                if (pipe.producerCores.length > 0) {
+                    output.push(
+                        <div className='producer-consumer'>
+                            <h3>Producer:</h3>
+                            <h2>
+                                {[
+                                    ...new Set(
+                                        pipe.producerCores.map((core) => graphOnChip?.getNode(core)?.operation?.name),
+                                    ),
+                                ]}
+                            </h2>
+                        </div>,
+                    );
+                }
+                if (pipe.consumerCores.length > 0) {
+                    output.push(
+                        <div className='producer-consumer'>
+                            <h3>Consumer:</h3>
+                            <h2>
+                                {[
+                                    ...new Set(
+                                        pipe.consumerCores.map((core) => graphOnChip?.getNode(core)?.operation?.name),
+                                    ),
+                                ]}
+                            </h2>
+                        </div>,
+                    );
+                }
+            } else {
+                return undefined;
+            }
+        } else {
+            return undefined;
+        }
+        // eslint-disable-next-line react/jsx-no-useless-fragment
+        return <>{output}</>;
+    };
+
+    useEffect(() => {
+        setTooltipContent(undefined);
+    }, [graphOnChip]);
 
     return (
         <div
             className='pipe-info-dialog'
             onMouseEnter={() => {
+                if (!tooltipContent) {
+                    setTooltipContent(setupData());
+                }
+
                 onEnter?.();
             }}
             onFocus={() => {
@@ -56,24 +89,9 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
             }}
         >
             <Tooltip2
-                disabled={hide || (!producers.length && !consumers.length)}
+                disabled={hide || !tooltipContent}
                 usePortal
-                content={
-                    <>
-                        {producers.length > 0 && (
-                            <div className='producer-consumer'>
-                                <h3>Producer:</h3>
-                                <h2>{producers}</h2>
-                            </div>
-                        )}
-                        {consumers.length > 0 && (
-                            <div className='producer-consumer'>
-                                <h3>Consumer:</h3>
-                                <h2>{consumers}</h2>
-                            </div>
-                        )}
-                    </>
-                }
+                content={tooltipContent}
                 position={Position.BOTTOM_RIGHT}
                 hoverOpenDelay={130}
             >
