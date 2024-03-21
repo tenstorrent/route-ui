@@ -1,5 +1,5 @@
 import React from 'react';
-import { NetworkLink } from '../../../data/Chip';
+import { NetworkLink } from '../../../data/GraphOnChip';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 
 interface DetailedViewNOCRouterRendererProps {

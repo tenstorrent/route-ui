@@ -3,9 +3,9 @@ import store from 'data/store/createStore';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
-import { ChipProvider } from '../data/ChipDataProvider';
+import { GraphOnChipProvider } from '../data/GraphOnChipContext';
 import Cluster from '../data/Cluster';
-import { ClusterDataSource } from '../data/DataSource';
+import { ClusterContext } from '../data/ClusterContext';
 import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
 import MainRouteRenderer from './views/MainRouteRenderer';
 import SplashScreen from './views/SplashScreen';
@@ -22,16 +22,16 @@ export default function App() {
     return (
         <Provider store={store}>
             {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
-            <ClusterDataSource.Provider value={{ cluster, setCluster }}>
-                <ChipProvider>
+            <ClusterContext.Provider value={{ cluster, setCluster }}>
+                <GraphOnChipProvider>
                     <Router>
                         <Routes>
                             <Route path='/' element={<SplashScreen />} />
                             <Route path='/render' element={<MainRouteRenderer />} />
                         </Routes>
                     </Router>
-                </ChipProvider>
-            </ClusterDataSource.Provider>
+                </GraphOnChipProvider>
+            </ClusterContext.Provider>
         </Provider>
     );
 }

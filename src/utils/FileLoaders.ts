@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import Chip from 'data/Chip';
+import GraphOnChip from 'data/GraphOnChip';
 import {
     ChipDesignJSON,
     GraphnameToEpochToDeviceJSON,
@@ -24,7 +24,7 @@ import fs, { Dirent, existsSync } from 'fs';
 import { load } from 'js-yaml';
 import path from 'path';
 import Cluster from '../data/Cluster';
-import { GraphRelationshipState } from '../data/StateTypes';
+import { GraphRelationship } from '../data/StateTypes';
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from '../data/sources/ClusterDescriptor';
 
 export const readFile = async (filename: string): Promise<string> =>
@@ -100,20 +100,21 @@ export const validatePerfResultsFolder = async (dirPath: string): Promise<[isVal
     }
     return [true, null];
 };
-const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Promise<GraphRelationshipState[]> => {
+const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Promise<GraphRelationship[]> => {
     try {
         const netlistAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
         return netlistAnalyzerFiles
             .filter((file) => file.isFile() && file.name.includes('temporal_epoch'))
             .map((file) => file.name)
-            .map((filename) => {
-                const epoch = getTemporalEpochFromGraphName(filename);
-                const chipId = getChipIdFromFilename(filename);
-                return {
-                    name: filename,
-                    temporalEpoch: epoch,
+            .map((name) => {
+                const temporalEpoch = getTemporalEpochFromGraphName(name) || 0;
+                const chipId = getChipIdFromFilename(name) || 0;
+                const graphRelationship: GraphRelationship = {
+                    name,
+                    temporalEpoch,
                     chipId,
-                } as GraphRelationshipState;
+                };
+                return graphRelationship;
             });
     } catch (err) {
         console.error('Failed to read netlist_analyzer folder', err);
@@ -121,7 +122,7 @@ const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Pr
     }
 };
 
-export const getAvailableGraphNames = async (perfResultsPath: string): Promise<GraphRelationshipState[]> => {
+export const getAvailableGraphNames = async (perfResultsPath: string): Promise<GraphRelationship[]> => {
     try {
         const runtimeDataPath = path.join(perfResultsPath, 'runtime_data.yaml');
         const runtimeDataYaml = await readFile(runtimeDataPath);
@@ -129,11 +130,12 @@ export const getAvailableGraphNames = async (perfResultsPath: string): Promise<G
 
         return Object.entries(runtimeData.graph_to_epoch_map as GraphnameToEpochToDeviceJSON).map(
             ([graphName, mapping]) => {
-                return {
+                const graphRelationship: GraphRelationship = {
                     name: graphName,
                     temporalEpoch: mapping.epoch_id,
                     chipId: mapping.target_device,
-                } as GraphRelationshipState;
+                };
+                return graphRelationship;
             },
         );
     } catch (err) {
@@ -165,7 +167,7 @@ export const loadCluster = async (perfResultsPath: string): Promise<Cluster | nu
     return null;
 };
 
-const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chip> => {
+const loadChipFromArchitecture = async (architecture: Architecture): Promise<GraphOnChip> => {
     if (architecture === Architecture.NONE) {
         throw new Error('No architecture provided.');
     }
@@ -177,7 +179,7 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Chi
         [Architecture.WORMHOLE]: wormholeArch.default,
     }[architecture];
 
-    return Chip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
+    return GraphOnChip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
 };
 
 /** @description only for netlist analizer files */
@@ -220,7 +222,7 @@ const loadChipFromNetlistAnalyzer = async (
     graphName: string,
     chipId: number | null,
     temporalEpoch: number | null,
-): Promise<Chip | null> => {
+): Promise<GraphOnChip | null> => {
     try {
         const netListAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
         let netlistAnalyzerFilepath: string = '';
@@ -247,19 +249,19 @@ const loadChipFromNetlistAnalyzer = async (
         }
         if (netlistAnalyzerFilepath !== '') {
             const data = await readFile(netlistAnalyzerFilepath);
-            let chip = Chip.CREATE_FROM_NETLIST_JSON(load(data) as NetlistAnalyzerDataJSON);
+            let graphOnChip = GraphOnChip.CREATE_FROM_NETLIST_JSON(load(data) as NetlistAnalyzerDataJSON);
             if (netlistAnalyzerOptoPipeFilepath !== '') {
                 try {
                     const opsData = await readFile(netlistAnalyzerOptoPipeFilepath);
-                    chip = Chip.AUGMENT_FROM_OPS_JSON(chip, (load(opsData) as any).ops);
-                    if (chip) {
-                        return chip;
+                    graphOnChip = GraphOnChip.AUGMENT_FROM_OPS_JSON(graphOnChip, (load(opsData) as any).ops);
+                    if (graphOnChip) {
+                        return graphOnChip;
                     }
                 } catch (err) {
                     console.error('Failed to read opto pipes file', err);
                 }
-                if (chip) {
-                    return chip;
+                if (graphOnChip) {
+                    return graphOnChip;
                 }
             }
         } else {
@@ -270,14 +272,19 @@ const loadChipFromNetlistAnalyzer = async (
     }
     return null;
 };
-export const loadGraph = async (folderPath: string, graph: GraphRelationshipState): Promise<Chip> => {
+export const loadGraph = async (folderPath: string, graph: GraphRelationship): Promise<GraphOnChip> => {
     const { name, chipId, temporalEpoch } = graph;
 
     let architecture = Architecture.NONE;
 
-    let chip: Chip | null = await loadChipFromNetlistAnalyzer(path.join(folderPath), name, chipId, temporalEpoch);
+    let graphOnChip: GraphOnChip | null = await loadChipFromNetlistAnalyzer(
+        path.join(folderPath),
+        name,
+        chipId,
+        temporalEpoch,
+    );
 
-    if (chip === null) {
+    if (graphOnChip === null) {
         try {
             const metadata = (await loadJsonFile(
                 path.join(folderPath, 'perf_results', 'metadata', `${name}.json`),
@@ -292,14 +299,17 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
         } catch (err) {
             console.error('Failed to read metadata from folder:', err);
         }
-        chip = await loadChipFromArchitecture(architecture);
+        graphOnChip = await loadChipFromArchitecture(architecture);
     }
 
     try {
         const graphPath = path.join(folderPath, `perf_results`, 'graph_descriptor', name, 'cores_to_ops.json');
         const graphDescriptorJson = await loadJsonFile(graphPath);
 
-        chip = Chip.AUGMENT_FROM_GRAPH_DESCRIPTOR(chip, graphDescriptorJson as GraphDescriptorJSON);
+        graphOnChip = GraphOnChip.AUGMENT_FROM_GRAPH_DESCRIPTOR(
+            graphOnChip,
+            graphDescriptorJson as GraphDescriptorJSON,
+        );
     } catch (err) {
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
@@ -307,7 +317,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
         const queuesPath = path.join(folderPath, `perf_results`, 'queue_descriptor', 'queue_descriptor.json');
         const queueDescriptorJson = await loadJsonFile(queuesPath);
 
-        chip = Chip.AUGMENT_WITH_QUEUE_DETAILS(chip, queueDescriptorJson as QueueDescriptorJson);
+        graphOnChip = GraphOnChip.AUGMENT_WITH_QUEUE_DETAILS(graphOnChip, queueDescriptorJson as QueueDescriptorJson);
     } catch (err) {
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
@@ -332,24 +342,24 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationshipStat
                     /* TODO: Should use an actual `device-id` for the chipId. The device-id mappings for graphs are available in
                      *   `perf_results/perf_info_all_epochs.csv`.
                      *
-                     * The node ID keys in the perf analyzer results file don't have the chip ID (device ID) component.
-                     * We're forcing chip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
+                     * The node ID keys in the perf analyzer results file don't have the graphOnChip ID (device ID) component.
+                     * We're forcing graphOnChip ID to 0 here, since for now we're only dealing with single-graph temporal epochs.
                      */
                     return Object.entries(result['core-measurements']).map(([coreId, corePerfJson]) => {
-                        return [`${chip?.chipId}-${coreId}`, corePerfJson];
+                        return [`${graphOnChip?.chipId}-${coreId}`, corePerfJson];
                     });
                 })
                 .flat(),
         );
 
-        chip = Chip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(chip, analyzerResultsJsonWithChipIds);
+        graphOnChip = GraphOnChip.AUGMENT_WITH_PERF_ANALYZER_RESULTS(graphOnChip, analyzerResultsJsonWithChipIds);
 
-        chip = Chip.AUGMENT_WITH_OP_PERFORMANCE(chip, opPerformanceByOp);
+        graphOnChip = GraphOnChip.AUGMENT_WITH_OP_PERFORMANCE(graphOnChip, opPerformanceByOp);
     } catch (err) {
         console.error('graph_perf_report_per_op.json not found, skipping \n', err);
     }
 
-    return chip;
+    return graphOnChip;
 };
 
 export const getAvailableNetlistFiles = async (folderPath: string): Promise<string[]> => {

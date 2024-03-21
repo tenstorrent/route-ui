@@ -7,21 +7,21 @@ import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ChipContext } from '../../data/ChipDataProvider';
-import { ClusterDataSource } from '../../data/DataSource';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
+import { ClusterContext } from '../../data/ClusterContext';
 import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
 
 export interface SideBarProps {}
 
 export const SideBar: React.FC<SideBarProps> = () => {
-    const { resetChips } = useContext(ChipContext);
+    const { resetGraphOnChipState } = useContext(GraphOnChipContext);
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
-    const { cluster } = useContext(ClusterDataSource);
+    const { cluster } = useContext(ClusterContext);
     const dispatch = useDispatch();
     const reloadAppData = () => {
-        resetChips();
+        resetGraphOnChipState();
         dispatch(setSelectedFile(''));
         dispatch(setSelectedFolder(''));
         navigate('/');

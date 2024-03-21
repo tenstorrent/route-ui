@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
 
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 
 import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';
 import { getGroupColor } from '../../../data/ColorGenerator';

@@ -14,14 +14,14 @@ import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_G
 import Collapsible from '../Collapsible';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { getTotalOpsForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
-    const chip = useContext(ChipContext).getActiveChip();
-    const graphName = useContext(ChipContext).getGraphName();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
     const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
@@ -33,7 +33,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
             <Button
                 minimal
                 onClick={() => {
-                    const resetValue = chip?.totalOpCycles || 1;
+                    const resetValue = graphOnChip?.totalOpCycles || 1;
 
                     dispatch(updateTotalOPs({ graphName, totalOps: resetValue }));
                 }}
@@ -42,7 +42,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
         </Tooltip2>
     );
 
-    if (chip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
+    if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
         aiclkRightElement = (
             <Tooltip2 content='Cycles per input cannot be 0'>
                 <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />

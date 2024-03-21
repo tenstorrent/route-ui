@@ -1,7 +1,7 @@
 import { Icon, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { useContext, useState } from 'react';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import QueueIcon from '../../../main/assets/QueueIcon';
 import ComputeNodesPropertiesTab from './ComputeNodesPropertiesTab';
 import OperationsPropertiesTab from './OperationsPropertiesTab';
@@ -12,12 +12,12 @@ import './PropertiesPanel.scss';
 
 export default function PropertiesPanel() {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     return (
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
                 <Tab id='tab-nodes' title='Nodes' panel={<ComputeNodesPropertiesTab />} />
-                {chip?.hasPipes && (
+                {graphOnChip?.hasPipes && (
                     <Tab
                         id='tab-pipes'
                         title={
@@ -28,7 +28,7 @@ export default function PropertiesPanel() {
                         panel={<PipesPropertiesTab />}
                     />
                 )}
-                {chip?.hasOperations && (
+                {graphOnChip?.hasOperations && (
                     <Tab
                         id='tab-ops'
                         title={
@@ -39,7 +39,7 @@ export default function PropertiesPanel() {
                         panel={<OperationsPropertiesTab />}
                     />
                 )}
-                {chip?.hasQueues && (
+                {graphOnChip?.hasQueues && (
                     <Tab
                         id='tab-queues'
                         title={

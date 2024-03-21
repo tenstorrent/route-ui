@@ -3,7 +3,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { RootState } from '../../../data/store/createStore';
 import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
@@ -17,16 +17,16 @@ import SelectableOperation from '../SelectableOperation';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
-    const queuesList = useMemo(() => (chip ? [...chip.queues] : []), [chip]);
+    const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
 
     const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const selectFilteredQueue = () => {
-        if (!chip) {
+        if (!graphOnChip) {
             return;
         }
         Object.keys(queueSelectionState).forEach((name) => {

@@ -5,7 +5,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import {
     getSelectedFolderLocationType,
     getSelectedRemoteFolder,
@@ -21,7 +21,7 @@ import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
 
 const RemoteSyncConfigurator: FC = () => {
-    const { resetChips } = useContext(ChipContext);
+    const { resetGraphOnChipState } = useContext(GraphOnChipContext);
     const remote = useRemote();
 
     const dispatch = useDispatch();
@@ -45,7 +45,8 @@ const RemoteSyncConfigurator: FC = () => {
         if (checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
         } else {
-            resetChips();
+            // TODO: fix this
+            resetGraphOnChipState();
         }
     };
 

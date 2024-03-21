@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'data/store/createStore';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
-import { NetworkLink, NOCLink } from '../../../data/Chip';
+import { NetworkLink, NOCLink } from '../../../data/GraphOnChip';
 import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
 import { PipeSelection } from '../../../data/StateTypes';
 import {
@@ -17,7 +17,7 @@ import {
     PCIeLinkName,
 } from '../../../data/Types';
 import { getAllLinksForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
@@ -29,7 +29,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
     const svgRef = useRef<SVGSVGElement | null>(null);
     const showLinkSaturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturation);
     const linkSaturationTreshold = useSelector((state: RootState) => state.linkSaturation.linkSaturationTreshold);
-    const graphName = useContext(ChipContext).getGraphName();
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
     const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));

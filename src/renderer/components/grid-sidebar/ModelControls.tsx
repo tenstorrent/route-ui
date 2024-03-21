@@ -2,7 +2,7 @@ import { Slider } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { MAX_MODEL_RATIO_THRESHOLD, MIN_MODEL_RATIO_THRESHOLD } from '../../../data/constants';
 import type { RootState } from '../../../data/store/createStore';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
@@ -11,14 +11,14 @@ import Collapsible from '../Collapsible';
 import useOperationsTable, { type OpTableFields } from '../bottom-dock/useOperationsTable.hooks';
 
 const ModelControls: FC = () => {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector((state: RootState) => getOperationRatioThreshold(state));
     const { getMaxModelEstimateRatio } = useOperationsTable();
     const maxModelEstimateRatio = useMemo(
         () =>
             getMaxModelEstimateRatio(
-                [...(chip?.operations ?? [])].map((op) => {
+                [...(graphOnChip?.operations ?? [])].map((op) => {
                     return {
                         operation: op,
                         name: op.name,
@@ -28,7 +28,7 @@ const ModelControls: FC = () => {
                 }),
             ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [chip?.operations],
+        [graphOnChip?.operations],
     );
 
     const clampNumber = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));

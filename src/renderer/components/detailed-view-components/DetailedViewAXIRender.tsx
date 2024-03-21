@@ -1,5 +1,5 @@
 import React from 'react';
-import { DramBankLink, NOC2AXILink, NetworkLink, NOCLink } from '../../../data/Chip';
+import { DramBankLink, NOC2AXILink, NetworkLink, NOCLink } from '../../../data/GraphOnChip';
 import { DramBankLinkName, NetworkLinkName, NOC } from '../../../data/Types';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 

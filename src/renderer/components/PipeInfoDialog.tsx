@@ -2,8 +2,8 @@ import React, { FC, useContext, useEffect, useState } from 'react';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { Position } from '@blueprintjs/core';
 import { JSX } from 'react/jsx-runtime';
-import { Pipe } from '../../data/Chip';
-import { ChipContext } from '../../data/ChipDataProvider';
+import { Pipe } from '../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 export interface PipeInfoDialogProps {
     contents: React.ReactNode;
@@ -17,10 +17,10 @@ export interface PipeInfoDialogProps {
  */
 const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => {
     const [tooltipContent, setTooltipContent] = useState<JSX.Element | undefined>(undefined);
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const setupData = () => {
-        const pipe: Pipe = chip?.pipes.get(pipeId) as Pipe;
+        const pipe: Pipe = graphOnChip?.pipes.get(pipeId) as Pipe;
         const output: JSX.Element[] = [];
         if (pipe) {
             if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
@@ -29,7 +29,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
                         <div className='producer-consumer'>
                             <h3>Producer:</h3>
                             <h2>
-                                {[...new Set(pipe.producerCores.map((core) => chip?.getNode(core)?.operation?.name))]}
+                                {[...new Set(pipe.producerCores.map((core) => graphOnChip?.getNode(core)?.operation?.name))]}
                             </h2>
                         </div>,
                     );
@@ -39,7 +39,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
                         <div className='producer-consumer'>
                             <h3>Consumer:</h3>
                             <h2>
-                                {[...new Set(pipe.consumerCores.map((core) => chip?.getNode(core)?.operation?.name))]}
+                                {[...new Set(pipe.consumerCores.map((core) => graphOnChip?.getNode(core)?.operation?.name))]}
                             </h2>
                         </div>,
                     );
@@ -56,7 +56,7 @@ const PipeInfoDialog: FC<PipeInfoDialogProps> = ({ contents, pipeId, hide }) => 
 
     useEffect(() => {
         setTooltipContent(undefined);
-    }, [chip]);
+    }, [graphOnChip]);
 
     if (hide) {
         return contents as JSX.Element;

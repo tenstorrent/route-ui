@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 import { getShowNodeLocation } from '../../../data/store/selectors/uiState.selectors';
 import { formatNodeUID } from '../../../utils/DataUtils';
 

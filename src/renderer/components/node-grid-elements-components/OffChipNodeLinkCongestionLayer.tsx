@@ -1,6 +1,6 @@
 import { FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { RootState } from '../../../data/store/createStore';
 import { ComputeNodeType } from '../../../data/Types';
@@ -10,7 +10,7 @@ import {
     getLinkSaturation,
     getShowLinkSaturation
 } from '../../../data/store/selectors/linkSaturation.selectors';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;
@@ -20,7 +20,7 @@ interface OffChipNodeLinkCongestionLayerProps {
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node }) => {
-    const graphName = useContext(ChipContext).getGraphName();
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);

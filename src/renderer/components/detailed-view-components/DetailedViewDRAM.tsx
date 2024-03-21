@@ -4,8 +4,8 @@ import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { ComputeNode, NOCLink } from '../../../data/Chip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import LinkDetails from '../LinkDetails';
@@ -19,16 +19,16 @@ interface DetailedViewDRAMRendererProps {
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
-    const chip = useContext(ChipContext).getActiveChip();
-    const architecture = chip?.architecture ?? Architecture.NONE;
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
     const nodeList = useMemo(() => {
-        if (chip && node.dramChannelId > -1) {
-            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === node.dramChannelId)];
+        if (graphOnChip && node.dramChannelId > -1) {
+            return [...filterIterable(graphOnChip?.nodes, (n) => n.dramChannelId === node.dramChannelId)];
         }
         return [];
-    }, [node, chip]);
+    }, [node, graphOnChip]);
 
     const dram = node.dramChannel || null;
 

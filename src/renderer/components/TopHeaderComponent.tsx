@@ -9,7 +9,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType } from '../../data/StateTypes';
 import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';
@@ -36,7 +36,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { getGraphName, resetChips, getActiveGraph, getActiveChip } = useContext(ChipContext);
+    const { getActiveGraphName, resetGraphOnChipState, getActiveGraphRelationship, getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
@@ -50,10 +50,10 @@ const TopHeaderComponent: React.FC = () => {
         .getSavedRemoteFolders(selectedConnection)
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
-    const selectedGraph = getGraphName();
-    const chipId = getActiveChip()?.chipId;
-    const architecture = getActiveChip()?.architecture;
-    const temporalEpoch = getActiveGraph()?.temporalEpoch;
+    const selectedGraph = getActiveGraphName();
+    const chipId = getActiveGraphOnChip()?.chipId;
+    const architecture = getActiveGraphOnChip()?.architecture;
+    const temporalEpoch = getActiveGraphRelationship()?.temporalEpoch;
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
@@ -67,7 +67,7 @@ const TopHeaderComponent: React.FC = () => {
             dispatch(setSelectedRemoteFolder(newFolder));
         }
 
-        resetChips();
+        resetGraphOnChipState();
 
         if (checkLocalFolderExists(folderPath)) {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);

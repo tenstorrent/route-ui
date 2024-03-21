@@ -5,7 +5,7 @@ import { RootState } from 'data/store/createStore';
 import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import React, { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
@@ -16,16 +16,16 @@ import SelectableOperation from '../SelectableOperation';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
     const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
+    const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);
 
     const { selected, selectOperation } = useSelectableGraphVertex();
     const selectFilteredOperations = () => {
-        if (!chip) {
+        if (!graphOnChip) {
             return;
         }
         Object.keys(groupsSelectionState).forEach((op) => {

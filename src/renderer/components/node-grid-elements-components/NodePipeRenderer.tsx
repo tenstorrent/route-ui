@@ -1,7 +1,7 @@
 import { FC, useContext, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import * as d3 from 'd3';
-import { ComputeNode } from '../../../data/Chip';
+import { ComputeNode } from '../../../data/GraphOnChip';
 import { getHighContrastState, getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
 import { RootState } from '../../../data/store/createStore';
 import { PipeSelection } from '../../../data/StateTypes';
@@ -19,7 +19,7 @@ import {
     getLinkSaturation,
     getShowLinkSaturation
 } from '../../../data/store/selectors/linkSaturation.selectors';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 interface NodePipeRendererProps {
     node: ComputeNode;
@@ -28,7 +28,7 @@ interface NodePipeRendererProps {
 const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
-    const graphName = useContext(ChipContext).getGraphName();
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));
 
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);

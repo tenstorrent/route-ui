@@ -7,7 +7,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { ComputeNodeType } from '../../../data/Types';
 import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';
@@ -20,16 +20,16 @@ interface DetailedViewProps {}
 
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
-    const { getActiveChip, getGraphName, chipState } = useContext(ChipContext);
-    const chip = getActiveChip();
-    const graphName = getGraphName();
+    const { getActiveGraphOnChip, getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
+    const graphName = getActiveGraphName();
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
 
-    const architecture = chipState.chips[graphName]?.architecture;
+    const architecture = graphOnChipList[graphName]?.architecture;
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
-    const node = uid ? chip?.getNode(uid) : null;
+    const node = uid ? graphOnChip?.getNode(uid) : null;
 
     useEffect(() => {
         if (detailedViewElement.current) {

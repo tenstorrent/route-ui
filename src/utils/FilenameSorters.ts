@@ -1,9 +1,9 @@
-import { GraphRelationshipState } from '../data/StateTypes';
+import { GraphRelationship } from '../data/StateTypes';
 
 const NETLIST_ANALYZER_REGEX = /^\D*(\d+)\D*(\d*).yaml$/;
 const PERF_ANALYZER_REGEX = /^\D+(\d+)\D*(\d*)\D*(\d*)$/;
 
-export function sortNetlistAnalyzerFiles(filenames: GraphRelationshipState[]) {
+export function sortNetlistAnalyzerFiles(filenames: GraphRelationship[]) {
     return filenames.sort((a, b) => {
         const parsedA = NETLIST_ANALYZER_REGEX.exec(a.name);
         const parsedB = NETLIST_ANALYZER_REGEX.exec(b.name);
@@ -17,7 +17,7 @@ export function sortNetlistAnalyzerFiles(filenames: GraphRelationshipState[]) {
     });
 }
 
-export function sortPerfAnalyzerGraphnames(filenames: GraphRelationshipState[]) {
+export function sortPerfAnalyzerGraphnames(filenames: GraphRelationship[]) {
     return filenames.sort((a, b) => {
         const parsedA = PERF_ANALYZER_REGEX.exec(a.name);
         const parsedB = PERF_ANALYZER_REGEX.exec(b.name);

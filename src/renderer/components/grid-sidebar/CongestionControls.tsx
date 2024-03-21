@@ -36,14 +36,14 @@ import {
 } from '../../../data/store/slices/linkSaturation.slice';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import LinkCongestionControl from './LinkCongestionControl';
 
 export const CongestionControls: FC = () => {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
-    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor || 10;
-    const hasPipes = chip?.hasPipes || false;
+    const maxBwLimitedFactor = graphOnChip?.details.maxBwLimitedFactor || 10;
+    const hasPipes = graphOnChip?.hasPipes || false;
 
     const dispatch = useDispatch();
 

@@ -14,8 +14,8 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
-import { ComputeNode } from '../../../data/Chip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { ComputeNode } from '../../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
 import { columnRenderer } from './SharedTable';
@@ -30,18 +30,18 @@ import SelectableOperation, { SelectableOperationPerformance } from '../Selectab
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
     const dispatch = useDispatch();
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');
     const [filterQuery, setFilterQuery] = useState<string>('');
     const tableFields = useMemo(() => {
-        if (!chip) {
+        if (!graphOnChip) {
             return [];
         }
 
         let list = [];
-        const selectedOperation = chip.getOperation(selectedOperationName);
+        const selectedOperation = graphOnChip.getOperation(selectedOperationName);
 
         if (selectedOperation) {
             list = [...selectedOperation.cores].map((core: ComputeNode) => {
@@ -53,7 +53,7 @@ function OperationsTable() {
                 } as OpTableFields;
             });
         } else {
-            list = [...chip.operations].map((op) => {
+            list = [...graphOnChip.operations].map((op) => {
                 return {
                     operation: op,
                     name: op.name,
@@ -70,7 +70,7 @@ function OperationsTable() {
         }
 
         return sortTableFields(list);
-    }, [chip, selectedOperationName, filterQuery, sortTableFields]);
+    }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
@@ -80,7 +80,7 @@ function OperationsTable() {
         setSelectedOperationName('');
         setFilterQuery('');
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [chip]);
+    }, [graphOnChip]);
 
     const operationCellRenderer = (rowIndex: number) => {
         const opName = tableFields[rowIndex].name;
@@ -235,7 +235,7 @@ function OperationsTable() {
         <>
             <div>
                 <SearchField
-                    disabled={!chip || selectedOperationName !== ''}
+                    disabled={!graphOnChip || selectedOperationName !== ''}
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[]}

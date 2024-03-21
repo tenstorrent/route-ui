@@ -4,7 +4,7 @@ import { selectPipeSelectionById } from 'data/store/selectors/pipeSelection.sele
 import { updateFocusPipe, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { ChangeEvent, FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PipeSegment, convertBytes } from '../../data/Chip';
+import { PipeSegment, convertBytes } from '../../data/GraphOnChip';
 import getPipeColor from '../../data/ColorGenerator';
 import ColorSwatch from './ColorSwatch';
 import HighlightedText from './HighlightedText';

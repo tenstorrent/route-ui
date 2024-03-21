@@ -92,13 +92,7 @@ export interface NetworkCongestionState {
     showNOC1: boolean;
 }
 
-export enum IoType {
-    ALL = 'all',
-    IN = 'in',
-    OUT = 'out',
-}
-
-export interface GraphRelationshipState {
+export interface GraphRelationship {
     name: string;
     temporalEpoch: number;
     chipId: number;

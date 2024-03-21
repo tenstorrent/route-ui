@@ -8,8 +8,8 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
-import { ComputeNode, NOCLink, PipeSegment } from '../../../data/Chip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
@@ -116,7 +116,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
-    const { graphName } = useContext(ChipContext).chipState;
+    const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -332,7 +332,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} graphName={graphName} showEmpty />
+                        <LinkDetails key={link.name} link={link} graphName={activeGraphName} showEmpty />
                     ))}
                 </div>
             )}
@@ -341,20 +341,20 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const chip = useContext(ChipContext).getActiveChip();
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
     const selectedNodes: ComputeNode[] = useMemo(() => {
-        if (!chip) {
+        if (!graphOnChip) {
             return [];
         }
         return Object.values(nodesSelectionState.nodeList)
             .filter((n) => n.selected)
-            .map((nodeState) => chip.getNode(nodeState.id));
-    }, [chip, nodesSelectionState]);
+            .map((nodeState) => graphOnChip.getNode(nodeState.id));
+    }, [graphOnChip, nodesSelectionState]);
 
     return (
-        <div className='properties-container'>
-            {/* {selectedNodes.length ? <div>Selected compute nodes</div> : ''} */}
+        // TODO: give this a greyed out look when data is not available
+        <div className={`properties-container ${graphOnChip ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
                     {selectedNodes.map((node: ComputeNode) => (

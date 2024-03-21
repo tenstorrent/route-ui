@@ -6,11 +6,11 @@ import { Button, Checkbox, MenuItem, PopoverPosition } from '@blueprintjs/core';
 import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Chip, { ComputeNode } from '../../../data/Chip';
-import { ChipContext } from '../../../data/ChipDataProvider';
+import GraphOnChip, { ComputeNode } from '../../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import getPipeColor from '../../../data/ColorGenerator';
-import { ClusterDataSource } from '../../../data/DataSource';
-import { GraphRelationshipState, PipeSelection } from '../../../data/StateTypes';
+import { ClusterContext } from '../../../data/ClusterContext';
+import { GraphRelationship, PipeSelection } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
 import {
@@ -31,7 +31,7 @@ export interface ClusterViewDialog {}
 
 const NODE_GRID_SIZE = 6;
 
-const renderItem: ItemRenderer<GraphRelationshipState[]> = (
+const renderItem: ItemRenderer<GraphRelationship[]> = (
     item,
     //
     { handleClick, modifiers },
@@ -50,12 +50,12 @@ const renderItem: ItemRenderer<GraphRelationshipState[]> = (
     );
 };
 const ClusterView: FC<ClusterViewDialog> = () => {
-    const { cluster } = useContext(ClusterDataSource);
-    const { getChipByGraphName, getGraphName, getAvailableGraphs } = useContext(ChipContext);
+    const { cluster } = useContext(ClusterContext);
+    const { getGraphOnChip, getActiveGraphName, getGraphRelationshipList } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
-    const graphInformation = getAvailableGraphs();
-    const selectedGraph = getGraphName();
-    const availableTemporalEpochs: GraphRelationshipState[][] = [];
+    const graphInformation = getGraphRelationshipList();
+    const selectedGraph = getActiveGraphName();
+    const availableTemporalEpochs: GraphRelationship[][] = [];
     const [pciPipes, setPciPipes] = useState<string[]>([]);
 
     const [pipeFilter, setPipeFilter] = useState<string>('');
@@ -68,7 +68,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
     });
     const selectedGraphItem = graphInformation.find((graph) => graph.name === selectedGraph);
 
-    const [selectedEpoch, setSelectedEpoch] = useState<GraphRelationshipState[]>(
+    const [selectedEpoch, setSelectedEpoch] = useState<GraphRelationship[]>(
         availableTemporalEpochs[selectedGraphItem?.temporalEpoch || 0] || [],
     );
 
@@ -89,8 +89,8 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         const pipeList = selectedEpoch
             .map((graph) => {
                 return [
-                    ...(getChipByGraphName(graph.name)?.ethernetPipes.map((pipe) => pipe) || []),
-                    ...(getChipByGraphName(graph.name)?.pciePipes.map((pipe) => {
+                    ...(getGraphOnChip(graph.name)?.ethernetPipes.map((pipe) => pipe) || []),
+                    ...(getGraphOnChip(graph.name)?.pciePipes.map((pipe) => {
                         pciList.push(pipe.id);
                         return pipe;
                     }) || []),
@@ -104,7 +104,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
         return pipeList.filter((pipeSegment, index, self) => {
             return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
         });
-    }, [selectedEpoch, getChipByGraphName]);
+    }, [selectedEpoch, getGraphOnChip]);
 
     const pipeIds = uniquePipeList.map((pipe) => pipe.id);
 
@@ -225,12 +225,12 @@ const ClusterView: FC<ClusterViewDialog> = () => {
                 }}
             >
                 {cluster?.chips.map((clusterChip) => {
-                    let chip: Chip | undefined;
+                    let graphOnChip: GraphOnChip | undefined;
                     let graphName: string | undefined;
                     selectedEpoch.forEach((graph) => {
-                        const chipByGraphName = getChipByGraphName(graph.name);
+                        const chipByGraphName = getGraphOnChip(graph.name);
                         if (chipByGraphName?.chipId === clusterChip.id) {
-                            chip = chipByGraphName;
+                            graphOnChip = chipByGraphName;
                             graphName = graph.name;
                         }
                     });
@@ -289,7 +289,7 @@ const ClusterView: FC<ClusterViewDialog> = () => {
 
                             {[...ethPosition.entries()].map(([position, value]) => {
                                 return value.map((uid: string, index: number) => {
-                                    const node = chip?.getNode(uid);
+                                    const node = graphOnChip?.getNode(uid);
                                     return (
                                         <EthPipeRenderer
                                             key={uid}
