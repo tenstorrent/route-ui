@@ -89,6 +89,7 @@ export enum HighlightType {
     INPUT = 'input',
     OUTPUT = 'output',
     NONE = '',
+    BOTH = 'both',
 }
 
 export enum QueueLocation {
