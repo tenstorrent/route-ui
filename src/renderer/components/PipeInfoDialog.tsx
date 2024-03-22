@@ -1,9 +1,9 @@
-import { Position } from '@blueprintjs/core';
+import { Icon, Position } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import React, { FC, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
-import type { Pipe } from '../../data/GraphOnChip';
 import './PipeInfoDialog.scss';
 
 export interface PipeInfoDialogProps {
@@ -22,46 +22,55 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
     const [tooltipContent, setTooltipContent] = useState<React.JSX.Element | undefined>(undefined);
 
     const setupData = () => {
-        const pipe: Pipe = graphOnChip?.pipes.get(pipeId) as Pipe;
-        const output: React.JSX.Element[] = [];
-        if (pipe) {
-            if (pipe.producerCores.length > 0 || pipe.consumerCores.length > 0) {
-                if (pipe.producerCores.length > 0) {
-                    output.push(
-                        <div className='producer-consumer'>
-                            <h3>Producer:</h3>
-                            <h2>
-                                {[
-                                    ...new Set(
-                                        pipe.producerCores.map((core) => graphOnChip?.getNode(core)?.operation?.name),
-                                    ),
-                                ]}
-                            </h2>
-                        </div>,
-                    );
-                }
-                if (pipe.consumerCores.length > 0) {
-                    output.push(
-                        <div className='producer-consumer'>
-                            <h3>Consumer:</h3>
-                            <h2>
-                                {[
-                                    ...new Set(
-                                        pipe.consumerCores.map((core) => graphOnChip?.getNode(core)?.operation?.name),
-                                    ),
-                                ]}
-                            </h2>
-                        </div>,
-                    );
-                }
-            } else {
-                return undefined;
-            }
-        } else {
+        const producers = [
+            ...new Set(
+                graphOnChip?.pipes
+                    .get(pipeId)
+                    ?.producerCores?.map((core) => graphOnChip?.getNode(core)?.operation?.name) ?? [],
+            ),
+        ];
+        const consumers = [
+            ...new Set(
+                graphOnChip?.pipes
+                    .get(pipeId)
+                    ?.consumerCores?.map((core) => graphOnChip?.getNode(core)?.operation?.name) ?? [],
+            ),
+        ];
+
+        if (producers.length === 0 && consumers.length === 0) {
             return undefined;
         }
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        return <>{output}</>;
+
+        return (
+            <div className='producer-consumer-tooltip'>
+                {producers.length > 0 && (
+                    <>
+                        <h3>
+                            <Icon icon={IconNames.EXPORT} className='producer-icon' />
+                            Producer{producers.length > 1 ? 's' : ''}:
+                        </h3>
+                        <ul>
+                            {producers.map((producer) => (
+                                <li>{producer}</li>
+                            ))}
+                        </ul>
+                    </>
+                )}
+                {consumers.length > 0 && (
+                    <>
+                        <h3>
+                            <Icon icon={IconNames.IMPORT} className='consumer-icon' />
+                            Consumer{consumers.length > 1 ? 's' : ''}:
+                        </h3>
+                        <ul>
+                            {consumers.map((consumer) => (
+                                <li>{consumer}</li>
+                            ))}
+                        </ul>
+                    </>
+                )}
+            </div>
+        );
     };
 
     useEffect(() => {
