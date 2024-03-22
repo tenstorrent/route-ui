@@ -2,7 +2,7 @@
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select } from '@blueprintjs/select';
-import { Button, MenuItem, PopoverPosition } from '@blueprintjs/core';
+import { Button, Checkbox, Classes, MenuItem, NumericInput, PopoverPosition } from '@blueprintjs/core';
 import { FC, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GraphOnChip from '../../../data/GraphOnChip';
@@ -12,9 +12,13 @@ import { ClusterContext } from '../../../data/ClusterContext';
 import { GraphRelationship } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION } from '../../../data/Types';
 import { RootState } from '../../../data/store/createStore';
-import { getShowLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
+import {
+    getEpochAdjustedTotalOps,
+    getEpochNormalizedTotalOps,
+    getShowLinkSaturation,
+} from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
-import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
+import { updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import ColorSwatch from '../ColorSwatch';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
@@ -22,6 +26,7 @@ import SelectablePipe from '../SelectablePipe';
 import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
 import EthPipeRenderer from './EthPipeRenderer';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
+import { updateEpochNormalizedOP } from '../../../data/store/slices/linkSaturation.slice';
 
 const renderItem: ItemRenderer<GraphRelationship[]> = (
     item,
@@ -111,29 +116,88 @@ const ClusterView: FC = () => {
     };
 
     const pciPipeStateList = useSelector((state: RootState) => getSelectedPipes(state, pciPipes));
-    const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(false);
+    const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(true);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
+    const normalizedAdjustedOPsList = useSelector(getEpochAdjustedTotalOps);
+    const normalizedOPsList = useSelector(getEpochNormalizedTotalOps);
+
+    const normalizedAdjustedOPs = useMemo(() => {
+        return normalizedAdjustedOPsList[selectedEpoch[0]?.temporalEpoch] || 1;
+    }, [normalizedAdjustedOPsList, selectedEpoch]);
+
+    const normalizedOPsInitial = useMemo(() => {
+        return normalizedOPsList[selectedEpoch[0]?.temporalEpoch] || 1;
+    }, [normalizedOPsList, selectedEpoch]);
+
     return (
         <div className='cluster-view-container'>
             <div
                 className='cluster-view-pipelist'
-                // this is to address the bug with a sticking focus pipe
-
-                onMouseOut={() => {
-                    dispatch(updateFocusPipe(null));
-                }}
             >
                 <div className='congestion-container'>
                     <LinkCongestionControls showNOCControls={false} />
-                    {/* TODO: enable or remove once the decisions around normalized ocngestion are made */}
-                    {/* <Checkbox */}
-                    {/*     checked={normalizedSaturation} */}
-                    {/*     label='Normalized congestion' */}
-                    {/*     disabled={!showLinkSaturation} */}
-                    {/*     onChange={(event) => { */}
-                    {/*         setNormalizedSaturation(event.currentTarget.checked); */}
-                    {/*     }} */}
-                    {/* /> */}
+                    <Checkbox
+                        checked={normalizedSaturation}
+                        label='Normalized congestion'
+                        disabled={!showLinkSaturation}
+                        onChange={(event) => {
+                            setNormalizedSaturation(event.currentTarget.checked);
+                        }}
+                    />
+                    <div>
+                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                        <label className={Classes.LABEL} htmlFor='normOpCyclesInput' style={{ marginBottom: '5px' }}>
+                            Normalized cycles/input
+                        </label>
+                        <NumericInput
+                            disabled={!showLinkSaturation || !normalizedSaturation}
+                            id='normOpCyclesInput'
+                            value={normalizedAdjustedOPs}
+                            stepSize={normalizedAdjustedOPs / 10}
+                            minorStepSize={100}
+                            majorStepSize={100000}
+                            min={1}
+                            onValueChange={(value) => {
+                                let newValue = value;
+
+                                if (value === 0) {
+                                    newValue = 1;
+                                }
+
+                                if (Number.isNaN(value)) {
+                                    newValue = 1;
+                                }
+
+                                dispatch(
+                                    updateEpochNormalizedOP({
+                                        epoch: selectedEpoch[0]?.temporalEpoch,
+                                        updatedValue: newValue,
+                                    }),
+                                );
+                            }}
+                            rightElement={
+                                <Tooltip2
+                                    content='Reset to initial normalized value'
+                                    usePortal
+                                    portalClassName={'cluster-reset-tooltip'}
+                                >
+                                    <Button
+                                        minimal
+                                        onClick={() => {
+                                            dispatch(
+                                                updateEpochNormalizedOP({
+                                                    epoch: selectedEpoch[0]?.temporalEpoch,
+                                                    updatedValue: normalizedOPsInitial,
+                                                }),
+                                            );
+                                        }}
+                                        icon={IconNames.RESET}
+                                    />
+                                </Tooltip2>
+                            }
+                        />
+                    </div>
+                    <hr />
                 </div>
                 {availableTemporalEpochs.length > 1 && (
                     <Select

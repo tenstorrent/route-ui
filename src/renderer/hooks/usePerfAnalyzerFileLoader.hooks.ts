@@ -15,8 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import type GraphOnChip from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import { ClusterModel, ClusterContext } from '../../data/ClusterContext';
-import type { FolderLocationType, LinkState, PipeSelection } from '../../data/StateTypes';
+import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
+import type { EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
     initialLoadNormalizedOPs,
@@ -35,7 +35,8 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } =
+        useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveGraphOnChip();
     const navigate = useNavigate();
@@ -91,11 +92,10 @@ const usePerfAnalyzerFileLoader = () => {
 
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
-            const totalOpsPerEpoch: Map<number, number> = new Map();
+            const totalOpsPerEpoch: number[] = [];
             const totalOpsNormalized: Record<string, number> = {};
-
             const graphOnChipList: GraphOnChip[] = [];
-            const linkData: Record<string, LinkState[]> = {};
+            const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
             const times = [];
@@ -106,11 +106,13 @@ const usePerfAnalyzerFileLoader = () => {
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
 
-                const ops = totalOpsPerEpoch.get(graph.temporalEpoch) ?? 1;
-                totalOpsPerEpoch.set(graph.temporalEpoch, Math.max(graphOnChip.totalOpCycles, ops));
-
+                const ops = totalOpsPerEpoch[graph.temporalEpoch] ?? 1;
+                totalOpsPerEpoch[graph.temporalEpoch] = Math.max(graphOnChip.totalOpCycles, ops);
                 graphOnChipList.push(graphOnChip);
-                linkData[graph.name] = graphOnChip.getAllLinks().map((link) => link.generateInitialState());
+                linkDataByGraphname[graph.name] = {
+                    linkStates: graphOnChip.getAllLinks().map((link) => link.generateInitialState()),
+                    temporalEpoch: graph.temporalEpoch,
+                };
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
 
@@ -121,15 +123,15 @@ const usePerfAnalyzerFileLoader = () => {
             }
 
             sortedGraphs.forEach((graph) => {
-                totalOpsNormalized[graph.name] = totalOpsPerEpoch.get(graph.temporalEpoch) ?? 1;
+                totalOpsNormalized[graph.name] = totalOpsPerEpoch[graph.temporalEpoch] ?? 1;
             });
 
             loadGraphOnChips(graphOnChipList, sortedGraphs);
 
-            dispatch(initialLoadLinkData(linkData));
+            dispatch(initialLoadLinkData(linkDataByGraphname));
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
-            dispatch(initialLoadNormalizedOPs(totalOpsNormalized));
+            dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
 
             // console.table(times, ['graph', 'time']);
             // console.log('total', performance.now() - entireRunStartTime, 'ms');
