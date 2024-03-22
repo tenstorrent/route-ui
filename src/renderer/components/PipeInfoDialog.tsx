@@ -76,16 +76,16 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
                     setTooltipContent(setupData());
                 }
 
-                onEnter?.();
+                requestAnimationFrame(() => onEnter?.());
             }}
             onFocus={() => {
-                onEnter?.();
+                requestAnimationFrame(() => onEnter?.());
             }}
             onMouseOut={() => {
-                onLeave?.();
+                requestAnimationFrame(() => onLeave?.());
             }}
             onBlur={() => {
-                onLeave?.();
+                requestAnimationFrame(() => onLeave?.());
             }}
         >
             <Tooltip2
@@ -93,7 +93,7 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
                 usePortal
                 content={tooltipContent}
                 position={Position.BOTTOM_RIGHT}
-                hoverOpenDelay={130}
+                hoverOpenDelay={100}
             >
                 <div className='pipe-info-dialog-wrapper'>{children}</div>
             </Tooltip2>
