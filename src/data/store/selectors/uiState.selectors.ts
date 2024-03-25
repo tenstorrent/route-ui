@@ -11,7 +11,7 @@ export const getShowEmptyLinks = (state: RootState) => state.uiState.showEmptyLi
 
 export const getShowOperationNames = (state: RootState) => state.uiState.showOperationNames;
 
-export const getShowNodeLocation = (state: RootState) => state.uiState.showNodeLocation;
+export const getShowNodeUID = (state: RootState) => state.uiState.showNodeUID;
 
 export const getGridZoom = (state: RootState) => state.uiState.gridZoom;
 
