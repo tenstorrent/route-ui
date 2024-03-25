@@ -1,9 +1,9 @@
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { GraphVertexType } from '../../../data/GraphNames';
-import { RootState } from '../../../data/store/createStore';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
@@ -16,7 +16,7 @@ import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
 function QueuesTable() {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const queueSelectionState = useSelector(getSelectedQueueList);
     const tableFields = useMemo(() => {
         if (!graphOnChip) {
             return [];
@@ -64,9 +64,7 @@ function QueuesTable() {
             cellRendererDependencies={[
                 sortDirection,
                 sortingColumn,
-                nodesSelectionState.operations,
-                nodesSelectionState.queues,
-                nodesSelectionState.nodeList,
+                queueSelectionState,
                 tableFields,
                 tableFields.length,
             ]}
@@ -78,7 +76,6 @@ function QueuesTable() {
                 sortDirection,
                 sortingColumn,
                 tableFields,
-                nodesSelectionState,
                 customCellContentRenderer: queueCellRenderer,
             })}
             {
@@ -92,7 +89,6 @@ function QueuesTable() {
                             sortDirection,
                             sortingColumn,
                             tableFields,
-                            nodesSelectionState,
                         }),
                     ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
             }

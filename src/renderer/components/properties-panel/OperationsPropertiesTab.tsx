@@ -1,12 +1,12 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { RootState } from 'data/store/createStore';
 import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
 import React, { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
+import { getSelectedOperationList } from '../../../data/store/selectors/nodeSelection.selectors';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
@@ -18,7 +18,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
 
-    const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
+    const groupsSelectionState = useSelector(getSelectedOperationList);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);

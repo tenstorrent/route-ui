@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from 'react-redux';
+import { getSelectedOperationList, getSelectedQueueList } from '../../data/store/selectors/nodeSelection.selectors';
 import { selectOperation, selectQueue } from '../../data/store/slices/nodeSelection.slice';
-import { RootState } from '../../data/store/createStore';
 
 const useSelectableGraphVertex = () => {
     const dispatch = useDispatch();
 
-    const operationsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
-    const queuesSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
+    const operationsSelectionState = useSelector(getSelectedOperationList);
+    const queuesSelectionState = useSelector(getSelectedQueueList);
 
     return {
         disabledQueue: (name: string) => queuesSelectionState[name]?.selected === undefined,

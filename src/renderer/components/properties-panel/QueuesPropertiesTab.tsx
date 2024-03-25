@@ -4,7 +4,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { RootState } from '../../../data/store/createStore';
+import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
@@ -21,7 +21,7 @@ function QueuesPropertiesTab() {
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
+    const queueSelectionState = useSelector(getSelectedQueueList);
     const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
 
     const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();

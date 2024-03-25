@@ -1,10 +1,9 @@
 import { ChangeEvent, JSXElementConstructor, ReactElement } from 'react';
 
-import { Cell, Column, ColumnHeaderCell2, IColumnProps } from '@blueprintjs/table';
 import { Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { Cell, Column, ColumnHeaderCell2, IColumnProps } from '@blueprintjs/table';
 
-import type { NodeSelectionState } from '../../../data/StateTypes';
 import type { OpTableFields } from './useOperationsTable.hooks';
 import type { QueuesTableFields } from './useQueuesTable.hook';
 
@@ -17,10 +16,7 @@ export interface DataTableColumnDefinition<T extends TableFields> {
     sortable: boolean;
     align?: 'left' | 'right';
     canSelectAllRows?: boolean;
-    getSelectedState?: (
-        rows: T[],
-        nodesSelectionState: NodeSelectionState,
-    ) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
+    getSelectedState?: (rows: T[]) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
     handleSelectAll?: (rows: T[], selected: boolean) => void;
     formatter: (value: any) => string;
 }
@@ -113,7 +109,6 @@ interface HeaderRenderingProps<T extends TableFields> {
     sortingColumn: keyof T;
     column: keyof T;
     tableFields: T[];
-    nodesSelectionState: NodeSelectionState;
     changeSorting: (column: keyof T) => (direction: SortingDirection) => void;
 }
 
@@ -123,7 +118,6 @@ export const headerRenderer = <T extends TableFields>({
     sortingColumn,
     column,
     tableFields,
-    nodesSelectionState,
     changeSorting,
 }: HeaderRenderingProps<T>) => {
     const columnLabel = definition?.label ?? (column as string);
@@ -135,7 +129,7 @@ export const headerRenderer = <T extends TableFields>({
         targetSortDirection = sortDirection === SortingDirection.ASC ? SortingDirection.DESC : SortingDirection.ASC;
     }
 
-    const checkboxState = definition?.getSelectedState?.(tableFields, nodesSelectionState);
+    const checkboxState = definition?.getSelectedState?.(tableFields);
     const selectableClass = definition?.canSelectAllRows ? 'can-select-all-rows' : '';
 
     return (
@@ -221,7 +215,6 @@ export interface ColumnRendererProps<T extends TableFields> {
     sortDirection: SortingDirection;
     sortingColumn: keyof T;
     tableFields: T[];
-    nodesSelectionState: NodeSelectionState;
     isInteractive?: boolean;
     cellClassName?: string;
     customCellContentRenderer?: (rowIndex: number) => ReactElement | string;
@@ -234,7 +227,6 @@ export const columnRenderer = <T extends TableFields>({
     sortDirection,
     sortingColumn,
     tableFields,
-    nodesSelectionState,
     isInteractive,
     cellClassName,
     customCellContentRenderer,
@@ -262,7 +254,6 @@ export const columnRenderer = <T extends TableFields>({
                     sortDirection,
                     sortingColumn,
                     tableFields,
-                    nodesSelectionState,
                 })
             }
         />

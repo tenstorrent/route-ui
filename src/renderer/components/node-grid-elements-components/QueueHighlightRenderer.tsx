@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
-import { ComputeNode } from '../../../data/GraphOnChip';
-import { RootState } from '../../../data/store/createStore';
 import { getGroupColor } from '../../../data/ColorGenerator';
+import { ComputeNode } from '../../../data/GraphOnChip';
+import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
 
 const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
-    const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
+    const queueSelectionState = useSelector(getSelectedQueueList);
     return (
         <div className='queue-highlighter-content'>
             {node.queueList.map((queue) => {
