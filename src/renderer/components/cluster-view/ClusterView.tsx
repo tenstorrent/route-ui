@@ -19,7 +19,7 @@ import {
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
-import { updateFocusPipe, updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
+import { updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
 import ColorSwatch from '../ColorSwatch';
 import FilterableComponent from '../FilterableComponent';
@@ -126,10 +126,6 @@ const ClusterView: FC<ClusterViewDialog> = () => {
             <div
                 className='cluster-view-pipelist'
                 // this is to address the bug with a sticking focus pipe
-
-                onMouseOut={() => {
-                    dispatch(updateFocusPipe(null));
-                }}
             >
                 <div className='congestion-container'>
                     <LinkCongestionControls showNOCControls={false} />
