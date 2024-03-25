@@ -310,14 +310,11 @@
             }
 
             &.core-highlight-input,
-            &.core-highlight-output {
+            &.core-highlight-output,
+            &.core-highlight-both {
                 .core-highlight {
-                    $inset: 8px;
+                    inset: 8px;
                     position: absolute;
-                    top: $inset;
-                    left: $inset;
-                    bottom: $inset;
-                    right: $inset;
                     pointer-events: none;
                 }
             }
@@ -331,6 +328,20 @@
             &.core-highlight-output {
                 .core-highlight {
                     border: 2px solid $core-highlight-output;
+                }
+            }
+
+            &.core-highlight-both {
+                .core-highlight {
+                    $dash-size: 10deg;
+                    border: 2px solid transparent;
+                    border-image: repeating-conic-gradient(
+                        $core-highlight-inout 0deg,
+                        $core-highlight-inout $dash-size,
+                        $core-highlight-output $dash-size,
+                        $core-highlight-output calc(2 * $dash-size)
+                    ) 1;
+
                 }
             }
 

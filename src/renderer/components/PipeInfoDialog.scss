@@ -1,3 +1,33 @@
+@import '../scss/variables';
+
 .pipe-info-dialog-wrapper {
 	pointer-events: none;
+}
+
+.producer-consumer-tooltip {
+	h3 {
+		display: flex;
+		gap: 7px;
+		align-items: center;
+	}
+
+	.producer-icon svg {
+		color: $core-highlight-output;
+	}
+
+	.consumer-icon svg {
+		color: $core-highlight-inout;
+	}
+
+	ul {
+		list-style: none;
+		margin-block: 5px 20px;
+		padding-inline-start: 0;
+		margin-inline-start: 24px;
+		font-size: x-large;
+
+		&:last-of-type {
+			margin-block-end: 5px;
+		}
+	}
 }
