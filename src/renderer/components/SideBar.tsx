@@ -33,8 +33,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
     const isDockOpen = useSelector(getDockOpenState);
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
 
-    const clusterViewEnabled = useSelector(getExperimentalFeatures('showClusterView'));
-    const clusterViewButtonEnabled = clusterViewEnabled && cluster?.chips !== undefined && cluster?.chips.length > 1;
+    const clusterViewButtonEnabled = cluster?.chips !== undefined && cluster?.chips.length > 1;
 
     return (
         <div className='sidebar'>

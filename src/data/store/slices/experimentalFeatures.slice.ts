@@ -13,12 +13,10 @@ export const experimentalFeaturesSlice = createSlice({
         toggleQueuesTable: (state, action: PayloadAction<boolean | undefined>) => {
             state.showQueuesTable = action.payload ?? !state.showQueuesTable;
         },
-        toggleClusterView: (state, action: PayloadAction<boolean | undefined>) => {
-            state.showClusterView = action.payload ?? !state.showClusterView;
-        }
+
     },
 });
 
-export const { toggleQueuesTable, toggleClusterView } = experimentalFeaturesSlice.actions;
+export const { toggleQueuesTable } = experimentalFeaturesSlice.actions;
 
 export const experimentalFeaturesReducer = experimentalFeaturesSlice.reducer;
