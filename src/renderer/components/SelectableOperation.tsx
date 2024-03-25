@@ -53,7 +53,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                 </span>
             )}
             <HighlightedText text={opName} filter={stringFilter} />
-            <ColorSwatch isVisible={value} color={getGroupColor(opName)} />
+            <ColorSwatch isVisible color={getGroupColor(opName)} />
         </div>
     );
 };
