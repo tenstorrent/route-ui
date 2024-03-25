@@ -1,18 +1,18 @@
 import { Button, Card, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { RootState } from 'data/store/createStore';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
+import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { GraphVertexType } from '../../../data/GraphNames';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
+import { getSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -342,12 +342,12 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const nodesSelectionState = useSelector(getSelectedNodeList);
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!graphOnChip) {
             return [];
         }
-        return Object.values(nodesSelectionState.nodeList)
+        return Object.values(nodesSelectionState)
             .filter((n) => n.selected)
             .map((nodeState) => graphOnChip.getNode(nodeState.id));
     }, [graphOnChip, nodesSelectionState]);

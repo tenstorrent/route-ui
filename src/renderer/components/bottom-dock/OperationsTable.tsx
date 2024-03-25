@@ -14,18 +14,22 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
+import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { GraphVertexType } from '../../../data/GraphNames';
 import { Operation } from '../../../data/GraphTypes';
-import { columnRenderer } from './SharedTable';
-import { RootState } from '../../../data/store/createStore';
+import {
+    getSelectedNodeList,
+    getSelectedOperationList,
+    getSelectedQueueList,
+} from '../../../data/store/selectors/nodeSelection.selectors';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { numberFormatter, valueRatio } from '../../utils/numbers';
 import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
+import { columnRenderer } from './SharedTable';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -71,7 +75,9 @@ function OperationsTable() {
 
         return sortTableFields(list);
     }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection);
+    const nodesSelectionState = useSelector(getSelectedNodeList);
+    const operationsSelectionState = useSelector(getSelectedOperationList);
+    const queueSelectionState = useSelector(getSelectedQueueList);
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
@@ -117,7 +123,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={nodesSelectionState.operations[opName] === undefined}
+                        disabled={operationsSelectionState[opName] === undefined}
                         title='View operation cores'
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
@@ -136,7 +142,7 @@ function OperationsTable() {
         return (
             <div className='op-element'>
                 <Checkbox
-                    checked={nodesSelectionState.nodeList[cellContent]?.selected}
+                    checked={nodesSelectionState[cellContent]?.selected}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         dispatch(updateNodeSelection({ id: cellContent.toString(), selected: e.target.checked }));
                     }}
@@ -180,7 +186,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={nodesSelectionState.operations[slowestOperand.name] === undefined}
+                        disabled={operationsSelectionState[slowestOperand.name] === undefined}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
                             setSelectedOperationName(slowestOperand.name);
@@ -253,9 +259,9 @@ function OperationsTable() {
                 cellRendererDependencies={[
                     sortDirection,
                     sortingColumn,
-                    nodesSelectionState.operations,
-                    nodesSelectionState.queues,
-                    nodesSelectionState.nodeList,
+                    nodesSelectionState,
+                    operationsSelectionState,
+                    queueSelectionState,
                     tableFields,
                     selectedOperationName,
                     tableFields.length,
@@ -270,7 +276,6 @@ function OperationsTable() {
                     sortDirection,
                     sortingColumn,
                     tableFields,
-                    nodesSelectionState,
                     isInteractive: true,
                     customCellContentRenderer: operationCellRenderer,
                 })}
@@ -282,7 +287,6 @@ function OperationsTable() {
                           sortDirection,
                           sortingColumn,
                           tableFields,
-                          nodesSelectionState,
                       })
                     : columnRenderer({
                           key: 'core_id',
@@ -291,7 +295,6 @@ function OperationsTable() {
                           sortDirection,
                           sortingColumn,
                           tableFields,
-                          nodesSelectionState,
                           customCellContentRenderer: coreIdCellRenderer,
                       })}
                 {
@@ -303,7 +306,6 @@ function OperationsTable() {
                             sortDirection,
                             sortingColumn,
                             tableFields,
-                            nodesSelectionState,
                             customCellContentRenderer: getCustomCellRenderer(key),
                         }),
                     ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>

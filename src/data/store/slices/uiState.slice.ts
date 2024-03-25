@@ -16,8 +16,7 @@ interface UIState {
     applicationMode: ApplicationMode;
     showEmptyLinks: boolean;
     showOperationNames: boolean;
-    // TODO: Rename to `snowNodeUID`
-    showNodeLocation: boolean;
+    showNodeUID: boolean;
     gridZoom: number;
     detailedViewZoom: number;
     detailedViewHeight: number;
@@ -34,7 +33,7 @@ const uiStateInitialState: UIState = {
     applicationMode: ApplicationMode.NONE,
     showEmptyLinks: false,
     showOperationNames: false,
-    showNodeLocation: false,
+    showNodeUID: false,
     gridZoom: 1,
     detailedViewZoom: 1,
     detailedViewHeight: INITIAL_DETAILS_VIEW_HEIGHT,
@@ -74,8 +73,8 @@ const uiStateSlice = createSlice({
         updateShowOperationNames: (state, action: PayloadAction<boolean>) => {
             state.showOperationNames = action.payload;
         },
-        updateShowNodeLocation: (state, action: PayloadAction<boolean>) => {
-            state.showNodeLocation = action.payload;
+        updateShowNodeUID: (state, action: PayloadAction<boolean>) => {
+            state.showNodeUID = action.payload;
         },
         updateGridZoom: (state, action: PayloadAction<number>) => {
             state.gridZoom = action.payload;
@@ -110,7 +109,7 @@ export const {
     clearSelectedApplication,
     updateShowEmptyLinks,
     updateShowOperationNames,
-    updateShowNodeLocation,
+    updateShowNodeUID,
     updateGridZoom,
     updateDetailedViewZoom,
     updateDetailedViewHeight,

@@ -1,18 +1,18 @@
-import { FC } from 'react';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { Position, Switch } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Collapsible from '../Collapsible';
 import {
     getShowEmptyLinks,
-    getShowNodeLocation,
+    getShowNodeUID,
     getShowOperationNames,
 } from '../../../data/store/selectors/uiState.selectors';
 import {
     updateShowEmptyLinks,
-    updateShowNodeLocation,
+    updateShowNodeUID,
     updateShowOperationNames,
 } from '../../../data/store/slices/uiState.slice';
+import Collapsible from '../Collapsible';
 
 import './GridControls.scss';
 
@@ -21,7 +21,7 @@ export const GridControls: FC = () => {
 
     const showEmptyLinks = useSelector(getShowEmptyLinks);
     const showOperationNames = useSelector(getShowOperationNames);
-    const showNodeLocation = useSelector(getShowNodeLocation);
+    const showNodeLocation = useSelector(getShowNodeUID);
 
     return (
         <Collapsible
@@ -51,7 +51,7 @@ export const GridControls: FC = () => {
                     <Switch
                         checked={showNodeLocation}
                         label='location'
-                        onChange={(event) => dispatch(updateShowNodeLocation(event.currentTarget.checked))}
+                        onChange={(event) => dispatch(updateShowNodeUID(event.currentTarget.checked))}
                     />
                 </Tooltip2>
                 <hr />

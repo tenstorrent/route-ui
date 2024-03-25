@@ -1,6 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphVertexType } from '../../data/GraphNames';
-import { RootState } from '../../data/store/createStore';
+import {
+    getSelectedNodeList,
+    getSelectedOperationList,
+    getSelectedQueueList,
+} from '../../data/store/selectors/nodeSelection.selectors';
 import { selectOperation, selectQueue, updateNodeSelection } from '../../data/store/slices/nodeSelection.slice';
 import { getSelectedState, handleSelectAll } from '../components/bottom-dock/SharedTable';
 import type { OpTableFields } from '../components/bottom-dock/useOperationsTable.hooks';
@@ -28,9 +32,9 @@ const useSelectedTableRows = () => {
         return queuesSelectionState[name]?.selected === undefined;
     };
 
-    const operationsSelectionState = useSelector((state: RootState) => state.nodeSelection.operations);
-    const queuesSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
-    const nodesSelectionState = useSelector((state: RootState) => state.nodeSelection.nodeList);
+    const operationsSelectionState = useSelector(getSelectedOperationList);
+    const queuesSelectionState = useSelector(getSelectedQueueList);
+    const nodesSelectionState = useSelector(getSelectedNodeList);
 
     return {
         handleSelectAllCores: handleSelectAll<OpTableFields>((row, selected) =>
