@@ -12,7 +12,7 @@ import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import { getSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -342,15 +342,13 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const nodesSelectionState = useSelector(getSelectedNodeList);
+    const orderedNodeSelection = useSelector(getOrderedNodeList);
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!graphOnChip) {
             return [];
         }
-        return Object.values(nodesSelectionState)
-            .filter((n) => n.selected)
-            .map((nodeState) => graphOnChip.getNode(nodeState.id));
-    }, [graphOnChip, nodesSelectionState]);
+        return orderedNodeSelection.map((nodeState) => graphOnChip.getNode(nodeState.id));
+    }, [graphOnChip, orderedNodeSelection]);
 
     return (
         // TODO: give this a greyed out look when data is not available

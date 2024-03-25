@@ -3,6 +3,7 @@ import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
+    nodeListOrder: [],
     operations: {},
     queues: {},
     dram: [],
@@ -106,8 +107,20 @@ const nodeSelectionSlice = createSlice({
             if (node) {
                 node.selected = selected;
             }
+
+            const nodeIndex = state.nodeListOrder.indexOf(id);
+            if (nodeIndex > -1 && !selected) {
+                state.nodeListOrder = [...state.nodeListOrder].toSpliced(nodeIndex, 1);
+            }
+
+            if (nodeIndex === -1 && selected) {
+                state.nodeListOrder = [...state.nodeListOrder, id];
+            }
+
             state.dram.forEach((dramGroup) => {
-                if (dramGroup.data.map((n) => n.id).filter((nodeid) => state.nodeList[nodeid].selected).length > 0) {
+                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[n.id].selected);
+
+                if (hasSelectedNode) {
                     dramGroup.selected = true;
                 } else {
                     dramGroup.selected = false;
@@ -118,6 +131,9 @@ const nodeSelectionSlice = createSlice({
             Object.values(state.nodeList).forEach((node) => {
                 node.selected = false;
             });
+
+            state.nodeListOrder = [];
+
             state.dram.forEach((dramGroup) => {
                 dramGroup.selected = false;
             });
