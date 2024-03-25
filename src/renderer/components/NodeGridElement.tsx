@@ -31,12 +31,14 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     let coreHighlight = HighlightType.NONE;
     const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
     const isProducer = node.producerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
-    if (isConsumer) {
+    if (isConsumer && isProducer) {
+        coreHighlight = HighlightType.BOTH;
+    } else if (isConsumer) {
         coreHighlight = HighlightType.OUTPUT;
-    }
-    if (isProducer) {
+    } else if (isProducer) {
         coreHighlight = HighlightType.INPUT;
     }
+
     const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
     const triggerSelection = () => {

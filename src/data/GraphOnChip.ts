@@ -415,8 +415,6 @@ export default class GraphOnChip {
                 );
             };
 
-            // const operandsByName: Map<string, Operand> = new Map();
-
             Object.entries(operationsJson).map(([operationName, opJson]) => {
                 const operation = augmentedChip.operationsByName.get(operationName);
                 if (!operation) {
