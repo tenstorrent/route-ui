@@ -100,7 +100,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     return (
         <div className='core-runtime-metrics'>
             {runtimeMetrics.map(([label, value, unit]) => (
-                <div className='core-runtime-item'>
+                <div className='core-runtime-item' key={`${label}-${value}-${unit}`}>
                     <h4 className='core-runtime-label'>{label}:</h4>
                     <span className='core-runtime-value'>
                         {value}
@@ -188,9 +188,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         <>
                             <h4 className='io-label'>Inputs:</h4>
                             {inputs.map((operand, index) => (
-                                <ul className='scrollable-content'>
+                                <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
-                                        <div key={operand.name} style={{ fontSize: '12px' }}>
+                                        <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
@@ -200,7 +200,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                                             node.getInternalPipeIDsForNode().includes(pipeId),
                                                         )
                                                         .map((pipeId) => (
-                                                            <li>
+                                                            <li key={`${operand.name}-${pipeId}`}>
                                                                 <SelectablePipe
                                                                     pipeSegment={
                                                                         new PipeSegment(pipeId, 0, NOCLinkName.NONE)
@@ -215,7 +215,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className=' scrollable-content pipe-ids-for-core'>
                                                     {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                        <li>
+                                                        <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
                                                                     new PipeSegment(pipeId, 0, NOCLinkName.NONE)
@@ -237,9 +237,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         <>
                             <h4 className='io-label'>Outputs:</h4>
                             {outputs.map((operand, index) => (
-                                <ul className='scrollable-content'>
+                                <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
-                                        <div key={operand.name} style={{ fontSize: '12px' }}>
+                                        <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
@@ -249,7 +249,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                                             node.getInternalPipeIDsForNode().includes(pipeId),
                                                         )
                                                         .map((pipeId) => (
-                                                            <li>
+                                                            <li key={`${operand.name}-${pipeId}`}>
                                                                 <SelectablePipe
                                                                     pipeSegment={
                                                                         new PipeSegment(pipeId, 0, NOCLinkName.NONE)
@@ -262,9 +262,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                                 </ul>
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
-                                                <ul className=' scrollable-content pipe-ids-for-core'>
+                                                <ul className='scrollable-content pipe-ids-for-core'>
                                                     {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                        <li>
+                                                        <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
                                                                     new PipeSegment(pipeId, 0, NOCLinkName.NONE)
