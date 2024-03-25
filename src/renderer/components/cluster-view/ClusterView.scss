@@ -1,15 +1,21 @@
 @import "../../scss/variables";
 
-.cluster-view-overlay{
+.cluster-reset-tooltip {
+    z-index: $cluster-view-zindex;
+}
+
+.cluster-view-overlay {
 
     .cluster-view-wrap,
-    .bp4-overlay-backdrop{
+    .bp4-overlay-backdrop {
         z-index: $cluster-view-zindex;
     }
-    .bp4-overlay-backdrop{
+
+    .bp4-overlay-backdrop {
         backdrop-filter: blur(3px);
     }
 }
+
 .cluster-view-card {
     padding: 15px;
     padding-bottom: 20px;
@@ -58,18 +64,26 @@
         gap: 10px;
 
         .pipe-list {
-            max-height: calc(100vh - 240px);
+            max-height: calc(100vh - 280px);
             min-width: 150px;
             overflow-y: auto;
         }
     }
+
     .congestion-container {
         display: flex;
         flex-direction: column;
+
+        hr {
+            width: calc(100% - 10px);
+            margin-left: 0;
+        }
     }
+
     .congestion-legend {
         width: calc(100% - 10px);
         height: 3px;
+        margin-bottom: 2px;
     }
 
     .bp4-slider {
@@ -90,7 +104,7 @@
             gap: 5px;
             position: relative;
 
-            .chip-id{
+            .chip-id {
                 position: absolute;
                 top: 0;
                 right: 0;
@@ -126,8 +140,10 @@
     }
 
 }
+
 .bp4-overlay {
-    .bp4-transition-container {
+    .bp4-transition-container,
+    .bp4-popover2-transition-container {
         z-index: $cluster-view-zindex;
     }
 }

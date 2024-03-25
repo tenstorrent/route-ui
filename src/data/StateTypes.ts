@@ -75,15 +75,22 @@ export interface LinkState {
     normalizedSaturation: number;
 }
 
+export interface EpochAndLinkStates {
+    linkStates: LinkState[];
+    temporalEpoch: number;
+}
 
 export interface LinkGraphState {
     links: Record<string, LinkState>;
     totalOps: number;
+    temporalEpoch: number;
 }
 
 export interface NetworkCongestionState {
     linkSaturationTreshold: number;
     graphs: Record<string, LinkGraphState>;
+    epochNormalizedTotalOps: number[];
+    epochAdjustedTotalOps: number[];
     CLKMHz: number;
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;
@@ -97,6 +104,7 @@ export interface GraphRelationship {
     temporalEpoch: number;
     chipId: number;
 }
+
 export interface ClusterViewState {
     isOpen: boolean;
 }
