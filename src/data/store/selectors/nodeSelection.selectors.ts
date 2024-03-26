@@ -14,3 +14,5 @@ export const getSelectedNodeList = (state: RootState) => state.nodeSelection.nod
 
 export const getOrderedNodeList = (state: RootState) =>
     state.nodeSelection.nodeListOrder.map((id) => state.nodeSelection.nodeList[id]);
+
+export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;

@@ -64,6 +64,7 @@ export interface NodeSelectionState {
     nodeList: Record<string, ComputeNodeState>;
     nodeListOrder: string[];
     dram: { data: ComputeNodeState[]; selected: boolean }[];
+    focusNode: string | null;
 }
 
 export interface LinkState {

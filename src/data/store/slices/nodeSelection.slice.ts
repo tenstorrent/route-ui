@@ -7,6 +7,7 @@ const nodesInitialState: NodeSelectionState = {
     operations: {},
     queues: {},
     dram: [],
+    focusNode: null,
 };
 
 const findSiblingNodeLocations = (node: ComputeNodeState, nodes: ComputeNodeState[]) => {
@@ -172,6 +173,9 @@ const nodeSelectionSlice = createSlice({
                 queue.selected = false;
             });
         },
+        updateFocusNode(state, action: PayloadAction<string | null>) {
+            state.focusNode = action.payload;
+        },
     },
 });
 
@@ -186,6 +190,7 @@ export const {
     selectAllQueues,
     clearAllQueues,
     clearAllNodes,
+    updateFocusNode,
 } = nodeSelectionSlice.actions;
 
 export const nodeSelectionReducer = nodeSelectionSlice.reducer;
