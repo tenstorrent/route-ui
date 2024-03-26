@@ -310,10 +310,7 @@
 
             &.focus {
                 .node-border {
-                    inset: 4px;
-                    border: 2px dashed $node-select;
-                    position: absolute;
-                    background: color-mix(in srgb, $node-select 20%, transparent);
+                    border-color: $node-select-focus;
                 }
             }
 

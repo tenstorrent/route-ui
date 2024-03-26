@@ -73,10 +73,10 @@
             &.focus {
                 background-image: linear-gradient(
                     to bottom,
-                    color-mix(in srgb, $node-select 70%, transparent),
-                    color-mix(in srgb, $node-select 70%, transparent)
+                    color-mix(in srgb, #fff 40%, transparent),
+                    color-mix(in srgb, #fff 40%, transparent)
                 );
-                background-blend-mode: screen;
+                background-blend-mode: normal;
             }
         }
 
