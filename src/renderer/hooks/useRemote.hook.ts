@@ -87,11 +87,18 @@ const useRemoteConnection = () => {
         });
     };
 
-    const testConnection = async (connection: RemoteConnection) => {
+    const testConnection = async (connection: Partial<RemoteConnection>) => {
         const connectionStatus: ConnectionStatus = {
             status: ConnectionTestStates.IDLE,
             message: '',
         };
+
+        if (!connection.host || !connection.port) {
+            connectionStatus.status = ConnectionTestStates.FAILED;
+            connectionStatus.message = 'No connection provided';
+
+            return connectionStatus;
+        }
 
         connectionStatus.status = ConnectionTestStates.PROGRESS;
 
@@ -114,11 +121,18 @@ const useRemoteConnection = () => {
         }
     };
 
-    const testRemoteFolder = async (connection: RemoteConnection) => {
+    const testRemoteFolder = async (connection: Partial<RemoteConnection>) => {
         const connectionStatus: ConnectionStatus = {
             status: ConnectionTestStates.IDLE,
             message: '',
         };
+
+        if (!connection.host || !connection.port || !connection.path) {
+            connectionStatus.status = ConnectionTestStates.FAILED;
+            connectionStatus.message = 'No connection provided';
+
+            return connectionStatus;
+        }
 
         connectionStatus.status = ConnectionTestStates.PROGRESS;
 
