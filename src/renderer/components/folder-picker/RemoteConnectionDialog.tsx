@@ -50,7 +50,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
         { status: ConnectionTestStates.IDLE, message: 'Test connection' },
         { status: ConnectionTestStates.IDLE, message: 'Test remote folder path' },
     ];
-    const [connection, setConnection] = useState(defaultConnection);
+    const [connection, setConnection] = useState<Partial<RemoteConnection>>(defaultConnection);
     const [connectionTests, setConnectionTests] = useState<ConnectionStatus[]>(defaultConnectionTests);
     const { testConnection, testRemoteFolder } = useRemoteConnection();
     const [isTestingConnection, setIsTestingconnection] = useState(false);
@@ -131,14 +131,14 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 >
                     <InputGroup
                         key='port'
-                        value={connection.port.toString()}
+                        value={connection.port?.toString() ?? ''}
                         onChange={(e) => {
                             const number = Number.parseInt(e.target.value, 10);
 
-                            if (number > 0 && number < 99999) {
+                            if (e.target.value === '') {
+                                setConnection({ ...connection, port: undefined });
+                            } else if (number > 0 && number < 99999) {
                                 setConnection({ ...connection, port: number });
-                            } else {
-                                setConnection({ ...connection, port: 22 });
                             }
                         }}
                     />
@@ -177,7 +177,7 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                         disabled={!isValidConnection}
                         onClick={() => {
                             if (isValidConnection) {
-                                onAddConnection(connection);
+                                onAddConnection(connection as RemoteConnection);
                                 closeDialog();
                             }
                         }}
