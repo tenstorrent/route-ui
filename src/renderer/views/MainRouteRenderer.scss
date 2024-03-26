@@ -269,6 +269,11 @@
             position: relative;
             border: 1px solid $tt-very-dark-gray;
 
+            & * {
+                pointer-events: none;
+                user-select: none;
+            }
+
             .op-label {
                 color: black;
                 width: 100%;
@@ -428,11 +433,6 @@
                     width: 5px;
                     height: 100%;
                 }
-            }
-
-            .node-layer {
-                pointer-events: none;
-                user-select: none;
             }
         }
     }

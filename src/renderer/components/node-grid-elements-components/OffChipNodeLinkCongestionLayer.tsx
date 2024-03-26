@@ -67,7 +67,7 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
     const saturationBg = toRGBA(congestionColor, 0.5);
     congestionStyle = getOffChipCongestionStyles(saturationBg);
 
-    return <div className='node-layer off-chip-congestion' style={congestionStyle} />;
+    return <div className='off-chip-congestion' style={congestionStyle} />;
 };
 
 export default OffChipNodeLinkCongestionLayer;

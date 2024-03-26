@@ -28,12 +28,12 @@ const OperationCongestionLayer: FC<{ node: ComputeNode }> = ({ node }) => {
     if (opFactor > threshold) {
         const congestionColor = toRGBA(calculateOpCongestionColor(opFactor, 0, isHighContrast), 0.5);
         return (
-            <div className='node-layer operation-congestion' style={{ backgroundColor: congestionColor }}>
+            <div className='operation-congestion' style={{ backgroundColor: congestionColor }}>
                 {opFactor}
             </div>
         );
     }
-    return <div className='node-layer operation-congestion' />;
+    return <div className='operation-congestion' />;
 };
 
 export default OperationCongestionLayer;
