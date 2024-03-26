@@ -49,7 +49,7 @@
 
         h3 {
             color: $tt-black;
-            padding: 5px;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -57,6 +57,7 @@
             .hover-wrapper {
                 display: flex;
                 align-items: center;
+                padding: 5px;
                 gap: 5px;
                 flex-grow: 1;
 
@@ -65,14 +66,17 @@
                 }
             }
 
+            .bp4-button {
+                margin: 5px;
+            }
+
             &.focus {
-                background-image: repeating-linear-gradient(45deg,
-                    transparent 0,
-                    transparent 10px,
-                    color-mix(in srgb, $node-select 50%, transparent) 10px,
-                    color-mix(in srgb, $node-select 50%, transparent) 20px
+                background-image: linear-gradient(
+                    to bottom,
+                    color-mix(in srgb, $node-select 70%, transparent),
+                    color-mix(in srgb, $node-select 70%, transparent)
                 );
-                background-repeat: no-repeat;
+                background-blend-mode: screen;
             }
         }
 
