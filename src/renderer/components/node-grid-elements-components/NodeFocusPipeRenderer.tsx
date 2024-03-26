@@ -33,7 +33,7 @@ const NodeFocusPipeRenderer: FC<NodeFocusPipeRendererProps> = ({ node }) => {
         drawSelections(svg, NOCLinkName.NOC1_IN, node, focusedPipeIds);
         drawSelections(svg, NOCLinkName.NOC1_OUT, node, focusedPipeIds);
     }
-    return <svg className='node-focus-svg' ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
+    return <svg className='node-layer node-focus-svg' ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
 };
 
 export default NodeFocusPipeRenderer;

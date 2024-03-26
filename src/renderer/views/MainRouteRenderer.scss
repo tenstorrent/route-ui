@@ -405,7 +405,6 @@
             .node-focus-svg,
             .node-svg {
                 position: absolute;
-                pointer-events: none;
             }
 
             .node-svg {
@@ -425,6 +424,11 @@
                     width: 5px;
                     height: 100%;
                 }
+            }
+
+            .node-layer {
+                pointer-events: none;
+                user-select: none;
             }
         }
     }

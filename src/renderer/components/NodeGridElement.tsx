@@ -66,8 +66,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             <QueueHighlightRenderer node={node} />
 
             {/* Highlights and selections */}
-            <div className='core-highlight' />
-            <div className='node-border' />
+            <div className='node-layer core-highlight' />
+            <div className='node-layer node-border' />
 
             {/* Congestion information */}
             <OperationCongestionLayer node={node} />
@@ -82,7 +82,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             <NodeFocusPipeRenderer node={node} />
 
             {/* Node type label */}
-            <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
+            <div className={`node-layer node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
         </button>
     );
 };

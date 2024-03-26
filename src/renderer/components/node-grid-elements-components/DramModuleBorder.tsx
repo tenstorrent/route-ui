@@ -25,7 +25,7 @@ const DramModuleBorder: FC<DramModuleBorderProps> = ({ node }) => {
         dramStyles = getDramGroupingStyles(border);
     }
 
-    return <div className='dram-border' style={dramStyles} />;
+    return <div className='node-layer dram-border' style={dramStyles} />;
 };
 
 export default DramModuleBorder;

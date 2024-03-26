@@ -7,7 +7,7 @@ import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelectio
 const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
     const queueSelectionState = useSelector(getSelectedQueueList);
     return (
-        <div className='queue-highlighter-content'>
+        <div className='node-layer queue-highlighter-content'>
             {node.queueList.map((queue) => {
                 if (queueSelectionState[queue.name]?.selected) {
                     return (

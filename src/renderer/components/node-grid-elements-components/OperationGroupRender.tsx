@@ -38,7 +38,7 @@ const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
         }
     }
 
-    return <div className='group-border' style={operationStyles} />;
+    return <div className='node-layer group-border' style={operationStyles} />;
 };
 
 export default OperationGroupRender;

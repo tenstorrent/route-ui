@@ -123,7 +123,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
 
     return (
         <svg
-            className={`node-svg ${focusPipe !== null ? 'focus-mode' : ''}`}
+            className={`node-layer node-svg ${focusPipe !== null ? 'focus-mode' : ''}`}
             ref={svgRef}
             width={NODE_SIZE}
             height={NODE_SIZE}
