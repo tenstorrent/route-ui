@@ -3,10 +3,10 @@ import { useSelector } from 'react-redux';
 
 import { ComputeNode } from '../../../data/GraphOnChip';
 
-import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';
 import { getGroupColor } from '../../../data/ColorGenerator';
-import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
 import { RootState } from '../../../data/store/createStore';
+import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';
 
 const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
     const showOperationNames = useSelector(getShowOperationNames);
@@ -21,7 +21,7 @@ const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
         node.opName !== '' &&
         showOperationNames &&
         shouldShowLabel && (
-            <div className='op-label' style={{ backgroundColor: getGroupColor(node.opName) }} title={node.opName}>
+            <div className='node-layer op-label' style={{ backgroundColor: getGroupColor(node.opName) }}>
                 {node.opName}
             </div>
         )
