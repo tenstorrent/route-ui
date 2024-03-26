@@ -58,7 +58,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
 
     return (
         <button
-            title={showOperationNames ? node.opName : undefined}
+            title={showOperationNames ? node.opName : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
