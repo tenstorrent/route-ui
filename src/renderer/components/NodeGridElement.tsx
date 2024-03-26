@@ -56,7 +56,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
-            } ${focusNode === node.uid ? 'focus' : ''}`}
+            } ${nodeState?.selected && focusNode === node.uid ? 'focus' : ''}`}
             onClick={triggerSelection}
             onMouseEnter={() => {
                 requestAnimationFrame(() => {
