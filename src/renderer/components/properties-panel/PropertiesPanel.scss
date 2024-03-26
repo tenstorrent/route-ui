@@ -53,6 +53,27 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+
+            .hover-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                flex-grow: 1;
+
+                & * {
+                    pointer-events: none;
+                }
+            }
+
+            &.focus {
+                background-image: repeating-linear-gradient(45deg,
+                    transparent 0,
+                    transparent 10px,
+                    color-mix(in srgb, $node-select 50%, transparent) 10px,
+                    color-mix(in srgb, $node-select 50%, transparent) 20px
+                );
+                background-repeat: no-repeat;
+            }
         }
 
         .io-label {

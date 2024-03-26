@@ -1,7 +1,7 @@
 import { Button, Card, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
@@ -12,7 +12,7 @@ import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import { getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getFocusNode, getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -118,6 +118,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
     const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
+    const focusNode = useSelector(getFocusNode);
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -132,9 +133,33 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
             <h3
                 className={`node-type node-type-${node.getNodeLabel()} ${
                     node.uid === selectedDetailsViewUID && isDetailsViewOpen ? 'detailed-view' : ''
-                }`}
+                } ${focusNode === node.uid ? 'focus' : ''}`}
             >
-                {node.type.toUpperCase()} {formatNodeUID(node.uid)}
+                <span
+                    className='hover-wrapper'
+                    onMouseEnter={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(node.uid));
+                        });
+                    }}
+                    onFocus={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(node.uid));
+                        });
+                    }}
+                    onMouseOut={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(null));
+                        });
+                    }}
+                    onBlur={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(null));
+                        });
+                    }}
+                >
+                    {node.type.toUpperCase()} {formatNodeUID(node.uid)}
+                </span>
                 <Tooltip2 content='Close ComputeNode'>
                     <Button
                         small

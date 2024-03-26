@@ -299,13 +299,21 @@
                     left: $inset;
                     bottom: $inset;
                     right: $inset;
-                    pointer-events: none;
                 }
+            }
 
-                &.detailed-view {
-                    .node-border {
-                        border: 2px solid $bright-highlight;
-                    }
+            &.detailed-view {
+                .node-border {
+                    border: 2px solid $bright-highlight;
+                }
+            }
+
+            &.focus {
+                .node-border {
+                    inset: 4px;
+                    border: 2px dashed $node-select;
+                    position: absolute;
+                    background: color-mix(in srgb, $node-select 20%, transparent);
                 }
             }
 
@@ -315,7 +323,6 @@
                 .core-highlight {
                     inset: 8px;
                     position: absolute;
-                    pointer-events: none;
                 }
             }
 

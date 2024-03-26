@@ -1,6 +1,6 @@
 import { RootState } from 'data/store/createStore';
-import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
-import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { getFocusNode, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +27,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    const focusNode = useSelector(getFocusNode);
 
     let coreHighlight = HighlightType.NONE;
     const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
@@ -55,8 +56,28 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
-            }`}
+            } ${focusNode === node.uid ? 'focus' : ''}`}
             onClick={triggerSelection}
+            onMouseEnter={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(node.uid));
+                });
+            }}
+            onFocus={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(node.uid));
+                });
+            }}
+            onMouseOut={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(null));
+                });
+            }}
+            onBlur={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(null));
+                });
+            }}
         >
             {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />
