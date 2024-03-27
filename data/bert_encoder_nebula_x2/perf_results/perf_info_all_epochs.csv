@@ -1,4 +1,0 @@
-,program-name  ,graph-name              ,aiclk  ,device-id  ,input-count  ,first-to-last-inputs  ,num-cycles-per-tensor-all-inputs  ,num-tensors-per-second-all-inputs  ,num-cycles-all-inputs  ,largest-wait-for-epoch-binary  ,
-,run_fwd       ,fwd_0_temporal_epoch_0  ,1000   ,0          ,1            ,0->0                  ,N/A                               ,N/A                                ,591                    ,62279061                       ,
-,run_fwd       ,fwd_1_temporal_epoch_0  ,1000   ,1          ,1            ,0->0                  ,N/A                               ,N/A                                ,137032                 ,134239791                      ,
-,run_fwd       ,fwd_2_temporal_epoch_1  ,1000   ,0          ,1            ,0->0                  ,N/A                               ,N/A                                ,180348                 ,73602637                       ,

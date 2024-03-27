@@ -1,3 +1,0 @@
-chip_descriptors:
-  0: ./tt_build/test_inference_8381574644216967368/device_descs/0.yaml
-  1: ./tt_build/test_inference_8381574644216967368/device_descs/1.yaml

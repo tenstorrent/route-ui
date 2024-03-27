@@ -1,4 +1,0 @@
-Reading perf events from ./tt_build/test_inference_8381574644216967368/perf_results/device/device_perf_dump_program_0_run_fwd_graph_fwd_0_temporal_epoch_0_locid_0_globid_0_device_0.yaml
-Dumping cores_to_ops_map into ./tt_build/test_inference_8381574644216967368/perf_results/device//0000_run_fwd/0000_fwd_0_temporal_epoch_0/cores_to_ops.json
-Processing core	(x=1, y=1) with op-name = 
-Writing the perf results in ./tt_build/test_inference_8381574644216967368/perf_results/device//0000_run_fwd/0000_fwd_0_temporal_epoch_0//perf_postprocess.json
