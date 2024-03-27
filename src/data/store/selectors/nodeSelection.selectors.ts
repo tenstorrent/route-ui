@@ -13,6 +13,6 @@ export const getSelectedQueueList = (state: RootState) => state.nodeSelection.qu
 export const getSelectedNodeList = (state: RootState) => state.nodeSelection.nodeList;
 
 export const getOrderedNodeList = (state: RootState) =>
-    state.nodeSelection.nodeListOrder.map((id) => state.nodeSelection.nodeList[id]);
+    state.nodeSelection.nodeListOrder.map((id) => state.nodeSelection.nodeList[id]).toReversed();
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;
