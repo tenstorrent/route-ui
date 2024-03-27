@@ -1,12 +1,16 @@
 import { RootState } from 'data/store/createStore';
-import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
-import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { getFocusNode, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
-import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../data/store/selectors/uiState.selectors';
+import {
+    getDetailedViewOpenState,
+    getSelectedDetailsViewUID,
+    getShowOperationNames,
+} from '../../data/store/selectors/uiState.selectors';
 import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
@@ -27,6 +31,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    const focusNode = useSelector(getFocusNode);
+    const showOperationNames = useSelector(getShowOperationNames);
 
     let coreHighlight = HighlightType.NONE;
     const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
@@ -52,11 +58,32 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
 
     return (
         <button
+            title={showOperationNames ? node.opName : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
-            }`}
+            } ${nodeState?.selected && focusNode === node.uid ? 'focus' : ''}`}
             onClick={triggerSelection}
+            onMouseEnter={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(node.uid));
+                });
+            }}
+            onFocus={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(node.uid));
+                });
+            }}
+            onMouseOut={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(null));
+                });
+            }}
+            onBlur={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(null));
+                });
+            }}
         >
             {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />

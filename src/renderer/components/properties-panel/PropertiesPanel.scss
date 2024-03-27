@@ -49,10 +49,34 @@
 
         h3 {
             color: $tt-black;
-            padding: 5px;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
+
+            .hover-wrapper {
+                display: flex;
+                align-items: center;
+                padding: 5px;
+                gap: 5px;
+                flex-grow: 1;
+
+                & * {
+                    pointer-events: none;
+                }
+            }
+
+            .bp4-button {
+                margin: 5px;
+            }
+
+            &.focus {
+                background-image: linear-gradient(
+                    to bottom,
+                    color-mix(in srgb, #fff 40%, transparent),
+                    color-mix(in srgb, #fff 40%, transparent)
+                );
+            }
         }
 
         .io-label {

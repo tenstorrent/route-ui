@@ -11,3 +11,8 @@ export const getQueue = (state: RootState, id: string) => state.nodeSelection.qu
 export const getSelectedQueueList = (state: RootState) => state.nodeSelection.queues;
 
 export const getSelectedNodeList = (state: RootState) => state.nodeSelection.nodeList;
+
+export const getOrderedNodeList = (state: RootState) =>
+    state.nodeSelection.nodeListOrder.map((id) => state.nodeSelection.nodeList[id]);
+
+export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;

@@ -20,6 +20,7 @@ $tt-dark-blue: #004c9b;
 
 $bright-highlight: #99ff00;
 $node-select: #ffd500;
+$node-select-focus: #99c4ff;
 $core-highlight-inout: #ff3c00;
 $core-highlight-output: #0077ff;
 $pipe-select: #fff58a;
@@ -60,15 +61,21 @@ $desktop-large: 1440px;
 $desktop-4k: 2560px;
 
 @mixin min-desktop {
-    @media (min-width: $desktop) { @content; }
+    @media (min-width: $desktop) {
+        @content;
+    }
 }
 
 @mixin min-desktop-large {
-    @media (min-width: $desktop-large) { @content; }
+    @media (min-width: $desktop-large) {
+        @content;
+    }
 }
 
 @mixin min-desktop-4k {
-    @media (min-width: $desktop-4k) { @content; }
+    @media (min-width: $desktop-4k) {
+        @content;
+    }
 }
 
 $detailed-view-zindex: 80;

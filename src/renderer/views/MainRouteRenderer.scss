@@ -270,6 +270,11 @@
             position: relative;
             border: 1px solid $tt-very-dark-gray;
 
+            & * {
+                pointer-events: none;
+                user-select: none;
+            }
+
             .op-label {
                 color: black;
                 width: 100%;
@@ -300,13 +305,18 @@
                     left: $inset;
                     bottom: $inset;
                     right: $inset;
-                    pointer-events: none;
                 }
+            }
 
-                &.detailed-view {
-                    .node-border {
-                        border: 2px solid $bright-highlight;
-                    }
+            &.detailed-view {
+                .node-border {
+                    border: 2px solid $bright-highlight;
+                }
+            }
+
+            &.focus {
+                .node-border {
+                    border-color: $node-select-focus;
                 }
             }
 
@@ -316,7 +326,6 @@
                 .core-highlight {
                     inset: 8px;
                     position: absolute;
-                    pointer-events: none;
                 }
             }
 
@@ -406,7 +415,6 @@
             .node-focus-svg,
             .node-svg {
                 position: absolute;
-                pointer-events: none;
             }
 
             .node-svg {

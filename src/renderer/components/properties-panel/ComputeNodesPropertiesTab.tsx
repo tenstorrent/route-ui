@@ -1,7 +1,7 @@
 import { Button, Card, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
@@ -12,7 +12,7 @@ import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import { getSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getFocusNode, getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -100,7 +100,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     return (
         <div className='core-runtime-metrics'>
             {runtimeMetrics.map(([label, value, unit]) => (
-                <div className='core-runtime-item'>
+                <div className='core-runtime-item' key={`${label}-${value}-${unit}`}>
                     <h4 className='core-runtime-label'>{label}:</h4>
                     <span className='core-runtime-value'>
                         {value}
@@ -118,6 +118,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
     const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
     const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
+    const focusNode = useSelector(getFocusNode);
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -132,9 +133,33 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
             <h3
                 className={`node-type node-type-${node.getNodeLabel()} ${
                     node.uid === selectedDetailsViewUID && isDetailsViewOpen ? 'detailed-view' : ''
-                }`}
+                } ${focusNode === node.uid ? 'focus' : ''}`}
             >
-                {node.type.toUpperCase()} {formatNodeUID(node.uid)}
+                <span
+                    className='hover-wrapper'
+                    onMouseEnter={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(node.uid));
+                        });
+                    }}
+                    onFocus={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(node.uid));
+                        });
+                    }}
+                    onMouseOut={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(null));
+                        });
+                    }}
+                    onBlur={() => {
+                        requestAnimationFrame(() => {
+                            dispatch(updateFocusNode(null));
+                        });
+                    }}
+                >
+                    {node.type.toUpperCase()} {formatNodeUID(node.uid)}
+                </span>
                 <Tooltip2 content='Close ComputeNode'>
                     <Button
                         small
@@ -188,9 +213,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         <>
                             <h4 className='io-label'>Inputs:</h4>
                             {inputs.map((operand, index) => (
-                                <ul className='scrollable-content'>
+                                <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
-                                        <div key={operand.name} style={{ fontSize: '12px' }}>
+                                        <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
@@ -200,7 +225,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                                             node.getInternalPipeIDsForNode().includes(pipeId),
                                                         )
                                                         .map((pipeId) => (
-                                                            <li>
+                                                            <li key={`${operand.name}-${pipeId}`}>
                                                                 <SelectablePipe
                                                                     pipeSegment={
                                                                         new PipeSegment(pipeId, 0, NOCLinkName.NONE)
@@ -215,7 +240,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className=' scrollable-content pipe-ids-for-core'>
                                                     {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                        <li>
+                                                        <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
                                                                     new PipeSegment(pipeId, 0, NOCLinkName.NONE)
@@ -237,9 +262,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         <>
                             <h4 className='io-label'>Outputs:</h4>
                             {outputs.map((operand, index) => (
-                                <ul className='scrollable-content'>
+                                <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
-                                        <div key={operand.name} style={{ fontSize: '12px' }}>
+                                        <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
@@ -249,7 +274,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                                             node.getInternalPipeIDsForNode().includes(pipeId),
                                                         )
                                                         .map((pipeId) => (
-                                                            <li>
+                                                            <li key={`${operand.name}-${pipeId}`}>
                                                                 <SelectablePipe
                                                                     pipeSegment={
                                                                         new PipeSegment(pipeId, 0, NOCLinkName.NONE)
@@ -262,9 +287,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                                 </ul>
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
-                                                <ul className=' scrollable-content pipe-ids-for-core'>
+                                                <ul className='scrollable-content pipe-ids-for-core'>
                                                     {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
-                                                        <li>
+                                                        <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
                                                                     new PipeSegment(pipeId, 0, NOCLinkName.NONE)
@@ -342,15 +367,13 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const nodesSelectionState = useSelector(getSelectedNodeList);
+    const orderedNodeSelection = useSelector(getOrderedNodeList);
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!graphOnChip) {
             return [];
         }
-        return Object.values(nodesSelectionState)
-            .filter((n) => n.selected)
-            .map((nodeState) => graphOnChip.getNode(nodeState.id));
-    }, [graphOnChip, nodesSelectionState]);
+        return orderedNodeSelection.map((nodeState) => graphOnChip.getNode(nodeState.id));
+    }, [graphOnChip, orderedNodeSelection]);
 
     return (
         // TODO: give this a greyed out look when data is not available
