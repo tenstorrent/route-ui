@@ -1,5 +1,5 @@
 {
-  "description": "Route UI",
+  "description": "Tenstorrent Perf Debug Analyzer",
   "keywords": [
     "visualization",
     "test",
@@ -13,10 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/tenstorrent/route-ui.git"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
-    "name": "Tenstorrent",
-    "email": "",
+    "name": "Tenstorrent Inc.",
     "url": "https://tenstorrent.com"
   },
   "contributors": [
