@@ -1,8 +1,8 @@
 import { RootState } from 'data/store/createStore';
-import { getFocusNode, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { getFocusNode, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
@@ -33,6 +33,14 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
     const focusNode = useSelector(getFocusNode);
     const showOperationNames = useSelector(getShowOperationNames);
+    const { data: selectedGroupData } = useSelector((state: RootState) => getOperation(state, node.opName)) ?? {};
+    const shouldShowLabel = useMemo(() => {
+        const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
+        // Use the top border to determine if the label should be shown.
+        // It will only show for the items that are the "first" in that selected group.
+        // This may be either vertical or horizontal, so we cover both the top and left borders.
+        return !selectedNodeData?.siblings.top && !selectedNodeData?.siblings.left;
+    }, [selectedGroupData, node.uid]);
 
     let coreHighlight = HighlightType.NONE;
     const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
@@ -58,7 +66,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
 
     return (
         <button
-            title={showOperationNames ? node.opName : ''}
+            title={showOperationNames && shouldShowLabel ? node.opName : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
