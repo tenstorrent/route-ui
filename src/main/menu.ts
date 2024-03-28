@@ -137,9 +137,7 @@ export default class MenuBuilder {
                     {
                         label: 'Report Issue',
                         click: () => {
-                            shell.openExternal(
-                                'https://yyz-gitlab.local.tenstorrent.com/tenstorrent/route-ui/-/issues/new',
-                            );
+                            shell.openExternal('https://github.com/tenstorrent/route-ui/issues/new');
                         },
                     },
                 ],
