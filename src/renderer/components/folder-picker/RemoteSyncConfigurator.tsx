@@ -17,7 +17,6 @@ import {
 } from '../../../data/store/selectors/uiState.selectors';
 import { setSelectedFolderLocationType, setSelectedRemoteFolder } from '../../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../../utils/FileLoaders';
-import useLogging from '../../hooks/useLogging.hook';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import useRemote, { RemoteConnection, RemoteFolder } from '../../hooks/useRemote.hook';
 import GraphSelector from '../graph-selector/GraphSelector';
@@ -39,7 +38,6 @@ const RemoteSyncConfigurator: FC = () => {
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
     const [isFetchingFolderStatus, setIsFetchingFolderStatus] = useState(false);
 
-    const logging = useLogging();
     const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
 
     const updateSelectedFolder = async (folder?: RemoteFolder) => {
@@ -184,9 +182,7 @@ const RemoteSyncConfigurator: FC = () => {
                             );
 
                             await updateSelectedFolder(updatedfolders[0]);
-                        } catch (err) {
-                            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
-
+                        } catch {
                             // eslint-disable-next-line no-alert
                             alert('Unable to connect to remote server.');
                         } finally {
@@ -242,9 +238,7 @@ const RemoteSyncConfigurator: FC = () => {
                                     );
 
                                     await updateSelectedFolder(selectedFolder);
-                                } catch (err) {
-                                    logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
-
+                                } catch {
                                     // eslint-disable-next-line no-alert
                                     alert('Unable to sync remote folder');
                                 } finally {

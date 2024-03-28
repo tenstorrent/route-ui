@@ -10,7 +10,6 @@ import { mkdir } from 'fs/promises';
 import path from 'path';
 
 import useAppConfig from './useAppConfig.hook';
-import useLogging from './useLogging.hook';
 
 // Required for connecting to a socket on localhost
 dns.setDefaultResultOrder('ipv4first');
@@ -50,13 +49,12 @@ export interface RemoteFolder {
 const escapeWhitespace = (str: string) => str.replace(/(\s)/g, '\\$1');
 
 const useRemoteConnection = () => {
-    const logging = useLogging();
     const { getAppConfig, setAppConfig, deleteAppConfig } = useAppConfig();
     const defaultSshOptions = ['-q', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=240'];
 
     const runShellCommand = async (cmd: string, params: string[]) => {
         return new Promise<string>((resolve, reject) => {
-            logging.info(`Running command: ${cmd} ${params.join(' ')}`);
+            console.info(`Running command: ${cmd} ${params.join(' ')}`);
 
             const command = spawn(cmd, params, {
                 stdio: ['ignore', 'pipe', 'pipe'],
@@ -75,22 +73,27 @@ const useRemoteConnection = () => {
             });
 
             command.on('close', (code) => {
-                logging.info(`Command exited with code ${code}`);
+                console.info(`Command exited with code ${code}`);
 
                 if (code !== 0 || stderr.length > 0) {
-                    reject(
-                        Error(
-                            `Command "${cmd} ${params.join(
-                                ' ',
-                            )}" failed with status code ${code}.\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`,
-                        ),
-                    );
+                    console.error(`Command "${cmd} ${params.join(' ')}" failed with status code ${code}.`);
+                    console.error(`STDOUT: ${stdout}`);
+                    console.error(`STDERR: ${stderr}`);
+
+                    reject(new Error('Remote command failed to exeute.'));
+
+                    return;
                 }
+
                 resolve(stdout);
             });
 
-            command.on('error', (err) => reject(err));
-            command.on('disconnect', () => reject(Error('Command disconnected')));
+            command.on('error', (err) => {
+                console.error(`Command "${cmd} ${params.join(' ')}" failed with error: ${err}`);
+
+                reject(new Error('Remote command failed to execute.'));
+            });
+            command.on('disconnect', () => reject(new Error('Command disconnected')));
         });
     };
 
@@ -122,7 +125,7 @@ const useRemoteConnection = () => {
             connectionStatus.status = ConnectionTestStates.FAILED;
             connectionStatus.message = 'Could not connect to SSH server';
 
-            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+            console.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
             return connectionStatus;
         }
@@ -162,7 +165,7 @@ const useRemoteConnection = () => {
             connectionStatus.status = ConnectionTestStates.FAILED;
             connectionStatus.message = 'Remote folder path does not exist';
 
-            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+            console.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
 
             return connectionStatus;
         }
@@ -260,7 +263,7 @@ const useRemoteConnection = () => {
             // TODO: review the need for the `-s` option
             await runShellCommand('rsync', ['-s', ...baseOptions, ...pathOptions]);
         } catch (err: any) {
-            logging.info(
+            console.info(
                 `Initial RSYNC attempt failed: ${(err as Error)?.message ?? err?.toString() ?? 'Unknown error'}`,
             );
 
