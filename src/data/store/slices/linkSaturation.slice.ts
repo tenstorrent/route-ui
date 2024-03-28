@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import { EpochAndLinkStates, LinkState, NetworkCongestionState } from 'data/StateTypes';
 import { LinkType, NOC } from 'data/Types';
@@ -98,7 +98,7 @@ const linkSaturationSlice = createSlice({
 
             Object.entries(perGraph).forEach(([graphName, normalizedOpCycles]) => {
                 const graphState = state.graphs[graphName];
-                if(graphState.links) {
+                if (graphState.links) {
                     Object.values(graphState.links).forEach((linkState: LinkState) => {
                         if (linkState.type === LinkType.ETHERNET) {
                             calculateNormalizedSaturation(linkState, normalizedOpCycles);

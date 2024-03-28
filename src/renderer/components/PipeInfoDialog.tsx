@@ -6,7 +6,7 @@
 import { Icon, Position } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import React, { FC, useContext, useEffect, useState, type PropsWithChildren } from 'react';
+import React, { FC, type PropsWithChildren, useContext, useEffect, useState } from 'react';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 import './PipeInfoDialog.scss';

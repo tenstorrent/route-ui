@@ -6,7 +6,7 @@
 import { Button, Classes, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { setDockOpenState } from 'data/store/slices/uiState.slice';
-import { useState, type FC } from 'react';
+import { type FC, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getExperimentalFeatures } from '../../../data/store/selectors/experimentalFeatures.selectors';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';

@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import { FC, type CSSProperties } from 'react';
+import { type CSSProperties, FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../../data/ColorGenerator';
 import { ComputeNode } from '../../../data/GraphOnChip';

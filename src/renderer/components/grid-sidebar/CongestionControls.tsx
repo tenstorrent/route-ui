@@ -5,7 +5,7 @@
 
 import React, { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Position, Slider, Switch } from '@blueprintjs/core';
+import { Button, Slider, Switch } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { IconNames } from '@blueprintjs/icons';
@@ -25,20 +25,12 @@ import {
     selectAllQueues,
 } from '../../../data/store/slices/nodeSelection.slice';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
-import { calculateLinkCongestionColor, calculateOpCongestionColor } from '../../../utils/DrawingAPI';
-import { NOC } from '../../../data/Types';
-import {
-    getLinkSaturation,
-    getShowLinkSaturation,
-    getShowNOC0,
-    getShowNOC1,
-} from '../../../data/store/selectors/linkSaturation.selectors';
+import { calculateOpCongestionColor } from '../../../utils/DrawingAPI';
+
+
 import Collapsible from '../Collapsible';
-import {
-    updateLinkSaturation,
-    updateShowLinkSaturation,
-    updateShowNOC,
-} from '../../../data/store/slices/linkSaturation.slice';
+
+
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -98,8 +90,7 @@ export const CongestionControls: FC = () => {
                         flexDirection: 'column',
                     }}
                 >
-                    {
-                        <>
+                    <>
                             <LinkCongestionControl />
                             <hr />
                             <div>
@@ -136,7 +127,6 @@ export const CongestionControls: FC = () => {
                             </div>
                             <hr />
                         </>
-                    }
                 </Collapsible>
             )}
         </>

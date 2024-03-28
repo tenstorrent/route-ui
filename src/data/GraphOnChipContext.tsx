@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import React, { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, createContext, useCallback, useMemo, useState } from 'react';
 import GraphOnChip from './GraphOnChip';
 import type { GraphRelationship } from './StateTypes';
 

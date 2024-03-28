@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { PipeSelection, PipeSelectionState } from 'data/StateTypes';
 
 const pipesInitialState: PipeSelectionState = {

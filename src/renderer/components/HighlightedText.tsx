@@ -15,7 +15,7 @@ const HighlightedText: FC<HighlightedTextProps> = ({ text, filter }) => {
 
     if (index === -1) {
         return (
-            <span title={text} className="highlighted-text">
+            <span title={text} className='highlighted-text'>
                 {text}
             </span>
         );
@@ -28,7 +28,7 @@ const HighlightedText: FC<HighlightedTextProps> = ({ text, filter }) => {
     return (
         <span
             title={text}
-            className="highlighted-text"
+            className='highlighted-text'
             dangerouslySetInnerHTML={{ __html: `${before}<mark>${match}</mark>${after}` }}
         />
     );

@@ -13,7 +13,7 @@ import ClusterView from './ClusterView';
 
 import './ClusterView.scss';
 
-const ClusterViewDialog: React.FC = ({}) => {
+const ClusterViewDialog: React.FC = () => {
     const dispatch = useDispatch();
     const { isOpen } = useSelector((state: RootState) => state.clusterView);
 

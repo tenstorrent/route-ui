@@ -80,7 +80,9 @@ const useRemoteConnection = () => {
                 if (code !== 0 || stderr.length > 0) {
                     reject(
                         Error(
-                            `Command "${cmd} ${params.join(' ')}" failed with status code ${code}.\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`,
+                            `Command "${cmd} ${params.join(
+                                ' ',
+                            )}" failed with status code ${code}.\nSTDOUT: ${stdout}\nSTDERR: ${stderr}`,
                         ),
                     );
                 }

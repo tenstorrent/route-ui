@@ -70,4 +70,3 @@ export interface MeasurementsJSON {
 export interface CoreMeasurementsJSON {
     [coreId: string]: CorePerfJson;
 }
-

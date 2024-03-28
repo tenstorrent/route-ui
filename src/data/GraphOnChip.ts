@@ -15,20 +15,20 @@ import { GraphVertex } from './GraphTypes';
 import {
     ChipDesignJSON,
     DramChannelJSON,
-    NetlistAnalyzerDataJSON,
     NOCLinkJSON,
+    NetlistAnalyzerDataJSON,
     NodeDataJSON,
     OperationDataJSON,
 } from './JSONDataTypes';
 import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
 import {
-    aggregateCoresByOperation,
     GraphDescriptorJSON,
     OperandJSON,
     OperationDescription,
+    aggregateCoresByOperation,
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
-import { parsedQueueLocation, QueueDescriptorJson } from './sources/QueueDescriptor';
+import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
 import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
     Architecture,
@@ -38,10 +38,10 @@ import {
     EthernetLinkName,
     LinkType,
     Loc,
-    NetworkLinkName,
     NOC,
     NOC2AXILinkName,
     NOCLinkName,
+    NetworkLinkName,
     PCIeLinkName,
     QueueLocation,
 } from './Types';

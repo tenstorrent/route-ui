@@ -7,7 +7,6 @@ import { MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { GraphName, OperationName } from './GraphNames';
 /*  eslint-disable no-undef */
 export class MeasurementDetails implements MeasurementsJSON {
-
     [key: `input_pipe_bw_${number}`]: number; // available bandwidth (hole size)
 
     [key: `output_pipe_bw_${number}`]: number;
@@ -82,7 +81,6 @@ export class MeasurementDetails implements MeasurementsJSON {
 
         return this._slowestOperandPerformance;
     }
-
 
     get slowestOperandDetails() {
         if (this.slowestOperandPerformance?.direction && this.slowestOperandPerformance?.index !== null) {

@@ -247,7 +247,9 @@ export const columnRenderer = <T extends TableFields>({
                     rowIndex,
                     tableFields,
                     isInteractive,
-                    className: `${cellClassName ?? ''} ${customCellContentRenderer && 'table-cell-interactive table-operation-cell'}`,
+                    className: `${cellClassName ?? ''} ${
+                        customCellContentRenderer && 'table-cell-interactive table-operation-cell'
+                    }`,
                     customContent: customCellContentRenderer?.(rowIndex),
                 })
             }

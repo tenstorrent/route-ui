@@ -6,7 +6,7 @@
 import { Button, Icon, MenuItem, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
+import { type ItemPredicate, ItemRenderer, Select2 } from '@blueprintjs/select';
 import { FC, type PropsWithChildren } from 'react';
 import { RemoteFolder } from '../../hooks/useRemote.hook';
 
@@ -45,7 +45,9 @@ const remoteFolderRenderer =
 
         let statusIcon = (
             <Tooltip2
-                content={`Fetching folder status, last sync: ${lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'}`}
+                content={`Fetching folder status, last sync: ${
+                    lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'
+                }`}
             >
                 <Spinner size={16} />
             </Tooltip2>
@@ -55,7 +57,9 @@ const remoteFolderRenderer =
             if (isLocalFolderOutdated(folder)) {
                 statusIcon = (
                     <Tooltip2
-                        content={`Folder is stale, last sync: ${lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'}`}
+                        content={`Folder is stale, last sync: ${
+                            lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'
+                        }`}
                     >
                         <Icon icon={IconNames.HISTORY} color='goldenrod' />
                     </Tooltip2>
@@ -63,7 +67,9 @@ const remoteFolderRenderer =
             } else {
                 statusIcon = (
                     <Tooltip2
-                        content={`Folder is up to date, last sync: ${lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'}`}
+                        content={`Folder is up to date, last sync: ${
+                            lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'
+                        }`}
                     >
                         <Icon icon={IconNames.UPDATED} color='green' />
                     </Tooltip2>

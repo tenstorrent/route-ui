@@ -70,7 +70,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName || ''));
     const isHighContrast = useSelector((state: RootState) => state.uiState.highContrastEnabled);
-    
+
     useEffect(() => {
         if (svgRef.current) {
             const svg = d3.select(svgRef.current);
@@ -89,9 +89,9 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                                 drawEthLink(svg, ethPosition, link.name, size, color, 6);
                             }
                         } else if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
-                                const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
-                                drawEthLink(svg, ethPosition, link.name, size, color, 6);
-                            }
+                            const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
+                            drawEthLink(svg, ethPosition, link.name, size, color, 6);
+                        }
                     }
                 });
             }
