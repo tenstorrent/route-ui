@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { useEffect } from 'react';
 
 const KEYBOARD_FOCUS_CLASS = 'tt-keyboard-focus';

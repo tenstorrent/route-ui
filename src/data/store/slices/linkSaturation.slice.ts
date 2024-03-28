@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { EpochAndLinkStates, LinkState, NetworkCongestionState } from 'data/StateTypes';

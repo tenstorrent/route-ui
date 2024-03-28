@@ -1,10 +1,15 @@
-import { type CSSProperties, FC } from 'react';
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
+import { FC, type CSSProperties } from 'react';
 import { useSelector } from 'react-redux';
+import { getGroupColor } from '../../../data/ColorGenerator';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { RootState } from '../../../data/store/createStore';
 import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';
-import { getGroupColor } from '../../../data/ColorGenerator';
 import { getNodeOpBackgroundStyles, getNodeOpBorderStyles } from '../../../utils/DrawingAPI';
 
 interface OperationGroupRenderProps {

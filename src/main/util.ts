@@ -1,6 +1,11 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 /* eslint import/prefer-default-export: off */
-import { URL } from 'url';
 import path from 'path';
+import { URL } from 'url';
 
 export function resolveHtmlPath(htmlFileName: string) {
     if (process.env.NODE_ENV === 'development') {
@@ -24,8 +29,8 @@ export const generateRuntimeData = () => {
         const string = `fwd_0_${e}_temporal_epoch_${e}:
   epoch_id: ${e}
   target_device: 1\n`;
-  // epoch_id: 0
-  // target_device: ${e}\n`;
+        // epoch_id: 0
+        // target_device: ${e}\n`;
         output += string;
     }
     console.log(output);

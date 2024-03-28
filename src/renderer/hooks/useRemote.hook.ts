@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { spawn } from 'child_process';
 import dns from 'dns';
 import { existsSync } from 'fs';

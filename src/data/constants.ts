@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { DramBankLinkName, EthernetLinkName, NOC2AXILinkName, NOCLinkName, PCIeLinkName } from './Types';
 
 export const LINK_SATURATION_INITIAIL_PERCENT = 75;

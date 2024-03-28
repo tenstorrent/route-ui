@@ -1,16 +1,21 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
-import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
-import { RootState } from '../../../data/store/createStore';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { ComputeNodeType } from '../../../data/Types';
-import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
+import { RootState } from '../../../data/store/createStore';
 import {
     getAllLinksForGraph,
     getLinkSaturation,
-    getShowLinkSaturation
+    getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
+import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
 
 interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;

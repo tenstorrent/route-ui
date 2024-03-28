@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { BrowserWindow, ipcMain } from 'electron';
 
 import { ElectronEvents } from '../ElectronEvents';

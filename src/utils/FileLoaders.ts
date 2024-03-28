@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 /* eslint-disable no-console */
 
 import GraphOnChip from 'data/GraphOnChip';

@@ -1,0 +1,52 @@
+###
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+###
+
+files:
+  "**/*.ts":
+    header:
+      startBlock: "/**\n"
+      linePrefix: " * "
+      endBlock: " */\n\n"
+  "**/*.tsx":
+    header:
+      startBlock: "/**\n"
+      linePrefix: " * "
+      endBlock: " */\n\n"
+  "**/*.scss":
+    header:
+      startBlock: "/**\n"
+      linePrefix: " * "
+      endBlock: " */\n\n"
+  "**/*.yaml":
+    header:
+      startBlock: "###\n"
+      linePrefix: "# "
+      endBlock: "###\n\n"
+  "**/*.css":
+    header:
+      startBlock: "/**\n"
+      linePrefix: " * "
+      endBlock: " */\n\n"
+  "**/*.html":
+    header:
+      startBlock: "<!--\n"
+      linePrefix: " "
+      endBlock: "-->\n\n"
+  "**/Dockerfile":
+    header:
+      startBlock: "###\n"
+      linePrefix: "# "
+      endBlock: "###\n\n"
+ignore:
+- .erb
+- .git
+- .github
+- .vscode
+- node_modules
+- release
+
+license: |
+  SPDX-License-Identifier: Apache-2.0
+  SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.

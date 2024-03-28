@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { Button, Classes, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { setDockOpenState } from 'data/store/slices/uiState.slice';

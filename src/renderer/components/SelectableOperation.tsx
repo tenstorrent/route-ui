@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import React, { ChangeEvent, FC } from 'react';

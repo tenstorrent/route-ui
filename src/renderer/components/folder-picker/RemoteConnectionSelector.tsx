@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';

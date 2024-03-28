@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { createRoot } from 'react-dom/client';
 
 import { updateStateOnEvent } from './utils/bridge';

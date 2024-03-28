@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { Slider } from '@blueprintjs/core';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

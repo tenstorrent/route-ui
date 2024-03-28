@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { Button, Classes, Icon, NumericInput } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';

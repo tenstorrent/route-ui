@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 /* eslint-disable no-useless-constructor */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
@@ -324,15 +329,18 @@ export default class GraphOnChip {
                 const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
                 graphOnChip.totalCols = Math.max(loc.y, graphOnChip.totalCols);
                 graphOnChip.totalRows = Math.max(loc.x, graphOnChip.totalRows);
-                const [node, newOperation] = ComputeNode.fromNetlistJSON(nodeJSON, graphOnChip.chipId, (name: OperationName) =>
-                    graphOnChip.operationsByName.get(name),
+                const [node, newOperation] = ComputeNode.fromNetlistJSON(
+                    nodeJSON,
+                    graphOnChip.chipId,
+                    (name: OperationName) => graphOnChip.operationsByName.get(name),
                 );
                 if (newOperation) {
                     // console.log('Adding operation: ', newOperation.name);
                     graphOnChip.addOperation(newOperation);
                 }
                 if (node.dramChannelId !== -1 && graphOnChip.dramChannels) {
-                    const dramChannel = graphOnChip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
+                    const dramChannel =
+                        graphOnChip.dramChannels.find((channel) => channel.id === node.dramChannelId) || null;
                     if (dramChannel === null) {
                         console.error(`Node ${node.uid} has a missing dram channel ${node.dramChannelId}`);
                     }
@@ -399,7 +407,10 @@ export default class GraphOnChip {
         return graphOnChip;
     }
 
-    public static AUGMENT_FROM_OPS_JSON(graphOnChip: GraphOnChip, operationsJson: Record<string, OperationDataJSON>): GraphOnChip {
+    public static AUGMENT_FROM_OPS_JSON(
+        graphOnChip: GraphOnChip,
+        operationsJson: Record<string, OperationDataJSON>,
+    ): GraphOnChip {
         if (graphOnChip) {
             const augmentedChip = new GraphOnChip(graphOnChip.chipId);
             Object.assign(augmentedChip, graphOnChip);

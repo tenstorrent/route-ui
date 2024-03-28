@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
 import {
     closeDetailedView,

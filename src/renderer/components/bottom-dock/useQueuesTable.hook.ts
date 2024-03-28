@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { useCallback, useState } from 'react';
 import { Queue } from '../../../data/GraphTypes';
 import { QueueDetailsJson } from '../../../data/sources/QueueDescriptor';

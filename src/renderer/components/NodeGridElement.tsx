@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { RootState } from 'data/store/createStore';
 import { getFocusNode, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
