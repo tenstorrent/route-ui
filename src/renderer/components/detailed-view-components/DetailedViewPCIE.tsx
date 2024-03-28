@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ComputeNode, NetworkLink, NOC2AXILink, NOCLink, PCIeLink } from '../../../data/GraphOnChip';
+import { ComputeNode, NOC2AXILink, NOCLink, NetworkLink, PCIeLink } from '../../../data/GraphOnChip';
 import { NOC, NOC2AXILinkName, NOCLinkName, PCIeLinkName } from '../../../data/Types';
 import LinkDetails from '../LinkDetails';
 import DetailedViewPipeControls from './DetailedViewPipeControls';

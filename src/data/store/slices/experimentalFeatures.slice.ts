@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ExperimentalFeaturesState } from 'data/StateTypes';
 
 const experimentalFeaturesInitialState: ExperimentalFeaturesState = {

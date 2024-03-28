@@ -9,16 +9,16 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'data/store/createStore';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 
-import { NetworkLink, NOCLink } from '../../../data/GraphOnChip';
-import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
+import { NOCLink, NetworkLink } from '../../../data/GraphOnChip';
+import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
 import { PipeSelection } from '../../../data/StateTypes';
 import {
     DramBankLinkName,
-    NOC2AXILinkName,
     EthernetLinkName,
-    NetworkLinkName,
     NOC,
+    NOC2AXILinkName,
     NOCLinkName,
+    NetworkLinkName,
     PCIeLinkName,
 } from '../../../data/Types';
 import { getAllLinksForGraph } from '../../../data/store/selectors/linkSaturation.selectors';

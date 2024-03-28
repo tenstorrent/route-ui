@@ -6,7 +6,7 @@
 import { Button, Icon, MenuItem, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { ItemRenderer, Select2, type ItemPredicate } from '@blueprintjs/select';
+import { type ItemPredicate, ItemRenderer, Select2 } from '@blueprintjs/select';
 import { FC, type PropsWithChildren } from 'react';
 import { RemoteFolder } from '../../hooks/useRemote.hook';
 

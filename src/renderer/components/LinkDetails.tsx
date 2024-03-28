@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'data/store/createStore';
 import { getLinkData } from 'data/store/selectors/linkSaturation.selectors';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
-import { PipeSegment, NetworkLink, formatToBytesPerCycle, convertBytes } from '../../data/GraphOnChip';
+import { NetworkLink, PipeSegment, convertBytes, formatToBytesPerCycle } from '../../data/GraphOnChip';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
 import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';

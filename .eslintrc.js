@@ -22,6 +22,12 @@ module.exports = {
         "no-plusplus": 'off',
         "no-underscore-dangle": 'off',
         "react/function-component-definition": 0,
+        "sort-imports": ["error", {
+            "ignoreDeclarationSort": true
+        }],
+        "import/first": "error",
+        "import/newline-after-import": "error",
+        "import/no-duplicates": "error"
         // "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }],  // May conflict with prettier
     },
     parserOptions: {
