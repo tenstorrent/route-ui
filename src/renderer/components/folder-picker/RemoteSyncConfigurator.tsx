@@ -37,6 +37,7 @@ const RemoteSyncConfigurator: FC = () => {
     const [isSyncingRemoteFolder, setIsSyncingRemoteFolder] = useState(false);
     const [isLoadingFolderList, setIsLoadingFolderList] = useState(false);
     const [isFetchingFolderStatus, setIsFetchingFolderStatus] = useState(false);
+    const [isRemoteOffline, setIsRemoteOffline] = useState(false);
 
     const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
 
@@ -97,9 +98,10 @@ const RemoteSyncConfigurator: FC = () => {
                 setIsFetchingFolderStatus(true);
                 const updatedRemoteFolders = await remote.listRemoteFolders(remote.persistentState.selectedConnection);
 
+                setIsRemoteOffline(false);
                 updateSavedRemoteFolders(remote.persistentState.selectedConnection!, updatedRemoteFolders);
-            } catch (err) {
-                logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+            } catch {
+                setIsRemoteOffline(true);
             } finally {
                 setIsFetchingFolderStatus(false);
             }
@@ -136,6 +138,7 @@ const RemoteSyncConfigurator: FC = () => {
                     connections={remote.persistentState.savedConnectionList}
                     disabled={isLoadingFolderList || isSyncingRemoteFolder}
                     loading={isLoadingFolderList}
+                    offline={isRemoteOffline}
                     onEditConnection={async (updatedConnection, oldConnection) => {
                         const updatedConnections = [...remote.persistentState.savedConnectionList];
 
@@ -163,9 +166,10 @@ const RemoteSyncConfigurator: FC = () => {
                             const fetchedRemoteFolders = await remote.listRemoteFolders(connection);
                             const updatedFolders = updateSavedRemoteFolders(connection, fetchedRemoteFolders);
 
+                            setIsRemoteOffline(false);
                             await updateSelectedFolder(updatedFolders[0]);
-                        } catch (err) {
-                            logging.error((err as Error)?.message ?? err?.toString() ?? 'Unknown error');
+                        } catch {
+                            setIsRemoteOffline(true);
                         } finally {
                             setIsFetchingFolderStatus(false);
                         }
