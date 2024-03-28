@@ -98,8 +98,7 @@ export const CongestionControls: FC = () => {
                         flexDirection: 'column',
                     }}
                 >
-                    {
-                        <>
+                    <>
                             <LinkCongestionControl />
                             <hr />
                             <div>
@@ -136,7 +135,6 @@ export const CongestionControls: FC = () => {
                             </div>
                             <hr />
                         </>
-                    }
                 </Collapsible>
             )}
         </>
