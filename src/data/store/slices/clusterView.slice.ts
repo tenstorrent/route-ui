@@ -6,10 +6,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ClusterViewState } from '../../StateTypes';
 
-
 const clusterviewInitialState: ClusterViewState = {
     isOpen: false,
-}
+};
 export const clusterViewSlice = createSlice({
     name: 'clusterView',
     initialState: clusterviewInitialState,

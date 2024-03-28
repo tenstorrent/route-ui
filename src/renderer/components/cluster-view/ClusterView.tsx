@@ -136,9 +136,7 @@ const ClusterView: FC = () => {
 
     return (
         <div className='cluster-view-container'>
-            <div
-                className='cluster-view-pipelist'
-            >
+            <div className='cluster-view-pipelist'>
                 <div className='congestion-container'>
                     <LinkCongestionControls showNOCControls={false} />
                     <Checkbox

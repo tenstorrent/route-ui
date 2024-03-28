@@ -18,7 +18,6 @@ export const experimentalFeaturesSlice = createSlice({
         toggleQueuesTable: (state, action: PayloadAction<boolean | undefined>) => {
             state.showQueuesTable = action.payload ?? !state.showQueuesTable;
         },
-
     },
 });
 

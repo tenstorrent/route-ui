@@ -98,7 +98,7 @@ const linkSaturationSlice = createSlice({
 
             Object.entries(perGraph).forEach(([graphName, normalizedOpCycles]) => {
                 const graphState = state.graphs[graphName];
-                if(graphState.links) {
+                if (graphState.links) {
                     Object.values(graphState.links).forEach((linkState: LinkState) => {
                         if (linkState.type === LinkType.ETHERNET) {
                             calculateNormalizedSaturation(linkState, normalizedOpCycles);
