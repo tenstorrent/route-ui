@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import React, { type ReactElement } from 'react';
 
 import { Button } from '@blueprintjs/core';

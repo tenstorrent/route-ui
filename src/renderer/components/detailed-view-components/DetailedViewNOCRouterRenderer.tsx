@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import React from 'react';
 import { NetworkLink } from '../../../data/GraphOnChip';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';

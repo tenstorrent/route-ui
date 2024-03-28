@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import * as d3 from 'd3';
 import { FC, useContext, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';

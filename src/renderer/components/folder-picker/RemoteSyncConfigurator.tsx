@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { FC, useContext, useEffect, useState } from 'react';
 
 import { AnchorButton, FormGroup } from '@blueprintjs/core';

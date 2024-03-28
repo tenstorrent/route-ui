@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import type { ComputeNode } from './GraphOnChip';
 import type { Operand } from './Graph';
 import type { QueueDetailsJson } from './sources/QueueDescriptor';

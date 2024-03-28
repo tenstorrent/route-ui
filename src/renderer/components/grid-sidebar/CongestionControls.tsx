@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import React, { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Position, Slider, Switch } from '@blueprintjs/core';

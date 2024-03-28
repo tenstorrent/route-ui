@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import React from 'react';
 import { DramBankLink, NOC2AXILink, NetworkLink, NOCLink } from '../../../data/GraphOnChip';
 import { DramBankLinkName, NetworkLinkName, NOC } from '../../../data/Types';

@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { GraphRelationship } from '../data/StateTypes';
 
 const NETLIST_ANALYZER_REGEX = /^\D*(\d+)\D*(\d*).yaml$/;

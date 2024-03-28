@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { OperandDirection, OperandPerformance } from '../data/OpPerfDetails';
 
 export const calculateSlowestOperand = (operand: string): OperandPerformance | null => {

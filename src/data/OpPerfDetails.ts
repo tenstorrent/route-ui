@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { GraphName, OperationName } from './GraphNames';
 /*  eslint-disable no-undef */

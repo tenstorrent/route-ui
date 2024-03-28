@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { RootState } from '../createStore';
 
 export const getDockOpenState = (state: RootState) => state.uiState.dockOpen;

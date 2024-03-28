@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { FocusStyleManager } from '@blueprintjs/core';
 import store from 'data/store/createStore';
 import { useState } from 'react';

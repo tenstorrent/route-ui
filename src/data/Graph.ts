@@ -1,9 +1,14 @@
-import { ComputeNodeType } from './Types';
-import type { GraphVertex, Operation, Queue } from './GraphTypes';
-import { QueueDetailsJson } from './sources/QueueDescriptor';
-import { ComputeNode } from './GraphOnChip';
-import { OperandDirection, OperandPerformance, OpPerfDetails } from './OpPerfDetails';
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
+import { ComputeNode } from './GraphOnChip';
+import type { GraphVertex, Operation, Queue } from './GraphTypes';
+import { OpPerfDetails, OperandDirection, OperandPerformance } from './OpPerfDetails';
+import { ComputeNodeType } from './Types';
+import { QueueDetailsJson } from './sources/QueueDescriptor';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */

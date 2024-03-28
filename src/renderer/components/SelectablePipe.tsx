@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { Checkbox } from '@blueprintjs/core';
 import { RootState } from 'data/store/createStore';
 import { selectPipeSelectionById } from 'data/store/selectors/pipeSelection.selectors';

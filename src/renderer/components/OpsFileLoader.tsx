@@ -1,8 +1,13 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 // import yaml from 'js-yaml';
+import { Button } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import fs from 'fs';
 import { FC } from 'react';
-import { IconNames } from '@blueprintjs/icons';
-import { Button } from '@blueprintjs/core';
 import useLogging from '../hooks/useLogging.hook';
 
 interface OpsFileLoaderProps {}

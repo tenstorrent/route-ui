@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from './sources/ClusterDescriptor';
 import ChipDesign from './ChipDesign';
 import { ChipDesignJSON } from './JSONDataTypes';

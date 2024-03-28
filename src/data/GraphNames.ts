@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 export type OperationName = string;
 export type QueueName = string;
 export type GraphVertexId = OperationName | QueueName;

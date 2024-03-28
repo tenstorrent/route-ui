@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { Position, Slider, Switch } from '@blueprintjs/core';
 import React, { FC } from 'react';

@@ -1,6 +1,11 @@
-import React, { useReducer } from 'react';
-import { Tooltip2 } from '@blueprintjs/popover2';
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { Button, Icon } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
+import React, { useReducer } from 'react';
 
 /**
  * Renders a target element within a clickable button, which toggles the visibility of the expanded content.

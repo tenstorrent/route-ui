@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { configureStore } from '@reduxjs/toolkit';
 import { clusterViewReducer } from './slices/clusterView.slice';
 import { experimentalFeaturesReducer } from './slices/experimentalFeatures.slice';

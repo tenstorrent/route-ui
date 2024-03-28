@@ -1,3 +1,8 @@
+/**
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+ */
+
 import { useDispatch, useSelector } from 'react-redux';
 import { getSelectedOperationList, getSelectedQueueList } from '../../data/store/selectors/nodeSelection.selectors';
 import { selectOperation, selectQueue } from '../../data/store/slices/nodeSelection.slice';
