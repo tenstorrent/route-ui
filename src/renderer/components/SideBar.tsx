@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import { ClusterContext } from '../../data/ClusterContext';
-import { getExperimentalFeatures } from '../../data/store/selectors/experimentalFeatures.selectors';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
 
 export interface SideBarProps {}

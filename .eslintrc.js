@@ -1,6 +1,6 @@
 module.exports = {
     extends: ['erb'],
-    plugins: ['@typescript-eslint'],
+    plugins: ['@typescript-eslint', 'unused-imports'],
     rules: {
         // A temporary hack related to IDE not resolving correct package.json
         'import/no-extraneous-dependencies': 'off',
@@ -27,7 +27,12 @@ module.exports = {
         }],
         "import/first": "error",
         "import/newline-after-import": "error",
-        "import/no-duplicates": "error"
+        "import/no-duplicates": "error",
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+            "warn",
+            { vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" }
+        ]
         // "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }],  // May conflict with prettier
     },
     parserOptions: {
