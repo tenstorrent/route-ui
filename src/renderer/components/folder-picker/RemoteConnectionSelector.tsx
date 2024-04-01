@@ -44,6 +44,7 @@ interface RemoteConnectionSelectorProps {
     connection?: RemoteConnection;
     disabled: boolean;
     loading: boolean;
+    offline: boolean;
     onSelectConnection: (connection: RemoteConnection) => void;
     onEditConnection: (newConnection: RemoteConnection, oldConnection?: RemoteConnection) => void;
     onRemoveConnection: (connection: RemoteConnection) => void;
@@ -55,6 +56,7 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
     connection,
     disabled,
     loading,
+    offline,
     onSelectConnection,
     onEditConnection,
     onRemoveConnection,
@@ -76,7 +78,7 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                 onItemSelect={onSelectConnection}
             >
                 <Button
-                    icon={IconNames.CLOUD}
+                    icon={offline ? IconNames.BAN_CIRCLE : IconNames.CLOUD}
                     rightIcon={IconNames.CARET_DOWN}
                     disabled={disabled}
                     text={formatConnectionString(selectedConnection)}
