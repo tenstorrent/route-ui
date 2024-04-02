@@ -18,6 +18,7 @@ interface UIState {
     folderPath: string;
     selectedRemoteFolder?: RemoteFolder;
     selectedFolderLocationType: FolderLocationType;
+    isLoadingFolder: boolean;
     applicationMode: ApplicationMode;
     showEmptyLinks: boolean;
     showOperationNames: boolean;
@@ -35,6 +36,7 @@ const uiStateInitialState: UIState = {
     folderPath: '',
     selectedRemoteFolder: undefined,
     selectedFolderLocationType: 'local',
+    isLoadingFolder: false,
     applicationMode: ApplicationMode.NONE,
     showEmptyLinks: false,
     showOperationNames: false,
@@ -65,6 +67,9 @@ const uiStateSlice = createSlice({
         },
         setSelectedFolder(state, action: PayloadAction<string>) {
             state.folderPath = action.payload;
+        },
+        setIsLoadingFolder(state, action: PayloadAction<boolean>) {
+            state.isLoadingFolder = action.payload;
         },
         setApplicationMode(state, action: PayloadAction<ApplicationMode>) {
             state.applicationMode = action.payload;
@@ -110,6 +115,7 @@ export const {
     setSelectedFolder,
     setSelectedRemoteFolder,
     setSelectedFolderLocationType,
+    setIsLoadingFolder,
     setApplicationMode,
     clearSelectedApplication,
     updateShowEmptyLinks,
