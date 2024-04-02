@@ -104,6 +104,29 @@
         align-self: end;
     }
 
+    .main-route-loading-overlay {
+        grid-area: sidebar-start / controls-start / main-end / properties-end;
+        background: $tt-background;
+        display: grid;
+        place-items: center;
+        z-index: calc(infinity * 1);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.5s ease-in-out;
+        font-size: larger;
+    }
+
+    &.loading-data {
+        .main-route-loading-overlay {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .grid-sidebar { display: none; }
+        .main-content { display: none; }
+        .properties-panel { display: none; }
+    }
+
     &.detailed-view-open {
         grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
         grid-template-areas:
@@ -122,6 +145,32 @@
         ;
 
         .bottom-dock { display: block; }
+    }
+
+    &.invalid-data {
+        grid-template-columns: $sidebar-width $controls-panel-width 1fr 0;
+
+        .properties-panel { display: none; }
+
+        .main-content {
+            text-align: center;
+            justify-self: center;
+            align-self: start;
+            margin-block-start: 10vh;
+
+            p {
+                margin-block: 20px;
+                font-size: x-large;
+            }
+
+            svg {
+                color: $tt-dark-gray;
+            }
+
+            .error-message svg {
+                color: $tt-yellow;
+            }
+        }
     }
 
     @media (max-width: 1280px) {
