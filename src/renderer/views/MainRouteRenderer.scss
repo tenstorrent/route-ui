@@ -85,7 +85,10 @@
     }
 
     .sidebar { grid-area: sidebar; }
-    .grid-sidebar { grid-area: controls; }
+    .grid-sidebar {
+        grid-area: controls;
+        position: relative;
+    }
     .main-content {
         max-width: 50vw;
         width: fit-content;
@@ -95,6 +98,7 @@
     .properties-panel {
         min-width: $properties-panel-width;
         grid-area: properties;
+        position: relative;
     }
 
     .bottom-dock {
@@ -105,7 +109,7 @@
     }
 
     .main-route-loading-overlay {
-        grid-area: sidebar-start / controls-start / main-end / properties-end;
+        grid-area: main;
         background: $tt-background;
         display: grid;
         place-items: center;
@@ -114,6 +118,14 @@
         pointer-events: none;
         transition: all 0.25s ease-in-out;
         font-size: larger;
+        width: 50vw;
+    }
+
+    .panel-overlay {
+        position: absolute;
+        inset: 0;
+        background: color-mix(in srgb, $tt-background 80%, transparent);
+        display: none;
     }
 
     &.loading-data {
@@ -122,9 +134,9 @@
             pointer-events: all;
         }
 
-        .grid-sidebar { display: none; }
         .main-content { display: none; }
-        .properties-panel { display: none; }
+
+        .panel-overlay { display: block; }
     }
 
     &.detailed-view-open {
@@ -148,10 +160,6 @@
     }
 
     &.invalid-data {
-        grid-template-columns: $sidebar-width $controls-panel-width 1fr 0;
-
-        .properties-panel { display: none; }
-
         .main-content {
             text-align: center;
             justify-self: center;
@@ -164,13 +172,11 @@
             }
 
             svg {
-                color: $tt-dark-gray;
-            }
-
-            .error-message svg {
                 color: $tt-yellow;
             }
         }
+
+        .panel-overlay { display: block; }
     }
 
     @media (max-width: 1280px) {
