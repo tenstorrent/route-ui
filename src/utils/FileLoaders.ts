@@ -174,7 +174,7 @@ export const loadCluster = async (perfResultsPath: string): Promise<Cluster | nu
 
 const loadChipFromArchitecture = async (architecture: Architecture): Promise<GraphOnChip> => {
     if (architecture === Architecture.NONE) {
-        throw new Error('No architecture provided.');
+        throw new Error('Unable to parse selected folder, insufficient data provided.')
     }
     const grayskullArch = await import('data/architectures/arch-grayskull.json');
     const wormholeArch = await import('data/architectures/arch-wormhole.json');
