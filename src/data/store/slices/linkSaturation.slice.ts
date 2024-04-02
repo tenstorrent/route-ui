@@ -72,6 +72,7 @@ const linkSaturationSlice = createSlice({
                 const { DRAMBandwidthBytes, PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
 
                 if (graphState) {
+                    graphState.totalOps = totalOps;
                     Object.values(graphState.links).forEach((linkState) => {
                         if (linkState.type === LinkType.ETHERNET) {
                             linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
