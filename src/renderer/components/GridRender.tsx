@@ -55,7 +55,7 @@ export default function GridRender() {
                     ) : (
                         <div className='no-data'>
                             <p>
-                                Unable to parse selected folder, insufficient data provided.
+                                Unable to parse selected folder.
                                 <br />
                                 Please select another folder
                             </p>
