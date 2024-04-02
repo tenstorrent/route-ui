@@ -47,15 +47,18 @@ export default function GridRender() {
             )}
             {graphOnChip === undefined && (
                 <div className='invalid-data-message'>
+                    <Icon icon={IconNames.WARNING_SIGN} size={50} />
                     {error ? (
                         <div className='error-message'>
-                            <Icon icon={IconNames.WARNING_SIGN} size={50} />
                             <p>{error}</p>
                         </div>
                     ) : (
                         <div className='no-data'>
-                            <Icon icon={IconNames.TH_DISCONNECT} size={50} />
-                            <p>No data found. Please select another folder</p>
+                            <p>
+                                Unable to parse selected folder, insufficient data provided.
+                                <br />
+                                Please select another folder
+                            </p>
                         </div>
                     )}
                 </div>
