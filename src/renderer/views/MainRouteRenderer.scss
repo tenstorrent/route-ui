@@ -165,10 +165,11 @@
             text-align: center;
             justify-self: center;
             align-self: center;
+            margin-block-start: -$top-bar-height;
 
             p {
                 margin-block: 20px;
-                font-size: x-large;
+                font-size: larger;
             }
 
             svg {
