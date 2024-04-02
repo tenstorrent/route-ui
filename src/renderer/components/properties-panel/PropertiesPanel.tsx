@@ -56,6 +56,7 @@ export default function PropertiesPanel() {
                     />
                 )}
             </Tabs>
+            <div className='panel-overlay'></div>
         </div>
     );
 }

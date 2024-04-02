@@ -73,6 +73,7 @@ const TopHeaderComponent: React.FC = () => {
             dispatch(setSelectedRemoteFolder(newFolder));
         }
 
+        // TODO: do we need this call?
         resetGraphOnChipState();
 
         if (checkLocalFolderExists(folderPath)) {

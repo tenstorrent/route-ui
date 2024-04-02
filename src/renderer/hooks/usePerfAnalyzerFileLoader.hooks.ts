@@ -7,6 +7,7 @@ import { getFolderPathSelector } from 'data/store/selectors/uiState.selectors';
 import {
     closeDetailedView,
     setApplicationMode,
+    setIsLoadingFolder,
     setSelectedFolder,
     setSelectedFolderLocationType,
 } from 'data/store/slices/uiState.slice';
@@ -18,9 +19,9 @@ import { ApplicationMode } from 'data/Types';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
+import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type { EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
@@ -29,10 +30,10 @@ import {
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
 import { clearAllNodes, loadNodesData } from '../../data/store/slices/nodeSelection.slice';
-import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
-import useLogging from './useLogging.hook';
 import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
+import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
+import useLogging from './useLogging.hook';
 
 const usePerfAnalyzerFileLoader = () => {
     const dispatch = useDispatch();
@@ -85,6 +86,7 @@ const usePerfAnalyzerFileLoader = () => {
         dispatch(resetPipeSelection());
         dispatch(resetNetworksState());
         setError(null);
+        dispatch(setIsLoadingFolder(true));
 
         try {
             // TODO: needs gone once we are happy with performance
@@ -148,6 +150,7 @@ const usePerfAnalyzerFileLoader = () => {
         }
 
         setCluster(await loadCluster(folderPath));
+        dispatch(setIsLoadingFolder(false));
     };
 
     const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {

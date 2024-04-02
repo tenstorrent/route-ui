@@ -85,7 +85,10 @@
     }
 
     .sidebar { grid-area: sidebar; }
-    .grid-sidebar { grid-area: controls; }
+    .grid-sidebar {
+        grid-area: controls;
+        position: relative;
+    }
     .main-content {
         max-width: 50vw;
         width: fit-content;
@@ -95,6 +98,7 @@
     .properties-panel {
         min-width: $properties-panel-width;
         grid-area: properties;
+        position: relative;
     }
 
     .bottom-dock {
@@ -102,6 +106,38 @@
         display: none;
         height: $initial-dock-height;
         align-self: end;
+    }
+
+    .main-route-loading-overlay {
+        grid-area: main;
+        background: $tt-background;
+        display: grid;
+        place-items: center;
+        z-index: calc(infinity * 1);
+        opacity: 0;
+        pointer-events: none;
+        user-select: none;
+        transition: all 0.25s ease-in-out;
+        font-size: larger;
+        width: 50vw;
+    }
+
+    .panel-overlay {
+        position: absolute;
+        inset: 0;
+        background: color-mix(in srgb, $tt-background 80%, transparent);
+        display: none;
+    }
+
+    &.loading-data {
+        .main-route-loading-overlay {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .main-content { display: none; }
+
+        .panel-overlay { display: block; }
     }
 
     &.detailed-view-open {
@@ -122,6 +158,26 @@
         ;
 
         .bottom-dock { display: block; }
+    }
+
+    &.invalid-data {
+        .main-content {
+            text-align: center;
+            justify-self: center;
+            align-self: center;
+            margin-block-start: -$top-bar-height;
+
+            p {
+                margin-block: 20px;
+                font-size: larger;
+            }
+
+            svg {
+                color: $tt-yellow;
+            }
+        }
+
+        .panel-overlay { display: block; }
     }
 
     @media (max-width: 1280px) {
