@@ -54,11 +54,7 @@ export default function GridRender() {
                         </div>
                     ) : (
                         <div className='no-data'>
-                            <p>
-                                Unable to parse selected folder.
-                                <br />
-                                Please select another folder
-                            </p>
+                            <p>Unable to parse selected folder</p>
                         </div>
                     )}
                 </div>
