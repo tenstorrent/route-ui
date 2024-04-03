@@ -4,18 +4,19 @@
  */
 
 import * as d3 from 'd3';
-import { FC, useContext, useEffect, useMemo, useRef } from 'react';
+import { FC, useContext, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { PipeSelection } from '../../../data/StateTypes';
 import { NOC, NOCLinkName } from '../../../data/Types';
-import { RootState } from '../../../data/store/createStore';
 import {
     getAllLinksForGraph,
     getLinkSaturation,
     getShowLinkSaturation,
+    getShowNOC0,
+    getShowNOC1,
 } from '../../../data/store/selectors/linkSaturation.selectors';
+import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState, getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
 import {
     NOC_CONFIGURATION,
@@ -34,17 +35,10 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
     const graphName = useContext(GraphOnChipContext).getActiveGraphName();
-    const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));
+    const linksData = useSelector(getAllLinksForGraph(graphName));
 
-    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
-    const allPipeStates = useSelector((state: RootState) => state.pipeSelection.pipes);
-    const selectedPipeIds = useMemo(
-        () =>
-            Object.values(allPipeStates)
-                .filter((pipe: PipeSelection) => pipe.selected)
-                .map((pipe: PipeSelection) => pipe.id),
-        [allPipeStates],
-    );
+    const focusPipe = useSelector(getFocusPipe);
+    const selectedPipeIds = useSelector(getSelectedPipesIds);
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
@@ -52,8 +46,8 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
 
-    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
-    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
+    const noc0Saturation = useSelector(getShowNOC0);
+    const noc1Saturation = useSelector(getShowNOC1);
 
     const showEmptyLinks = useSelector(getShowEmptyLinks);
 

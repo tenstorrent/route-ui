@@ -3,12 +3,12 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
+import * as d3 from 'd3';
 import { FC, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import * as d3 from 'd3';
 import { ComputeNode } from '../../../data/GraphOnChip';
-import { RootState } from '../../../data/store/createStore';
 import { NOCLinkName } from '../../../data/Types';
+import { getFocusPipe } from '../../../data/store/selectors/pipeSelection.selectors';
 import { NODE_SIZE, drawSelections } from '../../../utils/DrawingAPI';
 
 interface NodeFocusPipeRendererProps {
@@ -19,7 +19,7 @@ const NodeFocusPipeRenderer: FC<NodeFocusPipeRendererProps> = ({ node }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
-    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    const focusPipe = useSelector(getFocusPipe);
     const focusedPipeIds = [focusPipe || ''];
 
     svg.selectAll('*').remove();

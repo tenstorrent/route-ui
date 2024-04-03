@@ -10,7 +10,6 @@ import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../data/ColorGenerator';
 import { GraphVertexType } from '../../data/GraphNames';
 import { Operation } from '../../data/GraphTypes';
-import { RootState } from '../../data/store/createStore';
 import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
@@ -75,8 +74,8 @@ interface SelectableOperationPerformanceProps {
 }
 
 export const SelectableOperationPerformance: FC<SelectableOperationPerformanceProps> = ({ operation, children }) => {
-    const render = useSelector((state: RootState) => getShowOperationPerformanceGrid(state));
-    const threshold = useSelector((state: RootState) => getOperationPerformanceTreshold(state));
+    const render = useSelector(getShowOperationPerformanceGrid);
+    const threshold = useSelector(getOperationPerformanceTreshold);
     const isHighContrast: boolean = useSelector(getHighContrastState);
     if (!render || !operation || !operation.details) {
         return children;

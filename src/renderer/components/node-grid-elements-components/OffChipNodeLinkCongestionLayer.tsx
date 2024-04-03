@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { ComputeNodeType } from '../../../data/Types';
-import { RootState } from '../../../data/store/createStore';
 import {
     getAllLinksForGraph,
     getLinkSaturation,
@@ -26,7 +25,7 @@ interface OffChipNodeLinkCongestionLayerProps {
  */
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node }) => {
     const graphName = useContext(GraphOnChipContext).getActiveGraphName();
-    const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName));
+    const linksData = useSelector(getAllLinksForGraph(graphName));
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
