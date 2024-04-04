@@ -37,7 +37,9 @@ import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import LinkCongestionControl from './LinkCongestionControl';
 
 export const CongestionControls: FC = () => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
+    const graphName = getActiveGraphName();
 
     const maxBwLimitedFactor = graphOnChip?.details.maxBwLimitedFactor || 10;
     const hasPipes = graphOnChip?.hasPipes || false;
@@ -91,42 +93,39 @@ export const CongestionControls: FC = () => {
                     }}
                 >
                     <>
-                            <LinkCongestionControl />
-                            <hr />
-                            <div>
-                                <Tooltip2 content='Select all Pipes'>
-                                    <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())} />
-                                </Tooltip2>
-                                &nbsp;
-                                <Tooltip2 content='Clear all Pipes'>
-                                    <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
-                                </Tooltip2>
-                            </div>
-                            <hr />
-                            <div>
-                                <Tooltip2 content='Select all Operations'>
-                                    <Button icon={IconNames.CUBE_ADD} onClick={() => dispatch(selectAllOperations())} />
-                                </Tooltip2>
-                                &nbsp;
-                                <Tooltip2 content='Clear all Operations'>
-                                    <Button
-                                        icon={IconNames.CUBE_REMOVE}
-                                        onClick={() => dispatch(clearAllOperations())}
-                                    />
-                                </Tooltip2>
-                            </div>
-                            <hr />
-                            <div>
-                                <Tooltip2 content='Select all Queues'>
-                                    <Button icon={<QueueIconPlus />} onClick={() => dispatch(selectAllQueues())} />
-                                </Tooltip2>
-                                &nbsp;
-                                <Tooltip2 content='Clear all Queues'>
-                                    <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues())} />
-                                </Tooltip2>
-                            </div>
-                            <hr />
-                        </>
+                        <LinkCongestionControl />
+                        <hr />
+                        <div>
+                            <Tooltip2 content='Select all Pipes'>
+                                <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())} />
+                            </Tooltip2>
+                            &nbsp;
+                            <Tooltip2 content='Clear all Pipes'>
+                                <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
+                            </Tooltip2>
+                        </div>
+                        <hr />
+                        <div>
+                            <Tooltip2 content='Select all Operations'>
+                                <Button icon={IconNames.CUBE_ADD} onClick={() => dispatch(selectAllOperations())} />
+                            </Tooltip2>
+                            &nbsp;
+                            <Tooltip2 content='Clear all Operations'>
+                                <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                            </Tooltip2>
+                        </div>
+                        <hr />
+                        <div>
+                            <Tooltip2 content='Select all Queues'>
+                                <Button icon={<QueueIconPlus />} onClick={() => dispatch(selectAllQueues(graphName))} />
+                            </Tooltip2>
+                            &nbsp;
+                            <Tooltip2 content='Clear all Queues'>
+                                <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues(graphName))} />
+                            </Tooltip2>
+                        </div>
+                        <hr />
+                    </>
                 </Collapsible>
             )}
         </>

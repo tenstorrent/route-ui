@@ -22,11 +22,13 @@ import SelectableOperation from '../SelectableOperation';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
+    const graphName = getActiveGraphName();
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const queueSelectionState = useSelector(getSelectedQueueList);
+    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
     const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
 
     const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
@@ -56,7 +58,7 @@ function QueuesPropertiesTab() {
                             <Button icon={<QueueIconPlus />} onClick={() => selectFilteredQueue()} />
                         </Tooltip2>,
                         <Tooltip2 content='Deselect all queues' position={PopoverPosition.RIGHT} key='deselect-all-ops'>
-                            <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues())} />
+                            <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues(graphName))} />
                         </Tooltip2>,
                     ]}
                 />

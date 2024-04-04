@@ -19,9 +19,11 @@ import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
+    const graphName = getActiveGraphName();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
-    const queueSelectionState = useSelector(getSelectedQueueList);
+    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
     const tableFields = useMemo(() => {
         if (!graphOnChip) {
             return [];

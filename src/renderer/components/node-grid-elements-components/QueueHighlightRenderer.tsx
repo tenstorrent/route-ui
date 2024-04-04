@@ -3,14 +3,16 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../../data/ColorGenerator';
 import { ComputeNode } from '../../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
 
 const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
-    const queueSelectionState = useSelector(getSelectedQueueList);
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
     return (
         <div className='queue-highlighter-content'>
             {node.queueList.map((queue) => {
