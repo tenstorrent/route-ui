@@ -6,8 +6,6 @@
 import { LogLevel } from '../../Types';
 import { RootState } from '../createStore';
 
-export const getLogEntry = (state: RootState, id: number) => state.logging.entryList[id];
-
 export const getLogEntries = (state: RootState) => state.logging.entryList;
 
 export const getLogEntriesByType = (type: LogLevel) => (state: RootState) =>

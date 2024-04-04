@@ -4,7 +4,6 @@
  */
 
 import { Checkbox } from '@blueprintjs/core';
-import { RootState } from 'data/store/createStore';
 import { selectPipeSelectionById } from 'data/store/selectors/pipeSelection.selectors';
 import { updateFocusPipe, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { ChangeEvent, FC } from 'react';
@@ -30,7 +29,7 @@ const SelectablePipe: FC<SelectablePipeProps> = ({
     showBandwidthUse = false,
 }) => {
     const dispatch = useDispatch();
-    const pipeState = useSelector((state: RootState) => selectPipeSelectionById(state, pipeSegment.id));
+    const pipeState = useSelector(selectPipeSelectionById(pipeSegment.id));
     const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
         dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
     };

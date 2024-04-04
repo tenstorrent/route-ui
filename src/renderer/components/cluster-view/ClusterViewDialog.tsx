@@ -3,19 +3,19 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Button, Classes, Overlay } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { RootState } from 'data/store/createStore';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { closeClusterView } from '../../../data/store/slices/clusterView.slice';
 import ClusterView from './ClusterView';
 
+import { getClusterView } from '../../../data/store/selectors/clusterView.selector';
 import './ClusterView.scss';
 
 const ClusterViewDialog: React.FC = () => {
     const dispatch = useDispatch();
-    const { isOpen } = useSelector((state: RootState) => state.clusterView);
+    const { isOpen } = useSelector(getClusterView);
 
     return (
         <Overlay

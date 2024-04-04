@@ -8,15 +8,15 @@ import { FC, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
-import { RootState } from '../../../data/store/createStore';
-import { PipeSelection } from '../../../data/StateTypes';
+import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
     getAllLinksForGraph,
     getLinkSaturation,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
+import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
+import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
-import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 
 interface EthPipeRendererProps {
     id: string;
@@ -38,10 +38,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     normalizedSaturation,
 }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
-    const pipeSelection = useSelector((state: RootState) => state.pipeSelection.pipes);
-    const selectedPipeIds = Object.values(pipeSelection)
-        .filter((pipe: PipeSelection) => pipe.selected)
-        .map((pipe: PipeSelection) => pipe.id);
+    const selectedPipeIds = useSelector(getSelectedPipesIds);
 
     const { x, y } = calculateEthPosition(ethPosition, index);
 
@@ -64,12 +61,12 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
               .flat();
     const size = clusterChipSize / CLUSTER_NODE_GRID_SIZE - 5; // grid, 5 gap
 
-    const focusPipeId = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    const focusPipeId = useSelector(getFocusPipe);
 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const linksData = useSelector((state: RootState) => getAllLinksForGraph(state, graphName || ''));
-    const isHighContrast = useSelector((state: RootState) => state.uiState.highContrastEnabled);
+    const linksData = useSelector(getAllLinksForGraph(graphName || ''));
+    const isHighContrast = useSelector(getHighContrastState);
 
     useEffect(() => {
         if (svgRef.current) {
@@ -129,7 +126,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        pipeSelection,
+        //
         nodePipeIn,
         nodePipeOut,
         focusPipeId,

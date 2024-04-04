@@ -4,23 +4,27 @@
  */
 
 import { Button, Classes, Icon, NumericInput } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { IconNames } from '@blueprintjs/icons';
-import { FC, useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     updateCLK,
     updateDRAMBandwidth,
     updatePCIBandwidth,
     updateTotalOPs,
 } from 'data/store/slices/linkSaturation.slice';
-import { RootState } from '../../../data/store/createStore';
+import { FC, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
 import Collapsible from '../Collapsible';
-import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { getTotalOpsForGraph } from '../../../data/store/selectors/linkSaturation.selectors';
+import {
+    getCLKMhz,
+    getDRAMBandwidth,
+    getPCIBandwidth,
+    getTotalOpsForGraph,
+} from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface DRAMBandwidthControlsProps {}
 
@@ -28,10 +32,10 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
-    const dramBandwidth = useSelector((state: RootState) => state.linkSaturation.DRAMBandwidthGBs);
-    const clkMHz = useSelector((state: RootState) => state.linkSaturation.CLKMHz);
-    const PCIeBandwidth = useSelector((state: RootState) => state.linkSaturation.PCIBandwidthGBs);
-    const opCycles = useSelector((state: RootState) => getTotalOpsForGraph(state, graphName));
+    const dramBandwidth = useSelector(getDRAMBandwidth);
+    const clkMHz = useSelector(getCLKMhz);
+    const PCIeBandwidth = useSelector(getPCIBandwidth);
+    const opCycles = useSelector(getTotalOpsForGraph(graphName));
 
     let aiclkRightElement = (
         <Tooltip2 content='Reset Total OP Cycles'>

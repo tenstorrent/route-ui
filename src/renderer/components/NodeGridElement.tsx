@@ -3,7 +3,6 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import { RootState } from 'data/store/createStore';
 import { getFocusNode, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
@@ -11,6 +10,7 @@ import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
+import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
 import {
     getDetailedViewOpenState,
     getSelectedDetailsViewUID,
@@ -32,13 +32,13 @@ interface NodeGridElementProps {
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const dispatch = useDispatch();
-    const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
+    const nodeState = useSelector(selectNodeSelectionById(node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
-    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    const focusPipe = useSelector(getFocusPipe);
     const focusNode = useSelector(getFocusNode);
     const showOperationNames = useSelector(getShowOperationNames);
-    const { data: selectedGroupData } = useSelector((state: RootState) => getOperation(state, node.opName)) ?? {};
+    const { data: selectedGroupData } = useSelector(getOperation(node.opName)) ?? {};
     const shouldShowLabel = useMemo(() => {
         const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
         // Use the top border to determine if the label should be shown.

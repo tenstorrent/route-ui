@@ -9,7 +9,6 @@ import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { MAX_MODEL_RATIO_THRESHOLD, MIN_MODEL_RATIO_THRESHOLD } from '../../../data/constants';
-import type { RootState } from '../../../data/store/createStore';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 import { updateOperationRatioThreshold } from '../../../data/store/slices/operationPerf.slice';
 import Collapsible from '../Collapsible';
@@ -18,7 +17,7 @@ import useOperationsTable, { type OpTableFields } from '../bottom-dock/useOperat
 const ModelControls: FC = () => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const dispatch = useDispatch();
-    const opperationRatioThreshold = useSelector((state: RootState) => getOperationRatioThreshold(state));
+    const opperationRatioThreshold = useSelector(getOperationRatioThreshold);
     const { getMaxModelEstimateRatio } = useOperationsTable();
     const maxModelEstimateRatio = useMemo(
         () =>

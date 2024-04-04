@@ -4,25 +4,26 @@
  */
 
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
+import { Button, Checkbox, Classes, MenuItem, NumericInput, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select } from '@blueprintjs/select';
-import { Button, Checkbox, Classes, MenuItem, NumericInput, PopoverPosition } from '@blueprintjs/core';
 import { FC, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ClusterContext } from '../../../data/ClusterContext';
+import getPipeColor from '../../../data/ColorGenerator';
 import GraphOnChip from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import getPipeColor from '../../../data/ColorGenerator';
-import { ClusterContext } from '../../../data/ClusterContext';
 import { GraphRelationship } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION } from '../../../data/Types';
-import { RootState } from '../../../data/store/createStore';
+import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
     getEpochAdjustedTotalOps,
     getEpochNormalizedTotalOps,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipes } from '../../../data/store/selectors/pipeSelection.selectors';
+import { updateEpochNormalizedOP } from '../../../data/store/slices/linkSaturation.slice';
 import { updateMultiplePipeSelection } from '../../../data/store/slices/pipeSelection.slice';
 import ColorSwatch from '../ColorSwatch';
 import FilterableComponent from '../FilterableComponent';
@@ -30,8 +31,6 @@ import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
 import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
 import EthPipeRenderer from './EthPipeRenderer';
-import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
-import { updateEpochNormalizedOP } from '../../../data/store/slices/linkSaturation.slice';
 
 const renderItem: ItemRenderer<GraphRelationship[]> = (
     item,
@@ -120,7 +119,7 @@ const ClusterView: FC = () => {
         );
     };
 
-    const pciPipeStateList = useSelector((state: RootState) => getSelectedPipes(state, pciPipes));
+    const pciPipeStateList = useSelector(getSelectedPipes(pciPipes));
     const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(true);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const normalizedAdjustedOPsList = useSelector(getEpochAdjustedTotalOps);
@@ -182,7 +181,7 @@ const ClusterView: FC = () => {
                                 <Tooltip2
                                     content='Reset to initial normalized value'
                                     usePortal
-                                    portalClassName="cluster-reset-tooltip"
+                                    portalClassName='cluster-reset-tooltip'
                                 >
                                     <Button
                                         minimal
