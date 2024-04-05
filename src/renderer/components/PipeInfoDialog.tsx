@@ -56,7 +56,7 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
                         </h3>
                         <ul>
                             {producers.map((producer) => (
-                                <li>{producer}</li>
+                                <li key={producer}>{producer}</li>
                             ))}
                         </ul>
                     </>
@@ -69,7 +69,7 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
                         </h3>
                         <ul>
                             {consumers.map((consumer) => (
-                                <li>{consumer}</li>
+                                <li key={consumer}>{consumer}</li>
                             ))}
                         </ul>
                     </>
