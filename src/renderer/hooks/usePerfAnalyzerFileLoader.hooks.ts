@@ -29,7 +29,12 @@ import {
     initialLoadTotalOPs,
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
-import { clearAllNodes, initialLoadQueues, loadNodesData } from '../../data/store/slices/nodeSelection.slice';
+import {
+    clearAllNodes,
+    initialLoadOPs,
+    initialLoadQueues,
+    loadNodesData,
+} from '../../data/store/slices/nodeSelection.slice';
 import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
@@ -105,7 +110,7 @@ const usePerfAnalyzerFileLoader = () => {
             const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
-            const queuesData: Record<string, ComputeNodeState[]> = {};
+            const nodesDataPerGraph: Record<string, ComputeNodeState[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -123,7 +128,9 @@ const usePerfAnalyzerFileLoader = () => {
                 };
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
-                queuesData[graph.name] = [...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState())];
+                nodesDataPerGraph[graph.name] = [
+                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState()),
+                ];
 
                 times.push({
                     graph: `${graph.name}`,
@@ -141,11 +148,14 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
             dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
-            dispatch(initialLoadQueues(queuesData));
+            dispatch(initialLoadQueues(nodesDataPerGraph));
+            dispatch(initialLoadOPs(nodesDataPerGraph));
 
             // console.table(times, ['graph', 'time']);
             // console.log('total', performance.now() - entireRunStartTime, 'ms');
-            logger.info(`Loaded ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`);
+            logger.info(
+                `Loaded ${folderPath} with ${graphs.length} graphs in ${performance.now() - entireRunStartTime} ms`,
+            );
         } catch (e) {
             const err = e as Error;
             logging.error(`Failed to read graph names from folder: ${err.message}`);

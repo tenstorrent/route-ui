@@ -13,7 +13,7 @@ const useSelectableGraphVertex = () => {
     const dispatch = useDispatch();
     const graphName = useContext(GraphOnChipContext).getActiveGraphName();
 
-    const operationsSelectionState = useSelector(getSelectedOperationList);
+    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
     const queuesSelectionState = useSelector(getSelectedQueueList(graphName));
 
     return {
@@ -23,7 +23,8 @@ const useSelectableGraphVertex = () => {
             operationsSelectionState[name]?.selected ?? queuesSelectionState[name]?.selected ?? false,
         selectQueue: (queueName: string, selected: boolean) =>
             dispatch(selectQueue({ graphName, queueName, selected })),
-        selectOperation: (opName: string, selected: boolean) => dispatch(selectOperation({ opName, selected })),
+        selectOperation: (opName: string, selected: boolean) =>
+            dispatch(selectOperation({ graphName, opName, selected })),
     };
 };
 

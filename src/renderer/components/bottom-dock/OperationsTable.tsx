@@ -83,7 +83,7 @@ function OperationsTable() {
         return sortTableFields(list);
     }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector(getSelectedNodeList);
-    const operationsSelectionState = useSelector(getSelectedOperationList);
+    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
     const queueSelectionState = useSelector(getSelectedQueueList(graphName));
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);

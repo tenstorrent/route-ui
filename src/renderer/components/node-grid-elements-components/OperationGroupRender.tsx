@@ -3,13 +3,14 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
-import { FC, type CSSProperties } from 'react';
+import { type CSSProperties, FC, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../../data/ColorGenerator';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';
 import { getNodeOpBackgroundStyles, getNodeOpBorderStyles } from '../../../utils/DrawingAPI';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 interface OperationGroupRenderProps {
     node: ComputeNode;
@@ -19,7 +20,8 @@ interface OperationGroupRenderProps {
  * Adds a highlight layer to a Core node element when the core's operation ("operation group") is selected.
  */
 const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
-    const selectedGroup = useSelector(getOperation(node.opName));
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const selectedGroup = useSelector(getOperation(graphName, node.opName));
     const showOperationNames = useSelector(getShowOperationNames);
 
     let operationStyles: CSSProperties = {};

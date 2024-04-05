@@ -107,11 +107,17 @@ export const CongestionControls: FC = () => {
                         <hr />
                         <div>
                             <Tooltip2 content='Select all Operations'>
-                                <Button icon={IconNames.CUBE_ADD} onClick={() => dispatch(selectAllOperations())} />
+                                <Button
+                                    icon={IconNames.CUBE_ADD}
+                                    onClick={() => dispatch(selectAllOperations(graphName))}
+                                />
                             </Tooltip2>
                             &nbsp;
                             <Tooltip2 content='Clear all Operations'>
-                                <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                                <Button
+                                    icon={IconNames.CUBE_REMOVE}
+                                    onClick={() => dispatch(clearAllOperations(graphName))}
+                                />
                             </Tooltip2>
                         </div>
                         <hr />
