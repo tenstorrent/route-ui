@@ -9,7 +9,7 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { useContext, useMemo } from 'react';
+import React, { Fragment, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
 import { GraphVertexType } from '../../../data/GraphNames';
@@ -198,7 +198,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                 <div className='opname theme-dark'>
                     <Collapsible label={<h4>Queues:</h4>} isOpen>
                         {node.queueList.map((queue) => (
-                            <>
+                            <Fragment key={queue.name}>
                                 <SelectableOperation
                                     disabled={disabledQueue(queue.name)}
                                     opName={queue.name}
@@ -207,7 +207,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                     stringFilter=''
                                 />
                                 <GraphVertexDetails graphNode={queue} showQueueDetails={false} />
-                            </>
+                            </Fragment>
                         ))}
                     </Collapsible>
                 </div>
