@@ -52,7 +52,6 @@ const usePerfAnalyzerFileLoader = () => {
     useEffect(() => {
         if (activeGraphOnChip) {
             dispatch(closeDetailedView());
-            // TODO: move both to bulk loading
             dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
