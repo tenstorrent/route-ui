@@ -40,7 +40,7 @@ const useSelectedTableRows = () => {
         return queuesSelectionState[name]?.selected === undefined;
     };
 
-    const operationsSelectionState = useSelector(getSelectedOperationList);
+    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
     const queuesSelectionState = useSelector(getSelectedQueueList(graphName));
     const nodesSelectionState = useSelector(getSelectedNodeList);
 
@@ -49,7 +49,7 @@ const useSelectedTableRows = () => {
             dispatch(updateNodeSelection({ id: row.core_id, selected })),
         ),
         handleSelectAllOperations: handleSelectAll<OpTableFields>(
-            (row, selected) => dispatch(selectOperation({ opName: row.name, selected })),
+            (row, selected) => dispatch(selectOperation({ graphName, opName: row.name, selected })),
             (row) => !getDisabledOperation(row.name),
         ),
         handleSelectAllSlowestOperands: handleSelectAll<OpTableFields>(
@@ -58,7 +58,7 @@ const useSelectedTableRows = () => {
                 const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
 
                 if (type === GraphVertexType.OPERATION) {
-                    dispatch(selectOperation({ opName: name, selected }));
+                    dispatch(selectOperation({ graphName, opName: name, selected }));
                 } else {
                     dispatch(selectQueue({ graphName, queueName: name, selected }));
                 }

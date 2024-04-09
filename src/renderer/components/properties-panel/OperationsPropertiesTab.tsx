@@ -21,9 +21,11 @@ import SelectableOperation from '../SelectableOperation';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const { getActiveGraphName, getActiveGraphOnChip } = useContext(GraphOnChipContext);
+    const graphName = getActiveGraphName();
+    const graphOnChip = getActiveGraphOnChip();
 
-    const groupsSelectionState = useSelector(getSelectedOperationList);
+    const groupsSelectionState = useSelector(getSelectedOperationList(graphName));
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);
@@ -59,7 +61,10 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >
-                            <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                            <Button
+                                icon={IconNames.CUBE_REMOVE}
+                                onClick={() => dispatch(clearAllOperations(graphName))}
+                            />
                         </Tooltip2>,
                     ]}
                 />

@@ -6,7 +6,7 @@
 import { getFocusNode, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
@@ -25,12 +25,14 @@ import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffC
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 interface NodeGridElementProps {
     node: ComputeNode;
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
@@ -38,7 +40,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const focusPipe = useSelector(getFocusPipe);
     const focusNode = useSelector(getFocusNode);
     const showOperationNames = useSelector(getShowOperationNames);
-    const { data: selectedGroupData } = useSelector(getOperation(node.opName)) ?? {};
+    const { data: selectedGroupData } = useSelector(getOperation(graphName, node.opName)) ?? {};
     const shouldShowLabel = useMemo(() => {
         const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
         // Use the top border to determine if the label should be shown.

@@ -64,7 +64,7 @@ export interface NodeSelection {
 }
 
 export interface NodeSelectionState {
-    operations: Record<string, { data: ComputeNodeState[]; selected: boolean }>;
+    operations: Record<string, Record<string, { data: ComputeNodeState[]; selected: boolean }>>;
     queues: Record<string, Record<string, { data: ComputeNodeState[]; selected: boolean }>>;
     nodeList: Record<string, ComputeNodeState>;
     nodeListOrder: string[];
