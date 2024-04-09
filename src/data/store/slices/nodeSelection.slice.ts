@@ -80,14 +80,7 @@ const nodeSelectionSlice = createSlice({
 
                 computaNodeStateList.forEach((item) => {
                     state.nodeList[graphName][item.id] = item;
-                });
-            });
-        },
-        initialLoadQueues(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
-            Object.entries(action.payload).forEach(([graphName, computeNodeStateList]) => {
-                state.queues[graphName] = {};
 
-                computeNodeStateList.forEach((item) => {
                     if (item.queueNameList.length > 0) {
                         item.queueNameList.forEach((queueName) => {
                             if (!state.queues[graphName][queueName]) {
