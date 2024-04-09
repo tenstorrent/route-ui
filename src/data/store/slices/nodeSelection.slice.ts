@@ -152,17 +152,6 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        clearAllNodes(state, action: PayloadAction<string>) {
-            Object.values(state.nodeList[action.payload]).forEach((node) => {
-                node.selected = false;
-            });
-
-            state.nodeListOrder[action.payload] = [];
-
-            state.dram.forEach((dramGroup) => {
-                dramGroup.selected = false;
-            });
-        },
         selectOperation(state, action: PayloadAction<{ graphName: string; opName: string; selected: boolean }>) {
             const { graphName, opName, selected } = action.payload;
             const operation = state.operations[graphName][opName];
@@ -214,7 +203,6 @@ export const {
     selectQueue,
     selectAllQueues,
     clearAllQueues,
-    clearAllNodes,
     updateFocusNode,
 } = nodeSelectionSlice.actions;
 

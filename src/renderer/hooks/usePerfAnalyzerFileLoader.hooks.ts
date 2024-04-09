@@ -163,7 +163,6 @@ const usePerfAnalyzerFileLoader = () => {
         if (selectedFolder) {
             try {
                 dispatch(closeDetailedView());
-                dispatch(clearAllNodes(graphName));
                 setActiveGraph(graphName);
                 navigate('/render');
             } catch (e) {
