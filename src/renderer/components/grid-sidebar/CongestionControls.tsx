@@ -96,11 +96,11 @@ export const CongestionControls: FC = () => {
                         <LinkCongestionControl />
                         <hr />
                         <div>
-                            <Tooltip2 content='Select all Pipes'>
+                            <Tooltip2 content='Select all pipes'>
                                 <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())} />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Clear all Pipes'>
+                            <Tooltip2 content='Clear all pipes'>
                                 <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
                             </Tooltip2>
                         </div>
