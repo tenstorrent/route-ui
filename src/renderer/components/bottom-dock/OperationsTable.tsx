@@ -82,7 +82,7 @@ function OperationsTable() {
 
         return sortTableFields(list);
     }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
-    const nodesSelectionState = useSelector(getSelectedNodeList);
+    const nodesSelectionState = useSelector(getSelectedNodeList(graphName));
     const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
     const queueSelectionState = useSelector(getSelectedQueueList(graphName));
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
@@ -151,7 +151,9 @@ function OperationsTable() {
                 <Checkbox
                     checked={nodesSelectionState[cellContent]?.selected}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                        dispatch(updateNodeSelection({ id: cellContent.toString(), selected: e.target.checked }));
+                        dispatch(
+                            updateNodeSelection({ graphName, id: cellContent.toString(), selected: e.target.checked }),
+                        );
                     }}
                 />
                 {cellContent}

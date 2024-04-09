@@ -42,11 +42,11 @@ const useSelectedTableRows = () => {
 
     const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
     const queuesSelectionState = useSelector(getSelectedQueueList(graphName));
-    const nodesSelectionState = useSelector(getSelectedNodeList);
+    const nodesSelectionState = useSelector(getSelectedNodeList(graphName));
 
     return {
         handleSelectAllCores: handleSelectAll<OpTableFields>((row, selected) =>
-            dispatch(updateNodeSelection({ id: row.core_id, selected })),
+            dispatch(updateNodeSelection({ graphName, id: row.core_id, selected })),
         ),
         handleSelectAllOperations: handleSelectAll<OpTableFields>(
             (row, selected) => dispatch(selectOperation({ graphName, opName: row.name, selected })),

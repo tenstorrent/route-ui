@@ -8,7 +8,7 @@ import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
-    nodeListOrder: [],
+    nodeListOrder: {},
     operations: {},
     queues: {},
     dram: [],
@@ -64,12 +64,9 @@ const nodeSelectionSlice = createSlice({
     initialState: nodesInitialState,
     reducers: {
         loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
-            state.nodeList = {};
             state.dram = [];
 
             action.payload.forEach((item) => {
-                state.nodeList[item.id] = item;
-
                 if (item.dramChannelId !== -1) {
                     if (!state.dram[item.dramChannelId]) {
                         state.dram[item.dramChannelId] = { data: [], selected: false };
@@ -80,6 +77,14 @@ const nodeSelectionSlice = createSlice({
 
             state.dram.forEach((dramElement) => {
                 setBorders(dramElement.data);
+            });
+        },
+        initialLoadAllNodes(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
+            Object.entries(action.payload).forEach(([graphName, computaNodeStateList]) => {
+                state.nodeList[graphName] = {};
+                computaNodeStateList.forEach((item) => {
+                    state.nodeList[graphName][item.id] = item;
+                });
             });
         },
         initialLoadQueues(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
@@ -121,25 +126,25 @@ const nodeSelectionSlice = createSlice({
             });
         },
 
-        updateNodeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
-            const { id, selected } = action.payload;
-            const node: ComputeNodeState | undefined = state.nodeList[id];
+        updateNodeSelection(state, action: PayloadAction<{ graphName: string; id: string; selected: boolean }>) {
+            const { graphName, id, selected } = action.payload;
+            const node: ComputeNodeState | undefined = state.nodeList[graphName][id];
 
             if (node) {
                 node.selected = selected;
             }
 
-            const nodeIndex = state.nodeListOrder.indexOf(id);
+            const nodeIndex = state.nodeListOrder[graphName].indexOf(id);
             if (nodeIndex > -1 && !selected) {
-                state.nodeListOrder = [...state.nodeListOrder].toSpliced(nodeIndex, 1);
+                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName]].toSpliced(nodeIndex, 1);
             }
 
             if (nodeIndex === -1 && selected) {
-                state.nodeListOrder = [...state.nodeListOrder, id];
+                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName], id];
             }
 
             state.dram.forEach((dramGroup) => {
-                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[n.id].selected);
+                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[graphName][n.id].selected);
 
                 if (hasSelectedNode) {
                     dramGroup.selected = true;
@@ -148,12 +153,12 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        clearAllNodes(state) {
-            Object.values(state.nodeList).forEach((node) => {
+        clearAllNodes(state, action: PayloadAction<string>) {
+            Object.values(state.nodeList[action.payload]).forEach((node) => {
                 node.selected = false;
             });
 
-            state.nodeListOrder = [];
+            state.nodeListOrder[action.payload] = [];
 
             state.dram.forEach((dramGroup) => {
                 dramGroup.selected = false;
@@ -203,6 +208,7 @@ const nodeSelectionSlice = createSlice({
 export const {
     //
     loadNodesData,
+    initialLoadAllNodes,
     initialLoadQueues,
     initialLoadOPs,
     updateNodeSelection,
