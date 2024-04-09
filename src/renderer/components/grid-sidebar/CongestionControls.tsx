@@ -100,7 +100,7 @@ export const CongestionControls: FC = () => {
                                 <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())} />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Clear all pipes'>
+                            <Tooltip2 content='Deselect all pipes'>
                                 <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
                             </Tooltip2>
                         </div>
@@ -113,7 +113,7 @@ export const CongestionControls: FC = () => {
                                 />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Clear all operations for active graph'>
+                            <Tooltip2 content='Deselect all operations for active graph'>
                                 <Button
                                     icon={IconNames.CUBE_REMOVE}
                                     onClick={() => dispatch(clearAllOperations(graphName))}
@@ -126,7 +126,7 @@ export const CongestionControls: FC = () => {
                                 <Button icon={<QueueIconPlus />} onClick={() => dispatch(selectAllQueues(graphName))} />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Clear all queues for active graph'>
+                            <Tooltip2 content='Deselect all queues for active graph'>
                                 <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues(graphName))} />
                             </Tooltip2>
                         </div>

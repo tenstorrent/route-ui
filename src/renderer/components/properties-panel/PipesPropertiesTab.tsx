@@ -47,7 +47,11 @@ const PipesPropertiesTab = () => {
                         >
                             <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
                         </Tooltip2>,
-                        <Tooltip2 content='Clear all pipes' position={PopoverPosition.RIGHT} key='deselect-all-pipes'>
+                        <Tooltip2
+                            content='Deselect all pipes'
+                            position={PopoverPosition.RIGHT}
+                            key='deselect-all-pipes'
+                        >
                             <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
                         </Tooltip2>,
                     ]}

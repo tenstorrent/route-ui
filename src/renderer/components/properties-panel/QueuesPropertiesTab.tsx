@@ -58,7 +58,7 @@ function QueuesPropertiesTab() {
                             <Button icon={<QueueIconPlus />} onClick={() => selectFilteredQueue()} />
                         </Tooltip2>,
                         <Tooltip2
-                            content='Clear all queues queues for active graph'
+                            content='Deselect all queues for active graph'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >

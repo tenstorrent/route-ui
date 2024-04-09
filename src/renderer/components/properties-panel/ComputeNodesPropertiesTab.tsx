@@ -354,7 +354,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                             icon={IconNames.FILTER_REMOVE}
                             onClick={() => updatePipesState(node.getPipeIdsForNode(), false)}
                         >
-                            Clear all pipes
+                            Deselect all pipes
                         </Button>
                     </>
                 )}
