@@ -1,7 +1,6 @@
-/**
- * SPDX-License-Identifier: Apache-2.0
- * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
- */
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';

@@ -1,7 +1,6 @@
-/**
- * SPDX-License-Identifier: Apache-2.0
- * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
- */
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 // import yaml from 'js-yaml';
 import { Button } from '@blueprintjs/core';

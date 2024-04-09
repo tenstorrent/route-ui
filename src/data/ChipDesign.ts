@@ -1,7 +1,6 @@
-/**
- * SPDX-License-Identifier: Apache-2.0
- * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
- */
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { ChipDesignJSON } from './JSONDataTypes';
 import { Architecture, ComputeNodeType, ComputeNodeTypeArch, Loc } from './Types';

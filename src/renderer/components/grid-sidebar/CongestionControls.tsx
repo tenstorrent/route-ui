@@ -1,7 +1,6 @@
-/**
- * SPDX-License-Identifier: Apache-2.0
- * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
- */
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import React, { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,9 +26,7 @@ import {
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateOpCongestionColor } from '../../../utils/DrawingAPI';
 
-
 import Collapsible from '../Collapsible';
-
 
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
