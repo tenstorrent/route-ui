@@ -79,8 +79,6 @@ const usePerfAnalyzerFileLoader = () => {
     };
 
     const loadFolder = async (folderPath: string): Promise<void> => {
-        // TODO: need the below
-        // dispatch(setSelectedFolder(''));
         resetGraphOnChipState();
         dispatch(resetPipeSelection());
         dispatch(resetNetworksState());
