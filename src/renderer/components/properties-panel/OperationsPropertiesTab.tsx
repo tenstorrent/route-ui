@@ -57,7 +57,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                             <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                         </Tooltip2>,
                         <Tooltip2
-                            content='Deselect all operations'
+                            content='Deselect all operations for active graph'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >

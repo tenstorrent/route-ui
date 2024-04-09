@@ -96,24 +96,24 @@ export const CongestionControls: FC = () => {
                         <LinkCongestionControl />
                         <hr />
                         <div>
-                            <Tooltip2 content='Select all Pipes'>
+                            <Tooltip2 content='Select all pipes'>
                                 <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())} />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Clear all Pipes'>
+                            <Tooltip2 content='Deselect all pipes'>
                                 <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
                             </Tooltip2>
                         </div>
                         <hr />
                         <div>
-                            <Tooltip2 content='Select all Operations'>
+                            <Tooltip2 content='Select all operations for active graph'>
                                 <Button
                                     icon={IconNames.CUBE_ADD}
                                     onClick={() => dispatch(selectAllOperations(graphName))}
                                 />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Clear all Operations'>
+                            <Tooltip2 content='Deselect all operations for active graph'>
                                 <Button
                                     icon={IconNames.CUBE_REMOVE}
                                     onClick={() => dispatch(clearAllOperations(graphName))}
@@ -122,11 +122,11 @@ export const CongestionControls: FC = () => {
                         </div>
                         <hr />
                         <div>
-                            <Tooltip2 content='Select all Queues'>
+                            <Tooltip2 content='Select all queues for active graph'>
                                 <Button icon={<QueueIconPlus />} onClick={() => dispatch(selectAllQueues(graphName))} />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Clear all Queues'>
+                            <Tooltip2 content='Deselect all queues for active graph'>
                                 <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues(graphName))} />
                             </Tooltip2>
                         </div>

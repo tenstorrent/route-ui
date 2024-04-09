@@ -68,7 +68,7 @@ export interface NodeSelectionState {
     queues: Record<string, Record<string, { data: ComputeNodeState[]; selected: boolean }>>;
     nodeList: Record<string, Record<string, ComputeNodeState>>;
     nodeListOrder: Record<string, string[]>;
-    dram: { data: ComputeNodeState[]; selected: boolean }[];
+    dram: Record<string, { data: ComputeNodeState[]; selected: boolean }[]>;
     focusNode: string | null;
 }
 
