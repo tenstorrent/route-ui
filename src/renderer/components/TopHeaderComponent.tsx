@@ -42,7 +42,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 const TopHeaderComponent: React.FC = () => {
     const { getActiveGraphName, resetGraphOnChipState, getActiveGraphRelationship, getActiveGraphOnChip } =
         useContext(GraphOnChipContext);
-    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
     const localFolderPath = useSelector(getFolderPathSelector);
@@ -117,7 +117,10 @@ const TopHeaderComponent: React.FC = () => {
                         text={folderLocationType === 'local' ? getTestName(localFolderPath) : ''}
                     />
                 </Tooltip2>
-                <GraphSelector autoLoadFistGraph />
+                <GraphSelector
+                    onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
+                    loadFirstGraphHandler={(graph) => loadPerfAnalyzerGraph(graph)}
+                />
             </div>
 
             <div className='text-content'>

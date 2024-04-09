@@ -38,7 +38,7 @@ const RemoteSyncConfigurator: FC = () => {
     const [isFetchingFolderStatus, setIsFetchingFolderStatus] = useState(false);
     const [isRemoteOffline, setIsRemoteOffline] = useState(false);
 
-    const { loadPerfAnalyzerFolder } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
 
     const updateSelectedFolder = async (folder?: RemoteFolder) => {
         dispatch(setSelectedRemoteFolder(folder));
@@ -251,6 +251,7 @@ const RemoteSyncConfigurator: FC = () => {
                         />
                     </Tooltip2>
                     <GraphSelector
+                        onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
                         disabled={
                             selectedFolderLocationType === 'local' || isSyncingRemoteFolder || isLoadingFolderList
                         }

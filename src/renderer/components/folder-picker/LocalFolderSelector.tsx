@@ -20,7 +20,8 @@ const getTestName = (path: string) => {
 };
 
 const LocalFolderOptions: FC = () => {
-    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error, loadPerfAnalyzerGraph } =
+        usePerfAnalyzerFileLoader();
     const localFolderPath = useSelector(getFolderPathSelector);
     const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
     return (
@@ -38,7 +39,10 @@ const LocalFolderOptions: FC = () => {
                     }}
                     text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : undefined}
                 />
-                <GraphSelector disabled={selectedFolderLocationType === 'remote'} />
+                <GraphSelector
+                    onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
+                    disabled={selectedFolderLocationType === 'remote'}
+                />
                 {error && (
                     <div className='loading-error'>
                         <p>{error.toString()}</p>
