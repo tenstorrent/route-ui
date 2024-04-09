@@ -20,6 +20,8 @@ export const getSelectedQueueList = (graphName: string) => (state: RootState) =>
 export const getSelectedNodeList = (graphName: string) => (state: RootState) => state.nodeSelection.nodeList[graphName];
 
 export const getOrderedNodeList = (graphName: string) => (state: RootState) =>
-    state.nodeSelection.nodeListOrder[graphName].map((id) => state.nodeSelection.nodeList[graphName][id]).toReversed();
+    (state.nodeSelection.nodeListOrder[graphName] ?? [])
+        .map((id) => state.nodeSelection.nodeList[graphName][id])
+        .toReversed();
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;
