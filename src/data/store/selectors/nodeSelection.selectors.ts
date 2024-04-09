@@ -9,8 +9,8 @@ export const getDramGroup = (id: number | undefined) => (state: RootState) =>
     id !== undefined && id > -1 ? state.nodeSelection.dram[id] : null;
 
 export const selectNodeSelectionById = (id: string) => (state: RootState) => state.nodeSelection.nodeList[id];
-export const getOperation = (graphName: string, id: string) => (state: RootState) =>
-    state.nodeSelection.operations[graphName][id];
+export const getOperation = (graphName: string, opName: string) => (state: RootState) =>
+    state.nodeSelection.operations[graphName][opName];
 export const getSelectedOperationList = (graphName: string) => (state: RootState) =>
     state.nodeSelection.operations[graphName];
 
