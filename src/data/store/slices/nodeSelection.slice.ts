@@ -74,6 +74,7 @@ const nodeSelectionSlice = createSlice({
             Object.entries(action.payload).forEach(([graphName, computaNodeStateList]) => {
                 state.dram[graphName] = [];
                 state.nodeList[graphName] = {};
+                state.nodeListOrder[graphName] = [];
                 state.queues[graphName] = {};
                 state.operations[graphName] = {};
 
