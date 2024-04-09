@@ -12,7 +12,7 @@ export const selectNodeSelectionById = (id: string) => (state: RootState) => sta
 export const getOperation = (id: string) => (state: RootState) => state.nodeSelection.operations[id];
 export const getSelectedOperationList = (state: RootState) => state.nodeSelection.operations;
 
-export const getSelectedQueueList = (state: RootState) => state.nodeSelection.queues;
+export const getSelectedQueueList = (graphName: string) => (state: RootState) => state.nodeSelection.queues[graphName];
 
 export const getSelectedNodeList = (state: RootState) => state.nodeSelection.nodeList;
 

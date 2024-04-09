@@ -39,7 +39,9 @@ import { columnRenderer } from './SharedTable';
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
+    const graphName = getActiveGraphName();
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');
@@ -82,7 +84,7 @@ function OperationsTable() {
     }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector(getSelectedNodeList);
     const operationsSelectionState = useSelector(getSelectedOperationList);
-    const queueSelectionState = useSelector(getSelectedQueueList);
+    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
     const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);

@@ -3,8 +3,10 @@
  * SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
  */
 
+import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphVertexType } from '../../data/GraphNames';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import {
     getSelectedNodeList,
     getSelectedOperationList,
@@ -17,6 +19,7 @@ import type { QueuesTableFields } from '../components/bottom-dock/useQueuesTable
 
 const useSelectedTableRows = () => {
     const dispatch = useDispatch();
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
 
     const getDisabledOperation = (name: string) => {
         return operationsSelectionState[name]?.selected === undefined;
@@ -38,7 +41,7 @@ const useSelectedTableRows = () => {
     };
 
     const operationsSelectionState = useSelector(getSelectedOperationList);
-    const queuesSelectionState = useSelector(getSelectedQueueList);
+    const queuesSelectionState = useSelector(getSelectedQueueList(graphName));
     const nodesSelectionState = useSelector(getSelectedNodeList);
 
     return {
@@ -57,14 +60,14 @@ const useSelectedTableRows = () => {
                 if (type === GraphVertexType.OPERATION) {
                     dispatch(selectOperation({ opName: name, selected }));
                 } else {
-                    dispatch(selectQueue({ queueName: name, selected }));
+                    dispatch(selectQueue({ graphName, queueName: name, selected }));
                 }
             },
             (row) => !getDisabledSlowestOperand(row),
         ),
         handleSelectAllQueues: handleSelectAll<QueuesTableFields>(
             (row, selected) => {
-                dispatch(selectQueue({ queueName: row.name, selected }));
+                dispatch(selectQueue({ graphName, queueName: row.name, selected }));
             },
             (row) => !getQueuesDisabledState(row.name),
         ),

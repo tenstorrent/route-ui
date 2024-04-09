@@ -67,7 +67,6 @@ const nodeSelectionSlice = createSlice({
             state.operations = {};
             state.nodeList = {};
             state.dram = [];
-            state.queues = {};
 
             action.payload.forEach((item) => {
                 state.nodeList[item.id] = item;
@@ -83,26 +82,34 @@ const nodeSelectionSlice = createSlice({
                     }
                     state.dram[item.dramChannelId].data.push(item);
                 }
-                if (item.queueNameList.length > 0) {
-                    item.queueNameList.forEach((queueName) => {
-                        if (!state.queues[queueName]) {
-                            state.queues[queueName] = { data: [], selected: false };
-                        }
-                        state.queues[queueName].data.push(item);
-                    });
-                }
             });
 
             Object.values(state.operations).forEach((operation) => {
                 setSiblings(operation.data);
             });
 
-            Object.values(state.queues).forEach((queue) => {
-                setSiblings(queue.data);
-            });
-
             state.dram.forEach((dramElement) => {
                 setBorders(dramElement.data);
+            });
+        },
+        initialLoadQueues(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
+            Object.entries(action.payload).forEach(([graphName, computaNodeStateList]) => {
+                state.queues[graphName] = {};
+
+                computaNodeStateList.forEach((item) => {
+                    if (item.queueNameList.length > 0) {
+                        item.queueNameList.forEach((queueName) => {
+                            if (!state.queues[graphName][queueName]) {
+                                state.queues[graphName][queueName] = { data: [], selected: false };
+                            }
+                            state.queues[graphName][queueName].data.push(item);
+                        });
+                    }
+                });
+
+                Object.values(state.queues[graphName]).forEach((queue) => {
+                    setSiblings(queue.data);
+                });
             });
         },
 
@@ -161,20 +168,20 @@ const nodeSelectionSlice = createSlice({
                 operation.selected = false;
             });
         },
-        selectQueue(state, action: PayloadAction<{ queueName: string; selected: boolean }>) {
-            const { queueName, selected } = action.payload;
-            const queue = state.queues[queueName];
+        selectQueue(state, action: PayloadAction<{ graphName: string; queueName: string; selected: boolean }>) {
+            const { graphName, queueName, selected } = action.payload;
+            const queue = state.queues[graphName][queueName];
             if (queue) {
                 queue.selected = selected;
             }
         },
-        selectAllQueues(state) {
-            Object.values(state.queues).forEach((queue) => {
+        selectAllQueues(state, action: PayloadAction<string>) {
+            Object.values(state.queues[action.payload]).forEach((queue) => {
                 queue.selected = true;
             });
         },
-        clearAllQueues(state) {
-            Object.values(state.queues).forEach((queue) => {
+        clearAllQueues(state, action: PayloadAction<string>) {
+            Object.values(state.queues[action.payload]).forEach((queue) => {
                 queue.selected = false;
             });
         },
@@ -187,6 +194,7 @@ const nodeSelectionSlice = createSlice({
 export const {
     //
     loadNodesData,
+    initialLoadQueues,
     updateNodeSelection,
     selectOperation,
     selectAllOperations,

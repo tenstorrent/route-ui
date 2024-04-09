@@ -22,14 +22,14 @@ import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import type { EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
+import type { ComputeNodeState, EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
     initialLoadNormalizedOPs,
     initialLoadTotalOPs,
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
-import { clearAllNodes, loadNodesData } from '../../data/store/slices/nodeSelection.slice';
+import { clearAllNodes, initialLoadQueues, loadNodesData } from '../../data/store/slices/nodeSelection.slice';
 import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
@@ -105,6 +105,7 @@ const usePerfAnalyzerFileLoader = () => {
             const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
+            const queuesData: Record<string, ComputeNodeState[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -122,6 +123,7 @@ const usePerfAnalyzerFileLoader = () => {
                 };
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
+                queuesData[graph.name] = [...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState())];
 
                 times.push({
                     graph: `${graph.name}`,
@@ -139,6 +141,7 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
             dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
+            dispatch(initialLoadQueues(queuesData));
 
             // console.table(times, ['graph', 'time']);
             // console.log('total', performance.now() - entireRunStartTime, 'ms');
