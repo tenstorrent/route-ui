@@ -170,7 +170,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         small
                         icon={IconNames.CROSS}
                         onClick={() => {
-                            dispatch(updateNodeSelection({ id: node.uid, selected: false }));
+                            dispatch(
+                                updateNodeSelection({ graphName: activeGraphName, id: node.uid, selected: false }),
+                            );
                         }}
                     />
                 </Tooltip2>
@@ -371,8 +373,10 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const orderedNodeSelection = useSelector(getOrderedNodeList);
+    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const graphName = getActiveGraphName();
+    const graphOnChip = getActiveGraphOnChip();
+    const orderedNodeSelection = useSelector(getOrderedNodeList(graphName));
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!graphOnChip) {
             return [];

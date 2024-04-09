@@ -71,6 +71,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                 onClick={() => {
                                                     dispatch(
                                                         updateNodeSelection({
+                                                            graphName,
                                                             id: currentNode.uid,
                                                             selected: true,
                                                         }),

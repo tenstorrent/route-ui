@@ -31,6 +31,7 @@ import {
 } from '../../data/store/slices/linkSaturation.slice';
 import {
     clearAllNodes,
+    initialLoadAllNodes,
     initialLoadOPs,
     initialLoadQueues,
     loadNodesData,
@@ -150,6 +151,7 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
             dispatch(initialLoadQueues(nodesDataPerGraph));
             dispatch(initialLoadOPs(nodesDataPerGraph));
+            dispatch(initialLoadAllNodes(nodesDataPerGraph));
 
             // console.table(times, ['graph', 'time']);
             // console.log('total', performance.now() - entireRunStartTime, 'ms');
@@ -170,7 +172,7 @@ const usePerfAnalyzerFileLoader = () => {
         if (selectedFolder) {
             try {
                 dispatch(closeDetailedView());
-                dispatch(clearAllNodes());
+                dispatch(clearAllNodes(graphName));
                 setActiveGraph(graphName);
                 navigate('/render');
             } catch (e) {
