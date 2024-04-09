@@ -29,13 +29,7 @@ import {
     initialLoadTotalOPs,
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
-import {
-    clearAllNodes,
-    initialLoadAllNodes,
-    initialLoadOPs,
-    initialLoadQueues,
-    loadNodesData,
-} from '../../data/store/slices/nodeSelection.slice';
+import { initialLoadAllNodesData } from '../../data/store/slices/nodeSelection.slice';
 import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
@@ -60,7 +54,6 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(closeDetailedView());
             // TODO: move both to bulk loading
             dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
-            dispatch(loadNodesData([...mapIterable(activeGraphOnChip.nodes, (node) => node.generateInitialState())]));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeGraphOnChip]);
@@ -149,9 +142,7 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
             dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
-            dispatch(initialLoadQueues(nodesDataPerGraph));
-            dispatch(initialLoadOPs(nodesDataPerGraph));
-            dispatch(initialLoadAllNodes(nodesDataPerGraph));
+            dispatch(initialLoadAllNodesData(nodesDataPerGraph));
 
             // console.table(times, ['graph', 'time']);
             // console.log('total', performance.now() - entireRunStartTime, 'ms');

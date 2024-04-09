@@ -5,8 +5,8 @@
 
 import { RootState } from '../createStore';
 
-export const getDramGroup = (id: number | undefined) => (state: RootState) =>
-    id !== undefined && id > -1 ? state.nodeSelection.dram[id] : null;
+export const getDramGroup = (graphName: string, id: number | undefined) => (state: RootState) =>
+    id !== undefined && id > -1 ? state.nodeSelection.dram[graphName][id] : null;
 
 export const selectNodeSelectionById = (graphName: string, id: string) => (state: RootState) =>
     state.nodeSelection.nodeList[graphName]?.[id];
