@@ -14,7 +14,6 @@ interface PopoverMenuProps {
     selectedItem: string | null;
     onSelectItem: (graphName: string) => void;
     disabled: boolean;
-    loading?: boolean;
 }
 
 const PopoverMenu = ({
@@ -23,7 +22,6 @@ const PopoverMenu = ({
     selectedItem,
     onSelectItem,
     disabled,
-    loading,
 }: PopoverMenuProps): React.ReactElement => {
     return (
         <Popover2
@@ -45,15 +43,11 @@ const PopoverMenu = ({
             disabled={disabled}
             placement='right'
         >
-            <Button icon={IconNames.GRAPH} disabled={disabled || loading} loading={loading}>
+            <Button icon={IconNames.GRAPH} disabled={disabled}>
                 {label}
             </Button>
         </Popover2>
     );
-};
-
-PopoverMenu.defaultProps = {
-    loading: false,
 };
 
 export default PopoverMenu;
