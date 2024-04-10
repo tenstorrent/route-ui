@@ -117,10 +117,7 @@ const TopHeaderComponent: React.FC = () => {
                         text={folderLocationType === 'local' ? getTestName(localFolderPath) : ''}
                     />
                 </Tooltip2>
-                <GraphSelector
-                    onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
-                    loadFirstGraphHandler={(graph) => loadPerfAnalyzerGraph(graph)}
-                />
+                <GraphSelector onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)} />
             </div>
 
             <div className='text-content'>

@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { FC, useContext, useEffect, useState } from 'react';
+import { FC, useContext, useState } from 'react';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import PopoverMenu from '../PopoverMenu';
 
@@ -10,24 +10,13 @@ interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
     onSelectGraph: (graph: string) => Promise<void> | void;
-    loadFirstGraphHandler?: (graph: string) => Promise<void> | void;
 }
 
-const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, loadFirstGraphHandler }) => {
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph }) => {
     const { getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
     const selectedGraph = getActiveGraphName();
     const availableGraphs = Object.keys(graphOnChipList);
     const [isLoadingGraph, setIsLoadingGraph] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            if (loadFirstGraphHandler && !isLoadingGraph && !selectedGraph && availableGraphs?.length > 0) {
-                setIsLoadingGraph(true);
-                await loadFirstGraphHandler(availableGraphs[0]);
-                setIsLoadingGraph(false);
-            }
-        })();
-    }, [isLoadingGraph, selectedGraph, availableGraphs, loadFirstGraphHandler]);
 
     return (
         <PopoverMenu
@@ -46,7 +35,6 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
 GraphSelector.defaultProps = {
     disabled: false,
     label: undefined,
-    loadFirstGraphHandler: undefined,
 };
 
 export default GraphSelector;
