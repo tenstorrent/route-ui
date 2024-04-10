@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { FC, useContext, useState } from 'react';
+import { FC, useContext } from 'react';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import PopoverMenu from '../PopoverMenu';
 
@@ -16,7 +16,6 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph 
     const { getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
     const selectedGraph = getActiveGraphName();
     const availableGraphs = Object.keys(graphOnChipList);
-    const [isLoadingGraph, setIsLoadingGraph] = useState(false);
 
     return (
         <PopoverMenu
@@ -24,12 +23,9 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph 
             options={availableGraphs}
             selectedItem={selectedGraph}
             onSelectItem={(graph) => {
-                setIsLoadingGraph(true);
                 onSelectGraph(graph);
-                setIsLoadingGraph(false);
             }}
-            disabled={disabled || isLoadingGraph || availableGraphs?.length === 0}
-            loading={isLoadingGraph}
+            disabled={disabled || availableGraphs?.length === 0}
         />
     );
 };
