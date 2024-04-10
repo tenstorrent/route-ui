@@ -155,7 +155,7 @@ const usePerfAnalyzerFileLoader = () => {
         dispatch(setIsLoadingFolder(false));
     };
 
-    const loadPerfAnalyzerGraph = async (graphName: string): Promise<void> => {
+    const loadPerfAnalyzerGraph = (graphName: string) => {
         if (selectedFolder) {
             try {
                 dispatch(closeDetailedView());
