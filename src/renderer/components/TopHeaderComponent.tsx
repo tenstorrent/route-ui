@@ -11,7 +11,7 @@ import {
     getSelectedFolderLocationType,
     getSelectedRemoteFolder,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType } from '../../data/StateTypes';
@@ -66,13 +66,9 @@ const TopHeaderComponent: React.FC = () => {
     const architecture = getActiveGraphOnChip()?.architecture;
     const temporalEpoch = getActiveGraphRelationship()?.temporalEpoch;
 
-    useEffect(() => {
-        if (!selectedGraph && availableGraphs.length > 0) {
-            loadPerfAnalyzerGraph(availableGraphs[0]);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedGraph, availableGraphs]);
+    if (!selectedGraph && availableGraphs.length > 0) {
+        loadPerfAnalyzerGraph(availableGraphs[0]);
+    }
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
