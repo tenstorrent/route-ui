@@ -4,34 +4,26 @@
 
 import { FC, useContext } from 'react';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 import PopoverMenu from '../PopoverMenu';
 
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph?: (graph: string) => void;
-    autoLoadFistGraph?: boolean;
+    onSelectGraph: (graph: string) => void;
 }
 
-const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, autoLoadFistGraph }) => {
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph }) => {
     const { getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
-    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const selectedGraph = getActiveGraphName();
     const availableGraphs = Object.keys(graphOnChipList);
 
-    if (autoLoadFistGraph && !selectedGraph && availableGraphs?.length > 0) {
-        loadPerfAnalyzerGraph(availableGraphs[0]);
-    }
-
     return (
-        <PopoverMenu // Graph picker
+        <PopoverMenu
             label={selectedGraph || (label ?? 'Select graph')}
             options={availableGraphs}
             selectedItem={selectedGraph}
-            onSelectItem={async (graph) => {
-                await loadPerfAnalyzerGraph(graph);
-                onSelectGraph?.(graph);
+            onSelectItem={(graph) => {
+                onSelectGraph(graph);
             }}
             disabled={disabled || availableGraphs?.length === 0}
         />
@@ -41,8 +33,6 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
 GraphSelector.defaultProps = {
     disabled: false,
     label: undefined,
-    onSelectGraph: undefined,
-    autoLoadFistGraph: false,
 };
 
 export default GraphSelector;

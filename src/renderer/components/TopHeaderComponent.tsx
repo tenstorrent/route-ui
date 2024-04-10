@@ -40,9 +40,14 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { getActiveGraphName, resetGraphOnChipState, getActiveGraphRelationship, getActiveGraphOnChip } =
-        useContext(GraphOnChipContext);
-    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog } = usePerfAnalyzerFileLoader();
+    const {
+        getActiveGraphName,
+        resetGraphOnChipState,
+        getActiveGraphRelationship,
+        getActiveGraphOnChip,
+        graphOnChipList,
+    } = useContext(GraphOnChipContext);
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
     const localFolderPath = useSelector(getFolderPathSelector);
@@ -56,9 +61,14 @@ const TopHeaderComponent: React.FC = () => {
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
     const selectedGraph = getActiveGraphName();
+    const availableGraphs = Object.keys(graphOnChipList);
     const chipId = getActiveGraphOnChip()?.chipId;
     const architecture = getActiveGraphOnChip()?.architecture;
     const temporalEpoch = getActiveGraphRelationship()?.temporalEpoch;
+
+    if (!selectedGraph && availableGraphs.length > 0) {
+        loadPerfAnalyzerGraph(availableGraphs[0]);
+    }
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
@@ -117,7 +127,7 @@ const TopHeaderComponent: React.FC = () => {
                         text={folderLocationType === 'local' ? getTestName(localFolderPath) : ''}
                     />
                 </Tooltip2>
-                <GraphSelector autoLoadFistGraph />
+                <GraphSelector onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)} />
             </div>
 
             <div className='text-content'>
