@@ -24,7 +24,15 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph 
             options={availableGraphs}
             selectedItem={selectedGraph}
             onSelectItem={async (graph) => {
-                await onSelectGraph(graph);
+                try {
+                    setIsLoadingGraph(true);
+                    await onSelectGraph(graph);
+                } catch (err) {
+                    // eslint-disable-next-line no-console
+                    console.error(err);
+                } finally {
+                    setIsLoadingGraph(false);
+                }
             }}
             disabled={disabled || isLoadingGraph || availableGraphs?.length === 0}
             loading={isLoadingGraph}
