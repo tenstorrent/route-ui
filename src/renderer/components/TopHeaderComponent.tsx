@@ -11,7 +11,7 @@ import {
     getSelectedFolderLocationType,
     getSelectedRemoteFolder,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType } from '../../data/StateTypes';
@@ -40,8 +40,13 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 };
 
 const TopHeaderComponent: React.FC = () => {
-    const { getActiveGraphName, resetGraphOnChipState, getActiveGraphRelationship, getActiveGraphOnChip } =
-        useContext(GraphOnChipContext);
+    const {
+        getActiveGraphName,
+        resetGraphOnChipState,
+        getActiveGraphRelationship,
+        getActiveGraphOnChip,
+        graphOnChipList,
+    } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
@@ -56,9 +61,18 @@ const TopHeaderComponent: React.FC = () => {
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
     const selectedGraph = getActiveGraphName();
+    const availableGraphs = Object.keys(graphOnChipList);
     const chipId = getActiveGraphOnChip()?.chipId;
     const architecture = getActiveGraphOnChip()?.architecture;
     const temporalEpoch = getActiveGraphRelationship()?.temporalEpoch;
+
+    useEffect(() => {
+        if (!selectedGraph && availableGraphs.length > 0) {
+            loadPerfAnalyzerGraph(availableGraphs[0]);
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedGraph, availableGraphs]);
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
