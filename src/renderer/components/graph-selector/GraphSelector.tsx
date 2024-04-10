@@ -9,7 +9,7 @@ import PopoverMenu from '../PopoverMenu';
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph: (graph: string) => Promise<void> | void;
+    onSelectGraph: (graph: string) => void;
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph }) => {
@@ -23,16 +23,10 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph 
             label={selectedGraph || (label ?? 'Select graph')}
             options={availableGraphs}
             selectedItem={selectedGraph}
-            onSelectItem={async (graph) => {
-                try {
-                    setIsLoadingGraph(true);
-                    await onSelectGraph(graph);
-                } catch (err) {
-                    // eslint-disable-next-line no-console
-                    console.error(err);
-                } finally {
-                    setIsLoadingGraph(false);
-                }
+            onSelectItem={(graph) => {
+                setIsLoadingGraph(true);
+                onSelectGraph(graph);
+                setIsLoadingGraph(false);
             }}
             disabled={disabled || isLoadingGraph || availableGraphs?.length === 0}
             loading={isLoadingGraph}
