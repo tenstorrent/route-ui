@@ -19,7 +19,7 @@ import {
     PerfAnalyzerResultsJson,
     PerfAnalyzerResultsPerOpJSON,
 } from 'data/sources/PerfAnalyzerResults';
-import { type QueueBlockDimentions, QueueDescriptorJson } from 'data/sources/QueueDescriptor';
+import { type QueueBlockDimensions, QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 // TODO: Replace FS to use the native promise one
 // Node 20 supports FS using promises instead of callbacks
 // update this to use the new pattern
@@ -319,16 +319,16 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
         const queueDescriptorJson = await loadJsonFile<QueueDescriptorJson>(queuesPath);
 
         Object.values(queueDescriptorJson).forEach((queueDescriptor) => {
-            const blockDimentionsString = queueDescriptor['block-dim'];
-            const blockDimentions: Record<string, string> = {};
+            const blockDimensionsString = queueDescriptor['block-dim'];
+            const blockDimensions: Record<string, string> = {};
 
             ['t', 'ublock_rt', 'ublock_ct', 'mblock_m', 'mblock_n', 'ublock_order'].forEach((propertyName) => {
                 const propertyMatchRegex = new RegExp(`\\.${propertyName}\\s*=\\s*(?<value>.+?),`, 'iu');
 
-                blockDimentions[propertyName] = propertyMatchRegex.exec(blockDimentionsString)?.groups?.value ?? '';
+                blockDimensions[propertyName] = propertyMatchRegex.exec(blockDimensionsString)?.groups?.value ?? '';
             });
 
-            queueDescriptor.blockDimentions = blockDimentions as unknown as QueueBlockDimentions;
+            queueDescriptor.blockDimensions = blockDimensions as unknown as QueueBlockDimensions;
         });
 
         graphOnChip = GraphOnChip.AUGMENT_WITH_QUEUE_DETAILS(graphOnChip, queueDescriptorJson);

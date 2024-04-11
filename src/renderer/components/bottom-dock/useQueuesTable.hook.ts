@@ -63,15 +63,15 @@ queuesTableColumns.set('data-format', {
     align: 'left',
     formatter: (value) => value.toString(),
 });
-queuesTableColumns.set('blockDimentions', {
-    label: 'Block Dimentions',
+// TODO: split into one field for each column
+queuesTableColumns.set('blockDimensions', {
+    label: 'Block Dimensions',
     sortable: true,
     align: 'left',
-    // TODO: transform to JSX
     formatter: (value) => JSON.stringify(value),
 });
 queuesTableColumns.set('tile-dim', {
-    label: 'Tile Dimentions',
+    label: 'Tile Dimensions',
     sortable: true,
     align: 'left',
     formatter: (value) => value.toString(),
@@ -83,11 +83,12 @@ queuesTableColumns.set('grid-size', {
     formatter: (value) => value.toString(),
 });
 queuesTableColumns.set('processedLocation', {
-    label: 'Processed Location',
+    label: 'Location',
     sortable: true,
     align: 'left',
     formatter: (value) => value.toString(),
 });
+// TODO: format to only show address and channel, drop subchannel when it is -1
 queuesTableColumns.set('allocation-info', {
     label: 'Allocation Info',
     sortable: true,

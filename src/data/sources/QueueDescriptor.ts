@@ -11,7 +11,7 @@ interface AllocationInfoJson {
     subchannel: number;
 }
 
-export interface QueueBlockDimentions {
+export interface QueueBlockDimensions {
     t: string;
     ublock_rt: string;
     ublock_ct: string;
@@ -24,7 +24,7 @@ export interface QueueDetailsJson {
     alias: string;
     'allocation-info': AllocationInfoJson[];
     'block-dim': string;
-    blockDimentions: QueueBlockDimentions;
+    blockDimensions: QueueBlockDimensions;
     'data-format': string;
     'device-id': number;
     entries: number;
