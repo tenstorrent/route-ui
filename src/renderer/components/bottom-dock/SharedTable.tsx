@@ -16,6 +16,7 @@ import './SharedTable.scss';
 export type TableFields = OpTableFields | QueuesTableFields;
 
 export interface DataTableColumnDefinition<T extends TableFields> {
+    lookupProperty?: keyof T;
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
@@ -124,7 +125,7 @@ export const headerRenderer = <T extends TableFields>({
     tableFields,
     changeSorting,
 }: HeaderRenderingProps<T>) => {
-    const columnLabel = definition?.label ?? (column as string);
+    const columnLabel = definition?.label ?? column.toString();
     const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
     const sortClass = `${sortingColumn === column ? 'current-sort' : ''} ${sortDirectionClass}`;
     let targetSortDirection = sortDirection;
@@ -197,14 +198,15 @@ export const cellRenderer = <T extends TableFields>({
     className,
     customContent,
 }: CellRenderingProps<T>) => {
-    const stringContent = definition?.formatter(tableFields[rowIndex][key] ?? '');
+    const propertyName = definition?.lookupProperty ?? key;
+    const stringContent = definition?.formatter(tableFields[rowIndex][propertyName] ?? '');
 
     const alignClass = (definition?.align && `align-${definition?.align}`) || '';
 
     return (
         <Cell
             interactive={isInteractive === true}
-            key={`${key.toString()}-${rowIndex}`}
+            key={`${propertyName.toString()}-${rowIndex}`}
             className={`${alignClass} ${className ?? ''}`}
         >
             {customContent || stringContent}
