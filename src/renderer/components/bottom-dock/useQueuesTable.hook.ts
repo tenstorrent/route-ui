@@ -31,6 +31,20 @@ queuesTableColumns.set('entries', {
     align: 'left',
     formatter: (value) => value.toString(),
 });
+
+queuesTableColumns.set('device-id', {
+    label: 'Device ID',
+    sortable: true,
+    align: 'left',
+    formatter: (value) => value.toString(),
+});
+
+queuesTableColumns.set('source-device-id', {
+    label: 'Source Device ID',
+    sortable: true,
+    align: 'left',
+    formatter: (value) => value.toString(),
+});
 queuesTableColumns.set('input', {
     label: 'Input',
     sortable: true,
@@ -49,14 +63,15 @@ queuesTableColumns.set('data-format', {
     align: 'left',
     formatter: (value) => value.toString(),
 });
-queuesTableColumns.set('block-dim', {
-    label: 'Block Dim',
+queuesTableColumns.set('blockDimentions', {
+    label: 'Block Dimentions',
     sortable: true,
     align: 'left',
-    formatter: (value) => value.toString(),
+    // TODO: transform to JSX
+    formatter: (value) => JSON.stringify(value),
 });
 queuesTableColumns.set('tile-dim', {
-    label: 'Tile Dim',
+    label: 'Tile Dimentions',
     sortable: true,
     align: 'left',
     formatter: (value) => value.toString(),
@@ -72,6 +87,12 @@ queuesTableColumns.set('processedLocation', {
     sortable: true,
     align: 'left',
     formatter: (value) => value.toString(),
+});
+queuesTableColumns.set('allocation-info', {
+    label: 'Allocation Info',
+    sortable: true,
+    align: 'left',
+    formatter: (value) => JSON.stringify(value),
 });
 
 const useQueuesTable = () => {
