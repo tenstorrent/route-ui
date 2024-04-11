@@ -17,15 +17,7 @@ export interface QueuesTableFields extends QueueDetailsJson {
     name: string;
 }
 
-type QueuesTableColumn =
-    | keyof QueuesTableFields
-    | 'queue'
-    | 'blockDimensions.t'
-    | 'blockDimensions.mblock_m'
-    | 'blockDimensions.mblock_n'
-    | 'blockDimensions.ublock_ct'
-    | 'blockDimensions.ublock_rt'
-    | 'blockDimensions.ublock_order';
+type QueuesTableColumn = keyof QueuesTableFields | 'queue' | `blockDimensions.${keyof QueueBlockDimensions}`;
 
 const queuesTableColumns: Map<QueuesTableColumn, DataTableColumnDefinition<QueuesTableFields>> = new Map();
 
