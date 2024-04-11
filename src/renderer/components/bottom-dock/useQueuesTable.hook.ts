@@ -17,7 +17,7 @@ export interface QueuesTableFields extends QueueDetailsJson {
     name: string;
 }
 
-type QueueusTableColumn =
+type QueuesTableColumn =
     | keyof QueuesTableFields
     | 'queue'
     | 'blockDimensions.t'
@@ -27,7 +27,7 @@ type QueueusTableColumn =
     | 'blockDimensions.ublock_rt'
     | 'blockDimensions.ublock_order';
 
-const queuesTableColumns: Map<QueueusTableColumn, DataTableColumnDefinition<QueuesTableFields>> = new Map();
+const queuesTableColumns: Map<QueuesTableColumn, DataTableColumnDefinition<QueuesTableFields>> = new Map();
 
 queuesTableColumns.set('queue', {
     label: 'Queue',
@@ -155,7 +155,7 @@ queuesTableColumns.set('allocation-info', {
 
 const useQueuesTable = () => {
     const { handleSelectAllQueues, getQueuesSelectedState } = useSelectedTableRows();
-    const [sortingColumn, setSortingColumn] = useState<QueueusTableColumn>('entries');
+    const [sortingColumn, setSortingColumn] = useState<QueuesTableColumn>('entries');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
 
     const sortTableFields = useCallback(
@@ -184,7 +184,7 @@ const useQueuesTable = () => {
         },
         [sortingColumn, sortDirection],
     );
-    const changeSorting = (selectedColumn: QueueusTableColumn) => (direction: SortingDirection) => {
+    const changeSorting = (selectedColumn: QueuesTableColumn) => (direction: SortingDirection) => {
         setSortDirection(direction);
         setSortingColumn(selectedColumn);
     };
