@@ -78,42 +78,42 @@ queuesTableColumns.set('data-format', {
 
 queuesTableColumns.set('blockDimensions.t', {
     lookupProperty: 'blockDimensions',
-    label: 'Block Dimensions (t)',
+    label: 't (block dim)',
     sortable: true,
     align: 'left',
     formatter: (value: QueueBlockDimensions) => value.t.toString(),
 });
 queuesTableColumns.set('blockDimensions.mblock_m', {
     lookupProperty: 'blockDimensions',
-    label: 'Block Dimensions (mblock_m)',
+    label: 'mblock_m (block dim)',
     sortable: true,
     align: 'left',
     formatter: (value: QueueBlockDimensions) => value.mblock_m.toString(),
 });
 queuesTableColumns.set('blockDimensions.mblock_n', {
     lookupProperty: 'blockDimensions',
-    label: 'Block Dimensions (mblock_n)',
+    label: 'mblock_n (block dim)',
     sortable: true,
     align: 'left',
     formatter: (value: QueueBlockDimensions) => value.mblock_n.toString(),
 });
 queuesTableColumns.set('blockDimensions.ublock_ct', {
     lookupProperty: 'blockDimensions',
-    label: 'Block Dimensions (ublock_ct)',
+    label: 'ublock_ct (block dim)',
     sortable: true,
     align: 'left',
     formatter: (value: QueueBlockDimensions) => value.ublock_ct.toString(),
 });
 queuesTableColumns.set('blockDimensions.ublock_rt', {
     lookupProperty: 'blockDimensions',
-    label: 'Block Dimensions (ublock_rt)',
+    label: 'ublock_rt (block dim)',
     sortable: true,
     align: 'left',
     formatter: (value: QueueBlockDimensions) => value.ublock_rt.toString(),
 });
 queuesTableColumns.set('blockDimensions.ublock_order', {
     lookupProperty: 'blockDimensions',
-    label: 'Block Dimensions (ublock_order)',
+    label: 'ublock_order (block dim)',
     sortable: true,
     align: 'left',
     formatter: (value: QueueBlockDimensions) => value.ublock_order,
