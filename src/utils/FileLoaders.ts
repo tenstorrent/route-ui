@@ -19,7 +19,7 @@ import {
     PerfAnalyzerResultsJson,
     PerfAnalyzerResultsPerOpJSON,
 } from 'data/sources/PerfAnalyzerResults';
-import { QueueDescriptorJson } from 'data/sources/QueueDescriptor';
+import { type QueueBlockDimentions, QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 // TODO: Replace FS to use the native promise one
 // Node 20 supports FS using promises instead of callbacks
 // update this to use the new pattern
@@ -42,9 +42,9 @@ export const readFile = async (filename: string): Promise<string> =>
         });
     });
 
-export const loadJsonFile = async (filePath: string): Promise<unknown> => {
+export const loadJsonFile = async <T extends unknown>(filePath: string) => {
     const file = await readFile(filePath);
-    return JSON.parse(file);
+    return JSON.parse(file) as T;
 };
 
 export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
@@ -290,9 +290,9 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
 
     if (graphOnChip === null) {
         try {
-            const metadata = (await loadJsonFile(
+            const metadata = await loadJsonFile<MetadataJSON>(
                 path.join(folderPath, 'perf_results', 'metadata', `${name}.json`),
-            )) as MetadataJSON;
+            );
             const arch = metadata.arch_name;
             if (arch.includes(Architecture.GRAYSKULL)) {
                 architecture = Architecture.GRAYSKULL;
@@ -308,20 +308,30 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
 
     try {
         const graphPath = path.join(folderPath, `perf_results`, 'graph_descriptor', name, 'cores_to_ops.json');
-        const graphDescriptorJson = await loadJsonFile(graphPath);
+        const graphDescriptorJson = await loadJsonFile<GraphDescriptorJSON>(graphPath);
 
-        graphOnChip = GraphOnChip.AUGMENT_FROM_GRAPH_DESCRIPTOR(
-            graphOnChip,
-            graphDescriptorJson as GraphDescriptorJSON,
-        );
+        graphOnChip = GraphOnChip.AUGMENT_FROM_GRAPH_DESCRIPTOR(graphOnChip, graphDescriptorJson);
     } catch (err) {
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
     try {
         const queuesPath = path.join(folderPath, `perf_results`, 'queue_descriptor', 'queue_descriptor.json');
-        const queueDescriptorJson = await loadJsonFile(queuesPath);
+        const queueDescriptorJson = await loadJsonFile<QueueDescriptorJson>(queuesPath);
 
-        graphOnChip = GraphOnChip.AUGMENT_WITH_QUEUE_DETAILS(graphOnChip, queueDescriptorJson as QueueDescriptorJson);
+        Object.values(queueDescriptorJson).forEach((queueDescriptor) => {
+            const blockDimentionsString = queueDescriptor['block-dim'];
+            const blockDimentions: Record<string, string> = {};
+
+            ['t', 'ublock_rt', 'ublock_ct', 'mblock_m', 'mblock_n', 'ublock_order'].forEach((propertyName) => {
+                const propertyMatchRegex = new RegExp(`\\.${propertyName}\\s*=\\s*(?<value>.+?),`, 'iu');
+
+                blockDimentions[propertyName] = propertyMatchRegex.exec(blockDimentionsString)?.groups?.value ?? '';
+            });
+
+            queueDescriptor.blockDimentions = blockDimentions as unknown as QueueBlockDimentions;
+        });
+
+        graphOnChip = GraphOnChip.AUGMENT_WITH_QUEUE_DETAILS(graphOnChip, queueDescriptorJson);
     } catch (err) {
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
@@ -333,7 +343,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
             name,
             'graph_perf_report_per_op.json',
         );
-        const analyzerResultsJson = (await loadJsonFile(analyzerResultsPath)) as PerfAnalyzerResultsPerOpJSON;
+        const analyzerResultsJson = await loadJsonFile<PerfAnalyzerResultsPerOpJSON>(analyzerResultsPath);
 
         const opPerformanceByOp: OpPerformanceByOp = new Map();
         const analyzerResultsJsonWithChipIds: PerfAnalyzerResultsJson = Object.fromEntries(
