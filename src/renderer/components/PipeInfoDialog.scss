@@ -16,11 +16,11 @@
 	}
 
 	.producer-icon svg {
-		color: $core-highlight-output;
+		color: $core-highlight-inout;
 	}
 
 	.consumer-icon svg {
-		color: $core-highlight-inout;
+		color: $core-highlight-output;
 	}
 
 	ul {
