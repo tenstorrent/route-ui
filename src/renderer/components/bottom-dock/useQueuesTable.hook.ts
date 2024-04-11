@@ -4,7 +4,11 @@
 
 import { useCallback, useState } from 'react';
 import { Queue } from '../../../data/GraphTypes';
-import { QueueDetailsJson } from '../../../data/sources/QueueDescriptor';
+import {
+    type AllocationInfoJson,
+    type QueueBlockDimensions,
+    QueueDetailsJson,
+} from '../../../data/sources/QueueDescriptor';
 import useSelectedTableRows from '../../hooks/useSelectableTableRows.hook';
 import { DataTableColumnDefinition, SortingDirection, sortAsc, sortDesc } from './SharedTable';
 
@@ -13,7 +17,15 @@ export interface QueuesTableFields extends QueueDetailsJson {
     name: string;
 }
 
-type QueueusTableColumn = keyof QueuesTableFields | 'queue';
+type QueueusTableColumn =
+    | keyof QueuesTableFields
+    | 'queue'
+    | 'blockDimensions.t'
+    | 'blockDimensions.mblock_m'
+    | 'blockDimensions.mblock_n'
+    | 'blockDimensions.ublock_ct'
+    | 'blockDimensions.ublock_rt'
+    | 'blockDimensions.ublock_order';
 
 const queuesTableColumns: Map<QueueusTableColumn, DataTableColumnDefinition<QueuesTableFields>> = new Map();
 
@@ -63,13 +75,50 @@ queuesTableColumns.set('data-format', {
     align: 'left',
     formatter: (value) => value.toString(),
 });
-// TODO: split into one field for each column
-queuesTableColumns.set('blockDimensions', {
-    label: 'Block Dimensions',
+
+queuesTableColumns.set('blockDimensions.t', {
+    lookupProperty: 'blockDimensions',
+    label: 'Block Dimensions (t)',
     sortable: true,
     align: 'left',
-    formatter: (value) => JSON.stringify(value),
+    formatter: (value: QueueBlockDimensions) => value.t.toString(),
 });
+queuesTableColumns.set('blockDimensions.mblock_m', {
+    lookupProperty: 'blockDimensions',
+    label: 'Block Dimensions (mblock_m)',
+    sortable: true,
+    align: 'left',
+    formatter: (value: QueueBlockDimensions) => value.mblock_m.toString(),
+});
+queuesTableColumns.set('blockDimensions.mblock_n', {
+    lookupProperty: 'blockDimensions',
+    label: 'Block Dimensions (mblock_n)',
+    sortable: true,
+    align: 'left',
+    formatter: (value: QueueBlockDimensions) => value.mblock_n.toString(),
+});
+queuesTableColumns.set('blockDimensions.ublock_ct', {
+    lookupProperty: 'blockDimensions',
+    label: 'Block Dimensions (ublock_ct)',
+    sortable: true,
+    align: 'left',
+    formatter: (value: QueueBlockDimensions) => value.ublock_ct.toString(),
+});
+queuesTableColumns.set('blockDimensions.ublock_rt', {
+    lookupProperty: 'blockDimensions',
+    label: 'Block Dimensions (ublock_rt)',
+    sortable: true,
+    align: 'left',
+    formatter: (value: QueueBlockDimensions) => value.ublock_rt.toString(),
+});
+queuesTableColumns.set('blockDimensions.ublock_order', {
+    lookupProperty: 'blockDimensions',
+    label: 'Block Dimensions (ublock_order)',
+    sortable: true,
+    align: 'left',
+    formatter: (value: QueueBlockDimensions) => value.ublock_order,
+});
+
 queuesTableColumns.set('tile-dim', {
     label: 'Tile Dimensions',
     sortable: true,
@@ -88,12 +137,20 @@ queuesTableColumns.set('processedLocation', {
     align: 'left',
     formatter: (value) => value.toString(),
 });
-// TODO: format to only show address and channel, drop subchannel when it is -1
+
 queuesTableColumns.set('allocation-info', {
     label: 'Allocation Info',
     sortable: true,
     align: 'left',
-    formatter: (value) => JSON.stringify(value),
+    formatter: (value: AllocationInfoJson[]) =>
+        value
+            .map((info) => {
+                const subchannel = info.subchannel > -1 ? ` Sub CH: ${info.subchannel}` : '';
+                const channel = `CH: ${info.channel}${subchannel}`;
+
+                return `${info.address} (${channel})`;
+            })
+            .join(', '),
 });
 
 const useQueuesTable = () => {
@@ -104,16 +161,26 @@ const useQueuesTable = () => {
     const sortTableFields = useCallback(
         (queuesList: QueuesTableFields[]) => {
             const tableFields = queuesList;
+            const sortingFunction = sortDirection === SortingDirection.ASC ? sortAsc : sortDesc;
 
             if (sortingColumn === 'queue') {
-                return sortDirection === SortingDirection.ASC
-                    ? tableFields.sort((a, b) => sortAsc(a.name, b.name))
-                    : tableFields.sort((a, b) => sortDesc(a.name, b.name));
+                return tableFields.sort((a, b) => sortingFunction(a.name, b.name));
             }
 
-            return sortDirection === SortingDirection.ASC
-                ? tableFields.sort((a, b) => sortAsc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''))
-                : tableFields.sort((a, b) => sortDesc(a ? a[sortingColumn] : '', b ? b[sortingColumn] : ''));
+            if (sortingColumn.startsWith('blockDimensions.')) {
+                const [column, subcolumn] = sortingColumn.split('.') as ['blockDimensions', keyof QueueBlockDimensions];
+
+                return tableFields.sort((a, b) =>
+                    sortingFunction(a?.[column]?.[subcolumn] ?? '', b?.[column]?.[subcolumn] ?? ''),
+                );
+            }
+
+            return tableFields.sort((a, b) =>
+                sortingFunction(
+                    a?.[sortingColumn as keyof QueuesTableFields] ?? '',
+                    b?.[sortingColumn as keyof QueuesTableFields] ?? '',
+                ),
+            );
         },
         [sortingColumn, sortDirection],
     );

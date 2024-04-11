@@ -5,7 +5,7 @@
 import { QueueLocation } from '../Types';
 import { QueueName } from '../GraphNames';
 
-interface AllocationInfoJson {
+export interface AllocationInfoJson {
     address: number;
     channel: number;
     subchannel: number;
