@@ -320,12 +320,18 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
 
         Object.values(queueDescriptorJson).forEach((queueDescriptor) => {
             const blockDimensionsString = queueDescriptor['block-dim'];
-            const blockDimensions: Record<string, string> = {};
+            const blockDimensions: Record<string, string | number> = {};
 
             ['t', 'ublock_rt', 'ublock_ct', 'mblock_m', 'mblock_n', 'ublock_order'].forEach((propertyName) => {
                 const propertyMatchRegex = new RegExp(`\\.${propertyName}\\s*=\\s*(?<value>.+?),`, 'iu');
+                const propertyString = propertyMatchRegex.exec(blockDimensionsString)?.groups?.value ?? '';
+                const parsedProperty = Number.parseFloat(propertyString);
 
-                blockDimensions[propertyName] = propertyMatchRegex.exec(blockDimensionsString)?.groups?.value ?? '';
+                if (Number.isNaN(parsedProperty)) {
+                    blockDimensions[propertyName] = propertyString;
+                } else {
+                    blockDimensions[propertyName] = parsedProperty;
+                }
             });
 
             queueDescriptor.blockDimensions = blockDimensions as unknown as QueueBlockDimensions;

@@ -12,11 +12,11 @@ interface AllocationInfoJson {
 }
 
 export interface QueueBlockDimensions {
-    t: string;
-    ublock_rt: string;
-    ublock_ct: string;
-    mblock_m: string;
-    mblock_n: string;
+    t: number;
+    ublock_rt: number;
+    ublock_ct: number;
+    mblock_m: number;
+    mblock_n: number;
     ublock_order: string;
 }
 
