@@ -16,7 +16,7 @@ import './SharedTable.scss';
 export type TableFields = OpTableFields | QueuesTableFields;
 
 export interface DataTableColumnDefinition<T extends TableFields> {
-    lookupProperty?: keyof T;
+    lookupProperty?: string;
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
@@ -108,23 +108,23 @@ export const getSelectedState = <T extends TableFields>(
     };
 };
 
-interface HeaderRenderingProps<K extends string, T extends TableFields> {
+interface HeaderRenderingProps<T extends TableFields> {
     definition?: DataTableColumnDefinition<T>;
     sortDirection: SortingDirection;
-    sortingColumn: K;
-    column: K;
+    sortingColumn: string;
+    column: string;
     tableFields: T[];
-    changeSorting: (column: K) => (direction: SortingDirection) => void;
+    changeSorting: <K extends keyof T>(column: K) => (direction: SortingDirection) => void;
 }
 
-export const headerRenderer = <K extends string, T extends TableFields>({
+export const headerRenderer = <T extends TableFields>({
     definition,
     sortDirection,
     sortingColumn,
     column,
     tableFields,
     changeSorting,
-}: HeaderRenderingProps<K, T>) => {
+}: HeaderRenderingProps<T>) => {
     const columnLabel = definition?.label ?? column.toString();
     const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
     const sortClass = `${sortingColumn === column ? 'current-sort' : ''} ${sortDirectionClass}`;
@@ -146,7 +146,7 @@ export const headerRenderer = <K extends string, T extends TableFields>({
                         <div
                             className='sortable-table-header'
                             role='button'
-                            onClick={() => changeSorting(column)(targetSortDirection)}
+                            onClick={() => changeSorting(column as keyof T)(targetSortDirection)}
                             title={columnLabel}
                         >
                             {sortingColumn === column && (
@@ -179,9 +179,9 @@ export const headerRenderer = <K extends string, T extends TableFields>({
     );
 };
 
-interface CellRenderingProps<K extends string, T extends TableFields> {
+interface CellRenderingProps<T extends TableFields> {
     definition?: DataTableColumnDefinition<T>;
-    key: K;
+    key: string;
     rowIndex: number;
     tableFields: T[];
     isInteractive?: boolean;
@@ -189,7 +189,7 @@ interface CellRenderingProps<K extends string, T extends TableFields> {
     customContent?: string | ReactElement;
 }
 
-export const cellRenderer = <K extends string, T extends TableFields>({
+export const cellRenderer = <T extends TableFields>({
     definition,
     key,
     rowIndex,
@@ -197,7 +197,7 @@ export const cellRenderer = <K extends string, T extends TableFields>({
     isInteractive,
     className,
     customContent,
-}: CellRenderingProps<K, T>) => {
+}: CellRenderingProps<T>) => {
     const propertyName = definition?.lookupProperty ?? key;
     const stringContent = definition?.formatter(tableFields[rowIndex][propertyName as keyof T] ?? '');
 
@@ -214,19 +214,19 @@ export const cellRenderer = <K extends string, T extends TableFields>({
     );
 };
 
-export interface ColumnRendererProps<K extends string, T extends TableFields> {
-    key: K;
-    columnDefinition: Map<K, DataTableColumnDefinition<T>>;
-    changeSorting: (column: K) => (direction: SortingDirection) => void;
+export interface ColumnRendererProps<T extends TableFields> {
+    key: string;
+    columnDefinition: Map<string, DataTableColumnDefinition<T>>;
+    changeSorting: <K extends keyof T>(column: K) => (direction: SortingDirection) => void;
     sortDirection: SortingDirection;
-    sortingColumn: K;
+    sortingColumn: string;
     tableFields: T[];
     isInteractive?: boolean;
     cellClassName?: string;
     customCellContentRenderer?: (rowIndex: number) => ReactElement | string;
 }
 
-export const columnRenderer = <K extends string, T extends TableFields>({
+export const columnRenderer = <T extends TableFields>({
     key,
     columnDefinition,
     changeSorting,
@@ -236,11 +236,11 @@ export const columnRenderer = <K extends string, T extends TableFields>({
     isInteractive,
     cellClassName,
     customCellContentRenderer,
-}: ColumnRendererProps<K, T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
+}: ColumnRendererProps<T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
     return (
         <Column
-            key={key as string}
-            id={key as string}
+            key={key}
+            id={key}
             cellRenderer={(rowIndex) =>
                 cellRenderer({
                     definition: columnDefinition.get(key),
