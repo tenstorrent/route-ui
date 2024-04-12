@@ -108,7 +108,7 @@ queuesTableColumns.set('blockDimensions.ublock_order', {
     label: 'ublock_order (block dim)',
     sortable: true,
     align: 'left',
-    formatter: (value: QueueBlockDimensions) => value.ublock_order,
+    formatter: (value: QueueBlockDimensions) => value.ublock_order.toString(),
 });
 
 queuesTableColumns.set('tile-dim', {

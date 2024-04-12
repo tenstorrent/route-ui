@@ -19,7 +19,7 @@ import {
     PerfAnalyzerResultsJson,
     PerfAnalyzerResultsPerOpJSON,
 } from 'data/sources/PerfAnalyzerResults';
-import { type QueueBlockDimensions, QueueDescriptorJson } from 'data/sources/QueueDescriptor';
+import { QUEUE_BLOCK_FIELDS, type QueueBlockDimensions, QueueDescriptorJson } from 'data/sources/QueueDescriptor';
 // TODO: Replace FS to use the native promise one
 // Node 20 supports FS using promises instead of callbacks
 // update this to use the new pattern
@@ -322,7 +322,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
             const blockDimensionsString = queueDescriptor['block-dim'];
             const blockDimensions: Record<string, string | number> = {};
 
-            ['t', 'ublock_rt', 'ublock_ct', 'mblock_m', 'mblock_n', 'ublock_order'].forEach((propertyName) => {
+            QUEUE_BLOCK_FIELDS.forEach((propertyName) => {
                 const propertyMatchRegex = new RegExp(`\\.${propertyName}\\s*=\\s*(?<value>.+?),`, 'iu');
                 const propertyString = propertyMatchRegex.exec(blockDimensionsString)?.groups?.value ?? '';
                 const parsedProperty = Number.parseFloat(propertyString);

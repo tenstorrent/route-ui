@@ -11,14 +11,11 @@ export interface AllocationInfoJson {
     subchannel: number;
 }
 
-export interface QueueBlockDimensions {
-    t: number;
-    ublock_rt: number;
-    ublock_ct: number;
-    mblock_m: number;
-    mblock_n: number;
-    ublock_order: string;
-}
+export const QUEUE_BLOCK_FIELDS = ['t', 'ublock_rt', 'ublock_ct', 'mblock_m', 'mblock_n', 'ublock_order'] as const;
+
+export type QueueBlockDimensions = {
+    [key in (typeof QUEUE_BLOCK_FIELDS)[number]]: number | string;
+};
 
 export interface QueueDetailsJson {
     alias: string;
