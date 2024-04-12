@@ -16,6 +16,7 @@ import './SharedTable.scss';
 export type TableFields = OpTableFields | QueuesTableFields;
 
 export interface DataTableColumnDefinition<T extends TableFields> {
+    lookupProperty?: string;
     label: string;
     sortable: boolean;
     align?: 'left' | 'right';
@@ -110,10 +111,10 @@ export const getSelectedState = <T extends TableFields>(
 interface HeaderRenderingProps<T extends TableFields> {
     definition?: DataTableColumnDefinition<T>;
     sortDirection: SortingDirection;
-    sortingColumn: keyof T;
-    column: keyof T;
+    sortingColumn: string;
+    column: string;
     tableFields: T[];
-    changeSorting: (column: keyof T) => (direction: SortingDirection) => void;
+    changeSorting: <K extends keyof T>(column: K) => (direction: SortingDirection) => void;
 }
 
 export const headerRenderer = <T extends TableFields>({
@@ -124,7 +125,7 @@ export const headerRenderer = <T extends TableFields>({
     tableFields,
     changeSorting,
 }: HeaderRenderingProps<T>) => {
-    const columnLabel = definition?.label ?? (column as string);
+    const columnLabel = definition?.label ?? column.toString();
     const sortDirectionClass = sortDirection === SortingDirection.ASC ? 'sorted-asc' : 'sorted-desc';
     const sortClass = `${sortingColumn === column ? 'current-sort' : ''} ${sortDirectionClass}`;
     let targetSortDirection = sortDirection;
@@ -145,7 +146,7 @@ export const headerRenderer = <T extends TableFields>({
                         <div
                             className='sortable-table-header'
                             role='button'
-                            onClick={() => changeSorting(column)(targetSortDirection)}
+                            onClick={() => changeSorting(column as keyof T)(targetSortDirection)}
                             title={columnLabel}
                         >
                             {sortingColumn === column && (
@@ -180,7 +181,7 @@ export const headerRenderer = <T extends TableFields>({
 
 interface CellRenderingProps<T extends TableFields> {
     definition?: DataTableColumnDefinition<T>;
-    key: keyof T;
+    key: string;
     rowIndex: number;
     tableFields: T[];
     isInteractive?: boolean;
@@ -197,27 +198,28 @@ export const cellRenderer = <T extends TableFields>({
     className,
     customContent,
 }: CellRenderingProps<T>) => {
-    const stringContent = definition?.formatter(tableFields[rowIndex][key] ?? '');
+    const propertyName = definition?.lookupProperty ?? key;
+    const formattedContent = definition?.formatter(tableFields[rowIndex][propertyName as keyof T] ?? '');
 
     const alignClass = (definition?.align && `align-${definition?.align}`) || '';
 
     return (
         <Cell
             interactive={isInteractive === true}
-            key={`${key.toString()}-${rowIndex}`}
+            key={`${propertyName.toString()}-${rowIndex}`}
             className={`${alignClass} ${className ?? ''}`}
         >
-            {customContent || stringContent}
+            {customContent || formattedContent}
         </Cell>
     );
 };
 
 export interface ColumnRendererProps<T extends TableFields> {
-    key: keyof T;
-    columnDefinition: Map<keyof T, DataTableColumnDefinition<T>>;
-    changeSorting: (column: keyof T) => (direction: SortingDirection) => void;
+    key: string;
+    columnDefinition: Map<string, DataTableColumnDefinition<T>>;
+    changeSorting: <K extends keyof T>(column: K) => (direction: SortingDirection) => void;
     sortDirection: SortingDirection;
-    sortingColumn: keyof T;
+    sortingColumn: string;
     tableFields: T[];
     isInteractive?: boolean;
     cellClassName?: string;
@@ -237,8 +239,8 @@ export const columnRenderer = <T extends TableFields>({
 }: ColumnRendererProps<T>): ReactElement<IColumnProps, JSXElementConstructor<any>> => {
     return (
         <Column
-            key={key as string}
-            id={key as string}
+            key={key}
+            id={key}
             cellRenderer={(rowIndex) =>
                 cellRenderer({
                     definition: columnDefinition.get(key),
