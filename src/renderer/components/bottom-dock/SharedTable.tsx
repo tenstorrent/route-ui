@@ -199,7 +199,7 @@ export const cellRenderer = <T extends TableFields>({
     customContent,
 }: CellRenderingProps<T>) => {
     const propertyName = definition?.lookupProperty ?? key;
-    const stringContent = definition?.formatter(tableFields[rowIndex][propertyName as keyof T] ?? '');
+    const formattedContent = definition?.formatter(tableFields[rowIndex][propertyName as keyof T] ?? '');
 
     const alignClass = (definition?.align && `align-${definition?.align}`) || '';
 
@@ -209,7 +209,7 @@ export const cellRenderer = <T extends TableFields>({
             key={`${propertyName.toString()}-${rowIndex}`}
             className={`${alignClass} ${className ?? ''}`}
         >
-            {customContent || stringContent}
+            {customContent || formattedContent}
         </Cell>
     );
 };
