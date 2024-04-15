@@ -93,7 +93,7 @@ const remoteFolderRenderer =
                 disabled={modifiers.disabled}
                 key={`${formatRemoteFolderName(folder, connection)}${lastSynced ?? lastModified}`}
                 onClick={handleClick}
-                text={formatRemoteFolderName(folder, connection)}
+                text={formatRemoteFolderName(folder)}
                 // @ts-expect-error - Hack abusing label, it actually works.
                 label={statusIcon}
                 labelClassName='remote-folder-status-icon'

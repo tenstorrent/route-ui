@@ -104,11 +104,7 @@ const TopHeaderComponent: React.FC = () => {
         <div className='top-header-component'>
             <div className='text-content'>
                 <Tooltip2
-                    content={
-                        folderLocationType === 'local'
-                            ? 'Select remote folder'
-                            : formatRemoteFolderName(remoteConnectionConfig.selectedConnection, selectedRemoteFolder)
-                    }
+                    content={folderLocationType === 'local' ? 'Select remote folder' : undefined}
                     placement='bottom'
                 >
                     <RemoteFolderSelector
