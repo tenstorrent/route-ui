@@ -55,11 +55,10 @@ const TopHeaderComponent: React.FC = () => {
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderLocationType = useSelector(getSelectedFolderLocationType);
 
-    const remoteConnectionConfig = useRemoteConnection().persistentState;
+    const { persistentState: remoteConnectionConfig } = useRemoteConnection();
 
-    const { selectedConnection } = remoteConnectionConfig;
     const availableRemoteFolders = remoteConnectionConfig
-        .getSavedRemoteFolders(selectedConnection)
+        .getSavedRemoteFolders(remoteConnectionConfig.selectedConnection)
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
     const selectedGraph = getActiveGraphName();
@@ -108,13 +107,14 @@ const TopHeaderComponent: React.FC = () => {
                     content={
                         folderLocationType === 'local'
                             ? 'Select remote folder'
-                            : formatRemoteFolderName(selectedConnection, selectedRemoteFolder)
+                            : formatRemoteFolderName(remoteConnectionConfig.selectedConnection, selectedRemoteFolder)
                     }
                     placement='bottom'
                 >
                     <RemoteFolderSelector
                         remoteFolders={availableRemoteFolders}
                         remoteFolder={folderLocationType === 'remote' ? selectedRemoteFolder : undefined}
+                        remoteConnection={remoteConnectionConfig.selectedConnection}
                         falbackLabel=''
                         icon={IconNames.CLOUD_DOWNLOAD}
                         onSelectFolder={async (folder) => {
