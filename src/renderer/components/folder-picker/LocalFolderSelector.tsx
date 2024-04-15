@@ -18,7 +18,7 @@ import { ElectronEvents } from '../../../main/ElectronEvents';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return lastFolder ? `${pathSeparator}${lastFolder}` : undefined;
+    return lastFolder || undefined;
 };
 
 const LocalFolderOptions: FC = () => {
@@ -40,7 +40,10 @@ const LocalFolderOptions: FC = () => {
                         await loadPerfAnalyzerFolder(folderPath);
 
                         if (folderPath) {
-                            sendEventToMain(ElectronEvents.UPDATE_FOLDER_NAME, folderPath);
+                            sendEventToMain(
+                                ElectronEvents.UPDATE_FOLDER_NAME,
+                                `(Local Folder) — ${getTestName(folderPath)}`,
+                            );
                         }
                     }}
                     text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : undefined}

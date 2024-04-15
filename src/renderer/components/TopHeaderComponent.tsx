@@ -30,7 +30,7 @@ import { ElectronEvents } from '../../main/ElectronEvents';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return lastFolder ? `${pathSeparator}${lastFolder}` : 'n/a';
+    return lastFolder || 'n/a';
 };
 
 const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFolder) => {
@@ -90,7 +90,7 @@ const TopHeaderComponent: React.FC = () => {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
 
             if (newFolderLocationType === 'local') {
-                sendEventToMain(ElectronEvents.UPDATE_FOLDER_NAME, folderPath);
+                sendEventToMain(ElectronEvents.UPDATE_FOLDER_NAME, `(Local Folder) — ${getTestName(folderPath)}`);
             } else {
                 sendEventToMain(
                     ElectronEvents.UPDATE_FOLDER_NAME,
