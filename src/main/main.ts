@@ -17,6 +17,9 @@ import path from 'path';
 // import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { listenToEventFromWindow } from './utils/bridge';
+import { ElectronEvents } from './ElectronEvents';
+import packageJson from '../../package.json';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -89,7 +92,18 @@ const createWindow = async () => {
         } else {
             mainWindow.show();
         }
-        mainWindow.setTitle(`${mainWindow.title} ${app.getVersion()}`);
+        mainWindow.setTitle(`${packageJson.build.productName} (v${app.getVersion()})`);
+
+        listenToEventFromWindow(ElectronEvents.UPDATE_FOLDER_NAME, (newTitle) => {
+            console.log(`updated folder: ${newTitle}`);
+            const baseAppTitle = `${packageJson.build.productName} (v${app.getVersion()})`;
+
+            if (newTitle) {
+                mainWindow?.setTitle(`${baseAppTitle} — ${newTitle}`);
+            } else {
+                mainWindow?.setTitle(baseAppTitle);
+            }
+        });
     });
 
     mainWindow.on('closed', () => {
