@@ -25,6 +25,8 @@ import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
 import GraphSelector from './graph-selector/GraphSelector';
 
 import './TopHeaderComponent.scss';
+import { sendEventToMain } from '../utils/bridge';
+import { ElectronEvents } from '../../main/ElectronEvents';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
@@ -36,7 +38,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
         return 'n/a';
     }
 
-    return `${connection.name} - ${folder.testName}`;
+    return `${connection.name} — ${folder.testName}`;
 };
 
 const TopHeaderComponent: React.FC = () => {
@@ -87,6 +89,15 @@ const TopHeaderComponent: React.FC = () => {
 
         if (checkLocalFolderExists(folderPath)) {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
+
+            if (newFolderLocationType === 'local') {
+                sendEventToMain(ElectronEvents.UPDATE_FOLDER_NAME, folderPath);
+            } else {
+                sendEventToMain(
+                    ElectronEvents.UPDATE_FOLDER_NAME,
+                    formatRemoteFolderName(remoteConnectionConfig.selectedConnection, newFolder as RemoteFolder),
+                );
+            }
         }
     };
 
