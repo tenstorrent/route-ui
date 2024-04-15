@@ -7,20 +7,30 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { type ItemPredicate, ItemRenderer, Select2 } from '@blueprintjs/select';
 import { FC, type PropsWithChildren } from 'react';
-import { RemoteFolder } from '../../hooks/useRemote.hook';
+import { type RemoteConnection, RemoteFolder } from '../../hooks/useRemote.hook';
 
 const formatter = new Intl.DateTimeFormat('en-US', {
     dateStyle: 'long',
     timeStyle: 'short',
 });
 
-const formatRemoteFolderName = (folder: RemoteFolder) => {
-    return folder.testName;
+const formatRemoteFolderName = (folder?: RemoteFolder, connection?: RemoteConnection) => {
+    if (!folder) {
+        return 'n/a';
+    }
+
+    if (!connection) {
+        return folder.testName;
+    }
+
+    return `${connection.name} — ${folder.testName}`;
 };
 
-const filterFolders: ItemPredicate<RemoteFolder> = (query, folder) => {
-    return formatRemoteFolderName(folder).toLowerCase().includes(query.toLowerCase());
-};
+const filterFolders =
+    (connection?: RemoteConnection): ItemPredicate<RemoteFolder> =>
+    (query, folder) => {
+        return formatRemoteFolderName(folder, connection).toLowerCase().includes(query.toLowerCase());
+    };
 
 const isLocalFolderOutdated = (folder: RemoteFolder) => {
     if (!folder.lastSynced) {
@@ -34,7 +44,7 @@ const isLocalFolderOutdated = (folder: RemoteFolder) => {
 };
 
 const remoteFolderRenderer =
-    (syncingFolderList: boolean): ItemRenderer<RemoteFolder> =>
+    (syncingFolderList: boolean, connection?: RemoteConnection): ItemRenderer<RemoteFolder> =>
     (folder, { handleClick, modifiers }) => {
         if (!modifiers.matchesPredicate) {
             return null;
@@ -81,7 +91,7 @@ const remoteFolderRenderer =
                 className='remote-folder-item'
                 active={modifiers.active}
                 disabled={modifiers.disabled}
-                key={`${formatRemoteFolderName(folder)}${lastSynced ?? lastModified}`}
+                key={`${formatRemoteFolderName(folder, connection)}${lastSynced ?? lastModified}`}
                 onClick={handleClick}
                 text={formatRemoteFolderName(folder)}
                 // @ts-expect-error - Hack abusing label, it actually works.
@@ -94,6 +104,7 @@ const remoteFolderRenderer =
 interface RemoteFolderSelectorProps {
     remoteFolder?: RemoteFolder;
     remoteFolders?: RemoteFolder[];
+    remoteConnection?: RemoteConnection;
     loading?: boolean;
     updatingFolderList?: boolean;
     falbackLabel?: string;
@@ -104,6 +115,7 @@ interface RemoteFolderSelectorProps {
 const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = ({
     remoteFolder,
     remoteFolders,
+    remoteConnection,
     loading,
     updatingFolderList = false,
     onSelectFolder,
@@ -116,9 +128,9 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
             <Select2
                 className='remote-folder-select'
                 items={remoteFolders ?? []}
-                itemRenderer={remoteFolderRenderer(updatingFolderList)}
+                itemRenderer={remoteFolderRenderer(updatingFolderList, remoteConnection)}
                 filterable
-                itemPredicate={filterFolders}
+                itemPredicate={filterFolders(remoteConnection)}
                 noResults={<MenuItem disabled text='No results' roleStructure='listoption' />}
                 disabled={loading || remoteFolders?.length === 0}
                 onItemSelect={onSelectFolder}
@@ -127,7 +139,7 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
                     icon={icon as any}
                     rightIcon={remoteFolders && remoteFolders?.length > 0 ? IconNames.CARET_DOWN : undefined}
                     disabled={loading || remoteFolders?.length === 0}
-                    text={remoteFolder ? formatRemoteFolderName(remoteFolder) : falbackLabel}
+                    text={remoteFolder ? formatRemoteFolderName(remoteFolder, remoteConnection) : falbackLabel}
                 />
             </Select2>
             {children}
@@ -140,6 +152,7 @@ RemoteFolderSelector.defaultProps = {
     updatingFolderList: false,
     remoteFolders: [],
     remoteFolder: undefined,
+    remoteConnection: undefined,
     falbackLabel: undefined,
     icon: undefined,
 };

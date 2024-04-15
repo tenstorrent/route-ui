@@ -25,10 +25,12 @@ import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
 import GraphSelector from './graph-selector/GraphSelector';
 
 import './TopHeaderComponent.scss';
+import { sendEventToMain } from '../utils/bridge';
+import { ElectronEvents } from '../../main/ElectronEvents';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return lastFolder ? `${pathSeparator}${lastFolder}` : 'n/a';
+    return lastFolder || 'n/a';
 };
 
 const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFolder) => {
@@ -36,7 +38,7 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
         return 'n/a';
     }
 
-    return `${connection.name} - ${folder.testName}`;
+    return `${connection.name} — ${folder.testName}`;
 };
 
 const TopHeaderComponent: React.FC = () => {
@@ -53,11 +55,10 @@ const TopHeaderComponent: React.FC = () => {
     const localFolderPath = useSelector(getFolderPathSelector);
     const folderLocationType = useSelector(getSelectedFolderLocationType);
 
-    const remoteConnectionConfig = useRemoteConnection().persistentState;
+    const { persistentState: remoteConnectionConfig } = useRemoteConnection();
 
-    const { selectedConnection } = remoteConnectionConfig;
     const availableRemoteFolders = remoteConnectionConfig
-        .getSavedRemoteFolders(selectedConnection)
+        .getSavedRemoteFolders(remoteConnectionConfig.selectedConnection)
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
     const selectedGraph = getActiveGraphName();
@@ -87,6 +88,15 @@ const TopHeaderComponent: React.FC = () => {
 
         if (checkLocalFolderExists(folderPath)) {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
+
+            if (newFolderLocationType === 'local') {
+                sendEventToMain(ElectronEvents.UPDATE_WINDOW_TITLE, `(Local Folder) — ${getTestName(folderPath)}`);
+            } else {
+                sendEventToMain(
+                    ElectronEvents.UPDATE_WINDOW_TITLE,
+                    formatRemoteFolderName(remoteConnectionConfig.selectedConnection, newFolder as RemoteFolder),
+                );
+            }
         }
     };
 
@@ -94,16 +104,13 @@ const TopHeaderComponent: React.FC = () => {
         <div className='top-header-component'>
             <div className='text-content'>
                 <Tooltip2
-                    content={
-                        folderLocationType === 'local'
-                            ? 'Select remote folder'
-                            : formatRemoteFolderName(selectedConnection, selectedRemoteFolder)
-                    }
+                    content={folderLocationType === 'local' ? 'Select remote folder' : undefined}
                     placement='bottom'
                 >
                     <RemoteFolderSelector
                         remoteFolders={availableRemoteFolders}
                         remoteFolder={folderLocationType === 'remote' ? selectedRemoteFolder : undefined}
+                        remoteConnection={remoteConnectionConfig.selectedConnection}
                         falbackLabel=''
                         icon={IconNames.CLOUD_DOWNLOAD}
                         onSelectFolder={async (folder) => {

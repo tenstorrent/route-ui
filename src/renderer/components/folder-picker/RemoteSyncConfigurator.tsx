@@ -22,6 +22,8 @@ import GraphSelector from '../graph-selector/GraphSelector';
 import AddRemoteConnection from './AddRemoteConnection';
 import RemoteConnectionSelector from './RemoteConnectionSelector';
 import RemoteFolderSelector from './RemoteFolderSelector';
+import { sendEventToMain } from '../../utils/bridge';
+import { ElectronEvents } from '../../../main/ElectronEvents';
 
 const RemoteSyncConfigurator: FC = () => {
     const { resetGraphOnChipState } = useContext(GraphOnChipContext);
@@ -207,6 +209,13 @@ const RemoteSyncConfigurator: FC = () => {
                     updatingFolderList={isFetchingFolderStatus}
                     onSelectFolder={async (folder) => {
                         await updateSelectedFolder(folder);
+
+                        if (remote.persistentState.selectedConnection) {
+                            sendEventToMain(
+                                ElectronEvents.UPDATE_WINDOW_TITLE,
+                                `${remote.persistentState.selectedConnection.name} — ${folder.testName}`,
+                            );
+                        }
                     }}
                 >
                     <Tooltip2 content='Sync remote folder'>

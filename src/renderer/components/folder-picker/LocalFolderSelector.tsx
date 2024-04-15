@@ -13,10 +13,12 @@ import GraphSelector from '../graph-selector/GraphSelector';
 import FolderPicker from './FolderPicker';
 
 import './FolderPicker.scss';
+import { sendEventToMain } from '../../utils/bridge';
+import { ElectronEvents } from '../../../main/ElectronEvents';
 
 const getTestName = (path: string) => {
     const lastFolder = path.split(pathSeparator).pop();
-    return lastFolder ? `${pathSeparator}${lastFolder}` : undefined;
+    return lastFolder || undefined;
 };
 
 const LocalFolderOptions: FC = () => {
@@ -36,6 +38,13 @@ const LocalFolderOptions: FC = () => {
                         const folderPath = await openPerfAnalyzerFolderDialog();
 
                         await loadPerfAnalyzerFolder(folderPath);
+
+                        if (folderPath) {
+                            sendEventToMain(
+                                ElectronEvents.UPDATE_WINDOW_TITLE,
+                                `(Local Folder) — ${getTestName(folderPath)}`,
+                            );
+                        }
                     }}
                     text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : undefined}
                 />
