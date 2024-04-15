@@ -94,8 +94,7 @@ const createWindow = async () => {
         }
         mainWindow.setTitle(`${packageJson.build.productName} (v${app.getVersion()})`);
 
-        listenToEventFromWindow(ElectronEvents.UPDATE_FOLDER_NAME, (newTitle) => {
-            console.log(`updated folder: ${newTitle}`);
+        listenToEventFromWindow(ElectronEvents.UPDATE_WINDOW_TITLE, (newTitle) => {
             const baseAppTitle = `${packageJson.build.productName} (v${app.getVersion()})`;
 
             if (newTitle) {

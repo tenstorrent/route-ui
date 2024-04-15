@@ -212,7 +212,7 @@ const RemoteSyncConfigurator: FC = () => {
 
                         if (remote.persistentState.selectedConnection) {
                             sendEventToMain(
-                                ElectronEvents.UPDATE_FOLDER_NAME,
+                                ElectronEvents.UPDATE_WINDOW_TITLE,
                                 `${remote.persistentState.selectedConnection.name} — ${folder.testName}`,
                             );
                         }

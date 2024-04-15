@@ -41,7 +41,7 @@ const LocalFolderOptions: FC = () => {
 
                         if (folderPath) {
                             sendEventToMain(
-                                ElectronEvents.UPDATE_FOLDER_NAME,
+                                ElectronEvents.UPDATE_WINDOW_TITLE,
                                 `(Local Folder) — ${getTestName(folderPath)}`,
                             );
                         }

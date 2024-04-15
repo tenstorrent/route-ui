@@ -90,10 +90,10 @@ const TopHeaderComponent: React.FC = () => {
             await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
 
             if (newFolderLocationType === 'local') {
-                sendEventToMain(ElectronEvents.UPDATE_FOLDER_NAME, `(Local Folder) — ${getTestName(folderPath)}`);
+                sendEventToMain(ElectronEvents.UPDATE_WINDOW_TITLE, `(Local Folder) — ${getTestName(folderPath)}`);
             } else {
                 sendEventToMain(
-                    ElectronEvents.UPDATE_FOLDER_NAME,
+                    ElectronEvents.UPDATE_WINDOW_TITLE,
                     formatRemoteFolderName(remoteConnectionConfig.selectedConnection, newFolder as RemoteFolder),
                 );
             }
