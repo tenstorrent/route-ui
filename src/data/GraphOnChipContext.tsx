@@ -66,7 +66,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .map((graphOnChip, index) => {
                 const { temporalEpoch } = graphs[index];
                 return [
-                    [...graphOnChip.operations]
+                    ...[...graphOnChip.operations]
                         .filter((operation) => !operation.isOffchip)
                         .map((operation) => ({
                             name: operation.name,
@@ -75,14 +75,14 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                             type: GraphVertexType.OPERATION,
                             ref: operation as Operand,
                         })),
-                    [...graphOnChip.queues].map((queue) => ({
+                    ...[...graphOnChip.queues].map((queue) => ({
                         name: queue.name,
                         graphName: graphs[index].name,
                         temporalEpoch,
                         type: GraphVertexType.QUEUE,
                         ref: queue as Operand,
                     })),
-                ].flat();
+                ];
             })
             .flat();
         setState({
