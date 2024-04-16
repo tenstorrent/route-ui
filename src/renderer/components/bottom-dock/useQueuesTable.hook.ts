@@ -73,42 +73,48 @@ queuesTableColumns.set('blockDimensions.t', {
     label: 't (block dim)',
     sortable: true,
     align: 'left',
-    formatter: (value: QueueBlockDimensions) => value.t.toString(),
+    formatter: (value: QueueBlockDimensions | string) =>
+        typeof value === 'object' && value.t ? value.t.toString() : '',
 });
 queuesTableColumns.set('blockDimensions.mblock_m', {
     lookupProperty: 'blockDimensions',
     label: 'mblock_m (block dim)',
     sortable: true,
     align: 'left',
-    formatter: (value: QueueBlockDimensions) => value.mblock_m.toString(),
+    formatter: (value: QueueBlockDimensions | string) =>
+        typeof value === 'object' && value.mblock_m ? value.mblock_m.toString() : '',
 });
 queuesTableColumns.set('blockDimensions.mblock_n', {
     lookupProperty: 'blockDimensions',
     label: 'mblock_n (block dim)',
     sortable: true,
     align: 'left',
-    formatter: (value: QueueBlockDimensions) => value.mblock_n.toString(),
+    formatter: (value: QueueBlockDimensions | string) =>
+        typeof value === 'object' && value.mblock_n ? value.mblock_n.toString() : '',
 });
 queuesTableColumns.set('blockDimensions.ublock_ct', {
     lookupProperty: 'blockDimensions',
     label: 'ublock_ct (block dim)',
     sortable: true,
     align: 'left',
-    formatter: (value: QueueBlockDimensions) => value.ublock_ct.toString(),
+    formatter: (value: QueueBlockDimensions | string) =>
+        typeof value === 'object' && value.ublock_ct ? value.ublock_ct.toString() : '',
 });
 queuesTableColumns.set('blockDimensions.ublock_rt', {
     lookupProperty: 'blockDimensions',
     label: 'ublock_rt (block dim)',
     sortable: true,
     align: 'left',
-    formatter: (value: QueueBlockDimensions) => value.ublock_rt.toString(),
+    formatter: (value: QueueBlockDimensions | string) =>
+        typeof value === 'object' && value.ublock_rt ? value.ublock_rt.toString() : '',
 });
 queuesTableColumns.set('blockDimensions.ublock_order', {
     lookupProperty: 'blockDimensions',
     label: 'ublock_order (block dim)',
     sortable: true,
     align: 'left',
-    formatter: (value: QueueBlockDimensions) => value.ublock_order.toString(),
+    formatter: (value: QueueBlockDimensions | string) =>
+        typeof value === 'object' && value.ublock_order ? value.ublock_order.toString() : '',
 });
 
 queuesTableColumns.set('tile-dim', {
@@ -134,15 +140,17 @@ queuesTableColumns.set('allocation-info', {
     label: 'Allocation Info',
     sortable: true,
     align: 'left',
-    formatter: (value: AllocationInfoJson[]) =>
-        value
-            .map((info) => {
-                const subchannel = info.subchannel > -1 ? ` Sub CH: ${info.subchannel}` : '';
-                const channel = `CH: ${info.channel}${subchannel}`;
+    formatter: (value: AllocationInfoJson[] | string) =>
+        Array.isArray(value)
+            ? value
+                  .map((info) => {
+                      const subchannel = info.subchannel > -1 ? ` Sub CH: ${info.subchannel}` : '';
+                      const channel = `CH: ${info.channel}${subchannel}`;
 
-                return `${info.address} (${channel})`;
-            })
-            .join(', '),
+                      return `${info.address} (${channel})`;
+                  })
+                  .join(', ')
+            : '',
 });
 
 const useQueuesTable = () => {
