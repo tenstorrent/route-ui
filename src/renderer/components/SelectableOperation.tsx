@@ -1,10 +1,24 @@
-import React, { ChangeEvent, FC } from 'react';
-import { Checkbox, Icon } from '@blueprintjs/core';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import HighlightedText from './HighlightedText';
+import React, { ChangeEvent, FC } from 'react';
+import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../data/ColorGenerator';
-import { GraphVertexType } from '../../data/GraphTypes';
+import { GraphVertexType } from '../../data/GraphNames';
+import { Operation } from '../../data/GraphTypes';
+import {
+    getOperationPerformanceTreshold,
+    getShowOperationPerformanceGrid,
+} from '../../data/store/selectors/operationPerf.selectors';
+import { getHighContrastState } from '../../data/store/selectors/uiState.selectors';
 import QueueIcon from '../../main/assets/QueueIcon';
+import { calculateOpCongestionColor } from '../../utils/DrawingAPI';
+import ColorSwatch from './ColorSwatch';
+import HighlightedText from './HighlightedText';
+import './SelectableOperation.scss';
 
 interface SelectableOperationProps {
     opName: string;
@@ -13,6 +27,7 @@ interface SelectableOperationProps {
     stringFilter: string;
     type?: GraphVertexType | null;
     disabled?: boolean;
+    offchip?: boolean;
 }
 
 /**
@@ -23,13 +38,19 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     selectFunc,
     value,
     stringFilter,
-    type= null,
+    type = null,
     disabled = false,
+    offchip = false,
 }) => {
+    const onForeignClick = () => {
+        console.log('Foreign click');
+    };
+
+    // TODO: determine and implement graph navigation
     return (
         <div className='op-element'>
             <Checkbox
-                disabled={disabled}
+                disabled={disabled || offchip}
                 checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     selectFunc(opName, e.target.checked);
@@ -41,11 +62,19 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     {type === GraphVertexType.QUEUE && <QueueIcon />}
                 </span>
             )}
+            {offchip && (
+                <Button
+                    className='foreign'
+                    title="Navigate to graph"
+                    disabled
+                    small
+                    minimal
+                    icon={IconNames.OPEN_APPLICATION}
+                    onClick={onForeignClick}
+                />
+            )}
             <HighlightedText text={opName} filter={stringFilter} />
-            <span
-                className={`color-swatch ${value ? '' : 'transparent'}`}
-                style={{ backgroundColor: getGroupColor(opName) }}
-            />
+            <ColorSwatch isVisible color={getGroupColor(opName)} />
         </div>
     );
 };
@@ -53,5 +82,46 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
 SelectableOperation.defaultProps = {
     type: null,
     disabled: false,
+    offchip: false,
 };
 export default SelectableOperation;
+
+interface SelectableOperationPerformanceProps {
+    operation: Operation | null;
+    children: React.ReactElement<typeof SelectableOperation>;
+}
+
+export const SelectableOperationPerformance: FC<SelectableOperationPerformanceProps> = ({ operation, children }) => {
+    const render = useSelector(getShowOperationPerformanceGrid);
+    const threshold = useSelector(getOperationPerformanceTreshold);
+    const isHighContrast: boolean = useSelector(getHighContrastState);
+    if (!render || !operation || !operation.details) {
+        return children;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let operandType: GraphVertexType | null;
+    React.Children.forEach(children, (child) => {
+        if (React.isValidElement<SelectableOperationProps>(child)) {
+            operandType = child.props.type || null;
+        }
+    });
+
+    // TODO: we will use operandType in the next iterration to address the type of styling we render as queue custom icon requires stroke and not color/fill
+    const opFactor = operation.details?.bw_limited_factor || 1;
+    if (opFactor > threshold) {
+        const congestionColor = calculateOpCongestionColor(opFactor, 0, isHighContrast);
+
+        return (
+            <div
+                className='op-performance-indicator'
+                style={{
+                    color: `${congestionColor}`,
+                }}
+            >
+                {children}
+            </div>
+        );
+    }
+    return children;
+};

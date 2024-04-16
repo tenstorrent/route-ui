@@ -1,55 +1,164 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Button, Switch } from '@blueprintjs/core';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { sep as pathSeparator } from 'path';
+
 import { IconNames } from '@blueprintjs/icons';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import {
-    getArchitectureSelector,
-    getDockOpenState,
     getFolderPathSelector,
-    getHighContrastState,
+    getSelectedFolderLocationType,
+    getSelectedRemoteFolder,
 } from 'data/store/selectors/uiState.selectors';
-import { setDockOpenState, setHighContrastState } from 'data/store/slices/uiState.slice';
-import '../scss/TopHeaderComponent.scss';
+import React, { useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
+import type { FolderLocationType } from '../../data/StateTypes';
+import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
+import { checkLocalFolderExists } from '../../utils/FileLoaders';
+import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
+import type { RemoteConnection, RemoteFolder } from '../hooks/useRemote.hook';
+import useRemoteConnection from '../hooks/useRemote.hook';
+import FolderPicker from './folder-picker/FolderPicker';
+import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
 import GraphSelector from './graph-selector/GraphSelector';
 
+import './TopHeaderComponent.scss';
+import { sendEventToMain } from '../utils/bridge';
+import { ElectronEvents } from '../../main/ElectronEvents';
+
+const getTestName = (path: string) => {
+    const lastFolder = path.split(pathSeparator).pop();
+    return lastFolder || 'n/a';
+};
+
+const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFolder) => {
+    if (!connection || !folder) {
+        return 'n/a';
+    }
+
+    return `${connection.name} — ${folder.testName}`;
+};
+
 const TopHeaderComponent: React.FC = () => {
+    const {
+        getActiveGraphName,
+        resetGraphOnChipState,
+        getActiveGraphRelationship,
+        getActiveGraphOnChip,
+        graphOnChipList,
+    } = useContext(GraphOnChipContext);
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
-    const isHighContrast = useSelector(getHighContrastState);
-    const isDockOpen = useSelector(getDockOpenState);
-    const architecture = useSelector(getArchitectureSelector);
-    const folderPath = useSelector(getFolderPathSelector);
+
+    const localFolderPath = useSelector(getFolderPathSelector);
+    const folderLocationType = useSelector(getSelectedFolderLocationType);
+
+    const { persistentState: remoteConnectionConfig } = useRemoteConnection();
+
+    const availableRemoteFolders = remoteConnectionConfig
+        .getSavedRemoteFolders(remoteConnectionConfig.selectedConnection)
+        .filter((folder) => folder.lastSynced);
+    const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
+    const selectedGraph = getActiveGraphName();
+    const availableGraphs = Object.keys(graphOnChipList);
+    const chipId = getActiveGraphOnChip()?.chipId;
+    const architecture = getActiveGraphOnChip()?.architecture;
+    const temporalEpoch = getActiveGraphRelationship()?.temporalEpoch;
+
+    if (!selectedGraph && availableGraphs.length > 0) {
+        loadPerfAnalyzerGraph(availableGraphs[0]);
+    }
+
+    const updateSelectedFolder = async (
+        newFolder: RemoteFolder | string,
+        newFolderLocationType: FolderLocationType,
+    ) => {
+        const folderPath = (newFolder as RemoteFolder)?.localPath ?? newFolder;
+
+        if (typeof newFolder === 'string') {
+            dispatch(setSelectedRemoteFolder(undefined));
+        } else {
+            dispatch(setSelectedRemoteFolder(newFolder));
+        }
+
+        // TODO: do we need this call?
+        resetGraphOnChipState();
+
+        if (checkLocalFolderExists(folderPath)) {
+            await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
+
+            if (newFolderLocationType === 'local') {
+                sendEventToMain(ElectronEvents.UPDATE_WINDOW_TITLE, `(Local Folder) — ${getTestName(folderPath)}`);
+            } else {
+                sendEventToMain(
+                    ElectronEvents.UPDATE_WINDOW_TITLE,
+                    formatRemoteFolderName(remoteConnectionConfig.selectedConnection, newFolder as RemoteFolder),
+                );
+            }
+        }
+    };
 
     return (
         <div className='top-header-component'>
-            <Switch
-                checked={isHighContrast}
-                label='Enable high contrast'
-                onChange={(event) => dispatch(setHighContrastState(event.currentTarget.checked))}
-            />
+            <div className='text-content'>
+                <Tooltip2
+                    content={folderLocationType === 'local' ? 'Select remote folder' : undefined}
+                    placement='bottom'
+                >
+                    <RemoteFolderSelector
+                        remoteFolders={availableRemoteFolders}
+                        remoteFolder={folderLocationType === 'remote' ? selectedRemoteFolder : undefined}
+                        remoteConnection={remoteConnectionConfig.selectedConnection}
+                        falbackLabel=''
+                        icon={IconNames.CLOUD_DOWNLOAD}
+                        onSelectFolder={async (folder) => {
+                            await updateSelectedFolder(folder, 'remote');
+                        }}
+                    />
+                </Tooltip2>
+                <Tooltip2
+                    content={folderLocationType === 'remote' ? 'Select local folder' : localFolderPath}
+                    placement='bottom'
+                >
+                    <FolderPicker
+                        icon={IconNames.FolderSharedOpen}
+                        onSelectFolder={async () => {
+                            const folderPath = await openPerfAnalyzerFolderDialog();
+
+                            if (folderPath) {
+                                await updateSelectedFolder(folderPath, 'local');
+                            }
+                        }}
+                        text={folderLocationType === 'local' ? getTestName(localFolderPath) : ''}
+                    />
+                </Tooltip2>
+                <GraphSelector onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)} />
+            </div>
 
             <div className='text-content'>
-                {architecture ? (
-                    <span>
-                        Architecture: <span className='architecture-label'>{architecture}</span>
-                    </span>
-                ) : (
-                    ''
+                {selectedGraph && architecture && (
+                    <>
+                        <span>Architecture:</span>
+                        <span className='architecture-label'>{architecture}</span>
+                    </>
                 )}
-                <GraphSelector />
+
+                {selectedGraph && chipId !== undefined && (
+                    <>
+                        <span>Chip:</span>
+                        <span>{chipId}</span>
+                    </>
+                )}
+
+                {selectedGraph && temporalEpoch !== undefined && (
+                    <>
+                        <span>Epoch:</span>
+                        <span>{temporalEpoch}</span>
+                    </>
+                )}
             </div>
-            {folderPath && (
-                <div className='text-content'>
-                    <span>Selected Folder: </span>
-                    <span className='path-label'>{folderPath}</span>
-                </div>
-            )}
-            {process.env.NODE_ENV === 'development' && (
-                <Button
-                    icon={IconNames.APPLICATION}
-                    text='Dock'
-                    onClick={() => dispatch(setDockOpenState(!isDockOpen))}
-                />
-            )}
         </div>
     );
 };

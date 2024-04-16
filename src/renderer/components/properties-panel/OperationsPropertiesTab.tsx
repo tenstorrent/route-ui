@@ -1,51 +1,49 @@
-import { useDispatch, useSelector } from 'react-redux';
-import React, { useContext, useMemo, useState } from 'react';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { selectGroup, clearAllOperations } from 'data/store/slices/nodeSelection.slice';
-import { RootState } from 'data/store/createStore';
-
-import DataSource from '../../../data/DataSource';
-import FilterableComponent from '../FilterableComponent';
-import SelectableOperation from '../SelectableOperation';
-import SearchField from '../SearchField';
-import GraphVertexDetails from '../GraphVertexDetails';
+import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import React, { useContext, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import { Operation } from '../../../data/GraphTypes';
+import { getSelectedOperationList } from '../../../data/store/selectors/nodeSelection.selectors';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
-import SelectablePipe from '../SelectablePipe';
-import { PipeSegment } from '../../../data/Chip';
-import { NOCLinkName } from '../../../data/Types';
+import FilterableComponent from '../FilterableComponent';
+import GraphVertexDetails from '../GraphVertexDetails';
+import SearchField from '../SearchField';
+import SelectableOperation from '../SelectableOperation';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
+    const { getActiveGraphName, getActiveGraphOnChip } = useContext(GraphOnChipContext);
+    const graphName = getActiveGraphName();
+    const graphOnChip = getActiveGraphOnChip();
 
-    const { chip } = useContext(DataSource);
-    const groupsSelectionState = useSelector((state: RootState) => state.nodeSelection.groups);
+    const groupsSelectionState = useSelector(getSelectedOperationList(graphName));
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const operationsList = useMemo(() => (chip ? [...chip.operations] : []), [chip]);
+    const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);
 
+    const { selected, selectOperation } = useSelectableGraphVertex();
     const selectFilteredOperations = () => {
-        if (!chip) {
+        if (!graphOnChip) {
             return;
         }
         Object.keys(groupsSelectionState).forEach((op) => {
             if (op.toLowerCase().includes(filterQuery.toLowerCase())) {
-                dispatch(selectGroup({ opName: op, selected: true }));
+                selectOperation(op, true);
             }
         });
     };
 
-    const setOperationSelectionState = (opName: string, selected: boolean) =>
-        dispatch(
-            selectGroup({
-                opName,
-                selected,
-            }),
-        );
     return (
-        <div>
-            <div>
+        <div className='properties-container'>
+            <div className='properties-filter'>
                 <SearchField
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
@@ -58,64 +56,47 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                             <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
                         </Tooltip2>,
                         <Tooltip2
-                            content='Deselect all operations'
+                            content='Deselect all operations for active graph'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >
-                            <Button icon={IconNames.CUBE_REMOVE} onClick={() => dispatch(clearAllOperations())} />
+                            <Button
+                                icon={IconNames.CUBE_REMOVE}
+                                onClick={() => dispatch(clearAllOperations(graphName))}
+                            />
                         </Tooltip2>,
                     ]}
                 />
                 <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
                 <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
-            <div className='operations-wrap list-wrap'>
-                <div className='scrollable-content'>
-                    {operationsList.map((operation) => {
-                        return (
-                            <FilterableComponent
-                                key={operation.name}
-                                filterableString={operation.name}
-                                filterQuery={filterQuery}
-                                component={
-                                    <Collapsible
-                                        label={
-                                            <SelectableOperation
-                                                opName={operation.name}
-                                                value={groupsSelectionState[operation.name]?.selected}
-                                                selectFunc={setOperationSelectionState}
-                                                stringFilter={filterQuery}
-                                            />
-                                        }
-                                        isOpen={allOpen}
-                                    >
-                                        <>
-                                            <Collapsible
-                                                label={<h5>pipes:</h5>}
-                                                isOpen={false}
-                                                styles={{ marginLeft: '20px' }}
-                                            >
-                                                <ul className='scrollable-content'>
-                                                    {operation.uniquePipeIds.map((pipeId) => (
-                                                        <li>
-                                                            <SelectablePipe
-                                                                pipeSegment={
-                                                                    new PipeSegment(pipeId, 0, NOCLinkName.NONE)
-                                                                }
-                                                                pipeFilter=''
-                                                            />
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </Collapsible>
-                                            {operation && <GraphVertexDetails graphNode={operation} />}
-                                        </>
-                                    </Collapsible>
-                                }
-                            />
-                        );
-                    })}
-                </div>
+            <div className='properties-list'>
+                {operationsList.map((operation: Operation) => {
+                    return (
+                        <FilterableComponent
+                            key={operation.name}
+                            filterableString={operation.name}
+                            filterQuery={filterQuery}
+                            component={
+                                <Collapsible
+                                    label={
+                                        <SelectableOperation
+                                            disabled={operation.isOffchip}
+                                            opName={operation.name}
+                                            value={selected(operation.name)}
+                                            selectFunc={selectOperation}
+                                            stringFilter={filterQuery}
+                                            offchip={operation.isOffchip}
+                                        />
+                                    }
+                                    isOpen={allOpen}
+                                >
+                                    {operation && <GraphVertexDetails graphNode={operation} />}
+                                </Collapsible>
+                            }
+                        />
+                    );
+                })}
             </div>
         </div>
     );

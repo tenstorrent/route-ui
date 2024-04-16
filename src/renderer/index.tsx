@@ -1,13 +1,19 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import { createRoot } from 'react-dom/client';
+
+import { updateStateOnEvent } from './utils/bridge';
+
+import { toggleQueuesTable } from '../data/store/slices/experimentalFeatures.slice';
+import { setLogOutputEnabled } from '../data/store/slices/logging.slice';
+import { ElectronEvents } from '../main/ElectronEvents';
 import App from './App';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
 root.render(<App />);
 
-// calling IPC exposed from preload script
-// window.electron.ipcRenderer.once('ipc-example', (arg) => {
-//     // eslint-disable-next-line no-console
-//     console.log(arg);
-// });
-// window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
+updateStateOnEvent(ElectronEvents.TOGGLE_LOG_OUTPUT, setLogOutputEnabled);
+updateStateOnEvent(ElectronEvents.TOGGLE_QUEUES_TABLE, toggleQueuesTable, true);

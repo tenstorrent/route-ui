@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 export enum ComputeNodeTypeArch {
     ARC = 'arc',
     DRAM = 'dram',
@@ -89,6 +93,7 @@ export enum HighlightType {
     INPUT = 'input',
     OUTPUT = 'output',
     NONE = '',
+    BOTH = 'both',
 }
 
 export enum QueueLocation {
@@ -103,4 +108,18 @@ export enum ApplicationMode {
     NETLIST_ANALYZER = 'netlist-analyzer',
     // For the future
     PERF_UI = 'perf-ui',
+}
+
+export enum LogLevel {
+    INFO = 'info',
+    ERROR = 'error',
+    WARNING = 'warning',
+    LOG = 'log',
+}
+
+export enum CLUSTER_ETH_POSITION {
+    TOP = 'top',
+    BOTTOM = 'bottom',
+    LEFT = 'left',
+    RIGHT = 'right',
 }

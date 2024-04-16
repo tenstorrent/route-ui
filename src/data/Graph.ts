@@ -1,11 +1,13 @@
-import { process } from '@electron/remote';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
+import { ComputeNode } from './GraphOnChip';
+import type { GraphVertex, Operation, Queue } from './GraphTypes';
+import { OpPerfDetails, OperandDirection, OperandPerformance } from './OpPerfDetails';
 import { ComputeNodeType } from './Types';
-import type { GraphVertex, GraphVertexId, OperandName, Operation, OperationName, Queue } from './GraphTypes';
-import { GraphVertexType } from './GraphTypes';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
-import { OpPerfJSON } from './sources/PerfAnalyzerResults';
-import { ComputeNode } from './Chip';
-import { OpPerfDetails } from './OpPerfDetails';
 
 /** Provides common functionality for Graph Nodes.
  * Intended to be extended once for each value of `GraphVertexType`. */
@@ -14,11 +16,45 @@ export abstract class AbstractGraphVertex implements Operand {
 
     abstract readonly vertexType: GraphVertexType;
 
+    abstract get isOffchip(): boolean;
+
     protected inputOperands: Operand[];
 
     protected outputOperands: Operand[];
 
     private _pipeIdsByCore: Map<string, string[]> = new Map();
+
+    private pipesPerOperator: Map<string, string[]> = new Map();
+
+    private pipesPerOperatorIndexed: Map<string, string[][]> = new Map();
+
+    public getPipesForOperator(operator: string): string[] {
+        return this.pipesPerOperator.get(operator) || [];
+    }
+
+    public setPipesForOperator(operator: string, pipeIds: string[], index: number): void {
+        if (this.pipesPerOperator.has(operator)) {
+            this.pipesPerOperator.get(operator)!.push(...pipeIds);
+        } else {
+            this.pipesPerOperator.set(operator, pipeIds);
+        }
+        const uniquePipeIds = [...new Set(this.pipesPerOperator.get(operator)!.map((pipeId) => pipeId.toString()))];
+        this.pipesPerOperator.set(operator, uniquePipeIds);
+
+        if (this.pipesPerOperatorIndexed.has(operator)) {
+            const operatorPipeIdsIndexed = this.pipesPerOperatorIndexed.get(operator)!;
+            const pipesByIndex = operatorPipeIdsIndexed[index] || [];
+            operatorPipeIdsIndexed[index] = [...new Set([...pipesByIndex, ...pipeIds])];
+        } else {
+            const operatorPipeIdsIndexed: string[][] = [];
+            operatorPipeIdsIndexed[index] = [...new Set(pipeIds)];
+            this.pipesPerOperatorIndexed.set(operator, operatorPipeIdsIndexed);
+        }
+    }
+
+    public getPipesForOperatorIndexed(operator: string, index: number): string[] {
+        return this.pipesPerOperatorIndexed.get(operator)?.[index] || [];
+    }
 
     public toString(): string {
         return `${this.name} (${this.vertexType})`;
@@ -29,17 +65,21 @@ export abstract class AbstractGraphVertex implements Operand {
     }
 
     public set pipeIdsByCore(value: Map<string, string[]>) {
-        // console.log(`updating ${this.name} with ${value.size}`);
         if (this._pipeIdsByCore.size > 0) {
-            value.forEach((pipeids, key) => {
-                if (this._pipeIdsByCore.has(key)) {
-                    this._pipeIdsByCore.get(key)!.push(...pipeids);
+            value.forEach((pipeIds, coreId) => {
+                if (this._pipeIdsByCore.has(coreId)) {
+                    this._pipeIdsByCore.get(coreId)!.push(...pipeIds);
                 } else {
-                    this._pipeIdsByCore.set(key, pipeids);
+                    this._pipeIdsByCore.set(coreId, pipeIds);
                 }
             });
         }
+
         this._pipeIdsByCore = value;
+
+        this._pipeIdsByCore.forEach((pipeIds, coreId) => {
+            this._pipeIdsByCore.set(coreId, [...new Set(pipeIds.map((pipeId) => pipeId.toString()))]);
+        });
     }
 
     public bandwidth: number = 0;
@@ -60,39 +100,20 @@ export abstract class AbstractGraphVertex implements Operand {
 
     /** All input operands */
     get inputs(): Operand[] {
-        // TODO: this is a slight performance hit, to remove once pipe data is merged
-        if (process.env.NODE_ENV === 'development') {
-            return [...this.inputOperands];
-        }
         return this.inputOperands;
     }
 
     /** All output operands */
     get outputs(): Operand[] {
-        if (process.env.NODE_ENV === 'development') {
-            return [...this.outputOperands];
-        }
         return this.outputOperands;
     }
 
     assignInputs(inputs: Operand[]) {
-        this.inputOperands = [...new Set([...this.inputOperands, ...inputs])];
-        if (process.env.NODE_ENV === 'development') {
-            const inputNames = this.inputs.map((input) => input.name);
-            if (inputNames.length !== new Set(inputNames).size) {
-                throw new Error(`Operation ${this.name} has duplicate input operands`);
-            }
-        }
+        this.inputOperands = [...this.inputOperands, ...inputs];
     }
 
     assignOutputs(outputs: Operand[]) {
-        this.outputOperands = [...new Set([...this.outputOperands, ...outputs])];
-        if (process.env.NODE_ENV === 'development') {
-            const outputNames = this.outputs.map((output) => output.name);
-            if (outputNames.length !== new Set(outputNames).size) {
-                throw new Error(`Operation ${this.name} has duplicate output operands`);
-            }
-        }
+        this.outputOperands = [...this.outputOperands, ...outputs];
     }
 
     get uniquePipeIds(): string[] {
@@ -115,6 +136,11 @@ export abstract class AbstractGraphVertex implements Operand {
 export class BuildableQueue extends AbstractGraphVertex implements Queue {
     readonly vertexType = GraphVertexType.QUEUE;
 
+    get isOffchip(): boolean {
+        // TODO: requires implementation
+        return false;
+    }
+
     details?: QueueDetailsJson;
 }
 
@@ -131,6 +157,21 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         super(name, inputOperands, outputOperands);
         this._cores = [];
         cores.forEach((core) => this.assignCore(core));
+    }
+
+    get slowestOperand(): Operand | null {
+        const result = this.details?.slowestOperandPerformance;
+        return result ? this.getOperandByPerformance(result) : null;
+    }
+
+    getOperandByPerformance(op: OperandPerformance | null): Operand | null {
+        if (op) {
+            if (op.direction === OperandDirection.INPUT) {
+                return [...this.inputs][op.index];
+            }
+            return [...this.outputs][op.index];
+        }
+        return null;
     }
 
     details?: OpPerfDetails;
@@ -156,6 +197,10 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     get cores() {
         return this._cores.values();
     }
+
+    get isOffchip(): boolean {
+        return this._cores.length === 0;
+    }
 }
 
 export interface Operand {
@@ -167,9 +212,17 @@ export interface Operand {
     perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
     uniquePipeIds: string[];
 
+    getPipesForOperator(operator: string): string[];
+
+    setPipesForOperator(operator: string, pipeIds: string[], index: number): void;
+
+    getPipesForOperatorIndexed(operator: string, index: number): string[];
+
     getPipeIdsForCore(coreId: string): string[];
 
     getAllPipeIds(): Iterable<string[]>;
 
     isConnected(): boolean;
+
+    isOffchip: boolean;
 }

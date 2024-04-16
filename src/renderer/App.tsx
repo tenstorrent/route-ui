@@ -1,34 +1,41 @@
-import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import './App.scss';
-import { useMemo, useState } from 'react';
-import store from 'data/store/createStore';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import TenstorrentLogo from '../main/assets/TenstorrentLogo';
-import DataSource, { GridContext } from '../data/DataSource';
-import Chip from '../data/Chip';
-import MainRouteRenderer from './MainRouteRenderer';
-import SplashScreen from './SplashScreen';
-import TopHeaderComponent from './components/TopHeaderComponent';
+import { FocusStyleManager } from '@blueprintjs/core';
+import store from 'data/store/createStore';
+import { useState } from 'react';
+import { Provider } from 'react-redux';
+import { Route, MemoryRouter as Router, Routes } from 'react-router-dom';
+import { GraphOnChipProvider } from '../data/GraphOnChipContext';
+import Cluster from '../data/Cluster';
+import { ClusterContext } from '../data/ClusterContext';
+import useKeyboardFocus from './hooks/useKeyboardFocus.hook';
+import MainRouteRenderer from './views/MainRouteRenderer';
+import SplashScreen from './views/SplashScreen';
+
+import './scss/App.scss';
 
 export default function App() {
+    useKeyboardFocus();
     // @ts-ignore
-    const [chip, setChip] = useState<Chip>(null);
-    const memoizedChip = useMemo<GridContext>(() => ({ chip, setChip }), [chip]);
+
+    const [cluster, setCluster] = useState<Cluster | null>(null);
+
+    FocusStyleManager.onlyShowFocusOnTabs();
     return (
         <Provider store={store}>
-            <DataSource.Provider value={memoizedChip}>
-                <Router>
-                    <div className='header'>
-                        <TenstorrentLogo />
-                        <TopHeaderComponent />
-                    </div>
-                    <Routes>
-                        <Route path='/' element={<SplashScreen />} />
-                        <Route path='/render' element={<MainRouteRenderer updateData={setChip} />} />
-                    </Routes>
-                </Router>
-            </DataSource.Provider>
+            {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+            <ClusterContext.Provider value={{ cluster, setCluster }}>
+                <GraphOnChipProvider>
+                    <Router>
+                        <Routes>
+                            <Route path='/' element={<SplashScreen />} />
+                            <Route path='/render' element={<MainRouteRenderer />} />
+                        </Routes>
+                    </Router>
+                </GraphOnChipProvider>
+            </ClusterContext.Provider>
         </Provider>
     );
 }

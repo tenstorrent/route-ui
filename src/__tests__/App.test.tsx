@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import '@testing-library/jest-dom';
 import { render } from '@testing-library/react';
 import App from '../renderer/App';

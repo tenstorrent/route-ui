@@ -1,396 +1,131 @@
-import React, { useContext, useRef } from 'react';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { getFocusNode, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { openDetailedView } from 'data/store/slices/uiState.slice';
+import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import * as d3 from 'd3';
-import { getDramGroup, getGroup, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
-import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
-import { openDetailedView } from 'data/store/slices/detailedView.slice';
-import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
-import { RootState } from 'data/store/createStore';
-import { ComputeNode } from '../../data/Chip';
+import { ComputeNode } from '../../data/GraphOnChip';
+import { HighlightType } from '../../data/Types';
+import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
 import {
-    calculateLinkCongestionColor,
-    calculateOpCongestionColor,
-    drawLink,
-    drawNOCRouter,
-    drawSelections,
-    getDramGroupingStyles,
-    getNodeOpStyles,
-    getOffChipCongestionStyles,
-    NOC_CONFIGURATION,
-    NODE_SIZE,
-    toRGBA,
-} from '../../utils/DrawingAPI';
-import { getGroupColor } from '../../data/ColorGenerator';
-import { PipeSelection } from '../../data/StateTypes';
-import { ComputeNodeType, HighlightType, NOC, NOCLinkName } from '../../data/Types';
-import {
-    getOperationPerformanceTreshold,
-    getShowOperationPerformanceGrid,
-} from '../../data/store/selectors/operationPerf.selectors';
-import DataSource, { GridContext } from '../../data/DataSource';
+    getDetailedViewOpenState,
+    getSelectedDetailsViewUID,
+    getShowOperationNames,
+} from '../../data/store/selectors/uiState.selectors';
+import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
+import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
+import NodeLocation from './node-grid-elements-components/NodeLocation';
+import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
+import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
+import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
+import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
+import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
+import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 interface NodeGridElementProps {
     node: ComputeNode;
-    showEmptyLinks: boolean;
-    showOperationColors: boolean;
-    showNodeLocation: boolean;
-    showLinkSaturation: boolean;
-    linkSaturationTreshold: number;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({
-    //
-    node,
-    showEmptyLinks,
-    showOperationColors,
-    showNodeLocation,
-    showLinkSaturation,
-    linkSaturationTreshold,
-    //
-}) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
-    const nodeState = useSelector((state: RootState) => selectNodeSelectionById(state, node.uid));
-    const { isOpen, uid } = useSelector((state: RootState) => state.detailedView);
-    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
+    const nodeState = useSelector(selectNodeSelectionById(graphName, node.uid));
+    const isOpen = useSelector(getDetailedViewOpenState);
+    const uid = useSelector(getSelectedDetailsViewUID);
+    const focusPipe = useSelector(getFocusPipe);
+    const focusNode = useSelector(getFocusNode);
+    const showOperationNames = useSelector(getShowOperationNames);
+    const { data: selectedGroupData } = useSelector(getOperation(graphName, node.opName)) ?? {};
+    const shouldShowLabel = useMemo(() => {
+        const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
+        // Use the top border to determine if the label should be shown.
+        // It will only show for the items that are the "first" in that selected group.
+        // This may be either vertical or horizontal, so we cover both the top and left borders.
+        return !selectedNodeData?.siblings.top && !selectedNodeData?.siblings.left;
+    }, [selectedGroupData, node.uid]);
 
     let coreHighlight = HighlightType.NONE;
     const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
     const isProducer = node.producerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
-    if (isConsumer) {
+    if (isConsumer && isProducer) {
+        coreHighlight = HighlightType.BOTH;
+    } else if (isConsumer) {
         coreHighlight = HighlightType.OUTPUT;
-    }
-    if (isProducer) {
+    } else if (isProducer) {
         coreHighlight = HighlightType.INPUT;
     }
+
     const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
     const triggerSelection = () => {
-        const selectedState = nodeState.selected;
+        const selectedState = nodeState?.selected;
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));
         } else {
-            dispatch(updateNodeSelection({ id: node.uid, selected: !nodeState.selected }));
+            dispatch(updateNodeSelection({ graphName, id: node.uid, selected: !nodeState?.selected }));
         }
     };
 
     return (
         <button
+            title={showOperationNames && shouldShowLabel ? node.opName : ''}
             type='button'
-            className={`node-item ${highlightClass} ${nodeState.selected ? 'selected' : ''} ${
+            className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
-            }`}
+            } ${nodeState?.selected && focusNode === node.uid ? 'focus' : ''}`}
             onClick={triggerSelection}
+            onMouseEnter={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(node.uid));
+                });
+            }}
+            onFocus={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(node.uid));
+                });
+            }}
+            onMouseOut={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(null));
+                });
+            }}
+            onBlur={() => {
+                requestAnimationFrame(() => {
+                    dispatch(updateFocusNode(null));
+                });
+            }}
         >
-            <OperationCongestionLayer node={node} />
+            {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />
             <DramModuleBorder node={node} />
-            <OffChipNodeLinkCongestionLayer
-                node={node}
-                showLinkSaturation={showLinkSaturation}
-                linkSaturationTreshold={linkSaturationTreshold}
-            />
+
+            {/* Queues */}
             <QueueHighlightRenderer node={node} />
-            <div className='node-border' />
+
+            {/* Highlights and selections */}
             <div className='core-highlight' />
-            {node.opName !== '' && showOperationColors && (
-                <div className='op-color-swatch' style={{ backgroundColor: getGroupColor(node.opName) }} />
-            )}
-            {showNodeLocation && (
-                <div className='node-location'>
-                    {/* {node.loc.x},{node.loc.y} */}
-                    {node.uid}
-                </div>
-            )}
+            <div className='node-border' />
+
+            {/* Congestion information */}
+            <OperationCongestionLayer node={node} />
+            <OffChipNodeLinkCongestionLayer node={node} />
+
+            {/* Labels for location and operation */}
+            <NodeLocation node={node} />
+            <NodeOperationLabel node={node} />
+
+            {/* Pipes */}
+            <NodePipeRenderer node={node} />
             <NodeFocusPipeRenderer node={node} />
-            <NodePipeRenderer
-                node={node}
-                showEmptyLinks={showEmptyLinks}
-                showLinkSaturation={showLinkSaturation}
-                linkSaturationTreshold={linkSaturationTreshold}
-            />
+
+            {/* Node type label */}
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
         </button>
     );
 };
 
 export default NodeGridElement;
-
-const OperationCongestionLayer: React.FC<{ node: ComputeNode }> = ({ node }) => {
-    const { chip } = useContext<GridContext>(DataSource);
-    const render = useSelector((state: RootState) => getShowOperationPerformanceGrid(state));
-    const treshold = useSelector((state: RootState) => getOperationPerformanceTreshold(state));
-    const isHighContrast = useSelector(getHighContrastState);
-    const maxBwLimitedFactor = chip?.details.maxBwLimitedFactor;
-    if (!render) {
-        return null;
-    }
-    if (node.type !== ComputeNodeType.CORE || node.opName === '') {
-        return null;
-    }
-
-    const op = node.operation;
-    const opFactor = op?.details?.bw_limited_factor || 1;
-    if (opFactor > treshold) {
-        const congestionColor = toRGBA(
-            calculateOpCongestionColor(opFactor, 0, maxBwLimitedFactor, isHighContrast),
-            0.5,
-        );
-        // toRGBA(congestionColor, 0.5);
-        return (
-            <div className='operation-congestion' style={{ backgroundColor: congestionColor }}>
-                {opFactor}
-            </div>
-        );
-    }
-    return <div className='operation-congestion'></div>;
-};
-
-interface DramModuleBorderProps {
-    node: ComputeNode;
-}
-
-/** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
-const DramModuleBorder: React.FC<DramModuleBorderProps> = ({ node }) => {
-    const dramSelectionState = useSelector((state: RootState) => getDramGroup(state, node.dramChannelId));
-    let dramStyles = {};
-    if (
-        node.dramChannelId > -1 &&
-        dramSelectionState &&
-        dramSelectionState.selected &&
-        dramSelectionState.data.length > 1
-    ) {
-        const border = dramSelectionState.data.filter((n) => n.id === node.uid)[0]?.border;
-        dramStyles = getDramGroupingStyles(border);
-    }
-
-    return <div className='dram-border' style={dramStyles} />;
-};
-
-interface OffChipNodeLinkCongestionLayerProps {
-    node: ComputeNode;
-    showLinkSaturation: boolean;
-    linkSaturationTreshold: number;
-}
-
-/**
- * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
- * @param node
- * @param showLinkSaturation
- * @param linkSaturationTreshold
- * @constructor
- */
-const OffChipNodeLinkCongestionLayer: React.FC<OffChipNodeLinkCongestionLayerProps> = ({
-    //
-    node,
-    showLinkSaturation,
-    linkSaturationTreshold,
-}) => {
-    const linksData = useSelector((state: RootState) => state.linkSaturation.links);
-    const isHighContrast = useSelector(getHighContrastState);
-    if (!showLinkSaturation) {
-        return null;
-    }
-    let congestionStyle = {};
-    const { type } = node;
-    let offChipLinkIds: string[] = [];
-    switch (type) {
-        case ComputeNodeType.DRAM:
-            offChipLinkIds =
-                node.dramChannel?.links.map((link) => {
-                    return link.uid;
-                }) || [];
-            break;
-        case ComputeNodeType.ETHERNET:
-            offChipLinkIds =
-                [...node.internalLinks.values()].map((link) => {
-                    return link.uid;
-                }) || [];
-            break;
-
-        case ComputeNodeType.PCIE:
-            offChipLinkIds =
-                [...node.internalLinks].map(([link]) => {
-                    return link.uid;
-                }) || [];
-            break;
-        default:
-            return null;
-    }
-
-    const saturationValues = offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
-    const saturation = Math.max(...saturationValues) || 0;
-    if (saturation < linkSaturationTreshold) {
-        return null;
-    }
-    const congestionColor = calculateLinkCongestionColor(saturation, 0, isHighContrast);
-    const saturationBg = toRGBA(congestionColor, 0.5);
-    congestionStyle = getOffChipCongestionStyles(saturationBg);
-
-    return <div className='off-chip-congestion' style={congestionStyle} />;
-};
-
-const QueueHighlightRenderer: React.FC<{ node: ComputeNode }> = ({ node }) => {
-    const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
-    return (
-        <div className='queue-highlighter-content'>
-            {node.queueList.map((queue) => {
-                if (queueSelectionState[queue.name]?.selected) {
-                    return (
-                        <div
-                            key={queue.name}
-                            className='queue-highlighter'
-                            style={{ backgroundColor: getGroupColor(queue.name) }}
-                        />
-                    );
-                }
-                return null;
-            })}
-        </div>
-    );
-};
-
-interface OperationGroupRenderProps {
-    node: ComputeNode;
-}
-
-/** Adds a highlight layer to a Core node element when the core's operation ("operation group") is selected. */
-const OperationGroupRender: React.FC<OperationGroupRenderProps> = ({
-    //
-    node,
-    //
-}) => {
-    const selectedGroup = useSelector((state: RootState) => getGroup(state, node.opName));
-    let operationStyles = {};
-    if (node.opName !== '' && selectedGroup?.selected) {
-        const color = getGroupColor(node.opName);
-        operationStyles = { borderColor: getGroupColor(node.opName) };
-        const border = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.border;
-        operationStyles = getNodeOpStyles(operationStyles, color, border);
-    }
-
-    return <div className='group-border' style={operationStyles} />;
-};
-
-interface NodeFocusPipeRendererProps {
-    node: ComputeNode;
-}
-
-const NodeFocusPipeRenderer: React.FC<NodeFocusPipeRendererProps> = ({
-    //
-    node,
-    //
-}) => {
-    // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
-    const svgRef = useRef<SVGSVGElement | null>(null);
-    const svg = d3.select(svgRef.current);
-    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
-    const focusedPipeIds = [focusPipe || ''];
-
-    svg.selectAll('*').remove();
-    if (focusPipe && node.pipes.filter((pipe) => pipe.id === focusPipe).length > 0) {
-        drawSelections(svg, NOCLinkName.NOC0_EAST_OUT, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC0_WEST_IN, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC0_SOUTH_OUT, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC0_NORTH_IN, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC0_IN, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC0_OUT, node, focusedPipeIds);
-
-        drawSelections(svg, NOCLinkName.NOC1_NORTH_OUT, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC1_SOUTH_IN, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC1_WEST_OUT, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC1_EAST_IN, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC1_IN, node, focusedPipeIds);
-        drawSelections(svg, NOCLinkName.NOC1_OUT, node, focusedPipeIds);
-    }
-    return <svg className='node-focus-svg' ref={svgRef} width={NODE_SIZE} height={NODE_SIZE} />;
-};
-
-interface NodePipeRendererProps {
-    node: ComputeNode;
-    showEmptyLinks: boolean;
-    showLinkSaturation: boolean;
-    linkSaturationTreshold: number;
-}
-
-const NodePipeRenderer: React.FC<NodePipeRendererProps> = ({
-    //
-    node,
-    showEmptyLinks,
-    showLinkSaturation,
-    linkSaturationTreshold,
-    //
-}) => {
-    // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
-    const isHighContrast = useSelector(getHighContrastState);
-    const linksData = useSelector((state: RootState) => state.linkSaturation.links);
-    const focusPipe = useSelector((state: RootState) => state.pipeSelection.focusPipe);
-    const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
-    const selectedPipeIds = Object.values(allPipes)
-        .filter((pipe: PipeSelection) => pipe.selected)
-        .map((pipe: PipeSelection) => pipe.id);
-
-    const svgRef = useRef<SVGSVGElement | null>(null);
-    const svg = d3.select(svgRef.current);
-
-    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
-    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
-
-    svg.selectAll('*').remove();
-    if (showEmptyLinks) {
-        drawLink(svg, NOCLinkName.NOC1_NORTH_OUT);
-        drawLink(svg, NOCLinkName.NOC0_NORTH_IN);
-        drawLink(svg, NOCLinkName.NOC1_SOUTH_IN);
-        drawLink(svg, NOCLinkName.NOC0_SOUTH_OUT);
-        drawLink(svg, NOCLinkName.NOC1_EAST_IN);
-        drawLink(svg, NOCLinkName.NOC0_EAST_OUT);
-        drawLink(svg, NOCLinkName.NOC0_WEST_IN);
-        drawLink(svg, NOCLinkName.NOC1_WEST_OUT);
-        drawLink(svg, NOCLinkName.NOC1_OUT);
-        drawLink(svg, NOCLinkName.NOC0_OUT);
-        drawLink(svg, NOCLinkName.NOC0_IN);
-        drawLink(svg, NOCLinkName.NOC1_IN);
-    }
-
-    if (showLinkSaturation) {
-        node.links.forEach((link) => {
-            if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
-                const linkStateData = linksData[link.uid];
-                if (linkStateData.saturation >= linkSaturationTreshold) {
-                    const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
-                    drawLink(svg, link.name, color, 5);
-                }
-            }
-        });
-    }
-
-    let noc0numPipes = 0;
-    let noc1numPipes = 0;
-    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_EAST_OUT, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_WEST_IN, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_SOUTH_OUT, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_NORTH_IN, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_IN, node, selectedPipeIds);
-    noc0numPipes += drawSelections(svg, NOCLinkName.NOC0_OUT, node, selectedPipeIds);
-
-    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_NORTH_OUT, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_SOUTH_IN, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_WEST_OUT, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_EAST_IN, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_IN, node, selectedPipeIds);
-    noc1numPipes += drawSelections(svg, NOCLinkName.NOC1_OUT, node, selectedPipeIds);
-
-    if (noc0numPipes > 0) {
-        drawNOCRouter(svg, NOC_CONFIGURATION.noc0);
-    }
-    if (noc1numPipes > 0) {
-        drawNOCRouter(svg, NOC_CONFIGURATION.noc1);
-    }
-    return (
-        <svg
-            className={`node-svg ${focusPipe !== null ? 'focus-mode' : ''}`}
-            ref={svgRef}
-            width={NODE_SIZE}
-            height={NODE_SIZE}
-        />
-    );
-};

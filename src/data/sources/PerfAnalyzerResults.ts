@@ -1,4 +1,8 @@
-import type { GraphName, OperationName } from '../GraphTypes';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { GraphName, OperationName } from '../GraphNames';
 
 export interface PerfAnalyzerResultsJson {
     [coreId: string]: CorePerfJson; // Maps a core ID to a perf analyzer result
@@ -23,8 +27,6 @@ export interface OpAttributesJSON {
 
     /** The graph that this result analyzes. Should be the same as the name of the folder that contained this result's data file. */
     graph_name: GraphName;
-
-    warnings: string;
 
     /** The Operation that was mapped to this core */
     op_name: OperationName;
@@ -67,4 +69,3 @@ export interface MeasurementsJSON {
 export interface CoreMeasurementsJSON {
     [coreId: string]: CorePerfJson;
 }
-

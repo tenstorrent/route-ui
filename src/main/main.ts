@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 /**
@@ -8,29 +12,16 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
+import { BrowserWindow, app, nativeImage, shell } from 'electron';
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, nativeImage } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 // import remoteMain from '@electron/remote/main';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-
-class AppUpdater {
-    constructor() {
-        log.transports.file.level = 'info';
-        autoUpdater.logger = log;
-        autoUpdater.checkForUpdatesAndNotify();
-    }
-}
+import { listenToEventFromWindow } from './utils/bridge';
+import { ElectronEvents } from './ElectronEvents';
+import packageJson from '../../package.json';
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-    const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-    console.log(msgTemplate(arg));
-    event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
     const sourceMapSupport = require('source-map-support');
@@ -101,7 +92,17 @@ const createWindow = async () => {
         } else {
             mainWindow.show();
         }
-        mainWindow.setTitle(`${mainWindow.title} ${app.getVersion()}`);
+        mainWindow.setTitle(`${packageJson.build.productName} (v${app.getVersion()})`);
+
+        listenToEventFromWindow(ElectronEvents.UPDATE_WINDOW_TITLE, (newTitle) => {
+            const baseAppTitle = `${packageJson.build.productName} (v${app.getVersion()})`;
+
+            if (newTitle) {
+                mainWindow?.setTitle(`${baseAppTitle} — ${newTitle}`);
+            } else {
+                mainWindow?.setTitle(baseAppTitle);
+            }
+        });
     });
 
     mainWindow.on('closed', () => {
@@ -109,17 +110,14 @@ const createWindow = async () => {
     });
 
     const menuBuilder = new MenuBuilder(mainWindow);
-    menuBuilder.buildMenu();
+
+    await menuBuilder.buildMenu();
 
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
         shell.openExternal(edata.url);
         return { action: 'deny' };
     });
-
-    // Remove this if your app does not use auto updates
-    // eslint-disable-next-line
-    new AppUpdater();
 };
 
 /**

@@ -1,9 +1,11 @@
-import { app, Menu, shell, BrowserWindow, MenuItemConstructorOptions } from 'electron';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
-    selector?: string;
-    submenu?: DarwinMenuItemConstructorOptions[] | Menu;
-}
+import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
+
+import { ElectronEvents } from './ElectronEvents';
+import { getSavedState, listenToEventFromWindow, sendEventToWindow } from './utils/bridge';
 
 export default class MenuBuilder {
     mainWindow: BrowserWindow;
@@ -12,20 +14,29 @@ export default class MenuBuilder {
         this.mainWindow = mainWindow;
     }
 
-    buildMenu(): Menu {
+    async buildMenu() {
         if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
             this.setupDevelopmentEnvironment();
         }
 
-        const template = process.platform === 'darwin' ? this.buildDarwinTemplate() : this.buildDefaultTemplate();
+        const template =
+            process.platform === 'darwin' ? await this.buildDarwinTemplate() : await this.buildDefaultTemplate();
 
         const menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);
 
+        listenToEventFromWindow(ElectronEvents.TOGGLE_QUEUES_TABLE, (isChecked) => {
+            const menuItem = menu.getMenuItemById('toggleQueuesTable');
+
+            if (menuItem) {
+                menuItem.checked = isChecked;
+            }
+        });
+
         return menu;
     }
 
-    setupDevelopmentEnvironment(): void {
+    setupDevelopmentEnvironment() {
         this.mainWindow.webContents.on('context-menu', (_, props) => {
             const { x, y } = props;
 
@@ -40,237 +51,161 @@ export default class MenuBuilder {
         });
     }
 
-    buildDarwinTemplate(): MenuItemConstructorOptions[] {
-        const subMenuAbout: DarwinMenuItemConstructorOptions = {
-            label: 'RouteUI',
-            submenu: [
-                {
-                    label: 'About',
-                    selector: 'orderFrontStandardAboutPanel:',
-                },
-                { type: 'separator' },
-                { label: 'Services', submenu: [] },
-                { type: 'separator' },
-                {
-                    label: 'Hide ElectronReact',
-                    accelerator: 'Command+H',
-                    selector: 'hide:',
-                },
-                {
-                    label: 'Hide Others',
-                    accelerator: 'Command+Shift+H',
-                    selector: 'hideOtherApplications:',
-                },
-                { label: 'Show All', selector: 'unhideAllApplications:' },
-                { type: 'separator' },
-                {
-                    label: 'Quit',
-                    accelerator: 'Command+Q',
-                    click: () => {
-                        app.quit();
-                    },
-                },
-            ],
-        };
-        const subMenuEdit: DarwinMenuItemConstructorOptions = {
-            label: 'Edit',
-            submenu: [
-                { label: 'Undo', accelerator: 'Command+Z', selector: 'undo:' },
-                {
-                    label: 'Redo',
-                    accelerator: 'Shift+Command+Z',
-                    selector: 'redo:',
-                },
-                { type: 'separator' },
-                { label: 'Cut', accelerator: 'Command+X', selector: 'cut:' },
-                { label: 'Copy', accelerator: 'Command+C', selector: 'copy:' },
-                {
-                    label: 'Paste',
-                    accelerator: 'Command+V',
-                    selector: 'paste:',
-                },
-                {
-                    label: 'Select All',
-                    accelerator: 'Command+A',
-                    selector: 'selectAll:',
-                },
-            ],
-        };
-        const subMenuViewDev: MenuItemConstructorOptions = {
-            label: 'View',
-            submenu: [
-                {
-                    label: 'Reload',
-                    accelerator: 'Command+R',
-                    click: () => {
-                        this.mainWindow.webContents.reload();
-                    },
-                },
-                {
-                    label: 'Toggle Full Screen',
-                    accelerator: 'Ctrl+Command+F',
-                    click: () => {
-                        this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-                    },
-                },
-                {
-                    label: 'Toggle Developer Tools',
-                    accelerator: 'Alt+Command+I',
-                    click: () => {
-                        this.mainWindow.webContents.toggleDevTools();
-                    },
-                },
-            ],
-        };
-        const subMenuViewProd: MenuItemConstructorOptions = {
-            label: 'View',
-            submenu: [
-                {
-                    label: 'Toggle Full Screen',
-                    accelerator: 'Ctrl+Command+F',
-                    click: () => {
-                        this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-                    },
-                },
-            ],
-        };
-        const subMenuWindow: DarwinMenuItemConstructorOptions = {
-            label: 'Window',
-            submenu: [
-                {
-                    label: 'Minimize',
-                    accelerator: 'Command+M',
-                    selector: 'performMiniaturize:',
-                },
-                {
-                    label: 'Close',
-                    accelerator: 'Command+W',
-                    selector: 'performClose:',
-                },
-                { type: 'separator' },
-                { label: 'Bring All to Front', selector: 'arrangeInFront:' },
-            ],
-        };
-        const subMenuHelp: MenuItemConstructorOptions = {
-            label: 'Help',
-            submenu: [
-                {
-                    label: 'Learn More',
-                    click() {
-                        shell.openExternal('https://electronjs.org');
-                    },
-                },
-                {
-                    label: 'Documentation',
-                    click() {
-                        shell.openExternal('https://github.com/electron/electron/tree/main/docs#readme');
-                    },
-                },
-                {
-                    label: 'Community Discussions',
-                    click() {
-                        shell.openExternal('https://www.electronjs.org/community');
-                    },
-                },
-                {
-                    label: 'Search Issues',
-                    click() {
-                        shell.openExternal('https://github.com/electron/electron/issues');
-                    },
-                },
-            ],
-        };
+    async buildDarwinTemplate() {
+        const subMenuViewDev: Array<MenuItemConstructorOptions> = [
+            { type: 'separator' },
+            { role: 'reload' },
+            { role: 'forceReload' },
+            { role: 'toggleDevTools' },
+        ];
 
-        const subMenuView =
-            process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-                ? subMenuViewDev
-                : subMenuViewProd;
-
-        return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
-    }
-
-    buildDefaultTemplate() {
-        const templateDefault = [
+        const darwinTemplateDefault: Array<MenuItemConstructorOptions> = [
             {
-                label: '&File',
+                label: 'RouteUI',
+                role: 'appMenu',
+                submenu: [
+                    { role: 'about', label: 'About RouteUI' },
+                    { type: 'separator' },
+                    { role: 'services' },
+                    { type: 'separator' },
+                    { role: 'hide', label: 'Hide RouteUI' },
+                    { role: 'hideOthers' },
+                    { role: 'unhide' },
+                    { type: 'separator' },
+                    { role: 'quit', label: 'Quit RouteUI' },
+                ],
+            },
+            {
+                label: 'Edit',
+                role: 'editMenu',
+                submenu: [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }],
+            },
+            {
+                label: 'Debug',
                 submenu: [
                     {
-                        label: '&Open',
-                        accelerator: 'Ctrl+O',
+                        label: 'Toggle logging',
+                        type: 'checkbox',
+                        checked: false,
+                        accelerator: 'Alt+Command+L',
+                        click: (menuItem) => {
+                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
+                        },
                     },
                     {
-                        label: '&Close',
-                        accelerator: 'Ctrl+W',
+                        label: 'Experimental Features',
+                        type: 'submenu',
+                        submenu: [
+                            {
+                                label: 'Toggle Queues Table',
+                                id: 'toggleQueuesTable',
+                                type: 'checkbox',
+                                checked:
+                                    (
+                                        await getSavedState<[boolean]>(
+                                            this.mainWindow,
+                                            ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        )
+                                    )?.[0] ?? false,
+                                click: (menuItem) => {
+                                    sendEventToWindow(
+                                        this.mainWindow,
+                                        ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        menuItem.checked,
+                                    );
+                                },
+                            },
+                        ],
+                    },
+                    ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+                        ? subMenuViewDev
+                        : []),
+                ],
+            },
+            {
+                label: 'Window',
+                role: 'windowMenu',
+                submenu: [
+                    { role: 'minimize' },
+                    { role: 'zoom' },
+                    { type: 'separator' },
+                    { role: 'togglefullscreen' },
+                    { type: 'separator' },
+                    { role: 'front' },
+                ],
+            },
+            {
+                label: 'Help',
+                role: 'help',
+                submenu: [
+                    {
+                        label: 'Report Issue',
                         click: () => {
-                            this.mainWindow.close();
+                            shell.openExternal('https://github.com/tenstorrent/route-ui/issues/new');
                         },
                     },
                 ],
             },
+        ];
+
+        return darwinTemplateDefault as Array<MenuItemConstructorOptions>;
+    }
+
+    async buildDefaultTemplate() {
+        const subMenuViewDev: Array<MenuItemConstructorOptions> = [
+            { type: 'separator' },
+            { role: 'reload' },
+            { role: 'forceReload' },
+            { role: 'toggleDevTools' },
+        ];
+
+        const templateDefault: Array<MenuItemConstructorOptions> = [
             {
-                label: '&View',
-                submenu:
-                    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-                        ? [
-                              {
-                                  label: '&Reload',
-                                  accelerator: 'Ctrl+R',
-                                  click: () => {
-                                      this.mainWindow.webContents.reload();
-                                  },
-                              },
-                              {
-                                  label: 'Toggle &Full Screen',
-                                  accelerator: 'F11',
-                                  click: () => {
-                                      this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-                                  },
-                              },
-                              {
-                                  label: 'Toggle &Developer Tools',
-                                  accelerator: 'Alt+Ctrl+I',
-                                  click: () => {
-                                      this.mainWindow.webContents.toggleDevTools();
-                                  },
-                              },
-                          ]
-                        : [
-                              {
-                                  label: 'Toggle &Full Screen',
-                                  accelerator: 'F11',
-                                  click: () => {
-                                      this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-                                  },
-                              },
-                          ],
+                label: '&File',
+                submenu: [{ type: 'separator' }, { role: 'close' }, { role: 'quit' }],
             },
             {
-                label: 'Help',
+                label: 'Debug',
                 submenu: [
                     {
-                        label: 'Learn More',
-                        click() {
-                            shell.openExternal('https://electronjs.org');
+                        label: 'Toggle logging',
+                        type: 'checkbox',
+                        checked: false,
+                        accelerator: 'Alt+Ctrl+L',
+                        click: (menuItem) => {
+                            menuItem.checked = !menuItem.checked;
+
+                            sendEventToWindow(this.mainWindow, ElectronEvents.TOGGLE_LOG_OUTPUT, menuItem.checked);
                         },
                     },
                     {
-                        label: 'Documentation',
-                        click() {
-                            shell.openExternal('https://github.com/electron/electron/tree/main/docs#readme');
-                        },
+                        label: 'Experimental Features',
+                        type: 'submenu',
+                        submenu: [
+                            {
+                                label: 'Toggle Queues Table',
+                                id: 'toggleQueuesTable',
+                                type: 'checkbox',
+                                checked:
+                                    (
+                                        await getSavedState<[boolean]>(
+                                            this.mainWindow,
+                                            ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        )
+                                    )?.[0] ?? false,
+                                click: (menuItem) => {
+                                    sendEventToWindow(
+                                        this.mainWindow,
+                                        ElectronEvents.TOGGLE_QUEUES_TABLE,
+                                        menuItem.checked,
+                                    );
+                                },
+                            },
+                        ],
                     },
-                    {
-                        label: 'Community Discussions',
-                        click() {
-                            shell.openExternal('https://www.electronjs.org/community');
-                        },
-                    },
-                    {
-                        label: 'Search Issues',
-                        click() {
-                            shell.openExternal('https://github.com/electron/electron/issues');
-                        },
-                    },
+                    ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+                        ? subMenuViewDev
+                        : []),
                 ],
             },
         ];

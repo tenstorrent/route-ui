@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 export const isIterable = (value: unknown): value is Iterable<unknown> =>
     value !== null &&
     typeof value === 'object' &&

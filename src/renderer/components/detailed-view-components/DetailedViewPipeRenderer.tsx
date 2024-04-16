@@ -1,36 +1,49 @@
-import React, { useEffect, useRef } from 'react';
-import * as d3 from 'd3';
-import { useSelector } from 'react-redux';
-import { RootState } from 'data/store/createStore';
-import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { NetworkLink, NOCLink } from '../../../data/Chip';
-import { calculateLinkCongestionColor, drawLink, drawPipesDirect, LinkRenderType } from '../../../utils/DrawingAPI';
-import { PipeSelection } from '../../../data/StateTypes';
+import * as d3 from 'd3';
+import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
+import React, { useContext, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+
+import { NOCLink, NetworkLink } from '../../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import {
     DramBankLinkName,
-    NOC2AXILinkName,
     EthernetLinkName,
-    NetworkLinkName,
     NOC,
+    NOC2AXILinkName,
     NOCLinkName,
+    NetworkLinkName,
     PCIeLinkName,
 } from '../../../data/Types';
+import {
+    getAllLinksForGraph,
+    getLinkSaturation,
+    getShowLinkSaturation,
+    getShowNOC0,
+    getShowNOC1,
+} from '../../../data/store/selectors/linkSaturation.selectors';
+import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
+import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
     className?: string;
+    size?: number;
 };
 
-const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className }) => {
+const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className, size = 80 }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
-    const showLinkSaturation = useSelector((state: RootState) => state.linkSaturation.showLinkSaturation);
-    const linkSaturationTreshold = useSelector((state: RootState) => state.linkSaturation.linkSaturation);
-    const allPipes = useSelector((state: RootState) => state.pipeSelection.pipes);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
+    const linkSaturationTreshold = useSelector(getLinkSaturation);
+    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const selectedPipeIds = useSelector(getSelectedPipesIds);
     const isHighContrast = useSelector(getHighContrastState);
-    const linksData = useSelector((state: RootState) => state.linkSaturation.links);
-    const noc0Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC0);
-    const noc1Saturation = useSelector((state: RootState) => state.linkSaturation.showNOC1);
+    const linksData = useSelector(getAllLinksForGraph(graphName));
+    const noc0Saturation = useSelector(getShowNOC0);
+    const noc1Saturation = useSelector(getShowNOC1);
 
     // TODO: see if useLayoutEffect is better in a future
     useEffect(() => {
@@ -65,10 +78,6 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         };
 
         links.forEach((link) => {
-            const selectedPipeIds = Object.values(allPipes)
-                .filter((pipeSegment: PipeSelection) => pipeSegment.selected)
-                .map((pipeSegment: PipeSelection) => pipeSegment.id);
-
             const validPipes = link.pipes
                 .map((pipeSegment) => pipeSegment.id)
                 .filter((pipeId) => selectedPipeIds.includes(pipeId));
@@ -82,7 +91,6 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
     }, [
         svgRef,
         links,
-        allPipes,
         showLinkSaturation,
         linkSaturationTreshold,
         linksData,
@@ -90,7 +98,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         noc1Saturation,
         isHighContrast,
     ]);
-    
+
     const linkNames = links.map((link) => link.name).join(' ');
     return (
         <div className='pipe-renderer' data-links={linkNames}>
@@ -104,9 +112,9 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
             {/*   </div> */}
             {/* ))} */}
             <svg
-                width='80'
-                height='80'
-                viewBox='0 0 80 80'
+                width={size}
+                height={size}
+                viewBox={`0 0 ${size} ${size}`}
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
                 className={`svg ${className}`}

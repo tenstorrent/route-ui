@@ -1,7 +1,11 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { readDirEntries, findFiles, validatePerfResultsFolder, getAvailableGraphNames } from '../FileLoaders';
+import { findFiles, getAvailableGraphNames, readDirEntries, validatePerfResultsFolder } from '../FileLoaders';
 
 const generateRandomKey = () => Math.random().toString(36).substring(2);
 

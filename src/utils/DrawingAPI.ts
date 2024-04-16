@@ -1,17 +1,26 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import type { CSSProperties } from 'react';
+
 import * as d3 from 'd3';
-import { ComputeNode } from '../data/Chip';
+import { ComputeNode } from '../data/GraphOnChip';
 import getPipeColor from '../data/ColorGenerator';
+import { ComputeNodeSiblings } from '../data/StateTypes';
 import {
+    CLUSTER_ETH_POSITION,
     DramBankLinkName,
     EthernetLinkName,
-    NetworkLinkName,
     NOC2AXILinkName,
     NOCLinkName,
+    NetworkLinkName,
     PCIeLinkName,
 } from '../data/Types';
 import { MAX_CONGESTION_VALUE, MAX_OPERATION_PERFORMANCE_THRESHOLD } from '../data/constants';
 
 export const NODE_SIZE = 100;
+
 const NOC_CENTER = { x: 30, y: NODE_SIZE - 30 };
 const CENTER_DISPERSION = 10; // dispersion from the starting point
 const NOC_0_X_OFFSET = -CENTER_DISPERSION;
@@ -98,6 +107,158 @@ export const drawLink = (
             .attr('fill', color || '#7e7e7e');
     }
 };
+
+const getEthLinkPoints = (ethPosition: CLUSTER_ETH_POSITION, direction: EthernetLinkName, size: number) => {
+    const offset = size * 0.17;
+
+    let lineStartX: number = 0;
+    let lineEndX: number = 0;
+    let lineStartY: number = 0;
+    let lineEndY: number = 0;
+
+    const arrowHeadHeight = 7;
+    const arrowHeadWidth = 7;
+    let arrowOffset = 0;
+    let arrow = { p1: '', p2: '', p3: '' };
+
+    const arrowShift = size * 0.9;
+
+    switch (ethPosition) {
+        case CLUSTER_ETH_POSITION.TOP:
+            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -arrowShift : size - arrowShift;
+            lineStartX = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
+            lineStartY = 0;
+            lineEndX = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
+            lineEndY = size;
+            break;
+        case CLUSTER_ETH_POSITION.BOTTOM:
+            arrowOffset = direction === EthernetLinkName.ETH_IN ? -arrowShift : size - arrowShift;
+            lineStartX = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            lineStartY = 0;
+            lineEndX = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            lineEndY = size;
+
+            break;
+        case CLUSTER_ETH_POSITION.LEFT:
+            arrowOffset = direction === EthernetLinkName.ETH_OUT ? -arrowShift : size - arrowShift;
+            lineStartX = 0;
+            lineStartY = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
+            lineEndX = size;
+            lineEndY = size / 2 + (direction === EthernetLinkName.ETH_IN ? offset : -offset);
+            break;
+        case CLUSTER_ETH_POSITION.RIGHT:
+            arrowOffset = direction === EthernetLinkName.ETH_IN ? -arrowShift : size - arrowShift;
+            lineStartX = 0;
+            lineStartY = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            lineEndX = size;
+            lineEndY = size / 2 + (direction === EthernetLinkName.ETH_IN ? -offset : offset);
+            break;
+        default:
+            console.error('Invalid eth position');
+    }
+    const arrowUp = {
+        p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+        p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+        p3: `${lineEndX},${lineEndY + arrowOffset}`,
+    };
+    const arrowDown = {
+        p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+        p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY - arrowHeadHeight - arrowOffset}`,
+        p3: `${lineEndX},${lineEndY - arrowOffset}`,
+    };
+    const arrowLeft = {
+        p1: `${lineEndX + arrowHeadHeight + arrowOffset},${lineEndY - arrowHeadWidth / 2}`,
+        p2: `${lineEndX + arrowHeadHeight + arrowOffset},${lineEndY + arrowHeadWidth / 2}`,
+        p3: `${lineEndX + arrowOffset},${lineEndY}`,
+    };
+    const arrowRight = {
+        p1: `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY - arrowHeadWidth / 2}`,
+        p2: `${lineEndX - arrowHeadHeight - arrowOffset},${lineEndY + arrowHeadWidth / 2}`,
+        p3: `${lineEndX - arrowOffset},${lineEndY}`,
+    };
+
+    switch (ethPosition) {
+        case CLUSTER_ETH_POSITION.TOP:
+            arrow = direction === EthernetLinkName.ETH_IN ? arrowDown : arrowUp;
+            break;
+        case CLUSTER_ETH_POSITION.BOTTOM:
+            arrow = direction === EthernetLinkName.ETH_OUT ? arrowDown : arrowUp;
+            break;
+        case CLUSTER_ETH_POSITION.LEFT:
+            arrow = direction === EthernetLinkName.ETH_IN ? arrowRight : arrowLeft;
+            break;
+        case CLUSTER_ETH_POSITION.RIGHT:
+            arrow = direction === EthernetLinkName.ETH_OUT ? arrowRight : arrowLeft;
+            break;
+        default:
+            console.error('Invalid eth position');
+    }
+    return { lineEndX, lineEndY, lineStartX, lineStartY, arrow };
+};
+
+export const drawEthLink = (
+    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+    ethPosition: CLUSTER_ETH_POSITION,
+    direction: EthernetLinkName,
+    size: number,
+    color?: string,
+    stroke: number = 1,
+) => {
+    const {
+        //
+        lineEndX,
+        lineEndY,
+        lineStartX,
+        lineStartY,
+        arrow,
+    } = getEthLinkPoints(ethPosition, direction, size);
+
+    svg.append('line')
+        .attr('x1', lineStartX)
+        .attr('y1', lineStartY)
+        .attr('x2', lineEndX)
+        .attr('y2', lineEndY)
+        .attr('stroke-width', stroke)
+        .attr('stroke', color || '#4d4d4d');
+};
+export const drawEthPipes = (
+    svg: d3.Selection<SVGSVGElement, unknown, null, undefined>,
+    ethPosition: CLUSTER_ETH_POSITION,
+    pipeIds: string[],
+    direction: EthernetLinkName,
+    size: number,
+) => {
+    const {
+        //
+        lineEndX,
+        lineEndY,
+        lineStartX,
+        lineStartY,
+        arrow,
+    } = getEthLinkPoints(ethPosition, direction, size);
+
+    if (pipeIds.length > 0) {
+        svg
+            // prettier
+            .append('polygon')
+            .attr('points', `${arrow.p1} ${arrow.p2} ${arrow.p3}`)
+            .attr('fill', '#ffffff');
+    }
+    const strokeLength = 4;
+    const dashArray = [strokeLength, (pipeIds.length - 1) * strokeLength];
+    pipeIds.forEach((pipeId: string, index: number) => {
+        svg.append('line')
+            .attr('x1', lineStartX)
+            .attr('y1', lineStartY)
+            .attr('x2', lineEndX)
+            .attr('y2', lineEndY)
+            .attr('stroke-width', 2)
+            .attr('stroke', getPipeColor(pipeId))
+            .attr('stroke-dasharray', dashArray.join(','))
+            .attr('stroke-dashoffset', index * dashArray[0]);
+    });
+};
+
 export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderType = LinkRenderType.GRID) => {
     let lineStartX: number = 0;
     let lineEndX: number = 0;
@@ -351,22 +512,24 @@ export const getLinkPoints = (linkName: NetworkLinkName, renderType: LinkRenderT
         case PCIeLinkName.PCIE_INOUT:
         case NOC2AXILinkName.NOC0_NOC2AXI:
         case NOC2AXILinkName.NOC1_NOC2AXI:
-            arrowOffset = 5;
-            lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
-            lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
-            lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET;
-            lineEndY = 0;
-            arrow = {
-                p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-                p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
-                p3: `${lineEndX},${lineEndY + arrowOffset}`,
-            };
+            if (renderType === LinkRenderType.DETAILED_VIEW) {
+                arrowOffset = 5;
+                lineStartX = NOC_CENTER.x + NOC_1_X_OFFSET;
+                lineStartY = NOC_CENTER.y + NOC_1_Y_OFFSET;
+                lineEndX = NOC_CENTER.x + NOC_1_X_OFFSET;
+                lineEndY = 0;
+                arrow = {
+                    p1: `${lineEndX - arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p2: `${lineEndX + arrowHeadWidth / 2},${lineEndY + arrowHeadHeight + arrowOffset}`,
+                    p3: `${lineEndX},${lineEndY + arrowOffset}`,
+                };
 
-            arrowSecondary = {
-                p1: `${lineStartX - arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
-                p2: `${lineStartX + arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
-                p3: `${lineStartX},${lineStartY - arrowOffset}`,
-            };
+                arrowSecondary = {
+                    p1: `${lineStartX - arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
+                    p2: `${lineStartX + arrowHeadWidth / 2},${lineStartY - arrowHeadHeight - arrowOffset}`,
+                    p3: `${lineStartX},${lineStartY - arrowOffset}`,
+                };
+            }
             break;
         default:
             console.warn('Unknown link type', linkName);
@@ -459,13 +622,8 @@ export const drawNOCRouter = (
         .attr('stroke', '#9e9e9e');
 };
 
-export const calculateOpCongestionColor = (
-    value: number,
-    min: number = 0,
-    max: number = MAX_OPERATION_PERFORMANCE_THRESHOLD,
-    isHC: boolean = false,
-): string => {
-    // const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
+export const calculateOpCongestionColor = (value: number, min: number = 0, isHC: boolean = false): string => {
+    const max = MAX_OPERATION_PERFORMANCE_THRESHOLD;
     const normalizedVal = Math.min(value, max);
     const ratio = (normalizedVal - min) / (max - min);
     const intensity = Math.round(ratio * 255);
@@ -540,25 +698,42 @@ export const getOffChipCongestionStyles = (color: string): {} => {
     return { background: gradient };
 };
 
-export const getNodeOpStyles = (
-    styles: {},
-    color: string | undefined,
-    border: { left: boolean; right: boolean; top: boolean; bottom: boolean },
-): {} => {
-    const borderSize = 2;
-    if (border.left) {
-        styles = { ...styles, borderLeft: `${borderSize}px solid ${color}` };
-    }
-    if (border.right) {
-        styles = { ...styles, borderRight: `${borderSize}px solid ${color}` };
-    }
-    if (border.top) {
-        styles = { ...styles, borderTop: `${borderSize}px solid ${color}` };
-    }
-    if (border.bottom) {
-        styles = { ...styles, borderBottom: `${borderSize}px solid ${color}` };
+export const getNodeOpBorderStyles = ({
+    node,
+    styles,
+    color,
+    siblings,
+    isSelected = false,
+}: {
+    node: ComputeNode;
+    siblings: ComputeNodeSiblings;
+    styles: CSSProperties;
+    color: string | undefined;
+    isSelected: boolean;
+}) => {
+    const newStyles: CSSProperties = { ...styles };
+    const borderStyle = `2px ${isSelected ? 'solid' : 'dashed'} ${color}`;
+
+    if (!siblings.left) {
+        newStyles.borderLeft = borderStyle;
     }
 
+    if (!siblings.right) {
+        newStyles.borderRight = borderStyle;
+    }
+
+    if (!siblings.top) {
+        newStyles.borderTop = borderStyle;
+    }
+
+    if (!siblings.bottom) {
+        newStyles.borderBottom = borderStyle;
+    }
+
+    return newStyles;
+};
+
+export const getNodeOpBackgroundStyles = (styles: CSSProperties, color: string | undefined) => {
     const gradientColor = color?.replace(')', ', 0.25)').replace('rgb', 'rgba');
     const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
 

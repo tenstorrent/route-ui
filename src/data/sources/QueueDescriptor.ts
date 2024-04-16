@@ -1,16 +1,27 @@
-import type { QueueName } from '../GraphTypes';
-import { QueueLocation } from '../Types';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-interface AllocationInfoJson {
+import { QueueLocation } from '../Types';
+import { QueueName } from '../GraphNames';
+
+export interface AllocationInfoJson {
     address: number;
     channel: number;
     subchannel: number;
 }
 
+export const QUEUE_BLOCK_FIELDS = ['t', 'ublock_rt', 'ublock_ct', 'mblock_m', 'mblock_n', 'ublock_order'] as const;
+
+export type QueueBlockDimensions = {
+    [key in (typeof QUEUE_BLOCK_FIELDS)[number]]: number | string;
+};
+
 export interface QueueDetailsJson {
     alias: string;
     'allocation-info': AllocationInfoJson[];
     'block-dim': string;
+    blockDimensions: QueueBlockDimensions;
     'data-format': string;
     'device-id': number;
     entries: number;

@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import { ChipDesignJSON } from './JSONDataTypes';
 import { Architecture, ComputeNodeType, ComputeNodeTypeArch, Loc } from './Types';
 
@@ -10,7 +14,7 @@ export default class ChipDesign {
 
     public nodes: ComputeNodeSimple[] = [];
 
-    constructor(json: ChipDesignJSON) {
+    constructor(json: ChipDesignJSON, chipId: number = 0) {
         if (json.arch_name.toLowerCase().includes(Architecture.GRAYSKULL)) {
             this.architecture = Architecture.GRAYSKULL;
         }
@@ -23,15 +27,15 @@ export default class ChipDesign {
 
         this.nodes.push(
             ...json.arc.map((loc) => {
-                return new ComputeNodeSimple(ComputeNodeType.CORE, loc);
+                return new ComputeNodeSimple(ComputeNodeType.CORE, loc, chipId);
             }),
             ...json.functional_workers.map((loc) => {
-                return new ComputeNodeSimple(ComputeNodeType.CORE, loc);
+                return new ComputeNodeSimple(ComputeNodeType.CORE, loc, chipId);
             }),
             ...json.dram
                 .map((channel, dramChannelId) => {
                     return channel.map((loc, dramSubChannelId) => {
-                        const core = new ComputeNodeSimple(ComputeNodeType.DRAM, loc);
+                        const core = new ComputeNodeSimple(ComputeNodeType.DRAM, loc, chipId);
                         core.dramChannelId = dramChannelId;
                         core.dramSubchannelId = dramSubChannelId;
                         return core;
@@ -39,14 +43,14 @@ export default class ChipDesign {
                 })
                 .flat(),
 
-            ...json.eth.map((loc) => {
-                return new ComputeNodeSimple(ComputeNodeType.ETHERNET, loc);
+            ...json.eth.map((loc, index) => {
+                return new ComputeNodeSimple(ComputeNodeType.ETHERNET, loc, chipId, index);
             }),
             ...json.pcie.map((loc) => {
-                return new ComputeNodeSimple(ComputeNodeType.PCIE, loc);
+                return new ComputeNodeSimple(ComputeNodeType.PCIE, loc, chipId);
             }),
             ...json.router_only.map((loc) => {
-                return new ComputeNodeSimple(ComputeNodeType.ROUTER, loc);
+                return new ComputeNodeSimple(ComputeNodeType.ROUTER, loc, chipId);
             }),
         );
         this.nodes = this.nodes.sort((a, b) => {
@@ -67,9 +71,17 @@ export class ComputeNodeSimple {
 
     public dramSubchannelId: number = 0;
 
-    constructor(type: ComputeNodeType, location: string) {
+    /** only applicable to concrete impelmentations */
+    public uid = '';
+
+    // TODO: shoudl only live on ETH type
+    public ethId = 0;
+
+    constructor(type: ComputeNodeType, location: string, chipId: number = 0, ethId: number = 0) {
         this.type = type;
         this.loc = { x: parseInt(location.split('-')[0], 10), y: parseInt(location.split('-')[1], 10) };
+        this.uid = `${chipId}-${location}`; // TODO: consider passing constructed UID
+        this.ethId = ethId;
     }
 }
 

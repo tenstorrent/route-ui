@@ -1,0 +1,6 @@
+# SSH Container Data
+data/
+
+# SSH keys
+*.pub
+*.key

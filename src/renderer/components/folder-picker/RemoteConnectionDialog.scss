@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+@import "../../scss/variables";
+
+.bp4-dialog.remote-connection-dialog {
+    background-color: $tt-slight-off-background;
+
+    .bp4-dialog-header {
+        background-color: $tt-off-background;
+
+        .bp4-icon, .bp4-heading {
+            color: $tt-light-gray;
+        }
+    }
+
+    .bp4-form-group-sub-label { color: $tt-light-gray; }
+
+    fieldset {
+        border: solid 1px $tt-medium-gray;
+        border-radius: 5px;
+    }
+}
+
+.verify-connection-item {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    .connection-status-icon {
+        animation: 0.7s steps(2) infinite alternate both;
+    }
+
+    &.status-IDLE .connection-status-icon { color: gray; }
+    &.status-PROGRESS .connection-status-icon {
+        animation-name: connection-test-progress;
+        color: gold;
+    }
+    &.status-FAILED .connection-status-icon { color: orangered; }
+    &.status-OK .connection-status-icon { color: greenyellow; }
+}
+
+@keyframes connection-test-progress {
+    from { color: gray; }
+    to { color: gold; }
+}

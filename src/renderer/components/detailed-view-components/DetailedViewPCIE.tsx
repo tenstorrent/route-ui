@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import React from 'react';
-import { ComputeNode, NetworkLink, NOC2AXILink, NOCLink, PCIeLink } from '../../../data/Chip';
+import { ComputeNode, NOC2AXILink, NOCLink, NetworkLink, PCIeLink } from '../../../data/GraphOnChip';
 import { NOC, NOC2AXILinkName, NOCLinkName, PCIeLinkName } from '../../../data/Types';
 import LinkDetails from '../LinkDetails';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
@@ -8,9 +12,10 @@ import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedView
 
 interface DetailedViewPCIERendererProps {
     node: ComputeNode;
+    graphName: string;
 }
 
-const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node }) => {
+const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, graphName }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -55,7 +60,7 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
-                        return <LinkDetails key={link.name} link={link} showEmpty={false} />;
+                        return <LinkDetails graphName={graphName} key={link.name} link={link} showEmpty={false} />;
                     })}
                 </div>
             </div>

@@ -1,0 +1,173 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+@import "../../scss/variables";
+
+.bottom-dock {
+    padding: 0 20px;
+    background-color: $tt-light-gray;
+    position: relative;
+    color-scheme: light;
+
+    .search-field {
+        margin-top: 10px;
+    }
+
+    .dock-close-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .operations-table pre {
+        color: $tt-dark-gray;
+    }
+
+    .bp4-tab-panel {
+        margin-top: 0px;
+    }
+
+    .bp4-tab {
+        border: none;
+        color: $tt-dark-gray;
+        transition: background-color 250ms linear, color 250ms linear, border 250ms ease-out;
+
+        &:hover {
+            color: $tt-medium-gray;
+        }
+
+        &[aria-selected="true"] {
+            color: $tt-dark-blue;
+            background-color: transparent;
+        }
+    }
+
+
+    .bp4-tab-indicator-wrapper .bp4-tab-indicator {
+        bottom: 2px;
+        height: 1px;
+        background-color: $tt-dark-blue;
+    }
+
+    .queues-table,
+    .operations-table,
+    .operands-table {
+        height: 255px;
+        margin-top: 5px;
+
+        .bp4-table-cell-ledger-odd {
+            background-color: $tt-extra-light-gray;
+        }
+
+        .bp4-table-cell {
+            &.align-right {
+                text-align: right;
+            }
+        }
+    }
+
+    .queues-table { height: 290px; }
+
+    .no-data-available {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 255px;
+        color: $tt-dark-gray;
+        font-weight: bold;
+    }
+
+    .op-element {
+        margin-bottom: 0;
+        gap: 5px;
+        display: grid;
+        grid-template-columns: 1fr 1fr auto 1fr;
+        align-items: center;
+
+        .highlighted-text {
+            color: $tt-black;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bp4-control:not(.bp4-align-right) {
+            margin: 0;
+            margin-right: -7px;
+        }
+
+        .op-type.icon {
+            line-height: 1;
+
+            &.queue {
+                svg {
+                    stroke: #5F6B7C;
+                }
+            }
+        }
+    }
+
+    .slowest-operand-direction-icon { margin-left: 2px; }
+
+    .table-operation-cell > div {
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
+        gap: 5px;
+
+    }
+
+    .table-operation-cell.align-right > div { justify-content: end; }
+
+    .bp4-table-column-name-text {
+        padding-right: 25px;
+    }
+
+    .can-select-all-rows .bp4-table-column-name-text {
+        padding-left: 35px;
+    }
+
+    .sortable-table-checkbox {
+        width: 0;
+        margin: 0;
+        position: absolute;
+        left: 10px;
+        top: -29.5px;
+    }
+
+    .sortable-table-header {
+        cursor: pointer;
+        position: absolute;
+        width: 100%;
+        // this is a little hackish, maybe find a more elegant solution
+        height: 30px;
+        top: -30px;
+
+        .sort-icon {
+            right: 5px;
+            top: 0; //calc(50% - 8px);
+            position: absolute;
+            padding-left: 25px;
+            background: linear-gradient(to left, $sort-header, transparent);
+
+            > span {
+                background-color: $sort-header;
+            }
+        }
+    }
+
+    .bp4-table-header {
+        &.current-sort {
+            .bp4-table-column-name {
+                //color: $tt-white-text;
+                //background-color: $tt-dark-gray;
+                background-color: $sort-header;
+            }
+
+            &.sorted-desc {
+
+            }
+        }
+    }
+}

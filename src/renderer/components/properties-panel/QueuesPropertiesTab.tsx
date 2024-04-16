@@ -1,95 +1,100 @@
-import React, { useContext, useMemo, useState } from 'react';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import DataSource from '../../../data/DataSource';
-import SearchField from '../SearchField';
+import { useContext, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
+import QueueIconMinus from '../../../main/assets/QueueIconMinus';
+import QueueIconPlus from '../../../main/assets/QueueIconPlus';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
+import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
-import Collapsible from '../Collapsible';
+import SearchField from '../SearchField';
 import SelectableOperation from '../SelectableOperation';
-import { clearAllQueues, selectQueue } from '../../../data/store/slices/nodeSelection.slice';
-import { RootState } from '../../../data/store/createStore';
-import QueueIconPlus from '../../../main/assets/QueueIconPlus';
-import QueueIconMinus from '../../../main/assets/QueueIconMinus';
-import { QueueLocation } from '../../../data/Types';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
-    const { chip } = useContext(DataSource);
+    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
+    const graphName = getActiveGraphName();
+
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const queueSelectionState = useSelector((state: RootState) => state.nodeSelection.queues);
-    const queuesList = useMemo(() => (chip ? [...chip.queues] : []), [chip]);
-    const setQueueSelectionState = (queueName: string, selected: boolean) =>
-        dispatch(
-            selectQueue({
-                queueName,
-                selected,
-            }),
-        );
+    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
+    const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
+
+    const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
     const selectFilteredQueue = () => {
-        if (!chip) {
+        if (!graphOnChip) {
             return;
         }
         Object.keys(queueSelectionState).forEach((name) => {
             if (name.toLowerCase().includes(filterQuery.toLowerCase())) {
-                dispatch(selectQueue({ queueName: name, selected: true }));
+                selectQueue(name, true);
             }
         });
     };
 
-
-
     return (
-        <div>
-            <SearchField
-                searchQuery={filterQuery}
-                onQueryChanged={setFilterQuery}
-                controls={[
-                    <Tooltip2
-                        content='Select all filtered queues'
-                        position={PopoverPosition.RIGHT}
-                        key='select-all-ops'
-                    >
-                        <Button icon={<QueueIconPlus />} onClick={() => selectFilteredQueue()} />
-                    </Tooltip2>,
-                    <Tooltip2 content='Deselect all queues' position={PopoverPosition.RIGHT} key='deselect-all-ops'>
-                        <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues())} />
-                    </Tooltip2>,
-                ]}
-            />
-            <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
-            <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
-            <div className='operations-wrap list-wrap'>
-                <div className='scrollable-content'>
-                    {queuesList.map((queue) => (
-                        <FilterableComponent
-                            key={queue.name}
-                            filterableString={queue.name}
-                            filterQuery={filterQuery}
-                            component={
-                                <Collapsible
-                                    key={queue.name}
-                                    label={
-                                        <SelectableOperation
-                                            disabled={queueSelectionState[queue.name]?.selected === undefined}
-                                            opName={queue.name}
-                                            value={queueSelectionState[queue.name]?.selected}
-                                            selectFunc={setQueueSelectionState}
-                                            stringFilter={filterQuery}
-                                        />
-                                    }
-                                    isOpen={allOpen}
-                                    contentStyles={{ color: '#000' }}
-                                >
-                                    {queue && <GraphVertexDetails graphNode={queue} />}
-                                </Collapsible>
-                            }
-                        />
-                    ))}
-                </div>
+        <div className='properties-container'>
+            <div className='properties-filter'>
+                <SearchField
+                    searchQuery={filterQuery}
+                    onQueryChanged={setFilterQuery}
+                    controls={[
+                        <Tooltip2
+                            content='Select all filtered queues'
+                            position={PopoverPosition.RIGHT}
+                            key='select-all-ops'
+                        >
+                            <Button icon={<QueueIconPlus />} onClick={() => selectFilteredQueue()} />
+                        </Tooltip2>,
+                        <Tooltip2
+                            content='Deselect all queues for active graph'
+                            position={PopoverPosition.RIGHT}
+                            key='deselect-all-ops'
+                        >
+                            <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues(graphName))} />
+                        </Tooltip2>,
+                    ]}
+                />
+                <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />
+                <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
+            </div>
+
+            <div className='properties-list'>
+                {queuesList.map((queue) => (
+                    <FilterableComponent
+                        key={queue.name}
+                        filterableString={queue.name}
+                        filterQuery={filterQuery}
+                        component={
+                            <Collapsible
+                                key={queue.name}
+                                label={
+                                    <SelectableOperation
+                                        disabled={disabledQueue(queue.name)}
+                                        opName={queue.name}
+                                        value={selected(queue.name)}
+                                        selectFunc={selectQueue}
+                                        stringFilter={filterQuery}
+                                    />
+                                }
+                                isOpen={allOpen}
+                                contentStyles={{ color: '#000' }}
+                            >
+                                {queue && <GraphVertexDetails graphNode={queue} />}
+                            </Collapsible>
+                        }
+                    />
+                ))}
             </div>
         </div>
     );

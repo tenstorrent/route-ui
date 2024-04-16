@@ -1,31 +1,26 @@
-// import yaml from 'js-yaml';
-import { useDispatch } from 'react-redux';
-import fs from 'fs';
-import { useNavigate } from 'react-router-dom';
-import { FC, useContext } from 'react';
-import { IconNames } from '@blueprintjs/icons';
-import { Button } from '@blueprintjs/core';
-import DataSource from '../../data/DataSource';
-import Chip from '../../data/Chip';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-interface OpsFileLoaderProps {
-    updateData: (data: Chip) => void;
-}
+// import yaml from 'js-yaml';
+import { Button } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import fs from 'fs';
+import { FC } from 'react';
+import useLogging from '../hooks/useLogging.hook';
+
+interface OpsFileLoaderProps {}
 
 /**
  * Temporary file loader for arch.yaml files
- * @param updateData
  * @constructor
  *
  * @description This component is used to test load arch.yaml files to see data compatibility and pave the way for the new arch.json format
  * UPDATE: should be replaced with baked in json arch files
  *
  */
-const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
-    const navigate = useNavigate();
-    const { setChip } = useContext(DataSource);
-
-    const dispatch = useDispatch();
+const OpsFileLoader: FC<OpsFileLoaderProps> = () => {
+    const logger = useLogging();
 
     const loadFile = async () => {
         // eslint-disable-next-line global-require
@@ -44,7 +39,7 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
 
             fs.readFile(String(filelist), 'utf-8', (err, data) => {
                 if (err) {
-                    console.error(err);
+                    logger.error(`An error occurred reading the file: ${err.message}`);
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
@@ -52,7 +47,7 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = ({ updateData }) => {
                     try {
                         const json = JSON.parse(data);
                     } catch (error) {
-                        console.error(error);
+                        logger.error(`Error parsing JSON file: ${(error as Error).message}`);
                     }
                 });
             });

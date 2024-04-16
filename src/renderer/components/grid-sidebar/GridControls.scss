@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+@import '../../scss/variables';
+
+.warning-button {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+
+    svg {
+        fill: $alert-color !important;
+    }
+}

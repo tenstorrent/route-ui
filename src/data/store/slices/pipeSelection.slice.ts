@@ -1,5 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PipeSelectionState, PipeSelection } from 'data/StateTypes';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { PipeSelection, PipeSelectionState } from 'data/StateTypes';
 
 const pipesInitialState: PipeSelectionState = {
     pipes: {},
@@ -12,12 +16,13 @@ const pipeSelectionSlice = createSlice({
     initialState: pipesInitialState,
     reducers: {
         loadPipeSelection(state, action: PayloadAction<PipeSelection[]>) {
-            state.pipes = {};
-            state.pipeIds = [];
+            // state.pipes = {};
+            // state.pipeIds = [];
             action.payload.forEach((item) => {
                 state.pipes[item.id] = item;
                 state.pipeIds.push(item.id);
             });
+            state.pipeIds = [...new Set(state.pipeIds)];
         },
         updateFocusPipe(state, action: PayloadAction<string | null>) {
             state.focusPipe = action.payload;
@@ -27,6 +32,14 @@ const pipeSelectionSlice = createSlice({
             if (state.pipes[id]) {
                 state.pipes[id].selected = selected;
             }
+        },
+        updateMultiplePipeSelection(state, action: PayloadAction<{ ids: string[]; selected: boolean }>) {
+            const { ids, selected } = action.payload;
+            ids.forEach((id) => {
+                if (state.pipes[id]) {
+                    state.pipes[id].selected = selected;
+                }
+            });
         },
         clearAllPipes(state) {
             state.pipeIds.forEach((id) => {
@@ -38,6 +51,10 @@ const pipeSelectionSlice = createSlice({
                 state.pipes[id].selected = true;
             });
         },
+        resetPipeSelection(state) {
+            state.pipes = {};
+            state.pipeIds = [];
+        },
     },
 });
 export const {
@@ -47,6 +64,8 @@ export const {
     clearAllPipes,
     selectAllPipes,
     updateFocusPipe,
+    resetPipeSelection,
+    updateMultiplePipeSelection,
 } = pipeSelectionSlice.actions;
 
 export const pipeSelectionReducer = pipeSelectionSlice.reducer;

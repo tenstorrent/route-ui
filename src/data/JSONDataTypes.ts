@@ -1,4 +1,15 @@
-import { Architecture, ComputeNodeTypeArch } from './Types';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { ComputeNodeTypeArch } from './Types';
+
+export interface GraphnameToEpochToDeviceJSON {
+    [key: string]: {
+        epoch_id: number;
+        target_device: number;
+    };
+}
 
 export interface NodeDataJSON {
     location: number[];
@@ -9,6 +20,7 @@ export interface NodeDataJSON {
     op_cycles: number;
     dram_channel?: number;
     dram_subchannel?: number;
+    harvested?: boolean;
     links: { [key: string]: NOCLinkJSON };
 }
 
@@ -64,6 +76,7 @@ export interface ChipDesignJSON {
     pcie: string[];
     router_only: string[];
     functional_workers: string[];
+
     [unknownKey: string]: unknown;
 }
 

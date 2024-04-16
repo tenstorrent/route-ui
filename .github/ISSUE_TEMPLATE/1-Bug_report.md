@@ -11,9 +11,8 @@ labels: 'bug'
 <!-- If the following boxes are not ALL checked, your issue is likely to be closed -->
 
 - [ ] Using npm
-- [ ] Using an up-to-date [`main` branch](https://github.com/electron-react-boilerplate/electron-react-boilerplate/tree/main)
+- [ ] Using an up-to-date [`main` branch](https://github.com/tenstorrent/route-ui/tree/main)
 - [ ] Using latest version of devtools. [Check the docs for how to update](https://electron-react-boilerplate.js.org/docs/dev-tools/)
-- [ ] Tried solutions mentioned in [#400](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/400)
 - [ ] For issue in production release, add devtools output of `DEBUG_PROD=true npm run build && npm start`
 
 ## Expected Behavior
@@ -54,14 +53,3 @@ labels: 'bug'
 - Node version :
 - electron-react-boilerplate version or branch :
 - Operating System and version :
-- Link to your project :
-
-<!---
-❗️❗️ Also, please consider donating (https://opencollective.com/electron-react-boilerplate-594) ❗️❗️
-
-Donations will ensure the following:
-
-🔨 Long term maintenance of the project
-🛣 Progress on the roadmap
-🐛 Quick responses to bug reports and help requests
- -->

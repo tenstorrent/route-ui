@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import Ajv, { ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import draft06 from 'ajv/lib/refs/json-schema-draft-06.json';

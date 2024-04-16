@@ -1,34 +1,38 @@
-import React, { useContext, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { openDetailedView } from 'data/store/slices/detailedView.slice';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
-import { getArchitectureSelector } from 'data/store/selectors/uiState.selectors';
-import { ComputeNode, NOCLink } from '../../../data/Chip';
+import { openDetailedView } from 'data/store/slices/uiState.slice';
+import React, { useContext, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
+import { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
-import LinkDetails from '../LinkDetails';
 import { filterIterable } from '../../../utils/IterableHelpers';
-import DataSource, { GridContext } from '../../../data/DataSource';
-import DetailedViewPipeControls from './DetailedViewPipeControls';
-import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
+import LinkDetails from '../LinkDetails';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
+import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
+import DetailedViewPipeControls from './DetailedViewPipeControls';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
+    graphName: string;
 }
 
-const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node }) => {
-    const { chip } = useContext<GridContext>(DataSource);
-    const architecture = useSelector(getArchitectureSelector);
+const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
+    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
     const nodeList = useMemo(() => {
-        if (chip && node.dramChannelId > -1) {
-            return [...filterIterable(chip?.nodes, (n) => n.dramChannelId === node.dramChannelId)];
+        if (graphOnChip && node.dramChannelId > -1) {
+            return [...filterIterable(graphOnChip?.nodes, (n) => n.dramChannelId === node.dramChannelId)];
         }
         return [];
-    }, [node, chip]);
+    }, [node, graphOnChip]);
 
     const dram = node.dramChannel || null;
 
@@ -66,6 +70,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                 onClick={() => {
                                                     dispatch(
                                                         updateNodeSelection({
+                                                            graphName,
                                                             id: currentNode.uid,
                                                             selected: true,
                                                         }),
@@ -129,6 +134,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
+                                    graphName={graphName}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
                                 />
@@ -142,12 +148,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
+                                graphName={graphName}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} link={link} showEmpty={false} />
+                        <LinkDetails key={link.name} graphName={graphName} link={link} showEmpty={false} />
                     ))}
                 </div>
             </div>

@@ -1,8 +1,13 @@
-import React, { useEffect } from 'react';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import { Button, Collapse } from '@blueprintjs/core';
-import { JSX } from 'react/jsx-runtime';
 import { IconNames } from '@blueprintjs/icons';
-import '../scss/Collapsible.scss';
+import React, { useEffect } from 'react';
+import { JSX } from 'react/jsx-runtime';
+
+import './Collapsible.scss';
 
 interface CollapsibleProps {
     label: string | JSX.Element;
@@ -21,9 +26,9 @@ interface CollapsibleProps {
  */
 const Collapsible: React.FC<React.PropsWithChildren<CollapsibleProps>> = ({
     label,
-    isOpen=true,
-    styles= {},
-    contentStyles= {},
+    isOpen = true,
+    styles = {},
+    contentStyles = {},
     children,
 }) => {
     const [isOpenState, setIsOpenState] = React.useState(isOpen);

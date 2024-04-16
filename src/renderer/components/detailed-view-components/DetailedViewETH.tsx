@@ -1,7 +1,11 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 // new component DetailedViewDRAM
 
 import React from 'react';
-import { ComputeNode, NetworkLink, NOCLink } from '../../../data/Chip';
+import { ComputeNode, NOCLink, NetworkLink } from '../../../data/GraphOnChip';
 import { NOCLinkName } from '../../../data/Types';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 import LinkDetails from '../LinkDetails';
@@ -10,9 +14,10 @@ import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 
 interface DetailedViewETHRendererProps {
     node: ComputeNode;
+    graphName: string;
 }
 
-const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node }) => {
+const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, graphName }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -62,7 +67,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node 
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
-                        return <LinkDetails key={link.name} link={link} showEmpty={false} />;
+                        return <LinkDetails graphName={graphName} key={link.name} link={link} showEmpty={false} />;
                     })}
                 </div>
             </div>

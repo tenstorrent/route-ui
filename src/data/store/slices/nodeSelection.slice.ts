@@ -1,11 +1,45 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
-    groups: {},
+    nodeListOrder: {},
+    operations: {},
     queues: {},
-    dram: [],
+    dram: {},
+    focusNode: null,
+};
+
+const findSiblingNodeLocations = (node: ComputeNodeState, nodes: ComputeNodeState[]) => {
+    const top = nodes
+        .filter((n) => n.loc.x === node.loc.x && n.loc.y <= node.loc.y - 1)
+        .sort((a, b) => b.loc.y - a.loc.y)[0]?.loc;
+    const bottom = nodes
+        .filter((n) => n.loc.x === node.loc.x && n.loc.y >= node.loc.y + 1)
+        .sort((a, b) => a.loc.y - b.loc.y)[0]?.loc;
+    const left = nodes
+        .filter((n) => n.loc.y === node.loc.y && n.loc.x <= node.loc.x - 1)
+        .sort((a, b) => b.loc.x - a.loc.x)[0]?.loc;
+    const right = nodes
+        .filter((n) => n.loc.y === node.loc.y && n.loc.x >= node.loc.x + 1)
+        .sort((a, b) => a.loc.x - b.loc.x)[0]?.loc;
+
+    return {
+        top,
+        bottom,
+        left,
+        right,
+    };
+};
+
+const setSiblings = (nodes: ComputeNodeState[]) => {
+    nodes.forEach((node) => {
+        node.siblings = findSiblingNodeLocations(node, nodes);
+    });
 };
 
 const setBorders = (nodes: ComputeNodeState[]) => {
@@ -28,98 +62,141 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
-        // this only runs one time per file load
-        loadNodesData(state, action: PayloadAction<ComputeNodeState[]>) {
-            state.groups = {};
+        initialLoadAllNodesData(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
             state.nodeList = {};
-            state.dram = [];
+            state.nodeListOrder = {};
+            state.operations = {};
             state.queues = {};
-            action.payload.forEach((item) => {
-                state.nodeList[item.id] = item;
-                if (item.opName !== '') {
-                    if (!state.groups[item.opName]) {
-                        state.groups[item.opName] = { data: [], selected: false };
+            state.dram = {};
+            state.focusNode = null;
+
+            Object.entries(action.payload).forEach(([graphName, computaNodeStateList]) => {
+                state.dram[graphName] = [];
+                state.nodeList[graphName] = {};
+                state.nodeListOrder[graphName] = [];
+                state.queues[graphName] = {};
+                state.operations[graphName] = {};
+
+                computaNodeStateList.forEach((item) => {
+                    state.nodeList[graphName][item.id] = item;
+
+                    if (item.queueNameList.length > 0) {
+                        item.queueNameList.forEach((queueName) => {
+                            if (!state.queues[graphName][queueName]) {
+                                state.queues[graphName][queueName] = { data: [], selected: false };
+                            }
+                            state.queues[graphName][queueName].data.push(item);
+                        });
                     }
-                    state.groups[item.opName].data.push(item);
-                }
-                if (item.dramChannelId !== -1) {
-                    if (!state.dram[item.dramChannelId]) {
-                        state.dram[item.dramChannelId] = { data: [], selected: false };
-                    }
-                    state.dram[item.dramChannelId].data.push(item);
-                }
-                if (item.queueNameList.length > 0) {
-                    item.queueNameList.forEach((queueName) => {
-                        if (!state.queues[queueName]) {
-                            state.queues[queueName] = { data: [], selected: false };
+
+                    if (item.dramChannelId !== -1) {
+                        if (!state.dram[graphName][item.dramChannelId]) {
+                            state.dram[graphName][item.dramChannelId] = { data: [], selected: false };
                         }
-                        state.queues[queueName].data.push(item);
-                    });
-                }
-            });
-            Object.values(state.groups).forEach((group) => {
-                setBorders(group.data);
-            });
-            Object.values(state.queues).forEach((queue) => {
-                setBorders(queue.data);
-            });
-            state.dram.forEach((dramElement) => {
-                setBorders(dramElement.data);
+                        state.dram[graphName][item.dramChannelId].data.push(item);
+                    }
+
+                    if (item.opName !== '') {
+                        if (!state.operations[graphName][item.opName]) {
+                            state.operations[graphName][item.opName] = { data: [], selected: false };
+                        }
+                        state.operations[graphName][item.opName].data.push(item);
+                    }
+                });
+
+                state.dram[graphName].forEach((dramElement) => {
+                    setBorders(dramElement.data);
+                });
+
+                Object.values(state.queues[graphName]).forEach((queue) => {
+                    setSiblings(queue.data);
+                });
+
+                Object.values(state.operations[graphName]).forEach((operation) => {
+                    setSiblings(operation.data);
+                });
             });
         },
-        updateNodeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
-            const { id, selected } = action.payload;
-            const node: ComputeNodeState | undefined = state.nodeList[id];
+
+        updateNodeSelection(state, action: PayloadAction<{ graphName: string; id: string; selected: boolean }>) {
+            const { graphName, id, selected } = action.payload;
+            const node: ComputeNodeState | undefined = state.nodeList[graphName][id];
 
             if (node) {
                 node.selected = selected;
             }
-            state.dram.forEach((dramGroup) => {
-                if (dramGroup.data.map((n) => n.id).filter((nodeid) => state.nodeList[nodeid].selected).length > 0) {
+
+            const nodeIndex = state.nodeListOrder[graphName].indexOf(id);
+            if (nodeIndex > -1 && !selected) {
+                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName]].toSpliced(nodeIndex, 1);
+            }
+
+            if (nodeIndex === -1 && selected) {
+                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName], id];
+            }
+
+            state.dram[graphName].forEach((dramGroup) => {
+                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[graphName][n.id].selected);
+
+                if (hasSelectedNode) {
                     dramGroup.selected = true;
                 } else {
                     dramGroup.selected = false;
                 }
             });
         },
+        selectOperation(state, action: PayloadAction<{ graphName: string; opName: string; selected: boolean }>) {
+            const { graphName, opName, selected } = action.payload;
+            const operation = state.operations[graphName][opName];
 
-        /** select operation */
-        selectGroup(state, action: PayloadAction<{ opName: string; selected: boolean }>) {
-            // TODO: refactor
-            const { opName, selected } = action.payload;
-            const group = state.groups[opName];
-            if (group) {
-                group.selected = selected;
+            if (operation) {
+                operation.selected = selected;
             }
         },
-        clearAllOperations(state) {
-            Object.values(state.groups).forEach((group) => {
-                group.selected = false;
+        selectAllOperations(state, action: PayloadAction<string>) {
+            Object.values(state.operations[action.payload]).forEach((operation) => {
+                operation.selected = true;
             });
         },
-        selectQueue(state, action: PayloadAction<{ queueName: string; selected: boolean }>) {
-            const { queueName, selected } = action.payload;
-            const queue = state.queues[queueName];
+        clearAllOperations(state, action: PayloadAction<string>) {
+            Object.values(state.operations[action.payload]).forEach((operation) => {
+                operation.selected = false;
+            });
+        },
+        selectQueue(state, action: PayloadAction<{ graphName: string; queueName: string; selected: boolean }>) {
+            const { graphName, queueName, selected } = action.payload;
+            const queue = state.queues[graphName][queueName];
             if (queue) {
                 queue.selected = selected;
             }
         },
-        clearAllQueues(state) {
-            Object.values(state.queues).forEach((queue) => {
+        selectAllQueues(state, action: PayloadAction<string>) {
+            Object.values(state.queues[action.payload]).forEach((queue) => {
+                queue.selected = true;
+            });
+        },
+        clearAllQueues(state, action: PayloadAction<string>) {
+            Object.values(state.queues[action.payload]).forEach((queue) => {
                 queue.selected = false;
             });
-        }
+        },
+        updateFocusNode(state, action: PayloadAction<string | null>) {
+            state.focusNode = action.payload;
+        },
     },
 });
 
 export const {
     //
-    loadNodesData,
+    initialLoadAllNodesData,
     updateNodeSelection,
-    selectGroup,
+    selectOperation,
+    selectAllOperations,
     clearAllOperations,
     selectQueue,
+    selectAllQueues,
     clearAllQueues,
+    updateFocusNode,
 } = nodeSelectionSlice.actions;
 
 export const nodeSelectionReducer = nodeSelectionSlice.reducer;

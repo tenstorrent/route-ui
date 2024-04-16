@@ -1,20 +1,38 @@
-import useFileLoader from 'renderer/hooks/useFileLoader.hook';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+import { FC, useContext } from 'react';
+import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import PopoverMenu from '../PopoverMenu';
 
-function GraphSelector() {
-    const { selectedGraph, handleSelectGraph, availableGraphs } = useFileLoader();
+interface GraphSelectorProps {
+    disabled?: boolean;
+    label?: string;
+    onSelectGraph: (graph: string) => void;
+}
 
-    return availableGraphs.length ? (
-        <PopoverMenu // Graph picker
-            label={selectedGraph}
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph }) => {
+    const { getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
+    const selectedGraph = getActiveGraphName();
+    const availableGraphs = Object.keys(graphOnChipList);
+
+    return (
+        <PopoverMenu
+            label={selectedGraph || (label ?? 'Select graph')}
             options={availableGraphs}
             selectedItem={selectedGraph}
-            onSelectItem={handleSelectGraph}
-            disabled={false}
+            onSelectItem={(graph) => {
+                onSelectGraph(graph);
+            }}
+            disabled={disabled || availableGraphs?.length === 0}
         />
-    ) : (
-        <div>{selectedGraph}</div>
     );
-}
+};
+
+GraphSelector.defaultProps = {
+    disabled: false,
+    label: undefined,
+};
 
 export default GraphSelector;

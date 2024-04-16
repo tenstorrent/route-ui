@@ -1,10 +1,14 @@
 {
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
+  "editor.formatOnPaste": true,
+  "editor.indentSize": 2,
+  
   "files.associations": {
     ".eslintrc": "jsonc",
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
-  
+
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -12,9 +16,29 @@
     "typescriptreact"
   ],
 
-  "javascript.validate.enable": false,
-  "javascript.format.enable": false,
-  "typescript.format.enable": false,
+  "javascript.validate.enable": true,
+  "javascript.format.enable": true,
+  "typescript.format.enable": true,
+  "typescript.preferences.importModuleSpecifierEnding": "auto",
+  "javascript.preferences.importModuleSpecifierEnding": "auto",
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
 
   "search.exclude": {
     ".git": true,

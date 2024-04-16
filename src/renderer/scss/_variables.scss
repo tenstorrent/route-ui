@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 /* Tenstorrent powerpoint theme */
 $tt-yellow: #ffd10a;
 $tt-red: #f04f5e;
@@ -8,6 +12,7 @@ $tt-slight-off-background: #383840;
 $tt-very-dark-gray: #1c2127;
 $tt-black: #000000;
 $tt-white-text: #fefef6;
+$tt-extra-light-gray: #f5f5f5;
 $tt-light-gray: #eeeee6;
 $tt-medium-light-gray: #cbcbcb;
 $tt-medium-gray: #909096;
@@ -19,10 +24,12 @@ $tt-dark-blue: #004c9b;
 
 $bright-highlight: #99ff00;
 $node-select: #ffd500;
+$node-select-focus: #99c4ff;
 $core-highlight-inout: #ff3c00;
 $core-highlight-output: #0077ff;
 $pipe-select: #fff58a;
 $c-dram: #7abdcc;
+$hc-core: #f996ff;
 $c-core: #a5cc7a;
 $c-router: #d0c079;
 $c-eth: #a794ee;
@@ -36,3 +43,44 @@ $link-saturation-fill: rgba(95, 107, 124, 0.2);
 
 $detailed-vew-component: #a6bce5;
 $detailed-vew-light-text: #99c4ff;
+
+$sort-header: #d8e4f6;
+
+$focus-ring: rgba(142, 243, 47, 0.9);
+
+$alert-color: #FF6C0A;
+
+/* Layout sizes */
+$top-bar-height: 50px;
+$initial-dock-height: 340px;
+
+$sidebar-width: 30px;
+$controls-panel-width: 230px;
+$compute-node-width: 260px;
+$properties-panel-width: 300px;
+
+/* Media query mixins */
+$desktop: 1024px;
+$desktop-large: 1440px;
+$desktop-4k: 2560px;
+
+@mixin min-desktop {
+    @media (min-width: $desktop) {
+        @content;
+    }
+}
+
+@mixin min-desktop-large {
+    @media (min-width: $desktop-large) {
+        @content;
+    }
+}
+
+@mixin min-desktop-4k {
+    @media (min-width: $desktop-4k) {
+        @content;
+    }
+}
+
+$detailed-view-zindex: 80;
+$cluster-view-zindex: 100;

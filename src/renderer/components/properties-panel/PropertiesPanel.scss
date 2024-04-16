@@ -1,0 +1,316 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+@import "../../scss/variables";
+
+.properties-panel {
+    background-color: $tt-medium-light-gray;
+    flex-grow: 1;
+    overflow-x: auto;
+    white-space: nowrap;
+    color-scheme: light;
+
+    .properties-panel__content {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .collapsible-component {
+        .op-element {
+            margin-bottom: 0;
+        }
+
+        .bp4-icon svg {
+            fill: $tt-dark-gray;
+        }
+    }
+}
+
+.properties-filter {
+    padding-inline: 10px;
+}
+
+.properties-panel-nodes {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-items: start;
+    width: fit-content;
+    padding-block: 10px;
+    gap: 20px;
+    height: fit-content;
+
+
+    .node-element {
+        width: $compute-node-width;
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: $tt-off-background;
+        padding: 10px;
+
+        h3 {
+            color: $tt-black;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .hover-wrapper {
+                display: flex;
+                align-items: center;
+                padding: 5px;
+                gap: 5px;
+                flex-grow: 1;
+
+                & * {
+                    pointer-events: none;
+                }
+            }
+
+            .bp4-button {
+                margin: 5px;
+            }
+
+            &.focus {
+                background-image: linear-gradient(
+                        to bottom,
+                        color-mix(in srgb, #fff 40%, transparent),
+                        color-mix(in srgb, #fff 40%, transparent)
+                );
+            }
+        }
+
+        .io-label {
+            color: $tt-white-text;
+            margin-bottom: 5px;
+        }
+
+        .node-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+    }
+
+    .producer-consumer {
+        margin-bottom: 10px;
+        margin-left: 1px;
+
+        h3 {
+            margin-left: -10px;
+            color: $tt-white-text;
+        }
+
+        h2 {
+            max-width: 50vw;
+            display: inline-block;
+            text-wrap: wrap;
+            word-break: break-word;
+            color: $tt-white-text;
+        }
+    }
+}
+
+.properties-tabs {
+    display: flex;
+    flex-direction: column;
+    justify-items: stretch;
+    align-items: stretch;
+    height: 100%;
+
+    .bp4-tab-list {
+        padding-inline: 10px;
+        padding-block-start: 10px;
+    }
+
+    .bp4-tab {
+        background-color: $tt-medium-light-gray;
+        color: $tt-black;
+        font-size: 16px;
+
+        &[aria-selected="true"] {
+            color: $tt-black;
+        }
+
+        &[data-tab-id="tab-ops"] {
+            svg {
+                fill: $tt-dark-gray;
+            }
+        }
+
+        &[data-tab-id="tab-queues"] {
+            svg {
+                stroke: $tt-dark-gray;
+            }
+        }
+    }
+
+    .bp4-tab-panel {
+        flex-grow: 1;
+        height: 100%;
+        overflow: auto;
+    }
+
+    .properties-container {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        height: 100%;
+        gap: 10px;
+    }
+
+    .properties-list {
+        overflow: auto;
+        height: 100%;
+        scrollbar-gutter: stable;
+        padding-inline: 10px;
+        width: 100%;
+    }
+
+
+    .op-type.icon {
+        line-height: 1;
+        margin-left: -7px;
+
+        &.op {
+            svg {
+                fill: #5F6B7C;
+            }
+        }
+
+        &.queue {
+            svg {
+                stroke: #5F6B7C;
+                fill: none;
+            }
+        }
+    }
+
+    .op-element {
+        color: $tt-black;
+        display: flex;
+        align-items: center;
+        margin-bottom: 6px;
+        gap: 5px;
+
+        .highlighted-text {
+            flex-shrink: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .core-runtime-metrics {
+        margin-left: 12px;
+
+        .model-perf-estimate {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+
+            .bp4-icon {
+                svg {
+                    fill: $tt-yellow;
+                }
+
+                &.out-of-memory {
+                    svg {
+                        fill: currentColor;
+                    }
+                }
+            }
+
+        }
+
+        .core-runtime-item {
+            margin-bottom: 4px;
+            display: flex;
+
+            .bp4-popover2-target {
+                display: flex;
+            }
+
+            h4 {
+                font-size: 10pt;
+                padding-right: 6px;
+            }
+
+            .core-runtime-value {
+                font-size: 10pt;
+            }
+        }
+    }
+
+    .graph-vertex-details {
+        color: #000;
+        margin-left: 20px;
+
+        .queue-detail-item {
+            margin: 4px 0 10px 12px;
+            display: flex;
+
+            .queue-detail-label {
+                font-size: 12px;
+                padding-right: 6px;
+            }
+
+            .queue-detail-value {
+                font-size: 12px;
+            }
+        }
+    }
+
+    label {
+        margin-bottom: 0;
+    }
+
+    .io-label {
+        margin-left: 12px;
+        margin-bottom: 6px;
+    }
+
+    .operation-operand {
+        margin-bottom: 5px;
+        margin-left: 20px;
+
+        p {
+            margin-bottom: 0;
+            font-size: 12px;
+        }
+    }
+
+    .pipes-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+
+        li {
+            padding-top: 4px;
+            padding-left: 5px;
+            font-size: 12px;
+            padding-bottom: 5px;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 100;
+            color: $tt-very-dark-gray;
+
+            .bp4-control.bp4-checkbox {
+                margin-bottom: 0;
+            }
+
+            .label {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
+        }
+    }
+}

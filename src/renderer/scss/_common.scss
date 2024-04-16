@@ -1,21 +1,31 @@
-body {
-    /*position: relative;
-    color: white;*/
-    /*overflow-y: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;*/
-    //height: 100vh;
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+:root {
+    color-scheme: dark;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+    pointer-events: none;
+}
+
+::-webkit-scrollbar-button {
+}
+
+body {
     margin: 0;
     background: $tt-background;
     color: $tt-white-text;
     font-family: 'Arial Nova', Arial, sans-serif;
     overflow-y: hidden;
     overflow-x: hidden;
+    height: 100vh;
+    display: flex;
 }
 
-* {
+*, *::before, *::after {
     box-sizing: border-box;
 }
 
@@ -23,10 +33,36 @@ a {
     color: $tt-light-blue;
 }
 
-*:active,
-*:focus {
-    outline: 0;
-    border: none;
+
+:focus {
+    outline-offset: 0px;
+}
+
+.bp4-control input:focus ~ .bp4-control-indicator {
+    outline-offset: 0;
+}
+
+:focus {
+    outline: $focus-ring solid 2px;
+    outline-offset: 0px;
+}
+
+.bp4-control input:focus ~ .bp4-control-indicator {
+    outline: $focus-ring solid 2px;
+    outline-offset: 0;
+}
+
+
+.node-item:focus {
+    outline: none;
+    //outline-offset: -2px;
+}
+
+.tt-keyboard-focus {
+    .node-item:focus {
+        outline: $focus-ring solid 2px;
+        outline-offset: -2px;
+    }
 }
 
 $top-nav-height: 70px;
@@ -72,21 +108,21 @@ $footer-height: 20px;
     justify-content: flex-start;
     align-items: center;
     gap: 20px;
+    margin-inline-end: 10px;
 }
 
 .splash-screen {
-    display: grid;
+    display: flex;
     width: 100vw;
     height: calc(100vh - 50px);
     grid-template-columns: 1fr;
-    justify-items: center;
+    justify-content: center;
     align-items: center;
     align-content: center;
     gap: 40px;
 }
 
 button, .button {
-    //@include common-monserrat;
     background-color: $tt-medium-blue;
     border: none;
     border-radius: 2px;
@@ -109,15 +145,16 @@ button, .button {
             background-color: lighten($tt-medium-blue, 20%);
         }
 
-        &:focus {
-            outline: none;
-        }
+        //&:focus {
+        //    outline: none;
+        //}
     }
 
     &.node-item {
         background-color: inherit;
         cursor: default;
         transition: color 100ms linear, background-color 100ms linear;
+
         &:hover {
             background-color: transparentize($tt-medium-blue, 0.9);
         }
@@ -127,4 +164,3 @@ button, .button {
 h1, h2, h3, h4, h5 {
     margin: 0;
 }
-

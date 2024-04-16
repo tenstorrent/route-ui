@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 import React from 'react';
-import { DramBankLink, NOC2AXILink, NetworkLink, NOCLink } from '../../../data/Chip';
-import { DramBankLinkName, NetworkLinkName, NOC } from '../../../data/Types';
+import { DramBankLink, NOC2AXILink, NOCLink, NetworkLink } from '../../../data/GraphOnChip';
+import { DramBankLinkName, NOC, NetworkLinkName } from '../../../data/Types';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 
 interface DetailedViewAXIRenderProps {

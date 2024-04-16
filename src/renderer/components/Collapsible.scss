@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+@import "../scss/variables";
+
+.collapsible-component {
+    > [type="button"] {
+        padding: 0;
+        margin-bottom: 5px;
+
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+
+        &.bp4-button { padding: 0; }
+
+        &:hover {
+            color: $tt-white-text;
+        }
+
+        .bp4-button-text {
+            color: $tt-white-text;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .operations-wrap & {
+            color: #000;
+            margin-bottom: 0;
+        }
+
+        .bp4-icon svg {
+            fill: $tt-white-text;
+        }
+    }
+}

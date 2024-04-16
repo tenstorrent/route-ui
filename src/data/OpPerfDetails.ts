@@ -1,6 +1,10 @@
-import { CoreMeasurementsJSON, MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
-import { GraphName, OperationName } from './GraphTypes';
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+import { MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
+import { GraphName, OperationName } from './GraphNames';
+/*  eslint-disable no-undef */
 export class MeasurementDetails implements MeasurementsJSON {
     [key: `input_pipe_bw_${number}`]: number; // available bandwidth (hole size)
 
@@ -54,11 +58,11 @@ export class MeasurementDetails implements MeasurementsJSON {
         });
     }
 
-    private _slowestOperand: OperandPerformance | undefined;
+    private _slowestOperandPerformance: OperandPerformance | undefined;
 
-    get slowestOperand(): OperandPerformance | null {
-        if (this._slowestOperand !== undefined) {
-            return this._slowestOperand;
+    get slowestOperandPerformance(): OperandPerformance | null {
+        if (this._slowestOperandPerformance !== undefined) {
+            return this._slowestOperandPerformance;
         }
         let operandType;
         if (this.slowest_operand.startsWith(OperandDirection.INPUT)) {
@@ -69,25 +73,27 @@ export class MeasurementDetails implements MeasurementsJSON {
             return null;
         }
 
-        this._slowestOperand = {
+        this._slowestOperandPerformance = {
             direction: operandType,
             index: parseInt(this.slowest_operand.split('-')[1], 10) || 0,
         };
 
-        return this._slowestOperand;
+        return this._slowestOperandPerformance;
     }
 
     get slowestOperandDetails() {
-        if (this.slowestOperand?.direction && this.slowestOperand?.index !== null) {
+        if (this.slowestOperandPerformance?.direction && this.slowestOperandPerformance?.index !== null) {
             const [actual, required] =
-                this.slowestOperand?.direction === OperandDirection.INPUT
+                this.slowestOperandPerformance?.direction === OperandDirection.INPUT
                     ? [OpPerfDynamicProperties.INPUT_PIPE_BW, OpPerfDynamicProperties.REQUIRED_INPUT_BW]
                     : [OpPerfDynamicProperties.OUTPUT_PIPE_BW, OpPerfDynamicProperties.REQUIRED_OUTPUT_BW];
             return {
-                type: this.slowestOperand?.direction,
-                index: this.slowestOperand?.index,
-                actual: this[`${actual}${this.slowestOperand?.index}`],
-                required: this[`${required}${this.slowestOperand?.index}`],
+                type: this.slowestOperandPerformance?.direction,
+                index: this.slowestOperandPerformance?.index,
+                // @ts-expect-error
+                actual: this[`${actual}${this.slowestOperandPerformance?.index}`],
+                // @ts-expect-error
+                required: this[`${required}${this.slowestOperandPerformance?.index}`],
                 bw_limited_factor: this.bw_limited_factor,
             };
         }
@@ -97,21 +103,22 @@ export class MeasurementDetails implements MeasurementsJSON {
 
     // TODO: not clear if these will ne needed, to reevaluate
 
-    // public getInputPipeBw(index: number): number {
-    //     return this[`${OpPerfDynamicProperties.INPUT_PIPE_BW}${index}`];
-    // }
-    //
-    // public getRequiredInputBw(index: number): number {
-    //     return this[`${OpPerfDynamicProperties.REQUIRED_INPUT_BW}${index}`];
-    // }
-    //
-    // public getOutputPipeBw(index: number): number {
-    //     return this[`${OpPerfDynamicProperties.OUTPUT_PIPE_BW}${index}`];
-    // }
-    //
-    // public getRequiredOutputBw(index: number): number {
-    //     return this[`${OpPerfDynamicProperties.REQUIRED_OUTPUT_BW}${index}`];
-    // }
+    public getInputPipeBw(index: number): number {
+        return this[`${OpPerfDynamicProperties.INPUT_PIPE_BW}${index}`];
+    }
+
+    public getRequiredInputBw(index: number): number {
+        return this[`${OpPerfDynamicProperties.REQUIRED_INPUT_BW}${index}`];
+    }
+
+    public getOutputPipeBw(index: number): number {
+        return this[`${OpPerfDynamicProperties.OUTPUT_PIPE_BW}${index}`];
+    }
+
+    public getRequiredOutputBw(index: number): number {
+        // @ts-expect-error
+        return this[`${OpPerfDynamicProperties.REQUIRED_OUTPUT_BW}${index}`];
+    }
 }
 
 // operrand type is a misleading term, its really a direction in this case;
@@ -120,9 +127,9 @@ export enum OperandDirection {
     OUTPUT = 'output',
 }
 
-type OperandPerformance = {
+export type OperandPerformance = {
     direction: OperandDirection;
-    index: number | null;
+    index: number;
 };
 
 export class OpPerfDetails extends MeasurementDetails implements OpPerfJSON {
@@ -151,7 +158,7 @@ export class OpPerfDetails extends MeasurementDetails implements OpPerfJSON {
 
 export enum OpPerfDynamicProperties {
     INPUT_PIPE_BW = 'input_pipe_bw_',
-    REQUIRED_INPUT_BW = 'required_input_bw_',
+    REQUIRED_INPUT_BW = 'required_input_bw_', // inconsistent naming in source data
     OUTPUT_PIPE_BW = 'output_pipe_bw_',
-    REQUIRED_OUTPUT_BW = 'required_output_bw_',
+    REQUIRED_OUTPUT_BW = 'required_output_pipe_bw_',
 }

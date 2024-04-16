@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+@import "../../scss/variables";
+
+.cluster-reset-tooltip {
+    z-index: $cluster-view-zindex;
+}
+
+.cluster-view-overlay {
+
+    .cluster-view-wrap,
+    .bp4-overlay-backdrop {
+        z-index: $cluster-view-zindex;
+    }
+
+    .bp4-overlay-backdrop {
+        backdrop-filter: blur(3px);
+    }
+}
+
+.cluster-view-card {
+    padding: 15px;
+    padding-bottom: 20px;
+    background-color: $tt-background;
+    color: $tt-white-text;
+    box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);
+    border: 1px solid $tt-medium-gray;
+    border-radius: 0;
+}
+
+.cluster-view-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    margin-bottom: 10px;
+
+    h3 {
+        text-transform: uppercase;
+    }
+
+}
+
+.cluster-view-container {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 31px;
+    margin-bottom: 50px;
+}
+
+.cluster-view-pipelist {
+    //display: flex;
+}
+
+.cluster-view-wrap {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 20px;
+
+    .cluster-view-pipelist {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .pipe-list {
+            max-height: calc(100vh - 280px);
+            min-width: 150px;
+            overflow-y: auto;
+        }
+    }
+
+    .congestion-container {
+        display: flex;
+        flex-direction: column;
+
+        hr {
+            width: calc(100% - 10px);
+            margin-left: 0;
+        }
+    }
+
+    .congestion-legend {
+        width: calc(100% - 10px);
+        height: 3px;
+        margin-bottom: 2px;
+    }
+
+    .bp4-slider {
+        width: calc(100% - 10px);
+    }
+
+    .cluster {
+        overflow-y: auto;
+        max-height: calc(100vh - 80px);
+        scrollbar-gutter: stable;
+        padding-right: 15px;
+        align-items: start;
+        align-content: start;
+
+        .chip {
+            background-color: #646464;
+            display: grid;
+            gap: 5px;
+            position: relative;
+
+            .chip-id {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                font-size: 25px;
+                text-align: right;
+                pointer-events: none;
+            }
+        }
+    }
+
+    .eth {
+        border-color: #99c4ff;
+        border-width: 1px;
+        border-style: solid;
+
+        &.eth-position-top {
+            border-top-color: transparent;
+        }
+
+        &.eth-position-bottom {
+            border-bottom-color: transparent;
+        }
+
+        &.eth-position-left {
+            border-left-color: transparent;
+        }
+
+        &.eth-position-right {
+            border-right-color: transparent;
+        }
+    }
+
+}
+
+.bp4-overlay {
+    .bp4-transition-container,
+    .bp4-popover2-transition-container {
+        z-index: $cluster-view-zindex;
+    }
+}
