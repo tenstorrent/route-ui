@@ -13,7 +13,7 @@ interface OperandDescriptor {
     graphName: string;
     temporalEpoch: number;
     type: GraphVertexType;
-    ref: Operand;
+    operand: Operand;
 }
 
 interface ApplicationModelState {
