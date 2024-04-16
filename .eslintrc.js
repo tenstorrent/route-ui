@@ -4,7 +4,12 @@ module.exports = {
     rules: {
         // A temporary hack related to IDE not resolving correct package.json
         'import/no-extraneous-dependencies': 'off',
+        '@typescript-eslint/await-thenable': 'error',
+        '@typescript-eslint/no-floating-promises': ['error', { ignoreVoid: true, ignoreIIFE: true }],
+        '@typescript-eslint/no-misused-promises': 'error',
         '@typescript-eslint/no-shadow': 'error',
+        'require-await': 'off',
+		'@typescript-eslint/require-await': ['error'],
         '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
         // 'comma-dangle': ['error', 'always-multiline'],  // May conflict with prettier
         'curly': ['error', 'all'],
