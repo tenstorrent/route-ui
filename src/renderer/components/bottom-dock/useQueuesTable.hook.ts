@@ -135,14 +135,7 @@ queuesTableColumns.set('allocation-info', {
     sortable: true,
     align: 'left',
     formatter: (value?: AllocationInfoJson[]) =>
-        value
-            ?.map((info) => {
-                const subchannel = info.subchannel > -1 ? ` Sub ch: ${info.subchannel}` : '';
-                const channel = `ch: ${info.channel}${subchannel}`;
-
-                return `${info.address} (${channel})`;
-            })
-            .join(', ') ?? '',
+        value?.map(({ address, channel }) => `${address} (ch: ${channel})`).join(', ') ?? '',
 });
 
 const useQueuesTable = () => {
