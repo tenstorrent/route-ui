@@ -23,7 +23,7 @@ export interface DataTableColumnDefinition<T extends TableFields> {
     canSelectAllRows?: boolean;
     getSelectedState?: (rows: T[]) => 'checked' | 'unchecked' | 'indeterminate' | 'disabled';
     handleSelectAll?: (rows: T[], selected: boolean) => void;
-    formatter: (value: any) => string;
+    formatter: (value?: any) => string;
 }
 
 export enum SortingDirection {
@@ -199,7 +199,7 @@ export const cellRenderer = <T extends TableFields>({
     customContent,
 }: CellRenderingProps<T>) => {
     const propertyName = definition?.lookupProperty ?? key;
-    const formattedContent = definition?.formatter(tableFields[rowIndex][propertyName as keyof T] ?? '');
+    const formattedContent = definition?.formatter(tableFields[rowIndex][propertyName as keyof T]) ?? '';
 
     const alignClass = (definition?.align && `align-${definition?.align}`) || '';
 
