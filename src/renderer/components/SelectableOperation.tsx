@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { Checkbox, Icon } from '@blueprintjs/core';
+import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import React, { ChangeEvent, FC } from 'react';
 import { useSelector } from 'react-redux';
@@ -27,6 +27,7 @@ interface SelectableOperationProps {
     stringFilter: string;
     type?: GraphVertexType | null;
     disabled?: boolean;
+    offchip?: boolean;
 }
 
 /**
@@ -39,11 +40,17 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     stringFilter,
     type = null,
     disabled = false,
+    offchip = false,
 }) => {
+    const onForeignClick = () => {
+        console.log('Foreign click');
+    };
+
+    // TODO: determine and implement graph navigation
     return (
         <div className='op-element'>
             <Checkbox
-                disabled={disabled}
+                disabled={disabled || offchip}
                 checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     selectFunc(opName, e.target.checked);
@@ -55,6 +62,17 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     {type === GraphVertexType.QUEUE && <QueueIcon />}
                 </span>
             )}
+            {offchip && (
+                <Button
+                    className='foreign'
+                    title="Navigate to graph"
+                    disabled
+                    small
+                    minimal
+                    icon={IconNames.OPEN_APPLICATION}
+                    onClick={onForeignClick}
+                />
+            )}
             <HighlightedText text={opName} filter={stringFilter} />
             <ColorSwatch isVisible color={getGroupColor(opName)} />
         </div>
@@ -64,6 +82,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
 SelectableOperation.defaultProps = {
     type: null,
     disabled: false,
+    offchip: false,
 };
 export default SelectableOperation;
 

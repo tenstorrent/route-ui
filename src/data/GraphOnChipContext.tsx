@@ -5,8 +5,19 @@
 import React, { ReactNode, createContext, useCallback, useMemo, useState } from 'react';
 import GraphOnChip from './GraphOnChip';
 import type { GraphRelationship } from './StateTypes';
+import { GraphVertexType } from './GraphNames';
+import { Operand } from './Graph';
+
+interface OperandDescriptor {
+    name: string;
+    graphName: string;
+    temporalEpoch: number;
+    type: GraphVertexType;
+    operand: Operand;
+}
 
 interface ApplicationModelState {
+    operands: Map<string, OperandDescriptor>;
     activeGraphName: string;
     graphOnChipList: {
         [graphName: string]: GraphOnChip;
@@ -24,9 +35,11 @@ interface GraphOnChipContextType {
     getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
     getActiveGraphName: () => string;
     graphOnChipList: Record<string, GraphOnChip>;
+    getOperand: (edgeName: string) => OperandDescriptor | undefined;
 }
 
 const applicationModelState: ApplicationModelState = {
+    operands: new Map<string, OperandDescriptor>(),
     activeGraphName: '',
     graphOnChipList: {},
     graphs: new Map<string, GraphRelationship>(),
@@ -42,16 +55,41 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphOnChip: () => undefined,
     getActiveGraphName: () => '',
     graphOnChipList: {},
+    getOperand: () => undefined,
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [state, setState] = useState<ApplicationModelState>(applicationModelState);
 
     const loadGraphOnChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationship[]) => {
+        const operands: OperandDescriptor[] = newChips
+            .map((graphOnChip, index) => {
+                const { temporalEpoch } = graphs[index];
+                return [
+                    ...[...graphOnChip.operations]
+                        .filter((operation) => !operation.isOffchip)
+                        .map((operation) => ({
+                            name: operation.name,
+                            graphName: graphs[index].name,
+                            temporalEpoch,
+                            type: GraphVertexType.OPERATION,
+                            ref: operation as Operand,
+                        })),
+                    ...[...graphOnChip.queues].map((queue) => ({
+                        name: queue.name,
+                        graphName: graphs[index].name,
+                        temporalEpoch,
+                        type: GraphVertexType.QUEUE,
+                        ref: queue as Operand,
+                    })),
+                ];
+            })
+            .flat();
         setState({
             activeGraphName: '',
             graphOnChipList: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
             graphs: new Map(graphs.map((graph) => [graph.name, graph])),
+            operands: new Map(operands.map((edge) => [edge.name, edge])),
         });
     }, []);
 
@@ -89,6 +127,13 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return state.activeGraphName;
     }, [state.activeGraphName]);
 
+    const getOperand = useCallback(
+        (edgeName: string) => {
+            return state.operands.get(edgeName);
+        },
+        [state.operands],
+    );
+
     const value = useMemo<GraphOnChipContextType>(
         () => ({
             loadGraphOnChips,
@@ -100,10 +145,10 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             resetGraphOnChipState: reset,
             setActiveGraph,
             graphOnChipList: state.graphOnChipList,
+            getOperand,
         }),
         [
             loadGraphOnChips,
-            state,
             getActiveGraphOnChip,
             getActiveGraphRelationship,
             getGraphRelationshipList,
@@ -111,6 +156,8 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getActiveGraphName,
             reset,
             setActiveGraph,
+            state.graphOnChipList,
+            getOperand,
         ],
     );
 

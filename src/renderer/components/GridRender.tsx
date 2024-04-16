@@ -4,10 +4,10 @@
 
 import { useContext } from 'react';
 import { useSelector } from 'react-redux';
-import { NODE_SIZE } from '../../utils/DrawingAPI';
 
 import { Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { NODE_SIZE } from '../../utils/DrawingAPI';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import { getGridZoom } from '../../data/store/selectors/uiState.selectors';

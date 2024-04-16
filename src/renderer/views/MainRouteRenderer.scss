@@ -745,6 +745,13 @@
     .queue-detail-item {
         color: #fff;
     }
+    .foreign {
+        .bp4-icon {
+            svg {
+                fill: $tt-extra-light-gray;
+            }
+        }
+    }
 
     .op-type.icon {
         &.op {
