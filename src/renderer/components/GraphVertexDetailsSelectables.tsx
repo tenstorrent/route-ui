@@ -17,6 +17,7 @@ const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.React
             value={selected(operand.name)}
             selectFunc={selectOperation}
             stringFilter=''
+            offchip={operand.isOffchip}
             type={operand.vertexType}
         />
     ) : (

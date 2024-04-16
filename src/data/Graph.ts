@@ -16,6 +16,8 @@ export abstract class AbstractGraphVertex implements Operand {
 
     abstract readonly vertexType: GraphVertexType;
 
+    abstract get isOffchip(): boolean;
+
     protected inputOperands: Operand[];
 
     protected outputOperands: Operand[];
@@ -134,6 +136,11 @@ export abstract class AbstractGraphVertex implements Operand {
 export class BuildableQueue extends AbstractGraphVertex implements Queue {
     readonly vertexType = GraphVertexType.QUEUE;
 
+    get isOffchip(): boolean {
+        // TODO: requires implementation
+        return false;
+    }
+
     details?: QueueDetailsJson;
 }
 
@@ -217,5 +224,5 @@ export interface Operand {
 
     isConnected(): boolean;
 
-    // operrandIds: string[];
+    isOffchip: boolean;
 }

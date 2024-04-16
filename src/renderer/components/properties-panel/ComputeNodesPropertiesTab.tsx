@@ -68,12 +68,15 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         slowestOperandText = `${actualText} / ${requiredText}`;
     }
 
+    // console.log(node.perfAnalyzerResults.slowest_operand, slowestOperand);
+
     const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
         //  - will likely want to add more organization if more details are added here
         //  - it's probably only useful to put heatmap-related values here (once heatmap is implemented),
         //    and leave other details for a drilling-down workflow
         //  - Operand-specific metrics should probably go under each operand?
+
 
         [
             'Model Estimate',

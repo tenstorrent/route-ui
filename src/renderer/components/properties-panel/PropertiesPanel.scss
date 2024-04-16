@@ -76,9 +76,9 @@
 
             &.focus {
                 background-image: linear-gradient(
-                    to bottom,
-                    color-mix(in srgb, #fff 40%, transparent),
-                    color-mix(in srgb, #fff 40%, transparent)
+                        to bottom,
+                        color-mix(in srgb, #fff 40%, transparent),
+                        color-mix(in srgb, #fff 40%, transparent)
                 );
             }
         }

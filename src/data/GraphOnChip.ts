@@ -425,9 +425,11 @@ export default class GraphOnChip {
                 );
             };
 
-            Object.entries(operationsJson).map(([operationName, opJson]) => {
+            Object.entries(operationsJson).forEach(([operationName, opJson]) => {
                 const operation = augmentedChip.operationsByName.get(operationName);
-                if (!operation) {
+
+                if (operation === undefined) {
+                    // console.log(operationName, operation)
                     /** this is perfectly normal, optopipe is a singlefile per temporal epoch and is multichip
                      * we will want to capture ALL information for multichip routing */
                     // console.warn(
@@ -557,17 +559,17 @@ export default class GraphOnChip {
     static AUGMENT_FROM_GRAPH_DESCRIPTOR(graphOnChip: GraphOnChip, graphDescriptorJson: GraphDescriptorJSON) {
         const newChip = new GraphOnChip(graphOnChip.chipId);
         Object.assign(newChip, graphOnChip);
-
         const opMap: Map<OperationName, OperationDescription> = aggregateCoresByOperation(graphDescriptorJson);
 
-        const operations = mapIterable(opMap.entries(), ([opName, opDescriptor]) => {
+        opMap.forEach((opDescriptor, opName) => {
             if (opName === undefined) {
                 console.error('Likely an empty graph');
                 throw new Error('opName is undefined');
             }
-            const cores: ComputeNode[] = opDescriptor.cores
-                // `core.id` is only an x-y locations and doesn't include Chip ID
-                .map((core) => newChip.getNode(`${graphOnChip.chipId}-${core.id}`));
+            // TODO: this is liekly unneeded. to verify
+            // const cores: ComputeNode[] = opDescriptor.cores
+            //     // `core.id` is only an x-y locations and doesn't include Chip ID
+            //     .map((core) => newChip.getNode(`${graphOnChip.chipId}-${core.id}`));
             const inputs = opDescriptor.inputs.map((operandJson) =>
                 newChip.createOperand(operandJson.name, operandJson.type),
             );
@@ -584,6 +586,12 @@ export default class GraphOnChip {
                         graphOnChip.addQueue(queue);
                     }
                     queue.assignOutputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
+                } else if (newChip.operationsByName.has(operand.name)) {
+                    const op = newChip.operationsByName.get(operand.name);
+                    if (op?.isOffchip) {
+                        const operation = newChip.operationsByName.get(opName);
+                        operation?.assignInputs([newChip.createOperand(operand.name, GraphVertexType.OPERATION)]);
+                    }
                 }
             });
             // Extract queues from output operands
@@ -595,13 +603,20 @@ export default class GraphOnChip {
                         graphOnChip.addQueue(queue);
                     }
                     queue.assignInputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
+                } else if (newChip.operationsByName.has(operand.name)) {
+                    const op = newChip.operationsByName.get(operand.name);
+                    if (op?.isOffchip) {
+                        const operation = newChip.operationsByName.get(opName);
+                        operation?.assignOutputs([newChip.createOperand(operand.name, GraphVertexType.OPERATION)]);
+                    }
                 }
             });
 
-            if (newChip.operationsByName.has(opName)) {
-                return newChip.operationsByName.get(opName) as BuildableOperation;
-            }
-            return new BuildableOperation(opName, cores, inputs, outputs);
+            // TODO: keeping for now, but we should remove this
+            // if (newChip.operationsByName.has(opName)) {
+            //     return newChip.operationsByName.get(opName) as BuildableOperation;
+            // }
+            // return new BuildableOperation(opName, cores, inputs, outputs);
         });
 
         /** if we have netlist and optopipe we should actively avoid this */

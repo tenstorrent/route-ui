@@ -86,6 +86,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                                             value={selected(operation.name)}
                                             selectFunc={selectOperation}
                                             stringFilter={filterQuery}
+                                            offchip={operation.isOffchip}
                                         />
                                     }
                                     isOpen={allOpen}
