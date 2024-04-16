@@ -28,19 +28,19 @@ operationsTableColumns.set('operation', {
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: (value) => value.toString(),
+    formatter: (value) => value?.toString(),
 });
 operationsTableColumns.set('grid_size', {
     label: 'Grid size',
     sortable: false,
-    formatter: (value) => value.toString(),
+    formatter: (value) => value?.toString(),
 });
 operationsTableColumns.set('core_id', {
     label: 'Core ID',
     sortable: false,
     align: 'left',
     canSelectAllRows: true,
-    formatter: (value) => value.toString(),
+    formatter: (value) => value?.toString(),
 });
 operationsTableColumns.set('bw_limited_factor', {
     label: 'BW Limited Factor',
@@ -53,7 +53,7 @@ operationsTableColumns.set('slowest_operand', {
     sortable: true,
     align: 'left',
     canSelectAllRows: true,
-    formatter: (value: Operand) => value?.name ?? '',
+    formatter: (value?: Operand) => value?.name ?? '',
 });
 operationsTableColumns.set('bw_bound_total_runtime', {
     label: 'BW Bound Total Runtime',

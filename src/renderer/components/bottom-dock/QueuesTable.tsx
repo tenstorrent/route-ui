@@ -57,6 +57,13 @@ function QueuesTable() {
         );
     };
 
+    const inputCellRenderer = (rowIndex: number) => {
+        const { input } = tableFields[rowIndex];
+
+        // TODO: render selectable operation and add lookup to input type and graph
+        return input;
+    };
+
     return (
         <Table2
             ref={table}
@@ -75,28 +82,19 @@ function QueuesTable() {
                 tableFields.length,
             ]}
         >
-            {columnRenderer({
-                key: 'queue',
-                columnDefinition: queuesTableColumns,
-                changeSorting,
-                sortDirection,
-                sortingColumn,
-                tableFields,
-                customCellContentRenderer: queueCellRenderer,
-            })}
             {
-                [...queuesTableColumns.keys()]
-                    .filter((key) => key !== 'queue')
-                    .map((key) =>
-                        columnRenderer({
-                            key,
-                            columnDefinition: queuesTableColumns,
-                            changeSorting,
-                            sortDirection,
-                            sortingColumn,
-                            tableFields,
-                        }),
-                    ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+                [...queuesTableColumns.keys()].map((key) =>
+                    columnRenderer({
+                        key,
+                        columnDefinition: queuesTableColumns,
+                        changeSorting,
+                        sortDirection,
+                        sortingColumn,
+                        tableFields,
+                        ...(key === 'queue' && { customCellContentRenderer: queueCellRenderer }),
+                        ...(key === 'input' && { customCellContentRenderer: inputCellRenderer }),
+                    }),
+                ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
             }
         </Table2>
     );
