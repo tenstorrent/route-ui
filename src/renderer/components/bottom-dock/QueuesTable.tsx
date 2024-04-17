@@ -12,6 +12,7 @@ import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook'
 import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
+import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 
 /**
  * QueuesTable - temporary component to display queues
@@ -39,6 +40,7 @@ function QueuesTable() {
         return sortTableFields(list);
     }, [graphOnChip, sortTableFields]);
     const { selected, disabledQueue, selectOperation, selectQueue } = useSelectableGraphVertex();
+    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const table = useRef<Table2>(null);
 
     const queueCellRenderer = (rowIndex: number) => {
@@ -94,6 +96,15 @@ function QueuesTable() {
                 value={selected(operandDescriptor?.name ?? '', operandDescriptor?.graphName)}
                 type={operandDescriptor?.type ?? GraphVertexType.OPERATION}
                 offchip={operandDescriptor?.graphName !== getActiveGraphName()}
+                offchipClick={
+                    operandDescriptor
+                        ? () => {
+                              if (operandDescriptor.graphName) {
+                                  loadPerfAnalyzerGraph(operandDescriptor.graphName);
+                              }
+                          }
+                        : undefined
+                }
             />
         );
     };
