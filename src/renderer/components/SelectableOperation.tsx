@@ -28,6 +28,7 @@ interface SelectableOperationProps {
     type?: GraphVertexType | null;
     disabled?: boolean;
     offchip?: boolean;
+    offchipClick?: () => void;
 }
 
 /**
@@ -41,16 +42,12 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     type = null,
     disabled = false,
     offchip = false,
+    offchipClick,
 }) => {
-    const onForeignClick = () => {
-        console.log('Foreign click');
-    };
-
-    // TODO: determine and implement graph navigation
     return (
         <div className={`op-element ${offchip ? 'offchip' : ''}`}>
             <Checkbox
-                disabled={disabled || offchip}
+                disabled={disabled}
                 checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     selectFunc(opName, e.target.checked);
@@ -68,11 +65,11 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                 <Button
                     className='foreign'
                     title='Navigate to graph'
-                    disabled
                     small
                     minimal
+                    disabled={offchipClick === undefined}
                     icon={IconNames.OPEN_APPLICATION}
-                    onClick={onForeignClick}
+                    onClick={() => offchipClick?.()}
                 />
             )}
         </div>
@@ -83,6 +80,7 @@ SelectableOperation.defaultProps = {
     type: null,
     disabled: false,
     offchip: false,
+    offchipClick: undefined,
 };
 export default SelectableOperation;
 
