@@ -69,7 +69,7 @@ function QueuesTable() {
 
         return (
             <SelectableOperation
-                opName={input}
+                opName={operandDescriptor?.name ?? 'N/A'}
                 disabled={!operandDescriptor}
                 selectFunc={() => {
                     if (!operandDescriptor) {
