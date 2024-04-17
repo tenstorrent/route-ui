@@ -7,7 +7,7 @@ import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from
 import { useSelector } from 'react-redux';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOperationsState, getQueuesState } from '../../../data/store/selectors/nodeSelection.selectors';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
@@ -18,11 +18,12 @@ import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip, getActiveGraphName, getOperand } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
     const graphName = getActiveGraphName();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
-    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
+    const operationsState = useSelector(getOperationsState);
+    const queuesState = useSelector(getQueuesState);
     const tableFields = useMemo(() => {
         if (!graphOnChip) {
             return [];
@@ -37,7 +38,7 @@ function QueuesTable() {
 
         return sortTableFields(list);
     }, [graphOnChip, sortTableFields]);
-    const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
+    const { selected, disabledQueue, selectOperation, selectQueue } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
 
     const queueCellRenderer = (rowIndex: number) => {
@@ -48,7 +49,7 @@ function QueuesTable() {
                 disabled={disabledQueue(queueName)}
                 opName={queueName}
                 value={selected(queueName)}
-                selectFunc={selectQueue}
+                selectFunc={() => selectQueue(queueName, !selected(queueName), graphName)}
                 stringFilter=''
                 type={GraphVertexType.QUEUE}
             />
@@ -60,8 +61,41 @@ function QueuesTable() {
     const inputCellRenderer = (rowIndex: number) => {
         const { input } = tableFields[rowIndex];
 
-        // TODO: render selectable operation and add lookup to input type and graph
-        return input;
+        if (input === 'HOST') {
+            return 'HOST';
+        }
+
+        const operandDescriptor = getOperand(input);
+
+        return (
+            <SelectableOperation
+                opName={input}
+                disabled={!operandDescriptor}
+                selectFunc={() => {
+                    if (!operandDescriptor) {
+                        return;
+                    }
+
+                    if (operandDescriptor.type === GraphVertexType.QUEUE) {
+                        selectQueue(
+                            operandDescriptor.name,
+                            !selected(operandDescriptor.name, operandDescriptor.graphName),
+                            operandDescriptor.graphName,
+                        );
+                    } else {
+                        selectOperation(
+                            operandDescriptor.name,
+                            !selected(operandDescriptor.name, operandDescriptor.graphName),
+                            operandDescriptor.graphName,
+                        );
+                    }
+                }}
+                stringFilter=''
+                value={selected(operandDescriptor?.name ?? '', operandDescriptor?.graphName)}
+                type={operandDescriptor?.type ?? GraphVertexType.OPERATION}
+                offchip={operandDescriptor?.graphName !== getActiveGraphName()}
+            />
+        );
     };
 
     return (
@@ -77,7 +111,8 @@ function QueuesTable() {
             cellRendererDependencies={[
                 sortDirection,
                 sortingColumn,
-                queueSelectionState,
+                queuesState,
+                operationsState,
                 tableFields,
                 tableFields.length,
             ]}
