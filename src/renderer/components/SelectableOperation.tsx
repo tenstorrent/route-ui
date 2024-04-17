@@ -48,7 +48,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
 
     // TODO: determine and implement graph navigation
     return (
-        <div className='op-element'>
+        <div className={`op-element ${offchip ? 'offchip' : ''}`}>
             <Checkbox
                 disabled={disabled || offchip}
                 checked={value}
@@ -62,10 +62,12 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     {type === GraphVertexType.QUEUE && <QueueIcon />}
                 </span>
             )}
+            <HighlightedText text={opName} filter={stringFilter} />
+            <ColorSwatch isVisible color={getGroupColor(opName)} />
             {offchip && (
                 <Button
                     className='foreign'
-                    title="Navigate to graph"
+                    title='Navigate to graph'
                     disabled
                     small
                     minimal
@@ -73,8 +75,6 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     onClick={onForeignClick}
                 />
             )}
-            <HighlightedText text={opName} filter={stringFilter} />
-            <ColorSwatch isVisible color={getGroupColor(opName)} />
         </div>
     );
 };
