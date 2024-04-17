@@ -69,15 +69,14 @@ function QueuesTable() {
 
         const operandDescriptor = getOperand(input);
 
+        if (!operandDescriptor) {
+            return 'N/A';
+        }
+
         return (
             <SelectableOperation
-                opName={operandDescriptor?.name ?? 'N/A'}
-                disabled={!operandDescriptor}
+                opName={operandDescriptor.name}
                 selectFunc={() => {
-                    if (!operandDescriptor) {
-                        return;
-                    }
-
                     if (operandDescriptor.type === GraphVertexType.QUEUE) {
                         selectQueue(
                             operandDescriptor.name,
@@ -93,18 +92,10 @@ function QueuesTable() {
                     }
                 }}
                 stringFilter=''
-                value={selected(operandDescriptor?.name ?? '', operandDescriptor?.graphName)}
-                type={operandDescriptor?.type ?? GraphVertexType.OPERATION}
-                offchip={operandDescriptor?.graphName !== getActiveGraphName()}
-                offchipClick={
-                    operandDescriptor
-                        ? () => {
-                              if (operandDescriptor.graphName) {
-                                  loadPerfAnalyzerGraph(operandDescriptor.graphName);
-                              }
-                          }
-                        : undefined
-                }
+                value={selected(operandDescriptor.name, operandDescriptor.graphName)}
+                type={operandDescriptor.type}
+                offchip={operandDescriptor.graphName !== getActiveGraphName()}
+                offchipClick={() => loadPerfAnalyzerGraph(operandDescriptor.graphName)}
             />
         );
     };
