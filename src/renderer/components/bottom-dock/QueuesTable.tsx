@@ -95,7 +95,7 @@ function QueuesTable() {
                 value={selected(operandDescriptor.name, operandDescriptor.graphName)}
                 type={operandDescriptor.type}
                 offchip={operandDescriptor.graphName !== getActiveGraphName()}
-                offchipClick={() => loadPerfAnalyzerGraph(operandDescriptor.graphName)}
+                offchipClickHandler={() => loadPerfAnalyzerGraph(operandDescriptor.graphName)}
             />
         );
     };

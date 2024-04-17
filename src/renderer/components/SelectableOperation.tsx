@@ -28,7 +28,7 @@ interface SelectableOperationProps {
     type?: GraphVertexType | null;
     disabled?: boolean;
     offchip?: boolean;
-    offchipClick?: () => void;
+    offchipClickHandler?: () => void;
 }
 
 /**
@@ -42,10 +42,10 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     type = null,
     disabled = false,
     offchip = false,
-    offchipClick,
+    offchipClickHandler: offchipClick,
 }) => {
     return (
-        <div className={`op-element ${offchip ? 'offchip' : ''}`}>
+        <div className={`op-element ${offchip ? 'has-offchip' : ''}`}>
             <Checkbox
                 disabled={disabled}
                 checked={value}
@@ -63,7 +63,6 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
             <ColorSwatch isVisible color={getGroupColor(opName)} />
             {offchip && (
                 <Button
-                    className='foreign'
                     title='Navigate to graph'
                     small
                     minimal
@@ -80,7 +79,7 @@ SelectableOperation.defaultProps = {
     type: null,
     disabled: false,
     offchip: false,
-    offchipClick: undefined,
+    offchipClickHandler: undefined,
 };
 export default SelectableOperation;
 
