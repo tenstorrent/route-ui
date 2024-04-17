@@ -40,6 +40,7 @@
     "lint-autofix": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "cross-env NODE_ENV=development prettier . --write",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
+      "package-linux": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --linux deb --publish never",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
