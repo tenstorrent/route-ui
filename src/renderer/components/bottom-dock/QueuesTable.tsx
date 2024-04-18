@@ -44,10 +44,11 @@ function QueuesTable() {
 
     const queueCellRenderer = (rowIndex: number) => {
         const queueName = tableFields[rowIndex].name;
+        const operandDescriptor = getOperand(queueName);
 
         return queueName ? (
             <SelectableOperation
-                disabled={disabledQueue(queueName)}
+                disabled={disabledQueue(queueName) || operandDescriptor?.graphName !== getActiveGraphName()}
                 opName={queueName}
                 value={selected(queueName)}
                 selectFunc={selectQueue}
