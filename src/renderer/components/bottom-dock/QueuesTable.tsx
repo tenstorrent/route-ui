@@ -21,7 +21,6 @@ import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hoo
 function QueuesTable() {
     const { getActiveGraphOnChip, getActiveGraphName, getOperand } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
-    const graphName = getActiveGraphName();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const operationsState = useSelector(getOperationsState);
     const queuesState = useSelector(getQueuesState);
@@ -39,7 +38,7 @@ function QueuesTable() {
 
         return sortTableFields(list);
     }, [graphOnChip, sortTableFields]);
-    const { selected, disabledQueue, selectOperation, selectQueue } = useSelectableGraphVertex();
+    const { selected, disabledQueue, selectOperand, selectQueue } = useSelectableGraphVertex();
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const table = useRef<Table2>(null);
 
@@ -51,7 +50,7 @@ function QueuesTable() {
                 disabled={disabledQueue(queueName)}
                 opName={queueName}
                 value={selected(queueName)}
-                selectFunc={() => selectQueue(queueName, !selected(queueName), graphName)}
+                selectFunc={selectQueue}
                 stringFilter=''
                 type={GraphVertexType.QUEUE}
             />
@@ -76,23 +75,9 @@ function QueuesTable() {
         return (
             <SelectableOperation
                 opName={operandDescriptor.name}
-                selectFunc={() => {
-                    if (operandDescriptor.type === GraphVertexType.QUEUE) {
-                        selectQueue(
-                            operandDescriptor.name,
-                            !selected(operandDescriptor.name, operandDescriptor.graphName),
-                            operandDescriptor.graphName,
-                        );
-                    } else {
-                        selectOperation(
-                            operandDescriptor.name,
-                            !selected(operandDescriptor.name, operandDescriptor.graphName),
-                            operandDescriptor.graphName,
-                        );
-                    }
-                }}
+                selectFunc={selectOperand}
                 stringFilter=''
-                value={selected(operandDescriptor.name, operandDescriptor.graphName)}
+                value={selected(operandDescriptor.name)}
                 type={operandDescriptor.type}
                 offchip={operandDescriptor.graphName !== getActiveGraphName()}
                 offchipClickHandler={() => loadPerfAnalyzerGraph(operandDescriptor.graphName)}
