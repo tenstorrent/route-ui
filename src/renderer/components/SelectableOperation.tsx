@@ -28,6 +28,7 @@ interface SelectableOperationProps {
     type?: GraphVertexType | null;
     disabled?: boolean;
     offchip?: boolean;
+    offchipClickHandler?: () => void;
 }
 
 /**
@@ -41,16 +42,12 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     type = null,
     disabled = false,
     offchip = false,
+    offchipClickHandler: offchipClick,
 }) => {
-    const onForeignClick = () => {
-        console.log('Foreign click');
-    };
-
-    // TODO: determine and implement graph navigation
     return (
-        <div className='op-element'>
+        <div className={`op-element ${offchip ? 'has-offchip' : ''}`}>
             <Checkbox
-                disabled={disabled || offchip}
+                disabled={disabled}
                 checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     selectFunc(opName, e.target.checked);
@@ -62,19 +59,18 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     {type === GraphVertexType.QUEUE && <QueueIcon />}
                 </span>
             )}
-            {offchip && (
-                <Button
-                    className='foreign'
-                    title="Navigate to graph"
-                    disabled
-                    small
-                    minimal
-                    icon={IconNames.OPEN_APPLICATION}
-                    onClick={onForeignClick}
-                />
-            )}
             <HighlightedText text={opName} filter={stringFilter} />
             <ColorSwatch isVisible color={getGroupColor(opName)} />
+            {offchip && (
+                <Button
+                    title='Navigate to graph'
+                    small
+                    minimal
+                    disabled={offchipClick === undefined}
+                    icon={IconNames.OPEN_APPLICATION}
+                    onClick={() => offchipClick?.()}
+                />
+            )}
         </div>
     );
 };
@@ -83,6 +79,7 @@ SelectableOperation.defaultProps = {
     type: null,
     disabled: false,
     offchip: false,
+    offchipClickHandler: undefined,
 };
 export default SelectableOperation;
 

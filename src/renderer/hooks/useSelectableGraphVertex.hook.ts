@@ -5,25 +5,48 @@
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import { getSelectedOperationList, getSelectedQueueList } from '../../data/store/selectors/nodeSelection.selectors';
+import { getOperationsState, getQueuesState } from '../../data/store/selectors/nodeSelection.selectors';
 import { selectOperation, selectQueue } from '../../data/store/slices/nodeSelection.slice';
+import { GraphVertexType } from '../../data/GraphNames';
 
 const useSelectableGraphVertex = () => {
     const dispatch = useDispatch();
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const currentGraphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const { getOperand } = useContext(GraphOnChipContext);
 
-    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
-    const queuesSelectionState = useSelector(getSelectedQueueList(graphName));
+    const operationsState = useSelector(getOperationsState);
+    const queuesState = useSelector(getQueuesState);
 
     return {
-        disabledQueue: (name: string) => queuesSelectionState[name]?.selected === undefined,
-        disabledOperation: (name: string) => operationsSelectionState[name]?.selected === undefined,
-        selected: (name: string) =>
-            operationsSelectionState[name]?.selected ?? queuesSelectionState[name]?.selected ?? false,
+        disabledQueue: (name: string) => queuesState[currentGraphName]?.[name]?.selected === undefined,
+        disabledOperation: (name: string) => operationsState[currentGraphName]?.[name]?.selected === undefined,
+        selected: (name: string) => {
+            const operand = getOperand(name);
+
+            if (!operand) {
+                return false;
+            }
+
+            const isOperationSelected = operationsState[operand.graphName]?.[name]?.selected;
+            const isQueueSelected = queuesState[operand.graphName]?.[name]?.selected;
+
+            return isOperationSelected ?? isQueueSelected ?? false;
+        },
         selectQueue: (queueName: string, selected: boolean) =>
-            dispatch(selectQueue({ graphName, queueName, selected })),
+            dispatch(selectQueue({ graphName: currentGraphName, queueName, selected })),
         selectOperation: (opName: string, selected: boolean) =>
-            dispatch(selectOperation({ graphName, opName, selected })),
+            dispatch(selectOperation({ graphName: currentGraphName, opName, selected })),
+        selectOperand: (name: string, selected: boolean) => {
+            const operand = getOperand(name);
+
+            if (operand) {
+                if (operand.type === GraphVertexType.QUEUE) {
+                    dispatch(selectQueue({ graphName: operand.graphName, queueName: name, selected }));
+                } else {
+                    dispatch(selectOperation({ graphName: operand.graphName, opName: name, selected }));
+                }
+            }
+        },
     };
 };
 

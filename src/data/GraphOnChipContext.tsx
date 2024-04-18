@@ -73,14 +73,14 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                             graphName: graphs[index].name,
                             temporalEpoch,
                             type: GraphVertexType.OPERATION,
-                            ref: operation as Operand,
+                            operand: operation as Operand,
                         })),
                     ...[...graphOnChip.queues].map((queue) => ({
                         name: queue.name,
                         graphName: graphs[index].name,
                         temporalEpoch,
                         type: GraphVertexType.QUEUE,
-                        ref: queue as Operand,
+                        operand: queue as Operand,
                     })),
                 ];
             })
