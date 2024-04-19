@@ -13,6 +13,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AnchorButton } from '@blueprintjs/core';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType } from '../../data/StateTypes';
 import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
@@ -48,6 +49,10 @@ const TopHeaderComponent: React.FC = () => {
         getActiveGraphRelationship,
         getActiveGraphOnChip,
         graphOnChipList,
+        selectPreviousGraph,
+        selectNextGraph,
+        getPreviousGraphList,
+        getNextGraphList,
     } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
@@ -135,6 +140,49 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)} />
+                <Tooltip2
+                    placement='bottom-end'
+                    disabled={getPreviousGraphList().length === 0}
+                    content={
+                        <ul className='graph-list-navigation-tooltip'>
+                            {getPreviousGraphList()
+                                .toReversed()
+                                .map((graphName) => (
+                                    <li>{graphName}</li>
+                                ))}
+                        </ul>
+                    }
+                >
+                    <AnchorButton
+                        title='Back to previous graph'
+                        minimal
+                        disabled={getPreviousGraphList().length === 0}
+                        icon={IconNames.ARROW_LEFT}
+                        onClick={() => selectPreviousGraph()}
+                    />
+                </Tooltip2>
+
+                <Tooltip2
+                    placement='bottom-start'
+                    disabled={getNextGraphList().length === 0}
+                    content={
+                        <ul className='graph-list-navigation-tooltip'>
+                            {getNextGraphList()
+                                .toReversed()
+                                .map((graphName) => (
+                                    <li>{graphName}</li>
+                                ))}
+                        </ul>
+                    }
+                >
+                    <AnchorButton
+                        title='Forward to next graph'
+                        minimal
+                        disabled={getNextGraphList().length === 0}
+                        icon={IconNames.ARROW_RIGHT}
+                        onClick={() => selectNextGraph()}
+                    />
+                </Tooltip2>
             </div>
 
             <div className='text-content'>
