@@ -18,7 +18,7 @@ interface OperandDescriptor {
 
 interface ApplicationModelState {
     operands: Map<string, OperandDescriptor>;
-    activeGraphName: string;
+    visitedGraphs: string[];
     graphOnChipList: {
         [graphName: string]: GraphOnChip;
     };
@@ -31,7 +31,9 @@ interface GraphOnChipContextType {
     getGraphRelationshipList: () => GraphRelationship[];
     getActiveGraphRelationship: () => GraphRelationship | undefined;
     getActiveGraphOnChip: () => GraphOnChip | undefined;
+    getPreviousGraphName: () => string | undefined;
     setActiveGraph: (graphName: string) => void;
+    selectPreviousGraph: () => void;
     getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
     getActiveGraphName: () => string;
     graphOnChipList: Record<string, GraphOnChip>;
@@ -40,7 +42,7 @@ interface GraphOnChipContextType {
 
 const applicationModelState: ApplicationModelState = {
     operands: new Map<string, OperandDescriptor>(),
-    activeGraphName: '',
+    visitedGraphs: [],
     graphOnChipList: {},
     graphs: new Map<string, GraphRelationship>(),
 };
@@ -51,7 +53,9 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphRelationshipList: () => [],
     getActiveGraphRelationship: () => undefined,
     getActiveGraphOnChip: () => undefined,
+    getPreviousGraphName: () => undefined,
     setActiveGraph: () => {},
+    selectPreviousGraph: () => {},
     getGraphOnChip: () => undefined,
     getActiveGraphName: () => '',
     graphOnChipList: {},
@@ -86,7 +90,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             })
             .flat();
         setState({
-            activeGraphName: '',
+            visitedGraphs: [],
             graphOnChipList: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
             graphs: new Map(graphs.map((graph) => [graph.name, graph])),
             operands: new Map(operands.map((edge) => [edge.name, edge])),
@@ -109,23 +113,40 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [state]);
 
     const getActiveGraphRelationship = useCallback(() => {
-        return state.graphs.get(state.activeGraphName);
+        return state.graphs.get(state.visitedGraphs.at(-1) ?? '');
     }, [state]);
 
     const getActiveGraphOnChip = useCallback(() => {
-        return state.graphOnChipList[state.activeGraphName];
+        return state.graphOnChipList[state.visitedGraphs.at(-1) ?? ''];
     }, [state]);
+
+    const getPreviousGraphName = useCallback(() => {
+        return state.visitedGraphs.at(-2);
+    }, [state.visitedGraphs]);
 
     const setActiveGraph = useCallback((graphName: string) => {
         setState((prevState) => ({
             ...prevState,
-            activeGraphName: graphName,
+            visitedGraphs: [...prevState.visitedGraphs, graphName],
         }));
     }, []);
 
+    const selectPreviousGraph = useCallback(() => {
+        setState((prevState) => {
+            if (prevState.visitedGraphs.length > 1) {
+                return {
+                    ...prevState,
+                    visitedGraphs: [...prevState.visitedGraphs.toSpliced(-1, 1)],
+                };
+            }
+
+            return prevState;
+        });
+    }, []);
+
     const getActiveGraphName = useCallback(() => {
-        return state.activeGraphName;
-    }, [state.activeGraphName]);
+        return state.visitedGraphs.at(-1) ?? '';
+    }, [state.visitedGraphs]);
 
     const getOperand = useCallback(
         (edgeName: string) => {
@@ -143,7 +164,9 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphOnChip,
             getActiveGraphName,
             resetGraphOnChipState: reset,
+            getPreviousGraphName,
             setActiveGraph,
+            selectPreviousGraph,
             graphOnChipList: state.graphOnChipList,
             getOperand,
         }),
@@ -155,7 +178,9 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphOnChip,
             getActiveGraphName,
             reset,
+            getPreviousGraphName,
             setActiveGraph,
+            selectPreviousGraph,
             state.graphOnChipList,
             getOperand,
         ],

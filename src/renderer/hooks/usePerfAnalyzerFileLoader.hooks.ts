@@ -40,7 +40,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } =
+    const { getActiveGraphOnChip, setActiveGraph, selectPreviousGraph, loadGraphOnChips, resetGraphOnChipState } =
         useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveGraphOnChip();
@@ -171,6 +171,22 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
+    const loadPreviousGraph = () => {
+        if (selectedFolder) {
+            try {
+                dispatch(closeDetailedView());
+                selectPreviousGraph();
+                navigate('/render');
+            } catch (e) {
+                const err = e as Error;
+                logging.error(`error loading and populating chip ${err.message}`);
+                setError(err.message ?? 'Unknown Error');
+            }
+        } else {
+            logging.error('Attempted to load graph but no folder path was available');
+        }
+    };
+
     const loadPerfAnalyzerFolder = async (
         folderPath?: string | null,
         folderLocationType: FolderLocationType = 'local',
@@ -187,6 +203,7 @@ const usePerfAnalyzerFileLoader = () => {
         loadPerfAnalyzerFolder,
         openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
+        loadPreviousGraph,
         error,
     };
 };
