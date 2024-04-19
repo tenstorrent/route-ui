@@ -17,6 +17,7 @@ import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import SelectableOperation from '../SelectableOperation';
+import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -72,6 +73,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
             </div>
             <div className='properties-list'>
                 {operationsList.map((operation: Operation) => {
+
                     return (
                         <FilterableComponent
                             key={operation.name}
@@ -80,13 +82,10 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                             component={
                                 <Collapsible
                                     label={
-                                        <SelectableOperation
-                                            disabled={operation.isOffchip}
-                                            opName={operation.name}
-                                            value={selected(operation.name)}
-                                            selectFunc={selectOperation}
+                                        <GraphVertexDetailsSelectables
+                                            operand={operation}
                                             stringFilter={filterQuery}
-                                            offchip={operation.isOffchip}
+                                            displayType={false}
                                         />
                                     }
                                     isOpen={allOpen}

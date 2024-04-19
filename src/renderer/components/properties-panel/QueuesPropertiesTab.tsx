@@ -5,7 +5,7 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
@@ -18,6 +18,7 @@ import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import SelectableOperation from '../SelectableOperation';
+import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
@@ -79,12 +80,10 @@ function QueuesPropertiesTab() {
                             <Collapsible
                                 key={queue.name}
                                 label={
-                                    <SelectableOperation
-                                        disabled={disabledQueue(queue.name)}
-                                        opName={queue.name}
-                                        value={selected(queue.name)}
-                                        selectFunc={selectQueue}
+                                    <GraphVertexDetailsSelectables
+                                        operand={queue}
                                         stringFilter={filterQuery}
+                                        displayType={false}
                                     />
                                 }
                                 isOpen={allOpen}
