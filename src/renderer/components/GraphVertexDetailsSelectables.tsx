@@ -2,34 +2,39 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Operand } from '../../data/Graph';
 import SelectableOperation from './SelectableOperation';
-import { GraphVertexType } from '../../data/GraphNames';
 import useSelectableGraphVertex from '../hooks/useSelectableGraphVertex.hook';
+import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
-const GraphVertexDetailsSelectables = (props: { operand: Operand }): React.ReactElement | null => {
-    const { operand } = props;
-    const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
-    return operand.vertexType === GraphVertexType.OPERATION ? (
-        <SelectableOperation
-            opName={operand.name}
-            value={selected(operand.name)}
-            selectFunc={selectOperation}
-            stringFilter=''
-            offchip={operand.isOffchip}
-            type={operand.vertexType}
-        />
-    ) : (
-        <SelectableOperation
-            disabled={disabledQueue(operand.name)}
-            opName={operand.name}
-            value={selected(operand.name)}
-            selectFunc={selectQueue}
-            stringFilter=''
-            type={operand.vertexType}
-        />
-    );
+const GraphVertexDetailsSelectables = (props: {
+    operand: Operand,
+    stringFilter?: string,
+    displayType?: boolean
+
+}): React.ReactElement | null => {
+    const { operand, stringFilter = '', displayType = true } = props;
+    const { selectOperand, selected } = useSelectableGraphVertex();
+    const { getOperand } = useContext(GraphOnChipContext);
+    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const operandDescriptor = getOperand(operand.name);
+
+    return <SelectableOperation
+        opName={operand.name}
+        value={selected(operand.name)}
+        selectFunc={selectOperand}
+        stringFilter={stringFilter}
+        offchip={operand.isOffchip}
+        type={displayType ? operand.vertexType : null}
+        offchipClickHandler={() => loadPerfAnalyzerGraph(operandDescriptor?.graphName ?? '')}
+    />;
+};
+
+GraphVertexDetailsSelectables.defaultProps = {
+    displayType: true,
+    stringFilter: '',
 };
 
 export default GraphVertexDetailsSelectables;

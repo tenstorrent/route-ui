@@ -42,8 +42,9 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     type = null,
     disabled = false,
     offchip = false,
-    offchipClickHandler: offchipClick,
+    offchipClickHandler,
 }) => {
+
     return (
         <div className={`op-element ${offchip ? 'has-offchip' : ''}`}>
             <Checkbox
@@ -66,9 +67,9 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     title='Navigate to graph'
                     small
                     minimal
-                    disabled={offchipClick === undefined}
+                    disabled={offchipClickHandler === undefined}
                     icon={IconNames.OPEN_APPLICATION}
-                    onClick={() => offchipClick?.()}
+                    onClick={() => offchipClickHandler?.()}
                 />
             )}
         </div>

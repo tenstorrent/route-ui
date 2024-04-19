@@ -48,10 +48,9 @@ function QueuesTable() {
 
         return queueName ? (
             <SelectableOperation
-                disabled={disabledQueue(queueName) || operandDescriptor?.graphName !== getActiveGraphName()}
                 opName={queueName}
                 value={selected(queueName)}
-                selectFunc={selectQueue}
+                selectFunc={selectOperand}
                 stringFilter=''
                 type={GraphVertexType.QUEUE}
             />
