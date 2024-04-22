@@ -23,7 +23,7 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
 import {
-    getOperation, getOperationsState,
+    getOperationsState,
     getSelectedNodeList,
     getSelectedOperationList,
     getSelectedQueueList,
@@ -45,7 +45,7 @@ function OperationsTable() {
     const graphName = getActiveGraphName();
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
-    const getOperand = useContext(GraphOnChipContext).getOperand;
+    const {getOperand} = useContext(GraphOnChipContext);
     const [selectedOperationName, setSelectedOperationName] = useState('');
     const [filterQuery, setFilterQuery] = useState<string>('');
     const tableFields = useMemo(() => {
@@ -88,7 +88,7 @@ function OperationsTable() {
     const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
     const allOperationsState = useSelector(getOperationsState);
     const queueSelectionState = useSelector(getSelectedQueueList(graphName));
-    const { selectOperand, selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
+    const { selectOperand, selected } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();

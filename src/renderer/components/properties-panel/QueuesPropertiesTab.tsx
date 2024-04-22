@@ -17,7 +17,6 @@ import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
-import SelectableOperation from '../SelectableOperation';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 
 function QueuesPropertiesTab() {
@@ -31,7 +30,7 @@ function QueuesPropertiesTab() {
     const queueSelectionState = useSelector(getSelectedQueueList(graphName));
     const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
 
-    const { selected, selectQueue, disabledQueue } = useSelectableGraphVertex();
+    const { selectQueue } = useSelectableGraphVertex();
     const selectFilteredQueue = () => {
         if (!graphOnChip) {
             return;
