@@ -165,12 +165,6 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
-    const loadPreviousGraph = () => {
-        dispatch(closeDetailedView());
-        selectPreviousGraph();
-        navigate('/render');
-    };
-
     const loadPerfAnalyzerFolder = async (
         folderPath?: string | null,
         folderLocationType: FolderLocationType = 'local',
@@ -187,7 +181,6 @@ const usePerfAnalyzerFileLoader = () => {
         loadPerfAnalyzerFolder,
         openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
-        loadPreviousGraph,
         error,
     };
 };
