@@ -16,7 +16,6 @@ import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
-import SelectableOperation from '../SelectableOperation';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
@@ -30,7 +29,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);
 
-    const { selected, selectOperation } = useSelectableGraphVertex();
+    const { selectOperation } = useSelectableGraphVertex();
     const selectFilteredOperations = () => {
         if (!graphOnChip) {
             return;
@@ -73,7 +72,6 @@ const OperationsPropertiesTab = (): React.ReactElement => {
             </div>
             <div className='properties-list'>
                 {operationsList.map((operation: Operation) => {
-
                     return (
                         <FilterableComponent
                             key={operation.name}

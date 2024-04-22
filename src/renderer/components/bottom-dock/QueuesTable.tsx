@@ -38,8 +38,8 @@ function QueuesTable() {
 
         return sortTableFields(list);
     }, [graphOnChip, sortTableFields]);
-    const { selected, selectOperand } = useSelectableGraphVertex();
-    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const { selected, selectOperand, navigateToGraph } = useSelectableGraphVertex();
+
     const table = useRef<Table2>(null);
 
     const queueCellRenderer = (rowIndex: number) => {
@@ -80,7 +80,7 @@ function QueuesTable() {
                 value={selected(operandDescriptor.name)}
                 type={operandDescriptor.type}
                 offchip={operandDescriptor.graphName !== getActiveGraphName()}
-                offchipClickHandler={() => loadPerfAnalyzerGraph(operandDescriptor.graphName)}
+                offchipClickHandler={navigateToGraph(operandDescriptor.name)}
             />
         );
     };

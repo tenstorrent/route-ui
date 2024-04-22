@@ -8,18 +8,20 @@ import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import { getOperationsState, getQueuesState } from '../../data/store/selectors/nodeSelection.selectors';
 import { selectOperation, selectQueue } from '../../data/store/slices/nodeSelection.slice';
 import { GraphVertexType } from '../../data/GraphNames';
+import usePerfAnalyzerFileLoader from './usePerfAnalyzerFileLoader.hooks';
 
 const useSelectableGraphVertex = () => {
     const dispatch = useDispatch();
     const currentGraphName = useContext(GraphOnChipContext).getActiveGraphName();
     const { getOperand } = useContext(GraphOnChipContext);
 
+    const {loadPerfAnalyzerGraph} = usePerfAnalyzerFileLoader();
+
     const operationsState = useSelector(getOperationsState);
     const queuesState = useSelector(getQueuesState);
 
     return {
         disabledQueue: (name: string) => queuesState[currentGraphName]?.[name]?.selected === undefined,
-        disabledOperation: (name: string) => operationsState[currentGraphName]?.[name]?.selected === undefined,
         selected: (name: string) => {
             const operand = getOperand(name);
 
@@ -47,6 +49,14 @@ const useSelectableGraphVertex = () => {
                 }
             }
         },
+        navigateToGraph: (operandName:string) => {
+            return () => {
+                const operand = getOperand(operandName);
+                if (operand) {
+                    loadPerfAnalyzerGraph(operand.graphName);
+                }
+            };
+        }
     };
 };
 

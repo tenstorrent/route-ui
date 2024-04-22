@@ -35,7 +35,6 @@ import { numberFormatter, valueRatio } from '../../utils/numbers';
 import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
-import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -45,7 +44,6 @@ function OperationsTable() {
     const graphName = getActiveGraphName();
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
-    const {getOperand} = useContext(GraphOnChipContext);
     const [selectedOperationName, setSelectedOperationName] = useState('');
     const [filterQuery, setFilterQuery] = useState<string>('');
     const tableFields = useMemo(() => {
@@ -88,10 +86,9 @@ function OperationsTable() {
     const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
     const allOperationsState = useSelector(getOperationsState);
     const queueSelectionState = useSelector(getSelectedQueueList(graphName));
-    const { selectOperand, selected } = useSelectableGraphVertex();
+    const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
-    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
 
     useEffect(() => {
         setSelectedOperationName('');
@@ -102,12 +99,10 @@ function OperationsTable() {
     const operationCellRenderer = (rowIndex: number) => {
         const opName = tableFields[rowIndex].name;
         const operation = tableFields[rowIndex].operation || null;
-        const operandDescriptor = getOperand(opName);
 
         return (
             <>
                 {opName ? (
-
                     <SelectableOperationPerformance operation={tableFields[rowIndex].operation || null}>
                         <SelectableOperation
                             opName={opName}
@@ -116,7 +111,7 @@ function OperationsTable() {
                             stringFilter={filterQuery}
                             type={GraphVertexType.OPERATION}
                             offchip={operation?.isOffchip}
-                            offchipClickHandler={() => loadPerfAnalyzerGraph(operandDescriptor?.graphName ?? '')}
+                            offchipClickHandler={navigateToGraph(opName)}
                         />
                     </SelectableOperationPerformance>
                 ) : (
@@ -139,7 +134,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={operationsSelectionState[opName] === undefined}
+                        disabled={operation?.isOffchip}
                         title='View operation cores'
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
@@ -175,9 +170,7 @@ function OperationsTable() {
         const slowestOperand = tableFields[rowIndex].slowestOperandRef;
 
         if (slowestOperand) {
-            const operandDescriptor = getOperand(slowestOperand.name);
             const type: GraphVertexType = slowestOperand.vertexType;
-            // <Cell className='table-cell-interactive table-operation-cell'>
             return (
                 <>
                     {slowOpString.includes('output') ? (
@@ -195,14 +188,14 @@ function OperationsTable() {
                             stringFilter=''
                             type={slowestOperand.vertexType}
                             offchip={slowestOperand.isOffchip}
-                            offchipClickHandler={() => loadPerfAnalyzerGraph(operandDescriptor?.graphName ?? '')}
+                            offchipClickHandler={navigateToGraph(slowestOperand.name)}
                         />
                     </SelectableOperationPerformance>
                     <Button
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={operationsSelectionState[slowestOperand.name] === undefined}
+                        disabled={slowestOperand.isOffchip}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
                             setSelectedOperationName(slowestOperand.name);

@@ -16,10 +16,7 @@ const GraphVertexDetailsSelectables = (props: {
 
 }): React.ReactElement | null => {
     const { operand, stringFilter = '', displayType = true } = props;
-    const { selectOperand, selected } = useSelectableGraphVertex();
-    const { getOperand } = useContext(GraphOnChipContext);
-    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
-    const operandDescriptor = getOperand(operand.name);
+    const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
 
     return <SelectableOperation
         opName={operand.name}
@@ -28,7 +25,7 @@ const GraphVertexDetailsSelectables = (props: {
         stringFilter={stringFilter}
         offchip={operand.isOffchip}
         type={displayType ? operand.vertexType : null}
-        offchipClickHandler={() => loadPerfAnalyzerGraph(operandDescriptor?.graphName ?? '')}
+        offchipClickHandler={navigateToGraph(operand.name)}
     />;
 };
 
