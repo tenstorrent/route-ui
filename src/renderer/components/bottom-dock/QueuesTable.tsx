@@ -38,13 +38,13 @@ function QueuesTable() {
 
         return sortTableFields(list);
     }, [graphOnChip, sortTableFields]);
-    const { selected, disabledQueue, selectOperand, selectQueue } = useSelectableGraphVertex();
+    const { selected, selectOperand } = useSelectableGraphVertex();
     const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const table = useRef<Table2>(null);
 
     const queueCellRenderer = (rowIndex: number) => {
         const queueName = tableFields[rowIndex].name;
-        const operandDescriptor = getOperand(queueName);
+
 
         return queueName ? (
             <SelectableOperation
