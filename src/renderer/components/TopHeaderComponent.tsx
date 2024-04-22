@@ -51,8 +51,8 @@ const TopHeaderComponent: React.FC = () => {
         graphOnChipList,
         selectPreviousGraph,
         selectNextGraph,
-        getPreviousGraphList,
-        getNextGraphList,
+        getPreviousGraphName,
+        getNextGraphName,
     } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
@@ -141,44 +141,25 @@ const TopHeaderComponent: React.FC = () => {
                 </Tooltip2>
                 <GraphSelector onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)} />
                 <Tooltip2
-                    placement='bottom-end'
-                    disabled={getPreviousGraphList().length === 0}
-                    content={
-                        <ul className='graph-list-navigation-tooltip'>
-                            {getPreviousGraphList()
-                                .toReversed()
-                                .map((graphName) => (
-                                    <li>{graphName}</li>
-                                ))}
-                        </ul>
-                    }
+                    disabled={!getPreviousGraphName()}
+                    content={`Back to graph: ${getPreviousGraphName()}`}
+                    placement='bottom'
                 >
                     <AnchorButton
-                        title='Back to previous graph'
                         minimal
-                        disabled={getPreviousGraphList().length === 0}
+                        disabled={!getPreviousGraphName()}
                         icon={IconNames.ARROW_LEFT}
                         onClick={() => selectPreviousGraph()}
                     />
                 </Tooltip2>
-
                 <Tooltip2
-                    placement='bottom-start'
-                    disabled={getNextGraphList().length === 0}
-                    content={
-                        <ul className='graph-list-navigation-tooltip'>
-                            {getNextGraphList()
-                                .toReversed()
-                                .map((graphName) => (
-                                    <li>{graphName}</li>
-                                ))}
-                        </ul>
-                    }
+                    disabled={!getNextGraphName()}
+                    content={`Forward to graph: ${getNextGraphName()}`}
+                    placement='bottom'
                 >
                     <AnchorButton
-                        title='Forward to next graph'
                         minimal
-                        disabled={getNextGraphList().length === 0}
+                        disabled={!getNextGraphName()}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => selectNextGraph()}
                     />
