@@ -157,34 +157,18 @@ const usePerfAnalyzerFileLoader = () => {
 
     const loadPerfAnalyzerGraph = (graphName: string) => {
         if (selectedFolder) {
-            try {
-                dispatch(closeDetailedView());
-                setActiveGraph(graphName);
-                navigate('/render');
-            } catch (e) {
-                const err = e as Error;
-                logging.error(`error loading and populating chip ${err.message}`);
-                setError(err.message ?? 'Unknown Error');
-            }
+            dispatch(closeDetailedView());
+            setActiveGraph(graphName);
+            navigate('/render');
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }
     };
 
     const loadPreviousGraph = () => {
-        if (selectedFolder) {
-            try {
-                dispatch(closeDetailedView());
-                selectPreviousGraph();
-                navigate('/render');
-            } catch (e) {
-                const err = e as Error;
-                logging.error(`error loading and populating chip ${err.message}`);
-                setError(err.message ?? 'Unknown Error');
-            }
-        } else {
-            logging.error('Attempted to load graph but no folder path was available');
-        }
+        dispatch(closeDetailedView());
+        selectPreviousGraph();
+        navigate('/render');
     };
 
     const loadPerfAnalyzerFolder = async (
