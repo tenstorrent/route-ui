@@ -129,13 +129,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getPreviousGraphName = useCallback(() => {
         return state.visitedGraphsHistory[state.currentGraphIndex - 1];
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.visitedGraphsHistory]);
+    }, [state.currentGraphIndex, state.visitedGraphsHistory]);
 
     const getNextGraphName = useCallback(() => {
         return state.visitedGraphsHistory[state.currentGraphIndex + 1];
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.visitedGraphsHistory]);
+    }, [state.currentGraphIndex, state.visitedGraphsHistory]);
 
     const setActiveGraph = useCallback((graphName: string) => {
         setState((prevState) => {
