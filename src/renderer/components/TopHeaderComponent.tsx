@@ -13,6 +13,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AnchorButton } from '@blueprintjs/core';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType } from '../../data/StateTypes';
 import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
@@ -48,6 +49,10 @@ const TopHeaderComponent: React.FC = () => {
         getActiveGraphRelationship,
         getActiveGraphOnChip,
         graphOnChipList,
+        selectPreviousGraph,
+        selectNextGraph,
+        getPreviousGraphName,
+        getNextGraphName,
     } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
@@ -135,6 +140,30 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)} />
+                <Tooltip2
+                    disabled={!getPreviousGraphName()}
+                    content={`Back to graph: ${getPreviousGraphName()}`}
+                    placement='bottom'
+                >
+                    <AnchorButton
+                        minimal
+                        disabled={!getPreviousGraphName()}
+                        icon={IconNames.ARROW_LEFT}
+                        onClick={() => selectPreviousGraph()}
+                    />
+                </Tooltip2>
+                <Tooltip2
+                    disabled={!getNextGraphName()}
+                    content={`Forward to graph: ${getNextGraphName()}`}
+                    placement='bottom'
+                >
+                    <AnchorButton
+                        minimal
+                        disabled={!getNextGraphName()}
+                        icon={IconNames.ARROW_RIGHT}
+                        onClick={() => selectNextGraph()}
+                    />
+                </Tooltip2>
             </div>
 
             <div className='text-content'>

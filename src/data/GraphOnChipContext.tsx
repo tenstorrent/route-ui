@@ -18,7 +18,8 @@ interface OperandDescriptor {
 
 interface ApplicationModelState {
     operands: Map<string, OperandDescriptor>;
-    activeGraphName: string;
+    visitedGraphsHistory: string[];
+    currentGraphIndex: number;
     graphOnChipList: {
         [graphName: string]: GraphOnChip;
     };
@@ -31,7 +32,11 @@ interface GraphOnChipContextType {
     getGraphRelationshipList: () => GraphRelationship[];
     getActiveGraphRelationship: () => GraphRelationship | undefined;
     getActiveGraphOnChip: () => GraphOnChip | undefined;
+    getPreviousGraphName: () => string | undefined;
+    getNextGraphName: () => string | undefined;
     setActiveGraph: (graphName: string) => void;
+    selectPreviousGraph: () => void;
+    selectNextGraph: () => void;
     getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
     getActiveGraphName: () => string;
     graphOnChipList: Record<string, GraphOnChip>;
@@ -40,7 +45,8 @@ interface GraphOnChipContextType {
 
 const applicationModelState: ApplicationModelState = {
     operands: new Map<string, OperandDescriptor>(),
-    activeGraphName: '',
+    visitedGraphsHistory: [],
+    currentGraphIndex: 0,
     graphOnChipList: {},
     graphs: new Map<string, GraphRelationship>(),
 };
@@ -51,7 +57,11 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphRelationshipList: () => [],
     getActiveGraphRelationship: () => undefined,
     getActiveGraphOnChip: () => undefined,
+    getPreviousGraphName: () => undefined,
+    getNextGraphName: () => undefined,
     setActiveGraph: () => {},
+    selectPreviousGraph: () => {},
+    selectNextGraph: () => {},
     getGraphOnChip: () => undefined,
     getActiveGraphName: () => '',
     graphOnChipList: {},
@@ -86,7 +96,8 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             })
             .flat();
         setState({
-            activeGraphName: '',
+            visitedGraphsHistory: [],
+            currentGraphIndex: 0,
             graphOnChipList: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
             graphs: new Map(graphs.map((graph) => [graph.name, graph])),
             operands: new Map(operands.map((edge) => [edge.name, edge])),
@@ -109,23 +120,60 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [state]);
 
     const getActiveGraphRelationship = useCallback(() => {
-        return state.graphs.get(state.activeGraphName);
+        return state.graphs.get(state.visitedGraphsHistory[state.currentGraphIndex] ?? '');
     }, [state]);
 
     const getActiveGraphOnChip = useCallback(() => {
-        return state.graphOnChipList[state.activeGraphName];
+        return state.graphOnChipList[state.visitedGraphsHistory[state.currentGraphIndex] ?? ''];
     }, [state]);
 
+    const getPreviousGraphName = useCallback(() => {
+        return state.visitedGraphsHistory[state.currentGraphIndex - 1];
+    }, [state.currentGraphIndex, state.visitedGraphsHistory]);
+
+    const getNextGraphName = useCallback(() => {
+        return state.visitedGraphsHistory[state.currentGraphIndex + 1];
+    }, [state.currentGraphIndex, state.visitedGraphsHistory]);
+
     const setActiveGraph = useCallback((graphName: string) => {
+        setState((prevState) => {
+            if (prevState.visitedGraphsHistory[prevState.currentGraphIndex] === graphName) {
+                return prevState;
+            }
+
+            const newGraphList = [
+                ...prevState.visitedGraphsHistory.slice(0, Math.max(0, prevState.currentGraphIndex + 1)),
+                graphName,
+            ];
+
+            return {
+                ...prevState,
+                currentGraphIndex: newGraphList.length - 1,
+                visitedGraphsHistory: newGraphList,
+            };
+        });
+    }, []);
+
+    const selectPreviousGraph = useCallback(() => {
         setState((prevState) => ({
             ...prevState,
-            activeGraphName: graphName,
+            currentGraphIndex: Math.max(0, prevState.currentGraphIndex - 1),
+            visitedGraphsHistory: [...prevState.visitedGraphsHistory],
+        }));
+    }, []);
+
+    const selectNextGraph = useCallback(() => {
+        setState((prevState) => ({
+            ...prevState,
+            currentGraphIndex: Math.min(prevState.visitedGraphsHistory.length - 1, prevState.currentGraphIndex + 1),
+            visitedGraphsHistory: [...prevState.visitedGraphsHistory],
         }));
     }, []);
 
     const getActiveGraphName = useCallback(() => {
-        return state.activeGraphName;
-    }, [state.activeGraphName]);
+        return state.visitedGraphsHistory[state.currentGraphIndex] ?? '';
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.visitedGraphsHistory]);
 
     const getOperand = useCallback(
         (edgeName: string) => {
@@ -143,7 +191,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphOnChip,
             getActiveGraphName,
             resetGraphOnChipState: reset,
+            getPreviousGraphName,
+            getNextGraphName,
             setActiveGraph,
+            selectPreviousGraph,
+            selectNextGraph,
             graphOnChipList: state.graphOnChipList,
             getOperand,
         }),
@@ -155,7 +207,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphOnChip,
             getActiveGraphName,
             reset,
+            getPreviousGraphName,
+            getNextGraphName,
             setActiveGraph,
+            selectPreviousGraph,
+            selectNextGraph,
             state.graphOnChipList,
             getOperand,
         ],

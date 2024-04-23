@@ -29,6 +29,9 @@
         margin-right: 0;
     }
 
+    .bp4-button.bp4-minimal svg { color: $tt-medium-light-gray; }
+    .bp4-button.bp4-minimal.bp4-disabled svg { color: $tt-dark-gray; }
+
     .path-label {
         max-width: clamp(150px, 15vw, 250px);
 
