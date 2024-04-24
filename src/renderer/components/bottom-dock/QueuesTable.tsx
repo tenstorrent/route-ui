@@ -7,12 +7,11 @@ import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from
 import { useSelector } from 'react-redux';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { getOperationsState, getQueuesState } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
-import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
 
 /**
  * QueuesTable - temporary component to display queues
@@ -22,8 +21,7 @@ function QueuesTable() {
     const { getActiveGraphOnChip, getActiveGraphName, getOperand } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
-    const operationsState = useSelector(getOperationsState);
-    const queuesState = useSelector(getQueuesState);
+    const operandState = useSelector(getOperandState);
     const tableFields = useMemo(() => {
         if (!graphOnChip) {
             return [];
@@ -44,7 +42,6 @@ function QueuesTable() {
 
     const queueCellRenderer = (rowIndex: number) => {
         const queueName = tableFields[rowIndex].name;
-
 
         return queueName ? (
             <SelectableOperation
@@ -95,14 +92,7 @@ function QueuesTable() {
             numRows={tableFields.length}
             enableColumnHeader
             numFrozenColumns={1}
-            cellRendererDependencies={[
-                sortDirection,
-                sortingColumn,
-                queuesState,
-                operationsState,
-                tableFields,
-                tableFields.length,
-            ]}
+            cellRendererDependencies={[sortDirection, sortingColumn, operandState, tableFields, tableFields.length]}
         >
             {
                 [...queuesTableColumns.keys()].map((key) =>

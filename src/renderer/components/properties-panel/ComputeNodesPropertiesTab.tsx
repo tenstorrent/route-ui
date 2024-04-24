@@ -124,7 +124,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
     const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
-    const { selected, selectQueue, selectOperation, disabledQueue } = useSelectableGraphVertex();
+    const { selected, selectOperand, disabledOperand } = useSelectableGraphVertex();
     const focusNode = useSelector(getFocusNode);
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -190,7 +190,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         <SelectableOperation
                             opName={node.operation.name}
                             value={selected(node.operation.name)}
-                            selectFunc={selectOperation}
+                            selectFunc={selectOperand}
                             stringFilter=''
                         />
                     </div>
@@ -204,10 +204,10 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         {node.queueList.map((queue) => (
                             <Fragment key={queue.name}>
                                 <SelectableOperation
-                                    disabled={disabledQueue(queue.name)}
+                                    disabled={disabledOperand(queue.name)}
                                     opName={queue.name}
                                     value={selected(queue.name)}
-                                    selectFunc={selectQueue}
+                                    selectFunc={selectOperand}
                                     stringFilter=''
                                 />
                                 <GraphVertexDetails graphNode={queue} showQueueDetails={false} />

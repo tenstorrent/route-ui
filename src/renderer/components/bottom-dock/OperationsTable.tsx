@@ -22,12 +22,7 @@ import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
-import {
-    getOperationsState,
-    getSelectedNodeList,
-    getSelectedOperationList,
-    getSelectedQueueList,
-} from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOperandState, getSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -83,9 +78,7 @@ function OperationsTable() {
         return sortTableFields(list);
     }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector(getSelectedNodeList(graphName));
-    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
-    const allOperationsState = useSelector(getOperationsState);
-    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
+    const allOperandsState = useSelector(getOperandState);
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
@@ -269,14 +262,12 @@ function OperationsTable() {
                     sortDirection,
                     sortingColumn,
                     nodesSelectionState,
-                    operationsSelectionState,
-                    queueSelectionState,
                     tableFields,
                     selectedOperationName,
                     tableFields.length,
                     operationRatioThreshold,
                     filterQuery,
-                    allOperationsState,
+                    allOperandsState,
                 ]}
             >
                 {columnRenderer({

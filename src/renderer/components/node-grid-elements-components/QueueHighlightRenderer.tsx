@@ -2,20 +2,18 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { FC, useContext } from 'react';
-import { useSelector } from 'react-redux';
+import { FC } from 'react';
 import { getGroupColor } from '../../../data/ColorGenerator';
 import { ComputeNode } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
+import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 
 const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
-    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
+    const { selected } = useSelectableGraphVertex();
+
     return (
         <div className='queue-highlighter-content'>
             {node.queueList.map((queue) => {
-                if (queueSelectionState[queue.name]?.selected) {
+                if (selected(queue.name)) {
                     return (
                         <div
                             key={queue.name}
