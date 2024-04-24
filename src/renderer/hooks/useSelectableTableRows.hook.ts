@@ -23,7 +23,7 @@ const useSelectedTableRows = () => {
         handleSelectAllCores: handleSelectAll<OpTableFields>((row, isSelected) =>
             dispatch(updateNodeSelection({ graphName, id: row.core_id, selected: isSelected })),
         ),
-        handleSelectAllOperations: handleSelectAll<OpTableFields>(
+        handleSelectAllOperands: handleSelectAll<OpTableFields | QueuesTableFields>(
             (row, isSelected) => selectOperand(row.name, isSelected),
             (row) => !disabledOperand(row.name),
         ),
@@ -31,24 +31,16 @@ const useSelectedTableRows = () => {
             (row, isSelected) => selectOperand(row.slowestOperandRef?.name ?? '', isSelected),
             (row) => !disabledOperand(row.slowestOperandRef?.name ?? ''),
         ),
-        handleSelectAllQueues: handleSelectAll<QueuesTableFields>(
-            (row, isSelected) => selectOperand(row.name, isSelected),
-            (row) => !disabledOperand(row.name),
-        ),
         getCoreSelectedState: getSelectedState<OpTableFields>(
             (row) => nodesSelectionState[row.core_id]?.selected ?? false,
         ),
-        getOperationSelectedState: getSelectedState<OpTableFields>(
+        getOperandSelectedState: getSelectedState<OpTableFields | QueuesTableFields>(
             (row) => selected(row.name),
             (row) => !disabledOperand(row.name),
         ),
         getSlowestOperandSelectedState: getSelectedState<OpTableFields>(
             (row) => selected(row.slowestOperandRef?.name ?? ''),
             (row) => !disabledOperand(row.slowestOperandRef?.name ?? ''),
-        ),
-        getQueuesSelectedState: getSelectedState<QueuesTableFields>(
-            (row) => selected(row.name),
-            (row) => !disabledOperand(row.name),
         ),
     };
 };
