@@ -2,6 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+import type { GraphVertexType } from './GraphNames';
 import { LinkType } from './Types';
 
 export interface ExperimentalFeaturesState {
@@ -63,8 +64,15 @@ export interface NodeSelection {
 }
 
 export interface NodeSelectionState {
-    operations: Record<string, Record<string, { data: ComputeNodeState[]; selected: boolean }>>;
-    queues: Record<string, Record<string, { data: ComputeNodeState[]; selected: boolean }>>;
+    operands: Record<
+        string,
+        {
+            data: ComputeNodeState[];
+            selected: boolean;
+            type: GraphVertexType;
+            graphName: string;
+        }
+    >;
     nodeList: Record<string, Record<string, ComputeNodeState>>;
     nodeListOrder: Record<string, string[]>;
     dram: Record<string, { data: ComputeNodeState[]; selected: boolean }[]>;

@@ -4,12 +4,12 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
+import { GraphVertexType } from '../../GraphNames';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
     nodeListOrder: {},
-    operations: {},
-    queues: {},
+    operands: {},
     dram: {},
     focusNode: null,
 };
@@ -65,8 +65,7 @@ const nodeSelectionSlice = createSlice({
         initialLoadAllNodesData(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
             state.nodeList = {};
             state.nodeListOrder = {};
-            state.operations = {};
-            state.queues = {};
+            state.operands = {};
             state.dram = {};
             state.focusNode = null;
 
@@ -74,18 +73,22 @@ const nodeSelectionSlice = createSlice({
                 state.dram[graphName] = [];
                 state.nodeList[graphName] = {};
                 state.nodeListOrder[graphName] = [];
-                state.queues[graphName] = {};
-                state.operations[graphName] = {};
 
                 computaNodeStateList.forEach((item) => {
                     state.nodeList[graphName][item.id] = item;
 
                     if (item.queueNameList.length > 0) {
                         item.queueNameList.forEach((queueName) => {
-                            if (!state.queues[graphName][queueName]) {
-                                state.queues[graphName][queueName] = { data: [], selected: false };
+                            if (!state.operands[queueName]) {
+                                state.operands[queueName] = {
+                                    data: [],
+                                    selected: false,
+                                    type: GraphVertexType.QUEUE,
+                                    graphName,
+                                };
                             }
-                            state.queues[graphName][queueName].data.push(item);
+
+                            state.operands[queueName].data.push(item);
                         });
                     }
 
@@ -97,10 +100,16 @@ const nodeSelectionSlice = createSlice({
                     }
 
                     if (item.opName !== '') {
-                        if (!state.operations[graphName][item.opName]) {
-                            state.operations[graphName][item.opName] = { data: [], selected: false };
+                        if (!state.operands[item.opName]) {
+                            state.operands[item.opName] = {
+                                data: [],
+                                selected: false,
+                                type: GraphVertexType.OPERATION,
+                                graphName,
+                            };
                         }
-                        state.operations[graphName][item.opName].data.push(item);
+
+                        state.operands[item.opName].data.push(item);
                     }
                 });
 
@@ -108,12 +117,8 @@ const nodeSelectionSlice = createSlice({
                     setBorders(dramElement.data);
                 });
 
-                Object.values(state.queues[graphName]).forEach((queue) => {
-                    setSiblings(queue.data);
-                });
-
-                Object.values(state.operations[graphName]).forEach((operation) => {
-                    setSiblings(operation.data);
+                Object.values(state.operands).forEach((operand) => {
+                    setSiblings(operand.data);
                 });
             });
         },
@@ -145,40 +150,60 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        selectOperation(state, action: PayloadAction<{ graphName: string; opName: string; selected: boolean }>) {
-            const { graphName, opName, selected } = action.payload;
-            const operation = state.operations[graphName][opName];
-
-            if (operation) {
-                operation.selected = selected;
-            }
-        },
         selectAllOperations(state, action: PayloadAction<string>) {
-            Object.values(state.operations[action.payload]).forEach((operation) => {
-                operation.selected = true;
-            });
+            Object.values(state.operands)
+                .filter((operand) => {
+                    const isOperation = operand.type === GraphVertexType.OPERATION;
+                    const isOnGraph = operand.graphName === action.payload;
+
+                    return isOperation && isOnGraph;
+                })
+                .forEach((operation) => {
+                    operation.selected = true;
+                });
         },
         clearAllOperations(state, action: PayloadAction<string>) {
-            Object.values(state.operations[action.payload]).forEach((operation) => {
-                operation.selected = false;
-            });
+            Object.values(state.operands)
+                .filter((operand) => {
+                    const isOperation = operand.type === GraphVertexType.OPERATION;
+                    const isOnGraph = operand.graphName === action.payload;
+
+                    return isOperation && isOnGraph;
+                })
+                .forEach((operation) => {
+                    operation.selected = false;
+                });
         },
-        selectQueue(state, action: PayloadAction<{ graphName: string; queueName: string; selected: boolean }>) {
-            const { graphName, queueName, selected } = action.payload;
-            const queue = state.queues[graphName][queueName];
-            if (queue) {
-                queue.selected = selected;
+        selectOperand(state, action: PayloadAction<{ operandName: string; selected: boolean }>) {
+            const { operandName, selected } = action.payload;
+
+            if (state.operands[operandName]) {
+                state.operands[operandName].selected = selected;
             }
         },
         selectAllQueues(state, action: PayloadAction<string>) {
-            Object.values(state.queues[action.payload]).forEach((queue) => {
-                queue.selected = true;
-            });
+            Object.values(state.operands)
+                .filter((operand) => {
+                    const isOperation = operand.type === GraphVertexType.QUEUE;
+                    const isOnGraph = operand.graphName === action.payload;
+
+                    return isOperation && isOnGraph;
+                })
+                .forEach((queue) => {
+                    queue.selected = true;
+                });
         },
         clearAllQueues(state, action: PayloadAction<string>) {
-            Object.values(state.queues[action.payload]).forEach((queue) => {
-                queue.selected = false;
-            });
+            Object.values(state.operands)
+                .filter((operand) => {
+                    const isOperation = operand.type === GraphVertexType.QUEUE;
+                    const isOnGraph = operand.graphName === action.payload;
+
+                    return isOperation && isOnGraph;
+                })
+                .forEach((queue) => {
+                    queue.selected = false;
+                });
         },
         updateFocusNode(state, action: PayloadAction<string | null>) {
             state.focusNode = action.payload;
@@ -190,10 +215,9 @@ export const {
     //
     initialLoadAllNodesData,
     updateNodeSelection,
-    selectOperation,
     selectAllOperations,
     clearAllOperations,
-    selectQueue,
+    selectOperand,
     selectAllQueues,
     clearAllQueues,
     updateFocusNode,
