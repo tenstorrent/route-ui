@@ -199,7 +199,7 @@ function OperationsTable() {
             );
         }
 
-        return slowOpString;
+        return slowOpString ?? 'N/A';
     };
 
     const modelRuntimeCellRenderer = (rowIndex: number) => {
