@@ -13,6 +13,12 @@ import { pipeSelectionReducer } from './slices/pipeSelection.slice';
 import { uiStateReducer } from './slices/uiState.slice';
 
 const store = configureStore({
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActionPaths: ['payload.filter'],
+            },
+        }),
     reducer: {
         uiState: uiStateReducer,
         pipeSelection: pipeSelectionReducer,
