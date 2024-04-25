@@ -4,7 +4,7 @@
   "description": "Tenstorrent Perf Debug Analyzer",
   "license": "Apache-2.0",
   "author": {
-    "name": "Tenstorrent Inc.",
+    "name": "Tenstorrent AI ULC",
     "url": "https://tenstorrent.com",
       "email": "info@tenstorrent.com"
   },
