@@ -63,16 +63,15 @@ export interface NodeSelection {
     selected: boolean;
 }
 
+export interface OperandSelectionState {
+    data: ComputeNodeState[];
+    selected: boolean;
+    type: GraphVertexType;
+    graphName: string;
+}
+
 export interface NodeSelectionState {
-    operands: Record<
-        string,
-        {
-            data: ComputeNodeState[];
-            selected: boolean;
-            type: GraphVertexType;
-            graphName: string;
-        }
-    >;
+    operands: Record<string, OperandSelectionState>;
     nodeList: Record<string, Record<string, ComputeNodeState>>;
     nodeListOrder: Record<string, string[]>;
     dram: Record<string, { data: ComputeNodeState[]; selected: boolean }[]>;

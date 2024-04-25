@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
+import { ComputeNodeState, NodeSelectionState, type OperandSelectionState } from 'data/StateTypes';
 import { GraphVertexType } from '../../GraphNames';
 
 const nodesInitialState: NodeSelectionState = {
@@ -150,6 +150,21 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
+        selectOperandList(
+            state,
+            action: PayloadAction<{
+                filter: (operandName: string, operand: OperandSelectionState) => boolean;
+                selected: boolean;
+            }>,
+        ) {
+            const { filter, selected } = action.payload;
+
+            Object.entries(state.operands)
+                .filter(([operandName, operand]) => filter(operandName, operand))
+                .forEach(([, operand]) => {
+                    operand.selected = selected;
+                });
+        },
         selectAllOperations(state, action: PayloadAction<string>) {
             Object.values(state.operands)
                 .filter((operand) => {
@@ -215,6 +230,7 @@ export const {
     //
     initialLoadAllNodesData,
     updateNodeSelection,
+    selectOperandList,
     selectAllOperations,
     clearAllOperations,
     selectOperand,
