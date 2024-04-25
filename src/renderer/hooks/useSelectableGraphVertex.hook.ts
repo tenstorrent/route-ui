@@ -20,13 +20,7 @@ const useSelectableGraphVertex = () => {
     return {
         disabledOperand: (name: string) => operandState[name]?.selected === undefined,
         selected: (name: string) => operandState?.[name]?.selected ?? false,
-        selectOperand: (name: string, selected: boolean) => {
-            const operand = getOperand(name);
-
-            if (operand) {
-                dispatch(selectOperand({ operandName: name, selected }));
-            }
-        },
+        selectOperand: (name: string, selected: boolean) => dispatch(selectOperand({ operandName: name, selected })),
         navigateToGraph: (operandName: string) => {
             return () => {
                 const operand = getOperand(operandName);
