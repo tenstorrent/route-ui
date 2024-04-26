@@ -155,9 +155,10 @@ const nodeSelectionSlice = createSlice({
         selectOperandList(state, action: PayloadAction<{ operands: string[]; selected: boolean }>) {
             const { operands: operandsToSelect, selected } = action.payload;
 
-            Object.entries(state.operands).forEach(([operandName, operand]) => {
-                if (operandsToSelect.includes(operandName)) {
-                    operand.selected = selected;
+
+            operandsToSelect.forEach((operandName) => {
+                if (state.operands[operandName]) {
+                    state.operands[operandName].selected = selected;
                 }
             });
         },
