@@ -78,51 +78,7 @@
         font-weight: bold;
     }
 
-    .op-element {
-        margin-bottom: 0;
-        gap: 5px;
-        display: grid;
-        grid-template-columns: 1fr 1fr auto 1fr;
-        align-items: center;
-
-        &.has-offchip {
-            grid-template-columns: 1fr 1fr auto 1fr 1fr;
-        }
-
-        .highlighted-text {
-            color: $tt-black;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .bp4-control:not(.bp4-align-right) {
-            margin: 0;
-            margin-right: -7px;
-        }
-
-        .op-type.icon {
-            line-height: 1;
-
-            &.queue {
-                svg {
-                    stroke: #5F6B7C;
-                }
-            }
-        }
-    }
-
     .slowest-operand-direction-icon { margin-left: 2px; }
-
-    .table-operation-cell > div {
-        display: flex;
-        flex-direction: row;
-        justify-content: start;
-        align-items: center;
-        gap: 5px;
-
-    }
-
-    .table-operation-cell.align-right > div { justify-content: end; }
 
     .bp4-table-column-name-text {
         padding-right: 25px;
