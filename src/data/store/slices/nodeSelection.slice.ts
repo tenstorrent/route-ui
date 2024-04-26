@@ -113,10 +113,12 @@ const nodeSelectionSlice = createSlice({
                     }
                 });
 
+                // TODO: move to context
                 state.dram[graphName].forEach((dramElement) => {
                     setBorders(dramElement.data);
                 });
 
+                // TODO: move to context
                 Object.values(state.operands).forEach((operand) => {
                     setSiblings(operand.data);
                 });
