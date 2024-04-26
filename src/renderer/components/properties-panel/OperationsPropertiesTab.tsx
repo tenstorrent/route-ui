@@ -29,13 +29,15 @@ const OperationsPropertiesTab = (): React.ReactElement => {
         if (!operationsList.length) {
             return;
         }
-        const operands = operationsList
-            .filter((operand) => {
-                return operand.name.toLowerCase().includes(filterQuery.toLowerCase());
-            })
-            .map((operand) => {
-                return operand.name;
-            });
+
+        const filter = filterQuery.toLowerCase();
+        const operands = operationsList.reduce<string[]>((filteredOperands, { name }) => {
+            if (name.toLowerCase().includes(filter)) {
+                filteredOperands.push(name);
+            }
+            return filteredOperands;
+        }, []);
+
         dispatch(selectOperandList({ operands, selected }));
     };
 
