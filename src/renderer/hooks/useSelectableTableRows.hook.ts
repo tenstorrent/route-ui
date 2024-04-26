@@ -26,24 +26,34 @@ const useSelectedTableRows = () => {
             });
         },
         handleSelectAllOperands: (rows: (OpTableFields | QueuesTableFields)[], isSelected: boolean) => {
-            const operandNames = [...new Set(rows.map((row) => row.name))];
+            const operandNames = [
+                ...new Set(
+                    rows.reduce<string[]>((namesList, row) => {
+                        if (!disabledOperand(row.name)) {
+                            namesList.push(row.name);
+                        }
 
-            dispatch(
-                selectOperandList({
-                    filter: (operandName) => operandNames.includes(operandName) && !disabledOperand(operandName),
-                    selected: isSelected,
-                }),
-            );
+                        return namesList;
+                    }, []),
+                ),
+            ];
+
+            dispatch(selectOperandList({ operands: operandNames, selected: isSelected }));
         },
         handleSelectAllSlowestOperands: (rows: OpTableFields[], isSelected: boolean) => {
-            const operandNames = [...new Set(rows.map((row) => row.slowestOperandRef?.name ?? ''))];
+            const operandNames = [
+                ...new Set(
+                    rows.reduce<string[]>((namesList, row) => {
+                        if (!disabledOperand(row.slowestOperandRef?.name ?? '')) {
+                            namesList.push(row.slowestOperandRef?.name ?? '');
+                        }
 
-            dispatch(
-                selectOperandList({
-                    filter: (operandName) => operandNames.includes(operandName) && !disabledOperand(operandName),
-                    selected: isSelected,
-                }),
-            );
+                        return namesList;
+                    }, []),
+                ),
+            ];
+
+            dispatch(selectOperandList({ operands: operandNames, selected: isSelected }));
         },
         getCoreSelectedState: getSelectedState<OpTableFields>(
             (row) => nodesSelectionState[row.core_id]?.selected ?? false,
