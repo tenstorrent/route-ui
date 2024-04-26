@@ -40,7 +40,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { getActiveGraphOnChip, setActiveGraph, selectPreviousGraph, loadGraphOnChips, resetGraphOnChipState } =
+    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } =
         useContext(GraphOnChipContext);
 
     const activeGraphOnChip = getActiveGraphOnChip();
@@ -48,9 +48,10 @@ const usePerfAnalyzerFileLoader = () => {
 
     const logger = useLogging();
 
+
     useEffect(() => {
         if (activeGraphOnChip) {
-            dispatch(closeDetailedView());
+            // TODO: this needs to go into bulk loading and useEffect shoudl be removed
             dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
