@@ -5,7 +5,7 @@
 import { Button, Card, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { Fragment, useContext, useMemo } from 'react';
@@ -16,7 +16,7 @@ import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import { getFocusNode, getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -68,7 +68,6 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         slowestOperandText = `${actualText} / ${requiredText}`;
     }
 
-    // console.log(node.perfAnalyzerResults.slowest_operand, slowestOperand);
 
     const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
@@ -76,7 +75,6 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
         //  - it's probably only useful to put heatmap-related values here (once heatmap is implemented),
         //    and leave other details for a drilling-down workflow
         //  - Operand-specific metrics should probably go under each operand?
-
 
         [
             'Model Estimate',
@@ -125,7 +123,6 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
     const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
     const { selected, selectOperand, disabledOperand } = useSelectableGraphVertex();
-    const focusNode = useSelector(getFocusNode);
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
         pipeList.forEach((pipeId) => {
@@ -135,35 +132,16 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 
     const inputs = node.operation && [...node.operation.inputs];
     const outputs = node.operation && [...node.operation.outputs];
+
+    const classList = ['node-type', `node-type-${node.getNodeLabel()}`];
+    if (node.uid === selectedDetailsViewUID && isDetailsViewOpen) {
+        classList.push('detailed-view');
+    }
     return (
         <Card className='node-element'>
-            <h3
-                className={`node-type node-type-${node.getNodeLabel()} ${
-                    node.uid === selectedDetailsViewUID && isDetailsViewOpen ? 'detailed-view' : ''
-                } ${focusNode === node.uid ? 'focus' : ''}`}
-            >
+            <h3 className={classList.join(' ')}>
                 <span
                     className='hover-wrapper'
-                    onMouseEnter={() => {
-                        requestAnimationFrame(() => {
-                            dispatch(updateFocusNode(node.uid));
-                        });
-                    }}
-                    onFocus={() => {
-                        requestAnimationFrame(() => {
-                            dispatch(updateFocusNode(node.uid));
-                        });
-                    }}
-                    onMouseOut={() => {
-                        requestAnimationFrame(() => {
-                            dispatch(updateFocusNode(null));
-                        });
-                    }}
-                    onBlur={() => {
-                        requestAnimationFrame(() => {
-                            dispatch(updateFocusNode(null));
-                        });
-                    }}
                 >
                     {node.type.toUpperCase()} {formatNodeUID(node.uid)}
                 </span>
