@@ -65,6 +65,21 @@
                 text-align: right;
             }
         }
+
+        .operand-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
+            max-width: calc(100% - 30px);
+
+            &.slowest-operand-wrapper { max-width: calc(100% - 50px); }
+
+            .op-element, .op-performance-indicator {
+                flex: 1 1 0;
+                width: 100%;
+            }
+        }
     }
 
     .queues-table { height: 290px; }
