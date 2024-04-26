@@ -5,7 +5,7 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import { clearAllOperationsForGraph } from 'data/store/slices/nodeSelection.slice';
 import React, { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -68,7 +68,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                         >
                             <Button
                                 icon={IconNames.CUBE_REMOVE}
-                                onClick={() => dispatch(clearAllOperations(graphName))}
+                                onClick={() => dispatch(clearAllOperationsForGraph(graphName))}
                             />
                         </Tooltip2>,
                     ]}

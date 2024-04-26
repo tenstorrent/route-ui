@@ -9,7 +9,7 @@ import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
-import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
+import { clearAllQueuesforGraph } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -67,7 +67,10 @@ function QueuesPropertiesTab() {
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >
-                            <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues(graphName))} />
+                            <Button
+                                icon={<QueueIconMinus />}
+                                onClick={() => dispatch(clearAllQueuesforGraph(graphName))}
+                            />
                         </Tooltip2>,
                     ]}
                 />

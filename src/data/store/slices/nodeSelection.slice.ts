@@ -161,7 +161,7 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        selectAllOperations(state, action: PayloadAction<string>) {
+        selectAllOperationsForGraph(state, action: PayloadAction<string>) {
             Object.values(state.operands).forEach((operand) => {
                 const isOperation = operand.type === GraphVertexType.OPERATION;
                 const isOnGraph = operand.graphName === action.payload;
@@ -171,7 +171,7 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        clearAllOperations(state, action: PayloadAction<string>) {
+        clearAllOperationsForGraph(state, action: PayloadAction<string>) {
             Object.values(state.operands).forEach((operand) => {
                 const isOperation = operand.type === GraphVertexType.OPERATION;
                 const isOnGraph = operand.graphName === action.payload;
@@ -188,7 +188,7 @@ const nodeSelectionSlice = createSlice({
                 state.operands[operandName].selected = selected;
             }
         },
-        selectAllQueues(state, action: PayloadAction<string>) {
+        selectAllQueuesForGraph(state, action: PayloadAction<string>) {
             Object.values(state.operands).forEach((operand) => {
                 const isOperation = operand.type === GraphVertexType.QUEUE;
                 const isOnGraph = operand.graphName === action.payload;
@@ -198,7 +198,7 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        clearAllQueues(state, action: PayloadAction<string>) {
+        clearAllQueuesforGraph(state, action: PayloadAction<string>) {
             Object.values(state.operands).forEach((operand) => {
                 const isOperation = operand.type === GraphVertexType.QUEUE;
                 const isOnGraph = operand.graphName === action.payload;
@@ -219,11 +219,11 @@ export const {
     initialLoadAllNodesData,
     updateNodeSelection,
     selectOperandList,
-    selectAllOperations,
-    clearAllOperations,
+    selectAllOperationsForGraph,
+    clearAllOperationsForGraph,
     selectOperand,
-    selectAllQueues,
-    clearAllQueues,
+    selectAllQueuesForGraph,
+    clearAllQueuesforGraph,
     updateFocusNode,
 } = nodeSelectionSlice.actions;
 
