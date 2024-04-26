@@ -5,47 +5,40 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { useContext, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useContext, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
-import { clearAllQueuesforGraph } from '../../../data/store/slices/nodeSelection.slice';
+import { selectOperandList } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
-import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
-import { GraphVertexType } from '../../../data/GraphNames';
 
-function QueuesPropertiesTab() {
+const QueuesPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
-    const graphName = getActiveGraphName();
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const operandsSelectionState = useSelector(getOperandState);
     const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
 
-    const { selectOperand } = useSelectableGraphVertex();
-    const selectFilteredQueue = () => {
-        if (!graphOnChip) {
+    const updateFilteredQueueSelection = (selected: boolean) => {
+        if (!queuesList.length) {
             return;
         }
 
-        Object.entries(operandsSelectionState).forEach(([name, operand]) => {
-            const isQueue = operand.type === GraphVertexType.QUEUE;
-            const isSameGraph = operand.graphName === graphName;
-            const isSameName = name.toLowerCase().includes(filterQuery.toLowerCase());
-
-            if (isQueue && isSameGraph && isSameName) {
-                selectOperand(name, true);
+        const filter = filterQuery.toLowerCase();
+        const operands = queuesList.reduce<string[]>((filteredOperands, { name }) => {
+            if (name.toLowerCase().includes(filter)) {
+                filteredOperands.push(name);
             }
-        });
+            return filteredOperands;
+        }, []);
+        dispatch(selectOperandList({ operands, selected }));
     };
 
     return (
@@ -60,17 +53,14 @@ function QueuesPropertiesTab() {
                             position={PopoverPosition.RIGHT}
                             key='select-all-ops'
                         >
-                            <Button icon={<QueueIconPlus />} onClick={() => selectFilteredQueue()} />
+                            <Button icon={<QueueIconPlus />} onClick={() => updateFilteredQueueSelection(true)} />
                         </Tooltip2>,
                         <Tooltip2
-                            content='Deselect all queues for active graph'
+                            content='Deselect all filtered queues'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >
-                            <Button
-                                icon={<QueueIconMinus />}
-                                onClick={() => dispatch(clearAllQueuesforGraph(graphName))}
-                            />
+                            <Button icon={<QueueIconMinus />} onClick={() => updateFilteredQueueSelection(false)} />
                         </Tooltip2>,
                     ]}
                 />
@@ -95,7 +85,6 @@ function QueuesPropertiesTab() {
                                     />
                                 }
                                 isOpen={allOpen}
-                                contentStyles={{ color: '#000' }}
                             >
                                 {queue && <GraphVertexDetails graphNode={queue} />}
                             </Collapsible>
@@ -105,6 +94,6 @@ function QueuesPropertiesTab() {
             </div>
         </div>
     );
-}
+};
 
 export default QueuesPropertiesTab;
