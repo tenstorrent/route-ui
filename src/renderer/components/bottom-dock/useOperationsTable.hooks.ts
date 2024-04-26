@@ -101,10 +101,10 @@ operationsTableColumns.set('kernel_total_runtime', {
 const useOperationsTable = () => {
     const {
         handleSelectAllCores,
-        handleSelectAllOperations,
+        handleSelectAllOperands,
         handleSelectAllSlowestOperands,
         getCoreSelectedState,
-        getOperationSelectedState,
+        getOperandSelectedState,
         getSlowestOperandSelectedState,
     } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<OperationTableColumn>('kernel_total_runtime');
@@ -141,8 +141,8 @@ const useOperationsTable = () => {
     operationsTableColumns.get('core_id')!.handleSelectAll = handleSelectAllCores;
     operationsTableColumns.get('core_id')!.getSelectedState = getCoreSelectedState;
 
-    operationsTableColumns.get('operation')!.handleSelectAll = handleSelectAllOperations;
-    operationsTableColumns.get('operation')!.getSelectedState = getOperationSelectedState;
+    operationsTableColumns.get('operation')!.handleSelectAll = handleSelectAllOperands;
+    operationsTableColumns.get('operation')!.getSelectedState = getOperandSelectedState;
 
     operationsTableColumns.get('slowest_operand')!.handleSelectAll = handleSelectAllSlowestOperands;
     operationsTableColumns.get('slowest_operand')!.getSelectedState = getSlowestOperandSelectedState;

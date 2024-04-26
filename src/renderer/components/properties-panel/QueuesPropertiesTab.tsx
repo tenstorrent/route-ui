@@ -5,11 +5,11 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import React, { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { getSelectedQueueList } from '../../../data/store/selectors/nodeSelection.selectors';
-import { clearAllQueues } from '../../../data/store/slices/nodeSelection.slice';
+import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
+import { clearAllQueuesforGraph } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -18,6 +18,7 @@ import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import { GraphVertexType } from '../../../data/GraphNames';
 
 function QueuesPropertiesTab() {
     const dispatch = useDispatch();
@@ -27,17 +28,22 @@ function QueuesPropertiesTab() {
 
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
+    const operandsSelectionState = useSelector(getOperandState);
     const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
 
-    const { selectQueue } = useSelectableGraphVertex();
+    const { selectOperand } = useSelectableGraphVertex();
     const selectFilteredQueue = () => {
         if (!graphOnChip) {
             return;
         }
-        Object.keys(queueSelectionState).forEach((name) => {
-            if (name.toLowerCase().includes(filterQuery.toLowerCase())) {
-                selectQueue(name, true);
+
+        Object.entries(operandsSelectionState).forEach(([name, operand]) => {
+            const isQueue = operand.type === GraphVertexType.QUEUE;
+            const isSameGraph = operand.graphName === graphName;
+            const isSameName = name.toLowerCase().includes(filterQuery.toLowerCase());
+
+            if (isQueue && isSameGraph && isSameName) {
+                selectOperand(name, true);
             }
         });
     };
@@ -61,7 +67,10 @@ function QueuesPropertiesTab() {
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >
-                            <Button icon={<QueueIconMinus />} onClick={() => dispatch(clearAllQueues(graphName))} />
+                            <Button
+                                icon={<QueueIconMinus />}
+                                onClick={() => dispatch(clearAllQueuesforGraph(graphName))}
+                            />
                         </Tooltip2>,
                     ]}
                 />

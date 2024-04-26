@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { getFocusNode, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { getFocusNode, getOperand, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
@@ -39,7 +39,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const focusPipe = useSelector(getFocusPipe);
     const focusNode = useSelector(getFocusNode);
     const showOperationNames = useSelector(getShowOperationNames);
-    const { data: selectedGroupData } = useSelector(getOperation(graphName, node.opName)) ?? {};
+    const { data: selectedGroupData } = useSelector(getOperand(node.opName)) ?? {};
     const shouldShowLabel = useMemo(() => {
         const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
         // Use the top border to determine if the label should be shown.

@@ -5,18 +5,19 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import { clearAllOperationsForGraph } from 'data/store/slices/nodeSelection.slice';
 import React, { useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
-import { getSelectedOperationList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import { GraphVertexType } from '../../../data/GraphNames';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
@@ -24,19 +25,24 @@ const OperationsPropertiesTab = (): React.ReactElement => {
     const graphName = getActiveGraphName();
     const graphOnChip = getActiveGraphOnChip();
 
-    const groupsSelectionState = useSelector(getSelectedOperationList(graphName));
+    const operandsSelectionState = useSelector(getOperandState);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);
 
-    const { selectOperation } = useSelectableGraphVertex();
+    const { selectOperand } = useSelectableGraphVertex();
     const selectFilteredOperations = () => {
         if (!graphOnChip) {
             return;
         }
-        Object.keys(groupsSelectionState).forEach((op) => {
-            if (op.toLowerCase().includes(filterQuery.toLowerCase())) {
-                selectOperation(op, true);
+
+        Object.entries(operandsSelectionState).forEach(([name, operand]) => {
+            const isQueue = operand.type === GraphVertexType.OPERATION;
+            const isSameGraph = operand.graphName === graphName;
+            const isSameName = name.toLowerCase().includes(filterQuery.toLowerCase());
+
+            if (isQueue && isSameGraph && isSameName) {
+                selectOperand(name, true);
             }
         });
     };
@@ -62,7 +68,7 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                         >
                             <Button
                                 icon={IconNames.CUBE_REMOVE}
-                                onClick={() => dispatch(clearAllOperations(graphName))}
+                                onClick={() => dispatch(clearAllOperationsForGraph(graphName))}
                             />
                         </Tooltip2>,
                     ]}
