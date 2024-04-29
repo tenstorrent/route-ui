@@ -33,11 +33,13 @@
     }
 
     .op-type.icon {
+        color: var(--js-congestion-color, $tt-black);
+
         line-height: 1;
 
         &.queue {
             svg {
-                stroke: #5F6B7C;
+                stroke: var(--js-congestion-color, #5F6B7C);
             }
         }
     }
