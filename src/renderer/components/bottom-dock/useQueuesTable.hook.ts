@@ -139,7 +139,7 @@ queuesTableColumns.set('allocation-info', {
 });
 
 const useQueuesTable = () => {
-    const { handleSelectAllQueues, getQueuesSelectedState } = useSelectedTableRows();
+    const { handleSelectAllOperands, getOperandSelectedState } = useSelectedTableRows();
     const [sortingColumn, setSortingColumn] = useState<QueuesTableColumn>('entries');
     const [sortDirection, setSortDirection] = useState<SortingDirection>(SortingDirection.DESC);
 
@@ -174,8 +174,8 @@ const useQueuesTable = () => {
         setSortingColumn(selectedColumn);
     };
 
-    queuesTableColumns.get('queue')!.handleSelectAll = handleSelectAllQueues;
-    queuesTableColumns.get('queue')!.getSelectedState = getQueuesSelectedState;
+    queuesTableColumns.get('queue')!.handleSelectAll = handleSelectAllOperands;
+    queuesTableColumns.get('queue')!.getSelectedState = getOperandSelectedState;
 
     return { sortTableFields, changeSorting, sortingColumn, sortDirection, queuesTableColumns };
 };

@@ -11,12 +11,8 @@ export const getDramGroup = (graphName: string, dramChannelId?: number) => (stat
 
 export const selectNodeSelectionById = (graphName: string, id: string) => (state: RootState) =>
     state.nodeSelection.nodeList[graphName]?.[id];
-export const getOperation = (graphName: string, opName: string) => (state: RootState) =>
-    state.nodeSelection.operations[graphName]?.[opName];
-export const getSelectedOperationList = (graphName: string) => (state: RootState) =>
-    state.nodeSelection.operations[graphName];
-
-export const getSelectedQueueList = (graphName: string) => (state: RootState) => state.nodeSelection.queues[graphName];
+export const getOperand = (opName: string) => (state: RootState) => state.nodeSelection.operands[opName];
+export const getOperandState = (state: RootState) => state.nodeSelection.operands;
 
 export const getSelectedNodeList = (graphName: string) => (state: RootState) => state.nodeSelection.nodeList[graphName];
 

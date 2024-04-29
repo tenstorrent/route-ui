@@ -5,40 +5,40 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { clearAllOperations } from 'data/store/slices/nodeSelection.slice';
+import { selectOperandList } from 'data/store/slices/nodeSelection.slice';
 import React, { useContext, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
-import { getSelectedOperationList } from '../../../data/store/selectors/nodeSelection.selectors';
-import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
-import SelectableOperation from '../SelectableOperation';
+import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 
 const OperationsPropertiesTab = (): React.ReactElement => {
     const dispatch = useDispatch();
-    const { getActiveGraphName, getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphName = getActiveGraphName();
+    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
 
-    const groupsSelectionState = useSelector(getSelectedOperationList(graphName));
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
     const [allOpen, setAllOpen] = useState(true);
 
-    const { selected, selectOperation } = useSelectableGraphVertex();
-    const selectFilteredOperations = () => {
-        if (!graphOnChip) {
+    const updateFilteredOperationSelection = (selected: boolean) => {
+        if (!operationsList.length) {
             return;
         }
-        Object.keys(groupsSelectionState).forEach((op) => {
-            if (op.toLowerCase().includes(filterQuery.toLowerCase())) {
-                selectOperation(op, true);
+
+        const filter = filterQuery.toLowerCase();
+        const operands = operationsList.reduce<string[]>((filteredOperands, { name }) => {
+            if (name.toLowerCase().includes(filter)) {
+                filteredOperands.push(name);
             }
-        });
+            return filteredOperands;
+        }, []);
+
+        dispatch(selectOperandList({ operands, selected }));
     };
 
     return (
@@ -53,16 +53,16 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                             position={PopoverPosition.RIGHT}
                             key='select-all-ops'
                         >
-                            <Button icon={IconNames.CUBE_ADD} onClick={() => selectFilteredOperations()} />
+                            <Button icon={IconNames.CUBE_ADD} onClick={() => updateFilteredOperationSelection(true)} />
                         </Tooltip2>,
                         <Tooltip2
-                            content='Deselect all operations for active graph'
+                            content='Deselect all filtered operations'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >
                             <Button
                                 icon={IconNames.CUBE_REMOVE}
-                                onClick={() => dispatch(clearAllOperations(graphName))}
+                                onClick={() => updateFilteredOperationSelection(false)}
                             />
                         </Tooltip2>,
                     ]}
@@ -80,13 +80,10 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                             component={
                                 <Collapsible
                                     label={
-                                        <SelectableOperation
-                                            disabled={operation.isOffchip}
-                                            opName={operation.name}
-                                            value={selected(operation.name)}
-                                            selectFunc={selectOperation}
+                                        <GraphVertexDetailsSelectables
+                                            operand={operation}
                                             stringFilter={filterQuery}
-                                            offchip={operation.isOffchip}
+                                            displayType={false}
                                         />
                                     }
                                     isOpen={allOpen}

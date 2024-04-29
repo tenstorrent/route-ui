@@ -48,9 +48,10 @@ const usePerfAnalyzerFileLoader = () => {
 
     const logger = useLogging();
 
+
     useEffect(() => {
         if (activeGraphOnChip) {
-            dispatch(closeDetailedView());
+            // TODO: this needs to go into bulk loading and useEffect shoudl be removed
             dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -157,15 +158,9 @@ const usePerfAnalyzerFileLoader = () => {
 
     const loadPerfAnalyzerGraph = (graphName: string) => {
         if (selectedFolder) {
-            try {
-                dispatch(closeDetailedView());
-                setActiveGraph(graphName);
-                navigate('/render');
-            } catch (e) {
-                const err = e as Error;
-                logging.error(`error loading and populating chip ${err.message}`);
-                setError(err.message ?? 'Unknown Error');
-            }
+            dispatch(closeDetailedView());
+            setActiveGraph(graphName);
+            navigate('/render');
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }

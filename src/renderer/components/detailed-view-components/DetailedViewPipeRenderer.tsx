@@ -97,6 +97,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         noc0Saturation,
         noc1Saturation,
         isHighContrast,
+        selectedPipeIds,
     ]);
 
     const linkNames = links.map((link) => link.name).join(' ');

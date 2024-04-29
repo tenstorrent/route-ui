@@ -2,6 +2,45 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+@import "../scss/variables";
+
 .op-performance-indicator {
     display: flex;
+}
+
+.op-element {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    gap: 5px;
+    color: $tt-black;
+    width: 100%;
+
+    .highlighted-text {
+        flex-shrink: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bp4-control.bp4-checkbox {
+        margin: 0;
+        width: 18px;
+        padding-left: 0;
+
+        &:not(.bp4-align-right) .bp4-control-indicator {
+            margin-left: 0;
+        }
+    }
+
+    .op-type.icon {
+        color: var(--js-congestion-color, $tt-black);
+
+        line-height: 1;
+
+        &.queue {
+            svg {
+                stroke: var(--js-congestion-color, $queue-color);
+            }
+        }
+    }
 }

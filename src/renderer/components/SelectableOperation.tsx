@@ -28,6 +28,7 @@ interface SelectableOperationProps {
     type?: GraphVertexType | null;
     disabled?: boolean;
     offchip?: boolean;
+    offchipClickHandler?: () => void;
 }
 
 /**
@@ -41,16 +42,13 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     type = null,
     disabled = false,
     offchip = false,
+    offchipClickHandler,
 }) => {
-    const onForeignClick = () => {
-        console.log('Foreign click');
-    };
 
-    // TODO: determine and implement graph navigation
     return (
-        <div className='op-element'>
+        <div className={`op-element ${offchip ? 'has-offchip' : ''}`}>
             <Checkbox
-                disabled={disabled || offchip}
+                disabled={disabled}
                 checked={value}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     selectFunc(opName, e.target.checked);
@@ -62,19 +60,18 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     {type === GraphVertexType.QUEUE && <QueueIcon />}
                 </span>
             )}
-            {offchip && (
-                <Button
-                    className='foreign'
-                    title="Navigate to graph"
-                    disabled
-                    small
-                    minimal
-                    icon={IconNames.OPEN_APPLICATION}
-                    onClick={onForeignClick}
-                />
-            )}
             <HighlightedText text={opName} filter={stringFilter} />
             <ColorSwatch isVisible color={getGroupColor(opName)} />
+            {offchip && (
+                <Button
+                    title='Navigate to graph'
+                    small
+                    minimal
+                    disabled={offchipClickHandler === undefined}
+                    icon={IconNames.OPEN_APPLICATION}
+                    onClick={() => offchipClickHandler?.()}
+                />
+            )}
         </div>
     );
 };
@@ -83,6 +80,7 @@ SelectableOperation.defaultProps = {
     type: null,
     disabled: false,
     offchip: false,
+    offchipClickHandler: undefined,
 };
 export default SelectableOperation;
 
@@ -95,33 +93,27 @@ export const SelectableOperationPerformance: FC<SelectableOperationPerformancePr
     const render = useSelector(getShowOperationPerformanceGrid);
     const threshold = useSelector(getOperationPerformanceTreshold);
     const isHighContrast: boolean = useSelector(getHighContrastState);
+
     if (!render || !operation || !operation.details) {
-        return children;
+        return <div className='op-performance-indicator'>{children}</div>;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let operandType: GraphVertexType | null;
-    React.Children.forEach(children, (child) => {
-        if (React.isValidElement<SelectableOperationProps>(child)) {
-            operandType = child.props.type || null;
-        }
-    });
-
-    // TODO: we will use operandType in the next iterration to address the type of styling we render as queue custom icon requires stroke and not color/fill
     const opFactor = operation.details?.bw_limited_factor || 1;
-    if (opFactor > threshold) {
-        const congestionColor = calculateOpCongestionColor(opFactor, 0, isHighContrast);
+    let congestionColor = 'currentColor';
 
-        return (
-            <div
-                className='op-performance-indicator'
-                style={{
-                    color: `${congestionColor}`,
-                }}
-            >
-                {children}
-            </div>
-        );
+    if (opFactor > threshold) {
+        congestionColor = calculateOpCongestionColor(opFactor, 0, isHighContrast);
     }
-    return children;
+
+    return (
+        <div
+            className='op-performance-indicator'
+            style={{
+                // @ts-expect-error
+                '--js-congestion-color': `${congestionColor}`,
+            }}
+        >
+            {children}
+        </div>
+    );
 };

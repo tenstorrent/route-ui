@@ -22,11 +22,7 @@ import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
-import {
-    getSelectedNodeList,
-    getSelectedOperationList,
-    getSelectedQueueList,
-} from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOperandState, getSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -82,9 +78,8 @@ function OperationsTable() {
         return sortTableFields(list);
     }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector(getSelectedNodeList(graphName));
-    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
-    const queueSelectionState = useSelector(getSelectedQueueList(graphName));
-    const { selected, selectOperation, disabledOperation, selectQueue, disabledQueue } = useSelectableGraphVertex();
+    const allOperandsState = useSelector(getOperandState);
+    const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
 
@@ -96,17 +91,20 @@ function OperationsTable() {
 
     const operationCellRenderer = (rowIndex: number) => {
         const opName = tableFields[rowIndex].name;
+        const operation = tableFields[rowIndex].operation || null;
+
         return (
-            <>
+            <span className='operand-wrapper'>
                 {opName ? (
                     <SelectableOperationPerformance operation={tableFields[rowIndex].operation || null}>
                         <SelectableOperation
-                            disabled={disabledOperation(opName)}
                             opName={opName}
                             value={selected(opName)}
-                            selectFunc={selectOperation}
+                            selectFunc={selectOperand}
                             stringFilter={filterQuery}
                             type={GraphVertexType.OPERATION}
+                            offchip={operation?.isOffchip}
+                            offchipClickHandler={navigateToGraph(opName)}
                         />
                     </SelectableOperationPerformance>
                 ) : (
@@ -129,7 +127,7 @@ function OperationsTable() {
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={operationsSelectionState[opName] === undefined}
+                        disabled={operation?.isOffchip}
                         title='View operation cores'
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
@@ -137,7 +135,7 @@ function OperationsTable() {
                         }}
                     />
                 )}
-            </>
+            </span>
         );
     };
 
@@ -166,9 +164,8 @@ function OperationsTable() {
 
         if (slowestOperand) {
             const type: GraphVertexType = slowestOperand.vertexType;
-            // <Cell className='table-cell-interactive table-operation-cell'>
             return (
-                <>
+                <span className='operand-wrapper slowest-operand-wrapper'>
                     {slowOpString.includes('output') ? (
                         <Icon size={12} icon={IconNames.EXPORT} title={slowOpString} />
                     ) : (
@@ -178,34 +175,31 @@ function OperationsTable() {
                         operation={type === GraphVertexType.OPERATION ? (slowestOperand as Operation) : null}
                     >
                         <SelectableOperation
-                            disabled={
-                                type === GraphVertexType.OPERATION
-                                    ? disabledOperation(slowestOperand.name)
-                                    : disabledQueue(slowestOperand.name)
-                            }
                             opName={slowestOperand.name}
                             value={selected(slowestOperand.name)}
-                            selectFunc={type === GraphVertexType.OPERATION ? selectOperation : selectQueue}
+                            selectFunc={selectOperand}
                             stringFilter=''
                             type={slowestOperand.vertexType}
+                            offchip={slowestOperand.isOffchip}
+                            offchipClickHandler={navigateToGraph(slowestOperand.name)}
                         />
                     </SelectableOperationPerformance>
                     <Button
                         style={{ height: '18px' }}
                         small
                         minimal
-                        disabled={operationsSelectionState[slowestOperand.name] === undefined}
+                        disabled={slowestOperand.isOffchip}
                         icon={IconNames.ARROW_RIGHT}
                         onClick={() => {
                             setSelectedOperationName(slowestOperand.name);
                         }}
                         title='View operation cores'
                     />
-                </>
+                </span>
             );
         }
 
-        return slowOpString;
+        return slowOpString ?? 'N/A';
     };
 
     const modelRuntimeCellRenderer = (rowIndex: number) => {
@@ -268,13 +262,12 @@ function OperationsTable() {
                     sortDirection,
                     sortingColumn,
                     nodesSelectionState,
-                    operationsSelectionState,
-                    queueSelectionState,
                     tableFields,
                     selectedOperationName,
                     tableFields.length,
                     operationRatioThreshold,
                     filterQuery,
+                    allOperandsState,
                 ]}
             >
                 {columnRenderer({

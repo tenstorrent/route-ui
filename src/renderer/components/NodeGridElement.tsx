@@ -2,8 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { getFocusNode, getOperation, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
-import { updateFocusNode, updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
+import { getOperand, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,9 +37,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
-    const focusNode = useSelector(getFocusNode);
     const showOperationNames = useSelector(getShowOperationNames);
-    const { data: selectedGroupData } = useSelector(getOperation(graphName, node.opName)) ?? {};
+    const { data: selectedGroupData } = useSelector(getOperand(node.opName)) ?? {};
     const shouldShowLabel = useMemo(() => {
         const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
         // Use the top border to determine if the label should be shown.
@@ -59,7 +58,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
         coreHighlight = HighlightType.INPUT;
     }
 
-    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
+
 
     const triggerSelection = () => {
         const selectedState = nodeState?.selected;
@@ -70,34 +69,22 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
         }
     };
 
+    const classList = ['node-item'];
+    if (coreHighlight !== HighlightType.NONE) {
+        classList.push(`core-highlight-${coreHighlight}`);
+    }
+    if (nodeState?.selected) {
+        classList.push('selected');
+    }
+    if (uid === node.uid && isOpen) {
+        classList.push('detailed-view');
+    }
     return (
         <button
             title={showOperationNames && shouldShowLabel ? node.opName : ''}
             type='button'
-            className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
-                node.uid === uid && isOpen ? 'detailed-view' : ''
-            } ${nodeState?.selected && focusNode === node.uid ? 'focus' : ''}`}
+            className={classList.join(' ')}
             onClick={triggerSelection}
-            onMouseEnter={() => {
-                requestAnimationFrame(() => {
-                    dispatch(updateFocusNode(node.uid));
-                });
-            }}
-            onFocus={() => {
-                requestAnimationFrame(() => {
-                    dispatch(updateFocusNode(node.uid));
-                });
-            }}
-            onMouseOut={() => {
-                requestAnimationFrame(() => {
-                    dispatch(updateFocusNode(null));
-                });
-            }}
-            onBlur={() => {
-                requestAnimationFrame(() => {
-                    dispatch(updateFocusNode(null));
-                });
-            }}
         >
             {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />

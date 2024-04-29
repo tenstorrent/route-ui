@@ -2,20 +2,18 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ComputeNode } from '../../../data/GraphOnChip';
 
 import { getGroupColor } from '../../../data/ColorGenerator';
-import { getOperation } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOperand } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getShowOperationNames } from '../../../data/store/selectors/uiState.selectors';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const showOperationNames = useSelector(getShowOperationNames);
-    const { data: selectedGroupData } = useSelector(getOperation(graphName, node.opName)) ?? {};
+    const { data: selectedGroupData } = useSelector(getOperand(node.opName)) ?? {};
     const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.

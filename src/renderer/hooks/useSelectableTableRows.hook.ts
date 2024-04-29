@@ -4,95 +4,67 @@
 
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { GraphVertexType } from '../../data/GraphNames';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import {
-    getSelectedNodeList,
-    getSelectedOperationList,
-    getSelectedQueueList,
-} from '../../data/store/selectors/nodeSelection.selectors';
-import { selectOperation, selectQueue, updateNodeSelection } from '../../data/store/slices/nodeSelection.slice';
-import { getSelectedState, handleSelectAll } from '../components/bottom-dock/SharedTable';
+import { getSelectedNodeList } from '../../data/store/selectors/nodeSelection.selectors';
+import { selectOperandList, updateNodeSelection } from '../../data/store/slices/nodeSelection.slice';
+import { getSelectedState } from '../components/bottom-dock/SharedTable';
 import type { OpTableFields } from '../components/bottom-dock/useOperationsTable.hooks';
 import type { QueuesTableFields } from '../components/bottom-dock/useQueuesTable.hook';
+import useSelectableGraphVertex from './useSelectableGraphVertex.hook';
 
 const useSelectedTableRows = () => {
     const dispatch = useDispatch();
     const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const { selected, disabledOperand } = useSelectableGraphVertex();
 
-    const getDisabledOperation = (name: string) => {
-        return operationsSelectionState[name]?.selected === undefined;
-    };
-
-    const getDisabledSlowestOperand = (row: OpTableFields) => {
-        const name = row.slowestOperandRef?.name ?? '';
-        const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
-
-        if (type === GraphVertexType.OPERATION) {
-            return operationsSelectionState[name]?.selected === undefined;
-        }
-
-        return queuesSelectionState[name]?.selected === undefined;
-    };
-
-    const getQueuesDisabledState = (name: string) => {
-        return queuesSelectionState[name]?.selected === undefined;
-    };
-
-    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
-    const queuesSelectionState = useSelector(getSelectedQueueList(graphName));
     const nodesSelectionState = useSelector(getSelectedNodeList(graphName));
 
     return {
-        handleSelectAllCores: handleSelectAll<OpTableFields>((row, selected) =>
-            dispatch(updateNodeSelection({ graphName, id: row.core_id, selected })),
-        ),
-        handleSelectAllOperations: handleSelectAll<OpTableFields>(
-            (row, selected) => dispatch(selectOperation({ graphName, opName: row.name, selected })),
-            (row) => !getDisabledOperation(row.name),
-        ),
-        handleSelectAllSlowestOperands: handleSelectAll<OpTableFields>(
-            (row, selected) => {
-                const name = row.slowestOperandRef?.name ?? '';
-                const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
+        handleSelectAllCores: (rows: OpTableFields[], isSelected: boolean) => {
+            rows.forEach((row) => {
+                dispatch(updateNodeSelection({ graphName, id: row.core_id, selected: isSelected }));
+            });
+        },
+        handleSelectAllOperands: (rows: (OpTableFields | QueuesTableFields)[], isSelected: boolean) => {
+            const operandNames = [
+                ...new Set(
+                    rows.reduce<string[]>((namesList, row) => {
+                        if (!disabledOperand(row.name)) {
+                            namesList.push(row.name);
+                        }
 
-                if (type === GraphVertexType.OPERATION) {
-                    dispatch(selectOperation({ graphName, opName: name, selected }));
-                } else {
-                    dispatch(selectQueue({ graphName, queueName: name, selected }));
-                }
-            },
-            (row) => !getDisabledSlowestOperand(row),
-        ),
-        handleSelectAllQueues: handleSelectAll<QueuesTableFields>(
-            (row, selected) => {
-                dispatch(selectQueue({ graphName, queueName: row.name, selected }));
-            },
-            (row) => !getQueuesDisabledState(row.name),
-        ),
+                        return namesList;
+                    }, []),
+                ),
+            ];
+
+            dispatch(selectOperandList({ operands: operandNames, selected: isSelected }));
+        },
+        handleSelectAllSlowestOperands: (rows: OpTableFields[], isSelected: boolean) => {
+            const operandNames = [
+                ...new Set(
+                    rows.reduce<string[]>((namesList, row) => {
+                        if (!disabledOperand(row.slowestOperandRef?.name ?? '')) {
+                            namesList.push(row.slowestOperandRef?.name ?? '');
+                        }
+
+                        return namesList;
+                    }, []),
+                ),
+            ];
+
+            dispatch(selectOperandList({ operands: operandNames, selected: isSelected }));
+        },
         getCoreSelectedState: getSelectedState<OpTableFields>(
             (row) => nodesSelectionState[row.core_id]?.selected ?? false,
         ),
-        getOperationSelectedState: getSelectedState<OpTableFields>(
-            (row) => operationsSelectionState[row.name]?.selected ?? false,
-            (row) => !getDisabledOperation(row.name),
+        getOperandSelectedState: getSelectedState<OpTableFields | QueuesTableFields>(
+            (row) => selected(row.name),
+            (row) => !disabledOperand(row.name),
         ),
         getSlowestOperandSelectedState: getSelectedState<OpTableFields>(
-            (row) => {
-                const name = row.slowestOperandRef?.name ?? '';
-                const type = row.slowestOperandRef?.vertexType ?? GraphVertexType.OPERATION;
-
-                if (type === GraphVertexType.OPERATION) {
-                    return operationsSelectionState[name]?.selected ?? false;
-                }
-
-                return queuesSelectionState[name]?.selected ?? false;
-            },
-            (row) => !getDisabledSlowestOperand(row),
-        ),
-        getQueuesSelectedState: getSelectedState<QueuesTableFields>(
-            (row) => queuesSelectionState[row.name]?.selected ?? false,
-            (row) => !getQueuesDisabledState(row.name),
+            (row) => selected(row.slowestOperandRef?.name ?? ''),
+            (row) => !disabledOperand(row.slowestOperandRef?.name ?? ''),
         ),
     };
 };

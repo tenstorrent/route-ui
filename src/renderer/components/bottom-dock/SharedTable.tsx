@@ -56,25 +56,6 @@ export const sortDesc = (a: any, b: any) => {
     return a < b ? 1 : -1;
 };
 
-export const handleSelectAll = <T extends TableFields>(
-    selectRow: (row: T, selected: boolean) => void,
-    getEnabledState?: (row: T) => boolean,
-) => {
-    return (rows: T[], selected: boolean) => {
-        let selectableRows = rows;
-
-        if (getEnabledState) {
-            selectableRows = rows.filter((row) => {
-                return getEnabledState(row);
-            });
-        }
-
-        selectableRows.forEach((row) => {
-            selectRow(row, selected);
-        });
-    };
-};
-
 export const getSelectedState = <T extends TableFields>(
     getSelectionState: (row: T) => boolean,
     getEnabledState?: (row: T) => boolean,

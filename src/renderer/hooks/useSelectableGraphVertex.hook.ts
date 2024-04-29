@@ -5,25 +5,30 @@
 import { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import { getSelectedOperationList, getSelectedQueueList } from '../../data/store/selectors/nodeSelection.selectors';
-import { selectOperation, selectQueue } from '../../data/store/slices/nodeSelection.slice';
+import { getOperandState } from '../../data/store/selectors/nodeSelection.selectors';
+import { selectOperand } from '../../data/store/slices/nodeSelection.slice';
+import usePerfAnalyzerFileLoader from './usePerfAnalyzerFileLoader.hooks';
 
 const useSelectableGraphVertex = () => {
     const dispatch = useDispatch();
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const { getOperand } = useContext(GraphOnChipContext);
 
-    const operationsSelectionState = useSelector(getSelectedOperationList(graphName));
-    const queuesSelectionState = useSelector(getSelectedQueueList(graphName));
+    const { loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+
+    const operandState = useSelector(getOperandState);
 
     return {
-        disabledQueue: (name: string) => queuesSelectionState[name]?.selected === undefined,
-        disabledOperation: (name: string) => operationsSelectionState[name]?.selected === undefined,
-        selected: (name: string) =>
-            operationsSelectionState[name]?.selected ?? queuesSelectionState[name]?.selected ?? false,
-        selectQueue: (queueName: string, selected: boolean) =>
-            dispatch(selectQueue({ graphName, queueName, selected })),
-        selectOperation: (opName: string, selected: boolean) =>
-            dispatch(selectOperation({ graphName, opName, selected })),
+        disabledOperand: (name: string) => operandState[name]?.selected === undefined,
+        selected: (name: string) => operandState?.[name]?.selected ?? false,
+        selectOperand: (name: string, selected: boolean) => dispatch(selectOperand({ operandName: name, selected })),
+        navigateToGraph: (operandName: string) => {
+            return () => {
+                const operand = getOperand(operandName);
+                if (operand) {
+                    loadPerfAnalyzerGraph(operand.graphName);
+                }
+            };
+        },
     };
 };
 

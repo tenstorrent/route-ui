@@ -622,7 +622,6 @@
 .opname {
     .op-type.icon {
         line-height: 1;
-        margin-left: -7px;
 
         &.op {
             svg {
@@ -634,20 +633,6 @@
             svg {
                 stroke: #5F6B7C;
             }
-        }
-    }
-
-    .op-element {
-        color: $tt-black;
-        display: flex;
-        align-items: center;
-        margin-bottom: 6px;
-        gap: 5px;
-
-        .highlighted-text {
-            flex-shrink: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
     }
 
