@@ -39,7 +39,7 @@
 
         &.queue {
             svg {
-                stroke: var(--js-congestion-color, #5F6B7C);
+                stroke: var(--js-congestion-color, $queue-color);
             }
         }
     }
