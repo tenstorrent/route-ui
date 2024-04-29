@@ -111,7 +111,7 @@ const createWindow = async () => {
 
     const menuBuilder = new MenuBuilder(mainWindow);
 
-    await menuBuilder.buildMenu();
+    menuBuilder.buildMenu();
 
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
