@@ -94,7 +94,7 @@ function OperationsTable() {
         const operation = tableFields[rowIndex].operation || null;
 
         return (
-            <>
+            <span className='operand-wrapper'>
                 {opName ? (
                     <SelectableOperationPerformance operation={tableFields[rowIndex].operation || null}>
                         <SelectableOperation
@@ -135,7 +135,7 @@ function OperationsTable() {
                         }}
                     />
                 )}
-            </>
+            </span>
         );
     };
 
@@ -165,7 +165,7 @@ function OperationsTable() {
         if (slowestOperand) {
             const type: GraphVertexType = slowestOperand.vertexType;
             return (
-                <>
+                <span className='operand-wrapper slowest-operand-wrapper'>
                     {slowOpString.includes('output') ? (
                         <Icon size={12} icon={IconNames.EXPORT} title={slowOpString} />
                     ) : (
@@ -195,7 +195,7 @@ function OperationsTable() {
                         }}
                         title='View operation cores'
                     />
-                </>
+                </span>
             );
         }
 

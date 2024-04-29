@@ -93,33 +93,27 @@ export const SelectableOperationPerformance: FC<SelectableOperationPerformancePr
     const render = useSelector(getShowOperationPerformanceGrid);
     const threshold = useSelector(getOperationPerformanceTreshold);
     const isHighContrast: boolean = useSelector(getHighContrastState);
+
     if (!render || !operation || !operation.details) {
-        return children;
+        return <div className='op-performance-indicator'>{children}</div>;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let operandType: GraphVertexType | null;
-    React.Children.forEach(children, (child) => {
-        if (React.isValidElement<SelectableOperationProps>(child)) {
-            operandType = child.props.type || null;
-        }
-    });
-
-    // TODO: we will use operandType in the next iterration to address the type of styling we render as queue custom icon requires stroke and not color/fill
     const opFactor = operation.details?.bw_limited_factor || 1;
-    if (opFactor > threshold) {
-        const congestionColor = calculateOpCongestionColor(opFactor, 0, isHighContrast);
+    let congestionColor = 'currentColor';
 
-        return (
-            <div
-                className='op-performance-indicator'
-                style={{
-                    color: `${congestionColor}`,
-                }}
-            >
-                {children}
-            </div>
-        );
+    if (opFactor > threshold) {
+        congestionColor = calculateOpCongestionColor(opFactor, 0, isHighContrast);
     }
-    return children;
+
+    return (
+        <div
+            className='op-performance-indicator'
+            style={{
+                // @ts-expect-error
+                '--js-congestion-color': `${congestionColor}`,
+            }}
+        >
+            {children}
+        </div>
+    );
 };
