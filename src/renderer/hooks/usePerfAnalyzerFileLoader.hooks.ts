@@ -15,7 +15,7 @@ import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFold
 
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
@@ -29,7 +29,6 @@ import {
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
 import { initialLoadAllNodesData } from '../../data/store/slices/nodeSelection.slice';
-import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
 import useLogging from './useLogging.hook';
@@ -40,22 +39,11 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } =
-        useContext(GraphOnChipContext);
+    const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
 
-    const activeGraphOnChip = getActiveGraphOnChip();
     const navigate = useNavigate();
 
     const logger = useLogging();
-
-
-    useEffect(() => {
-        if (activeGraphOnChip) {
-            // TODO: this needs to go into bulk loading and useEffect shoudl be removed
-            dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeGraphOnChip]);
 
     const openPerfAnalyzerFolderDialog = async () => {
         const folderList = dialog.showOpenDialogSync({
