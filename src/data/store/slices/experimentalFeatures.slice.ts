@@ -5,9 +5,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ExperimentalFeaturesState } from 'data/StateTypes';
 
-const experimentalFeaturesInitialState: ExperimentalFeaturesState = {
-    showClusterView: false,
-};
+const experimentalFeaturesInitialState: ExperimentalFeaturesState = {};
 
 export const experimentalFeaturesSlice = createSlice({
     name: 'experimentalFeatures',
