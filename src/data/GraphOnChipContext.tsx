@@ -41,6 +41,7 @@ interface GraphOnChipContextType {
     getActiveGraphName: () => string;
     graphOnChipList: Record<string, GraphOnChip>;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
+    getActiveGraphOnChipListForTemporalEpoch: () => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
 }
 
 const applicationModelState: ApplicationModelState = {
@@ -66,6 +67,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getActiveGraphName: () => '',
     graphOnChipList: {},
     getOperand: () => undefined,
+    getActiveGraphOnChipListForTemporalEpoch: () => [],
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -126,6 +128,16 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const getActiveGraphOnChip = useCallback(() => {
         return state.graphOnChipList[state.visitedGraphsHistory[state.currentGraphIndex] ?? ''];
     }, [state]);
+
+    const getActiveGraphOnChipListForTemporalEpoch = useCallback(() => {
+        const epoch = getActiveGraphRelationship()?.temporalEpoch;
+        const listOfGraphRel: GraphRelationship[] = [...state.graphs.values()].filter((graph: GraphRelationship) => {
+            return graph.temporalEpoch === epoch;
+        });
+        return listOfGraphRel.map((graph) => {
+            return { graph, graphOnChip: state.graphOnChipList[graph.name] };
+        });
+    }, [getActiveGraphRelationship, state.graphOnChipList, state.graphs]);
 
     const getPreviousGraphName = useCallback(() => {
         return state.visitedGraphsHistory[state.currentGraphIndex - 1];
@@ -198,6 +210,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             selectNextGraph,
             graphOnChipList: state.graphOnChipList,
             getOperand,
+            getActiveGraphOnChipListForTemporalEpoch,
         }),
         [
             loadGraphOnChips,
@@ -214,6 +227,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             selectNextGraph,
             state.graphOnChipList,
             getOperand,
+            getActiveGraphOnChipListForTemporalEpoch,
         ],
     );
 
