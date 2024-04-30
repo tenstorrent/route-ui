@@ -30,7 +30,7 @@ interface GraphOnChipContextType {
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
     resetGraphOnChipState: () => void;
     getGraphRelationshipList: () => GraphRelationship[];
-    getGraphsListByTemporalEpoch: () => { [k in number]: GraphRelationship[] };
+    getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
     getActiveGraphRelationship: () => GraphRelationship | undefined;
     getActiveGraphOnChip: () => GraphOnChip | undefined;
     getPreviousGraphName: () => string | undefined;
@@ -57,7 +57,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     loadGraphOnChips: () => {},
     resetGraphOnChipState: () => {},
     getGraphRelationshipList: () => [],
-    getGraphsListByTemporalEpoch: () => ({}),
+    getGraphsListByTemporalEpoch: () => new Map(),
     getActiveGraphRelationship: () => undefined,
     getActiveGraphOnChip: () => undefined,
     getPreviousGraphName: () => undefined,
@@ -124,17 +124,17 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [state]);
 
     const getGraphsListByTemporalEpoch = useCallback(() => {
-        return [...state.graphs.values()].reduce<{ [k in number]: GraphRelationship[] }>(
+        return [...state.graphs.values()].reduce<Map<number, GraphRelationship[]>>(
             (temporalEpochList, graphRelationship) => {
-                if (!temporalEpochList[graphRelationship.temporalEpoch]) {
-                    temporalEpochList[graphRelationship.temporalEpoch] = [];
+                if (!temporalEpochList.has(graphRelationship.temporalEpoch)) {
+                    temporalEpochList.set(graphRelationship.temporalEpoch, []);
                 }
 
-                temporalEpochList[graphRelationship.temporalEpoch].push(graphRelationship);
+                temporalEpochList.get(graphRelationship.temporalEpoch)!.push(graphRelationship);
 
                 return temporalEpochList;
             },
-            {},
+            new Map(),
         );
     }, [state.graphs]);
 

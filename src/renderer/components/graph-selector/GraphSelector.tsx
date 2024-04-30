@@ -20,7 +20,7 @@ interface GraphSelectorProps {
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
     const { getActiveGraphName, getGraphsListByTemporalEpoch } = useContext(GraphOnChipContext);
     const selectedGraph = getActiveGraphName();
-    const temporalEpochs = Object.entries(getGraphsListByTemporalEpoch());
+    const temporalEpochs = [...getGraphsListByTemporalEpoch().entries()];
 
     return (
         <Popover2
@@ -34,7 +34,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                 <MenuItem
                                     icon={IconNames.SERIES_DERIVED}
                                     key={`temporal-epoch-${temporalEpoch}`}
-                                    onClick={() => onSelectTemporalEpoch(temporalEpoch)}
+                                    onClick={() => onSelectTemporalEpoch(temporalEpoch.toString())}
                                     text={`Temporal Epoch ${temporalEpoch}`}
                                     className='graph-selector-temporal-epoch'
                                 />
