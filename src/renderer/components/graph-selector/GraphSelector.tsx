@@ -36,14 +36,14 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                     key={`temporal-epoch-${temporalEpoch}`}
                                     onClick={() => onSelectTemporalEpoch(temporalEpoch)}
                                     text={`Temporal Epoch ${temporalEpoch}`}
-                                    className='temporal-epoch-label'
+                                    className='graph-selector-temporal-epoch'
                                 />
                                 {graphRelationships.map((graphRelationship) => (
                                     <MenuItem
                                         key={`temporal-epoch-${temporalEpoch}-${graphRelationship.name}`}
                                         text={graphRelationship.name}
                                         onClick={() => onSelectGraph(graphRelationship.name)}
-                                        className='graph-label'
+                                        className='graph-selector-graph'
                                     />
                                 ))}
                             </>

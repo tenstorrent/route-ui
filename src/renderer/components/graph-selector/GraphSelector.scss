@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
 @import "../../scss/variables";
 
 .graph-selector-picker {
@@ -13,11 +17,11 @@
         padding: 0;
     }
 
-    .temporal-epoch-label {
-        font-weight: bold;
+    .bp4-menu-item {
+        padding: 3px 5px;
     }
 
-    .graph-label {
-        margin-inline-start: 32px;
+    .graph-selector-graph {
+        padding-inline-start: 26px;
     }
 }
