@@ -5,7 +5,7 @@
 import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
 
 import { ElectronEvents } from './ElectronEvents';
-import { getSavedState, listenToEventFromWindow, sendEventToWindow } from './utils/bridge';
+import { sendEventToWindow } from './utils/bridge';
 
 export default class MenuBuilder {
     mainWindow: BrowserWindow;
@@ -14,24 +14,15 @@ export default class MenuBuilder {
         this.mainWindow = mainWindow;
     }
 
-    async buildMenu() {
+    buildMenu() {
         if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
             this.setupDevelopmentEnvironment();
         }
 
-        const template =
-            process.platform === 'darwin' ? await this.buildDarwinTemplate() : await this.buildDefaultTemplate();
+        const template = process.platform === 'darwin' ? this.buildDarwinTemplate() : this.buildDefaultTemplate();
 
         const menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);
-
-        listenToEventFromWindow(ElectronEvents.TOGGLE_QUEUES_TABLE, (isChecked) => {
-            const menuItem = menu.getMenuItemById('toggleQueuesTable');
-
-            if (menuItem) {
-                menuItem.checked = isChecked;
-            }
-        });
 
         return menu;
     }
@@ -51,7 +42,7 @@ export default class MenuBuilder {
         });
     }
 
-    async buildDarwinTemplate() {
+    buildDarwinTemplate() {
         const subMenuViewDev: Array<MenuItemConstructorOptions> = [
             { type: 'separator' },
             { role: 'reload' },
@@ -95,27 +86,7 @@ export default class MenuBuilder {
                     {
                         label: 'Experimental Features',
                         type: 'submenu',
-                        submenu: [
-                            {
-                                label: 'Toggle Queues Table',
-                                id: 'toggleQueuesTable',
-                                type: 'checkbox',
-                                checked:
-                                    (
-                                        await getSavedState<[boolean]>(
-                                            this.mainWindow,
-                                            ElectronEvents.TOGGLE_QUEUES_TABLE,
-                                        )
-                                    )?.[0] ?? false,
-                                click: (menuItem) => {
-                                    sendEventToWindow(
-                                        this.mainWindow,
-                                        ElectronEvents.TOGGLE_QUEUES_TABLE,
-                                        menuItem.checked,
-                                    );
-                                },
-                            },
-                        ],
+                        submenu: [],
                     },
                     ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
                         ? subMenuViewDev
@@ -151,7 +122,7 @@ export default class MenuBuilder {
         return darwinTemplateDefault as Array<MenuItemConstructorOptions>;
     }
 
-    async buildDefaultTemplate() {
+    buildDefaultTemplate() {
         const subMenuViewDev: Array<MenuItemConstructorOptions> = [
             { type: 'separator' },
             { role: 'reload' },
@@ -181,27 +152,7 @@ export default class MenuBuilder {
                     {
                         label: 'Experimental Features',
                         type: 'submenu',
-                        submenu: [
-                            {
-                                label: 'Toggle Queues Table',
-                                id: 'toggleQueuesTable',
-                                type: 'checkbox',
-                                checked:
-                                    (
-                                        await getSavedState<[boolean]>(
-                                            this.mainWindow,
-                                            ElectronEvents.TOGGLE_QUEUES_TABLE,
-                                        )
-                                    )?.[0] ?? false,
-                                click: (menuItem) => {
-                                    sendEventToWindow(
-                                        this.mainWindow,
-                                        ElectronEvents.TOGGLE_QUEUES_TABLE,
-                                        menuItem.checked,
-                                    );
-                                },
-                            },
-                        ],
+                        submenu: [],
                     },
                     ...(process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
                         ? subMenuViewDev

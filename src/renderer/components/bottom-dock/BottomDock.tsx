@@ -7,7 +7,6 @@ import { IconNames } from '@blueprintjs/icons';
 import { setDockOpenState } from 'data/store/slices/uiState.slice';
 import { type FC, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getExperimentalFeatures } from '../../../data/store/selectors/experimentalFeatures.selectors';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
 import LogsOutput from '../LogsOutput';
 import OperationsTable from './OperationsTable';
@@ -24,7 +23,6 @@ const BottomDock: FC<BottomDockProps> = ({ isActive }) => {
     const dispatch = useDispatch();
 
     const isLogOutputEnabled = useSelector(getLogOutputEnabled);
-    const queuesTableEnabled = useSelector(getExperimentalFeatures('showQueuesTable'));
 
     return (
         <div className='dock bottom-dock'>
@@ -37,7 +35,7 @@ const BottomDock: FC<BottomDockProps> = ({ isActive }) => {
                 renderActiveTabPanelOnly
             >
                 <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
-                {queuesTableEnabled && <Tab id='tab2' title='Queues' panel={<QueuesTable />} />}
+                <Tab id='tab2' title='Queues' panel={<QueuesTable />} />
                 {/* <Tab */}
                 {/*     id='tab2' */}
                 {/*     title='Operands' */}

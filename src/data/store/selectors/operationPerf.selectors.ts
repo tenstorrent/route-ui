@@ -10,6 +10,4 @@ export const getOperationPerformanceTreshold = (state: RootState) =>
 export const getShowOperationPerformanceGrid = (state: RootState) =>
     state.operationPerformance.showOperationPerformanceGrid;
 
-export const getMaxBwLimitedFactor = (state: RootState) => state.operationPerformance.maxBwLimitedFactor;
-
 export const getOperationRatioThreshold = (state: RootState) => state.operationPerformance.operationRatioThreshold;
