@@ -1,0 +1,23 @@
+@import "../../scss/variables";
+
+.graph-selector-picker {
+    color: $tt-black;
+    padding: 8px 10px;
+    scrollbar-gutter: stable;
+    overflow-y: auto;
+    color-scheme: light;
+    max-height: 400px;
+    height: 100%;
+
+    .bp4-menu {
+        padding: 0;
+    }
+
+    .temporal-epoch-label {
+        font-weight: bold;
+    }
+
+    .graph-label {
+        margin-inline-start: 32px;
+    }
+}
