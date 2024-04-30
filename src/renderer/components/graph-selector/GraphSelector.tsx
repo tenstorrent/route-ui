@@ -3,30 +3,61 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { FC, useContext } from 'react';
+import { Popover2 } from '@blueprintjs/popover2';
+import { Button, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import PopoverMenu from '../PopoverMenu';
+
+import './GraphSelector.scss';
 
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
     onSelectGraph: (graph: string) => void;
+    onSelectTemporalEpoch: (temporalEpoch: string) => void;
 }
 
-const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph }) => {
-    const { getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
+    const { getActiveGraphName, getGraphsListByTemporalEpoch } = useContext(GraphOnChipContext);
     const selectedGraph = getActiveGraphName();
-    const availableGraphs = Object.keys(graphOnChipList);
+    const temporalEpochs = [...getGraphsListByTemporalEpoch().entries()];
 
     return (
-        <PopoverMenu
-            label={selectedGraph || (label ?? 'Select graph')}
-            options={availableGraphs}
-            selectedItem={selectedGraph}
-            onSelectItem={(graph) => {
-                onSelectGraph(graph);
-            }}
-            disabled={disabled || availableGraphs?.length === 0}
-        />
+        <Popover2
+            content={
+                <div className='graph-selector-picker'>
+                    <h3>{label}</h3>
+                    <Menu>
+                        {temporalEpochs.map(([temporalEpoch, graphRelationships], index) => (
+                            <>
+                                {index > 0 && <MenuDivider />}
+                                <MenuItem
+                                    icon={IconNames.SERIES_DERIVED}
+                                    key={`temporal-epoch-${temporalEpoch}`}
+                                    onClick={() => onSelectTemporalEpoch(temporalEpoch.toString())}
+                                    text={`Temporal Epoch ${temporalEpoch}`}
+                                    className='graph-selector-temporal-epoch'
+                                />
+                                {graphRelationships.map((graphRelationship) => (
+                                    <MenuItem
+                                        key={`temporal-epoch-${temporalEpoch}-${graphRelationship.name}`}
+                                        text={graphRelationship.name}
+                                        onClick={() => onSelectGraph(graphRelationship.name)}
+                                        className='graph-selector-graph'
+                                    />
+                                ))}
+                            </>
+                        ))}
+                    </Menu>
+                </div>
+            }
+            disabled={disabled || temporalEpochs?.length === 0}
+            placement='right'
+        >
+            <Button icon={IconNames.GRAPH} disabled={disabled}>
+                {selectedGraph || (label ?? 'Select graph')}
+            </Button>
+        </Popover2>
     );
 };
 

@@ -139,7 +139,13 @@ const TopHeaderComponent: React.FC = () => {
                         text={folderLocationType === 'local' ? getTestName(localFolderPath) : ''}
                     />
                 </Tooltip2>
-                <GraphSelector onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)} />
+                <GraphSelector
+                    onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
+                    onSelectTemporalEpoch={(newTemporalEpoch) => {
+                        // TODO: implement method to visualize temporal epoch
+                        console.log(`Temporal epoch selected: ${newTemporalEpoch}`);
+                    }}
+                />
                 <Tooltip2
                     disabled={!getPreviousGraphName()}
                     content={`Back to graph: ${getPreviousGraphName()}`}
