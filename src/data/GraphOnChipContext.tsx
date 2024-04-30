@@ -30,6 +30,7 @@ interface GraphOnChipContextType {
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
     resetGraphOnChipState: () => void;
     getGraphRelationshipList: () => GraphRelationship[];
+    getGraphsListByTemporalEpoch: () => { [k in number]: GraphRelationship[] };
     getActiveGraphRelationship: () => GraphRelationship | undefined;
     getActiveGraphOnChip: () => GraphOnChip | undefined;
     getPreviousGraphName: () => string | undefined;
@@ -56,6 +57,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     loadGraphOnChips: () => {},
     resetGraphOnChipState: () => {},
     getGraphRelationshipList: () => [],
+    getGraphsListByTemporalEpoch: () => ({}),
     getActiveGraphRelationship: () => undefined,
     getActiveGraphOnChip: () => undefined,
     getPreviousGraphName: () => undefined,
@@ -120,6 +122,21 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const getGraphRelationshipList = useCallback(() => {
         return [...state.graphs.values()];
     }, [state]);
+
+    const getGraphsListByTemporalEpoch = useCallback(() => {
+        return [...state.graphs.values()].reduce<{ [k in number]: GraphRelationship[] }>(
+            (temporalEpochList, graphRelationship) => {
+                if (!temporalEpochList[graphRelationship.temporalEpoch]) {
+                    temporalEpochList[graphRelationship.temporalEpoch] = [];
+                }
+
+                temporalEpochList[graphRelationship.temporalEpoch].push(graphRelationship);
+
+                return temporalEpochList;
+            },
+            {},
+        );
+    }, [state.graphs]);
 
     const getActiveGraphRelationship = useCallback(() => {
         return state.graphs.get(state.visitedGraphsHistory[state.currentGraphIndex] ?? '');
@@ -200,6 +217,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getActiveGraphOnChip,
             getActiveGraphRelationship,
             getGraphRelationshipList,
+            getGraphsListByTemporalEpoch,
             getGraphOnChip,
             getActiveGraphName,
             resetGraphOnChipState: reset,
@@ -217,6 +235,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getActiveGraphOnChip,
             getActiveGraphRelationship,
             getGraphRelationshipList,
+            getGraphsListByTemporalEpoch,
             getGraphOnChip,
             getActiveGraphName,
             reset,
