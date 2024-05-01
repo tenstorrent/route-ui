@@ -93,18 +93,15 @@ interface SelectableOperationPerformanceProps {
 }
 
 export const SelectableOperationPerformance: FC<SelectableOperationPerformanceProps> = ({ operation, children }) => {
-    const render = useSelector(getShowOperationPerformanceGrid);
+    const shouldShowOpPerformance = useSelector(getShowOperationPerformanceGrid);
     const threshold = useSelector(getOperationPerformanceTreshold);
     const isHighContrast: boolean = useSelector(getHighContrastState);
+    const shouldRenderColor = shouldShowOpPerformance && operation?.details != null;
 
-    if (!render || !operation || !operation.details) {
-        return <div className='op-performance-indicator'>{children}</div>;
-    }
-
-    const opFactor = operation.details?.bw_limited_factor || 1;
+    const opFactor = operation?.details?.bw_limited_factor || 1;
     let congestionColor = 'currentColor';
 
-    if (opFactor > threshold) {
+    if (shouldRenderColor && opFactor > threshold) {
         congestionColor = calculateOpCongestionColor(opFactor, 0, isHighContrast);
     }
 
