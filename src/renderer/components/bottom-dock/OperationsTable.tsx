@@ -105,35 +105,20 @@ function OperationsTable() {
                             type={GraphVertexType.OPERATION}
                             offchip={operation?.isOffchip}
                             offchipClickHandler={navigateToGraph(opName)}
-                        />
+                        >
+                            <Button
+                                style={{ height: '18px' }}
+                                small
+                                minimal
+                                disabled={operation?.isOffchip}
+                                title={selectedOperationName ? 'Back to operations view' : 'View operation cores'}
+                                icon={selectedOperationName ? IconNames.ARROW_LEFT : IconNames.ARROW_RIGHT}
+                                onClick={() => setSelectedOperationName(selectedOperationName ? '' : opName)}
+                            />
+                        </SelectableOperation>
                     </SelectableOperationPerformance>
                 ) : (
                     ''
-                )}
-
-                {selectedOperationName ? (
-                    <Button
-                        style={{ height: '18px' }}
-                        small
-                        minimal
-                        title='Back to operations view'
-                        icon={IconNames.ARROW_LEFT}
-                        onClick={() => {
-                            setSelectedOperationName('');
-                        }}
-                    />
-                ) : (
-                    <Button
-                        style={{ height: '18px' }}
-                        small
-                        minimal
-                        disabled={operation?.isOffchip}
-                        title='View operation cores'
-                        icon={IconNames.ARROW_RIGHT}
-                        onClick={() => {
-                            setSelectedOperationName(opName);
-                        }}
-                    />
                 )}
             </span>
         );
@@ -182,19 +167,20 @@ function OperationsTable() {
                             type={slowestOperand.vertexType}
                             offchip={slowestOperand.isOffchip}
                             offchipClickHandler={navigateToGraph(slowestOperand.name)}
-                        />
+                        >
+                            <Button
+                                style={{ height: '18px' }}
+                                small
+                                minimal
+                                disabled={slowestOperand.isOffchip}
+                                icon={IconNames.ARROW_RIGHT}
+                                onClick={() => {
+                                    setSelectedOperationName(slowestOperand.name);
+                                }}
+                                title='View operation cores'
+                            />
+                        </SelectableOperation>
                     </SelectableOperationPerformance>
-                    <Button
-                        style={{ height: '18px' }}
-                        small
-                        minimal
-                        disabled={slowestOperand.isOffchip}
-                        icon={IconNames.ARROW_RIGHT}
-                        onClick={() => {
-                            setSelectedOperationName(slowestOperand.name);
-                        }}
-                        title='View operation cores'
-                    />
                 </span>
             );
         }
@@ -225,19 +211,8 @@ function OperationsTable() {
         );
     };
 
-    const getCustomCellRenderer = (key: string) => {
-        switch (key) {
-            case 'slowest_operand':
-                return slowestOperandCellRenderer;
-            case 'model_runtime_per_input':
-                return modelRuntimeCellRenderer;
-            default:
-                return undefined;
-        }
-    };
-
-    const excludedColumns = ['operation', 'grid_size', 'core_id'];
-    const columns = Array.from(operationsTableColumns.keys()).filter((key) => !excludedColumns.includes(key));
+    const excludedColumn = !selectedOperationName ? 'core_id' : 'grid_size';
+    const columns = Array.from(operationsTableColumns.keys()).filter((key) => excludedColumn !== key);
 
     return (
         <>
@@ -256,6 +231,7 @@ function OperationsTable() {
                 selectionModes={SelectionModes.NONE}
                 className='operations-table'
                 numRows={tableFields.length}
+                rowHeights={[...new Array(tableFields.length)].fill(24)}
                 enableColumnHeader
                 numFrozenColumns={1}
                 cellRendererDependencies={[
@@ -270,34 +246,6 @@ function OperationsTable() {
                     allOperandsState,
                 ]}
             >
-                {columnRenderer({
-                    key: 'operation',
-                    columnDefinition: operationsTableColumns,
-                    changeSorting,
-                    sortDirection,
-                    sortingColumn,
-                    tableFields,
-                    isInteractive: true,
-                    customCellContentRenderer: operationCellRenderer,
-                })}
-                {!selectedOperationName
-                    ? columnRenderer({
-                          key: 'grid_size',
-                          columnDefinition: operationsTableColumns,
-                          changeSorting,
-                          sortDirection,
-                          sortingColumn,
-                          tableFields,
-                      })
-                    : columnRenderer({
-                          key: 'core_id',
-                          columnDefinition: operationsTableColumns,
-                          changeSorting,
-                          sortDirection,
-                          sortingColumn,
-                          tableFields,
-                          customCellContentRenderer: coreIdCellRenderer,
-                      })}
                 {
                     columns.map((key) =>
                         columnRenderer({
@@ -307,7 +255,12 @@ function OperationsTable() {
                             sortDirection,
                             sortingColumn,
                             tableFields,
-                            customCellContentRenderer: getCustomCellRenderer(key),
+                            ...(key === 'model_runtime_per_input' && {
+                                customCellContentRenderer: modelRuntimeCellRenderer,
+                            }),
+                            ...(key === 'slowest_operand' && { customCellContentRenderer: slowestOperandCellRenderer }),
+                            ...(key === 'operation' && { customCellContentRenderer: operationCellRenderer }),
+                            ...(key === 'core_id' && { customCellContentRenderer: coreIdCellRenderer }),
                         }),
                     ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
                 }

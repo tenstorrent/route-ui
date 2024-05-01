@@ -4,7 +4,7 @@
 
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, FC, type PropsWithChildren } from 'react';
 import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../data/ColorGenerator';
 import { GraphVertexType } from '../../data/GraphNames';
@@ -20,7 +20,7 @@ import ColorSwatch from './ColorSwatch';
 import HighlightedText from './HighlightedText';
 import './SelectableOperation.scss';
 
-interface SelectableOperationProps {
+interface SelectableOperationProps extends PropsWithChildren {
     opName: string;
     value: boolean;
     selectFunc: (operation: string, checked: boolean) => void;
@@ -43,8 +43,8 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     disabled = false,
     offchip = false,
     offchipClickHandler,
+    children,
 }) => {
-
     return (
         <div className={`op-element ${offchip ? 'has-offchip' : ''}`}>
             <Checkbox
@@ -64,6 +64,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
             <ColorSwatch isVisible color={getGroupColor(opName)} />
             {offchip && (
                 <Button
+                    className='offchip-button'
                     title='Navigate to graph'
                     small
                     minimal
@@ -72,6 +73,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     onClick={() => offchipClickHandler?.()}
                 />
             )}
+            {children}
         </div>
     );
 };
@@ -90,18 +92,15 @@ interface SelectableOperationPerformanceProps {
 }
 
 export const SelectableOperationPerformance: FC<SelectableOperationPerformanceProps> = ({ operation, children }) => {
-    const render = useSelector(getShowOperationPerformanceGrid);
+    const shouldShowOpPerformance = useSelector(getShowOperationPerformanceGrid);
     const threshold = useSelector(getOperationPerformanceTreshold);
     const isHighContrast: boolean = useSelector(getHighContrastState);
+    const shouldRenderColor = shouldShowOpPerformance && operation?.details != null;
 
-    if (!render || !operation || !operation.details) {
-        return <div className='op-performance-indicator'>{children}</div>;
-    }
-
-    const opFactor = operation.details?.bw_limited_factor || 1;
+    const opFactor = operation?.details?.bw_limited_factor || 1;
     let congestionColor = 'currentColor';
 
-    if (opFactor > threshold) {
+    if (shouldRenderColor && opFactor > threshold) {
         congestionColor = calculateOpCongestionColor(opFactor, 0, isHighContrast);
     }
 
