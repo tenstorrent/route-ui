@@ -65,6 +65,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
             <ColorSwatch isVisible color={getGroupColor(opName)} />
             {offchip && (
                 <Button
+                    className='offchip-button'
                     title='Navigate to graph'
                     small
                     minimal
