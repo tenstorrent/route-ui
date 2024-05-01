@@ -90,6 +90,7 @@ function QueuesTable() {
             selectionModes={SelectionModes.NONE}
             className='queues-table'
             numRows={tableFields.length}
+            rowHeights={[...new Array(tableFields.length)].fill(24)}
             enableColumnHeader
             numFrozenColumns={1}
             cellRendererDependencies={[sortDirection, sortingColumn, operandState, tableFields, tableFields.length]}
