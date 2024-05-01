@@ -233,6 +233,7 @@ function OperationsTable() {
                 selectionModes={SelectionModes.NONE}
                 className='operations-table'
                 numRows={tableFields.length}
+                rowHeights={[...new Array(tableFields.length)].fill(24)}
                 enableColumnHeader
                 numFrozenColumns={1}
                 cellRendererDependencies={[
