@@ -225,19 +225,8 @@ function OperationsTable() {
         );
     };
 
-    const getCustomCellRenderer = (key: string) => {
-        switch (key) {
-            case 'slowest_operand':
-                return slowestOperandCellRenderer;
-            case 'model_runtime_per_input':
-                return modelRuntimeCellRenderer;
-            default:
-                return undefined;
-        }
-    };
-
-    const excludedColumns = ['operation', 'grid_size', 'core_id'];
-    const columns = Array.from(operationsTableColumns.keys()).filter((key) => !excludedColumns.includes(key));
+    const excludedColumn = !selectedOperationName ? 'core_id' : 'grid_size';
+    const columns = Array.from(operationsTableColumns.keys()).filter((key) => excludedColumn !== key);
 
     return (
         <>
@@ -270,34 +259,6 @@ function OperationsTable() {
                     allOperandsState,
                 ]}
             >
-                {columnRenderer({
-                    key: 'operation',
-                    columnDefinition: operationsTableColumns,
-                    changeSorting,
-                    sortDirection,
-                    sortingColumn,
-                    tableFields,
-                    isInteractive: true,
-                    customCellContentRenderer: operationCellRenderer,
-                })}
-                {!selectedOperationName
-                    ? columnRenderer({
-                          key: 'grid_size',
-                          columnDefinition: operationsTableColumns,
-                          changeSorting,
-                          sortDirection,
-                          sortingColumn,
-                          tableFields,
-                      })
-                    : columnRenderer({
-                          key: 'core_id',
-                          columnDefinition: operationsTableColumns,
-                          changeSorting,
-                          sortDirection,
-                          sortingColumn,
-                          tableFields,
-                          customCellContentRenderer: coreIdCellRenderer,
-                      })}
                 {
                     columns.map((key) =>
                         columnRenderer({
@@ -307,7 +268,12 @@ function OperationsTable() {
                             sortDirection,
                             sortingColumn,
                             tableFields,
-                            customCellContentRenderer: getCustomCellRenderer(key),
+                            ...(key === 'model_runtime_per_input' && {
+                                customCellContentRenderer: modelRuntimeCellRenderer,
+                            }),
+                            ...(key === 'slowest_operand' && { customCellContentRenderer: slowestOperandCellRenderer }),
+                            ...(key === 'operation' && { customCellContentRenderer: operationCellRenderer }),
+                            ...(key === 'core_id' && { customCellContentRenderer: coreIdCellRenderer }),
                         }),
                     ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
                 }
