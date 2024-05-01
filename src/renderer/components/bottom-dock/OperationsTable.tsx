@@ -105,35 +105,21 @@ function OperationsTable() {
                             type={GraphVertexType.OPERATION}
                             offchip={operation?.isOffchip}
                             offchipClickHandler={navigateToGraph(opName)}
+                            rightButton={
+                                <Button
+                                    style={{ height: '18px' }}
+                                    small
+                                    minimal
+                                    disabled={operation?.isOffchip}
+                                    title={selectedOperationName ? 'Back to operations view' : 'View operation cores'}
+                                    icon={selectedOperationName ? IconNames.ARROW_LEFT : IconNames.ARROW_RIGHT}
+                                    onClick={() => setSelectedOperationName(selectedOperationName ? '' : opName)}
+                                />
+                            }
                         />
                     </SelectableOperationPerformance>
                 ) : (
                     ''
-                )}
-
-                {selectedOperationName ? (
-                    <Button
-                        style={{ height: '18px' }}
-                        small
-                        minimal
-                        title='Back to operations view'
-                        icon={IconNames.ARROW_LEFT}
-                        onClick={() => {
-                            setSelectedOperationName('');
-                        }}
-                    />
-                ) : (
-                    <Button
-                        style={{ height: '18px' }}
-                        small
-                        minimal
-                        disabled={operation?.isOffchip}
-                        title='View operation cores'
-                        icon={IconNames.ARROW_RIGHT}
-                        onClick={() => {
-                            setSelectedOperationName(opName);
-                        }}
-                    />
                 )}
             </span>
         );
@@ -182,19 +168,21 @@ function OperationsTable() {
                             type={slowestOperand.vertexType}
                             offchip={slowestOperand.isOffchip}
                             offchipClickHandler={navigateToGraph(slowestOperand.name)}
+                            rightButton={
+                                <Button
+                                    style={{ height: '18px' }}
+                                    small
+                                    minimal
+                                    disabled={slowestOperand.isOffchip}
+                                    icon={IconNames.ARROW_RIGHT}
+                                    onClick={() => {
+                                        setSelectedOperationName(slowestOperand.name);
+                                    }}
+                                    title='View operation cores'
+                                />
+                            }
                         />
                     </SelectableOperationPerformance>
-                    <Button
-                        style={{ height: '18px' }}
-                        small
-                        minimal
-                        disabled={slowestOperand.isOffchip}
-                        icon={IconNames.ARROW_RIGHT}
-                        onClick={() => {
-                            setSelectedOperationName(slowestOperand.name);
-                        }}
-                        title='View operation cores'
-                    />
                 </span>
             );
         }

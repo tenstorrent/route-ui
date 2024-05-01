@@ -4,7 +4,7 @@
 
 import { Button, Checkbox, Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, FC, type ReactElement } from 'react';
 import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../data/ColorGenerator';
 import { GraphVertexType } from '../../data/GraphNames';
@@ -29,6 +29,7 @@ interface SelectableOperationProps {
     disabled?: boolean;
     offchip?: boolean;
     offchipClickHandler?: () => void;
+    rightButton?: ReactElement;
 }
 
 /**
@@ -43,8 +44,8 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     disabled = false,
     offchip = false,
     offchipClickHandler,
+    rightButton = undefined,
 }) => {
-
     return (
         <div className={`op-element ${offchip ? 'has-offchip' : ''}`}>
             <Checkbox
@@ -72,6 +73,7 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
                     onClick={() => offchipClickHandler?.()}
                 />
             )}
+            {rightButton}
         </div>
     );
 };
@@ -81,6 +83,7 @@ SelectableOperation.defaultProps = {
     disabled: false,
     offchip: false,
     offchipClickHandler: undefined,
+    rightButton: undefined,
 };
 export default SelectableOperation;
 
