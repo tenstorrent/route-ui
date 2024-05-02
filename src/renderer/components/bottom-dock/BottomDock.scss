@@ -61,8 +61,13 @@
         }
 
         .bp4-table-cell {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+
             &.align-right {
                 text-align: right;
+                justify-content: end;
             }
         }
 
@@ -71,9 +76,9 @@
             align-items: center;
             justify-content: space-between;
             gap: 5px;
-            max-width: calc(100% - 30px);
+            max-width: 100%;
 
-            &.slowest-operand-wrapper { max-width: calc(100% - 50px); }
+            &.slowest-operand-wrapper { max-width: calc(100% - 18px); }
 
             .op-element, .op-performance-indicator {
                 flex: 1 1 0;

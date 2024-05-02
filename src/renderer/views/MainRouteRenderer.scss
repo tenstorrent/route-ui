@@ -730,6 +730,7 @@
     .queue-detail-item {
         color: #fff;
     }
+
     .foreign {
         .bp4-icon {
             svg {
@@ -737,6 +738,8 @@
             }
         }
     }
+
+    .op-element .offchip-button svg { color: $tt-medium-light-gray; }
 
     .op-type.icon {
         &.op {

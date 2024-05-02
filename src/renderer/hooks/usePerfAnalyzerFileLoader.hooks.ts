@@ -15,7 +15,7 @@ import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFold
 
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
@@ -32,6 +32,7 @@ import { initialLoadAllNodesData } from '../../data/store/slices/nodeSelection.s
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
 import useLogging from './useLogging.hook';
+import { updateMaxBwLimitedFactor } from '../../data/store/slices/operationPerf.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const dispatch = useDispatch();
@@ -39,11 +40,20 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
-
+    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } =
+        useContext(GraphOnChipContext);
+    const activeGraphOnChip = getActiveGraphOnChip();
     const navigate = useNavigate();
 
     const logger = useLogging();
+
+    useEffect(() => {
+        if (activeGraphOnChip) {
+            // this needs to be repalced with a more elaborate solution
+            dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
+        }
+
+    }, [activeGraphOnChip, dispatch]);
 
     const openPerfAnalyzerFolderDialog = async () => {
         const folderList = dialog.showOpenDialogSync({
