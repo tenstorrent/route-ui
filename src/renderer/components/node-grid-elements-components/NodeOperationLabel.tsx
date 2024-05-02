@@ -15,7 +15,7 @@ const NodeOperationLabel: FC<{ node: ComputeNode }> = ({ node }) => {
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
     // This may be either vertical or horizontal, so we cover both the top and left borders.
-    const shouldShowLabel = !node.siblings?.top && !node.siblings?.left;
+    const shouldShowLabel = !node.opSiblingNodes?.top && !node.opSiblingNodes?.left;
 
     return (
         node.opName !== '' &&

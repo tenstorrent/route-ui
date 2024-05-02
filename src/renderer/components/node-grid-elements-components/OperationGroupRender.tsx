@@ -30,7 +30,7 @@ const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
                 borderColor: color,
                 ...(shouldShowBorder
                     ? getNodeOpBorderStyles({
-                          siblings: node.siblings,
+                          siblings: node.opSiblingNodes,
                           isSelected: selectedGroup?.selected ?? false,
                       })
                     : {}),
