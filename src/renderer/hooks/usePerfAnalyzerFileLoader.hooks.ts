@@ -52,7 +52,6 @@ const usePerfAnalyzerFileLoader = () => {
             // this needs to be repalced with a more elaborate solution
             dispatch(updateMaxBwLimitedFactor(activeGraphOnChip.details.maxBwLimitedFactor));
         }
-
     }, [activeGraphOnChip, dispatch]);
 
     const openPerfAnalyzerFolderDialog = async () => {
@@ -158,11 +157,21 @@ const usePerfAnalyzerFileLoader = () => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
             setActiveGraph(graphName);
-            navigate('/render');
+            navigate('/render', { state: { graphName } });
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }
     };
+
+    const loadTemporalEpoch = (epoch: number) => {
+        if (selectedFolder) {
+            dispatch(closeDetailedView());
+            // setActiveGraph(graphName);
+            navigate('/render', { state: { epoch } });
+        } else {
+            logging.error('Attempted to load epoch but no folder path was available');
+        }
+    }
 
     const loadPerfAnalyzerFolder = async (
         folderPath?: string | null,
@@ -180,6 +189,7 @@ const usePerfAnalyzerFileLoader = () => {
         loadPerfAnalyzerFolder,
         openPerfAnalyzerFolderDialog,
         loadPerfAnalyzerGraph,
+        loadTemporalEpoch,
         error,
     };
 };

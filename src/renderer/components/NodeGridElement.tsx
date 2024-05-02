@@ -24,14 +24,14 @@ import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffC
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
-import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 interface NodeGridElementProps {
     node: ComputeNode;
+    graphName: string;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) => {
+    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(graphName, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
@@ -59,6 +59,9 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     }
 
 
+    // console.log(nodeState)
+
+    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
     const triggerSelection = () => {
         const selectedState = nodeState?.selected;
@@ -69,25 +72,17 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
         }
     };
 
-    const classList = ['node-item'];
-    if (coreHighlight !== HighlightType.NONE) {
-        classList.push(`core-highlight-${coreHighlight}`);
-    }
-    if (nodeState?.selected) {
-        classList.push('selected');
-    }
-    if (uid === node.uid && isOpen) {
-        classList.push('detailed-view');
-    }
     return (
         <button
             title={showOperationNames && shouldShowLabel ? node.opName : ''}
             type='button'
-            className={classList.join(' ')}
+            className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
+                node.uid === uid && isOpen ? 'detailed-view' : ''
+            } `}
             onClick={triggerSelection}
         >
             {/* Selected operation borders and backgrounds */}
-            <OperationGroupRender node={node} />
+            <OperationGroupRender node={node}  />
             <DramModuleBorder node={node} />
 
             {/* Queues */}
@@ -106,7 +101,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             <NodeOperationLabel node={node} />
 
             {/* Pipes */}
-            <NodePipeRenderer node={node} />
+            <NodePipeRenderer node={node} graphName={graphName} />
             <NodeFocusPipeRenderer node={node} />
 
             {/* Node type label */}

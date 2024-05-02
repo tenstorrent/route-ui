@@ -22,7 +22,7 @@ const getTestName = (path: string) => {
 };
 
 const LocalFolderOptions: FC = () => {
-    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error, loadPerfAnalyzerGraph } =
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error, loadPerfAnalyzerGraph, loadTemporalEpoch } =
         usePerfAnalyzerFileLoader();
     const localFolderPath = useSelector(getFolderPathSelector);
     const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
@@ -50,10 +50,7 @@ const LocalFolderOptions: FC = () => {
                 />
                 <GraphSelector
                     onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
-                    onSelectTemporalEpoch={(temporalEpoch) => {
-                        // TODO: implement method to visualize temporal epoch
-                        console.log(`Temporal epoch selected: ${temporalEpoch}`);
-                    }}
+                    onSelectTemporalEpoch={(temporalEpoch) => loadTemporalEpoch(temporalEpoch)}
                     disabled={selectedFolderLocationType === 'remote'}
                 />
                 {error && (
