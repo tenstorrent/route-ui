@@ -28,7 +28,7 @@ import {
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
-import { LinkState, PipeSelection } from './StateTypes';
+import { LinkState, PipeSelection, type ComputeNodeState } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -1168,6 +1168,16 @@ export class ComputeNode {
      */
     get opName(): string {
         return this.operation?.name || '';
+    }
+
+    public generateInitialState(): ComputeNodeState {
+        return {
+            id: this.uid,
+            selected: false,
+            queueNameList: this.queueList.map((queue) => queue.name),
+            opName: this.opName,
+            dramChannelId: this.dramChannelId,
+        };
     }
 
     /**

@@ -118,13 +118,7 @@ const usePerfAnalyzerFileLoader = () => {
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
                 nodesDataPerGraph[graph.name] = [
-                    ...mapIterable(graphOnChip.nodes, (node) => ({
-                        id: node.uid,
-                        selected: false,
-                        queueNameList: node.queueList.map((queue) => queue.name),
-                        opName: node.opName,
-                        dramChannelId: node.dramChannelId,
-                    })),
+                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState()),
                 ];
 
                 times.push({
