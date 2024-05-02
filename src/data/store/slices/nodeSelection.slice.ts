@@ -14,50 +14,6 @@ const nodesInitialState: NodeSelectionState = {
     focusNode: null,
 };
 
-const findSiblingNodeLocations = (node: ComputeNodeState, nodes: ComputeNodeState[]) => {
-    const top = nodes
-        .filter((n) => n.loc.x === node.loc.x && n.loc.y <= node.loc.y - 1)
-        .sort((a, b) => b.loc.y - a.loc.y)[0]?.loc;
-    const bottom = nodes
-        .filter((n) => n.loc.x === node.loc.x && n.loc.y >= node.loc.y + 1)
-        .sort((a, b) => a.loc.y - b.loc.y)[0]?.loc;
-    const left = nodes
-        .filter((n) => n.loc.y === node.loc.y && n.loc.x <= node.loc.x - 1)
-        .sort((a, b) => b.loc.x - a.loc.x)[0]?.loc;
-    const right = nodes
-        .filter((n) => n.loc.y === node.loc.y && n.loc.x >= node.loc.x + 1)
-        .sort((a, b) => a.loc.x - b.loc.x)[0]?.loc;
-
-    return {
-        top,
-        bottom,
-        left,
-        right,
-    };
-};
-
-const setSiblings = (nodes: ComputeNodeState[]) => {
-    nodes.forEach((node) => {
-        node.siblings = findSiblingNodeLocations(node, nodes);
-    });
-};
-
-const setBorders = (nodes: ComputeNodeState[]) => {
-    const locations = new Set(nodes.map((node) => JSON.stringify(node.loc)));
-    nodes.forEach((node) => {
-        const leftLoc = { x: node.loc.x - 1, y: node.loc.y };
-        const rightLoc = { x: node.loc.x + 1, y: node.loc.y };
-        const topLoc = { x: node.loc.x, y: node.loc.y - 1 };
-        const bottomLoc = { x: node.loc.x, y: node.loc.y + 1 };
-        node.border = {
-            left: !locations.has(JSON.stringify(leftLoc)),
-            right: !locations.has(JSON.stringify(rightLoc)),
-            top: !locations.has(JSON.stringify(topLoc)),
-            bottom: !locations.has(JSON.stringify(bottomLoc)),
-        };
-    });
-};
-
 const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
@@ -81,14 +37,11 @@ const nodeSelectionSlice = createSlice({
                         item.queueNameList.forEach((queueName) => {
                             if (!state.operands[queueName]) {
                                 state.operands[queueName] = {
-                                    data: [],
                                     selected: false,
                                     type: GraphVertexType.QUEUE,
                                     graphName,
                                 };
                             }
-
-                            state.operands[queueName].data.push(item);
                         });
                     }
 
@@ -102,25 +55,12 @@ const nodeSelectionSlice = createSlice({
                     if (item.opName !== '') {
                         if (!state.operands[item.opName]) {
                             state.operands[item.opName] = {
-                                data: [],
                                 selected: false,
                                 type: GraphVertexType.OPERATION,
                                 graphName,
                             };
                         }
-
-                        state.operands[item.opName].data.push(item);
                     }
-                });
-
-                // TODO: move to context
-                state.dram[graphName].forEach((dramElement) => {
-                    setBorders(dramElement.data);
-                });
-
-                // TODO: move to context
-                Object.values(state.operands).forEach((operand) => {
-                    setSiblings(operand.data);
                 });
             });
         },
@@ -154,7 +94,6 @@ const nodeSelectionSlice = createSlice({
         },
         selectOperandList(state, action: PayloadAction<{ operands: string[]; selected: boolean }>) {
             const { operands: operandsToSelect, selected } = action.payload;
-
 
             operandsToSelect.forEach((operandName) => {
                 if (state.operands[operandName]) {

@@ -5,9 +5,8 @@
 import type { CSSProperties } from 'react';
 
 import * as d3 from 'd3';
-import { ComputeNode } from '../data/GraphOnChip';
+import { ComputeNode, type ComputeNodeSiblings } from '../data/GraphOnChip';
 import getPipeColor from '../data/ColorGenerator';
-import { ComputeNodeSiblings } from '../data/StateTypes';
 import {
     CLUSTER_ETH_POSITION,
     DramBankLinkName,
@@ -699,43 +698,42 @@ export const getOffChipCongestionStyles = (color: string): {} => {
 };
 
 export const getNodeOpBorderStyles = ({
-    node,
-    styles,
-    color,
     siblings,
     isSelected = false,
 }: {
-    node: ComputeNode;
     siblings: ComputeNodeSiblings;
-    styles: CSSProperties;
-    color: string | undefined;
     isSelected: boolean;
 }) => {
-    const newStyles: CSSProperties = { ...styles };
-    const borderStyle = `2px ${isSelected ? 'solid' : 'dashed'} ${color}`;
+    const newStyles: CSSProperties = {};
+    const borderStyle = isSelected ? 'solid' : 'dashed';
+    const borderWidth = '2px';
 
     if (!siblings.left) {
-        newStyles.borderLeft = borderStyle;
+        newStyles.borderLeftStyle = borderStyle;
+        newStyles.borderLeftWidth = borderWidth;
     }
 
     if (!siblings.right) {
-        newStyles.borderRight = borderStyle;
+        newStyles.borderRightStyle = borderStyle;
+        newStyles.borderRightWidth = borderWidth;
     }
 
     if (!siblings.top) {
-        newStyles.borderTop = borderStyle;
+        newStyles.borderTopStyle = borderStyle;
+        newStyles.borderTopWidth = borderWidth;
     }
 
     if (!siblings.bottom) {
-        newStyles.borderBottom = borderStyle;
+        newStyles.borderBottomStyle = borderStyle;
+        newStyles.borderBottomWidth = borderWidth;
     }
 
     return newStyles;
 };
 
-export const getNodeOpBackgroundStyles = (styles: CSSProperties, color: string | undefined) => {
+export const getNodeOpBackgroundStyles = (color: string | undefined) => {
     const gradientColor = color?.replace(')', ', 0.25)').replace('rgb', 'rgba');
     const gradient = `repeating-linear-gradient(-45deg, ${gradientColor}, ${gradientColor} 3px, transparent 3px, transparent 6px)`;
 
-    return { ...styles, background: gradient };
+    return { background: gradient };
 };

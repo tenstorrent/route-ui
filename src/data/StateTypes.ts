@@ -27,32 +27,10 @@ export interface PipeSelectionState {
     focusPipe: string | null;
 }
 
-export interface ComputeNodeLocation {
-    x: number;
-    y: number;
-}
-
-export interface ComputeNodeSiblings {
-    left?: ComputeNodeLocation;
-    right?: ComputeNodeLocation;
-    top?: ComputeNodeLocation;
-    bottom?: ComputeNodeLocation;
-}
-
 export interface ComputeNodeState extends NodeSelection {
-    loc: ComputeNodeLocation;
     opName: string;
-    siblings: ComputeNodeSiblings;
-    /** @deprecated Keeping only for compatibility with DRAM logic */
-    border?: {
-        left: boolean;
-        right: boolean;
-        top: boolean;
-        bottom: boolean;
-    };
     queueNameList: string[];
     dramChannelId: number | -1;
-    dramSubchannelId: number | -1;
 }
 
 export interface NodeSelection {
@@ -61,7 +39,6 @@ export interface NodeSelection {
 }
 
 export interface OperandSelectionState {
-    data: ComputeNodeState[];
     selected: boolean;
     type: GraphVertexType;
     graphName: string;
