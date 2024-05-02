@@ -28,7 +28,7 @@ import {
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
-import { ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
+import { LinkState, PipeSelection, type ComputeNodeState } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -66,6 +66,56 @@ export default class GraphOnChip {
 
     private nodeByChannelId: Map<number, ComputeNode[]> = new Map();
 
+    private findSiblingNodeLocations(node: ComputeNode) {
+        const sameOperandNodes = [...this.nodesById.values()].filter((n) => n.opName === node.opName);
+
+        const top = sameOperandNodes
+            .filter((n) => n.loc.x === node.loc.x && n.loc.y <= node.loc.y - 1)
+            .sort((a, b) => b.loc.y - a.loc.y)[0]?.loc;
+        const bottom = sameOperandNodes
+            .filter((n) => n.loc.x === node.loc.x && n.loc.y >= node.loc.y + 1)
+            .sort((a, b) => a.loc.y - b.loc.y)[0]?.loc;
+        const left = sameOperandNodes
+            .filter((n) => n.loc.y === node.loc.y && n.loc.x <= node.loc.x - 1)
+            .sort((a, b) => b.loc.x - a.loc.x)[0]?.loc;
+        const right = sameOperandNodes
+            .filter((n) => n.loc.y === node.loc.y && n.loc.x >= node.loc.x + 1)
+            .sort((a, b) => a.loc.x - b.loc.x)[0]?.loc;
+
+        return {
+            top,
+            bottom,
+            left,
+            right,
+        };
+    }
+
+    private calculateOperationSiblings() {
+        this.nodesById.forEach((node) => {
+            node.opSiblingNodes = this.findSiblingNodeLocations(node);
+        });
+    }
+
+    private calculateDramBorders() {
+        const locations = new Set(
+            [...this.nodesById.values()].map((node) => JSON.stringify({ ...node.loc, channel: node.dramChannelId })),
+        );
+
+        this.nodesById.forEach((node) => {
+            const leftLoc = { x: node.loc.x - 1, y: node.loc.y, channel: node.dramChannelId };
+            const rightLoc = { x: node.loc.x + 1, y: node.loc.y, channel: node.dramChannelId };
+            const topLoc = { x: node.loc.x, y: node.loc.y - 1, channel: node.dramChannelId };
+            const bottomLoc = { x: node.loc.x, y: node.loc.y + 1, channel: node.dramChannelId };
+
+            node.dramBorder = {
+                left: !locations.has(JSON.stringify(leftLoc)),
+                right: !locations.has(JSON.stringify(rightLoc)),
+                top: !locations.has(JSON.stringify(topLoc)),
+                bottom: !locations.has(JSON.stringify(bottomLoc)),
+            };
+        });
+    }
+
     public get nodes(): Iterable<ComputeNode> {
         return this.nodesById.values();
     }
@@ -78,6 +128,9 @@ export default class GraphOnChip {
                 this.nodeByChannelId.set(channelId, [...(this.nodeByChannelId.get(channelId) || []), node]);
             }
         });
+
+        this.calculateOperationSiblings();
+        this.calculateDramBorders();
     }
 
     public getNode(nodeUID: string): ComputeNode {
@@ -966,6 +1019,13 @@ export class DramBankLink extends NetworkLink {
     }
 }
 
+export interface ComputeNodeSiblings {
+    left?: Loc;
+    right?: Loc;
+    top?: Loc;
+    bottom?: Loc;
+}
+
 export class ComputeNode {
     /** Creates a ComputeNode from a Node JSON object in a Netlist Analyzer output file.
      *
@@ -1075,6 +1135,11 @@ export class ComputeNode {
      */
     public dramChannelId: number = -1;
 
+    /** @deprecated Keeping only for compatibility with DRAM logic */
+    public dramBorder = { top: false, right: false, bottom: false, left: false };
+
+    public opSiblingNodes: ComputeNodeSiblings = {};
+
     // TODO: check if reassigend operation is updated here.
     private _operation: Operation | undefined = undefined;
 
@@ -1109,12 +1174,10 @@ export class ComputeNode {
         return {
             id: this.uid,
             selected: false,
-            loc: this.loc,
             queueNameList: this.queueList.map((queue) => queue.name),
             opName: this.opName,
             dramChannelId: this.dramChannelId,
-            dramSubchannelId: this.dramSubchannelId,
-        } as ComputeNodeState;
+        };
     }
 
     /**

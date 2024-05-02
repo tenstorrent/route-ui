@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { type CSSProperties, FC } from 'react';
+import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../../data/ColorGenerator';
 import { ComputeNode } from '../../../data/GraphOnChip';
@@ -20,28 +20,24 @@ interface OperationGroupRenderProps {
 const OperationGroupRender: FC<OperationGroupRenderProps> = ({ node }) => {
     const selectedGroup = useSelector(getOperand(node.opName));
     const showOperationNames = useSelector(getShowOperationNames);
+    const color = getGroupColor(node.opName);
+    const shouldShowBorder = node.opName !== '' && selectedGroup && (selectedGroup?.selected || showOperationNames);
 
-    let operationStyles: CSSProperties = {};
-
-    if (node.opName !== '' && selectedGroup && (selectedGroup?.selected || showOperationNames)) {
-        const color = getGroupColor(node.opName);
-        operationStyles = { borderColor: getGroupColor(node.opName) };
-        const siblings = selectedGroup.data.filter((n) => n.id === node.uid)[0]?.siblings ?? {};
-
-        operationStyles = getNodeOpBorderStyles({
-            node,
-            styles: operationStyles,
-            color,
-            siblings,
-            isSelected: selectedGroup.selected,
-        });
-
-        if (selectedGroup.selected) {
-            operationStyles = getNodeOpBackgroundStyles(operationStyles, color);
-        }
-    }
-
-    return <div className='group-border' style={operationStyles} />;
+    return (
+        <div
+            className='group-border'
+            style={{
+                borderColor: color,
+                ...(shouldShowBorder
+                    ? getNodeOpBorderStyles({
+                          siblings: node.opSiblingNodes,
+                          isSelected: selectedGroup?.selected ?? false,
+                      })
+                    : {}),
+                ...(selectedGroup?.selected ? { ...getNodeOpBackgroundStyles(color) } : {}),
+            }}
+        />
+    );
 };
 
 export default OperationGroupRender;
