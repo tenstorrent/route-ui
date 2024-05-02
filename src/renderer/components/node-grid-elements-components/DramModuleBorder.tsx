@@ -25,9 +25,7 @@ const DramModuleBorder: FC<DramModuleBorderProps> = ({ node }) => {
         dramSelectionState.selected &&
         dramSelectionState.data.length > 1
     ) {
-        const border = dramSelectionState.data.filter((n) => n.id === node.uid)[0]?.border!;
-
-        dramStyles = getDramGroupingStyles(border);
+        dramStyles = getDramGroupingStyles(node.dramBorder);
     }
 
     return <div className='dram-border' style={dramStyles} />;

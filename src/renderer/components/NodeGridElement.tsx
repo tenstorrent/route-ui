@@ -2,10 +2,10 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { getOperand, selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
+import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
@@ -38,14 +38,11 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
     const showOperationNames = useSelector(getShowOperationNames);
-    const { data: selectedGroupData } = useSelector(getOperand(node.opName)) ?? {};
-    const shouldShowLabel = useMemo(() => {
-        const [selectedNodeData] = selectedGroupData?.filter((n) => n.id === node.uid) ?? [];
-        // Use the top border to determine if the label should be shown.
-        // It will only show for the items that are the "first" in that selected group.
-        // This may be either vertical or horizontal, so we cover both the top and left borders.
-        return !selectedNodeData?.siblings.top && !selectedNodeData?.siblings.left;
-    }, [selectedGroupData, node.uid]);
+
+    // Use the top border to determine if the label should be shown.
+    // It will only show for the items that are the "first" in that selected group.
+    // This may be either vertical or horizontal, so we cover both the top and left borders.
+    const shouldShowLabel = !node.opSiblingNodes?.top && !node.opSiblingNodes?.left;
 
     let coreHighlight = HighlightType.NONE;
     const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
@@ -57,8 +54,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
     } else if (isProducer) {
         coreHighlight = HighlightType.INPUT;
     }
-
-
 
     const triggerSelection = () => {
         const selectedState = nodeState?.selected;
