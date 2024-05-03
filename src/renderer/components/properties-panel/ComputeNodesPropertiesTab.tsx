@@ -121,7 +121,9 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
-    const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const { getActiveGraphName, getActiveGraphRelationship } = useContext(GraphOnChipContext);
+    const activeGraphName = getActiveGraphName();
+    const { temporalEpoch = -1 } = getActiveGraphRelationship() ?? {};
     const { selected, selectOperand, disabledOperand } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -140,9 +142,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     return (
         <Card className='node-element'>
             <h3 className={classList.join(' ')}>
-                <span
-                    className='hover-wrapper'
-                >
+                <span className='hover-wrapper'>
                     {node.type.toUpperCase()} {formatNodeUID(node.uid)}
                 </span>
                 <Tooltip2 content='Close ComputeNode'>
@@ -150,9 +150,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         small
                         icon={IconNames.CROSS}
                         onClick={() => {
-                            dispatch(
-                                updateNodeSelection({ graphName: activeGraphName, id: node.uid, selected: false }),
-                            );
+                            dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: false }));
                         }}
                     />
                 </Tooltip2>
@@ -353,10 +351,10 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
-    const graphName = getActiveGraphName();
+    const { getActiveGraphOnChip, getActiveGraphRelationship } = useContext(GraphOnChipContext);
+    const { temporalEpoch = -1 } = getActiveGraphRelationship() ?? {};
     const graphOnChip = getActiveGraphOnChip();
-    const orderedNodeSelection = useSelector(getOrderedNodeList(graphName));
+    const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch));
     const selectedNodes: ComputeNode[] = useMemo(() => {
         if (!graphOnChip) {
             return [];

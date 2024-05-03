@@ -31,9 +31,9 @@ interface NodeGridElementProps {
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const { temporalEpoch = -1 } = useContext(GraphOnChipContext).getActiveGraphRelationship() ?? {};
     const dispatch = useDispatch();
-    const nodeState = useSelector(selectNodeSelectionById(graphName, node.uid));
+    const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
@@ -60,7 +60,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));
         } else {
-            dispatch(updateNodeSelection({ graphName, id: node.uid, selected: !nodeState?.selected }));
+            dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: !nodeState?.selected }));
         }
     };
 
