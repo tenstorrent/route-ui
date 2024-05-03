@@ -23,7 +23,9 @@ interface DetailedViewDRAMRendererProps {
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const { getActiveGraphOnChip, getActiveGraphRelationship } = useContext(GraphOnChipContext);
+    const graphOnChip = getActiveGraphOnChip();
+    const { temporalEpoch = -1 } = getActiveGraphRelationship() ?? {};
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
@@ -70,7 +72,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                 onClick={() => {
                                                     dispatch(
                                                         updateNodeSelection({
-                                                            graphName,
+                                                            temporalEpoch,
                                                             id: currentNode.uid,
                                                             selected: true,
                                                         }),

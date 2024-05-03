@@ -14,15 +14,16 @@ import useSelectableGraphVertex from './useSelectableGraphVertex.hook';
 
 const useSelectedTableRows = () => {
     const dispatch = useDispatch();
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const { getActiveGraphRelationship } = useContext(GraphOnChipContext);
+    const { temporalEpoch = -1 } = getActiveGraphRelationship() ?? {};
     const { selected, disabledOperand } = useSelectableGraphVertex();
 
-    const nodesSelectionState = useSelector(getSelectedNodeList(graphName));
+    const nodesSelectionState = useSelector(getSelectedNodeList(temporalEpoch));
 
     return {
         handleSelectAllCores: (rows: OpTableFields[], isSelected: boolean) => {
             rows.forEach((row) => {
-                dispatch(updateNodeSelection({ graphName, id: row.core_id, selected: isSelected }));
+                dispatch(updateNodeSelection({ temporalEpoch, id: row.core_id, selected: isSelected }));
             });
         },
         handleSelectAllOperands: (rows: (OpTableFields | QueuesTableFields)[], isSelected: boolean) => {

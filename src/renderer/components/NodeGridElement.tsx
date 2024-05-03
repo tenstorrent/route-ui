@@ -5,7 +5,7 @@
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
@@ -24,6 +24,7 @@ import NodeOperationLabel from './node-grid-elements-components/NodeOperationLab
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
+import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -31,9 +32,9 @@ interface NodeGridElementProps {
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) => {
-    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const { temporalEpoch = -1 } = useContext(GraphOnChipContext).getActiveGraphRelationship() ?? {};
     const dispatch = useDispatch();
-    const nodeState = useSelector(selectNodeSelectionById(graphName, node.uid));
+    const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
@@ -64,7 +65,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) =>
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));
         } else {
-            dispatch(updateNodeSelection({ graphName, id: node.uid, selected: !nodeState?.selected }));
+            dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: !nodeState?.selected }));
         }
     };
 

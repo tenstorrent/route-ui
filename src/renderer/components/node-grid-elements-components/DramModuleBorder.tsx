@@ -15,8 +15,8 @@ interface DramModuleBorderProps {
 
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
 const DramModuleBorder: FC<DramModuleBorderProps> = ({ node }) => {
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
-    const dramSelectionState = useSelector(getDramGroup(graphName, node.dramChannelId));
+    const { temporalEpoch = -1 } = useContext(GraphOnChipContext).getActiveGraphRelationship() ?? {};
+    const dramSelectionState = useSelector(getDramGroup(temporalEpoch, node.dramChannelId));
     let dramStyles = {};
 
     if (

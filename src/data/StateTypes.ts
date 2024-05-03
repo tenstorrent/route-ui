@@ -31,6 +31,7 @@ export interface ComputeNodeState extends NodeSelection {
     opName: string;
     queueNameList: string[];
     dramChannelId: number | -1;
+    graphName: string;
 }
 
 export interface NodeSelection {

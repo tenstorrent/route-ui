@@ -98,7 +98,7 @@ const usePerfAnalyzerFileLoader = () => {
             const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
-            const nodesDataPerGraph: Record<string, ComputeNodeState[]> = {};
+            const nodesDataPerGraph: Record<number, ComputeNodeState[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -116,9 +116,14 @@ const usePerfAnalyzerFileLoader = () => {
                 };
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
-                nodesDataPerGraph[graph.name] = [
-                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState()),
-                ];
+
+                if (!nodesDataPerGraph[graph.temporalEpoch]) {
+                    nodesDataPerGraph[graph.temporalEpoch] = [];
+                }
+
+                nodesDataPerGraph[graph.temporalEpoch].push(
+                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState(graph.name)),
+                );
 
                 times.push({
                     graph: `${graph.name}`,
