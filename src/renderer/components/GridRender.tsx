@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 
 import { Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { useLocation } from 'react-router-dom';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
@@ -19,16 +20,26 @@ import DetailedView from './detailed-view-components/DetailedView';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const { error } = usePerfAnalyzerFileLoader();
+    const location = useLocation();
+    const { graphName, epoch } = location.state;
+
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(graphName);
+    const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+
+    const style =
+        graphList.length > 1
+            ? {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '30px',
+              }
+            : {};
 
     return (
-        <div className='main-content'>
+        <div className='main-content' style={style}>
             {graphOnChip && (
-                <div
-                    className='grid-container'
-                    // this is to address the issue with focus pipe getting stuck because of Popover2
-                >
+                <div className='grid-container'>
                     <div
                         className='node-container'
                         style={{
@@ -38,13 +49,32 @@ export default function GridRender() {
                     >
                         {[
                             ...mapIterable(graphOnChip.nodes, (node: ComputeNode) => {
-                                return <NodeGridElement node={node} key={node.uid} />;
+                                return <NodeGridElement graphName={graphName} node={node} key={node.uid} />;
                             }),
                         ]}
                     </div>
                 </div>
             )}
-            {graphOnChip === undefined && (
+
+            {graphList.map((data) => {
+                return (
+                    <div className='grid-container'>
+                        <div
+                            className='node-container'
+                            style={{
+                                zoom: `${gridZoom}`,
+                                gridTemplateColumns: `repeat(${data.graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
+                            }}
+                        >
+                            {[...data.graphOnChip.nodes].map((node: ComputeNode) => {
+                                // console.log('render node');
+                                return <NodeGridElement node={node} graphName={data.graph.name} key={node.uid} />;
+                            })}
+                        </div>
+                    </div>
+                );
+            })}
+            {graphOnChip === undefined && graphList.length === 0 && (
                 <div className='invalid-data-message'>
                     <Icon icon={IconNames.WARNING_SIGN} size={50} />
                     {error ? (

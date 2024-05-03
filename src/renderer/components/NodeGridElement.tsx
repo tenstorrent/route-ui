@@ -5,7 +5,7 @@
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { useContext } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
@@ -15,23 +15,23 @@ import {
     getSelectedDetailsViewUID,
     getShowOperationNames,
 } from '../../data/store/selectors/uiState.selectors';
-import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
-import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
-import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
-import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
+import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
+import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
+import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
-import { GraphOnChipContext } from '../../data/GraphOnChipContext';
+import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
+    graphName: string;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) => {
+    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(graphName, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
@@ -55,6 +55,10 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
         coreHighlight = HighlightType.INPUT;
     }
 
+    // console.log(nodeState)
+
+    const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
+
     const triggerSelection = () => {
         const selectedState = nodeState?.selected;
         if (isOpen && selectedState) {
@@ -64,21 +68,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
         }
     };
 
-    const classList = ['node-item'];
-    if (coreHighlight !== HighlightType.NONE) {
-        classList.push(`core-highlight-${coreHighlight}`);
-    }
-    if (nodeState?.selected) {
-        classList.push('selected');
-    }
-    if (uid === node.uid && isOpen) {
-        classList.push('detailed-view');
-    }
     return (
         <button
             title={showOperationNames && shouldShowLabel ? node.opName : ''}
             type='button'
-            className={classList.join(' ')}
+            className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
+                node.uid === uid && isOpen ? 'detailed-view' : ''
+            } `}
             onClick={triggerSelection}
         >
             {/* Selected operation borders and backgrounds */}
@@ -101,7 +97,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node }) => {
             <NodeOperationLabel node={node} />
 
             {/* Pipes */}
-            <NodePipeRenderer node={node} />
+            <NodePipeRenderer node={node} graphName={graphName} />
             <NodeFocusPipeRenderer node={node} />
 
             {/* Node type label */}

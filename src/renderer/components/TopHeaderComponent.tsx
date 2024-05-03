@@ -54,7 +54,7 @@ const TopHeaderComponent: React.FC = () => {
         getPreviousGraphName,
         getNextGraphName,
     } = useContext(GraphOnChipContext);
-    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } = usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
     const localFolderPath = useSelector(getFolderPathSelector);
@@ -141,10 +141,7 @@ const TopHeaderComponent: React.FC = () => {
                 </Tooltip2>
                 <GraphSelector
                     onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
-                    onSelectTemporalEpoch={(newTemporalEpoch) => {
-                        // TODO: implement method to visualize temporal epoch
-                        console.log(`Temporal epoch selected: ${newTemporalEpoch}`);
-                    }}
+                    onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
                 <Tooltip2
                     disabled={!getPreviousGraphName()}
