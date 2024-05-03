@@ -15,15 +15,15 @@ import {
     getSelectedDetailsViewUID,
     getShowOperationNames,
 } from '../../data/store/selectors/uiState.selectors';
-import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
-import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
-import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
-import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
+import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
+import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
+import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
+import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -55,7 +55,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) =>
         coreHighlight = HighlightType.INPUT;
     }
 
-
     // console.log(nodeState)
 
     const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
@@ -79,7 +78,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) =>
             onClick={triggerSelection}
         >
             {/* Selected operation borders and backgrounds */}
-            <OperationGroupRender node={node}  />
+            <OperationGroupRender node={node} />
             <DramModuleBorder node={node} />
 
             {/* Queues */}

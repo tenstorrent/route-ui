@@ -35,13 +35,11 @@ export default function GridRender() {
                   gap: '30px',
               }
             : {};
+
     return (
         <div className='main-content' style={style}>
             {graphOnChip && (
-                <div
-                    className='grid-container'
-                    // this is to address the issue with focus pipe getting stuck because of Popover2
-                >
+                <div className='grid-container'>
                     <div
                         className='node-container'
                         style={{
@@ -58,26 +56,24 @@ export default function GridRender() {
                 </div>
             )}
 
-            {graphList.map((data) => (
-                <div
-                    className='grid-container'
-                    // this is to address the issue with focus pipe getting stuck because of Popover2
-                >
-                    <div
-                        className='node-container'
-                        style={{
-                            zoom: `${gridZoom}`,
-                            gridTemplateColumns: `repeat(${data.graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
-                        }}
-                    >
-                        {[
-                            ...mapIterable(data.graphOnChip.nodes, (node: ComputeNode) => {
+            {graphList.map((data) => {
+                return (
+                    <div className='grid-container'>
+                        <div
+                            className='node-container'
+                            style={{
+                                zoom: `${gridZoom}`,
+                                gridTemplateColumns: `repeat(${data.graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
+                            }}
+                        >
+                            {[...data.graphOnChip.nodes].map((node: ComputeNode) => {
+                                // console.log('render node');
                                 return <NodeGridElement node={node} graphName={data.graph.name} key={node.uid} />;
-                            }),
-                        ]}
+                            })}
+                        </div>
                     </div>
-                </div>
-            ))}
+                );
+            })}
             {graphOnChip === undefined && graphList.length === 0 && (
                 <div className='invalid-data-message'>
                     <Icon icon={IconNames.WARNING_SIGN} size={50} />
