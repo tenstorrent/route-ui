@@ -18,20 +18,20 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
-        initialLoadAllNodesData(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
+        initialLoadAllNodesData(state, action: PayloadAction<Record<number, ComputeNodeState[]>>) {
             state.nodeList = {};
             state.nodeListOrder = {};
             state.operands = {};
             state.dram = {};
             state.focusNode = null;
 
-            Object.entries(action.payload).forEach(([graphName, computeNodeStateList]) => {
-                state.dram[graphName] = [];
-                state.nodeList[graphName] = {};
-                state.nodeListOrder[graphName] = [];
+            Object.entries(action.payload).forEach(([temporalEpoch, computeNodeStateList]) => {
+                state.dram[temporalEpoch] = [];
+                state.nodeList[temporalEpoch] = {};
+                state.nodeListOrder[temporalEpoch] = [];
 
                 computeNodeStateList.forEach((item) => {
-                    state.nodeList[graphName][item.id] = item;
+                    state.nodeList[temporalEpoch][item.id] = item;
 
                     if (item.queueNameList.length > 0) {
                         item.queueNameList.forEach((queueName) => {
@@ -39,17 +39,17 @@ const nodeSelectionSlice = createSlice({
                                 state.operands[queueName] = {
                                     selected: false,
                                     type: GraphVertexType.QUEUE,
-                                    graphName,
+                                    graphName: item.graphName,
                                 };
                             }
                         });
                     }
 
                     if (item.dramChannelId !== -1) {
-                        if (!state.dram[graphName][item.dramChannelId]) {
-                            state.dram[graphName][item.dramChannelId] = { data: [], selected: false };
+                        if (!state.dram[temporalEpoch][item.dramChannelId]) {
+                            state.dram[temporalEpoch][item.dramChannelId] = { data: [], selected: false };
                         }
-                        state.dram[graphName][item.dramChannelId].data.push(item);
+                        state.dram[temporalEpoch][item.dramChannelId].data.push(item);
                     }
 
                     if (item.opName !== '') {
@@ -57,7 +57,7 @@ const nodeSelectionSlice = createSlice({
                             state.operands[item.opName] = {
                                 selected: false,
                                 type: GraphVertexType.OPERATION,
-                                graphName,
+                                graphName: item.graphName,
                             };
                         }
                     }
@@ -65,25 +65,25 @@ const nodeSelectionSlice = createSlice({
             });
         },
 
-        updateNodeSelection(state, action: PayloadAction<{ graphName: string; id: string; selected: boolean }>) {
-            const { graphName, id, selected } = action.payload;
-            const node: ComputeNodeState | undefined = state.nodeList[graphName][id];
+        updateNodeSelection(state, action: PayloadAction<{ temporalEpoch: number; id: string; selected: boolean }>) {
+            const { temporalEpoch, id, selected } = action.payload;
+            const node: ComputeNodeState | undefined = state.nodeList[temporalEpoch][id];
 
             if (node) {
                 node.selected = selected;
             }
 
-            const nodeIndex = state.nodeListOrder[graphName].indexOf(id);
+            const nodeIndex = state.nodeListOrder[temporalEpoch].indexOf(id);
             if (nodeIndex > -1 && !selected) {
-                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName]].toSpliced(nodeIndex, 1);
+                state.nodeListOrder[temporalEpoch] = [...state.nodeListOrder[temporalEpoch]].toSpliced(nodeIndex, 1);
             }
 
             if (nodeIndex === -1 && selected) {
-                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName], id];
+                state.nodeListOrder[temporalEpoch] = [...state.nodeListOrder[temporalEpoch], id];
             }
 
-            state.dram[graphName].forEach((dramGroup) => {
-                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[graphName][n.id].selected);
+            state.dram[temporalEpoch].forEach((dramGroup) => {
+                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[temporalEpoch][n.id].selected);
 
                 if (hasSelectedNode) {
                     dramGroup.selected = true;

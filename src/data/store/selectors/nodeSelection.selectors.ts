@@ -4,21 +4,22 @@
 
 import { RootState } from '../createStore';
 
-export const getDramGroup = (graphName: string, dramChannelId?: number) => (state: RootState) =>
+export const getDramGroup = (temporalEpoch: number, dramChannelId?: number) => (state: RootState) =>
     dramChannelId !== undefined && dramChannelId > -1
-        ? state.nodeSelection.dram[graphName]?.[dramChannelId]
+        ? state.nodeSelection.dram[temporalEpoch]?.[dramChannelId]
         : undefined;
 
-export const selectNodeSelectionById = (graphName: string, id: string) => (state: RootState) =>
-    state.nodeSelection.nodeList[graphName]?.[id];
+export const selectNodeSelectionById = (temporalEpoch: number, id: string) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch]?.[id];
 export const getOperand = (opName: string) => (state: RootState) => state.nodeSelection.operands[opName];
 export const getOperandState = (state: RootState) => state.nodeSelection.operands;
 
-export const getSelectedNodeList = (graphName: string) => (state: RootState) => state.nodeSelection.nodeList[graphName];
+export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch];
 
-export const getOrderedNodeList = (graphName: string) => (state: RootState) =>
-    (state.nodeSelection.nodeListOrder[graphName] ?? [])
-        .map((id) => state.nodeSelection.nodeList[graphName][id])
+export const getOrderedNodeList = (temporalEpoch: number) => (state: RootState) =>
+    (state.nodeSelection.nodeListOrder[temporalEpoch] ?? [])
+        .map((id) => state.nodeSelection.nodeList[temporalEpoch][id])
         .toReversed();
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;

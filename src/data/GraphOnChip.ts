@@ -1170,13 +1170,14 @@ export class ComputeNode {
         return this.operation?.name || '';
     }
 
-    public generateInitialState(): ComputeNodeState {
+    public generateInitialState(graphName: string): ComputeNodeState {
         return {
             id: this.uid,
             selected: false,
             queueNameList: this.queueList.map((queue) => queue.name),
             opName: this.opName,
             dramChannelId: this.dramChannelId,
+            graphName,
         };
     }
 
