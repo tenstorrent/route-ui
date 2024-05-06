@@ -28,15 +28,11 @@ const nodeSelectionSlice = createSlice({
             Object.entries(action.payload).forEach(([temporalEpoch, computeNodeStateList]) => {
                 state.dram[temporalEpoch] = {};
                 state.nodeList[temporalEpoch] = {};
-                state.nodeListOrder[temporalEpoch] = {};
+                state.nodeListOrder[temporalEpoch] = [];
 
                 computeNodeStateList.forEach((item) => {
                     if (!state.nodeList[temporalEpoch][item.graphName]) {
                         state.nodeList[temporalEpoch][item.graphName] = {};
-                    }
-
-                    if (!state.nodeListOrder[temporalEpoch][item.graphName]) {
-                        state.nodeListOrder[temporalEpoch][item.graphName] = [];
                     }
 
                     state.nodeList[temporalEpoch][item.graphName][item.id] = item;
@@ -99,16 +95,15 @@ const nodeSelectionSlice = createSlice({
 
             node.selected = selected;
 
-            const nodeIndex = state.nodeListOrder[temporalEpoch][graphName]?.indexOf(id) ?? -1;
+            const nodeIndex =
+                state.nodeListOrder[temporalEpoch]?.findIndex((n) => n.id === id && n.graphName === graphName) ?? -1;
 
             if (nodeIndex > -1 && !selected) {
-                state.nodeListOrder[temporalEpoch][graphName] = [
-                    ...state.nodeListOrder[temporalEpoch][graphName],
-                ].toSpliced(nodeIndex, 1);
+                state.nodeListOrder[temporalEpoch] = [...state.nodeListOrder[temporalEpoch]].toSpliced(nodeIndex, 1);
             }
 
             if (nodeIndex === -1 && selected) {
-                state.nodeListOrder[temporalEpoch][graphName] = [...state.nodeListOrder[temporalEpoch][graphName], id];
+                state.nodeListOrder[temporalEpoch] = [...state.nodeListOrder[temporalEpoch], { id, graphName }];
             }
 
             state.dram[temporalEpoch][graphName].forEach((dramGroup) => {

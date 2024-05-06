@@ -21,9 +21,9 @@ export const getOperandStatesRecord = (operandNames: string[]) => (state: RootSt
 export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
     state.nodeSelection.nodeList[temporalEpoch];
 
-export const getOrderedNodeList = (temporalEpoch: number, graphName: string) => (state: RootState) =>
-    (state.nodeSelection.nodeListOrder[temporalEpoch][graphName] ?? [])
-        .map((id) => state.nodeSelection.nodeList[temporalEpoch][graphName][id])
+export const getOrderedNodeList = (temporalEpoch: number) => (state: RootState) =>
+    (state.nodeSelection.nodeListOrder[temporalEpoch] ?? [])
+        .map(({ id, graphName }) => state.nodeSelection.nodeList[temporalEpoch][graphName][id])
         .toReversed();
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;

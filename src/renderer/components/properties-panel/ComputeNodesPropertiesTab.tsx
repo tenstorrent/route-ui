@@ -359,14 +359,17 @@ const ComputeNodePropertiesCard = ({ node, graphName }: ComputeNodeProps): React
 
 const ComputeNodesPropertiesTab = (): React.ReactElement => {
     const { getActiveGraphOnChip, getActiveGraphRelationship } = useContext(GraphOnChipContext);
-    const { temporalEpoch = -1, name: graphName = '' } = getActiveGraphRelationship() ?? {};
+    const { temporalEpoch = -1 } = getActiveGraphRelationship() ?? {};
     const graphOnChip = getActiveGraphOnChip();
-    const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch, graphName));
-    const selectedNodes: ComputeNode[] = useMemo(() => {
+    const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch));
+    const selectedNodes = useMemo(() => {
         if (!graphOnChip) {
             return [];
         }
-        return orderedNodeSelection.map((nodeState) => graphOnChip.getNode(nodeState.id));
+        return orderedNodeSelection.map((nodeState) => ({
+            node: graphOnChip.getNode(nodeState.id),
+            graphName: nodeState.graphName,
+        }));
     }, [graphOnChip, orderedNodeSelection]);
 
     return (
@@ -374,7 +377,7 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
         <div className={`properties-container ${graphOnChip ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map((node: ComputeNode) => (
+                    {selectedNodes.map(({ node, graphName }) => (
                         <ComputeNodePropertiesCard key={node?.uid} node={node} graphName={graphName} />
                     ))}
                 </div>
