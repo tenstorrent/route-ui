@@ -24,5 +24,5 @@ export const calculateSlowestOperand = (operand: string): OperandPerformance | n
  * so we are only changing the rendering to the user
  * it appears impractical to make a global change */
 export const formatNodeUID = (uid: string): string => {
-    return uid.replace(/^(\d+)-(\d+)-(\d+)$/, '$1-$3-$2');
+    return uid.replace(/^(.*?)(\d+)-(\d+)-(\d+)$/, '$2-$4-$3');
 };

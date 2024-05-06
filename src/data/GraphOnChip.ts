@@ -28,7 +28,7 @@ import {
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
-import { LinkState, PipeSelection, type ComputeNodeState } from './StateTypes';
+import { type ComputeNodeState, LinkState, PipeSelection } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -347,7 +347,7 @@ export default class GraphOnChip {
         GraphOnChip.GET_NOC_ORDER();
     }
 
-    public static CREATE_FROM_NETLIST_JSON(data: NetlistAnalyzerDataJSON) {
+    public static CREATE_FROM_NETLIST_JSON(data: NetlistAnalyzerDataJSON, graphName: string) {
         const graphOnChip = new GraphOnChip(data.chip_id || 0);
         graphOnChip.slowestOpCycles = data.slowest_op_cycles;
         graphOnChip.bwLimitedOpCycles = data.bw_limited_op_cycles;
@@ -381,11 +381,12 @@ export default class GraphOnChip {
                 const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
                 graphOnChip.totalCols = Math.max(loc.y, graphOnChip.totalCols);
                 graphOnChip.totalRows = Math.max(loc.x, graphOnChip.totalRows);
-                const [node, newOperation] = ComputeNode.fromNetlistJSON(
+                const [node, newOperation] = ComputeNode.fromNetlistJSON({
                     nodeJSON,
-                    graphOnChip.chipId,
-                    (name: OperationName) => graphOnChip.operationsByName.get(name),
-                );
+                    chipId: graphOnChip.chipId,
+                    getOperation: (name: OperationName) => graphOnChip.operationsByName.get(name),
+                    graphName,
+                });
                 if (newOperation) {
                     // console.log('Adding operation: ', newOperation.name);
                     graphOnChip.addOperation(newOperation);
@@ -592,7 +593,7 @@ export default class GraphOnChip {
         throw new Error('Chip is null');
     }
 
-    public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON) {
+    public static CREATE_FROM_CHIP_DESIGN(json: ChipDesignJSON, graphName: string) {
         const chipDesign = new ChipDesign(json);
         const graphOnChip = new GraphOnChip(0);
         graphOnChip.nodes = chipDesign.nodes.map((simpleNode) => {
@@ -601,6 +602,11 @@ export default class GraphOnChip {
             node.loc = simpleNode.loc;
             node.dramChannelId = simpleNode.dramChannelId;
             node.dramSubchannelId = simpleNode.dramSubchannelId;
+
+            if (node.type === ComputeNodeType.DRAM) {
+                node.uid = `${graphName}-${graphOnChip.chipId}-${simpleNode.loc.x}-${simpleNode.loc.y}`;
+            }
+
             return node;
         });
         graphOnChip.totalRows = chipDesign.totalRows;
@@ -1035,11 +1041,17 @@ export class ComputeNode {
      *   - The referenced operation will gain a back-reference to the new core
      *   - If a new operation is created, it will be returned as the second value of the returned tuple
      */
-    static fromNetlistJSON(
-        nodeJSON: NodeDataJSON,
-        chipId: number,
-        getOperation: (name: OperationName) => BuildableOperation | undefined,
-    ): [node: ComputeNode, createdOperation?: BuildableOperation] {
+    static fromNetlistJSON({
+        nodeJSON,
+        chipId,
+        getOperation,
+        graphName,
+    }: {
+        nodeJSON: NodeDataJSON;
+        chipId: number;
+        getOperation: (name: OperationName) => BuildableOperation | undefined;
+        graphName: string;
+    }): [node: ComputeNode, createdOperation?: BuildableOperation] {
         const node = new ComputeNode(`${chipId}-${nodeJSON.location[0]}-${nodeJSON.location[1]}`);
         node.opCycles = nodeJSON.op_cycles;
         node.links = new Map();
@@ -1053,6 +1065,10 @@ export class ComputeNode {
         }
         node.loc = { x: nodeJSON.location[0], y: nodeJSON.location[1] };
         node.uid = `${node.chipId}-${node.loc.x}-${node.loc.y}`;
+
+        if (node.type === ComputeNodeType.DRAM) {
+            node.uid = `${graphName}-${node.chipId}-${node.loc.x}-${node.loc.y}`;
+        }
 
         if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
             node.dramChannelId = nodeJSON.dram_channel;

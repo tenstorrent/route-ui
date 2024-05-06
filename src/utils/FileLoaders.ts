@@ -171,7 +171,7 @@ export const loadCluster = async (perfResultsPath: string): Promise<Cluster | nu
     return null;
 };
 
-const loadChipFromArchitecture = async (architecture: Architecture): Promise<GraphOnChip> => {
+const loadChipFromArchitecture = async (architecture: Architecture, graphName: string): Promise<GraphOnChip> => {
     if (architecture === Architecture.NONE) {
         throw new Error('Unable to parse selected folder, insufficient data provided.');
     }
@@ -183,7 +183,7 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Gra
         [Architecture.WORMHOLE]: wormholeArch.default,
     }[architecture];
 
-    return GraphOnChip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON);
+    return GraphOnChip.CREATE_FROM_CHIP_DESIGN(architectureJson as ChipDesignJSON, graphName);
 };
 
 /** @description only for netlist analizer files */
@@ -253,7 +253,7 @@ const loadChipFromNetlistAnalyzer = async (
         }
         if (netlistAnalyzerFilepath !== '') {
             const data = await readFile(netlistAnalyzerFilepath);
-            let graphOnChip = GraphOnChip.CREATE_FROM_NETLIST_JSON(load(data) as NetlistAnalyzerDataJSON);
+            let graphOnChip = GraphOnChip.CREATE_FROM_NETLIST_JSON(load(data) as NetlistAnalyzerDataJSON, graphName);
             if (netlistAnalyzerOptoPipeFilepath !== '') {
                 try {
                     const opsData = await readFile(netlistAnalyzerOptoPipeFilepath);
@@ -303,7 +303,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
         } catch (err) {
             console.error('Failed to read metadata from folder:', err);
         }
-        graphOnChip = await loadChipFromArchitecture(architecture);
+        graphOnChip = await loadChipFromArchitecture(architecture, graph.name);
     }
 
     try {
