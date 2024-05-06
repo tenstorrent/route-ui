@@ -87,7 +87,7 @@ const nodeSelectionSlice = createSlice({
             }>,
         ) {
             const { temporalEpoch, graphName, id, selected } = action.payload;
-            const node: ComputeNodeState | undefined = state.nodeList[temporalEpoch][graphName][id];
+            const node: ComputeNodeState | undefined = state.nodeList[temporalEpoch]?.[graphName]?.[id];
 
             if (!node) {
                 return;

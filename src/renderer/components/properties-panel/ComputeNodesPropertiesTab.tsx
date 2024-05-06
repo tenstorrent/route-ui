@@ -366,10 +366,20 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
         if (!graphOnChip) {
             return [];
         }
-        return orderedNodeSelection.map((nodeState) => ({
-            node: graphOnChip.getNode(nodeState.id),
-            graphName: nodeState.graphName,
-        }));
+        return orderedNodeSelection
+            .map((nodeState) => {
+                try {
+                    const node = graphOnChip.getNode(nodeState.id);
+
+                    return {
+                        node,
+                        graphName: nodeState.graphName,
+                    };
+                } catch {
+                    return undefined;
+                }
+            })
+            .filter((item) => item !== undefined) as { node: ComputeNode; graphName: string }[];
     }, [graphOnChip, orderedNodeSelection]);
 
     return (
