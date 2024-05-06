@@ -9,14 +9,14 @@ interface OperationPerformanceState {
     operationPerformanceTreshold: number;
     showOperationPerformanceGrid: boolean;
     operationRatioThreshold: number;
-    maxBwLimitedFactor: number;
+    randomUpdateTrigger: number;
 }
 
 const operationPerformanceInitialState: OperationPerformanceState = {
     operationPerformanceTreshold: INITIAL_OPERATION_PERFORMANCE_THRESHOLD,
     showOperationPerformanceGrid: false,
     operationRatioThreshold: MAX_MODEL_RATIO_THRESHOLD,
-    maxBwLimitedFactor: 1,
+    randomUpdateTrigger: 1,
 };
 
 const operationPerformanceSlice = createSlice({
@@ -32,15 +32,15 @@ const operationPerformanceSlice = createSlice({
         updateOperationRatioThreshold: (state, action) => {
             state.operationRatioThreshold = action.payload;
         },
-        updateMaxBwLimitedFactor: (state, action) => {
-            state.maxBwLimitedFactor = action.payload;
+        updateRandomRedux: (state, action) => {
+            state.randomUpdateTrigger = action.payload;
         },
     },
 });
 
 export const {
     updateOperationPerformanceThreshold,
-    updateMaxBwLimitedFactor,
+    updateRandomRedux,
     updateShowOperationPerformanceGrid,
     updateOperationRatioThreshold,
 } = operationPerformanceSlice.actions;

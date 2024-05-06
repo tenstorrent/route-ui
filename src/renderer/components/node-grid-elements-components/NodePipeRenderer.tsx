@@ -34,7 +34,6 @@ interface NodePipeRendererProps {
 const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, graphName }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
-    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const linksData = useSelector(getAllLinksForGraph(graphName));
 
     const focusPipe = useSelector(getFocusPipe);
@@ -51,7 +50,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, graphName }) => {
 
     const showEmptyLinks = useSelector(getShowEmptyLinks);
 
-    // TODO: review if we can clear the specific nodes instead of the full svg?
+
     svg.selectAll('*').remove();
 
     useEffect(() => {
