@@ -43,6 +43,7 @@ interface GraphOnChipContextType {
     graphOnChipList: Record<string, GraphOnChip>;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getActiveGraphOnChipListForTemporalEpoch: () => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
+    getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
 }
 
 const applicationModelState: ApplicationModelState = {
@@ -70,6 +71,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     graphOnChipList: {},
     getOperand: () => undefined,
     getActiveGraphOnChipListForTemporalEpoch: () => [],
+    getGraphOnChipListForTemporalEpoch: () => [],
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -156,6 +158,20 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
     }, [getActiveGraphRelationship, state.graphOnChipList, state.graphs]);
 
+    const getGraphOnChipListForTemporalEpoch = useCallback(
+        (epoch: number) => {
+            const listOfGraphRel: GraphRelationship[] = [...state.graphs.values()].filter(
+                (graph: GraphRelationship) => {
+                    return graph.temporalEpoch === epoch;
+                },
+            );
+            return listOfGraphRel.map((graph) => {
+                return { graph, graphOnChip: state.graphOnChipList[graph.name] };
+            });
+        },
+        [state.graphOnChipList, state.graphs],
+    );
+
     const getPreviousGraphName = useCallback(() => {
         return state.visitedGraphsHistory[state.currentGraphIndex - 1];
     }, [state.currentGraphIndex, state.visitedGraphsHistory]);
@@ -229,6 +245,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             graphOnChipList: state.graphOnChipList,
             getOperand,
             getActiveGraphOnChipListForTemporalEpoch,
+            getGraphOnChipListForTemporalEpoch,
         }),
         [
             loadGraphOnChips,
@@ -247,6 +264,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             state.graphOnChipList,
             getOperand,
             getActiveGraphOnChipListForTemporalEpoch,
+            getGraphOnChipListForTemporalEpoch,
         ],
     );
 

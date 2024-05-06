@@ -14,6 +14,12 @@ export const selectNodeSelectionById = (temporalEpoch: number, id: string) => (s
 export const getOperand = (opName: string) => (state: RootState) => state.nodeSelection.operands[opName];
 export const getOperandState = (state: RootState) => state.nodeSelection.operands;
 
+export const getOperandStateList = (operandNames: string[]) => (state: RootState) =>
+    operandNames.map((name) => state.nodeSelection.operands[name]);
+
+export const getOperandStatesRecord = (operandNames: string[]) => (state: RootState) =>
+    operandNames.reduce((acc, name) => ({ ...acc, [name]: state.nodeSelection.operands[name] }), {});
+
 export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
     state.nodeSelection.nodeList[temporalEpoch];
 

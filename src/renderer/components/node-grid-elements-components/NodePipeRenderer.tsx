@@ -28,12 +28,13 @@ import {
 
 interface NodePipeRendererProps {
     node: ComputeNode;
+    graphName: string;
 }
 
-const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node }) => {
+const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, graphName }) => {
     // TODO: note to future self this is working incidently, but once gridview starts being generated later or regenerated this will likely need a useEffect
     const isHighContrast = useSelector(getHighContrastState);
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const linksData = useSelector(getAllLinksForGraph(graphName));
 
     const focusPipe = useSelector(getFocusPipe);

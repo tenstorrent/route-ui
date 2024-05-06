@@ -14,7 +14,7 @@ interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
     onSelectGraph: (graph: string) => void;
-    onSelectTemporalEpoch: (temporalEpoch: string) => void;
+    onSelectTemporalEpoch: (temporalEpoch: number) => void;
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
@@ -34,7 +34,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                 <MenuItem
                                     icon={IconNames.SERIES_DERIVED}
                                     key={`temporal-epoch-${temporalEpoch}`}
-                                    onClick={() => onSelectTemporalEpoch(temporalEpoch.toString())}
+                                    onClick={() => onSelectTemporalEpoch(temporalEpoch)}
                                     text={`Temporal Epoch ${temporalEpoch}`}
                                     className='graph-selector-temporal-epoch'
                                 />
