@@ -31,11 +31,11 @@ const nodeSelectionSlice = createSlice({
                 state.nodeListOrder[temporalEpoch] = [];
 
                 computeNodeStateList.forEach((item) => {
-                    if (!state.nodeList[temporalEpoch][item.graphName]) {
-                        state.nodeList[temporalEpoch][item.graphName] = {};
+                    if (!state.nodeList[temporalEpoch]?.[item.graphName]) {
+                        state.nodeList[temporalEpoch]![item.graphName] = {};
                     }
 
-                    state.nodeList[temporalEpoch][item.graphName][item.id] = item;
+                    state.nodeList[temporalEpoch]![item.graphName]![item.id] = item;
 
                     if (item.queueNameList.length > 0) {
                         item.queueNameList.forEach((queueName) => {
@@ -50,18 +50,18 @@ const nodeSelectionSlice = createSlice({
                     }
 
                     if (item.dramChannelId !== -1) {
-                        if (!state.dram[temporalEpoch][item.graphName]) {
-                            state.dram[temporalEpoch][item.graphName] = [];
+                        if (!state.dram[temporalEpoch]?.[item.graphName]) {
+                            state.dram[temporalEpoch]![item.graphName] = [];
                         }
 
-                        if (!state.dram[temporalEpoch][item.graphName][item.dramChannelId]) {
-                            state.dram[temporalEpoch][item.graphName][item.dramChannelId] = {
+                        if (!state.dram[temporalEpoch]?.[item.graphName]?.[item.dramChannelId]) {
+                            state.dram[temporalEpoch]![item.graphName]![item.dramChannelId] = {
                                 data: [],
                                 selected: false,
                             };
                         }
 
-                        state.dram[temporalEpoch][item.graphName][item.dramChannelId].data.push(item);
+                        state.dram[temporalEpoch]![item.graphName]![item.dramChannelId]!.data.push(item);
                     }
 
                     if (item.opName !== '') {
@@ -99,16 +99,19 @@ const nodeSelectionSlice = createSlice({
                 state.nodeListOrder[temporalEpoch]?.findIndex((n) => n.id === id && n.graphName === graphName) ?? -1;
 
             if (nodeIndex > -1 && !selected) {
-                state.nodeListOrder[temporalEpoch] = [...state.nodeListOrder[temporalEpoch]].toSpliced(nodeIndex, 1);
+                state.nodeListOrder[temporalEpoch] = [...(state.nodeListOrder[temporalEpoch] ?? [])].toSpliced(
+                    nodeIndex,
+                    1,
+                );
             }
 
             if (nodeIndex === -1 && selected) {
-                state.nodeListOrder[temporalEpoch] = [...state.nodeListOrder[temporalEpoch], { id, graphName }];
+                state.nodeListOrder[temporalEpoch] = [...(state.nodeListOrder[temporalEpoch] ?? []), { id, graphName }];
             }
 
-            state.dram[temporalEpoch][graphName].forEach((dramGroup) => {
+            state.dram[temporalEpoch]?.[graphName]?.forEach((dramGroup) => {
                 const hasSelectedNode = dramGroup.data.some(
-                    (n) => state.nodeList[temporalEpoch][graphName][n.id].selected,
+                    (n) => state.nodeList[temporalEpoch]?.[graphName]?.[n.id]?.selected,
                 );
 
                 if (hasSelectedNode) {
@@ -123,7 +126,7 @@ const nodeSelectionSlice = createSlice({
 
             operandsToSelect.forEach((operandName) => {
                 if (state.operands[operandName]) {
-                    state.operands[operandName].selected = selected;
+                    state.operands[operandName]!.selected = selected;
                 }
             });
         },
@@ -151,7 +154,7 @@ const nodeSelectionSlice = createSlice({
             const { operandName, selected } = action.payload;
 
             if (state.operands[operandName]) {
-                state.operands[operandName].selected = selected;
+                state.operands[operandName]!.selected = selected;
             }
         },
         selectAllQueuesForGraph(state, action: PayloadAction<string>) {
