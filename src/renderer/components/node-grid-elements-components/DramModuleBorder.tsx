@@ -11,12 +11,13 @@ import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 interface DramModuleBorderProps {
     node: ComputeNode;
+    graphName: string;
 }
 
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
-const DramModuleBorder: FC<DramModuleBorderProps> = ({ node }) => {
+const DramModuleBorder: FC<DramModuleBorderProps> = ({ node, graphName }) => {
     const { temporalEpoch = -1 } = useContext(GraphOnChipContext).getActiveGraphRelationship() ?? {};
-    const dramSelectionState = useSelector(getDramGroup(temporalEpoch, node.dramChannelId));
+    const dramSelectionState = useSelector(getDramGroup(temporalEpoch, graphName, node.dramChannelId));
     let dramStyles = {};
 
     if (

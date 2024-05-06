@@ -36,7 +36,7 @@ function OperationsTable() {
     const dispatch = useDispatch();
     const { getActiveGraphOnChip, getActiveGraphRelationship } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
-    const { temporalEpoch = -1 } = getActiveGraphRelationship() ?? {};
+    const { temporalEpoch = -1, name: activeGraphName = '' } = getActiveGraphRelationship() ?? {};
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');
@@ -131,11 +131,12 @@ function OperationsTable() {
         return (
             <div className='op-element'>
                 <Checkbox
-                    checked={nodesSelectionState[cellContent]?.selected}
+                    checked={nodesSelectionState[activeGraphName][cellContent]?.selected}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         dispatch(
                             updateNodeSelection({
                                 temporalEpoch,
+                                graphName: activeGraphName,
                                 id: cellContent.toString(),
                                 selected: e.target.checked,
                             }),

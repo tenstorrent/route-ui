@@ -73,6 +73,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                     dispatch(
                                                         updateNodeSelection({
                                                             temporalEpoch,
+                                                            graphName,
                                                             id: currentNode.uid,
                                                             selected: true,
                                                         }),

@@ -15,7 +15,7 @@ import useSelectableGraphVertex from './useSelectableGraphVertex.hook';
 const useSelectedTableRows = () => {
     const dispatch = useDispatch();
     const { getActiveGraphRelationship } = useContext(GraphOnChipContext);
-    const { temporalEpoch = -1 } = getActiveGraphRelationship() ?? {};
+    const { temporalEpoch = -1, name: graphName = '' } = getActiveGraphRelationship() ?? {};
     const { selected, disabledOperand } = useSelectableGraphVertex();
 
     const nodesSelectionState = useSelector(getSelectedNodeList(temporalEpoch));
@@ -23,7 +23,7 @@ const useSelectedTableRows = () => {
     return {
         handleSelectAllCores: (rows: OpTableFields[], isSelected: boolean) => {
             rows.forEach((row) => {
-                dispatch(updateNodeSelection({ temporalEpoch, id: row.core_id, selected: isSelected }));
+                dispatch(updateNodeSelection({ temporalEpoch, graphName, id: row.core_id, selected: isSelected }));
             });
         },
         handleSelectAllOperands: (rows: (OpTableFields | QueuesTableFields)[], isSelected: boolean) => {
@@ -57,7 +57,7 @@ const useSelectedTableRows = () => {
             dispatch(selectOperandList({ operands: operandNames, selected: isSelected }));
         },
         getCoreSelectedState: getSelectedState<OpTableFields>(
-            (row) => nodesSelectionState[row.core_id]?.selected ?? false,
+            (row) => nodesSelectionState[graphName][row.core_id]?.selected ?? false,
         ),
         getOperandSelectedState: getSelectedState<OpTableFields | QueuesTableFields>(
             (row) => selected(row.name),
