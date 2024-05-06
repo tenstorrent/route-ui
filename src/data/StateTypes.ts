@@ -47,9 +47,9 @@ export interface OperandSelectionState {
 
 export interface NodeSelectionState {
     operands: Record<string, OperandSelectionState>;
-    nodeList: Record<string, Record<string, ComputeNodeState>>;
-    nodeListOrder: Record<string, string[]>;
-    dram: Record<string, { data: ComputeNodeState[]; selected: boolean }[]>;
+    nodeList: Record<string, Record<string, Record<string, ComputeNodeState>>>;
+    nodeListOrder: Record<string, Record<string, string[]>>;
+    dram: Record<string, Record<string, { data: ComputeNodeState[]; selected: boolean }[]>>;
     focusNode: string | null;
 }
 
