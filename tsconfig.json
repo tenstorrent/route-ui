@@ -12,7 +12,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "noUncheckedIndexedAccess": true,
     "allowJs": true,
     "outDir": ".erb/dll",
      "skipLibCheck": true
