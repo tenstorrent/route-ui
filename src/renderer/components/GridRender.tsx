@@ -50,7 +50,14 @@ export default function GridRender() {
                     >
                         {[
                             ...mapIterable(graphOnChip.nodes, (node: ComputeNode) => {
-                                return <NodeGridElement graphName={graphName} node={node} key={node.uid} />;
+                                return (
+                                    <NodeGridElement
+                                        graphName={graphName}
+                                        temporalEpoch={epoch}
+                                        node={node}
+                                        key={node.uid}
+                                    />
+                                );
                             }),
                         ]}
                     </div>
@@ -69,7 +76,14 @@ export default function GridRender() {
                         >
                             {[...data.graphOnChip.nodes].map((node: ComputeNode) => {
                                 // console.log('render node');
-                                return <NodeGridElement node={node} graphName={data.graph.name} key={node.uid} />;
+                                return (
+                                    <NodeGridElement
+                                        node={node}
+                                        temporalEpoch={epoch}
+                                        graphName={data.graph.name}
+                                        key={node.uid}
+                                    />
+                                );
                             })}
                         </div>
                     </div>
