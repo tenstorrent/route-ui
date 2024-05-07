@@ -2,6 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
 export const getDramGroup = (graphName: string, dramChannelId?: number) => (state: RootState) =>
@@ -12,7 +13,11 @@ export const getDramGroup = (graphName: string, dramChannelId?: number) => (stat
 export const selectNodeSelectionById = (graphName: string, id: string) => (state: RootState) =>
     state.nodeSelection.nodeList[graphName]?.[id];
 export const getOperand = (opName: string) => (state: RootState) => state.nodeSelection.operands[opName];
-export const getOperandState = (state: RootState) => state.nodeSelection.operands;
+
+export const getOperandState = createSelector(
+    (state: RootState) => state.nodeSelection,
+    (nodeSelection) => nodeSelection.operands,
+);
 
 export const getOperandStateList = (operandNames: string[]) => (state: RootState) =>
     operandNames.map((name) => state.nodeSelection.operands[name]);

@@ -36,16 +36,6 @@ const BottomDock: FC<BottomDockProps> = ({ isActive }) => {
             >
                 <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
                 <Tab id='tab2' title='Queues' panel={<QueuesTable />} />
-                {/* <Tab */}
-                {/*     id='tab2' */}
-                {/*     title='Operands' */}
-                {/*     panel={ */}
-                {/*         <Table2 numRows={40} className='operands-table' enableColumnResizing> */}
-                {/*             <Column name='Dollars' cellRenderer={dollarCellRenderer} /> */}
-                {/*             <Column name='Euros' cellRenderer={euroCellRenderer} /> */}
-                {/*         </Table2> */}
-                {/*     } */}
-                {/* /> */}
                 {isLogOutputEnabled && <Tab id='tab3' title='Logs' panel={<LogsOutput />} />}
             </Tabs>
             <Button
