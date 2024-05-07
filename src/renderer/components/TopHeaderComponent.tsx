@@ -73,7 +73,7 @@ const TopHeaderComponent: React.FC = () => {
     const temporalEpoch = getActiveGraphRelationship()?.temporalEpoch;
 
     if (!selectedGraph && availableGraphs.length > 0) {
-        loadPerfAnalyzerGraph(availableGraphs[0]);
+        loadPerfAnalyzerGraph(availableGraphs[0], temporalEpoch ?? -1);
     }
 
     const updateSelectedFolder = async (
@@ -140,7 +140,7 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector
-                    onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
+                    onSelectGraph={(graph, newTemporalEpoch) => loadPerfAnalyzerGraph(graph, newTemporalEpoch)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
                 <Tooltip2

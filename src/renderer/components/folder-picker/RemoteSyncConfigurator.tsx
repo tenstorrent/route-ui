@@ -260,7 +260,7 @@ const RemoteSyncConfigurator: FC = () => {
                         />
                     </Tooltip2>
                     <GraphSelector
-                        onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
+                        onSelectGraph={(graph, temporalEpoch) => loadPerfAnalyzerGraph(graph, temporalEpoch)}
                         onSelectTemporalEpoch={(temporalEpoch) => loadTemporalEpoch(temporalEpoch)}
                         disabled={
                             selectedFolderLocationType === 'local' || isSyncingRemoteFolder || isLoadingFolderList

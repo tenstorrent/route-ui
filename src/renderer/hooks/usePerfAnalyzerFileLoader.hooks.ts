@@ -156,11 +156,11 @@ const usePerfAnalyzerFileLoader = () => {
         dispatch(setIsLoadingFolder(false));
     };
 
-    const loadPerfAnalyzerGraph = (graphName: string) => {
+    const loadPerfAnalyzerGraph = (graphName: string, temporalEpoch: number) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
             setActiveGraph(graphName);
-            navigate('/render', { state: { graphName } });
+            navigate('/render', { state: { graphName, epoch: temporalEpoch } });
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }

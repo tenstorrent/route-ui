@@ -13,7 +13,7 @@ import './GraphSelector.scss';
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph: (graph: string) => void;
+    onSelectGraph: (graph: string, temporalEpoch: number) => void;
     onSelectTemporalEpoch: (temporalEpoch: number) => void;
 }
 
@@ -42,7 +42,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                     <MenuItem
                                         key={`temporal-epoch-${temporalEpoch}-${graphRelationship.name}`}
                                         text={graphRelationship.name}
-                                        onClick={() => onSelectGraph(graphRelationship.name)}
+                                        onClick={() => onSelectGraph(graphRelationship.name, temporalEpoch)}
                                         className='graph-selector-graph'
                                     />
                                 ))}
