@@ -39,6 +39,7 @@ const nodeSelectionSlice = createSlice({
                         id: item.id,
                         opName: item.opName,
                         queueNameList: item.queueNameList,
+                        selected: false,
                     };
 
                     if (item.dramChannelId !== -1) {
@@ -77,11 +78,13 @@ const nodeSelectionSlice = createSlice({
 
         updateNodeSelection(state, action: PayloadAction<{ temporalEpoch: string; id: string; selected: boolean }>) {
             const { temporalEpoch, id, selected } = action.payload;
-            const node = state.nodeList[temporalEpoch][id];
+            const node = state.nodeList?.[temporalEpoch]?.[id];
 
             if (!node) {
                 return;
             }
+
+            node.selected = selected;
 
             const nodeIndex = state.selectedNodeList[temporalEpoch].indexOf(id);
             if (nodeIndex > -1 && !selected) {

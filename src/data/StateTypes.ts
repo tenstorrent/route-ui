@@ -35,6 +35,7 @@ export interface ComputeNodeState {
     opName: string;
     queueNameList: string[];
     dramGroup?: string[];
+    selected: boolean;
 }
 
 export interface OperandSelectionState {

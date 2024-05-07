@@ -11,6 +11,7 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { Fragment, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
+import { useLocation } from 'react-router-dom';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -67,7 +68,6 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
 
         slowestOperandText = `${actualText} / ${requiredText}`;
     }
-
 
     const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
@@ -140,9 +140,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     return (
         <Card className='node-element'>
             <h3 className={classList.join(' ')}>
-                <span
-                    className='hover-wrapper'
-                >
+                <span className='hover-wrapper'>
                     {node.type.toUpperCase()} {formatNodeUID(node.uid)}
                 </span>
                 <Tooltip2 content='Close ComputeNode'>
@@ -151,7 +149,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         icon={IconNames.CROSS}
                         onClick={() => {
                             dispatch(
-                                updateNodeSelection({ graphName: activeGraphName, id: node.uid, selected: false }),
+                                updateNodeSelection({ temporalEpoch: activeGraphName, id: node.uid, selected: false }),
                             );
                         }}
                     />
@@ -352,12 +350,13 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     );
 };
 
-const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
-    const graphName = getActiveGraphName();
+const ComputeNodesPropertiesTab = () => {
+    const location = useLocation();
+    const { epoch: temporalEpoch } = location.state;
+    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
-    const orderedNodeSelection = useSelector(getOrderedNodeList(graphName));
-    const selectedNodes: ComputeNode[] = useMemo(() => {
+    const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch));
+    const selectedNodes = useMemo(() => {
         if (!graphOnChip) {
             return [];
         }
@@ -369,7 +368,7 @@ const ComputeNodesPropertiesTab = (): React.ReactElement => {
         <div className={`properties-container ${graphOnChip ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map((node: ComputeNode) => (
+                    {selectedNodes.map((node) => (
                         <ComputeNodePropertiesCard key={node?.uid} node={node} />
                     ))}
                 </div>
