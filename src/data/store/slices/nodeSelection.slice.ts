@@ -45,7 +45,10 @@ const nodeSelectionSlice = createSlice({
 
                     if (item.dramChannelId !== -1) {
                         const dramGroup = action.payload[temporalEpoch]
-                            .filter(({ dramChannelId }) => dramChannelId === item.dramChannelId)
+                            .filter(
+                                ({ dramChannelId, graphName }) =>
+                                    dramChannelId === item.dramChannelId && graphName === item.graphName,
+                            )
                             .map(({ id }) => id);
 
                         state.nodeList[temporalEpoch][item.id].dramGroup = dramGroup;
