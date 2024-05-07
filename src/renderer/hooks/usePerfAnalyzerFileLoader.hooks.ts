@@ -114,9 +114,14 @@ const usePerfAnalyzerFileLoader = () => {
                 };
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
-                nodesDataPerGraph[graph.name] = [
+
+                if (!nodesDataPerGraph[graph.temporalEpoch]) {
+                    nodesDataPerGraph[graph.temporalEpoch] = [];
+                }
+
+                nodesDataPerGraph[graph.temporalEpoch].push(
                     ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState(graph.name)),
-                ];
+                );
 
                 times.push({
                     graph: `${graph.name}`,
