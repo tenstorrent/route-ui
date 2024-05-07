@@ -98,8 +98,13 @@ const nodeSelectionSlice = createSlice({
                 state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch], id];
             }
 
+            const shouldKeepHighlighted =
+                state.nodeList[temporalEpoch][id].dramGroup?.some(
+                    (dramId) => state.nodeList[temporalEpoch][dramId].selected,
+                ) ?? false;
+
             state.nodeList[temporalEpoch][id].dramGroup?.forEach((dramId) => {
-                state.dramNodesHighlight[temporalEpoch][dramId] = selected;
+                state.dramNodesHighlight[temporalEpoch][dramId] = shouldKeepHighlighted || selected;
             });
         },
         selectOperandList(state, action: PayloadAction<{ operands: string[]; selected: boolean }>) {
