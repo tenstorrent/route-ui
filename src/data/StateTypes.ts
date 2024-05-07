@@ -97,3 +97,8 @@ export interface ClusterViewState {
 }
 
 export type FolderLocationType = 'local' | 'remote';
+
+export interface LocationState {
+    epoch: string;
+    graphName: string;
+}

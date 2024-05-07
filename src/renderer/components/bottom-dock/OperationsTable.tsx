@@ -16,7 +16,7 @@ import {
     useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { type Location, useLocation } from 'react-router-dom';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
 import { GraphVertexType } from '../../../data/GraphNames';
@@ -31,10 +31,11 @@ import { numberFormatter, valueRatio } from '../../utils/numbers';
 import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
+import type { LocationState } from '../../../data/StateTypes';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
-    const location = useLocation();
+    const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch } = location.state;
     const dispatch = useDispatch();
     const { getActiveGraphOnChip } = useContext(GraphOnChipContext);

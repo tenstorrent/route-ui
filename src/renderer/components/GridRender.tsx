@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 import { Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { useLocation } from 'react-router-dom';
+import { type Location, useLocation } from 'react-router-dom';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
@@ -17,11 +17,12 @@ import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks'
 import NodeGridElement from './NodeGridElement';
 import ClusterViewDialog from './cluster-view/ClusterViewDialog';
 import DetailedView from './detailed-view-components/DetailedView';
+import type { LocationState } from '../../data/StateTypes';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
     const { error } = usePerfAnalyzerFileLoader();
-    const location = useLocation();
+    const location: Location<LocationState> = useLocation();
     const { graphName, epoch } = location.state;
 
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(graphName);

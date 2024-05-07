@@ -3,16 +3,17 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { type Location, useLocation } from 'react-router-dom';
 import { getSelectedNodeList } from '../../data/store/selectors/nodeSelection.selectors';
 import { selectOperandList, updateNodeSelection } from '../../data/store/slices/nodeSelection.slice';
 import { getSelectedState } from '../components/bottom-dock/SharedTable';
 import type { OpTableFields } from '../components/bottom-dock/useOperationsTable.hooks';
 import type { QueuesTableFields } from '../components/bottom-dock/useQueuesTable.hook';
 import useSelectableGraphVertex from './useSelectableGraphVertex.hook';
+import type { LocationState } from '../../data/StateTypes';
 
 const useSelectedTableRows = () => {
-    const location = useLocation();
+    const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch } = location.state;
     const dispatch = useDispatch();
     const { selected, disabledOperand } = useSelectableGraphVertex();

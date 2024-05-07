@@ -11,7 +11,7 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { Fragment, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
-import { useLocation } from 'react-router-dom';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -27,6 +27,7 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -351,8 +352,8 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
 };
 
 const ComputeNodesPropertiesTab = () => {
-    const location = useLocation();
-    const { epoch: temporalEpoch } = location.state;
+    const location: Location<LocationState> = useLocation();
+    const { epoch: temporalEpoch, graphName } = location.state;
     const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
     const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch));

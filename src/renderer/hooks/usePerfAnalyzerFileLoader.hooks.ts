@@ -16,13 +16,13 @@ import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFold
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
 import { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
 import type { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import type { EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
+import type { EpochAndLinkStates, FolderLocationType, LocationState, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
     initialLoadNormalizedOPs,
@@ -43,7 +43,7 @@ const usePerfAnalyzerFileLoader = () => {
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
     const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
     const navigate = useNavigate();
-    const location = useLocation();
+    const location: Location<LocationState> = useLocation();
     const logger = useLogging();
 
     useEffect(() => {
