@@ -353,22 +353,36 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
 const ComputeNodesPropertiesTab = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch, graphName } = location.state;
-    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
+    const { graphOnChipList } = useContext(GraphOnChipContext);
     const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch));
     const selectedNodes = useMemo(() => {
-        if (!graphOnChip) {
-            return [];
+        const selectedNodesList = orderedNodeSelection
+            .map((nodeState) => {
+                try {
+                    return {
+                        node: graphOnChipList[nodeState.graphName].getNode(nodeState.id),
+                        graphName: nodeState.graphName,
+                    };
+                } catch (err) {
+                    console.error(err);
+                }
+
+                return undefined;
+            })
+            .filter((node) => node) as { node: ComputeNode; graphName: string }[];
+
+        if (graphName) {
+            return selectedNodesList.filter((node) => node.graphName === graphName);
         }
-        return orderedNodeSelection.map((nodeState) => graphOnChip.getNode(nodeState.id));
-    }, [graphOnChip, orderedNodeSelection]);
+
+        return selectedNodesList;
+    }, [graphOnChipList, orderedNodeSelection, graphName]);
 
     return (
-        // TODO: give this a greyed out look when data is not available
-        <div className={`properties-container ${graphOnChip ? '' : 'empty'}`}>
+        <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map((node) => (
+                    {selectedNodes.map(({ node }) => (
                         <ComputeNodePropertiesCard
                             key={node?.uid}
                             node={node}

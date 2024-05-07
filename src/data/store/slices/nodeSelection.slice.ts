@@ -40,6 +40,7 @@ const nodeSelectionSlice = createSlice({
                         opName: item.opName,
                         queueNameList: item.queueNameList,
                         selected: false,
+                        graphName: item.graphName,
                     };
 
                     if (item.dramChannelId !== -1) {
