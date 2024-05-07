@@ -5,10 +5,8 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
-export const getDramGroup = (graphName: string, dramChannelId?: number) => (state: RootState) =>
-    dramChannelId !== undefined && dramChannelId > -1
-        ? state.nodeSelection.dram[graphName]?.[dramChannelId]
-        : undefined;
+export const getDramGroup = (temporalEpoch: string, id: string) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch]?.[id]?.dramGroup;
 
 export const selectNodeSelectionById = (graphName: string, id: string) => (state: RootState) =>
     state.nodeSelection.nodeList[graphName]?.[id];
@@ -25,11 +23,12 @@ export const getOperandStateList = (operandNames: string[]) => (state: RootState
 export const getOperandStatesRecord = (operandNames: string[]) => (state: RootState) =>
     operandNames.reduce((acc, name) => ({ ...acc, [name]: state.nodeSelection.operands[name] }), {});
 
-export const getSelectedNodeList = (graphName: string) => (state: RootState) => state.nodeSelection.nodeList[graphName];
+export const getSelectedNodeList = (temporalEpoch: string) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch];
 
-export const getOrderedNodeList = (graphName: string) => (state: RootState) =>
-    (state.nodeSelection.nodeListOrder[graphName] ?? [])
-        .map((id) => state.nodeSelection.nodeList[graphName][id])
+export const getOrderedNodeList = (temporalEpoch: string) => (state: RootState) =>
+    (state.nodeSelection.selectedNodeList[temporalEpoch] ?? [])
+        .map((id) => state.nodeSelection.nodeList[temporalEpoch][id])
         .toReversed();
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;

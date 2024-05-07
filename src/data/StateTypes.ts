@@ -27,15 +27,14 @@ export interface PipeSelectionState {
     focusPipe: string | null;
 }
 
-export interface ComputeNodeState extends NodeSelection {
+type TemporalEpoch = string;
+type NodeUID = string;
+
+export interface ComputeNodeState {
+    id: NodeUID;
     opName: string;
     queueNameList: string[];
-    dramChannelId: number | -1;
-}
-
-export interface NodeSelection {
-    id: string;
-    selected: boolean;
+    dramGroup?: string[];
 }
 
 export interface OperandSelectionState {
@@ -45,10 +44,10 @@ export interface OperandSelectionState {
 }
 
 export interface NodeSelectionState {
-    operands: Record<string, OperandSelectionState>;
-    nodeList: Record<string, Record<string, ComputeNodeState>>;
-    nodeListOrder: Record<string, string[]>;
-    dram: Record<string, { data: ComputeNodeState[]; selected: boolean }[]>;
+    operands: Record<NodeUID, OperandSelectionState>;
+    nodeList: Record<TemporalEpoch, Record<NodeUID, ComputeNodeState>>;
+    selectedNodeList: Record<TemporalEpoch, NodeUID[]>;
+    dramNodesHighlight: Record<TemporalEpoch, Record<NodeUID, boolean>>;
     focusNode: string | null;
 }
 

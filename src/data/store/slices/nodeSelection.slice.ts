@@ -3,14 +3,15 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
+import { NodeSelectionState } from 'data/StateTypes';
 import { GraphVertexType } from '../../GraphNames';
+import type { ComputeNode } from '../../GraphOnChip';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
-    nodeListOrder: {},
+    selectedNodeList: {},
+    dramNodesHighlight: {},
     operands: {},
-    dram: {},
     focusNode: null,
 };
 
@@ -18,20 +19,36 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
-        initialLoadAllNodesData(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
+        initialLoadAllNodesData(
+            state,
+            action: PayloadAction<Record<string, ReturnType<ComputeNode['generateInitialState']>[]>>,
+        ) {
             state.nodeList = {};
-            state.nodeListOrder = {};
+            state.selectedNodeList = {};
             state.operands = {};
-            state.dram = {};
+            state.dramNodesHighlight = {};
             state.focusNode = null;
 
-            Object.entries(action.payload).forEach(([graphName, computeNodeStateList]) => {
-                state.dram[graphName] = [];
-                state.nodeList[graphName] = {};
-                state.nodeListOrder[graphName] = [];
+            Object.entries(action.payload).forEach(([temporalEpoch, computeNodeStateList]) => {
+                state.nodeList[temporalEpoch] = {};
+                state.selectedNodeList[temporalEpoch] = [];
+                state.dramNodesHighlight[temporalEpoch] = {};
 
                 computeNodeStateList.forEach((item) => {
-                    state.nodeList[graphName][item.id] = item;
+                    state.nodeList[temporalEpoch][item.id] = {
+                        id: item.id,
+                        opName: item.opName,
+                        queueNameList: item.queueNameList,
+                    };
+
+                    if (item.dramChannelId !== -1) {
+                        const dramGroup = action.payload[temporalEpoch]
+                            .filter(({ dramChannelId }) => dramChannelId === item.dramChannelId)
+                            .map(({ id }) => id);
+
+                        state.nodeList[temporalEpoch][item.id].dramGroup = dramGroup;
+                        state.dramNodesHighlight[temporalEpoch][item.id] = false;
+                    }
 
                     if (item.queueNameList.length > 0) {
                         item.queueNameList.forEach((queueName) => {
@@ -39,17 +56,10 @@ const nodeSelectionSlice = createSlice({
                                 state.operands[queueName] = {
                                     selected: false,
                                     type: GraphVertexType.QUEUE,
-                                    graphName,
+                                    graphName: item.graphName,
                                 };
                             }
                         });
-                    }
-
-                    if (item.dramChannelId !== -1) {
-                        if (!state.dram[graphName][item.dramChannelId]) {
-                            state.dram[graphName][item.dramChannelId] = { data: [], selected: false };
-                        }
-                        state.dram[graphName][item.dramChannelId].data.push(item);
                     }
 
                     if (item.opName !== '') {
@@ -57,7 +67,7 @@ const nodeSelectionSlice = createSlice({
                             state.operands[item.opName] = {
                                 selected: false,
                                 type: GraphVertexType.OPERATION,
-                                graphName,
+                                graphName: item.graphName,
                             };
                         }
                     }
@@ -65,31 +75,28 @@ const nodeSelectionSlice = createSlice({
             });
         },
 
-        updateNodeSelection(state, action: PayloadAction<{ graphName: string; id: string; selected: boolean }>) {
-            const { graphName, id, selected } = action.payload;
-            const node: ComputeNodeState | undefined = state.nodeList[graphName][id];
+        updateNodeSelection(state, action: PayloadAction<{ temporalEpoch: string; id: string; selected: boolean }>) {
+            const { temporalEpoch, id, selected } = action.payload;
+            const node = state.nodeList[temporalEpoch][id];
 
-            if (node) {
-                node.selected = selected;
+            if (!node) {
+                return;
             }
 
-            const nodeIndex = state.nodeListOrder[graphName].indexOf(id);
+            const nodeIndex = state.selectedNodeList[temporalEpoch].indexOf(id);
             if (nodeIndex > -1 && !selected) {
-                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName]].toSpliced(nodeIndex, 1);
+                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch]].toSpliced(
+                    nodeIndex,
+                    1,
+                );
             }
 
             if (nodeIndex === -1 && selected) {
-                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName], id];
+                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch], id];
             }
 
-            state.dram[graphName].forEach((dramGroup) => {
-                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[graphName][n.id].selected);
-
-                if (hasSelectedNode) {
-                    dramGroup.selected = true;
-                } else {
-                    dramGroup.selected = false;
-                }
+            state.nodeList[temporalEpoch][id].dramGroup?.forEach((dramId) => {
+                state.dramNodesHighlight[temporalEpoch][dramId] = selected;
             });
         },
         selectOperandList(state, action: PayloadAction<{ operands: string[]; selected: boolean }>) {

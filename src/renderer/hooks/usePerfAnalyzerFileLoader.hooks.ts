@@ -20,8 +20,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
+import type { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import type { ComputeNodeState, EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
+import type { EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
     initialLoadNormalizedOPs,
@@ -29,10 +30,10 @@ import {
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
 import { initialLoadAllNodesData } from '../../data/store/slices/nodeSelection.slice';
+import { updateRandomRedux } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
 import useLogging from './useLogging.hook';
-import { updateRandomRedux } from '../../data/store/slices/operationPerf.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const dispatch = useDispatch();
@@ -40,9 +41,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } =
-        useContext(GraphOnChipContext);
-    const activeGraphOnChip = getActiveGraphOnChip();
+    const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
     const navigate = useNavigate();
     const location = useLocation();
     const logger = useLogging();
@@ -50,6 +49,7 @@ const usePerfAnalyzerFileLoader = () => {
     useEffect(() => {
         console.log('location.state', location.state?.graphName);
         dispatch(updateRandomRedux(Math.random()));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state]);
 
     const openPerfAnalyzerFolderDialog = async () => {
@@ -96,7 +96,7 @@ const usePerfAnalyzerFileLoader = () => {
             const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
-            const nodesDataPerGraph: Record<string, ComputeNodeState[]> = {};
+            const nodesDataPerGraph: Record<string, ReturnType<ComputeNode['generateInitialState']>[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -115,7 +115,7 @@ const usePerfAnalyzerFileLoader = () => {
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
                 nodesDataPerGraph[graph.name] = [
-                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState()),
+                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState(graph.name)),
                 ];
 
                 times.push({
