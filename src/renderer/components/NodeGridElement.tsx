@@ -28,7 +28,7 @@ import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipe
 interface NodeGridElementProps {
     node: ComputeNode;
     graphName: string;
-    temporalEpoch: string;
+    temporalEpoch: number;
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temporalEpoch }) => {

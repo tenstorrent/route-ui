@@ -5,10 +5,10 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
-export const getDramHighlightState = (temporalEpoch: string, id: string) => (state: RootState) =>
+export const getDramHighlightState = (temporalEpoch: number, id: string) => (state: RootState) =>
     state.nodeSelection.dramNodesHighlight[temporalEpoch]?.[id];
 
-export const selectNodeSelectionById = (temporalEpoch: string, id: string) => (state: RootState) =>
+export const selectNodeSelectionById = (temporalEpoch: number, id: string) => (state: RootState) =>
     state.nodeSelection.nodeList[temporalEpoch]?.[id];
 export const getOperand = (opName: string) => (state: RootState) => state.nodeSelection.operands[opName];
 
@@ -20,10 +20,10 @@ export const getOperandState = createSelector(
 export const getOperandStateList = (operandNames: string[]) => (state: RootState) =>
     operandNames.map((name) => state.nodeSelection.operands[name]);
 
-export const getSelectedNodeList = (temporalEpoch: string) => (state: RootState) =>
+export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
     state.nodeSelection.nodeList[temporalEpoch];
 
-export const getOrderedNodeList = (temporalEpoch: string) => (state: RootState) =>
+export const getOrderedNodeList = (temporalEpoch: number) => (state: RootState) =>
     (state.nodeSelection.selectedNodeList[temporalEpoch] ?? [])
         .map((id) => state.nodeSelection.nodeList[temporalEpoch][id])
         .toReversed();

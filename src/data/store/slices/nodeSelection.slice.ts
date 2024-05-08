@@ -21,7 +21,7 @@ const nodeSelectionSlice = createSlice({
     reducers: {
         initialLoadAllNodesData(
             state,
-            action: PayloadAction<Record<string, ReturnType<ComputeNode['generateInitialState']>[]>>,
+            action: PayloadAction<Record<number, ReturnType<ComputeNode['generateInitialState']>[]>>,
         ) {
             state.nodeList = {};
             state.selectedNodeList = {};
@@ -30,12 +30,15 @@ const nodeSelectionSlice = createSlice({
             state.focusNode = null;
 
             Object.entries(action.payload).forEach(([temporalEpoch, computeNodeStateList]) => {
-                state.nodeList[temporalEpoch] = {};
-                state.selectedNodeList[temporalEpoch] = [];
-                state.dramNodesHighlight[temporalEpoch] = {};
+                // Object.entries always return the key converted to string, we convert epoch back to a number here
+                const epochNumber = Number.parseInt(temporalEpoch, 10);
+
+                state.nodeList[epochNumber] = {};
+                state.selectedNodeList[epochNumber] = [];
+                state.dramNodesHighlight[epochNumber] = {};
 
                 computeNodeStateList.forEach((item) => {
-                    state.nodeList[temporalEpoch][item.id] = {
+                    state.nodeList[epochNumber][item.id] = {
                         id: item.id,
                         opName: item.opName,
                         queueNameList: item.queueNameList,
@@ -44,15 +47,15 @@ const nodeSelectionSlice = createSlice({
                     };
 
                     if (item.dramChannelId !== -1) {
-                        const dramGroup = action.payload[temporalEpoch]
+                        const dramGroup = action.payload[epochNumber]
                             .filter(
                                 ({ dramChannelId, graphName }) =>
                                     dramChannelId === item.dramChannelId && graphName === item.graphName,
                             )
                             .map(({ id }) => id);
 
-                        state.nodeList[temporalEpoch][item.id].dramGroup = dramGroup;
-                        state.dramNodesHighlight[temporalEpoch][item.id] = false;
+                        state.nodeList[epochNumber][item.id].dramGroup = dramGroup;
+                        state.dramNodesHighlight[epochNumber][item.id] = false;
                     }
 
                     if (item.queueNameList.length > 0) {
@@ -80,7 +83,7 @@ const nodeSelectionSlice = createSlice({
             });
         },
 
-        updateNodeSelection(state, action: PayloadAction<{ temporalEpoch: string; id: string; selected: boolean }>) {
+        updateNodeSelection(state, action: PayloadAction<{ temporalEpoch: number; id: string; selected: boolean }>) {
             const { temporalEpoch, id, selected } = action.payload;
             const node = state.nodeList?.[temporalEpoch]?.[id];
 

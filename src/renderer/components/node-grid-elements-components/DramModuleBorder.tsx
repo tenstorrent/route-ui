@@ -10,7 +10,7 @@ import { getDramGroupingStyles } from '../../../utils/DrawingAPI';
 
 interface DramModuleBorderProps {
     node: ComputeNode;
-    temporalEpoch: string;
+    temporalEpoch: number;
 }
 
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */

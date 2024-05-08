@@ -31,7 +31,7 @@ import type { LocationState } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
-    temporalEpoch: string;
+    temporalEpoch: number;
     graphName: string;
 }
 

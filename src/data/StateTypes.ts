@@ -27,7 +27,7 @@ export interface PipeSelectionState {
     focusPipe: string | null;
 }
 
-type TemporalEpoch = string;
+type TemporalEpoch = number;
 type NodeUID = string;
 
 export interface ComputeNodeState {
@@ -100,6 +100,6 @@ export interface ClusterViewState {
 export type FolderLocationType = 'local' | 'remote';
 
 export interface LocationState {
-    epoch: string;
+    epoch: number;
     graphName: string;
 }

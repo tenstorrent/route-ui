@@ -20,7 +20,7 @@ import DetailedViewPipeControls from './DetailedViewPipeControls';
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
     graphName: string;
-    temporalEpoch: string;
+    temporalEpoch: number;
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName, temporalEpoch }) => {
