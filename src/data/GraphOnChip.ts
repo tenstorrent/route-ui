@@ -1032,6 +1032,7 @@ export interface NodeInitialState {
     opName: string;
     dramChannelId: number;
     graphName: string;
+    chipId: number;
 }
 
 export class ComputeNode {
@@ -1185,6 +1186,7 @@ export class ComputeNode {
             opName: this.opName,
             dramChannelId: this.dramChannelId,
             graphName,
+            chipId: this.chipId,
         };
     }
 

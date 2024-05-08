@@ -40,14 +40,14 @@ const nodeSelectionSlice = createSlice({
                         opName: item.opName,
                         queueNameList: item.queueNameList,
                         selected: false,
-                        graphName: item.graphName,
+                        chipId: item.chipId,
                     };
 
                     if (item.dramChannelId !== -1) {
                         const dramGroup = action.payload[epochNumber]
                             .filter(
-                                ({ dramChannelId, graphName }) =>
-                                    dramChannelId === item.dramChannelId && graphName === item.graphName,
+                                ({ dramChannelId, chipId }) =>
+                                    dramChannelId === item.dramChannelId && chipId === item.chipId,
                             )
                             .map(({ id }) => id);
 

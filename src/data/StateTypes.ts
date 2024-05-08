@@ -35,7 +35,7 @@ export interface ComputeNodeState {
     queueNameList: string[];
     dramGroup?: string[];
     selected: boolean;
-    graphName: string;
+    chipId: number;
 }
 
 export interface OperandSelectionState {

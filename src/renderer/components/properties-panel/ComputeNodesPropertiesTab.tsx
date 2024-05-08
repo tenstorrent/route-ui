@@ -353,36 +353,25 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
 const ComputeNodesPropertiesTab = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch, graphName } = location.state;
-    const { graphOnChipList } = useContext(GraphOnChipContext);
+    const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch);
     const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch));
     const selectedNodes = useMemo(() => {
         const selectedNodesList = orderedNodeSelection
             .map((nodeState) => {
-                try {
-                    return {
-                        node: graphOnChipList[nodeState.graphName].getNode(nodeState.id),
-                        graphName: nodeState.graphName,
-                    };
-                } catch (err) {
-                    console.error(err);
-                }
+                const graphOnChip = graphList.find(({ graph: { chipId } }) => chipId === nodeState.chipId);
 
-                return undefined;
+                return graphOnChip?.graphOnChip.getNode(nodeState.id);
             })
-            .filter((node) => node) as { node: ComputeNode; graphName: string }[];
-
-        if (graphName) {
-            return selectedNodesList.filter((node) => node.graphName === graphName);
-        }
+            .filter((node) => node) as ComputeNode[];
 
         return selectedNodesList;
-    }, [graphOnChipList, orderedNodeSelection, graphName]);
+    }, [graphList, orderedNodeSelection]);
 
     return (
         <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map(({ node }) => (
+                    {selectedNodes.map((node) => (
                         <ComputeNodePropertiesCard
                             key={node?.uid}
                             node={node}
