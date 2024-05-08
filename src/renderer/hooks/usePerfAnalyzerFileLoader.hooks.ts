@@ -96,7 +96,7 @@ const usePerfAnalyzerFileLoader = () => {
             const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
-            const nodesDataPerGraph: Record<string, ReturnType<ComputeNode['generateInitialState']>[]> = {};
+            const nodesDataPerTemporalEpoch: Record<number, ReturnType<ComputeNode['generateInitialState']>[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -115,11 +115,11 @@ const usePerfAnalyzerFileLoader = () => {
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
 
-                if (!nodesDataPerGraph[graph.temporalEpoch]) {
-                    nodesDataPerGraph[graph.temporalEpoch] = [];
+                if (!nodesDataPerTemporalEpoch[graph.temporalEpoch]) {
+                    nodesDataPerTemporalEpoch[graph.temporalEpoch] = [];
                 }
 
-                nodesDataPerGraph[graph.temporalEpoch].push(
+                nodesDataPerTemporalEpoch[graph.temporalEpoch].push(
                     ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState(graph.name)),
                 );
 
@@ -139,7 +139,7 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
             dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
-            dispatch(initialLoadAllNodesData(nodesDataPerGraph));
+            dispatch(initialLoadAllNodesData(nodesDataPerTemporalEpoch));
 
             // console.table(times, ['graph', 'time']);
             // console.log('total', performance.now() - entireRunStartTime, 'ms');
