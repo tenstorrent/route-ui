@@ -15,7 +15,7 @@ on:
 
 jobs:
     build:
-        runs-on: macos-13-arm64
+        runs-on: macos-latest
 
         strategy:
             matrix:
