@@ -27,7 +27,6 @@ export interface PipeSelectionState {
     focusPipe: string | null;
 }
 
-type TemporalEpoch = number;
 type NodeUID = string;
 
 export interface ComputeNodeState {
@@ -47,9 +46,9 @@ export interface OperandSelectionState {
 
 export interface NodeSelectionState {
     operands: Record<NodeUID, OperandSelectionState>;
-    nodeList: Record<TemporalEpoch, Record<NodeUID, ComputeNodeState>>;
-    selectedNodeList: Record<TemporalEpoch, NodeUID[]>;
-    dramNodesHighlight: Record<TemporalEpoch, Record<NodeUID, boolean>>;
+    nodeList: Record<NodeUID, ComputeNodeState>[];
+    selectedNodeList: NodeUID[][];
+    dramNodesHighlight: Record<NodeUID, boolean>[];
     focusNode: string | null;
 }
 

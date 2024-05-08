@@ -8,9 +8,9 @@ import { GraphVertexType } from '../../GraphNames';
 import type { NodeInitialState } from '../../GraphOnChip';
 
 const nodesInitialState: NodeSelectionState = {
-    nodeList: {},
-    selectedNodeList: {},
-    dramNodesHighlight: {},
+    nodeList: [],
+    selectedNodeList: [],
+    dramNodesHighlight: [],
     operands: {},
     focusNode: null,
 };
@@ -20,10 +20,10 @@ const nodeSelectionSlice = createSlice({
     initialState: nodesInitialState,
     reducers: {
         initialLoadAllNodesData(state, action: PayloadAction<Record<number, NodeInitialState[]>>) {
-            state.nodeList = {};
-            state.selectedNodeList = {};
+            state.nodeList = [];
+            state.selectedNodeList = [];
             state.operands = {};
-            state.dramNodesHighlight = {};
+            state.dramNodesHighlight = [];
             state.focusNode = null;
 
             Object.entries(action.payload).forEach(([temporalEpoch, computeNodeStateList]) => {
