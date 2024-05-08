@@ -63,32 +63,31 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
-
-            {graphList.map((data) => {
-                return (
-                    <div className='grid-container'>
-                        <div
-                            className='node-container'
-                            style={{
-                                zoom: `${gridZoom}`,
-                                gridTemplateColumns: `repeat(${data.graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
-                            }}
-                        >
-                            {[...data.graphOnChip.nodes].map((node: ComputeNode) => {
-                                // console.log('render node');
-                                return (
-                                    <NodeGridElement
-                                        node={node}
-                                        temporalEpoch={epoch}
-                                        graphName={data.graph.name}
-                                        key={node.uid}
-                                    />
-                                );
-                            })}
+            {!graphName && (graphList.map((data) => {
+                    return (
+                        <div className='grid-container'>
+                            <div
+                                className='node-container'
+                                style={{
+                                    zoom: `${gridZoom}`,
+                                    gridTemplateColumns: `repeat(${data.graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
+                                }}
+                            >
+                                {[...data.graphOnChip.nodes].map((node: ComputeNode) => {
+                                    return (
+                                        <NodeGridElement
+                                            node={node}
+                                            temporalEpoch={epoch}
+                                            graphName={data.graph.name}
+                                            key={node.uid}
+                                        />
+                                    );
+                                })}
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                }
+            ))}
             {graphOnChip === undefined && graphList.length === 0 && (
                 <div className='invalid-data-message'>
                     <Icon icon={IconNames.WARNING_SIGN} size={50} />
