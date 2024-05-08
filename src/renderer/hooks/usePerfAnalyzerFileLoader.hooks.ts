@@ -20,7 +20,7 @@ import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
-import type { ComputeNode } from '../../data/GraphOnChip';
+import type { NodeInitialState } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { EpochAndLinkStates, FolderLocationType, LocationState, PipeSelection } from '../../data/StateTypes';
 import {
@@ -96,7 +96,7 @@ const usePerfAnalyzerFileLoader = () => {
             const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
-            const nodesDataPerTemporalEpoch: Record<number, ReturnType<ComputeNode['generateInitialState']>[]> = {};
+            const nodesDataPerTemporalEpoch: Record<number, NodeInitialState[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {

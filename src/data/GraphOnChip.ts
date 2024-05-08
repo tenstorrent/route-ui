@@ -1026,6 +1026,14 @@ export interface ComputeNodeSiblings {
     bottom?: Loc;
 }
 
+export interface NodeInitialState {
+    id: string;
+    queueNameList: string[];
+    opName: string;
+    dramChannelId: number;
+    graphName: string;
+}
+
 export class ComputeNode {
     /** Creates a ComputeNode from a Node JSON object in a Netlist Analyzer output file.
      *
@@ -1170,7 +1178,7 @@ export class ComputeNode {
         return this.operation?.name || '';
     }
 
-    public generateInitialState(graphName: string) {
+    public generateInitialState(graphName: string): NodeInitialState {
         return {
             id: this.uid,
             queueNameList: this.queueList.map((queue) => queue.name),

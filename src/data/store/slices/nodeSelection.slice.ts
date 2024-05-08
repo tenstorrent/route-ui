@@ -5,7 +5,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { NodeSelectionState } from 'data/StateTypes';
 import { GraphVertexType } from '../../GraphNames';
-import type { ComputeNode } from '../../GraphOnChip';
+import type { NodeInitialState } from '../../GraphOnChip';
 
 const nodesInitialState: NodeSelectionState = {
     nodeList: {},
@@ -19,10 +19,7 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
-        initialLoadAllNodesData(
-            state,
-            action: PayloadAction<Record<number, ReturnType<ComputeNode['generateInitialState']>[]>>,
-        ) {
+        initialLoadAllNodesData(state, action: PayloadAction<Record<number, NodeInitialState[]>>) {
             state.nodeList = {};
             state.selectedNodeList = {};
             state.operands = {};
