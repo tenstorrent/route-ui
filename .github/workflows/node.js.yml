@@ -9,34 +9,33 @@ name: Build Application
 
 on:
     push:
-        branches:
-            - main
-            - dev # temporarily for testing
+        branches: [ "main", "dev" ]
     pull_request:
-        branches:
-            - main
+        branches: [ "main" ]
 
 jobs:
     build:
         runs-on: macos-13-arm64
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
 
-            - name: Set up Node.js
+        strategy:
+            matrix:
+                node-version: [20.x]  
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v3
               with:
-                  node-version: '20'
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'npm'
 
-            - name: Install dependencies
-              run: npm install
+            - run: npm install
+            
+            - run: npm run package
 
-            - name: Run build and package
-              run: npm run package
-
-            - name: Upload Artifacts
-              uses: actions/upload-artifact@v3
+            - uses: actions/upload-artifact@v3
               with:
                   name: packaged-app
-                  path: release/build/*.dmg # Updated path to where your build outputs the .dmg files
+                  path: release/build/*.dmg
 
