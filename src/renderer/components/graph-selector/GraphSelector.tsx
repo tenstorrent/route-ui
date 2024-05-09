@@ -21,10 +21,10 @@ interface GraphSelectorProps {
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
     const location: Location<LocationState> = useLocation();
-    const { chipId = -1, epoch } = location.state;
+    const { chipId = -1, epoch = -1 } = location?.state ?? {};
     const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
     const temporalEpochs = [...getGraphsListByTemporalEpoch().entries()];
-    const selectedGraph = getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph.name;
+    const selectedGraph = getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph.name ?? '';
 
     return (
         <Popover2
