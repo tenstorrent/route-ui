@@ -8,7 +8,7 @@ name: Build Linux Application
 
 on:
     push:
-        branches: [ "main", "dev" ]
+        branches: [ "main"]
     pull_request:
         branches: [ "main" ]
 
@@ -35,6 +35,6 @@ jobs:
 
             - uses: actions/upload-artifact@v3
               with:
-                  name: packaged-app
+                  name: packaged-app-linux
                   path: release/build/*.deb
 

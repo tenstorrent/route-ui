@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 ###
+
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
@@ -36,6 +37,7 @@ jobs:
 
             - uses: actions/upload-artifact@v3
               with:
-                  name: packaged-app
+                  name: packaged-app-macos
                   path: release/build/*.dmg
-
+                  
+            - run: echo run `xattr -d com.apple.quarantine /Applications/Route\ UI.app` after installation to bypass Apple security settings
