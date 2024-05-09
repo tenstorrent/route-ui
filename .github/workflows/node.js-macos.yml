@@ -10,7 +10,7 @@ name: Build MacOS Application
 
 on:
     push:
-        branches: [ "main", "dev" ]
+        branches: [ "main" ]
     pull_request:
         branches: [ "main" ]
 
@@ -20,24 +20,24 @@ jobs:
 
         strategy:
             matrix:
-                node-version: [20.x]
+                node-version: [ 20.x ]
 
         steps:
-            - uses: actions/checkout@v4
+            -   uses: actions/checkout@v4
 
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v3
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: 'npm'
+            -   name: Use Node.js ${{ matrix.node-version }}
+                uses: actions/setup-node@v3
+                with:
+                    node-version: ${{ matrix.node-version }}
+                    cache: 'npm'
 
-            - run: npm install
+            -   run: npm install
 
-            - run: npm run package
+            -   run: npm run package
 
-            - uses: actions/upload-artifact@v3
-              with:
-                  name: packaged-app-macos
-                  path: release/build/*.dmg
-                  
-            - run: echo run `xattr -d com.apple.quarantine /Applications/Route\ UI.app` after installation to bypass Apple security settings
+            -   uses: actions/upload-artifact@v3
+                with:
+                    name: packaged-app-macos
+                    path: release/build/*.dmg
+
+            -   run: echo run `xattr -d com.apple.quarantine /Applications/Route\ UI.app` after installation to bypass Apple security settings
