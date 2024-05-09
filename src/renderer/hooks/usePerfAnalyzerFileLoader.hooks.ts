@@ -34,7 +34,6 @@ import { updateRandomRedux } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
 import useLogging from './useLogging.hook';
-import type { LoadGraphParams, LoadTemporalEpochParams } from '../components/graph-selector/GraphSelector';
 
 const usePerfAnalyzerFileLoader = () => {
     const dispatch = useDispatch();
@@ -42,7 +41,8 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
+    const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState, getGraphRelationshipByGraphName } =
+        useContext(GraphOnChipContext);
     const navigate = useNavigate();
     const location: Location<LocationState> = useLocation();
     const logger = useLogging();
@@ -157,15 +157,22 @@ const usePerfAnalyzerFileLoader = () => {
         dispatch(setIsLoadingFolder(false));
     };
 
-    const loadPerfAnalyzerGraph = ({ epoch, graphName, chipId }: LoadGraphParams) => {
+    const loadPerfAnalyzerGraph = (graphName: string) => {
         if (selectedFolder) {
+            const graphRelationship = getGraphRelationshipByGraphName(graphName);
+
+            if (!graphRelationship) {
+                return;
+            }
+
             dispatch(closeDetailedView());
             setActiveGraph(graphName);
+
             navigate('/render', {
                 state: {
-                    epoch,
+                    epoch: graphRelationship.temporalEpoch,
                     graphName,
-                    chipId,
+                    chipId: graphRelationship.chipId,
                 },
             });
         } else {
@@ -173,7 +180,7 @@ const usePerfAnalyzerFileLoader = () => {
         }
     };
 
-    const loadTemporalEpoch = ({ epoch }: LoadTemporalEpochParams) => {
+    const loadTemporalEpoch = (epoch: number) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
             navigate('/render', {

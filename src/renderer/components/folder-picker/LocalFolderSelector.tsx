@@ -49,8 +49,8 @@ const LocalFolderOptions: FC = () => {
                     text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : undefined}
                 />
                 <GraphSelector
-                    onSelectGraph={(graphParams) => loadPerfAnalyzerGraph(graphParams)}
-                    onSelectTemporalEpoch={(epochParams) => loadTemporalEpoch(epochParams)}
+                    onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
+                    onSelectTemporalEpoch={(temporalEpoch) => loadTemporalEpoch(temporalEpoch)}
                     disabled={selectedFolderLocationType === 'remote'}
                 />
                 {error && (

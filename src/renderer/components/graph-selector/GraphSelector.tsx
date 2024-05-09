@@ -10,21 +10,11 @@ import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 import './GraphSelector.scss';
 
-export interface LoadGraphParams {
-    epoch: number;
-    graphName: string;
-    chipId: number;
-}
-
-export interface LoadTemporalEpochParams {
-    epoch: number;
-}
-
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph: (graphParams: LoadGraphParams) => void;
-    onSelectTemporalEpoch: (epochParams: LoadTemporalEpochParams) => void;
+    onSelectGraph: (graphName: string) => void;
+    onSelectTemporalEpoch: (temporalEpoch: number) => void;
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
@@ -44,11 +34,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                 <MenuItem
                                     icon={IconNames.SERIES_DERIVED}
                                     key={`temporal-epoch-${temporalEpoch}`}
-                                    onClick={() =>
-                                        onSelectTemporalEpoch({
-                                            epoch: temporalEpoch,
-                                        })
-                                    }
+                                    onClick={() => onSelectTemporalEpoch(temporalEpoch)}
                                     text={`Temporal Epoch ${temporalEpoch}`}
                                     className='graph-selector-temporal-epoch'
                                 />
@@ -56,13 +42,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                     <MenuItem
                                         key={`temporal-epoch-${temporalEpoch}-${graphRelationship.name}`}
                                         text={graphRelationship.name}
-                                        onClick={() =>
-                                            onSelectGraph({
-                                                epoch: temporalEpoch,
-                                                chipId: graphRelationship.chipId,
-                                                graphName: graphRelationship.name,
-                                            })
-                                        }
+                                        onClick={() => onSelectGraph(graphRelationship.name)}
                                         className='graph-selector-graph'
                                     />
                                 ))}
