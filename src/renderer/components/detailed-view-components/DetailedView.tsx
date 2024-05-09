@@ -29,7 +29,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const { getActiveGraphOnChip, graphOnChipList } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
     const location: Location<LocationState> = useLocation();
-    const { graphName, epoch: temporalEpoch } = location.state;
+    const { graphName = '', epoch: temporalEpoch } = location.state;
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
 

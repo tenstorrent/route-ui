@@ -23,7 +23,7 @@ export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
     const { error } = usePerfAnalyzerFileLoader();
     const location: Location<LocationState> = useLocation();
-    const { graphName, epoch } = location.state;
+    const { graphName = '', epoch } = location.state;
 
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(graphName);
     const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);

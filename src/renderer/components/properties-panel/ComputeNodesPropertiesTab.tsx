@@ -352,7 +352,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
 
 const ComputeNodesPropertiesTab = () => {
     const location: Location<LocationState> = useLocation();
-    const { epoch: temporalEpoch, graphName } = location.state;
+    const { epoch: temporalEpoch, graphName = '' } = location.state;
     const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch);
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(temporalEpoch));
     const selectedNodes = useMemo(() => {
