@@ -4,11 +4,11 @@
 
 import * as d3 from 'd3';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
+import { type Location, useLocation } from 'react-router-dom';
 import { NOCLink, NetworkLink } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import {
     DramBankLinkName,
     EthernetLinkName,
@@ -27,6 +27,7 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
+import type { LocationState } from '../../../data/StateTypes';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
@@ -35,10 +36,11 @@ type DetailedViewPipeRendererProps = {
 };
 
 const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className, size = 80 }) => {
+    const location: Location<LocationState> = useLocation();
+    const { graphName = '' } = location.state;
     const svgRef = useRef<SVGSVGElement | null>(null);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const selectedPipeIds = useSelector(getSelectedPipesIds);
     const isHighContrast = useSelector(getHighContrastState);
     const linksData = useSelector(getAllLinksForGraph(graphName));
@@ -126,6 +128,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
 };
 DetailedViewPipeRenderer.defaultProps = {
     className: '',
+    size: 80,
 };
 export default DetailedViewPipeRenderer;
 

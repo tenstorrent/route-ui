@@ -6,9 +6,11 @@ import { FC, useContext } from 'react';
 import { Popover2 } from '@blueprintjs/popover2';
 import { Button, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 import './GraphSelector.scss';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface GraphSelectorProps {
     disabled?: boolean;
@@ -18,9 +20,11 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
-    const { getActiveGraphName, getGraphsListByTemporalEpoch } = useContext(GraphOnChipContext);
-    const selectedGraph = getActiveGraphName();
+    const location: Location<LocationState> = useLocation();
+    const { chipId = -1, epoch } = location.state;
+    const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
     const temporalEpochs = [...getGraphsListByTemporalEpoch().entries()];
+    const selectedGraph = getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph.name;
 
     return (
         <Popover2

@@ -32,7 +32,6 @@ interface NodeGridElementProps {
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temporalEpoch }) => {
-    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);

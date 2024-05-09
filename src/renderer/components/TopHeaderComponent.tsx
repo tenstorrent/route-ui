@@ -14,8 +14,9 @@ import {
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnchorButton } from '@blueprintjs/core';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import type { FolderLocationType } from '../../data/StateTypes';
+import type { FolderLocationType, LocationState } from '../../data/StateTypes';
 import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -44,17 +45,17 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 
 const TopHeaderComponent: React.FC = () => {
     const {
-        getActiveGraphName,
         resetGraphOnChipState,
-        getActiveGraphRelationship,
         getActiveGraphOnChip,
         graphOnChipList,
+        // TODO: move those calls to navigation
         selectPreviousGraph,
         selectNextGraph,
         getPreviousGraphName,
         getNextGraphName,
     } = useContext(GraphOnChipContext);
-    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } = usePerfAnalyzerFileLoader();
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =
+        usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
 
     const localFolderPath = useSelector(getFolderPathSelector);
@@ -66,13 +67,12 @@ const TopHeaderComponent: React.FC = () => {
         .getSavedRemoteFolders(remoteConnectionConfig.selectedConnection)
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
-    const selectedGraph = getActiveGraphName();
     const availableGraphs = Object.keys(graphOnChipList);
-    const chipId = getActiveGraphOnChip()?.chipId;
     const architecture = getActiveGraphOnChip()?.architecture;
-    const temporalEpoch = getActiveGraphRelationship()?.temporalEpoch;
+    const location: Location<LocationState> = useLocation();
+    const { chipId, epoch: temporalEpoch } = location.state;
 
-    if (!selectedGraph && availableGraphs.length > 0) {
+    if (!chipId && !temporalEpoch && availableGraphs.length > 0) {
         loadPerfAnalyzerGraph(availableGraphs[0]);
     }
 
@@ -170,26 +170,22 @@ const TopHeaderComponent: React.FC = () => {
             </div>
 
             <div className='text-content'>
-                {selectedGraph && architecture && (
+                {architecture && (
                     <>
                         <span>Architecture:</span>
                         <span className='architecture-label'>{architecture}</span>
                     </>
                 )}
 
-                {selectedGraph && chipId !== undefined && (
+                {chipId !== undefined && (
                     <>
                         <span>Chip:</span>
                         <span>{chipId}</span>
                     </>
                 )}
 
-                {selectedGraph && temporalEpoch !== undefined && (
-                    <>
-                        <span>Epoch:</span>
-                        <span>{temporalEpoch}</span>
-                    </>
-                )}
+                <span>Epoch:</span>
+                <span>{temporalEpoch}</span>
             </div>
         </div>
     );

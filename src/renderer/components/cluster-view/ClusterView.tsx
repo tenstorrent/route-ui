@@ -9,11 +9,12 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import { FC, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { ClusterContext } from '../../../data/ClusterContext';
 import getPipeColor from '../../../data/ColorGenerator';
 import GraphOnChip from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { GraphRelationship } from '../../../data/StateTypes';
+import { GraphRelationship, type LocationState } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
@@ -50,11 +51,13 @@ const renderItem: ItemRenderer<GraphRelationship[]> = (
     );
 };
 const ClusterView: FC = () => {
+    const location: Location<LocationState> = useLocation();
+    const { epoch: temporalEpoch } = location.state;
+
     const { cluster } = useContext(ClusterContext);
-    const { getGraphOnChip, getActiveGraphName, getGraphRelationshipList } = useContext(GraphOnChipContext);
+    const { getGraphOnChip, getGraphRelationshipList } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
     const graphInformation = getGraphRelationshipList();
-    const selectedGraph = getActiveGraphName();
     const availableTemporalEpochs: GraphRelationship[][] = [];
     const [pciPipes, setPciPipes] = useState<string[]>([]);
 
@@ -66,10 +69,9 @@ const ClusterView: FC = () => {
             availableTemporalEpochs[item.temporalEpoch] = [item];
         }
     });
-    const selectedGraphItem = graphInformation.find((graph) => graph.name === selectedGraph);
 
     const [selectedEpoch, setSelectedEpoch] = useState<GraphRelationship[]>(
-        availableTemporalEpochs[selectedGraphItem?.temporalEpoch || 0] || [],
+        availableTemporalEpochs[temporalEpoch] || [],
     );
 
     /** we want explicit control over the size of chips based on cluster size */

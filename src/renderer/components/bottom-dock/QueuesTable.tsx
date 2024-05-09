@@ -18,7 +18,7 @@ import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const { getActiveGraphOnChip, getActiveGraphName, getOperand } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip, getOperand } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const operandState = useSelector(getOperandState);
@@ -76,7 +76,7 @@ function QueuesTable() {
                 stringFilter=''
                 value={selected(operandDescriptor.name)}
                 type={operandDescriptor.type}
-                offchip={operandDescriptor.graphName !== getActiveGraphName()}
+                offchip={operandDescriptor.operand.isOffchip}
                 offchipClickHandler={navigateToGraph(operandDescriptor.name)}
             />
         );

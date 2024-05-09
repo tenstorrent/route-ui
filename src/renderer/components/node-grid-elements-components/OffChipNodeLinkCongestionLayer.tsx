@@ -2,10 +2,10 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { FC, useContext } from 'react';
+import { FC } from 'react';
 import { useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { ComputeNode } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { ComputeNodeType } from '../../../data/Types';
 import {
     getAllLinksForGraph,
@@ -14,6 +14,7 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;
@@ -23,7 +24,8 @@ interface OffChipNodeLinkCongestionLayerProps {
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node }) => {
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const location: Location<LocationState> = useLocation();
+    const { graphName = '' } = location.state;
     const linksData = useSelector(getAllLinksForGraph(graphName));
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);

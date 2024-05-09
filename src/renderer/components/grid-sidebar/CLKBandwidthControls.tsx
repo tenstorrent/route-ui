@@ -13,6 +13,7 @@ import {
 } from 'data/store/slices/linkSaturation.slice';
 import { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
 import Collapsible from '../Collapsible';
@@ -24,12 +25,14 @@ import {
     getPCIBandwidth,
     getTotalOpsForGraph,
 } from '../../../data/store/selectors/linkSaturation.selectors';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
+    const location: Location<LocationState> = useLocation();
+    const { graphName = '' } = location.state;
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);

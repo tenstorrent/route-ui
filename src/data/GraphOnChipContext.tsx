@@ -41,7 +41,6 @@ interface GraphOnChipContextType {
     selectPreviousGraph: () => void;
     selectNextGraph: () => void;
     getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
-    getActiveGraphName: () => string;
     graphOnChipList: Record<string, GraphOnChip>;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getActiveGraphOnChipListForTemporalEpoch: () => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
@@ -70,7 +69,6 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     selectPreviousGraph: () => {},
     selectNextGraph: () => {},
     getGraphOnChip: () => undefined,
-    getActiveGraphName: () => '',
     graphOnChipList: {},
     getOperand: () => undefined,
     getActiveGraphOnChipListForTemporalEpoch: () => [],
@@ -227,11 +225,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }));
     }, []);
 
-    const getActiveGraphName = useCallback(() => {
-        return state.visitedGraphsHistory[state.currentGraphIndex] ?? '';
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.visitedGraphsHistory]);
-
     const getOperand = useCallback(
         (edgeName: string) => {
             return state.operands.get(edgeName);
@@ -248,7 +241,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
-            getActiveGraphName,
             resetGraphOnChipState: reset,
             getPreviousGraphName,
             getNextGraphName,
@@ -268,7 +260,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
-            getActiveGraphName,
             reset,
             getPreviousGraphName,
             getNextGraphName,
