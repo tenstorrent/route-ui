@@ -168,9 +168,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     return graph.temporalEpoch === epoch;
                 },
             );
-            return listOfGraphRel.map((graph) => {
-                return { graph, graphOnChip: state.graphOnChipList[graph.name] };
-            });
+            return listOfGraphRel
+                .map((graph) => {
+                    return { graph, graphOnChip: state.graphOnChipList[graph.name] };
+                })
+                .sort((a, b) => a.graphOnChip.chipId - b.graphOnChip.chipId);
         },
         [state.graphOnChipList, state.graphs],
     );

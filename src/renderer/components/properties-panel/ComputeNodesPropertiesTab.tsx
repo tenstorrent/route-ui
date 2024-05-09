@@ -358,9 +358,9 @@ const ComputeNodesPropertiesTab = () => {
     const selectedNodes = useMemo(() => {
         const selectedNodesList = orderedNodeSelection
             .map((nodeState) => {
-                const graphOnChip = graphList.find(({ graph: { chipId } }) => chipId === nodeState.chipId);
+                const graphOnChip = graphList[nodeState.chipId]?.graphOnChip;
 
-                return graphOnChip?.graphOnChip.getNode(nodeState.id);
+                return graphOnChip?.getNode(nodeState.id);
             })
             .filter((node) => node) as ComputeNode[];
 
