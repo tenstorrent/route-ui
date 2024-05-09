@@ -156,20 +156,40 @@ const usePerfAnalyzerFileLoader = () => {
         dispatch(setIsLoadingFolder(false));
     };
 
-    const loadPerfAnalyzerGraph = (state: LocationState) => {
+    interface LoadGraphParams {
+        epoch: number;
+        graphName: string;
+        chipId: number;
+    }
+
+    const loadPerfAnalyzerGraph = ({ epoch, graphName, chipId }: LoadGraphParams) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
-            setActiveGraph(state.graphName ?? '');
-            navigate('/render', { state });
+            setActiveGraph(graphName);
+            navigate('/render', {
+                state: {
+                    epoch,
+                    graphName,
+                    chipId,
+                },
+            });
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }
     };
 
-    const loadTemporalEpoch = (state: LocationState) => {
+    interface LoadTemporalEpochParams {
+        epoch: number;
+    }
+
+    const loadTemporalEpoch = ({ epoch }: LoadTemporalEpochParams) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
-            navigate('/render', { state });
+            navigate('/render', {
+                state: {
+                    epoch,
+                },
+            });
         } else {
             logging.error('Attempted to load epoch but no folder path was available');
         }
