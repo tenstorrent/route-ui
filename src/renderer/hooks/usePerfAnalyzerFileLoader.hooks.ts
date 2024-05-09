@@ -41,8 +41,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState, getGraphRelationshipByGraphName } =
-        useContext(GraphOnChipContext);
+    const { loadGraphOnChips, resetGraphOnChipState, getGraphRelationshipByGraphName } = useContext(GraphOnChipContext);
     const navigate = useNavigate();
     const location: Location<LocationState> = useLocation();
     const logger = useLogging();
@@ -166,7 +165,6 @@ const usePerfAnalyzerFileLoader = () => {
             }
 
             dispatch(closeDetailedView());
-            setActiveGraph(graphName);
 
             navigate('/render', {
                 state: {
