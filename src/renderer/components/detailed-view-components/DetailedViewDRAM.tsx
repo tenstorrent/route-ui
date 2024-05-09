@@ -20,9 +20,10 @@ import DetailedViewPipeControls from './DetailedViewPipeControls';
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
     graphName: string;
+    temporalEpoch: number;
 }
 
-const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
+const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName, temporalEpoch }) => {
     const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
@@ -70,7 +71,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                 onClick={() => {
                                                     dispatch(
                                                         updateNodeSelection({
-                                                            graphName,
+                                                            temporalEpoch,
                                                             id: currentNode.uid,
                                                             selected: true,
                                                         }),

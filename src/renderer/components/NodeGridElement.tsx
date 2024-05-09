@@ -28,12 +28,13 @@ import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipe
 interface NodeGridElementProps {
     node: ComputeNode;
     graphName: string;
+    temporalEpoch: number;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temporalEpoch }) => {
     // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
-    const nodeState = useSelector(selectNodeSelectionById(graphName, node.uid));
+    const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
@@ -64,7 +65,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) =>
         if (isOpen && selectedState) {
             dispatch(openDetailedView(node.uid));
         } else {
-            dispatch(updateNodeSelection({ graphName, id: node.uid, selected: !nodeState?.selected }));
+            dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: !nodeState?.selected }));
         }
     };
 
@@ -79,7 +80,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName }) =>
         >
             {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />
-            <DramModuleBorder node={node} />
+            <DramModuleBorder node={node} temporalEpoch={temporalEpoch} />
 
             {/* Queues */}
             <QueueHighlightRenderer node={node} />

@@ -11,6 +11,7 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { ComputeNodeType } from '../../../data/Types';
 import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
@@ -19,14 +20,16 @@ import DetailedViewETHRenderer from './DetailedViewETH';
 import DetailedViewPCIERenderer from './DetailedViewPCIE';
 
 import './DetailedView.scss';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface DetailedViewProps {}
 
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip, getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip, graphOnChipList } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
-    const graphName = getActiveGraphName();
+    const location: Location<LocationState> = useLocation();
+    const { graphName = '', epoch: temporalEpoch } = location.state;
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
 
@@ -61,7 +64,11 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                     {node && (
                         <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
                             {node.type === ComputeNodeType.DRAM && (
-                                <DetailedViewDRAMRenderer graphName={graphName} node={node} />
+                                <DetailedViewDRAMRenderer
+                                    graphName={graphName}
+                                    node={node}
+                                    temporalEpoch={temporalEpoch}
+                                />
                             )}
                             {node.type === ComputeNodeType.ETHERNET && (
                                 <DetailedViewETHRenderer graphName={graphName} node={node} />

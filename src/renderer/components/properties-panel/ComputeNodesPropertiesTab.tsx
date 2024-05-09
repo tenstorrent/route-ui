@@ -11,12 +11,13 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { Fragment, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import { getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOrderedSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -26,9 +27,12 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
+    temporalEpoch: number;
+    graphName: string;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -67,7 +71,6 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
 
         slowestOperandText = `${actualText} / ${requiredText}`;
     }
-
 
     const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
@@ -117,11 +120,10 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
-    const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
     const { selected, selectOperand, disabledOperand } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -140,9 +142,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     return (
         <Card className='node-element'>
             <h3 className={classList.join(' ')}>
-                <span
-                    className='hover-wrapper'
-                >
+                <span className='hover-wrapper'>
                     {node.type.toUpperCase()} {formatNodeUID(node.uid)}
                 </span>
                 <Tooltip2 content='Close ComputeNode'>
@@ -150,9 +150,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         small
                         icon={IconNames.CROSS}
                         onClick={() => {
-                            dispatch(
-                                updateNodeSelection({ graphName: activeGraphName, id: node.uid, selected: false }),
-                            );
+                            dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: false }));
                         }}
                     />
                 </Tooltip2>
@@ -344,7 +342,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} graphName={activeGraphName} showEmpty />
+                        <LinkDetails key={link.name} link={link} graphName={graphName} showEmpty />
                     ))}
                 </div>
             )}
@@ -352,25 +350,34 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     );
 };
 
-const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
-    const graphName = getActiveGraphName();
-    const graphOnChip = getActiveGraphOnChip();
-    const orderedNodeSelection = useSelector(getOrderedNodeList(graphName));
-    const selectedNodes: ComputeNode[] = useMemo(() => {
-        if (!graphOnChip) {
-            return [];
-        }
-        return orderedNodeSelection.map((nodeState) => graphOnChip.getNode(nodeState.id));
-    }, [graphOnChip, orderedNodeSelection]);
+const ComputeNodesPropertiesTab = () => {
+    const location: Location<LocationState> = useLocation();
+    const { epoch: temporalEpoch, graphName = '' } = location.state;
+    const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch);
+    const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(temporalEpoch));
+    const selectedNodes = useMemo(() => {
+        const selectedNodesList = orderedNodeSelection
+            .map((nodeState) => {
+                const graphOnChip = graphList[nodeState.chipId]?.graphOnChip;
+
+                return graphOnChip?.getNode(nodeState.id);
+            })
+            .filter((node) => node) as ComputeNode[];
+
+        return selectedNodesList;
+    }, [graphList, orderedNodeSelection]);
 
     return (
-        // TODO: give this a greyed out look when data is not available
-        <div className={`properties-container ${graphOnChip ? '' : 'empty'}`}>
+        <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map((node: ComputeNode) => (
-                        <ComputeNodePropertiesCard key={node?.uid} node={node} />
+                    {selectedNodes.map((node) => (
+                        <ComputeNodePropertiesCard
+                            key={node?.uid}
+                            node={node}
+                            temporalEpoch={temporalEpoch}
+                            graphName={graphName}
+                        />
                     ))}
                 </div>
             </div>

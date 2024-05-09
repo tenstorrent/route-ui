@@ -140,7 +140,7 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector
-                    onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
+                    onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
                 <Tooltip2

@@ -14,6 +14,7 @@ interface OperandDescriptor {
     temporalEpoch: number;
     type: GraphVertexType;
     operand: Operand;
+    chipId: number;
 }
 
 interface ApplicationModelState {
@@ -30,6 +31,7 @@ interface GraphOnChipContextType {
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
     resetGraphOnChipState: () => void;
     getGraphRelationshipList: () => GraphRelationship[];
+    getGraphRelationshipByGraphName: (graphName: string) => GraphRelationship | undefined;
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
     getActiveGraphRelationship: () => GraphRelationship | undefined;
     getActiveGraphOnChip: () => GraphOnChip | undefined;
@@ -58,6 +60,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     loadGraphOnChips: () => {},
     resetGraphOnChipState: () => {},
     getGraphRelationshipList: () => [],
+    getGraphRelationshipByGraphName: () => undefined,
     getGraphsListByTemporalEpoch: () => new Map(),
     getActiveGraphRelationship: () => undefined,
     getActiveGraphOnChip: () => undefined,
@@ -90,6 +93,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                             temporalEpoch,
                             type: GraphVertexType.OPERATION,
                             operand: operation as Operand,
+                            chipId: graphOnChip.chipId,
                         })),
                     ...[...graphOnChip.queues].map((queue) => ({
                         name: queue.name,
@@ -97,6 +101,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         temporalEpoch,
                         type: GraphVertexType.QUEUE,
                         operand: queue as Operand,
+                        chipId: graphOnChip.chipId,
                     })),
                 ];
             })
@@ -124,6 +129,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const getGraphRelationshipList = useCallback(() => {
         return [...state.graphs.values()];
     }, [state]);
+
+    const getGraphRelationshipByGraphName = useCallback(
+        (graphName: string) => state.graphs.get(graphName),
+        [state.graphs],
+    );
 
     const getGraphsListByTemporalEpoch = useCallback(() => {
         return [...state.graphs.values()].reduce<Map<number, GraphRelationship[]>>(
@@ -160,14 +170,16 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number) => {
-            const listOfGraphRel: GraphRelationship[] = [...state.graphs.values()].filter(
-                (graph: GraphRelationship) => {
-                    return graph.temporalEpoch === epoch;
-                },
-            );
-            return listOfGraphRel.map((graph) => {
-                return { graph, graphOnChip: state.graphOnChipList[graph.name] };
+            const graphArray: { graph: GraphRelationship; graphOnChip: GraphOnChip }[] = [];
+
+            state.graphs.forEach((graph) => {
+                if (graph.temporalEpoch === epoch) {
+                    const { chipId } = state.graphOnChipList[graph.name];
+                    graphArray[chipId] = { graph, graphOnChip: state.graphOnChipList[graph.name] };
+                }
             });
+
+            return graphArray;
         },
         [state.graphOnChipList, state.graphs],
     );
@@ -233,6 +245,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getActiveGraphOnChip,
             getActiveGraphRelationship,
             getGraphRelationshipList,
+            getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
             getActiveGraphName,
@@ -252,6 +265,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getActiveGraphOnChip,
             getActiveGraphRelationship,
             getGraphRelationshipList,
+            getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
             getActiveGraphName,

@@ -5,13 +5,11 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
-export const getDramGroup = (graphName: string, dramChannelId?: number) => (state: RootState) =>
-    dramChannelId !== undefined && dramChannelId > -1
-        ? state.nodeSelection.dram[graphName]?.[dramChannelId]
-        : undefined;
+export const getDramHighlightState = (temporalEpoch: number, id: string) => (state: RootState) =>
+    state.nodeSelection.dramNodesHighlight[temporalEpoch]?.[id];
 
-export const selectNodeSelectionById = (graphName: string, id: string) => (state: RootState) =>
-    state.nodeSelection.nodeList[graphName]?.[id];
+export const selectNodeSelectionById = (temporalEpoch: number, id: string) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch]?.[id];
 export const getOperand = (opName: string) => (state: RootState) => state.nodeSelection.operands[opName];
 
 export const getOperandState = createSelector(
@@ -19,17 +17,17 @@ export const getOperandState = createSelector(
     (nodeSelection) => nodeSelection.operands,
 );
 
-export const getOperandStateList = (operandNames: string[]) => (state: RootState) =>
-    operandNames.map((name) => state.nodeSelection.operands[name]);
+export const getOperandStateList = createSelector(
+    (state: RootState) => state.nodeSelection,
+    (nodeSelection) => (operandNames: string[]) => operandNames.map((name) => nodeSelection.operands[name]),
+);
 
-export const getOperandStatesRecord = (operandNames: string[]) => (state: RootState) =>
-    operandNames.reduce((acc, name) => ({ ...acc, [name]: state.nodeSelection.operands[name] }), {});
+export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch];
 
-export const getSelectedNodeList = (graphName: string) => (state: RootState) => state.nodeSelection.nodeList[graphName];
-
-export const getOrderedNodeList = (graphName: string) => (state: RootState) =>
-    (state.nodeSelection.nodeListOrder[graphName] ?? [])
-        .map((id) => state.nodeSelection.nodeList[graphName][id])
+export const getOrderedSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
+    (state.nodeSelection.selectedNodeList[temporalEpoch] ?? [])
+        .map((id) => state.nodeSelection.nodeList[temporalEpoch][id])
         .toReversed();
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;

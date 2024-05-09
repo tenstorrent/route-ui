@@ -3,14 +3,15 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ComputeNodeState, NodeSelectionState } from 'data/StateTypes';
+import { NodeSelectionState } from 'data/StateTypes';
 import { GraphVertexType } from '../../GraphNames';
+import type { NodeInitialState } from '../../GraphOnChip';
 
 const nodesInitialState: NodeSelectionState = {
-    nodeList: {},
-    nodeListOrder: {},
+    nodeList: [],
+    selectedNodeList: [],
+    dramNodesHighlight: [],
     operands: {},
-    dram: {},
     focusNode: null,
 };
 
@@ -18,20 +19,41 @@ const nodeSelectionSlice = createSlice({
     name: 'nodeSelection',
     initialState: nodesInitialState,
     reducers: {
-        initialLoadAllNodesData(state, action: PayloadAction<Record<string, ComputeNodeState[]>>) {
-            state.nodeList = {};
-            state.nodeListOrder = {};
+        initialLoadAllNodesData(state, action: PayloadAction<Record<number, NodeInitialState[]>>) {
+            state.nodeList = [];
+            state.selectedNodeList = [];
             state.operands = {};
-            state.dram = {};
+            state.dramNodesHighlight = [];
             state.focusNode = null;
 
-            Object.entries(action.payload).forEach(([graphName, computeNodeStateList]) => {
-                state.dram[graphName] = [];
-                state.nodeList[graphName] = {};
-                state.nodeListOrder[graphName] = [];
+            Object.entries(action.payload).forEach(([temporalEpoch, computeNodeStateList]) => {
+                // Object.entries always return the key converted to string, we convert epoch back to a number here
+                const epochNumber = Number.parseInt(temporalEpoch, 10);
+
+                state.nodeList[epochNumber] = {};
+                state.selectedNodeList[epochNumber] = [];
+                state.dramNodesHighlight[epochNumber] = {};
 
                 computeNodeStateList.forEach((item) => {
-                    state.nodeList[graphName][item.id] = item;
+                    state.nodeList[epochNumber][item.uid] = {
+                        id: item.uid,
+                        opName: item.opName,
+                        queueNameList: item.queueNameList,
+                        selected: false,
+                        chipId: item.chipId,
+                    };
+
+                    if (item.dramChannelId !== -1) {
+                        const dramGroup = action.payload[epochNumber]
+                            .filter(
+                                ({ dramChannelId, chipId }) =>
+                                    dramChannelId === item.dramChannelId && chipId === item.chipId,
+                            )
+                            .map(({ uid }) => uid);
+
+                        state.nodeList[epochNumber][item.uid].dramGroup = dramGroup;
+                        state.dramNodesHighlight[epochNumber][item.uid] = false;
+                    }
 
                     if (item.queueNameList.length > 0) {
                         item.queueNameList.forEach((queueName) => {
@@ -39,17 +61,9 @@ const nodeSelectionSlice = createSlice({
                                 state.operands[queueName] = {
                                     selected: false,
                                     type: GraphVertexType.QUEUE,
-                                    graphName,
                                 };
                             }
                         });
-                    }
-
-                    if (item.dramChannelId !== -1) {
-                        if (!state.dram[graphName][item.dramChannelId]) {
-                            state.dram[graphName][item.dramChannelId] = { data: [], selected: false };
-                        }
-                        state.dram[graphName][item.dramChannelId].data.push(item);
                     }
 
                     if (item.opName !== '') {
@@ -57,7 +71,6 @@ const nodeSelectionSlice = createSlice({
                             state.operands[item.opName] = {
                                 selected: false,
                                 type: GraphVertexType.OPERATION,
-                                graphName,
                             };
                         }
                     }
@@ -65,31 +78,35 @@ const nodeSelectionSlice = createSlice({
             });
         },
 
-        updateNodeSelection(state, action: PayloadAction<{ graphName: string; id: string; selected: boolean }>) {
-            const { graphName, id, selected } = action.payload;
-            const node: ComputeNodeState | undefined = state.nodeList[graphName][id];
+        updateNodeSelection(state, action: PayloadAction<{ temporalEpoch: number; id: string; selected: boolean }>) {
+            const { temporalEpoch, id, selected } = action.payload;
+            const node = state.nodeList?.[temporalEpoch]?.[id];
 
-            if (node) {
-                node.selected = selected;
+            if (!node) {
+                return;
             }
 
-            const nodeIndex = state.nodeListOrder[graphName].indexOf(id);
+            node.selected = selected;
+
+            const nodeIndex = state.selectedNodeList[temporalEpoch].indexOf(id);
             if (nodeIndex > -1 && !selected) {
-                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName]].toSpliced(nodeIndex, 1);
+                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch]].toSpliced(
+                    nodeIndex,
+                    1,
+                );
             }
 
             if (nodeIndex === -1 && selected) {
-                state.nodeListOrder[graphName] = [...state.nodeListOrder[graphName], id];
+                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch], id];
             }
 
-            state.dram[graphName].forEach((dramGroup) => {
-                const hasSelectedNode = dramGroup.data.some((n) => state.nodeList[graphName][n.id].selected);
+            const shouldKeepHighlighted =
+                state.nodeList[temporalEpoch][id].dramGroup?.some(
+                    (dramId) => state.nodeList[temporalEpoch][dramId].selected,
+                ) ?? false;
 
-                if (hasSelectedNode) {
-                    dramGroup.selected = true;
-                } else {
-                    dramGroup.selected = false;
-                }
+            state.nodeList[temporalEpoch][id].dramGroup?.forEach((dramId) => {
+                state.dramNodesHighlight[temporalEpoch][dramId] = shouldKeepHighlighted || selected;
             });
         },
         selectOperandList(state, action: PayloadAction<{ operands: string[]; selected: boolean }>) {
@@ -101,52 +118,12 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        selectAllOperationsForGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.OPERATION;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = true;
-                }
-            });
-        },
-        clearAllOperationsForGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.OPERATION;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = false;
-                }
-            });
-        },
         selectOperand(state, action: PayloadAction<{ operandName: string; selected: boolean }>) {
             const { operandName, selected } = action.payload;
 
             if (state.operands[operandName]) {
                 state.operands[operandName].selected = selected;
             }
-        },
-        selectAllQueuesForGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.QUEUE;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = true;
-                }
-            });
-        },
-        clearAllQueuesforGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.QUEUE;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = false;
-                }
-            });
         },
         updateFocusNode(state, action: PayloadAction<string | null>) {
             state.focusNode = action.payload;
@@ -159,11 +136,7 @@ export const {
     initialLoadAllNodesData,
     updateNodeSelection,
     selectOperandList,
-    selectAllOperationsForGraph,
-    clearAllOperationsForGraph,
     selectOperand,
-    selectAllQueuesForGraph,
-    clearAllQueuesforGraph,
     updateFocusNode,
 } = nodeSelectionSlice.actions;
 

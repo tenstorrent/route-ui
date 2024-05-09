@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 import { Icon } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { useLocation } from 'react-router-dom';
+import { type Location, useLocation } from 'react-router-dom';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
@@ -17,12 +17,13 @@ import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks'
 import NodeGridElement from './NodeGridElement';
 import ClusterViewDialog from './cluster-view/ClusterViewDialog';
 import DetailedView from './detailed-view-components/DetailedView';
+import type { LocationState } from '../../data/StateTypes';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
     const { error } = usePerfAnalyzerFileLoader();
-    const location = useLocation();
-    const { graphName, epoch } = location.state;
+    const location: Location<LocationState> = useLocation();
+    const { graphName = '', epoch } = location.state;
 
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(graphName);
     const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
@@ -49,31 +50,44 @@ export default function GridRender() {
                     >
                         {[
                             ...mapIterable(graphOnChip.nodes, (node: ComputeNode) => {
-                                return <NodeGridElement graphName={graphName} node={node} key={node.uid} />;
+                                return (
+                                    <NodeGridElement
+                                        graphName={graphName}
+                                        temporalEpoch={epoch}
+                                        node={node}
+                                        key={node.uid}
+                                    />
+                                );
                             }),
                         ]}
                     </div>
                 </div>
             )}
-
-            {graphList.map((data) => {
-                return (
-                    <div className='grid-container'>
-                        <div
-                            className='node-container'
-                            style={{
-                                zoom: `${gridZoom}`,
-                                gridTemplateColumns: `repeat(${data.graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
-                            }}
-                        >
-                            {[...data.graphOnChip.nodes].map((node: ComputeNode) => {
-                                // console.log('render node');
-                                return <NodeGridElement node={node} graphName={data.graph.name} key={node.uid} />;
-                            })}
+            {!graphName && (graphList.map((data) => {
+                    return (
+                        <div className='grid-container'>
+                            <div
+                                className='node-container'
+                                style={{
+                                    zoom: `${gridZoom}`,
+                                    gridTemplateColumns: `repeat(${data.graphOnChip.totalCols + 1}, ${NODE_SIZE}px)`,
+                                }}
+                            >
+                                {[...data.graphOnChip.nodes].map((node: ComputeNode) => {
+                                    return (
+                                        <NodeGridElement
+                                            node={node}
+                                            temporalEpoch={epoch}
+                                            graphName={data.graph.name}
+                                            key={node.uid}
+                                        />
+                                    );
+                                })}
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                }
+            ))}
             {graphOnChip === undefined && graphList.length === 0 && (
                 <div className='invalid-data-message'>
                     <Icon icon={IconNames.WARNING_SIGN} size={50} />

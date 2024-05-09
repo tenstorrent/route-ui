@@ -16,12 +16,13 @@ import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFold
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
 import { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
+import type { NodeInitialState } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import type { ComputeNodeState, EpochAndLinkStates, FolderLocationType, PipeSelection } from '../../data/StateTypes';
+import type { EpochAndLinkStates, FolderLocationType, LocationState, PipeSelection } from '../../data/StateTypes';
 import {
     initialLoadLinkData,
     initialLoadNormalizedOPs,
@@ -29,10 +30,10 @@ import {
     resetNetworksState,
 } from '../../data/store/slices/linkSaturation.slice';
 import { initialLoadAllNodesData } from '../../data/store/slices/nodeSelection.slice';
+import { updateRandomRedux } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
 import useLogging from './useLogging.hook';
-import { updateRandomRedux } from '../../data/store/slices/operationPerf.slice';
 
 const usePerfAnalyzerFileLoader = () => {
     const dispatch = useDispatch();
@@ -40,16 +41,16 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { getActiveGraphOnChip, setActiveGraph, loadGraphOnChips, resetGraphOnChipState } =
+    const { setActiveGraph, loadGraphOnChips, resetGraphOnChipState, getGraphRelationshipByGraphName } =
         useContext(GraphOnChipContext);
-    const activeGraphOnChip = getActiveGraphOnChip();
     const navigate = useNavigate();
-    const location = useLocation();
+    const location: Location<LocationState> = useLocation();
     const logger = useLogging();
 
     useEffect(() => {
-        console.log('location.state', location.state?.graphName);
+        console.log('location.state', location.state);
         dispatch(updateRandomRedux(Math.random()));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state]);
 
     const openPerfAnalyzerFolderDialog = async () => {
@@ -96,7 +97,7 @@ const usePerfAnalyzerFileLoader = () => {
             const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
             const pipeSelectionData: PipeSelection[] = [];
             const totalOpsData: Record<string, number> = {};
-            const nodesDataPerGraph: Record<string, ComputeNodeState[]> = {};
+            const nodesDataPerTemporalEpoch: Record<number, NodeInitialState[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
             for (const graph of sortedGraphs) {
@@ -114,9 +115,14 @@ const usePerfAnalyzerFileLoader = () => {
                 };
                 totalOpsData[graph.name] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
-                nodesDataPerGraph[graph.name] = [
+
+                if (!nodesDataPerTemporalEpoch[graph.temporalEpoch]) {
+                    nodesDataPerTemporalEpoch[graph.temporalEpoch] = [];
+                }
+
+                nodesDataPerTemporalEpoch[graph.temporalEpoch].push(
                     ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState()),
-                ];
+                );
 
                 times.push({
                     graph: `${graph.name}`,
@@ -134,7 +140,7 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
             dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
-            dispatch(initialLoadAllNodesData(nodesDataPerGraph));
+            dispatch(initialLoadAllNodesData(nodesDataPerTemporalEpoch));
 
             // console.table(times, ['graph', 'time']);
             // console.log('total', performance.now() - entireRunStartTime, 'ms');
@@ -153,9 +159,22 @@ const usePerfAnalyzerFileLoader = () => {
 
     const loadPerfAnalyzerGraph = (graphName: string) => {
         if (selectedFolder) {
+            const graphRelationship = getGraphRelationshipByGraphName(graphName);
+
+            if (!graphRelationship) {
+                return;
+            }
+
             dispatch(closeDetailedView());
             setActiveGraph(graphName);
-            navigate('/render', { state: { graphName } });
+
+            navigate('/render', {
+                state: {
+                    epoch: graphRelationship.temporalEpoch,
+                    graphName,
+                    chipId: graphRelationship.chipId,
+                },
+            });
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }
@@ -164,8 +183,11 @@ const usePerfAnalyzerFileLoader = () => {
     const loadTemporalEpoch = (epoch: number) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
-            // setActiveGraph(graphName);
-            navigate('/render', { state: { epoch } });
+            navigate('/render', {
+                state: {
+                    epoch,
+                },
+            });
         } else {
             logging.error('Attempted to load epoch but no folder path was available');
         }

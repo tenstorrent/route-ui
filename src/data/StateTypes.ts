@@ -27,28 +27,27 @@ export interface PipeSelectionState {
     focusPipe: string | null;
 }
 
-export interface ComputeNodeState extends NodeSelection {
+type NodeUID = string;
+
+export interface ComputeNodeState {
+    id: NodeUID;
     opName: string;
     queueNameList: string[];
-    dramChannelId: number | -1;
-}
-
-export interface NodeSelection {
-    id: string;
+    dramGroup?: string[];
     selected: boolean;
+    chipId: number;
 }
 
 export interface OperandSelectionState {
     selected: boolean;
     type: GraphVertexType;
-    graphName: string;
 }
 
 export interface NodeSelectionState {
-    operands: Record<string, OperandSelectionState>;
-    nodeList: Record<string, Record<string, ComputeNodeState>>;
-    nodeListOrder: Record<string, string[]>;
-    dram: Record<string, { data: ComputeNodeState[]; selected: boolean }[]>;
+    operands: Record<NodeUID, OperandSelectionState>;
+    nodeList: Record<NodeUID, ComputeNodeState>[];
+    selectedNodeList: NodeUID[][];
+    dramNodesHighlight: Record<NodeUID, boolean>[];
     focusNode: string | null;
 }
 
@@ -97,3 +96,10 @@ export interface ClusterViewState {
 }
 
 export type FolderLocationType = 'local' | 'remote';
+
+export interface LocationState {
+    epoch: number;
+    /** @deprecated */
+    graphName?: string;
+    chipId?: number;
+}

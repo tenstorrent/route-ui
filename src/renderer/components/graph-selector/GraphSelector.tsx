@@ -13,7 +13,7 @@ import './GraphSelector.scss';
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph: (graph: string) => void;
+    onSelectGraph: (graphName: string) => void;
     onSelectTemporalEpoch: (temporalEpoch: number) => void;
 }
 

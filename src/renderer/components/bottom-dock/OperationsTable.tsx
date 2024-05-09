@@ -16,6 +16,7 @@ import {
     useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import useOperationsTable, { OpTableFields } from './useOperationsTable.hooks';
 
 import { GraphVertexType } from '../../../data/GraphNames';
@@ -30,13 +31,15 @@ import { numberFormatter, valueRatio } from '../../utils/numbers';
 import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
+import type { LocationState } from '../../../data/StateTypes';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
+    const location: Location<LocationState> = useLocation();
+    const { epoch: temporalEpoch } = location.state;
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
-    const graphName = getActiveGraphName();
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');
@@ -77,7 +80,7 @@ function OperationsTable() {
 
         return sortTableFields(list);
     }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
-    const nodesSelectionState = useSelector(getSelectedNodeList(graphName));
+    const nodesSelectionState = useSelector(getSelectedNodeList(temporalEpoch));
     const allOperandsState = useSelector(getOperandState);
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
@@ -134,7 +137,11 @@ function OperationsTable() {
                     checked={nodesSelectionState[cellContent]?.selected}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         dispatch(
-                            updateNodeSelection({ graphName, id: cellContent.toString(), selected: e.target.checked }),
+                            updateNodeSelection({
+                                temporalEpoch,
+                                id: cellContent,
+                                selected: e.target.checked,
+                            }),
                         );
                     }}
                 />

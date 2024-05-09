@@ -28,7 +28,7 @@ import {
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
-import { LinkState, PipeSelection, type ComputeNodeState } from './StateTypes';
+import { LinkState, PipeSelection } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -1026,6 +1026,14 @@ export interface ComputeNodeSiblings {
     bottom?: Loc;
 }
 
+export interface NodeInitialState {
+    uid: string;
+    queueNameList: string[];
+    opName: string;
+    dramChannelId: number;
+    chipId: number;
+}
+
 export class ComputeNode {
     /** Creates a ComputeNode from a Node JSON object in a Netlist Analyzer output file.
      *
@@ -1170,13 +1178,13 @@ export class ComputeNode {
         return this.operation?.name || '';
     }
 
-    public generateInitialState(): ComputeNodeState {
+    public generateInitialState(): NodeInitialState {
         return {
-            id: this.uid,
-            selected: false,
+            uid: this.uid,
             queueNameList: this.queueList.map((queue) => queue.name),
             opName: this.opName,
             dramChannelId: this.dramChannelId,
+            chipId: this.chipId,
         };
     }
 
