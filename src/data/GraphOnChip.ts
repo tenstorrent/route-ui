@@ -1027,7 +1027,7 @@ export interface ComputeNodeSiblings {
 }
 
 export interface NodeInitialState {
-    id: string;
+    uid: string;
     queueNameList: string[];
     opName: string;
     dramChannelId: number;
@@ -1180,7 +1180,7 @@ export class ComputeNode {
 
     public generateInitialState(): NodeInitialState {
         return {
-            id: this.uid,
+            uid: this.uid,
             queueNameList: this.queueList.map((queue) => queue.name),
             opName: this.opName,
             dramChannelId: this.dramChannelId,

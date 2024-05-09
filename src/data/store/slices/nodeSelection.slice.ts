@@ -35,8 +35,8 @@ const nodeSelectionSlice = createSlice({
                 state.dramNodesHighlight[epochNumber] = {};
 
                 computeNodeStateList.forEach((item) => {
-                    state.nodeList[epochNumber][item.id] = {
-                        id: item.id,
+                    state.nodeList[epochNumber][item.uid] = {
+                        id: item.uid,
                         opName: item.opName,
                         queueNameList: item.queueNameList,
                         selected: false,
@@ -49,10 +49,10 @@ const nodeSelectionSlice = createSlice({
                                 ({ dramChannelId, chipId }) =>
                                     dramChannelId === item.dramChannelId && chipId === item.chipId,
                             )
-                            .map(({ id }) => id);
+                            .map(({ uid }) => uid);
 
-                        state.nodeList[epochNumber][item.id].dramGroup = dramGroup;
-                        state.dramNodesHighlight[epochNumber][item.id] = false;
+                        state.nodeList[epochNumber][item.uid].dramGroup = dramGroup;
+                        state.dramNodesHighlight[epochNumber][item.uid] = false;
                     }
 
                     if (item.queueNameList.length > 0) {
