@@ -76,7 +76,7 @@ const TopHeaderComponent: React.FC = () => {
         loadPerfAnalyzerGraph({
             epoch: temporalEpoch ?? 0,
             graphName: availableGraphs[0],
-            chipId,
+            chipId: chipId ?? 0,
         });
     }
 
@@ -144,8 +144,8 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector
-                    onSelectGraph={(state) => loadPerfAnalyzerGraph(state)}
-                    onSelectTemporalEpoch={(state) => loadTemporalEpoch(state)}
+                    onSelectGraph={(graphParams) => loadPerfAnalyzerGraph(graphParams)}
+                    onSelectTemporalEpoch={(epochParams) => loadTemporalEpoch(epochParams)}
                 />
                 <Tooltip2
                     disabled={!getPreviousGraphName()}

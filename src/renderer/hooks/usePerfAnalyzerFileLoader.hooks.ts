@@ -34,6 +34,7 @@ import { updateRandomRedux } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../../utils/IterableHelpers';
 import useLogging from './useLogging.hook';
+import type { LoadGraphParams, LoadTemporalEpochParams } from '../components/graph-selector/GraphSelector';
 
 const usePerfAnalyzerFileLoader = () => {
     const dispatch = useDispatch();
@@ -156,12 +157,6 @@ const usePerfAnalyzerFileLoader = () => {
         dispatch(setIsLoadingFolder(false));
     };
 
-    interface LoadGraphParams {
-        epoch: number;
-        graphName: string;
-        chipId: number;
-    }
-
     const loadPerfAnalyzerGraph = ({ epoch, graphName, chipId }: LoadGraphParams) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
@@ -177,10 +172,6 @@ const usePerfAnalyzerFileLoader = () => {
             logging.error('Attempted to load graph but no folder path was available');
         }
     };
-
-    interface LoadTemporalEpochParams {
-        epoch: number;
-    }
 
     const loadTemporalEpoch = ({ epoch }: LoadTemporalEpochParams) => {
         if (selectedFolder) {

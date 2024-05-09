@@ -9,13 +9,22 @@ import { IconNames } from '@blueprintjs/icons';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 import './GraphSelector.scss';
-import type { LocationState } from '../../../data/StateTypes';
+
+export interface LoadGraphParams {
+    epoch: number;
+    graphName: string;
+    chipId: number;
+}
+
+export interface LoadTemporalEpochParams {
+    epoch: number;
+}
 
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph: (state: LocationState) => void;
-    onSelectTemporalEpoch: (state: LocationState) => void;
+    onSelectGraph: (graphParams: LoadGraphParams) => void;
+    onSelectTemporalEpoch: (epochParams: LoadTemporalEpochParams) => void;
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
