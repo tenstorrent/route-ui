@@ -33,7 +33,6 @@ interface GraphOnChipContextType {
     getGraphRelationshipList: () => GraphRelationship[];
     getGraphRelationshipByGraphName: (graphName: string) => GraphRelationship | undefined;
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
-    getActiveGraphRelationship: () => GraphRelationship | undefined;
     getActiveGraphOnChip: () => GraphOnChip | undefined;
     getPreviousGraphName: () => string | undefined;
     getNextGraphName: () => string | undefined;
@@ -42,7 +41,6 @@ interface GraphOnChipContextType {
     getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
     graphOnChipList: Record<string, GraphOnChip>;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
-    getActiveGraphOnChipListForTemporalEpoch: () => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
     getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
 }
 
@@ -60,7 +58,6 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphRelationshipList: () => [],
     getGraphRelationshipByGraphName: () => undefined,
     getGraphsListByTemporalEpoch: () => new Map(),
-    getActiveGraphRelationship: () => undefined,
     getActiveGraphOnChip: () => undefined,
     getPreviousGraphName: () => undefined,
     getNextGraphName: () => undefined,
@@ -69,7 +66,6 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphOnChip: () => undefined,
     graphOnChipList: {},
     getOperand: () => undefined,
-    getActiveGraphOnChipListForTemporalEpoch: () => [],
     getGraphOnChipListForTemporalEpoch: () => [],
 });
 
@@ -146,23 +142,9 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
     }, [state.graphs]);
 
-    const getActiveGraphRelationship = useCallback(() => {
-        return state.graphs.get(state.visitedGraphsHistory[state.currentGraphIndex] ?? '');
-    }, [state]);
-
     const getActiveGraphOnChip = useCallback(() => {
         return state.graphOnChipList[state.visitedGraphsHistory[state.currentGraphIndex] ?? ''];
     }, [state]);
-
-    const getActiveGraphOnChipListForTemporalEpoch = useCallback(() => {
-        const epoch = getActiveGraphRelationship()?.temporalEpoch;
-        const listOfGraphRel: GraphRelationship[] = [...state.graphs.values()].filter((graph: GraphRelationship) => {
-            return graph.temporalEpoch === epoch;
-        });
-        return listOfGraphRel.map((graph) => {
-            return { graph, graphOnChip: state.graphOnChipList[graph.name] };
-        });
-    }, [getActiveGraphRelationship, state.graphOnChipList, state.graphs]);
 
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number) => {
@@ -215,7 +197,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         () => ({
             loadGraphOnChips,
             getActiveGraphOnChip,
-            getActiveGraphRelationship,
             getGraphRelationshipList,
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
@@ -227,13 +208,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             selectNextGraph,
             graphOnChipList: state.graphOnChipList,
             getOperand,
-            getActiveGraphOnChipListForTemporalEpoch,
             getGraphOnChipListForTemporalEpoch,
         }),
         [
             loadGraphOnChips,
             getActiveGraphOnChip,
-            getActiveGraphRelationship,
             getGraphRelationshipList,
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
@@ -245,7 +224,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             selectNextGraph,
             state.graphOnChipList,
             getOperand,
-            getActiveGraphOnChipListForTemporalEpoch,
             getGraphOnChipListForTemporalEpoch,
         ],
     );
