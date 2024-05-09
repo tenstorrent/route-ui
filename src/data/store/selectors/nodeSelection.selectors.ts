@@ -17,8 +17,10 @@ export const getOperandState = createSelector(
     (nodeSelection) => nodeSelection.operands,
 );
 
-export const getOperandStateList = (operandNames: string[]) => (state: RootState) =>
-    operandNames.map((name) => state.nodeSelection.operands[name]);
+export const getOperandStateList = createSelector(
+    (state: RootState) => state.nodeSelection,
+    (nodeSelection) => (operandNames: string[]) => operandNames.map((name) => nodeSelection.operands[name]),
+);
 
 export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
     state.nodeSelection.nodeList[temporalEpoch];

@@ -9,7 +9,7 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import { getOperandStateList } from '../../../data/store/selectors/nodeSelection.selectors';
 
 const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
-    const selected = useSelector(getOperandStateList(node.queueList.map((queue) => queue.name)));
+    const selected = useSelector(getOperandStateList)(node.queueList.map((queue) => queue.name));
 
     return (
         <div className='queue-highlighter-content'>
