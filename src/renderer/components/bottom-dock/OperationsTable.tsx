@@ -36,10 +36,10 @@ import type { LocationState } from '../../../data/StateTypes';
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
     const location: Location<LocationState> = useLocation();
-    const { epoch: temporalEpoch } = location.state;
+    const { epoch: temporalEpoch, chipId = -1 } = location.state;
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
+    const { getGraphOnChip } = useContext(GraphOnChipContext);
+    const graphOnChip = getGraphOnChip(temporalEpoch, chipId);
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');

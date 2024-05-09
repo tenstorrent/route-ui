@@ -25,7 +25,7 @@ export default function GridRender() {
     const location: Location<LocationState> = useLocation();
     const { graphName = '', chipId = -1, epoch } = location.state;
 
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(chipId);
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
     const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
 
     const style =

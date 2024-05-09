@@ -5,6 +5,7 @@
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
@@ -12,14 +13,17 @@ import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook'
 import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
+import type { LocationState } from '../../../data/StateTypes';
 
 /**
  * QueuesTable - temporary component to display queues
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const { getActiveGraphOnChip, getOperand } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
+    const location: Location<LocationState> = useLocation();
+    const { epoch: temporalEpoch, chipId = -1 } = location.state;
+    const { getGraphOnChip, getOperand } = useContext(GraphOnChipContext);
+    const graphOnChip = getGraphOnChip(temporalEpoch, chipId);
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const operandState = useSelector(getOperandState);
     const tableFields = useMemo(() => {

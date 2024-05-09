@@ -24,7 +24,7 @@ interface DetailedViewDRAMRendererProps {
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName, temporalEpoch }) => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, node.chipId);
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 

@@ -38,7 +38,7 @@ interface GraphOnChipContextType {
     getNextGraphName: () => string | undefined;
     selectPreviousGraph: () => void;
     selectNextGraph: () => void;
-    getGraphOnChip: (chipId: number) => GraphOnChip | undefined;
+    getGraphOnChip: (temporalEpoch: number, chipId: number) => GraphOnChip | undefined;
     graphOnChipList: Record<string, GraphOnChip>;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
@@ -108,10 +108,14 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const getGraphOnChip = useCallback(
-        (chipId: number) => {
-            return Object.values(state.graphOnChipList).find((graph) => graph.chipId === chipId);
+        (temporalEpoch: number, chipId: number) => {
+            const graphRelationship = [...state.graphs.values()].find(
+                (graph) => graph.temporalEpoch === temporalEpoch && graph.chipId === chipId,
+            );
+
+            return state.graphOnChipList[graphRelationship?.name ?? ''];
         },
-        [state.graphOnChipList],
+        [state.graphs, state.graphOnChipList],
     );
 
     const reset = useCallback(() => {
@@ -142,9 +146,8 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
     }, [state.graphs]);
 
-    const getActiveGraphOnChip = useCallback(() => {
-        return state.graphOnChipList[state.visitedGraphsHistory[state.currentGraphIndex] ?? ''];
-    }, [state]);
+    /** @deprecated Function will be removed soon, use `getGraphOnchip` instead. */
+    const getActiveGraphOnChip = useCallback(() => undefined, []);
 
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number) => {

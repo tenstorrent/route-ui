@@ -5,6 +5,7 @@
 import { Icon, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { useContext, useState } from 'react';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import QueueIcon from '../../../main/assets/QueueIcon';
 import ComputeNodesPropertiesTab from './ComputeNodesPropertiesTab';
@@ -13,14 +14,21 @@ import PipesPropertiesTab from './PipesPropertiesTab';
 import QueuesPropertiesTab from './QueuesPropertiesTab';
 
 import './PropertiesPanel.scss';
+import type { LocationState } from '../../../data/StateTypes';
 
 export default function PropertiesPanel() {
+    const location: Location<LocationState> = useLocation();
+    const { chipId = -1, epoch, graphName = '' } = location.state;
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
     return (
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
-                <Tab id='tab-nodes' title='Nodes' panel={<ComputeNodesPropertiesTab />} />
+                <Tab
+                    id='tab-nodes'
+                    title='Nodes'
+                    panel={<ComputeNodesPropertiesTab epoch={epoch} graphName={graphName} />}
+                />
                 {graphOnChip?.hasPipes && (
                     <Tab
                         id='tab-pipes'
@@ -29,7 +37,7 @@ export default function PropertiesPanel() {
                                 Pipes <Icon icon={IconNames.FILTER} />
                             </span>
                         }
-                        panel={<PipesPropertiesTab />}
+                        panel={<PipesPropertiesTab epoch={epoch} chipId={chipId} />}
                     />
                 )}
                 {graphOnChip?.hasOperations && (
@@ -40,7 +48,7 @@ export default function PropertiesPanel() {
                                 Operations <Icon icon={IconNames.CUBE} />
                             </span>
                         }
-                        panel={<OperationsPropertiesTab />}
+                        panel={<OperationsPropertiesTab chipId={chipId} epoch={epoch} />}
                     />
                 )}
                 {graphOnChip?.hasQueues && (
@@ -51,11 +59,11 @@ export default function PropertiesPanel() {
                                 Queues <QueueIcon />{' '}
                             </span>
                         }
-                        panel={<QueuesPropertiesTab />}
+                        panel={<QueuesPropertiesTab chipId={chipId} epoch={epoch} />}
                     />
                 )}
             </Tabs>
-            <div className='panel-overlay'></div>
+            <div className='panel-overlay' />
         </div>
     );
 }

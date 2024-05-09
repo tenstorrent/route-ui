@@ -14,9 +14,9 @@ import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
 
-const PipesPropertiesTab = () => {
+const PipesPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: number }) => {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
 
     const [pipeFilter, setPipeFilter] = useState<string>('');
 

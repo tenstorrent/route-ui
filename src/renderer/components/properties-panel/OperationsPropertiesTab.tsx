@@ -6,7 +6,7 @@ import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { selectOperandList } from 'data/store/slices/nodeSelection.slice';
-import React, { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
@@ -16,10 +16,10 @@ import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 
-const OperationsPropertiesTab = (): React.ReactElement => {
+const OperationsPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: number }) => {
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
+    const { getGraphOnChip } = useContext(GraphOnChipContext);
+    const graphOnChip = getGraphOnChip(epoch, chipId);
 
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);

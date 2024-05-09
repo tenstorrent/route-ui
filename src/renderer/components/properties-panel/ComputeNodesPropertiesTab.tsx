@@ -11,7 +11,6 @@ import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { Fragment, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
-import { type Location, useLocation } from 'react-router-dom';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -27,7 +26,6 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
-import type { LocationState } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -350,11 +348,9 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
     );
 };
 
-const ComputeNodesPropertiesTab = () => {
-    const location: Location<LocationState> = useLocation();
-    const { epoch: temporalEpoch, graphName = '' } = location.state;
-    const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch);
-    const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(temporalEpoch));
+const ComputeNodesPropertiesTab = ({ epoch, graphName }: { epoch: number; graphName: string }) => {
+    const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+    const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
     const selectedNodes = useMemo(() => {
         const selectedNodesList = orderedNodeSelection
             .map((nodeState) => {
@@ -375,7 +371,7 @@ const ComputeNodesPropertiesTab = () => {
                         <ComputeNodePropertiesCard
                             key={node?.uid}
                             node={node}
-                            temporalEpoch={temporalEpoch}
+                            temporalEpoch={epoch}
                             graphName={graphName}
                         />
                     ))}
