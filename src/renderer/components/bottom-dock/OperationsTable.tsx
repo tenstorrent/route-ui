@@ -139,7 +139,7 @@ function OperationsTable() {
                         dispatch(
                             updateNodeSelection({
                                 temporalEpoch,
-                                id: cellContent.toString(),
+                                id: cellContent,
                                 selected: e.target.checked,
                             }),
                         );

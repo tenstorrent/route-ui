@@ -15,10 +15,10 @@ interface DramModuleBorderProps {
 
 /** For a DRAM node, this renders a styling layer when the node's DRAM group is selected */
 const DramModuleBorder: FC<DramModuleBorderProps> = ({ node, temporalEpoch }) => {
-    const dramSelectionState = useSelector(getDramHighlightState(temporalEpoch, node.uid));
+    const isDramSelected = useSelector(getDramHighlightState(temporalEpoch, node.uid));
     let dramStyles = {};
 
-    if (dramSelectionState) {
+    if (isDramSelected) {
         dramStyles = getDramGroupingStyles(node.dramBorder);
     }
 

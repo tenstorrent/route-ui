@@ -17,7 +17,7 @@ import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import { getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOrderedSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
@@ -354,7 +354,7 @@ const ComputeNodesPropertiesTab = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch, graphName } = location.state;
     const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch);
-    const orderedNodeSelection = useSelector(getOrderedNodeList(temporalEpoch));
+    const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(temporalEpoch));
     const selectedNodes = useMemo(() => {
         const selectedNodesList = orderedNodeSelection
             .map((nodeState) => {
