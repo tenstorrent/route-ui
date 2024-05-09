@@ -163,16 +163,16 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number) => {
-            const listOfGraphRel: GraphRelationship[] = [...state.graphs.values()].filter(
-                (graph: GraphRelationship) => {
-                    return graph.temporalEpoch === epoch;
-                },
-            );
-            return listOfGraphRel
-                .map((graph) => {
-                    return { graph, graphOnChip: state.graphOnChipList[graph.name] };
-                })
-                .sort((a, b) => a.graphOnChip.chipId - b.graphOnChip.chipId);
+            const graphArray: { graph: GraphRelationship; graphOnChip: GraphOnChip }[] = [];
+
+            state.graphs.forEach((graph) => {
+                if (graph.temporalEpoch === epoch) {
+                    const { chipId } = state.graphOnChipList[graph.name];
+                    graphArray[chipId] = { graph, graphOnChip: state.graphOnChipList[graph.name] };
+                }
+            });
+
+            return graphArray;
         },
         [state.graphOnChipList, state.graphs],
     );
