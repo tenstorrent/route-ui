@@ -41,7 +41,6 @@ export interface ComputeNodeState {
 export interface OperandSelectionState {
     selected: boolean;
     type: GraphVertexType;
-    graphName: string;
 }
 
 export interface NodeSelectionState {

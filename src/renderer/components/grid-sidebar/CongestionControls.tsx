@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import React, { FC, useContext } from 'react';
+import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Slider, Switch } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
@@ -17,12 +17,7 @@ import {
     updateShowOperationPerformanceGrid,
 } from '../../../data/store/slices/operationPerf.slice';
 import { clearAllPipes, selectAllPipes } from '../../../data/store/slices/pipeSelection.slice';
-import {
-    clearAllOperationsForGraph,
-    clearAllQueuesforGraph,
-    selectAllOperationsForGraph,
-    selectAllQueuesForGraph,
-} from '../../../data/store/slices/nodeSelection.slice';
+import { selectOperandList } from '../../../data/store/slices/nodeSelection.slice';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateOpCongestionColor } from '../../../utils/DrawingAPI';
 
@@ -34,9 +29,14 @@ import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import LinkCongestionControl from './LinkCongestionControl';
 
 export const CongestionControls: FC = () => {
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
+    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
     const graphOnChip = getActiveGraphOnChip();
-    const graphName = getActiveGraphName();
+
+    const operationsOnGraph = useMemo(
+        () => [...(graphOnChip?.operations ?? [])].map(({ name }) => name),
+        [graphOnChip],
+    );
+    const queuesOnGraph = useMemo(() => [...(graphOnChip?.queues ?? [])].map(({ name }) => name), [graphOnChip]);
 
     const maxBwLimitedFactor = graphOnChip?.details.maxBwLimitedFactor || 10;
     const hasPipes = graphOnChip?.hasPipes || false;
@@ -106,14 +106,28 @@ export const CongestionControls: FC = () => {
                             <Tooltip2 content='Select all operations for active graph'>
                                 <Button
                                     icon={IconNames.CUBE_ADD}
-                                    onClick={() => dispatch(selectAllOperationsForGraph(graphName))}
+                                    onClick={() =>
+                                        dispatch(
+                                            selectOperandList({
+                                                operands: operationsOnGraph,
+                                                selected: true,
+                                            }),
+                                        )
+                                    }
                                 />
                             </Tooltip2>
                             &nbsp;
                             <Tooltip2 content='Deselect all operations for active graph'>
                                 <Button
                                     icon={IconNames.CUBE_REMOVE}
-                                    onClick={() => dispatch(clearAllOperationsForGraph(graphName))}
+                                    onClick={() =>
+                                        dispatch(
+                                            selectOperandList({
+                                                operands: operationsOnGraph,
+                                                selected: false,
+                                            }),
+                                        )
+                                    }
                                 />
                             </Tooltip2>
                         </div>
@@ -122,14 +136,28 @@ export const CongestionControls: FC = () => {
                             <Tooltip2 content='Select all queues for active graph'>
                                 <Button
                                     icon={<QueueIconPlus />}
-                                    onClick={() => dispatch(selectAllQueuesForGraph(graphName))}
+                                    onClick={() =>
+                                        dispatch(
+                                            selectOperandList({
+                                                operands: queuesOnGraph,
+                                                selected: true,
+                                            }),
+                                        )
+                                    }
                                 />
                             </Tooltip2>
                             &nbsp;
                             <Tooltip2 content='Deselect all queues for active graph'>
                                 <Button
                                     icon={<QueueIconMinus />}
-                                    onClick={() => dispatch(clearAllQueuesforGraph(graphName))}
+                                    onClick={() =>
+                                        dispatch(
+                                            selectOperandList({
+                                                operands: queuesOnGraph,
+                                                selected: false,
+                                            }),
+                                        )
+                                    }
                                 />
                             </Tooltip2>
                         </div>

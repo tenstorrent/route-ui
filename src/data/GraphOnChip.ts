@@ -1031,7 +1031,6 @@ export interface NodeInitialState {
     queueNameList: string[];
     opName: string;
     dramChannelId: number;
-    graphName: string;
     chipId: number;
 }
 
@@ -1179,13 +1178,12 @@ export class ComputeNode {
         return this.operation?.name || '';
     }
 
-    public generateInitialState(graphName: string): NodeInitialState {
+    public generateInitialState(): NodeInitialState {
         return {
             id: this.uid,
             queueNameList: this.queueList.map((queue) => queue.name),
             opName: this.opName,
             dramChannelId: this.dramChannelId,
-            graphName,
             chipId: this.chipId,
         };
     }

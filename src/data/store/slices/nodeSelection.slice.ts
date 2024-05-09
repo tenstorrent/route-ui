@@ -61,7 +61,6 @@ const nodeSelectionSlice = createSlice({
                                 state.operands[queueName] = {
                                     selected: false,
                                     type: GraphVertexType.QUEUE,
-                                    graphName: item.graphName,
                                 };
                             }
                         });
@@ -72,7 +71,6 @@ const nodeSelectionSlice = createSlice({
                             state.operands[item.opName] = {
                                 selected: false,
                                 type: GraphVertexType.OPERATION,
-                                graphName: item.graphName,
                             };
                         }
                     }
@@ -120,52 +118,12 @@ const nodeSelectionSlice = createSlice({
                 }
             });
         },
-        selectAllOperationsForGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.OPERATION;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = true;
-                }
-            });
-        },
-        clearAllOperationsForGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.OPERATION;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = false;
-                }
-            });
-        },
         selectOperand(state, action: PayloadAction<{ operandName: string; selected: boolean }>) {
             const { operandName, selected } = action.payload;
 
             if (state.operands[operandName]) {
                 state.operands[operandName].selected = selected;
             }
-        },
-        selectAllQueuesForGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.QUEUE;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = true;
-                }
-            });
-        },
-        clearAllQueuesforGraph(state, action: PayloadAction<string>) {
-            Object.values(state.operands).forEach((operand) => {
-                const isOperation = operand.type === GraphVertexType.QUEUE;
-                const isOnGraph = operand.graphName === action.payload;
-
-                if (isOperation && isOnGraph) {
-                    operand.selected = false;
-                }
-            });
         },
         updateFocusNode(state, action: PayloadAction<string | null>) {
             state.focusNode = action.payload;
@@ -178,11 +136,7 @@ export const {
     initialLoadAllNodesData,
     updateNodeSelection,
     selectOperandList,
-    selectAllOperationsForGraph,
-    clearAllOperationsForGraph,
     selectOperand,
-    selectAllQueuesForGraph,
-    clearAllQueuesforGraph,
     updateFocusNode,
 } = nodeSelectionSlice.actions;
 

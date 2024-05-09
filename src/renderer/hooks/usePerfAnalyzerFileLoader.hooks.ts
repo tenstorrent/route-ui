@@ -120,7 +120,7 @@ const usePerfAnalyzerFileLoader = () => {
                 }
 
                 nodesDataPerTemporalEpoch[graph.temporalEpoch].push(
-                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState(graph.name)),
+                    ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState()),
                 );
 
                 times.push({
