@@ -47,7 +47,7 @@ const usePerfAnalyzerFileLoader = () => {
     const logger = useLogging();
 
     useEffect(() => {
-        console.log('location.state', location.state?.graphName);
+        console.log('location.state', location.state);
         dispatch(updateRandomRedux(Math.random()));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state]);
@@ -156,21 +156,20 @@ const usePerfAnalyzerFileLoader = () => {
         dispatch(setIsLoadingFolder(false));
     };
 
-    const loadPerfAnalyzerGraph = (graphName: string, temporalEpoch: number) => {
+    const loadPerfAnalyzerGraph = (state: LocationState) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
-            setActiveGraph(graphName);
-            navigate('/render', { state: { graphName, epoch: temporalEpoch } });
+            setActiveGraph(state.graphName ?? '');
+            navigate('/render', { state });
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }
     };
 
-    const loadTemporalEpoch = (epoch: number) => {
+    const loadTemporalEpoch = (state: LocationState) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
-            // setActiveGraph(graphName);
-            navigate('/render', { state: { epoch } });
+            navigate('/render', { state });
         } else {
             logging.error('Attempted to load epoch but no folder path was available');
         }

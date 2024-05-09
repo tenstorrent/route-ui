@@ -99,5 +99,7 @@ export type FolderLocationType = 'local' | 'remote';
 
 export interface LocationState {
     epoch: number;
-    graphName: string;
+    /** @deprecated */
+    graphName?: string;
+    chipId?: number;
 }

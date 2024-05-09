@@ -14,6 +14,7 @@ interface OperandDescriptor {
     temporalEpoch: number;
     type: GraphVertexType;
     operand: Operand;
+    chipId: number;
 }
 
 interface ApplicationModelState {
@@ -90,6 +91,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                             temporalEpoch,
                             type: GraphVertexType.OPERATION,
                             operand: operation as Operand,
+                            chipId: graphOnChip.chipId,
                         })),
                     ...[...graphOnChip.queues].map((queue) => ({
                         name: queue.name,
@@ -97,6 +99,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         temporalEpoch,
                         type: GraphVertexType.QUEUE,
                         operand: queue as Operand,
+                        chipId: graphOnChip.chipId,
                     })),
                 ];
             })

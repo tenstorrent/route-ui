@@ -25,7 +25,11 @@ const useSelectableGraphVertex = () => {
             return () => {
                 const operand = getOperand(operandName);
                 if (operand) {
-                    loadPerfAnalyzerGraph(operand.graphName);
+                    loadPerfAnalyzerGraph({
+                        epoch: operand.temporalEpoch,
+                        graphName: operand.graphName,
+                        chipId: operand.chipId,
+                    });
                 }
             };
         },
