@@ -91,8 +91,8 @@ const ClusterView: FC = () => {
         const pipeList = selectedEpoch
             .map((graph) => {
                 return [
-                    ...(getGraphOnChip(graph.name)?.ethernetPipes.map((pipe) => pipe) || []),
-                    ...(getGraphOnChip(graph.name)?.pciePipes.map((pipe) => {
+                    ...(getGraphOnChip(graph.chipId)?.ethernetPipes.map((pipe) => pipe) || []),
+                    ...(getGraphOnChip(graph.chipId)?.pciePipes.map((pipe) => {
                         pciList.push(pipe.id);
                         return pipe;
                     }) || []),
@@ -287,7 +287,7 @@ const ClusterView: FC = () => {
                     let graphOnChip: GraphOnChip | undefined;
                     let graphName: string | undefined;
                     selectedEpoch.forEach((graph) => {
-                        const chipByGraphName = getGraphOnChip(graph.name);
+                        const chipByGraphName = getGraphOnChip(graph.chipId);
                         if (chipByGraphName?.chipId === clusterChip.id) {
                             graphOnChip = chipByGraphName;
                             graphName = graph.name;

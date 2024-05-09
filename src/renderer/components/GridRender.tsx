@@ -23,9 +23,9 @@ export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
     const { error } = usePerfAnalyzerFileLoader();
     const location: Location<LocationState> = useLocation();
-    const { graphName = '', epoch } = location.state;
+    const { graphName = '', chipId = -1, epoch } = location.state;
 
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(graphName);
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(chipId);
     const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
 
     const style =
@@ -39,7 +39,7 @@ export default function GridRender() {
 
     return (
         <div className='main-content' style={style}>
-            {graphOnChip && (
+            {graphOnChip ? (
                 <div className='grid-container'>
                     <div
                         className='node-container'
@@ -62,8 +62,8 @@ export default function GridRender() {
                         ]}
                     </div>
                 </div>
-            )}
-            {!graphName && (graphList.map((data) => {
+            ) : (
+                graphList.map((data) => {
                     return (
                         <div className='grid-container'>
                             <div
@@ -86,8 +86,8 @@ export default function GridRender() {
                             </div>
                         </div>
                     );
-                }
-            ))}
+                })
+            )}
             {graphOnChip === undefined && graphList.length === 0 && (
                 <div className='invalid-data-message'>
                     <Icon icon={IconNames.WARNING_SIGN} size={50} />

@@ -38,7 +38,7 @@ interface GraphOnChipContextType {
     getNextGraphName: () => string | undefined;
     selectPreviousGraph: () => void;
     selectNextGraph: () => void;
-    getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
+    getGraphOnChip: (chipId: number) => GraphOnChip | undefined;
     graphOnChipList: Record<string, GraphOnChip>;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
@@ -108,8 +108,8 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const getGraphOnChip = useCallback(
-        (graphName: string) => {
-            return state.graphOnChipList[graphName];
+        (chipId: number) => {
+            return Object.values(state.graphOnChipList).find((graph) => graph.chipId === chipId);
         },
         [state.graphOnChipList],
     );
