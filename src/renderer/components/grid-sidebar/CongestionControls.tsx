@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import React, { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

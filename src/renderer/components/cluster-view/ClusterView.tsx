@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import { Button, Checkbox, Classes, MenuItem, NumericInput, PopoverPosition } from '@blueprintjs/core';

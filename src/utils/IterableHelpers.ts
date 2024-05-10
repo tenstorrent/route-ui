@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 export const isIterable = (value: unknown): value is Iterable<unknown> =>
     value !== null &&

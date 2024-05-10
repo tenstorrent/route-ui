@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { createSlice } from '@reduxjs/toolkit';
 import { INITIAL_OPERATION_PERFORMANCE_THRESHOLD, MAX_MODEL_RATIO_THRESHOLD } from '../../constants';
