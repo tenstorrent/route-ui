@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC.
 
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';

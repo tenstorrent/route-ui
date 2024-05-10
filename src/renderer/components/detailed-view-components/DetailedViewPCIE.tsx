@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC.
 
 import React from 'react';
 import { ComputeNode, NOC2AXILink, NOCLink, NetworkLink, PCIeLink } from '../../../data/GraphOnChip';
