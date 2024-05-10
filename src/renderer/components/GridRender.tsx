@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { useContext } from 'react';
+import { CSSProperties, useContext } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Icon } from '@blueprintjs/core';
@@ -18,6 +18,7 @@ import NodeGridElement from './NodeGridElement';
 import ClusterViewDialog from './cluster-view/ClusterViewDialog';
 import DetailedView from './detailed-view-components/DetailedView';
 import type { LocationState } from '../../data/StateTypes';
+import { ClusterContext } from '../../data/ClusterContext';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
@@ -27,6 +28,7 @@ export default function GridRender() {
 
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(graphName);
     const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+    const { cluster } = useContext(ClusterContext);
 
     const style =
         graphList.length > 1
@@ -63,9 +65,18 @@ export default function GridRender() {
                     </div>
                 </div>
             )}
-            {!graphName && (graphList.map((data) => {
+            {!graphName &&
+                graphList.map((data) => {
+                    const id = data.graphOnChip.chipId;
+                    const clusterChip = cluster?.chips.find((chip) => chip.id === id);
+                    const clusterChipPositioning: CSSProperties = {};
+                    if (clusterChip) {
+                        clusterChipPositioning.gridColumn = clusterChip.coordinates.x + 1;
+                        clusterChipPositioning.gridRow = clusterChip.coordinates.y + 1;
+                    }
+                    clusterChipPositioning.contentVisibility = 'auto';
                     return (
-                        <div className='grid-container'>
+                        <div className='grid-container' style={clusterChipPositioning}>
                             <div
                                 className='node-container'
                                 style={{
@@ -80,14 +91,17 @@ export default function GridRender() {
                                             temporalEpoch={epoch}
                                             graphName={data.graph.name}
                                             key={node.uid}
+                                            connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
                                         />
                                     );
                                 })}
                             </div>
+                            <div className='chip-label'>
+                                {id} - {data.graph.name}
+                            </div>
                         </div>
                     );
-                }
-            ))}
+                })}
             {graphOnChip === undefined && graphList.length === 0 && (
                 <div className='invalid-data-message'>
                     <Icon icon={IconNames.WARNING_SIGN} size={50} />
