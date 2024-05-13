@@ -33,13 +33,13 @@ interface GraphOnChipContextType {
     getGraphRelationshipList: () => GraphRelationship[];
     getGraphRelationshipByGraphName: (graphName: string) => GraphRelationship | undefined;
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
+    /** @deprecated Function will be removed soon, use `getGraphOnchip` instead. */
     getActiveGraphOnChip: () => GraphOnChip | undefined;
     getPreviousGraphName: () => string | undefined;
     getNextGraphName: () => string | undefined;
     selectPreviousGraph: () => void;
     selectNextGraph: () => void;
     getGraphOnChip: (temporalEpoch: number, chipId: number) => GraphOnChip | undefined;
-    graphOnChipList: Record<string, GraphOnChip>;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
 }
@@ -64,7 +64,6 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     selectPreviousGraph: () => {},
     selectNextGraph: () => {},
     getGraphOnChip: () => undefined,
-    graphOnChipList: {},
     getOperand: () => undefined,
     getGraphOnChipListForTemporalEpoch: () => [],
 });
@@ -146,7 +145,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
     }, [state.graphs]);
 
-    /** @deprecated Function will be removed soon, use `getGraphOnchip` instead. */
     const getActiveGraphOnChip = useCallback(() => undefined, []);
 
     const getGraphOnChipListForTemporalEpoch = useCallback(
@@ -209,7 +207,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getNextGraphName,
             selectPreviousGraph,
             selectNextGraph,
-            graphOnChipList: state.graphOnChipList,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
         }),
@@ -225,7 +222,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getNextGraphName,
             selectPreviousGraph,
             selectNextGraph,
-            state.graphOnChipList,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
         ],
