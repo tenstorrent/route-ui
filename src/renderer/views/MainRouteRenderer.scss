@@ -320,6 +320,12 @@
             display: none;
         }
     }
+    .chip-label{
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+        color: $tt-medium-light-gray;
+    }
 
     .node-container {
         display: grid;

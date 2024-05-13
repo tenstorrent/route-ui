@@ -53,7 +53,6 @@ const usePerfAnalyzerFileLoader = () => {
     const logger = useLogging();
 
     useEffect(() => {
-        console.log('location.state', location.state);
         dispatch(updateRandomRedux(Math.random()));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state]);

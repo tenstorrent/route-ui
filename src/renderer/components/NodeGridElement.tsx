@@ -7,8 +7,8 @@ import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ComputeNode } from '../../data/GraphOnChip';
-import { HighlightType } from '../../data/Types';
+import { ComputeNode, PipeSegment } from '../../data/GraphOnChip';
+import { EthernetLinkName, HighlightType } from '../../data/Types';
 import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
 import {
     getDetailedViewOpenState,
@@ -24,14 +24,17 @@ import NodeOperationLabel from './node-grid-elements-components/NodeOperationLab
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
+import { ClusterChip } from '../../data/Cluster';
 
 interface NodeGridElementProps {
     node: ComputeNode;
     graphName: string;
     temporalEpoch: number;
+    connectedEth?: ClusterChip | null;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temporalEpoch }) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temporalEpoch, connectedEth }) => {
+    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
@@ -68,6 +71,16 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
         }
     };
 
+    let externalPipes: PipeSegment[] = [];
+
+    if (connectedEth !== null) {
+        externalPipes = node
+            .getInternalLinksForNode()
+            .filter((link) => link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT)
+            .map((link) => link.pipes)
+            .flat();
+    }
+
     return (
         <button
             title={showOperationNames && shouldShowLabel ? node.opName : ''}
@@ -77,6 +90,15 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
             } `}
             onClick={triggerSelection}
         >
+            {connectedEth !== null && externalPipes.length > 0 && (
+                <div className='eth-connection'>
+                    {/* TEMPORARY OTPUT */}
+                    <span>ETH {connectedEth?.id}</span>
+                    {/* {externalPipes.map((pipe) => ( */}
+                    {/*    <div key={pipe.id} className='eth-pipe' >{pipe.id}{pipe.linkName}</div> */}
+                    {/* ))} */}
+                </div>
+            )}
             {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />
             <DramModuleBorder node={node} temporalEpoch={temporalEpoch} />
@@ -105,5 +127,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
         </button>
     );
 };
-
+NodeGridElement.defaultProps = {
+    connectedEth: null,
+};
 export default NodeGridElement;
