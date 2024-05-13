@@ -14,7 +14,7 @@ import {
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnchorButton } from '@blueprintjs/core';
-import { type Location, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
+import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType, LocationState } from '../../data/StateTypes';
 import { setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
@@ -45,9 +45,6 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 
 const TopHeaderComponent: React.FC = () => {
     const navigate = useNavigate();
-    const navigationType = useNavigationType();
-    // TODO: find out how to properly disable buttons
-    console.log(navigationType);
 
     const { resetGraphOnChipState, getGraphOnChip } = useContext(GraphOnChipContext);
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =
@@ -134,10 +131,10 @@ const TopHeaderComponent: React.FC = () => {
                     onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
-                <Tooltip2 disabled={false} content={`Back to graph: ${'Previous graph'}`} placement='bottom'>
+                <Tooltip2 disabled={false} content='Back to previous graph' placement='bottom'>
                     <AnchorButton minimal disabled={false} icon={IconNames.ARROW_LEFT} onClick={() => navigate(-1)} />
                 </Tooltip2>
-                <Tooltip2 disabled={false} content={`Forward to graph: ${'Next graph'}`} placement='bottom'>
+                <Tooltip2 disabled={false} content='Forward next graph' placement='bottom'>
                     <AnchorButton minimal disabled={false} icon={IconNames.ARROW_RIGHT} onClick={() => navigate(1)} />
                 </Tooltip2>
             </div>

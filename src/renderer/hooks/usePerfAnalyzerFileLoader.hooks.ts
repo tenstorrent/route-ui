@@ -22,7 +22,13 @@ import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
 import type { NodeInitialState } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import type { EpochAndLinkStates, FolderLocationType, LocationState, PipeSelection } from '../../data/StateTypes';
+import type {
+    EpochAndLinkStates,
+    FolderLocationType,
+    LocationState,
+    NavigateOptions,
+    PipeSelection,
+} from '../../data/StateTypes';
 import {
     initialLoadLinkData,
     initialLoadNormalizedOPs,
@@ -171,8 +177,12 @@ const usePerfAnalyzerFileLoader = () => {
                     epoch: graphRelationship.temporalEpoch,
                     graphName,
                     chipId: graphRelationship.chipId,
+                    previous: {
+                        graphName: location.state.graphName ?? '',
+                        path: location.pathname,
+                    },
                 },
-            });
+            } satisfies NavigateOptions);
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }
@@ -184,8 +194,12 @@ const usePerfAnalyzerFileLoader = () => {
             navigate('/render', {
                 state: {
                     epoch,
+                    previous: {
+                        graphName: location.state.graphName ?? '',
+                        path: location.pathname,
+                    },
                 },
-            });
+            } satisfies NavigateOptions);
         } else {
             logging.error('Attempted to load epoch but no folder path was available');
         }

@@ -2,6 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+import type { RelativeRoutingType } from 'react-router-dom';
 import type { GraphVertexType } from './GraphNames';
 import { LinkType } from './Types';
 
@@ -102,4 +103,21 @@ export interface LocationState {
     /** @deprecated */
     graphName?: string;
     chipId?: number;
+    previous?: {
+        path: string;
+        graphName: string;
+    };
+    next?: {
+        path: string;
+        graphName: string;
+    };
+}
+
+export interface NavigateOptions {
+    replace?: boolean;
+    state?: LocationState;
+    preventScrollReset?: boolean;
+    relative?: RelativeRoutingType;
+    unstable_flushSync?: boolean;
+    unstable_viewTransition?: boolean;
 }
