@@ -33,7 +33,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
             state: {
                 epoch: -1,
                 previous: {
-                    graphName: location.state.graphName ?? '',
+                    graphName: location.state?.graphName ?? '',
                     path: location.pathname,
                 },
             },

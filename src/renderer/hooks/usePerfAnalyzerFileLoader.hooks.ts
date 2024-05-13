@@ -177,7 +177,7 @@ const usePerfAnalyzerFileLoader = () => {
                     graphName,
                     chipId: graphRelationship.chipId,
                     previous: {
-                        graphName: location.state.graphName ?? '',
+                        graphName: location.state?.graphName ?? '',
                         path: location.pathname,
                     },
                 },
@@ -194,7 +194,7 @@ const usePerfAnalyzerFileLoader = () => {
                 state: {
                     epoch,
                     previous: {
-                        graphName: location.state.graphName ?? '',
+                        graphName: location.state?.graphName ?? '',
                         path: location.pathname,
                     },
                 },
