@@ -62,7 +62,9 @@ const TopHeaderComponent: React.FC = () => {
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch: temporalEpoch } = location.state;
-    const architecture = getGraphOnChip(temporalEpoch, chipId ?? 0)?.architecture;
+    const architecture = [
+        ...new Set(getGraphOnChip(temporalEpoch, chipId).map(({ graph }) => graph.architecture)),
+    ].join(', ');
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
