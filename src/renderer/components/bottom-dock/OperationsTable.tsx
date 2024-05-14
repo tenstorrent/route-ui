@@ -32,25 +32,34 @@ import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import type { LocationState } from '../../../data/StateTypes';
+import type { BuildableOperation } from '../../../data/Graph';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
     const location: Location<LocationState> = useLocation();
-    const { epoch: temporalEpoch, chipId = -1 } = location.state;
+    const { epoch: temporalEpoch, chipId } = location.state;
     const dispatch = useDispatch();
-    const { getGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getGraphOnChip(temporalEpoch, chipId);
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId);
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');
     const [filterQuery, setFilterQuery] = useState<string>('');
     const tableFields = useMemo(() => {
-        if (!graphOnChip) {
+        if (!graphOnChipList) {
             return [];
         }
 
         let list = [];
-        const selectedOperation = graphOnChip.getOperation(selectedOperationName);
+        let selectedOperation: BuildableOperation | undefined;
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { graph } of graphOnChipList) {
+            selectedOperation = graph.getOperation(selectedOperationName);
+
+            if (selectedOperation) {
+                break;
+            }
+        }
 
         if (selectedOperation) {
             list = [...selectedOperation.cores].map((core: ComputeNode) => {
@@ -62,14 +71,17 @@ function OperationsTable() {
                 } as OpTableFields;
             });
         } else {
-            list = [...graphOnChip.operations].map((op) => {
-                return {
-                    operation: op,
-                    name: op.name,
-                    ...op.details,
-                    slowestOperandRef: op.slowestOperand,
-                } as unknown as OpTableFields;
-            });
+            list = graphOnChipList.flatMap(({ graph: { operations } }) =>
+                [...operations].map(
+                    (op) =>
+                        ({
+                            operation: op,
+                            name: op.name,
+                            ...op.details,
+                            slowestOperandRef: op.slowestOperand,
+                        }) as unknown as OpTableFields,
+                ),
+            );
         }
 
         if (filterQuery) {
@@ -79,7 +91,7 @@ function OperationsTable() {
         }
 
         return sortTableFields(list);
-    }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
+    }, [graphOnChipList, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector(getSelectedNodeList(temporalEpoch));
     const allOperandsState = useSelector(getOperandState);
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
@@ -90,7 +102,7 @@ function OperationsTable() {
         setSelectedOperationName('');
         setFilterQuery('');
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [graphOnChip]);
+    }, [temporalEpoch, chipId]);
 
     const operationCellRenderer = (rowIndex: number) => {
         const opName = tableFields[rowIndex].name;
@@ -225,7 +237,7 @@ function OperationsTable() {
         <>
             <div>
                 <SearchField
-                    disabled={!graphOnChip || selectedOperationName !== ''}
+                    disabled={!graphOnChipList || selectedOperationName !== ''}
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[]}

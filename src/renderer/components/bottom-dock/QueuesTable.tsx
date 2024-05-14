@@ -21,25 +21,28 @@ import type { LocationState } from '../../../data/StateTypes';
  */
 function QueuesTable() {
     const location: Location<LocationState> = useLocation();
-    const { epoch: temporalEpoch, chipId = -1 } = location.state;
+    const { epoch: temporalEpoch, chipId } = location.state;
     const { getGraphOnChip, getOperand } = useContext(GraphOnChipContext);
-    const graphOnChip = getGraphOnChip(temporalEpoch, chipId);
+    const graphOnChipList = getGraphOnChip(temporalEpoch, chipId);
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const operandState = useSelector(getOperandState);
     const tableFields = useMemo(() => {
-        if (!graphOnChip) {
+        if (!graphOnChipList) {
             return [];
         }
 
-        const list = [...graphOnChip.queues].map((queue) => {
-            return {
-                name: queue.name,
-                ...queue.details,
-            } as unknown as QueuesTableFields;
-        });
+        const list = graphOnChipList.flatMap(({ graph }) =>
+            [...graph.queues].map(
+                (queue) =>
+                    ({
+                        name: queue.name,
+                        ...queue.details,
+                    }) as unknown as QueuesTableFields,
+            ),
+        );
 
         return sortTableFields(list);
-    }, [graphOnChip, sortTableFields]);
+    }, [graphOnChipList, sortTableFields]);
     const { selected, selectOperand, navigateToGraph } = useSelectableGraphVertex();
 
     const table = useRef<Table2>(null);
