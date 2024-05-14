@@ -6,9 +6,11 @@ import { Icon, Position } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import React, { FC, type PropsWithChildren, useContext, useEffect, useState } from 'react';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 import './PipeInfoDialog.scss';
+import type { LocationState } from '../../data/StateTypes';
 
 export interface PipeInfoDialogProps {
     pipeId: string;
@@ -22,7 +24,10 @@ export interface PipeInfoDialogProps {
  * @description This wrapper component is used to display information about a Pipe Segment when the user hovers over it
  */
 const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, pipeId, hide, onEnter, onLeave }) => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const location: Location<LocationState> = useLocation();
+    const { epoch } = location.state;
+    // TODO: use multiple graphs
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch)[0]?.graph;
     const [tooltipContent, setTooltipContent] = useState<React.JSX.Element | undefined>(undefined);
 
     const setupData = () => {

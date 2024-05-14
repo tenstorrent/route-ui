@@ -31,8 +31,10 @@ interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const location: Location<LocationState> = useLocation();
-    const { graphName = '' } = location.state;
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const { epoch } = location.state;
+    // TODO: use multiple graphs
+    const { graph: graphOnChip, relationship: { name: graphName } = { name: '' } } =
+        useContext(GraphOnChipContext).getGraphOnChip(epoch)[0] ?? {};
     const dispatch = useDispatch();
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);

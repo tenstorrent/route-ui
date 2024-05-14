@@ -31,8 +31,6 @@ interface GraphOnChipContextType {
     getGraphRelationshipList: () => GraphRelationship[];
     getGraphRelationshipByGraphName: (graphName: string) => GraphRelationship | undefined;
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
-    /** @deprecated Function will be removed soon, use `getGraphOnchip` instead. */
-    getActiveGraphOnChip: () => GraphOnChip | undefined;
     getGraphOnChip: (
         temporalEpoch: number,
         chipId?: number,
@@ -53,7 +51,6 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphRelationshipList: () => [],
     getGraphRelationshipByGraphName: () => undefined,
     getGraphsListByTemporalEpoch: () => new Map(),
-    getActiveGraphOnChip: () => undefined,
     getGraphOnChip: () => [],
     getOperand: () => undefined,
     getGraphOnChipListForTemporalEpoch: () => [],
@@ -154,8 +151,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
     }, [state.graphs]);
 
-    const getActiveGraphOnChip = useCallback(() => undefined, []);
-
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number) => {
             const graphArray: { graph: GraphRelationship; graphOnChip: GraphOnChip }[] = [];
@@ -182,7 +177,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const value = useMemo<GraphOnChipContextType>(
         () => ({
             loadGraphOnChips,
-            getActiveGraphOnChip,
             getGraphRelationshipList,
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
@@ -193,7 +187,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }),
         [
             loadGraphOnChips,
-            getActiveGraphOnChip,
             getGraphRelationshipList,
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,

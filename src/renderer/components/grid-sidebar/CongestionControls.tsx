@@ -8,6 +8,7 @@ import { Button, Slider, Switch } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { IconNames } from '@blueprintjs/icons';
+import { type Location, useLocation } from 'react-router-dom';
 import {
     getOperationPerformanceTreshold,
     getShowOperationPerformanceGrid,
@@ -27,10 +28,13 @@ import QueueIconPlus from '../../../main/assets/QueueIconPlus';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import LinkCongestionControl from './LinkCongestionControl';
+import type { LocationState } from '../../../data/StateTypes';
 
 export const CongestionControls: FC = () => {
-    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
+    const location: Location<LocationState> = useLocation();
+    const { epoch } = location.state;
+    // TODO: use multiple graphs
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch)[0]?.graph;
 
     const operationsOnGraph = useMemo(
         () => [...(graphOnChip?.operations ?? [])].map(({ name }) => name),
