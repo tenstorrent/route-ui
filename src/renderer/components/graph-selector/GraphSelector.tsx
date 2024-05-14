@@ -21,10 +21,16 @@ interface GraphSelectorProps {
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
     const location: Location<LocationState> = useLocation();
-    const { chipId = -1, epoch = -1 } = location?.state ?? {};
+    const { chipId, epoch = -1 } = location?.state ?? {};
     const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
     const temporalEpochs = [...getGraphsListByTemporalEpoch().entries()];
-    const selectedGraph = getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph.name ?? '';
+    let selectedItemText = '';
+
+    if (chipId !== undefined) {
+        selectedItemText = getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph.name;
+    } else if (epoch >= 0) {
+        selectedItemText = `Temporal Epoch ${epoch}`;
+    }
 
     return (
         <Popover2
@@ -59,7 +65,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
             placement='right'
         >
             <Button icon={IconNames.GRAPH} disabled={disabled}>
-                {selectedGraph || (label ?? 'Select graph')}
+                {selectedItemText || (label ?? 'Select graph')}
             </Button>
         </Popover2>
     );
