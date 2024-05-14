@@ -112,7 +112,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
 
             {/* Congestion information */}
             <OperationCongestionLayer node={node} />
-            <OffChipNodeLinkCongestionLayer node={node} />
+            <OffChipNodeLinkCongestionLayer node={node} graphName={graphName} />
 
             {/* Labels for location and operation */}
             <NodeLocation node={node} />

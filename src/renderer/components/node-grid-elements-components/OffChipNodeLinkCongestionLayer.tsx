@@ -4,7 +4,6 @@
 
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
-import { type Location, useLocation } from 'react-router-dom';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { ComputeNodeType } from '../../../data/Types';
 import {
@@ -14,18 +13,16 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
-import type { LocationState } from '../../../data/StateTypes';
 
 interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;
+    graphName: string;
 }
 
 /**
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
-const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node }) => {
-    const location: Location<LocationState> = useLocation();
-    const { graphName = '' } = location.state;
+const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node, graphName }) => {
     const linksData = useSelector(getAllLinksForGraph(graphName));
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
