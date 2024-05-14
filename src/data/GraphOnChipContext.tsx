@@ -33,7 +33,10 @@ interface GraphOnChipContextType {
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
     /** @deprecated Function will be removed soon, use `getGraphOnchip` instead. */
     getActiveGraphOnChip: () => GraphOnChip | undefined;
-    getGraphOnChip: (temporalEpoch: number, chipId?: number) => GraphOnChip[];
+    getGraphOnChip: (
+        temporalEpoch: number,
+        chipId?: number,
+    ) => { graph: GraphOnChip; relationship: GraphRelationship }[];
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
 }
@@ -94,7 +97,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getGraphOnChip = useCallback(
         (temporalEpoch: number, chipId?: number) => {
-            const graphs: GraphOnChip[] = [];
+            const graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] = [];
 
             [...state.graphs.values()].forEach((graphRelationship) => {
                 const isSameTemporalEpoch = graphRelationship.temporalEpoch === temporalEpoch;
@@ -103,11 +106,17 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
                 if (isSameTemporalEpoch) {
                     if (!hasChipId) {
-                        graphs.push(state.graphOnChipList[graphRelationship.name]);
+                        graphs.push({
+                            graph: state.graphOnChipList[graphRelationship.name],
+                            relationship: graphRelationship,
+                        });
                     }
 
                     if (hasChipId && isSameChipId) {
-                        graphs.push(state.graphOnChipList[graphRelationship.name]);
+                        graphs.push({
+                            graph: state.graphOnChipList[graphRelationship.name],
+                            relationship: graphRelationship,
+                        });
                     }
                 }
             });
