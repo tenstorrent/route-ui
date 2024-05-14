@@ -6,27 +6,23 @@ import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
-import { useContext, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { PipeSegment } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import GraphOnChip from '../../../data/GraphOnChip';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
-const PipesPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: number }) => {
+const PipesPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
-
     const [pipeFilter, setPipeFilter] = useState<string>('');
+    const pipeSegments = useMemo(() => graphs.flatMap(({ graph }) => graph.allUniquePipes), [graphs]);
 
     const selectFilteredPipes = () => {
-        if (!graphOnChip) {
-            return;
-        }
-
-        graphOnChip.allUniquePipes.forEach((pipeSegment: PipeSegment) => {
+        pipeSegments.forEach((pipeSegment) => {
             if (pipeSegment.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
+                // TODO: batch update
                 dispatch(updatePipeSelection({ id: pipeSegment.id, selected: true }));
             }
         });
@@ -57,26 +53,25 @@ const PipesPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: number }
                 />
             </div>
             <div className='properties-list'>
-                {graphOnChip && (
-                    <ul className='pipes-list'>
-                        {graphOnChip.allUniquePipes.map((pipeSegment) => (
-                            <FilterableComponent
-                                key={pipeSegment.id}
-                                filterableString={pipeSegment.id}
-                                filterQuery={pipeFilter}
-                                component={
-                                    <li>
-                                        <SelectablePipe
-                                            pipeSegment={pipeSegment}
-                                            pipeFilter={pipeFilter}
-                                            showBandwidth={false}
-                                        />
-                                    </li>
-                                }
-                            />
-                        ))}
-                    </ul>
-                )}
+                <ul className='pipes-list'>
+                    {pipeSegments.map((pipeSegment, index) => (
+                        <FilterableComponent
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={`${index}-${pipeSegment.id}`}
+                            filterableString={pipeSegment.id}
+                            filterQuery={pipeFilter}
+                            component={
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={pipeSegment}
+                                        pipeFilter={pipeFilter}
+                                        showBandwidth={false}
+                                    />
+                                </li>
+                            }
+                        />
+                    ))}
+                </ul>
             </div>
         </div>
     );

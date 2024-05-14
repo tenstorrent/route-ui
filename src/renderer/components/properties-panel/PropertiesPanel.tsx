@@ -18,50 +18,45 @@ import type { LocationState } from '../../../data/StateTypes';
 
 export default function PropertiesPanel() {
     const location: Location<LocationState> = useLocation();
-    const { chipId = -1, epoch, graphName = '' } = location.state;
+    const { chipId, epoch } = location.state;
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
+
     return (
         <div className='properties-panel'>
             <Tabs id='my-tabs' selectedTabId={selectedTab} onChange={setSelectedTab} className='properties-tabs'>
                 <Tab
                     id='tab-nodes'
                     title='Nodes'
-                    panel={<ComputeNodesPropertiesTab epoch={epoch} graphName={graphName} />}
+                    panel={<ComputeNodesPropertiesTab graphs={graphOnChipList} epoch={epoch} />}
                 />
-                {graphOnChip?.hasPipes && (
-                    <Tab
-                        id='tab-pipes'
-                        title={
-                            <span>
-                                Pipes <Icon icon={IconNames.FILTER} />
-                            </span>
-                        }
-                        panel={<PipesPropertiesTab epoch={epoch} chipId={chipId} />}
-                    />
-                )}
-                {graphOnChip?.hasOperations && (
-                    <Tab
-                        id='tab-ops'
-                        title={
-                            <span>
-                                Operations <Icon icon={IconNames.CUBE} />
-                            </span>
-                        }
-                        panel={<OperationsPropertiesTab chipId={chipId} epoch={epoch} />}
-                    />
-                )}
-                {graphOnChip?.hasQueues && (
-                    <Tab
-                        id='tab-queues'
-                        title={
-                            <span>
-                                Queues <QueueIcon />{' '}
-                            </span>
-                        }
-                        panel={<QueuesPropertiesTab chipId={chipId} epoch={epoch} />}
-                    />
-                )}
+                <Tab
+                    id='tab-pipes'
+                    title={
+                        <span>
+                            Pipes <Icon icon={IconNames.FILTER} />
+                        </span>
+                    }
+                    panel={<PipesPropertiesTab graphs={graphOnChipList} />}
+                />
+                <Tab
+                    id='tab-ops'
+                    title={
+                        <span>
+                            Operations <Icon icon={IconNames.CUBE} />
+                        </span>
+                    }
+                    panel={<OperationsPropertiesTab graphs={graphOnChipList} />}
+                />
+                <Tab
+                    id='tab-queues'
+                    title={
+                        <span>
+                            Queues <QueueIcon />{' '}
+                        </span>
+                    }
+                    panel={<QueuesPropertiesTab graphs={graphOnChipList} />}
+                />
             </Tabs>
             <div className='panel-overlay' />
         </div>

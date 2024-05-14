@@ -6,23 +6,21 @@ import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { selectOperandList } from 'data/store/slices/nodeSelection.slice';
-import { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { Operation } from '../../../data/GraphTypes';
 import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import type GraphOnChip from '../../../data/GraphOnChip';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
-const OperationsPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: number }) => {
+const OperationsPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
-    const { getGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getGraphOnChip(epoch, chipId);
 
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
+    const operationsList = useMemo(() => [...new Set(graphs.flatMap(({ graph }) => [...graph.operations]))], [graphs]);
     const [allOpen, setAllOpen] = useState(true);
 
     const updateFilteredOperationSelection = (selected: boolean) => {
@@ -71,10 +69,11 @@ const OperationsPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: num
                 <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
             <div className='properties-list'>
-                {operationsList.map((operation: Operation) => {
+                {operationsList.map((operation, index) => {
                     return (
                         <FilterableComponent
-                            key={operation.name}
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={`${index}-${operation.name}`}
                             filterableString={operation.name}
                             filterQuery={filterQuery}
                             component={

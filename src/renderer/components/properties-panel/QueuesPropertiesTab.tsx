@@ -5,9 +5,8 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { selectOperandList } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
@@ -16,15 +15,14 @@ import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import type GraphOnChip from '../../../data/GraphOnChip';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
-const QueuesPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: number }) => {
+const QueuesPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
-    const { getGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getGraphOnChip(epoch, chipId);
-
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
+    const queuesList = useMemo(() => [...new Set(graphs.flatMap(({ graph }) => [...graph.queues]))], [graphs]);
 
     const updateFilteredQueueSelection = (selected: boolean) => {
         if (!queuesList.length) {
@@ -69,14 +67,16 @@ const QueuesPropertiesTab = ({ chipId, epoch }: { chipId: number; epoch: number 
             </div>
 
             <div className='properties-list'>
-                {queuesList.map((queue) => (
+                {queuesList.map((queue, index) => (
                     <FilterableComponent
-                        key={queue.name}
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${index}-${queue.name}`}
                         filterableString={queue.name}
                         filterQuery={filterQuery}
                         component={
                             <Collapsible
-                                key={queue.name}
+                                // eslint-disable-next-line react/no-array-index-key
+                                key={`collapsible-${index}-${queue.name}`}
                                 label={
                                     <GraphVertexDetailsSelectables
                                         operand={queue}

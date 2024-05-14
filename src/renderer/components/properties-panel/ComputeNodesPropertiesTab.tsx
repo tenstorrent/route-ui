@@ -8,12 +8,11 @@ import { Tooltip2 } from '@blueprintjs/popover2';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { closeDetailedView, openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { Fragment, useContext, useMemo } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
 import { GraphVertexType } from '../../../data/GraphNames';
-import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import GraphOnChip, { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import { getOrderedSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
@@ -26,6 +25,7 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -349,26 +349,31 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
     );
 };
 
-const ComputeNodesPropertiesTab = ({ epoch, graphName }: { epoch: number; graphName: string }) => {
-    const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+const ComputeNodesPropertiesTab = ({
+    graphs,
+    epoch,
+}: {
+    graphs: { graph: GraphOnChip; relationship: GraphRelationship }[];
+    epoch: number;
+}) => {
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
     const selectedNodes = useMemo(() => {
         const selectedNodesList = orderedNodeSelection
             .map((nodeState) => {
-                const graphOnChip = graphList[nodeState.chipId]?.graphOnChip;
+                const graphOnChip = graphs.find(({ relationship }) => relationship.chipId === nodeState.chipId);
 
-                return graphOnChip?.getNode(nodeState.id);
+                return { node: graphOnChip?.graph.getNode(nodeState.id), graphName: graphOnChip?.relationship.name };
             })
-            .filter((node) => node) as ComputeNode[];
+            .filter((node) => node) as { node: ComputeNode; graphName: string }[];
 
         return selectedNodesList;
-    }, [graphList, orderedNodeSelection]);
+    }, [graphs, orderedNodeSelection]);
 
     return (
         <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map((node) => (
+                    {selectedNodes.map(({ node, graphName }) => (
                         <ComputeNodePropertiesCard
                             key={node?.uid}
                             node={node}
