@@ -6,10 +6,9 @@ import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import GraphOnChip, { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import LinkDetails from '../LinkDetails';
@@ -21,10 +20,15 @@ interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
     graphName: string;
     temporalEpoch: number;
+    graphOnChip?: GraphOnChip;
 }
 
-const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName, temporalEpoch }) => {
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, node.chipId);
+const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
+    node,
+    graphName,
+    temporalEpoch,
+    graphOnChip,
+}) => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
@@ -76,7 +80,12 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                             selected: true,
                                                         }),
                                                     );
-                                                    dispatch(openDetailedView(currentNode.uid));
+                                                    dispatch(
+                                                        openDetailedView({
+                                                            nodeUid: currentNode.uid,
+                                                            chipId: currentNode.chipId,
+                                                        }),
+                                                    );
                                                 }}
                                             />
                                         )}
@@ -161,6 +170,10 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
             </div>
         </>
     );
+};
+
+DetailedViewDRAMRenderer.defaultProps = {
+    graphOnChip: undefined,
 };
 
 export default DetailedViewDRAMRenderer;

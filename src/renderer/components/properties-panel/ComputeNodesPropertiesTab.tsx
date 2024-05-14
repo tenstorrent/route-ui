@@ -7,7 +7,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
-import { openDetailedView } from 'data/store/slices/uiState.slice';
+import { closeDetailedView, openDetailedView } from 'data/store/slices/uiState.slice';
 import React, { Fragment, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
@@ -149,6 +149,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
                         icon={IconNames.CROSS}
                         onClick={() => {
                             dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: false }));
+                            dispatch(closeDetailedView());
                         }}
                     />
                 </Tooltip2>
@@ -301,7 +302,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
                         icon={IconNames.PROPERTIES}
                         disabled={node.uid === selectedDetailsViewUID && isDetailsViewOpen}
                         onClick={() => {
-                            dispatch(openDetailedView(node.uid));
+                            dispatch(openDetailedView({ nodeUid: node.uid, chipId: node.chipId }));
                         }}
                     >
                         Detailed View

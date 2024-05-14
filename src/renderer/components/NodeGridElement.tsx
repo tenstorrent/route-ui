@@ -65,7 +65,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     const triggerSelection = () => {
         const selectedState = nodeState?.selected;
         if (isOpen && selectedState) {
-            dispatch(openDetailedView(node.uid));
+            dispatch(openDetailedView({ nodeUid: node.uid, chipId: node.chipId }));
         } else {
             dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: !nodeState?.selected }));
         }
