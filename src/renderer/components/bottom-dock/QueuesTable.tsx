@@ -31,15 +31,22 @@ function QueuesTable() {
             return [];
         }
 
-        const list = graphOnChipList.flatMap(({ graph }) =>
-            [...graph.queues].map(
-                (queue) =>
-                    ({
-                        name: queue.name,
-                        ...queue.details,
-                    }) as unknown as QueuesTableFields,
-            ),
-        );
+        const list = [
+            ...graphOnChipList
+                .reduce((queueMap, { graph }) => {
+                    [...graph.queues].forEach((queue) => {
+                        if (!queueMap.has(queue.name)) {
+                            queueMap.set(queue.name, {
+                                name: queue.name,
+                                ...queue.details,
+                            } as unknown as QueuesTableFields);
+                        }
+                    });
+
+                    return queueMap;
+                }, new Map<string, QueuesTableFields>())
+                .values(),
+        ];
 
         return sortTableFields(list);
     }, [graphOnChipList, sortTableFields]);

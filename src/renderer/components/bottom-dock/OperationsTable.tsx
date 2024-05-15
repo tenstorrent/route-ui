@@ -49,7 +49,7 @@ function OperationsTable() {
             return [];
         }
 
-        let list = [];
+        let list: OpTableFields[] = [];
         let selectedOperation: BuildableOperation | undefined;
 
         // eslint-disable-next-line no-restricted-syntax
@@ -71,17 +71,24 @@ function OperationsTable() {
                 } as OpTableFields;
             });
         } else {
-            list = graphOnChipList.flatMap(({ graph: { operations } }) =>
-                [...operations].map(
-                    (op) =>
-                        ({
-                            operation: op,
-                            name: op.name,
-                            ...op.details,
-                            slowestOperandRef: op.slowestOperand,
-                        }) as unknown as OpTableFields,
-                ),
-            );
+            list = [
+                ...graphOnChipList
+                    .reduce((opMap, { graph: { operations } }) => {
+                        [...operations].forEach((op) => {
+                            if (!opMap.has(op.name)) {
+                                opMap.set(op.name, {
+                                    operation: op,
+                                    name: op.name,
+                                    ...op.details,
+                                    slowestOperandRef: op.slowestOperand,
+                                } as unknown as OpTableFields);
+                            }
+                        });
+
+                        return opMap;
+                    }, new Map<string, OpTableFields>())
+                    .values(),
+            ];
         }
 
         if (filterQuery) {
@@ -118,7 +125,7 @@ function OperationsTable() {
                             selectFunc={selectOperand}
                             stringFilter={filterQuery}
                             type={GraphVertexType.OPERATION}
-                            offchip={operation?.isOffchip}
+                            offchip={chipId !== undefined && operation?.isOffchip}
                             offchipClickHandler={navigateToGraph(opName)}
                         >
                             <Button
@@ -184,7 +191,7 @@ function OperationsTable() {
                             selectFunc={selectOperand}
                             stringFilter=''
                             type={slowestOperand.vertexType}
-                            offchip={slowestOperand.isOffchip}
+                            offchip={chipId !== undefined && slowestOperand.isOffchip}
                             offchipClickHandler={navigateToGraph(slowestOperand.name)}
                         >
                             <Button
