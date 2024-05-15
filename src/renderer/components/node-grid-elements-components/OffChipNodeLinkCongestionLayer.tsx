@@ -2,72 +2,70 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { ComputeNodeType } from '../../../data/Types';
-import {
-    getAllLinksForGraph,
-    getLinkSaturation,
-    getShowLinkSaturation,
-} from '../../../data/store/selectors/linkSaturation.selectors';
-import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
+import { getLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
+import type { LinkState } from '../../../data/StateTypes';
 
 interface OffChipNodeLinkCongestionLayerProps {
     node: ComputeNode;
-    graphName: string;
+    linksData: Record<string, LinkState>;
+    showLinkSaturation: boolean;
+    isHighContrast: boolean;
 }
 
 /**
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
-const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ node, graphName }) => {
-    const linksData = useSelector(getAllLinksForGraph(graphName));
-    const isHighContrast = useSelector(getHighContrastState);
-    const showLinkSaturation = useSelector(getShowLinkSaturation);
+const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({
+    node,
+    linksData,
+    showLinkSaturation,
+    isHighContrast,
+}) => {
     const linkSaturationTreshold = useSelector(getLinkSaturation);
 
-    if (!showLinkSaturation) {
-        return null;
-    }
+    const saturationValues = useMemo(() => {
+        let offChipLinkIds: string[] = [];
 
-    let congestionStyle = {};
-    const { type } = node;
-    let offChipLinkIds: string[] = [];
+        switch (node.type) {
+            case ComputeNodeType.DRAM:
+                offChipLinkIds =
+                    node.dramChannel?.links.map((link) => {
+                        return link.uid;
+                    }) || [];
+                break;
+            case ComputeNodeType.ETHERNET:
+                offChipLinkIds =
+                    [...node.internalLinks.values()].map((link) => {
+                        return link.uid;
+                    }) || [];
+                break;
 
-    switch (type) {
-        case ComputeNodeType.DRAM:
-            offChipLinkIds =
-                node.dramChannel?.links.map((link) => {
-                    return link.uid;
-                }) || [];
-            break;
-        case ComputeNodeType.ETHERNET:
-            offChipLinkIds =
-                [...node.internalLinks.values()].map((link) => {
-                    return link.uid;
-                }) || [];
-            break;
+            case ComputeNodeType.PCIE:
+                offChipLinkIds =
+                    [...node.internalLinks].map(([link]) => {
+                        return link.uid;
+                    }) || [];
+                break;
+            default:
+                break;
+        }
 
-        case ComputeNodeType.PCIE:
-            offChipLinkIds =
-                [...node.internalLinks].map(([link]) => {
-                    return link.uid;
-                }) || [];
-            break;
-        default:
-            return null;
-    }
+        return offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
+    }, [linksData, node]);
 
-    const saturationValues = offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
     const saturation = Math.max(...saturationValues) || 0;
-    if (saturation < linkSaturationTreshold) {
-        return null;
+    let congestionStyle = {};
+
+    if (showLinkSaturation && saturation >= linkSaturationTreshold) {
+        const congestionColor = calculateLinkCongestionColor(saturation, 0, isHighContrast);
+        const saturationBg = toRGBA(congestionColor, 0.5);
+        congestionStyle = getOffChipCongestionStyles(saturationBg);
     }
-    const congestionColor = calculateLinkCongestionColor(saturation, 0, isHighContrast);
-    const saturationBg = toRGBA(congestionColor, 0.5);
-    congestionStyle = getOffChipCongestionStyles(saturationBg);
 
     return <div className='off-chip-congestion' style={congestionStyle} />;
 };

@@ -5,26 +5,28 @@
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ComputeNode, PipeSegment } from '../../data/GraphOnChip';
+import { ComputeNode } from '../../data/GraphOnChip';
 import { EthernetLinkName, HighlightType } from '../../data/Types';
 import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
 import {
     getDetailedViewOpenState,
+    getHighContrastState,
     getSelectedDetailsViewUID,
     getShowOperationNames,
 } from '../../data/store/selectors/uiState.selectors';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
-import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
 import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
-import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
 import NodeOperationLabel from './node-grid-elements-components/NodeOperationLabel';
 import OperationGroupRender from './node-grid-elements-components/OperationGroupRender';
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
-import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import { ClusterChip } from '../../data/Cluster';
+import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
+import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
+import { getAllLinksForGraph, getShowLinkSaturation } from '../../data/store/selectors/linkSaturation.selectors';
+import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -40,7 +42,14 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
+
+    // TODO: move to grid rendering
     const showOperationNames = useSelector(getShowOperationNames);
+    const shouldRenderOpPerf = useSelector(getShowOperationPerformanceGrid);
+    const isHighContrast = useSelector(getHighContrastState);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
+    // TODO: pre-calculate link saturation and memoize it
+    const linksData = useSelector(getAllLinksForGraph(graphName));
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -71,15 +80,16 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
         }
     };
 
-    let externalPipes: PipeSegment[] = [];
-
-    if (connectedEth !== null) {
-        externalPipes = node
+    const externalPipes = useMemo(() => {
+        if (connectedEth === null) {
+            return [];
+        }
+        return node
             .getInternalLinksForNode()
             .filter((link) => link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT)
             .map((link) => link.pipes)
             .flat();
-    }
+    }, [connectedEth, node]);
 
     return (
         <button
@@ -99,6 +109,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
                     {/* ))} */}
                 </div>
             )}
+
             {/* Selected operation borders and backgrounds */}
             <OperationGroupRender node={node} />
             <DramModuleBorder node={node} temporalEpoch={temporalEpoch} />
@@ -111,17 +122,26 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
             <div className='node-border' />
 
             {/* Congestion information */}
-            <OperationCongestionLayer node={node} />
-            <OffChipNodeLinkCongestionLayer node={node} graphName={graphName} />
+            <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
+            <OffChipNodeLinkCongestionLayer
+                node={node}
+                linksData={linksData}
+                showLinkSaturation={showLinkSaturation}
+                isHighContrast={isHighContrast}
+            />
 
             {/* Labels for location and operation */}
             <NodeLocation node={node} />
-            <NodeOperationLabel node={node} />
+            <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
 
             {/* Pipes */}
-            <NodePipeRenderer node={node} graphName={graphName} />
-            <NodeFocusPipeRenderer node={node} />
-
+            <NodePipeRenderer
+                node={node}
+                isHighContrast={isHighContrast}
+                showLinkSaturation={showLinkSaturation}
+                linksData={linksData}
+            />
+            {/* <NodeFocusPipeRenderer node={node} /> */}
             {/* Node type label */}
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
         </button>
