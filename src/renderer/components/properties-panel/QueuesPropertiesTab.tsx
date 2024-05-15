@@ -22,6 +22,7 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relatio
     const dispatch = useDispatch();
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
+    // TODO: filter dupes
     const queuesList = useMemo(() => [...new Set(graphs.flatMap(({ graph }) => [...graph.queues]))], [graphs]);
 
     const updateFilteredQueueSelection = (selected: boolean) => {

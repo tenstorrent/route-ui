@@ -20,6 +20,7 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; rel
     const dispatch = useDispatch();
 
     const [filterQuery, setFilterQuery] = useState<string>('');
+    // TODO: filter dupes
     const operationsList = useMemo(() => [...new Set(graphs.flatMap(({ graph }) => [...graph.operations]))], [graphs]);
     const [allOpen, setAllOpen] = useState(true);
 
