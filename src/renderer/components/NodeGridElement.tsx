@@ -57,9 +57,12 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     const shouldShowLabel = !node.opSiblingNodes?.top && !node.opSiblingNodes?.left;
 
     let coreHighlight = HighlightType.NONE;
-    // TODO: invert logic to avoid recomputing consumer/producer cores. Simply check if the node id matches
-    const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
-    const isProducer = node.producerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
+    const nodeConsumerPipeMap = useMemo(() => [...new Set(node.consumerPipes.map((pipe) => pipe.id))], [node]);
+    const nodeProducerPipeMap = useMemo(() => [...new Set(node.producerPipes.map((pipe) => pipe.id))], [node]);
+
+    const isConsumer = nodeConsumerPipeMap.includes(focusPipe ?? '');
+    const isProducer = nodeProducerPipeMap.includes(focusPipe ?? '');
+
     if (isConsumer && isProducer) {
         coreHighlight = HighlightType.BOTH;
     } else if (isConsumer) {
