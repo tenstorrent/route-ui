@@ -37,6 +37,7 @@ interface GraphOnChipContextType {
     ) => { graph: GraphOnChip; relationship: GraphRelationship }[];
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
+    getTemporalEpochList: () => number[];
 }
 
 const applicationModelState: ApplicationModelState = {
@@ -54,6 +55,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphOnChip: () => [],
     getOperand: () => undefined,
     getGraphOnChipListForTemporalEpoch: () => [],
+    getTemporalEpochList: () => [],
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -151,6 +153,15 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
     }, [state.graphs]);
 
+    // method to get an array of temporalepoch ids
+    const getTemporalEpochList = useCallback(() => {
+        const temporalEpochList: number[] = [];
+        state.graphs.forEach((graph) => {
+            temporalEpochList[graph.temporalEpoch] = graph.temporalEpoch;
+        });
+        return temporalEpochList.filter((epoch) => epoch !== undefined) || [];
+    }, [state.graphs]);
+
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number) => {
             const graphArray: { graph: GraphRelationship; graphOnChip: GraphOnChip }[] = [];
@@ -184,6 +195,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             resetGraphOnChipState: reset,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
+            getTemporalEpochList,
         }),
         [
             loadGraphOnChips,
@@ -194,6 +206,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             reset,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
+            getTemporalEpochList,
         ],
     );
 
