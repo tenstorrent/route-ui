@@ -28,7 +28,7 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
 }) => {
     const linkSaturationTreshold = useSelector(getLinkSaturation);
 
-    const saturationValues = useMemo(() => {
+    const saturation = useMemo(() => {
         let offChipLinkIds: string[] = [];
 
         switch (node.type) {
@@ -55,10 +55,11 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
                 break;
         }
 
-        return offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
+        const saturationValues = offChipLinkIds.map((linkId) => linksData[linkId]?.saturation) || [0];
+
+        return Math.max(...saturationValues) || 0;
     }, [linksData, node]);
 
-    const saturation = Math.max(...saturationValues) || 0;
     let congestionStyle = {};
 
     if (showLinkSaturation && saturation >= linkSaturationTreshold) {
