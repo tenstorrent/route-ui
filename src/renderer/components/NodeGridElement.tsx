@@ -57,11 +57,9 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     const shouldShowLabel = !node.opSiblingNodes?.top && !node.opSiblingNodes?.left;
 
     let coreHighlight = HighlightType.NONE;
-    const nodeConsumerPipeMap = useMemo(() => [...new Set(node.consumerPipes.map((pipe) => pipe.id))], [node]);
-    const nodeProducerPipeMap = useMemo(() => [...new Set(node.producerPipes.map((pipe) => pipe.id))], [node]);
 
-    const isConsumer = nodeConsumerPipeMap.includes(focusPipe ?? '');
-    const isProducer = nodeProducerPipeMap.includes(focusPipe ?? '');
+    const isConsumer = node.consumerPipes.find(({ id }) => id === focusPipe) !== undefined;
+    const isProducer = node.producerPipes.find(({ id }) => id === focusPipe) !== undefined;
 
     if (isConsumer && isProducer) {
         coreHighlight = HighlightType.BOTH;
