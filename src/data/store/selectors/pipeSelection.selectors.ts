@@ -13,8 +13,11 @@ export const getFocusPipe = (state: RootState) => state.pipeSelection.focusPipe;
 export const getSelectedPipesIds = createSelector(
     (state: RootState) => Object.values(state.pipeSelection.pipes),
     (pipeSelectionStateList) =>
-        pipeSelectionStateList
-            //
-            .filter((pipe) => pipe.selected)
-            .map((pipe) => pipe.id),
+        pipeSelectionStateList.reduce((pipeIdList, pipe) => {
+            if (pipe.selected) {
+                pipeIdList.push(pipe.id);
+            }
+
+            return pipeIdList;
+        }, [] as string[]),
 );
