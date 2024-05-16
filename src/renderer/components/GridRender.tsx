@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { CSSProperties, useContext } from 'react';
+import { CSSProperties, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Icon } from '@blueprintjs/core';
@@ -27,6 +27,10 @@ export default function GridRender() {
 
     const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
     const { cluster } = useContext(ClusterContext);
+    const clusterChipsMap = useMemo(
+        () => Object.fromEntries((cluster?.chips ?? []).map((chip) => [chip.id, chip])),
+        [cluster],
+    );
 
     const style =
         graphOnChipList.length > 1
@@ -40,13 +44,16 @@ export default function GridRender() {
     return (
         <div className='main-content' style={style}>
             {graphOnChipList.map(({ graph: { chipId: id, totalCols, nodes }, relationship: { name: graphName } }) => {
-                const clusterChip = cluster?.chips.find((chip) => chip.id === id);
+                const clusterChip = clusterChipsMap[id];
                 const clusterChipPositioning: CSSProperties = {};
+
                 if (clusterChip) {
                     clusterChipPositioning.gridColumn = clusterChip.coordinates.x + 1;
                     clusterChipPositioning.gridRow = clusterChip.coordinates.y + 1;
                 }
+
                 clusterChipPositioning.contentVisibility = 'auto';
+
                 return (
                     <div className='grid-container' style={clusterChipPositioning}>
                         <div
