@@ -1080,6 +1080,10 @@ export class ComputeNode {
             if (link.type === LinkType.PCIE) {
                 node.internalLinks.set(linkName, link as PCIeLink);
             }
+
+            if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
+                node.externalPipes.push(...link.pipes);
+            }
         });
 
         // Associate with operation
@@ -1132,6 +1136,8 @@ export class ComputeNode {
     public producerPipes: Pipe[] = [];
 
     public pipes: Pipe[] = [];
+
+    public externalPipes: PipeSegment[] = [];
 
     /**
      * only relevant for dram nodes

@@ -5,10 +5,10 @@
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
-import { EthernetLinkName, HighlightType } from '../../data/Types';
+import { HighlightType } from '../../data/Types';
 import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
 import {
     getDetailedViewOpenState,
@@ -80,18 +80,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
         }
     };
 
-    // TODO: pre-calculate external pipes
-    const externalPipes = useMemo(() => {
-        if (connectedEth === null) {
-            return [];
-        }
-        return node
-            .getInternalLinksForNode()
-            .filter((link) => link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT)
-            .map((link) => link.pipes)
-            .flat();
-    }, [connectedEth, node]);
-
     return (
         <button
             title={showOperationNames && shouldShowLabel ? node.opName : ''}
@@ -101,7 +89,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
             } `}
             onClick={triggerSelection}
         >
-            {connectedEth !== null && externalPipes.length > 0 && (
+            {connectedEth !== null && node.externalPipes.length > 0 && (
                 <div className='eth-connection'>
                     {/* TEMPORARY OTPUT */}
                     <span>ETH {connectedEth?.id}</span>
