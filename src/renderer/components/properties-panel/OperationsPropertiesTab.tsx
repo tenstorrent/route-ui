@@ -15,13 +15,28 @@ import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
+import type { Operation } from '../../../data/GraphTypes';
 
 const OperationsPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
 
     const [filterQuery, setFilterQuery] = useState<string>('');
-    // TODO: filter dupes
-    const operationsList = useMemo(() => [...new Set(graphs.flatMap(({ graph }) => [...graph.operations]))], [graphs]);
+    const operationsList = useMemo(
+        () => [
+            ...graphs
+                .reduce((opMap, { graph }) => {
+                    [...graph.operations].forEach((op) => {
+                        if (!opMap.has(op.name)) {
+                            opMap.set(op.name, op);
+                        }
+                    });
+
+                    return opMap;
+                }, new Map<string, Operation>())
+                .values(),
+        ],
+        [graphs],
+    );
     const [allOpen, setAllOpen] = useState(true);
 
     const updateFilteredOperationSelection = (selected: boolean) => {

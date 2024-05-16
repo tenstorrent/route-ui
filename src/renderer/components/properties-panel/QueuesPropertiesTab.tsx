@@ -17,13 +17,28 @@ import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
+import type { Queue } from '../../../data/GraphTypes';
 
 const QueuesPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    // TODO: filter dupes
-    const queuesList = useMemo(() => [...new Set(graphs.flatMap(({ graph }) => [...graph.queues]))], [graphs]);
+    const queuesList = useMemo(
+        () => [
+            ...graphs
+                .reduce((queueMap, { graph }) => {
+                    [...graph.queues].forEach((queue) => {
+                        if (!queueMap.has(queue.name)) {
+                            queueMap.set(queue.name, queue);
+                        }
+                    });
+
+                    return queueMap;
+                }, new Map<string, Queue>())
+                .values(),
+        ],
+        [graphs],
+    );
 
     const updateFilteredQueueSelection = (selected: boolean) => {
         if (!queuesList.length) {
