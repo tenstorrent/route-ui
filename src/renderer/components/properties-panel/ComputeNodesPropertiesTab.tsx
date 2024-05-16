@@ -358,13 +358,21 @@ const ComputeNodesPropertiesTab = ({
 }) => {
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
     const selectedNodes = useMemo(() => {
-        const selectedNodesList = orderedNodeSelection
-            .map((nodeState) => {
-                const graphOnChip = graphs.find(({ relationship }) => relationship.chipId === nodeState.chipId);
+        const selectedNodesList = orderedNodeSelection.reduce(
+            (graphList, nodeState) => {
+                const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
 
-                return { node: graphOnChip?.graph.getNode(nodeState.id), graphName: graphOnChip?.relationship.name };
-            })
-            .filter((node) => node) as { node: ComputeNode; graphName: string }[];
+                if (graphOnChip) {
+                    graphList.push({
+                        node: graphOnChip?.graph.getNode(nodeState.id),
+                        graphName: graphOnChip?.relationship.name,
+                    });
+                }
+
+                return graphList;
+            },
+            [] as { node: ComputeNode; graphName: string }[],
+        );
 
         return selectedNodesList;
     }, [graphs, orderedNodeSelection]);
