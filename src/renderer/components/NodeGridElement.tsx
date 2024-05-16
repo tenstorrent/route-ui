@@ -43,12 +43,11 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
-
-    // TODO: move to grid rendering
     const showOperationNames = useSelector(getShowOperationNames);
     const shouldRenderOpPerf = useSelector(getShowOperationPerformanceGrid);
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
+
     // TODO: pre-calculate link saturation and memoize it
     const linksData = useSelector(getAllLinksForGraph(graphName));
 
@@ -58,6 +57,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     const shouldShowLabel = !node.opSiblingNodes?.top && !node.opSiblingNodes?.left;
 
     let coreHighlight = HighlightType.NONE;
+    // TODO: invert logic to avoid recomputing consumer/producer cores. Simply check if the node id matches
     const isConsumer = node.consumerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
     const isProducer = node.producerPipes.filter((pipe) => pipe.id === focusPipe).length > 0; // ?.consumerCores.includes(node.uid);
     if (isConsumer && isProducer) {
@@ -67,8 +67,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     } else if (isProducer) {
         coreHighlight = HighlightType.INPUT;
     }
-
-    // console.log(nodeState)
 
     const highlightClass = coreHighlight === HighlightType.NONE ? '' : `core-highlight-${coreHighlight}`;
 
@@ -81,6 +79,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
         }
     };
 
+    // TODO: pre-calculate external pipes
     const externalPipes = useMemo(() => {
         if (connectedEth === null) {
             return [];
