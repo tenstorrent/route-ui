@@ -22,7 +22,6 @@ const NodeFocusPipeRenderer: FC<NodeFocusPipeRendererProps> = ({ node }) => {
     svg.selectAll('*').remove();
 
     useEffect(() => {
-        // TODO: debug
         const focusedPipeIds = [focusPipe || ''];
 
         if (focusPipe && node.pipes.filter((pipe) => pipe.id === focusPipe).length > 0) {

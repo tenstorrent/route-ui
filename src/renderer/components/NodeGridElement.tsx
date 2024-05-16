@@ -27,6 +27,7 @@ import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffC
 import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
 import { getAllLinksForGraph, getShowLinkSaturation } from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
+import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -141,7 +142,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
                 showLinkSaturation={showLinkSaturation}
                 linksData={linksData}
             />
-            {/* <NodeFocusPipeRenderer node={node} /> */}
+            <NodeFocusPipeRenderer node={node} />
+
             {/* Node type label */}
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
         </button>
