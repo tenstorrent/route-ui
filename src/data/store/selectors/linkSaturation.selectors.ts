@@ -4,12 +4,12 @@
 
 import { RootState } from '../createStore';
 
-export const getLinkData = (graphName: string, id: string) => (state: RootState) =>
-    state.linkSaturation.graphs[graphName]?.links[id];
-export const getAllLinksForGraph = (graphName: string) => (state: RootState) =>
-    state.linkSaturation.graphs[graphName]?.links || [];
-export const getTotalOpsForGraph = (graphName: string) => (state: RootState) =>
-    state.linkSaturation.graphs[graphName]?.totalOps || 0;
+export const getLinkData = (temporalEpoch: number, id: string) => (state: RootState) =>
+    state.linkSaturation.graphs[temporalEpoch]?.links[id];
+export const getAllLinksForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.graphs[temporalEpoch]?.links || {};
+export const getTotalOpsForGraph = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.graphs[temporalEpoch]?.totalOps || 0;
 export const getEpochNormalizedTotalOps = (state: RootState) => state.linkSaturation.epochNormalizedTotalOps;
 export const getEpochAdjustedTotalOps = (state: RootState) => state.linkSaturation.epochAdjustedTotalOps;
 export const getLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturationTreshold;

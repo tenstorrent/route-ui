@@ -9,7 +9,7 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
-    getAllLinksForGraph,
+    getAllLinksForTemporalEpoch,
     getLinkSaturation,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
@@ -20,7 +20,7 @@ import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../.
 interface EthPipeRendererProps {
     id: string;
     node: ComputeNode | undefined;
-    graphName: string | undefined;
+    temporalEpoch: number;
     ethPosition: CLUSTER_ETH_POSITION;
     index: number;
     clusterChipSize: number;
@@ -30,7 +30,7 @@ interface EthPipeRendererProps {
 const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     id,
     node,
-    graphName,
+    temporalEpoch,
     ethPosition,
     index,
     clusterChipSize,
@@ -64,7 +64,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const linksData = useSelector(getAllLinksForGraph(graphName || ''));
+    const linksData = useSelector(getAllLinksForTemporalEpoch(temporalEpoch));
     const isHighContrast = useSelector(getHighContrastState);
 
     useEffect(() => {

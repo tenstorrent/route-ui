@@ -30,7 +30,6 @@ import type { GraphRelationship } from '../../../data/StateTypes';
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
-    graphName: string;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -118,7 +117,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
@@ -341,7 +340,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} graphName={graphName} showEmpty />
+                        <LinkDetails key={link.name} link={link} temporalEpoch={temporalEpoch} showEmpty />
                     ))}
                 </div>
             )}
@@ -358,21 +357,15 @@ const ComputeNodesPropertiesTab = ({
 }) => {
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
     const selectedNodes = useMemo(() => {
-        const selectedNodesList = orderedNodeSelection.reduce(
-            (graphList, nodeState) => {
-                const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
+        const selectedNodesList = orderedNodeSelection.reduce((graphList, nodeState) => {
+            const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
 
-                if (graphOnChip) {
-                    graphList.push({
-                        node: graphOnChip?.graph.getNode(nodeState.id),
-                        graphName: graphOnChip?.relationship.name,
-                    });
-                }
+            if (graphOnChip) {
+                graphList.push(graphOnChip?.graph.getNode(nodeState.id));
+            }
 
-                return graphList;
-            },
-            [] as { node: ComputeNode; graphName: string }[],
-        );
+            return graphList;
+        }, [] as ComputeNode[]);
 
         return selectedNodesList;
     }, [graphs, orderedNodeSelection]);
@@ -381,13 +374,8 @@ const ComputeNodesPropertiesTab = ({
         <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map(({ node, graphName }) => (
-                        <ComputeNodePropertiesCard
-                            key={node?.uid}
-                            node={node}
-                            temporalEpoch={epoch}
-                            graphName={graphName}
-                        />
+                    {selectedNodes.map((node) => (
+                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} />
                     ))}
                 </div>
             </div>

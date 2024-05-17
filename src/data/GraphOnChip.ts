@@ -1067,7 +1067,7 @@ export class ComputeNode {
             node.dramSubchannelId = nodeJSON.dram_subchannel || 0;
         }
 
-        const linkId = `${node.loc.x}-${node.loc.y}`;
+        const linkId = node.uid;
 
         Object.entries(nodeJSON.links).forEach(([linkName, linkJson], index) => {
             const link: NetworkLink = NetworkLink.CREATE(linkName as NOCLinkName, `${linkId}-${index}`, linkJson);

@@ -19,7 +19,7 @@ import {
     PCIeLinkName,
 } from '../../../data/Types';
 import {
-    getAllLinksForGraph,
+    getAllLinksForTemporalEpoch,
     getLinkSaturation,
     getShowLinkSaturation,
     getShowNOC0,
@@ -37,13 +37,13 @@ type DetailedViewPipeRendererProps = {
 
 const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className, size = 80 }) => {
     const location: Location<LocationState> = useLocation();
-    const { graphName = '' } = location.state;
+    const { epoch: temporalEpoch } = location.state;
     const svgRef = useRef<SVGSVGElement | null>(null);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const selectedPipeIds = useSelector(getSelectedPipesIds);
     const isHighContrast = useSelector(getHighContrastState);
-    const linksData = useSelector(getAllLinksForGraph(graphName));
+    const linksData = useSelector(getAllLinksForTemporalEpoch(temporalEpoch));
     const noc0Saturation = useSelector(getShowNOC0);
     const noc1Saturation = useSelector(getShowNOC1);
 

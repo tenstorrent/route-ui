@@ -12,10 +12,10 @@ import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedView
 
 interface DetailedViewPCIERendererProps {
     node: ComputeNode;
-    graphName: string;
+    temporalEpoch: number;
 }
 
-const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, graphName }) => {
+const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, temporalEpoch }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -60,7 +60,9 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
-                        return <LinkDetails graphName={graphName} key={link.name} link={link} showEmpty={false} />;
+                        return (
+                            <LinkDetails temporalEpoch={temporalEpoch} key={link.name} link={link} showEmpty={false} />
+                        );
                     })}
                 </div>
             </div>

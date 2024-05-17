@@ -4,7 +4,7 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { EpochAndLinkStates, LinkState, NetworkCongestionState } from 'data/StateTypes';
+import { LinkState, NetworkCongestionState } from 'data/StateTypes';
 import { LinkType, NOC } from 'data/Types';
 import {
     AICLK_INITIAL_MHZ,
@@ -16,7 +16,7 @@ import {
 
 const networkCongestionInitialState: NetworkCongestionState = {
     linkSaturationTreshold: LINK_SATURATION_INITIAIL_PERCENT,
-    graphs: {}, // graphName -> LinkGraphState
+    graphs: [],
     epochNormalizedTotalOps: [],
     epochAdjustedTotalOps: [],
     CLKMHz: AICLK_INITIAL_MHZ,
@@ -46,9 +46,9 @@ const linkSaturationSlice = createSlice({
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturationTreshold = action.payload;
         },
-        updateTotalOPs: (state, action: PayloadAction<{ graphName: string; totalOps: number }>) => {
-            const { graphName, totalOps } = action.payload;
-            const graphState = state.graphs[graphName];
+        updateTotalOPs: (state, action: PayloadAction<{ temporalEpoch: number; totalOps: number }>) => {
+            const { temporalEpoch, totalOps } = action.payload;
+            const graphState = state.graphs[temporalEpoch];
             const { DRAMBandwidthBytes, PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
 
             if (graphState) {
@@ -65,9 +65,9 @@ const linkSaturationSlice = createSlice({
                 });
             }
         },
-        initialLoadTotalOPs: (state, action: PayloadAction<Record<string, number>>) => {
-            Object.entries(action.payload).forEach(([graphName, totalOps]) => {
-                const graphState = state.graphs[graphName];
+        initialLoadTotalOPs: (state, action: PayloadAction<number[]>) => {
+            action.payload.forEach((totalOps, temporalEpoch) => {
+                const graphState = state.graphs[temporalEpoch];
                 const { DRAMBandwidthBytes, PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
 
                 if (graphState) {
@@ -96,38 +96,36 @@ const linkSaturationSlice = createSlice({
             state.epochNormalizedTotalOps = perEpoch;
             state.epochAdjustedTotalOps = perEpoch;
 
-            Object.entries(perGraph).forEach(([graphName, normalizedOpCycles]) => {
-                const graphState = state.graphs[graphName];
-                if (graphState.links) {
-                    Object.values(graphState.links).forEach((linkState: LinkState) => {
-                        if (linkState.type === LinkType.ETHERNET) {
-                            calculateNormalizedSaturation(linkState, normalizedOpCycles);
-                        }
-                    });
-                }
-            });
+            // TODO: recalculate "per graph"?
+            // Object.entries(perGraph).forEach(([graphName, normalizedOpCycles]) => {
+            //     const graphState = state.graphs[graphName];
+            //     if (graphState.links) {
+            //         Object.values(graphState.links).forEach((linkState: LinkState) => {
+            //             if (linkState.type === LinkType.ETHERNET) {
+            //                 calculateNormalizedSaturation(linkState, normalizedOpCycles);
+            //             }
+            //         });
+            //     }
+            // });
         },
         updateEpochNormalizedOP: (state, action: PayloadAction<{ epoch: number; updatedValue: number }>) => {
             const { epoch, updatedValue } = action.payload;
             state.epochAdjustedTotalOps[epoch] = updatedValue;
-            Object.values(state.graphs).forEach((graphState) => {
-                if (graphState.temporalEpoch === epoch) {
-                    Object.values(graphState.links).forEach((linkState: LinkState) => {
-                        if (linkState.type === LinkType.ETHERNET) {
-                            calculateNormalizedSaturation(linkState, updatedValue);
-                        }
-                    });
+
+            Object.values(state.graphs[epoch].links).forEach((linkState: LinkState) => {
+                if (linkState.type === LinkType.ETHERNET) {
+                    calculateNormalizedSaturation(linkState, updatedValue);
                 }
             });
         },
-        initialLoadLinkData: (state, action: PayloadAction<Record<string, EpochAndLinkStates>>) => {
-            Object.entries(action.payload).forEach(([graphName, graphData]) => {
-                if (!state.graphs[graphName]) {
-                    state.graphs[graphName] = { links: {}, totalOps: 0, temporalEpoch: graphData.temporalEpoch };
+        initialLoadLinkData: (state, action: PayloadAction<LinkState[][]>) => {
+            action.payload.forEach((graphData, temporalEpoch) => {
+                if (!state.graphs[temporalEpoch]) {
+                    state.graphs[temporalEpoch] = { links: {}, totalOps: 0 };
                 }
-                const graphState = state.graphs[graphName];
-                graphData.linkStates.forEach((item) => {
-                    graphState.links[item.id] = item;
+
+                graphData.forEach((item) => {
+                    state.graphs[temporalEpoch].links[item.id] = item;
                 });
             });
         },
@@ -155,7 +153,7 @@ const linkSaturationSlice = createSlice({
             }
         },
         resetNetworksState: (state) => {
-            state.graphs = {};
+            state.graphs = [];
         },
     },
 });

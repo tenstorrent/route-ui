@@ -23,8 +23,8 @@ import type GraphOnChip from '../../data/GraphOnChip';
 import type { NodeInitialState } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type {
-    EpochAndLinkStates,
     FolderLocationType,
+    LinkState,
     LocationState,
     NavigateOptions,
     PipeSelection,
@@ -98,9 +98,9 @@ const usePerfAnalyzerFileLoader = () => {
             const totalOpsPerEpoch: number[] = [];
             const totalOpsNormalized: Record<string, number> = {};
             const graphOnChipList: GraphOnChip[] = [];
-            const linkDataByGraphname: Record<string, EpochAndLinkStates> = {};
+            const linkDataByTemporalEpoch: LinkState[][] = [];
             const pipeSelectionData: PipeSelection[] = [];
-            const totalOpsData: Record<string, number> = {};
+            const totalOpsData: number[] = [];
             const nodesDataPerTemporalEpoch: Record<number, NodeInitialState[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
@@ -113,11 +113,10 @@ const usePerfAnalyzerFileLoader = () => {
                 const ops = totalOpsPerEpoch[graph.temporalEpoch] ?? 1;
                 totalOpsPerEpoch[graph.temporalEpoch] = Math.max(graphOnChip.totalOpCycles, ops);
                 graphOnChipList.push(graphOnChip);
-                linkDataByGraphname[graph.name] = {
-                    linkStates: graphOnChip.getAllLinks().map((link) => link.generateInitialState()),
-                    temporalEpoch: graph.temporalEpoch,
-                };
-                totalOpsData[graph.name] = graphOnChip.totalOpCycles;
+                linkDataByTemporalEpoch[graph.temporalEpoch] = graphOnChip
+                    .getAllLinks()
+                    .map((link) => link.generateInitialState());
+                totalOpsData[graph.temporalEpoch] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
 
                 if (!nodesDataPerTemporalEpoch[graph.temporalEpoch]) {
@@ -140,7 +139,7 @@ const usePerfAnalyzerFileLoader = () => {
 
             loadGraphOnChips(graphOnChipList, sortedGraphs);
 
-            dispatch(initialLoadLinkData(linkDataByGraphname));
+            dispatch(initialLoadLinkData(linkDataByTemporalEpoch));
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
             dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));

@@ -18,17 +18,11 @@ import DetailedViewPipeControls from './DetailedViewPipeControls';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
-    graphName: string;
     temporalEpoch: number;
     graphOnChip?: GraphOnChip;
 }
 
-const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
-    node,
-    graphName,
-    temporalEpoch,
-    graphOnChip,
-}) => {
+const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, temporalEpoch, graphOnChip }) => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
@@ -144,7 +138,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
-                                    graphName={graphName}
+                                    temporalEpoch={temporalEpoch}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
                                 />
@@ -158,13 +152,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
-                                graphName={graphName}
+                                temporalEpoch={temporalEpoch}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} graphName={graphName} link={link} showEmpty={false} />
+                        <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
                     ))}
                 </div>
             </div>

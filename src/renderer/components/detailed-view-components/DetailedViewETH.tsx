@@ -14,10 +14,10 @@ import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 
 interface DetailedViewETHRendererProps {
     node: ComputeNode;
-    graphName: string;
+    temporalEpoch: number;
 }
 
-const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, graphName }) => {
+const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, temporalEpoch }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -67,7 +67,9 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
-                        return <LinkDetails graphName={graphName} key={link.name} link={link} showEmpty={false} />;
+                        return (
+                            <LinkDetails temporalEpoch={temporalEpoch} key={link.name} link={link} showEmpty={false} />
+                        );
                     })}
                 </div>
             </div>

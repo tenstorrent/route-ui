@@ -33,13 +33,12 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch } = location.state;
     // TODO: use multiple graphs
-    const { graph: graphOnChip, relationship: { name: graphName } = { name: '' } } =
-        useContext(GraphOnChipContext).getGraphOnChip(epoch)[0] ?? {};
+    const { graph: graphOnChip } = useContext(GraphOnChipContext).getGraphOnChip(epoch)[0] ?? {};
     const dispatch = useDispatch();
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);
     const PCIeBandwidth = useSelector(getPCIBandwidth);
-    const opCycles = useSelector(getTotalOpsForGraph(graphName));
+    const opCycles = useSelector(getTotalOpsForGraph(epoch));
 
     let aiclkRightElement = (
         <Tooltip2 content='Reset Total OP Cycles'>
@@ -48,7 +47,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 onClick={() => {
                     const resetValue = graphOnChip?.totalOpCycles || 1;
 
-                    dispatch(updateTotalOPs({ graphName, totalOps: resetValue }));
+                    dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: resetValue }));
                 }}
                 icon={IconNames.RESET}
             />
@@ -88,7 +87,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                             newValue = 1;
                         }
 
-                        dispatch(updateTotalOPs({ graphName, totalOps: newValue }));
+                        dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: newValue }));
                     }}
                     rightElement={aiclkRightElement}
                 />

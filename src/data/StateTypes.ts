@@ -62,11 +62,6 @@ export interface LinkState {
     normalizedSaturation: number;
 }
 
-export interface EpochAndLinkStates {
-    linkStates: LinkState[];
-    temporalEpoch: number;
-}
-
 export interface LinkGraphState {
     links: Record<string, LinkState>;
     totalOps: number;
@@ -75,7 +70,7 @@ export interface LinkGraphState {
 
 export interface NetworkCongestionState {
     linkSaturationTreshold: number;
-    graphs: Record<string, LinkGraphState>;
+    graphs: { links: Record<string, LinkState>; totalOps: number }[];
     epochNormalizedTotalOps: number[];
     epochAdjustedTotalOps: number[];
     CLKMHz: number;
