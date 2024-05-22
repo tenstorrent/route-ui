@@ -2,11 +2,12 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-/* eslint-disable no-useless-constructor */
+/* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
+// eslint-disable-next-line import/no-cycle
 import { BuildableOperation, BuildableQueue, Operand } from './Graph';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
 import type { Operation, Queue } from './GraphTypes';
