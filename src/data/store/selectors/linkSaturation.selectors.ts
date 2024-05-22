@@ -2,16 +2,24 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
-export const getLinkData = (temporalEpoch: number, id: string) => (state: RootState) =>
-    state.linkSaturation.graphs[temporalEpoch]?.links[id];
+export const getLinkData = (temporalEpoch: number, nodeUid: string, linkId: string) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid].links[linkId];
 export const getAllLinksForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
-    state.linkSaturation.graphs[temporalEpoch]?.links || {};
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap || {};
 export const getTotalOpsForGraph = (temporalEpoch: number) => (state: RootState) =>
-    state.linkSaturation.graphs[temporalEpoch]?.totalOps || 0;
-export const getEpochNormalizedTotalOps = (state: RootState) => state.linkSaturation.epochNormalizedTotalOps;
-export const getEpochAdjustedTotalOps = (state: RootState) => state.linkSaturation.epochAdjustedTotalOps;
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOps || 0;
+export const getEpochNormalizedTotalOps = createSelector(
+    (state: RootState) => state.linkSaturation.linksPerTemporalEpoch,
+    (linksPerTemporalEpoch) => linksPerTemporalEpoch.map(({ normalizedTotalOps }) => normalizedTotalOps),
+);
+
+export const getEpochAdjustedTotalOps = createSelector(
+    (state: RootState) => state.linkSaturation.linksPerTemporalEpoch,
+    (linksPerTemporalEpoch) => linksPerTemporalEpoch.map(({ adjustedTotalOps }) => adjustedTotalOps),
+);
 export const getLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturationTreshold;
 export const getShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
 export const getShowNOC0 = (state: RootState) => state.linkSaturation.showNOC0;

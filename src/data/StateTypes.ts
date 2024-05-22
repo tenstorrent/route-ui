@@ -70,9 +70,13 @@ export interface LinkGraphState {
 
 export interface NetworkCongestionState {
     linkSaturationTreshold: number;
-    graphs: { links: Record<string, LinkState>; totalOps: number }[];
-    epochNormalizedTotalOps: number[];
-    epochAdjustedTotalOps: number[];
+    linksPerTemporalEpoch: {
+        linksPerNodeMap: Record<string, { links: Record<string, LinkState>; saturation: number; chipId: number }>;
+        totalOps: number;
+        totalOpPerChip: number[];
+        normalizedTotalOps: number;
+        adjustedTotalOps: number;
+    }[];
     CLKMHz: number;
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;

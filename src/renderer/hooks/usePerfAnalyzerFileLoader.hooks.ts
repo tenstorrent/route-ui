@@ -24,17 +24,12 @@ import type { NodeInitialState } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type {
     FolderLocationType,
-    LinkState,
     LocationState,
     NavigateOptions,
+    NetworkCongestionState,
     PipeSelection,
 } from '../../data/StateTypes';
-import {
-    initialLoadLinkData,
-    initialLoadNormalizedOPs,
-    initialLoadTotalOPs,
-    resetNetworksState,
-} from '../../data/store/slices/linkSaturation.slice';
+import { initialLoadLinkData, resetNetworksState } from '../../data/store/slices/linkSaturation.slice';
 import { initialLoadAllNodesData } from '../../data/store/slices/nodeSelection.slice';
 import { updateRandomRedux } from '../../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../../data/store/slices/pipeSelection.slice';
@@ -95,11 +90,9 @@ const usePerfAnalyzerFileLoader = () => {
 
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
-            const totalOpsPerEpoch: number[] = [];
             const graphOnChipList: GraphOnChip[] = [];
-            const linkDataByTemporalEpoch: LinkState[][] = [];
+            const linkDataByTemporalEpoch: NetworkCongestionState['linksPerTemporalEpoch'] = [];
             const pipeSelectionData: PipeSelection[] = [];
-            const totalOpsData: number[] = [];
             const nodesDataPerTemporalEpoch: Record<number, NodeInitialState[]> = {};
             const times = [];
             // eslint-disable-next-line no-restricted-syntax
@@ -109,13 +102,28 @@ const usePerfAnalyzerFileLoader = () => {
                 // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
 
-                const ops = totalOpsPerEpoch[graph.temporalEpoch] ?? 1;
-                totalOpsPerEpoch[graph.temporalEpoch] = Math.max(graphOnChip.totalOpCycles, ops);
+                if (!linkDataByTemporalEpoch[graph.temporalEpoch]) {
+                    linkDataByTemporalEpoch[graph.temporalEpoch] = {
+                        linksPerNodeMap: {},
+                        totalOpPerChip: [],
+                        totalOps: 0,
+                        normalizedTotalOps: 0,
+                        adjustedTotalOps: 0,
+                    };
+                }
+
+                const { linksPerNodeMap, totalOps: totalOpsPerEpoch } = linkDataByTemporalEpoch[graph.temporalEpoch];
+
+                linkDataByTemporalEpoch[graph.temporalEpoch].linksPerNodeMap = {
+                    ...linksPerNodeMap,
+                    ...graphOnChip.getAllLinksInitialState(),
+                };
+
+                const ops = totalOpsPerEpoch ?? 1;
+                linkDataByTemporalEpoch[graph.temporalEpoch].totalOps = Math.max(graphOnChip.totalOpCycles, ops);
+                linkDataByTemporalEpoch[graph.temporalEpoch].totalOpPerChip[graph.chipId] = graphOnChip.totalOpCycles;
+
                 graphOnChipList.push(graphOnChip);
-                linkDataByTemporalEpoch[graph.temporalEpoch] = graphOnChip
-                    .getAllLinks()
-                    .map((link) => link.generateInitialState());
-                totalOpsData[graph.temporalEpoch] = graphOnChip.totalOpCycles;
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
 
                 if (!nodesDataPerTemporalEpoch[graph.temporalEpoch]) {
@@ -135,9 +143,8 @@ const usePerfAnalyzerFileLoader = () => {
             loadGraphOnChips(graphOnChipList, sortedGraphs);
 
             dispatch(initialLoadLinkData(linkDataByTemporalEpoch));
+
             dispatch(loadPipeSelection(pipeSelectionData));
-            dispatch(initialLoadTotalOPs(totalOpsData));
-            dispatch(initialLoadNormalizedOPs({ perEpoch: totalOpsPerEpoch }));
             dispatch(initialLoadAllNodesData(nodesDataPerTemporalEpoch));
 
             // console.table(times, ['graph', 'time']);

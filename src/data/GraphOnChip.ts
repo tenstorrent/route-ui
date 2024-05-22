@@ -758,22 +758,54 @@ export default class GraphOnChip {
         return [...nodes];
     }
 
-    getAllLinks(): NetworkLink[] {
-        const links: NetworkLink[] = [];
+    getAllLinksInitialState() {
+        const links: Record<string, { saturation: number; chipId: number; links: Record<string, LinkState> }> = {};
+
         forEach(this.nodes, (node) => {
+            if (!links[node.uid]) {
+                links[node.uid] = {
+                    links: {},
+                    chipId: this.chipId,
+                    saturation: 0,
+                };
+            }
+
             node.links.forEach((link) => {
-                links.push(link);
+                links[node.uid].links[link.uid] = link.generateInitialState();
             });
             node.internalLinks.forEach((link) => {
-                links.push(link);
+                links[node.uid].links[link.uid] = link.generateInitialState();
             });
         });
+
         this.dramChannels.forEach((dramChannel) => {
+            // TODO: find correct node Uids for DRAM
+            const dramId = `DRAM-${this.chipId}-${dramChannel.id}`;
+
+            if (!links[dramId]) {
+                links[dramId] = {
+                    links: {},
+                    chipId: this.chipId,
+                    saturation: 0,
+                };
+            }
+
             dramChannel.links.forEach((link) => {
-                links.push(link);
+                links[dramId].links[link.uid] = link.generateInitialState();
+
                 dramChannel.subchannels.forEach((subchannel) => {
+                    const dramSubchannelId = `${dramId}-${subchannel.subchannelId}`;
+
+                    if (!links[dramSubchannelId]) {
+                        links[dramSubchannelId] = {
+                            links: {},
+                            chipId: this.chipId,
+                            saturation: 0,
+                        };
+                    }
+
                     subchannel.links.forEach((subchannelLink) => {
-                        links.push(subchannelLink);
+                        links[dramSubchannelId].links[subchannelLink.uid] = subchannelLink.generateInitialState();
                     });
                 });
             });
