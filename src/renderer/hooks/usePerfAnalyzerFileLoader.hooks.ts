@@ -96,7 +96,6 @@ const usePerfAnalyzerFileLoader = () => {
             dispatch(setSelectedFolder(folderPath));
             const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
             const totalOpsPerEpoch: number[] = [];
-            const totalOpsNormalized: Record<string, number> = {};
             const graphOnChipList: GraphOnChip[] = [];
             const linkDataByTemporalEpoch: LinkState[][] = [];
             const pipeSelectionData: PipeSelection[] = [];
@@ -133,16 +132,12 @@ const usePerfAnalyzerFileLoader = () => {
                 });
             }
 
-            sortedGraphs.forEach((graph) => {
-                totalOpsNormalized[graph.name] = totalOpsPerEpoch[graph.temporalEpoch] ?? 1;
-            });
-
             loadGraphOnChips(graphOnChipList, sortedGraphs);
 
             dispatch(initialLoadLinkData(linkDataByTemporalEpoch));
             dispatch(loadPipeSelection(pipeSelectionData));
             dispatch(initialLoadTotalOPs(totalOpsData));
-            dispatch(initialLoadNormalizedOPs({ perGraph: totalOpsNormalized, perEpoch: totalOpsPerEpoch }));
+            dispatch(initialLoadNormalizedOPs({ perEpoch: totalOpsPerEpoch }));
             dispatch(initialLoadAllNodesData(nodesDataPerTemporalEpoch));
 
             // console.table(times, ['graph', 'time']);

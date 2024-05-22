@@ -85,28 +85,22 @@ const linkSaturationSlice = createSlice({
                 }
             });
         },
-        initialLoadNormalizedOPs: (
-            state,
-            action: PayloadAction<{
-                perGraph: Record<string, number>;
-                perEpoch: number[];
-            }>,
-        ) => {
-            const { perGraph, perEpoch } = action.payload;
+        initialLoadNormalizedOPs: (state, action: PayloadAction<{ perEpoch: number[] }>) => {
+            const { perEpoch } = action.payload;
             state.epochNormalizedTotalOps = perEpoch;
             state.epochAdjustedTotalOps = perEpoch;
 
-            // TODO: recalculate "per graph"?
-            // Object.entries(perGraph).forEach(([graphName, normalizedOpCycles]) => {
-            //     const graphState = state.graphs[graphName];
-            //     if (graphState.links) {
-            //         Object.values(graphState.links).forEach((linkState: LinkState) => {
-            //             if (linkState.type === LinkType.ETHERNET) {
-            //                 calculateNormalizedSaturation(linkState, normalizedOpCycles);
-            //             }
-            //         });
-            //     }
-            // });
+            perEpoch.forEach((normalizedOpCycles, epoch) => {
+                const graphState = state.graphs[epoch];
+
+                if (graphState.links) {
+                    Object.values(graphState.links).forEach((linkState: LinkState) => {
+                        if (linkState.type === LinkType.ETHERNET) {
+                            calculateNormalizedSaturation(linkState, normalizedOpCycles);
+                        }
+                    });
+                }
+            });
         },
         updateEpochNormalizedOP: (state, action: PayloadAction<{ epoch: number; updatedValue: number }>) => {
             const { epoch, updatedValue } = action.payload;

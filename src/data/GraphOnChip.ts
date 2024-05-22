@@ -1072,7 +1072,14 @@ export class ComputeNode {
         Object.entries(nodeJSON.links).forEach(([linkName, linkJson], index) => {
             const link: NetworkLink = NetworkLink.CREATE(linkName as NOCLinkName, `${linkId}-${index}`, linkJson);
             if (link.type === LinkType.NOC) {
-                node.links.set(linkName, link as NOCLink);
+                // Added a const here to avoid casting multiple times
+                const NocLink = link as NOCLink;
+
+                node.links.set(linkName, NocLink);
+
+                if (NocLink.noc === NOC.NOC0 || NocLink.noc === NOC.NOC1) {
+                    node.noc0and1Links.push(NocLink);
+                }
             }
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
@@ -1121,6 +1128,8 @@ export class ComputeNode {
     public opCycles: number = 0;
 
     public links: Map<any, NOCLink> = new Map();
+
+    public noc0and1Links: NOCLink[] = [];
 
     /** @description Off chip links that are not part of the NOC, excluding DRAM links */
     public internalLinks: Map<any, NetworkLink> = new Map();
