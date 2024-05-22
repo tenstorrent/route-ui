@@ -26,7 +26,8 @@ import { ClusterChip } from '../../data/Cluster';
 import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
 import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
 import {
-    getAllLinksForTemporalEpoch,
+    getNodeLinksData,
+    getNodeSaturation,
     getShowLinkSaturation,
 } from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
@@ -49,8 +50,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
 
-    // TODO: pre-calculate link saturation and memoize it
-    const linksData = useSelector(getAllLinksForTemporalEpoch(temporalEpoch));
+    const linksData = useSelector(getNodeLinksData(temporalEpoch, node.uid));
+    const nodeSaturation = useSelector(getNodeSaturation(temporalEpoch, node.uid));
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -114,8 +115,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             {/* Congestion information */}
             <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
             <OffChipNodeLinkCongestionLayer
-                node={node}
-                linksData={linksData}
+                saturation={nodeSaturation}
                 showLinkSaturation={showLinkSaturation}
                 isHighContrast={isHighContrast}
             />
@@ -129,7 +129,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
                 node={node}
                 isHighContrast={isHighContrast}
                 showLinkSaturation={showLinkSaturation}
-                linksData={linksData}
+                linksData={linksData.links}
             />
             <NodeFocusPipeRenderer node={node} />
 

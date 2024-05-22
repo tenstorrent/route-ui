@@ -7,6 +7,10 @@ import { RootState } from '../createStore';
 
 export const getLinkData = (temporalEpoch: number, nodeUid: string, linkId: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid].links[linkId];
+export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid];
+export const getNodeSaturation = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid]?.saturation ?? 0;
 export const getAllLinksForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap || {};
 export const getTotalOpsForGraph = (temporalEpoch: number) => (state: RootState) =>
