@@ -31,11 +31,17 @@ import type { LocationState } from '../../../data/StateTypes';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
+    nodeUid: string;
     className?: string;
     size?: number;
 };
 
-const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className, size = 80 }) => {
+const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
+    links,
+    nodeUid,
+    className,
+    size = 80,
+}) => {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch } = location.state;
     const svgRef = useRef<SVGSVGElement | null>(null);
@@ -65,7 +71,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
                     }
                 }
                 if (renderCongestion) {
-                    const linkData = linksData[link.uid];
+                    const linkData = linksData[nodeUid].links[link.uid];
                     if (linkData?.saturation >= linkSaturationTreshold) {
                         drawLink(
                             svg,
@@ -100,6 +106,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         noc1Saturation,
         isHighContrast,
         selectedPipeIds,
+        nodeUid,
     ]);
 
     const linkNames = links.map((link) => link.name).join(' ');

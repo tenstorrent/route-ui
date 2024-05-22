@@ -39,16 +39,24 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                             <div className='node-container'>
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc0links}
+                                            nodeUid={node.uid}
+                                            label='NOC0'
+                                        />
                                     </div>
                                     <div className='col noc1'>
-                                        <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc1links}
+                                            nodeUid={node.uid}
+                                            label='NOC1'
+                                        />
                                     </div>
                                     <div className='col'>
                                         <div className='router'>
                                             <p className='label single-line'>Ethernet</p>
                                         </div>
-                                        <DetailedViewPipeRenderer links={internalNOCLinks} />
+                                        <DetailedViewPipeRenderer links={internalNOCLinks} nodeUid={node.uid} />
                                     </div>
                                 </div>
                             </div>
@@ -59,7 +67,11 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                             </div>
                         </div>
                         <div className='col eth-off-chip'>
-                            <DetailedViewPipeRenderer links={internalNOCLinks} className='centered-svg' />
+                            <DetailedViewPipeRenderer
+                                links={internalNOCLinks}
+                                nodeUid={node.uid}
+                                className='centered-svg'
+                            />
                         </div>
                     </div>
                 </div>
@@ -68,7 +80,13 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
-                            <LinkDetails temporalEpoch={temporalEpoch} key={link.name} link={link} showEmpty={false} />
+                            <LinkDetails
+                                temporalEpoch={temporalEpoch}
+                                key={link.name}
+                                link={link}
+                                nodeUid={node.uid}
+                                showEmpty={false}
+                            />
                         );
                     })}
                 </div>

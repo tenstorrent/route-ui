@@ -9,16 +9,18 @@ import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 
 interface DetailedViewAXIRenderProps {
     links: DramBankLink[] | NetworkLink[];
+    nodeUid: string;
     filter: DramBankLinkName | NetworkLinkName | null;
     label: string;
 }
 
-export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ links, filter, label }) => {
+export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ links, nodeUid, filter, label }) => {
     return (
         <div className='axi-dram-wrap'>
             <DetailedViewPipeRenderer
                 className='centered-svg'
                 links={links.filter((link) => (filter === null ? true : link.name === filter))}
+                nodeUid={nodeUid}
             />
             <div className='axi-dram'>
                 <p className='label'>{label}</p>
@@ -29,10 +31,11 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ li
 
 interface DetailedViewANOC2XIRenderProps {
     links: NOC2AXILink[] | NOCLink[];
+    nodeUid: string;
     noc: NOC;
 }
 
-export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({ links, noc }) => {
+export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({ links, nodeUid, noc }) => {
     return (
         <>
             <div className='noc2axi'>
@@ -41,6 +44,7 @@ export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps>
             <DetailedViewPipeRenderer
                 className='centered-svg'
                 links={links.filter((link) => (noc === NOC.ANY ? true : link.noc === noc))}
+                nodeUid={nodeUid}
             />
         </>
     );

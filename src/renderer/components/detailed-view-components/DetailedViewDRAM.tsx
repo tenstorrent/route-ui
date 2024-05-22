@@ -89,12 +89,28 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <DetailedViewPipeControls node={currentNode} numPipes={numPipes} />
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
-                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC0} />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc0links}
+                                            label='NOC0'
+                                            nodeUid={node.uid}
+                                        />
+                                        <DetailedViewNOC2AXIRender
+                                            links={subchannel.links}
+                                            noc={NOC.NOC0}
+                                            nodeUid={node.uid}
+                                        />
                                     </div>
                                     <div className='col noc1'>
-                                        <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
-                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC1} />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc1links}
+                                            label='NOC1'
+                                            nodeUid={node.uid}
+                                        />
+                                        <DetailedViewNOC2AXIRender
+                                            links={subchannel.links}
+                                            noc={NOC.NOC1}
+                                            nodeUid={node.uid}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -111,11 +127,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                         <>
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM0_INOUT}
                                 label='AXI DRAM0'
                             />
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM1_INOUT}
                                 label='AXI DRAM1'
                             />
@@ -124,6 +142,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                     {architecture === Architecture.GRAYSKULL && (
                         <DetailedViewAXIRender
                             links={dram.links}
+                            nodeUid={node.uid}
                             filter={DramBankLinkName.DRAM_INOUT}
                             label='Off-chip DRAM'
                         />
@@ -138,6 +157,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
+                                    nodeUid={n.uid}
                                     temporalEpoch={temporalEpoch}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
@@ -147,18 +167,24 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                     })}
                     {dram.subchannels.map((sub) =>
                         sub.links.map((link) => (
-                            //
                             <LinkDetails
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
+                                nodeUid={node.uid}
                                 temporalEpoch={temporalEpoch}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
+                        <LinkDetails
+                            key={link.name}
+                            temporalEpoch={temporalEpoch}
+                            link={link}
+                            nodeUid={node.uid}
+                            showEmpty={false}
+                        />
                     ))}
                 </div>
             </div>

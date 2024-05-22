@@ -340,7 +340,13 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} temporalEpoch={temporalEpoch} showEmpty />
+                        <LinkDetails
+                            key={link.name}
+                            link={link}
+                            nodeUid={node.uid}
+                            temporalEpoch={temporalEpoch}
+                            showEmpty
+                        />
                     ))}
                 </div>
             )}

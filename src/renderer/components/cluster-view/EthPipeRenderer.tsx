@@ -74,7 +74,8 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
             if (showLinkSaturation && linksData) {
                 node?.internalLinks.forEach((link) => {
                     if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
-                        const linkStateData = linksData[link.uid];
+                        const linkStateData = linksData[node.uid].links[link.uid];
+
                         if (normalizedSaturation) {
                             if (linkStateData && linkStateData.normalizedSaturation >= linkSaturationTreshold) {
                                 const color = calculateLinkCongestionColor(
