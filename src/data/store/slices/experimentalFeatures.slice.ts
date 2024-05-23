@@ -5,7 +5,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ExperimentalFeaturesState } from 'data/StateTypes';
 
-const experimentalFeaturesInitialState: ExperimentalFeaturesState = {};
+const experimentalFeaturesInitialState: ExperimentalFeaturesState = {
+    temporalEpochEnabled: false,
+};
 
 export const experimentalFeaturesSlice = createSlice({
     name: 'experimentalFeatures',

@@ -6,7 +6,9 @@ import type { RelativeRoutingType } from 'react-router-dom';
 import type { GraphVertexType } from './GraphNames';
 import { LinkType } from './Types';
 
-export interface ExperimentalFeaturesState {}
+export interface ExperimentalFeaturesState {
+    temporalEpochEnabled: boolean;
+}
 
 export interface HighContrastState {
     enabled: boolean;
