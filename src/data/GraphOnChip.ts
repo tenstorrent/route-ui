@@ -1145,12 +1145,12 @@ export class ComputeNode {
             const link: NetworkLink = NetworkLink.CREATE(linkName as NOCLinkName, `${linkId}-${index}`, linkJson);
             if (link.type === LinkType.NOC) {
                 // Added a const here to avoid casting multiple times
-                const NocLink = link as NOCLink;
+                const nocLink = link as NOCLink;
 
-                node.links.set(linkName, NocLink);
+                node.links.set(linkName, nocLink);
 
-                if (NocLink.noc === NOC.NOC0 || NocLink.noc === NOC.NOC1) {
-                    node.noc0and1Links.push(NocLink);
+                if (nocLink.noc === NOC.NOC0 || nocLink.noc === NOC.NOC1) {
+                    node.noc0and1Links.push(nocLink);
                 }
             }
             if (link.type === LinkType.ETHERNET) {
