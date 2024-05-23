@@ -1150,7 +1150,7 @@ export class ComputeNode {
                 node.links.set(linkName, nocLink);
 
                 if (nocLink.noc === NOC.NOC0 || nocLink.noc === NOC.NOC1) {
-                    node.noc0and1Links.push(nocLink);
+                    node.nocLinks.push(nocLink);
                 }
             }
             if (link.type === LinkType.ETHERNET) {
@@ -1229,7 +1229,7 @@ export class ComputeNode {
 
     public links: Map<any, NOCLink> = new Map();
 
-    public noc0and1Links: NOCLink[] = [];
+    public nocLinks: NOCLink[] = [];
 
     public offchipLinkIds: string[] = [];
 

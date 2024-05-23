@@ -62,7 +62,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, linksData, isHighCo
 
     useEffect(() => {
         if (showLinkSaturation) {
-            node.noc0and1Links.forEach((link) => {
+            node.nocLinks.forEach((link) => {
                 if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
                     const linkStateData = linksData[link.uid];
 
@@ -79,7 +79,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, linksData, isHighCo
         noc1Saturation,
         linkSaturationTreshold,
         linksData,
-        node.noc0and1Links,
+        node.nocLinks,
         svg,
         isHighContrast,
     ]);
