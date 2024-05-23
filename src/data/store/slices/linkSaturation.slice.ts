@@ -51,7 +51,7 @@ const linkSaturationSlice = createSlice({
 
             if (temporalEpochState) {
                 temporalEpochState.totalOps = totalOps;
-                Object.entries(temporalEpochState.linksPerNodeMap).forEach(([nodeUid, { links }]) => {
+                Object.entries(temporalEpochState.linksPerNodeMap).forEach(([nodeUid, { links, offchipLinkIds }]) => {
                     Object.values(links).forEach((linkState) => {
                         if (linkState.type === LinkType.ETHERNET) {
                             linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
@@ -60,15 +60,17 @@ const linkSaturationSlice = createSlice({
                         } else if (linkState.type === LinkType.PCIE) {
                             linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
                         }
-                        const { bpc, linkSaturation, nodeSaturation } = recalculateLinkSaturation(
-                            linkState,
-                            totalOps,
+                        const { bpc, linkSaturation, nodeSaturation, offChipSaturation } = recalculateLinkSaturation({
+                            link: linkState,
+                            totalOpCycles: totalOps,
                             links,
-                        );
+                            offchipLinkIds,
+                        });
 
                         linkState.bpc = bpc;
                         linkState.saturation = linkSaturation;
                         temporalEpochState.linksPerNodeMap[nodeUid].saturation = nodeSaturation;
+                        temporalEpochState.linksPerNodeMap[nodeUid].offchipSaturation = offChipSaturation;
                     });
                 });
             }
@@ -88,11 +90,10 @@ const linkSaturationSlice = createSlice({
         initialLoadLinkData: (state, action: PayloadAction<NetworkCongestionState['linksPerTemporalEpoch']>) => {
             state.linksPerTemporalEpoch = action.payload;
 
-            // TODO: are variables updates in state? (i.e. update reference instead of value)
             action.payload.forEach(({ linksPerNodeMap, normalizedTotalOps, totalOpPerChip }) => {
                 const { DRAMBandwidthBytes, PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
 
-                Object.entries(linksPerNodeMap).forEach(([nodeUid, { links, chipId }]) => {
+                Object.entries(linksPerNodeMap).forEach(([nodeUid, { links, chipId, offchipLinkIds }]) => {
                     Object.values(links).forEach((linkState) => {
                         if (linkState.type === LinkType.ETHERNET) {
                             linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
@@ -106,15 +107,21 @@ const linkSaturationSlice = createSlice({
                             linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
                         }
 
-                        const { bpc, linkSaturation, nodeSaturation } = recalculateLinkSaturation(
-                            linkState,
-                            totalOpPerChip[chipId],
+                        if (linkState.bpc === 0 && linkState.totalDataBytes > 0) {
+                            linkState.bpc = linkState.totalDataBytes / totalOpPerChip[chipId];
+                        }
+
+                        const { bpc, linkSaturation, nodeSaturation, offChipSaturation } = recalculateLinkSaturation({
+                            link: linkState,
+                            totalOpCycles: totalOpPerChip[chipId],
                             links,
-                        );
+                            offchipLinkIds,
+                        });
 
                         linkState.bpc = bpc;
                         linkState.saturation = linkSaturation;
                         linksPerNodeMap[nodeUid].saturation = nodeSaturation;
+                        linksPerNodeMap[nodeUid].offchipSaturation = offChipSaturation;
                     });
                 });
             });
@@ -152,19 +159,21 @@ const updateDRAMLinks = (state: NetworkCongestionState) => {
     const { DRAMBandwidthBytes, CLKHz } = getInitialCLKValues(state);
 
     Object.values(state.linksPerTemporalEpoch).forEach((epochState) => {
-        Object.entries(epochState.linksPerNodeMap).forEach(([nodeUid, { links }]) => {
+        Object.entries(epochState.linksPerNodeMap).forEach(([nodeUid, { links, offchipLinkIds }]) => {
             Object.values(links).forEach((linkState) => {
                 if (linkState.type === LinkType.DRAM) {
                     linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
-                    const { bpc, linkSaturation, nodeSaturation } = recalculateLinkSaturation(
-                        linkState,
-                        epochState.totalOps,
+                    const { bpc, linkSaturation, nodeSaturation, offChipSaturation } = recalculateLinkSaturation({
+                        link: linkState,
+                        totalOpCycles: epochState.totalOps,
                         links,
-                    );
+                        offchipLinkIds,
+                    });
 
                     linkState.bpc = bpc;
                     linkState.saturation = linkSaturation;
                     epochState.linksPerNodeMap[nodeUid].saturation = nodeSaturation;
+                    epochState.linksPerNodeMap[nodeUid].offchipSaturation = offChipSaturation;
                 }
             });
         });
@@ -175,41 +184,60 @@ const updatePCILinks = (state: NetworkCongestionState) => {
     const { PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
 
     Object.values(state.linksPerTemporalEpoch).forEach((epochState) => {
-        Object.entries(epochState.linksPerNodeMap).forEach(([nodeUid, { links }]) => {
+        Object.entries(epochState.linksPerNodeMap).forEach(([nodeUid, { links, offchipLinkIds }]) => {
             Object.values(links).forEach((linkState) => {
                 if (linkState.type === LinkType.PCIE) {
                     linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
-                    const { bpc, linkSaturation, nodeSaturation } = recalculateLinkSaturation(
-                        linkState,
-                        epochState.totalOps,
+                    const { bpc, linkSaturation, nodeSaturation, offChipSaturation } = recalculateLinkSaturation({
+                        link: linkState,
+                        totalOpCycles: epochState.totalOps,
                         links,
-                    );
+                        offchipLinkIds,
+                    });
 
                     linkState.bpc = bpc;
                     linkState.saturation = linkSaturation;
                     epochState.linksPerNodeMap[nodeUid].saturation = nodeSaturation;
+                    epochState.linksPerNodeMap[nodeUid].offchipSaturation = offChipSaturation;
                 }
             });
         });
     });
 };
 
-const recalculateLinkSaturation = (link: LinkState, totalOpCycles: number, links: Record<string, LinkState>) => {
-    const oldLinkSaturation = link.saturation;
+const recalculateLinkSaturation = ({
+    link,
+    totalOpCycles,
+    links,
+    offchipLinkIds,
+}: {
+    link: LinkState;
+    totalOpCycles: number;
+    links: Record<string, LinkState>;
+    offchipLinkIds: string[];
+}) => {
     const newLinkSaturation = (link.bpc / link.maxBandwidth) * 100;
 
     return {
         bpc: link.totalDataBytes / totalOpCycles,
         linkSaturation: newLinkSaturation,
-        nodeSaturation: Object.values(links).reduce((nodeSaturation, { saturation }) => {
-            let updatedSaturation = nodeSaturation;
+        ...Object.entries(links).reduce(
+            (updatedSaturation, [linkId, { saturation }]) => {
+                if (linkId !== link.id) {
+                    updatedSaturation.nodeSaturation = Math.max(updatedSaturation.nodeSaturation, saturation);
 
-            if (saturation !== oldLinkSaturation) {
-                updatedSaturation = Math.max(nodeSaturation, saturation);
-            }
+                    if (offchipLinkIds.includes(linkId)) {
+                        updatedSaturation.offChipSaturation = Math.max(updatedSaturation.offChipSaturation, saturation);
+                    }
+                }
 
-            return updatedSaturation;
-        }, newLinkSaturation),
+                return updatedSaturation;
+            },
+            {
+                nodeSaturation: newLinkSaturation,
+                offChipSaturation: newLinkSaturation,
+            },
+        ),
     };
 };
 

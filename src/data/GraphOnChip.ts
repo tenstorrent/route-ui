@@ -759,14 +759,25 @@ export default class GraphOnChip {
     }
 
     getAllLinksInitialState() {
-        const links: Record<string, { saturation: number; chipId: number; links: Record<string, LinkState> }> = {};
+        const links: Record<
+            string,
+            {
+                chipId: number;
+                links: Record<string, LinkState>;
+                offchipLinkIds: string[];
+                saturation: number;
+                offchipSaturation: number;
+            }
+        > = {};
 
         forEach(this.nodes, (node) => {
             if (!links[node.uid]) {
                 links[node.uid] = {
                     links: {},
+                    offchipLinkIds: [],
                     chipId: this.chipId,
                     saturation: 0,
+                    offchipSaturation: 0,
                 };
             }
 
@@ -776,6 +787,30 @@ export default class GraphOnChip {
             node.internalLinks.forEach((link) => {
                 links[node.uid].links[link.uid] = link.generateInitialState();
             });
+
+            switch (node.type) {
+                case ComputeNodeType.DRAM:
+                    links[node.uid].offchipLinkIds =
+                        node.dramChannel?.links.map((link) => {
+                            return link.uid;
+                        }) || [];
+                    break;
+                case ComputeNodeType.ETHERNET:
+                    links[node.uid].offchipLinkIds =
+                        [...node.internalLinks.values()].map((link) => {
+                            return link.uid;
+                        }) || [];
+                    break;
+
+                case ComputeNodeType.PCIE:
+                    links[node.uid].offchipLinkIds =
+                        [...node.internalLinks].map(([link]) => {
+                            return link.uid;
+                        }) || [];
+                    break;
+                default:
+                    break;
+            }
         });
 
         this.dramChannels.forEach((dramChannel) => {
@@ -785,8 +820,10 @@ export default class GraphOnChip {
             if (!links[dramId]) {
                 links[dramId] = {
                     links: {},
+                    offchipLinkIds: [],
                     chipId: this.chipId,
                     saturation: 0,
+                    offchipSaturation: 0,
                 };
             }
 
@@ -799,8 +836,10 @@ export default class GraphOnChip {
                     if (!links[dramSubchannelId]) {
                         links[dramSubchannelId] = {
                             links: {},
+                            offchipLinkIds: [],
                             chipId: this.chipId,
                             saturation: 0,
+                            offchipSaturation: 0,
                         };
                     }
 
