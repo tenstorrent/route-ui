@@ -20,7 +20,7 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
-    const IS_TEMPRAL_EPOCH_ENABLED = false;
+    const IS_TEMPORAL_EPOCH_ENABLED = false;
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
     const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
@@ -41,7 +41,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                     <Menu>
                         {temporalEpochs.map(([temporalEpoch, graphRelationships], index) => (
                             <>
-                                {IS_TEMPRAL_EPOCH_ENABLED && (
+                                {IS_TEMPORAL_EPOCH_ENABLED && (
                                     <>
                                         {index > 0 && <MenuDivider />}
                                         <MenuItem
