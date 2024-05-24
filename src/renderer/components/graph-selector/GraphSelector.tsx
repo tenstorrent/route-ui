@@ -20,6 +20,7 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
+    const IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED = false;
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
     const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
@@ -40,14 +41,18 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                     <Menu>
                         {temporalEpochs.map(([temporalEpoch, graphRelationships], index) => (
                             <>
-                                {index > 0 && <MenuDivider />}
-                                <MenuItem
-                                    icon={IconNames.SERIES_DERIVED}
-                                    key={`temporal-epoch-${temporalEpoch}`}
-                                    onClick={() => onSelectTemporalEpoch(temporalEpoch)}
-                                    text={`Temporal Epoch ${temporalEpoch}`}
-                                    className='graph-selector-temporal-epoch'
-                                />
+                                {IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED && (
+                                    <>
+                                        {index > 0 && <MenuDivider />}
+                                        <MenuItem
+                                            icon={IconNames.SERIES_DERIVED}
+                                            key={`temporal-epoch-${temporalEpoch}`}
+                                            onClick={() => onSelectTemporalEpoch(temporalEpoch)}
+                                            text={`Temporal Epoch ${temporalEpoch}`}
+                                            className='graph-selector-temporal-epoch'
+                                        />
+                                    </>
+                                )}
                                 {graphRelationships.map((graphRelationship) => (
                                     <MenuItem
                                         key={`temporal-epoch-${temporalEpoch}-${graphRelationship.name}`}
