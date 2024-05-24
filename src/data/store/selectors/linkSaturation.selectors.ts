@@ -9,7 +9,7 @@ export const getLinkData = (temporalEpoch: number, nodeUid: string, linkId: stri
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid].links[linkId];
 export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid];
-export const getOffchipNodeSaturation = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
+export const getOffchipLinkSaturationForNode = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid]?.offchipSaturation ?? 0;
 export const getAllLinksForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap || {};

@@ -27,7 +27,7 @@ import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffC
 import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
 import {
     getNodeLinksData,
-    getOffchipNodeSaturation,
+    getOffchipLinkSaturationForNode,
     getShowLinkSaturation,
 } from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
@@ -51,7 +51,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
 
     const linksData = useSelector(getNodeLinksData(temporalEpoch, node.uid));
-    const nodeSaturation = useSelector(getOffchipNodeSaturation(temporalEpoch, node.uid));
+    const offchipLinkSaturation = useSelector(getOffchipLinkSaturationForNode(temporalEpoch, node.uid));
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -115,7 +115,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             {/* Congestion information */}
             <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
             <OffChipNodeLinkCongestionLayer
-                saturation={nodeSaturation}
+                saturation={offchipLinkSaturation}
                 showLinkSaturation={showLinkSaturation}
                 isHighContrast={isHighContrast}
             />
