@@ -7,12 +7,10 @@ import { Popover2 } from '@blueprintjs/popover2';
 import { Button, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { type Location, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 import './GraphSelector.scss';
 import type { LocationState } from '../../../data/StateTypes';
-import { getExperimentalFeature } from '../../../data/store/selectors/experimentalFeatures.selectors';
 
 interface GraphSelectorProps {
     disabled?: boolean;
@@ -22,7 +20,7 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
-    const isTemporalEpochEnabled = useSelector(getExperimentalFeature('temporalEpochEnabled'));
+    const IS_TEMPRAL_EPOCH_ENABLED = false;
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
     const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
@@ -43,7 +41,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                     <Menu>
                         {temporalEpochs.map(([temporalEpoch, graphRelationships], index) => (
                             <>
-                                {isTemporalEpochEnabled && (
+                                {IS_TEMPRAL_EPOCH_ENABLED && (
                                     <>
                                         {index > 0 && <MenuDivider />}
                                         <MenuItem
