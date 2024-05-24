@@ -8,7 +8,7 @@ import { getLinkSaturation } from '../../../data/store/selectors/linkSaturation.
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
 
 interface OffChipNodeLinkCongestionLayerProps {
-    saturation: number;
+    offchipLinkSaturation: number;
     showLinkSaturation: boolean;
     isHighContrast: boolean;
 }
@@ -17,16 +17,16 @@ interface OffChipNodeLinkCongestionLayerProps {
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({
-    saturation,
+    offchipLinkSaturation,
     showLinkSaturation,
     isHighContrast,
 }) => {
-    const linkSaturationTreshold = useSelector(getLinkSaturation);
+    const linkSaturationThreshold = useSelector(getLinkSaturation);
 
     let congestionStyle = {};
 
-    if (showLinkSaturation && saturation >= linkSaturationTreshold) {
-        const congestionColor = calculateLinkCongestionColor(saturation, 0, isHighContrast);
+    if (showLinkSaturation && offchipLinkSaturation >= linkSaturationThreshold) {
+        const congestionColor = calculateLinkCongestionColor(offchipLinkSaturation, 0, isHighContrast);
         const saturationBg = toRGBA(congestionColor, 0.5);
         congestionStyle = getOffChipCongestionStyles(saturationBg);
     }

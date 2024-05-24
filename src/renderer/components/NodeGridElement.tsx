@@ -115,7 +115,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             {/* Congestion information */}
             <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
             <OffChipNodeLinkCongestionLayer
-                saturation={offchipLinkSaturation}
+                offchipLinkSaturation={offchipLinkSaturation}
                 showLinkSaturation={showLinkSaturation}
                 isHighContrast={isHighContrast}
             />
