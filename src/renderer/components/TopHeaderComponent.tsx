@@ -13,7 +13,6 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AnchorButton } from '@blueprintjs/core';
 import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType, LocationState } from '../../data/StateTypes';
@@ -138,12 +137,13 @@ const TopHeaderComponent: React.FC = () => {
                     onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
-                <Tooltip2 disabled={false} content='Back to previous graph' placement='bottom'>
+                {/* TODO: reenable once we figure out how to disable the buttons from going to the home screen */}
+                {/* <Tooltip2 disabled={false} content='Back to previous graph' placement='bottom'>
                     <AnchorButton minimal disabled={false} icon={IconNames.ARROW_LEFT} onClick={() => navigate(-1)} />
                 </Tooltip2>
                 <Tooltip2 disabled={false} content='Forward next graph' placement='bottom'>
                     <AnchorButton minimal disabled={false} icon={IconNames.ARROW_RIGHT} onClick={() => navigate(1)} />
-                </Tooltip2>
+                </Tooltip2> */}
             </div>
 
             <div className='text-content'>
