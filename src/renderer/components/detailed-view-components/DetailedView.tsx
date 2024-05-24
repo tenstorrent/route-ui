@@ -65,7 +65,11 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                     {node && (
                         <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
                             {node.type === ComputeNodeType.DRAM && (
-                                <DetailedViewDRAMRenderer node={node} temporalEpoch={temporalEpoch} />
+                                <DetailedViewDRAMRenderer
+                                    node={node}
+                                    temporalEpoch={temporalEpoch}
+                                    graphOnChip={graphOnChip}
+                                />
                             )}
                             {node.type === ComputeNodeType.ETHERNET && (
                                 <DetailedViewETHRenderer temporalEpoch={temporalEpoch} node={node} />
