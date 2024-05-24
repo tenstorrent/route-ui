@@ -290,7 +290,6 @@ const ClusterView: FC = () => {
                         const chipByGraphName = getGraphOnChip(graph.temporalEpoch, graph.chipId);
                         if (chipByGraphName?.chipId === clusterChip.id) {
                             graphOnChip = chipByGraphName;
-                            graphName = graph.name;
                         }
                     });
 

@@ -25,7 +25,12 @@ export default function GridRender() {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch } = location.state;
 
-    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
+    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+
+    if (chipId !== undefined) {
+        graphOnChipList = [graphOnChipList[chipId]];
+    }
+
     const { cluster } = useContext(ClusterContext);
     const clusterChipsMap = useMemo(
         () => Object.fromEntries((cluster?.chips ?? []).map((chip) => [chip.id, chip])),
@@ -43,7 +48,7 @@ export default function GridRender() {
 
     return (
         <div className='main-content' style={style}>
-            {graphOnChipList.map(({ graph: { chipId: id, totalCols, nodes }, relationship: { name: graphName } }) => {
+            {graphOnChipList.map(({ graphOnChip: { chipId: id, totalCols, nodes }, graph: { name: graphName } }) => {
                 const clusterChip = clusterChipsMap[id];
                 const clusterChipPositioning: CSSProperties = {};
 

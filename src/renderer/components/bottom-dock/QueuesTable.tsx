@@ -22,8 +22,12 @@ import type { LocationState } from '../../../data/StateTypes';
 function QueuesTable() {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch, chipId } = location.state;
-    const { getGraphOnChip, getOperand } = useContext(GraphOnChipContext);
-    const graphOnChipList = getGraphOnChip(temporalEpoch, chipId);
+    const { getGraphOnChipListForTemporalEpoch, getOperand } = useContext(GraphOnChipContext);
+    let graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch);
+
+    if (chipId !== undefined) {
+        graphOnChipList = [graphOnChipList[chipId]];
+    }
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const operandState = useSelector(getOperandState);
     const tableFields = useMemo(() => {
@@ -33,8 +37,8 @@ function QueuesTable() {
 
         const list = [
             ...graphOnChipList
-                .reduce((queueMap, { graph }) => {
-                    [...graph.queues].forEach((queue) => {
+                .reduce((queueMap, { graphOnChip }) => {
+                    [...graphOnChip.queues].forEach((queue) => {
                         if (!queueMap.has(queue.name)) {
                             queueMap.set(queue.name, {
                                 name: queue.name,

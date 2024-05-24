@@ -358,7 +358,7 @@ const ComputeNodesPropertiesTab = ({
     graphs,
     epoch,
 }: {
-    graphs: { graph: GraphOnChip; relationship: GraphRelationship }[];
+    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
     epoch: number;
 }) => {
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
@@ -367,7 +367,7 @@ const ComputeNodesPropertiesTab = ({
             const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
 
             if (graphOnChip) {
-                graphList.push(graphOnChip?.graph.getNode(nodeState.id));
+                graphList.push(graphOnChip?.graphOnChip.getNode(nodeState.id));
             }
 
             return graphList;

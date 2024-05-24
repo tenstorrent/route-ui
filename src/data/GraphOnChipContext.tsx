@@ -31,10 +31,7 @@ interface GraphOnChipContextType {
     getGraphRelationshipList: () => GraphRelationship[];
     getGraphRelationshipByGraphName: (graphName: string) => GraphRelationship | undefined;
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
-    getGraphOnChip: (
-        temporalEpoch: number,
-        chipId?: number,
-    ) => { graph: GraphOnChip; relationship: GraphRelationship }[];
+    getGraphOnChip: (temporalEpoch: number, chipId: number) => GraphOnChip | undefined;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
     getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
 }
@@ -51,7 +48,7 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphRelationshipList: () => [],
     getGraphRelationshipByGraphName: () => undefined,
     getGraphsListByTemporalEpoch: () => new Map(),
-    getGraphOnChip: () => [],
+    getGraphOnChip: () => undefined,
     getOperand: () => undefined,
     getGraphOnChipListForTemporalEpoch: () => [],
 });
@@ -93,32 +90,12 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, []);
 
     const getGraphOnChip = useCallback(
-        (temporalEpoch: number, chipId?: number) => {
-            const graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] = [];
+        (temporalEpoch: number, chipId: number) => {
+            const graphRelationship = [...state.graphs.values()].find(
+                (graph) => graph.temporalEpoch === temporalEpoch && graph.chipId === chipId,
+            );
 
-            [...state.graphs.values()].forEach((graphRelationship) => {
-                const isSameTemporalEpoch = graphRelationship.temporalEpoch === temporalEpoch;
-                const hasChipId = chipId !== null && chipId !== undefined;
-                const isSameChipId = graphRelationship.chipId === chipId;
-
-                if (isSameTemporalEpoch) {
-                    if (!hasChipId) {
-                        graphs.push({
-                            graph: state.graphOnChipList[graphRelationship.name],
-                            relationship: graphRelationship,
-                        });
-                    }
-
-                    if (hasChipId && isSameChipId) {
-                        graphs.push({
-                            graph: state.graphOnChipList[graphRelationship.name],
-                            relationship: graphRelationship,
-                        });
-                    }
-                }
-            });
-
-            return graphs;
+            return state.graphOnChipList[graphRelationship?.name ?? ''];
         },
         [state.graphs, state.graphOnChipList],
     );

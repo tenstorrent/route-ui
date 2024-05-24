@@ -46,7 +46,16 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 const TopHeaderComponent: React.FC = () => {
     const navigate = useNavigate();
 
-    const { resetGraphOnChipState, getGraphOnChip } = useContext(GraphOnChipContext);
+    const location: Location<LocationState> = useLocation();
+    const { chipId, epoch: temporalEpoch } = location.state;
+
+    const { resetGraphOnChipState, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
+    let graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch);
+
+    if (chipId !== undefined) {
+        graphOnChipList = [graphOnChipList[chipId]];
+    }
+
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =
         usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
@@ -60,11 +69,7 @@ const TopHeaderComponent: React.FC = () => {
         .getSavedRemoteFolders(remoteConnectionConfig.selectedConnection)
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
-    const location: Location<LocationState> = useLocation();
-    const { chipId, epoch: temporalEpoch } = location.state;
-    const architecture = [
-        ...new Set(getGraphOnChip(temporalEpoch, chipId).map(({ graph }) => graph.architecture)),
-    ].join(', ');
+    const architecture = [...new Set(graphOnChipList.map(({ graphOnChip }) => graphOnChip.architecture))].join(', ');
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,

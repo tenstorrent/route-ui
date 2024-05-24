@@ -35,9 +35,9 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const chipId = useSelector(getSelectedDetailsViewChipId);
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId)[0];
-    const architecture = graphOnChip?.graph.architecture ?? Architecture.NONE;
-    const node = uid ? graphOnChip?.graph.getNode(uid) ?? null : null;
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId ?? -1);
+    const architecture = graphOnChip?.architecture ?? Architecture.NONE;
+    const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
 
     useEffect(() => {
         if (detailedViewElement.current) {

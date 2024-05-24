@@ -20,7 +20,11 @@ export default function PropertiesPanel() {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch } = location.state;
     const [selectedTab, setSelectedTab] = useState<TabId>('tab-nodes');
-    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
+    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+
+    if (chipId !== undefined) {
+        graphOnChipList = [graphOnChipList[chipId]];
+    }
 
     return (
         <div className='properties-panel'>

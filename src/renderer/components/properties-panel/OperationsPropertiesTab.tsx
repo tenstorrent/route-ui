@@ -17,15 +17,15 @@ import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { Operation } from '../../../data/GraphTypes';
 
-const OperationsPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
+const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
 
     const [filterQuery, setFilterQuery] = useState<string>('');
     const operationsList = useMemo(
         () => [
             ...graphs
-                .reduce((opMap, { graph }) => {
-                    [...graph.operations].forEach((op) => {
+                .reduce((opMap, { graphOnChip }) => {
+                    [...graphOnChip.operations].forEach((op) => {
                         if (!opMap.has(op.name)) {
                             opMap.set(op.name, op);
                         }

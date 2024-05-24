@@ -27,7 +27,7 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
     const location: Location<LocationState> = useLocation();
     const { epoch } = location.state;
     // TODO: use multiple graphs
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch)[0]?.graph;
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch)[0]?.graphOnChip;
     const [tooltipContent, setTooltipContent] = useState<React.JSX.Element | undefined>(undefined);
 
     const setupData = () => {

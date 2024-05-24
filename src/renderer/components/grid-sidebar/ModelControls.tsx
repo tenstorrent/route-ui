@@ -17,9 +17,9 @@ import type { LocationState } from '../../../data/StateTypes';
 
 const ModelControls: FC = () => {
     const location: Location<LocationState> = useLocation();
-    const { epoch } = location.state;
+    const { epoch, chipId } = location.state;
     // TODO: use multiple graphs
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch)[0]?.graph;
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId ?? -1);
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector(getOperationRatioThreshold);
     const { getMaxModelEstimateRatio } = useOperationsTable();
