@@ -80,13 +80,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
-                            <LinkDetails
-                                temporalEpoch={temporalEpoch}
-                                key={link.name}
-                                link={link}
-                                nodeUid={node.uid}
-                                showEmpty={false}
-                            />
+                            <LinkDetails temporalEpoch={temporalEpoch} key={link.name} link={link} showEmpty={false} />
                         );
                     })}
                 </div>

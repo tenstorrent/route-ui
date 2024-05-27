@@ -90,10 +90,15 @@ const linkSaturationSlice = createSlice({
         initialLoadLinkData: (state, action: PayloadAction<NetworkCongestionState['linksPerTemporalEpoch']>) => {
             state.linksPerTemporalEpoch = action.payload;
 
-            action.payload.forEach(({ linksPerNodeMap, normalizedTotalOps, totalOpPerChip }) => {
+            action.payload.forEach(({ linksPerNodeMap, normalizedTotalOps, totalOpPerChip }, temporalEpoch) => {
                 const { DRAMBandwidthBytes, PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
 
                 Object.entries(linksPerNodeMap).forEach(([nodeUid, { links, chipId, offchipLinkIds }]) => {
+                    state.linksPerTemporalEpoch[temporalEpoch].allLinks = {
+                        ...state.linksPerTemporalEpoch[temporalEpoch].allLinks,
+                        ...links,
+                    };
+
                     Object.values(links).forEach((linkState) => {
                         if (linkState.type === LinkType.ETHERNET) {
                             linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;

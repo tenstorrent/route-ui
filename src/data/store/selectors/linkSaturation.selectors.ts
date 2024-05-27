@@ -5,13 +5,15 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
-export const getLinkData = (temporalEpoch: number, nodeUid: string, linkId: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid].links[linkId];
+export const getLinkData = (temporalEpoch: number, linkUid: string) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch].allLinks[linkUid];
+export const getAllLinksForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch].allLinks;
 export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid];
 export const getOffchipLinkSaturationForNode = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid]?.offchipSaturation ?? 0;
-export const getAllLinksForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
+export const getLinksPerNodeMapForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap || {};
 export const getTotalOpsForGraph = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOps || 0;

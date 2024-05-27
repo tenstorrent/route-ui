@@ -13,15 +13,14 @@ import SelectablePipe from './SelectablePipe';
 
 type LinkDetailsProps = {
     link: NetworkLink;
-    nodeUid: string;
     temporalEpoch: number;
     index?: number;
     showEmpty?: boolean;
 };
 
-const LinkDetails: React.FC<LinkDetailsProps> = ({ link, nodeUid, temporalEpoch, showEmpty, index }) => {
+const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, showEmpty, index }) => {
     const isHighContrast = useSelector(getHighContrastState);
-    const linkState = useSelector(getLinkData(temporalEpoch, nodeUid, link.uid));
+    const linkState = useSelector(getLinkData(temporalEpoch, link.uid));
     const color: string = calculateLinkCongestionColor(linkState?.saturation || 0, 0, isHighContrast);
 
     if (!showEmpty) {

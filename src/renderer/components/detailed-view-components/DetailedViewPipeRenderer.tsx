@@ -71,7 +71,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
                     }
                 }
                 if (renderCongestion) {
-                    const linkData = linksData[nodeUid].links[link.uid];
+                    const linkData = linksData[link.uid];
                     if (linkData?.saturation >= linkSaturationTreshold) {
                         drawLink(
                             svg,

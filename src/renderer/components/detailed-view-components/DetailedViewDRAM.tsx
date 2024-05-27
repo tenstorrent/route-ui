@@ -38,21 +38,26 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
     if (dram === null) {
         return null;
     }
+
     return (
         <>
             <div className='detailed-view-chip dram'>
                 <div className='node-container'>
                     {dram.subchannels.map((subchannel) => {
                         const currentNode = nodeList.find((n) => n.dramSubchannelId === subchannel.subchannelId);
+
                         const noc0links: NOCLink[] = [];
                         const noc1links: NOCLink[] = [];
+
                         if (currentNode) {
                             noc0links.push(currentNode.links.get(NOCLinkName.NOC0_IN) as NOCLink);
                             noc0links.push(currentNode.links.get(NOCLinkName.NOC0_OUT) as NOCLink);
                             noc1links.push(currentNode.links.get(NOCLinkName.NOC1_IN) as NOCLink);
                             noc1links.push(currentNode.links.get(NOCLinkName.NOC1_OUT) as NOCLink);
                         }
+
                         const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
+
                         return (
                             <div
                                 key={subchannel.subchannelId}
@@ -151,13 +156,12 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
             </div>
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
-                    {nodeList.map((n, index) => {
+                    {nodeList.map((_n, index) => {
                         return node.getInternalLinksForNode().map((link) => {
                             return (
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
-                                    nodeUid={n.uid}
                                     temporalEpoch={temporalEpoch}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
@@ -171,20 +175,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
-                                nodeUid={node.uid}
                                 temporalEpoch={temporalEpoch}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails
-                            key={link.name}
-                            temporalEpoch={temporalEpoch}
-                            link={link}
-                            nodeUid={node.uid}
-                            showEmpty={false}
-                        />
+                        <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
                     ))}
                 </div>
             </div>
