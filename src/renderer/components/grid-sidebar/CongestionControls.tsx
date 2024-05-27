@@ -33,17 +33,31 @@ import type { LocationState } from '../../../data/StateTypes';
 export const CongestionControls: FC = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch, chipId } = location.state;
-    // TODO: use multiple graphs
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId ?? -1);
+
+    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+
+    if (chipId !== undefined) {
+        if (graphOnChipList[chipId] !== undefined) {
+            graphOnChipList = [graphOnChipList[chipId]];
+        } else {
+            graphOnChipList = [];
+        }
+    }
 
     const operationsOnGraph = useMemo(
-        () => [...(graphOnChip?.operations ?? [])].map(({ name }) => name),
-        [graphOnChip],
+        () => graphOnChipList.flatMap(({ graphOnChip }) => [...graphOnChip.operations].map(({ name }) => name)),
+        [graphOnChipList],
     );
-    const queuesOnGraph = useMemo(() => [...(graphOnChip?.queues ?? [])].map(({ name }) => name), [graphOnChip]);
+    const queuesOnGraph = useMemo(
+        () => graphOnChipList.flatMap(({ graphOnChip }) => [...graphOnChip.queues].map(({ name }) => name)),
+        [graphOnChipList],
+    );
 
-    const maxBwLimitedFactor = graphOnChip?.details.maxBwLimitedFactor || 10;
-    const hasPipes = graphOnChip?.hasPipes || false;
+    const maxBwLimitedFactor = graphOnChipList.reduce(
+        (bwLimitedFactor, { graphOnChip }) => Math.max(graphOnChip.details.maxBwLimitedFactor, bwLimitedFactor),
+        10,
+    );
+    const hasPipes = graphOnChipList.some(({ graphOnChip }) => graphOnChip.hasPipes);
 
     const dispatch = useDispatch();
 
@@ -107,7 +121,9 @@ export const CongestionControls: FC = () => {
                         </div>
                         <hr />
                         <div>
-                            <Tooltip2 content='Select all operations for active graph'>
+                            <Tooltip2
+                                content={`Select all operations for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
+                            >
                                 <Button
                                     icon={IconNames.CUBE_ADD}
                                     onClick={() =>
@@ -121,7 +137,9 @@ export const CongestionControls: FC = () => {
                                 />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Deselect all operations for active graph'>
+                            <Tooltip2
+                                content={`Deselect all operations for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
+                            >
                                 <Button
                                     icon={IconNames.CUBE_REMOVE}
                                     onClick={() =>
@@ -137,7 +155,9 @@ export const CongestionControls: FC = () => {
                         </div>
                         <hr />
                         <div>
-                            <Tooltip2 content='Select all queues for active graph'>
+                            <Tooltip2
+                                content={`Select all queues for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
+                            >
                                 <Button
                                     icon={<QueueIconPlus />}
                                     onClick={() =>
@@ -151,7 +171,9 @@ export const CongestionControls: FC = () => {
                                 />
                             </Tooltip2>
                             &nbsp;
-                            <Tooltip2 content='Deselect all queues for active graph'>
+                            <Tooltip2
+                                content={`Deselect all queues for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
+                            >
                                 <Button
                                     icon={<QueueIconMinus />}
                                     onClick={() =>
