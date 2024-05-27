@@ -5,10 +5,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
-export const getLinkData = (temporalEpoch: number, linkUid: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch].allLinks[linkUid];
-export const getAllLinksForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch].allLinks;
 export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksPerNodeMap[nodeUid];
 export const getOffchipLinkSaturationForNode = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>

@@ -81,7 +81,6 @@ export interface NetworkCongestionState {
                 chipId: number;
             }
         >;
-        allLinks: Record<string, LinkState>;
         totalOps: number;
         totalOpPerChip: number[];
         normalizedTotalOps: number;

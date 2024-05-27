@@ -10,7 +10,7 @@ import {
     getSelectedDetailsViewChipId,
     getSelectedDetailsViewUID,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -22,6 +22,7 @@ import DetailedViewPCIERenderer from './DetailedViewPCIE';
 
 import './DetailedView.scss';
 import type { LocationState } from '../../../data/StateTypes';
+import { getLinksPerNodeMapForTemporalEpoch } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface DetailedViewProps {}
 
@@ -38,6 +39,12 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId ?? -1);
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
+
+    const linksData = useSelector(getLinksPerNodeMapForTemporalEpoch(temporalEpoch));
+    const allLinksState = useMemo(
+        () => Object.fromEntries(Object.values(linksData).flatMap(({ links }) => Object.entries(links))),
+        [linksData],
+    );
 
     useEffect(() => {
         if (detailedViewElement.current) {
@@ -68,14 +75,15 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                                 <DetailedViewDRAMRenderer
                                     node={node}
                                     temporalEpoch={temporalEpoch}
+                                    allLinksState={allLinksState}
                                     graphOnChip={graphOnChip}
                                 />
                             )}
                             {node.type === ComputeNodeType.ETHERNET && (
-                                <DetailedViewETHRenderer temporalEpoch={temporalEpoch} node={node} />
+                                <DetailedViewETHRenderer allLinksState={allLinksState} node={node} />
                             )}
                             {node.type === ComputeNodeType.PCIE && (
-                                <DetailedViewPCIERenderer temporalEpoch={temporalEpoch} node={node} />
+                                <DetailedViewPCIERenderer allLinksState={allLinksState} node={node} />
                             )}
                         </div>
                     )}

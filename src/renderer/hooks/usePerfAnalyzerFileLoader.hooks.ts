@@ -109,7 +109,6 @@ const usePerfAnalyzerFileLoader = () => {
                         totalOps: 0,
                         normalizedTotalOps: 0,
                         adjustedTotalOps: 0,
-                        allLinks: {},
                     };
                 }
 

@@ -15,14 +15,21 @@ import LinkDetails from '../LinkDetails';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
+import type { LinkState } from '../../../data/StateTypes';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
     temporalEpoch: number;
     graphOnChip?: GraphOnChip;
+    allLinksState: Record<string, LinkState>;
 }
 
-const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, temporalEpoch, graphOnChip }) => {
+const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
+    node,
+    temporalEpoch,
+    allLinksState,
+    graphOnChip,
+}) => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
@@ -96,11 +103,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                     <div className='col noc0'>
                                         <DetailedViewNOCRouterRenderer
                                             links={noc0links}
+                                            allLinksState={allLinksState}
                                             label='NOC0'
                                             nodeUid={node.uid}
                                         />
                                         <DetailedViewNOC2AXIRender
                                             links={subchannel.links}
+                                            allLinksState={allLinksState}
                                             noc={NOC.NOC0}
                                             nodeUid={node.uid}
                                         />
@@ -108,11 +117,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                     <div className='col noc1'>
                                         <DetailedViewNOCRouterRenderer
                                             links={noc1links}
+                                            allLinksState={allLinksState}
                                             label='NOC1'
                                             nodeUid={node.uid}
                                         />
                                         <DetailedViewNOC2AXIRender
                                             links={subchannel.links}
+                                            allLinksState={allLinksState}
                                             noc={NOC.NOC1}
                                             nodeUid={node.uid}
                                         />
@@ -132,12 +143,14 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                         <>
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                allLinksState={allLinksState}
                                 nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM0_INOUT}
                                 label='AXI DRAM0'
                             />
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                allLinksState={allLinksState}
                                 nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM1_INOUT}
                                 label='AXI DRAM1'
@@ -147,6 +160,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                     {architecture === Architecture.GRAYSKULL && (
                         <DetailedViewAXIRender
                             links={dram.links}
+                            allLinksState={allLinksState}
                             nodeUid={node.uid}
                             filter={DramBankLinkName.DRAM_INOUT}
                             label='Off-chip DRAM'
@@ -162,7 +176,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
-                                    temporalEpoch={temporalEpoch}
+                                    linkState={allLinksState[link.uid]}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
                                 />
@@ -175,13 +189,18 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
-                                temporalEpoch={temporalEpoch}
+                                linkState={allLinksState[link.uid]}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
+                        <LinkDetails
+                            key={link.name}
+                            linkState={allLinksState[link.uid]}
+                            link={link}
+                            showEmpty={false}
+                        />
                     ))}
                 </div>
             </div>
