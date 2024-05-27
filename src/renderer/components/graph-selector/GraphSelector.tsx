@@ -20,7 +20,7 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
-    const IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED = false;
+    const IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED = process.env.NODE_ENV === 'development';
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
     const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
