@@ -52,7 +52,11 @@ const TopHeaderComponent: React.FC = () => {
     let graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch);
 
     if (chipId !== undefined) {
-        graphOnChipList = [graphOnChipList[chipId]];
+        if (graphOnChipList[chipId] !== undefined) {
+            graphOnChipList = [graphOnChipList[chipId]];
+        } else {
+            graphOnChipList = [];
+        }
     }
 
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =

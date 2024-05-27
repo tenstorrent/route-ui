@@ -23,7 +23,11 @@ export default function PropertiesPanel() {
     let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
 
     if (chipId !== undefined) {
-        graphOnChipList = [graphOnChipList[chipId]];
+        if (graphOnChipList[chipId] !== undefined) {
+            graphOnChipList = [graphOnChipList[chipId]];
+        } else {
+            graphOnChipList = [];
+        }
     }
 
     return (
