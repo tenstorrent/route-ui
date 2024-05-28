@@ -5,7 +5,7 @@
 import { Icon, Position } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import React, { FC, type PropsWithChildren, useContext, useEffect, useState } from 'react';
+import React, { FC, type PropsWithChildren, useCallback, useContext, useEffect, useState } from 'react';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
@@ -25,24 +25,36 @@ export interface PipeInfoDialogProps {
  */
 const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, pipeId, hide, onEnter, onLeave }) => {
     const location: Location<LocationState> = useLocation();
-    const { epoch } = location.state;
-    // TODO: use multiple graphs
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch)[0]?.graphOnChip;
+    const { epoch, chipId } = location.state;
+    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+
+    if (chipId !== undefined) {
+        if (graphOnChipList[chipId] !== undefined) {
+            graphOnChipList = [graphOnChipList[chipId]];
+        } else {
+            graphOnChipList = [];
+        }
+    }
+
     const [tooltipContent, setTooltipContent] = useState<React.JSX.Element | undefined>(undefined);
 
-    const setupData = () => {
+    const setupData = useCallback(() => {
         const producers = [
             ...new Set(
-                graphOnChip?.pipes
-                    .get(pipeId)
-                    ?.producerCores?.map((core) => graphOnChip?.getNode(core)?.operation?.name) ?? [],
+                graphOnChipList.flatMap(({ graphOnChip }) =>
+                    graphOnChip.pipes
+                        .get(pipeId)
+                        ?.producerCores?.map((core) => graphOnChip.getNode(core)?.operation?.name),
+                ),
             ),
         ];
         const consumers = [
             ...new Set(
-                graphOnChip?.pipes
-                    .get(pipeId)
-                    ?.consumerCores?.map((core) => graphOnChip?.getNode(core)?.operation?.name) ?? [],
+                graphOnChipList.flatMap(({ graphOnChip }) =>
+                    graphOnChip.pipes
+                        .get(pipeId)
+                        ?.consumerCores?.map((core) => graphOnChip.getNode(core)?.operation?.name),
+                ),
             ),
         ];
 
@@ -80,11 +92,11 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
                 )}
             </div>
         );
-    };
+    }, [graphOnChipList, pipeId]);
 
     useEffect(() => {
         setTooltipContent(undefined);
-    }, [graphOnChip]);
+    }, [graphOnChipList]);
 
     return (
         <div

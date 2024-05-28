@@ -32,35 +32,52 @@ interface DRAMBandwidthControlsProps {}
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch, chipId } = location.state;
-    // TODO: use multiple graphs
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId ?? -1);
+
+    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
+
+    if (chipId !== undefined) {
+        if (graphOnChipList[chipId] !== undefined) {
+            graphOnChipList = [graphOnChipList[chipId]];
+        } else {
+            graphOnChipList = [];
+        }
+    }
+
     const dispatch = useDispatch();
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);
     const PCIeBandwidth = useSelector(getPCIBandwidth);
     const opCycles = useSelector(getTotalOpsForGraph(epoch));
-
-    let aiclkRightElement = (
-        <Tooltip2 content='Reset Total OP Cycles'>
-            <Button
-                minimal
-                onClick={() => {
-                    const resetValue = graphOnChip?.totalOpCycles || 1;
-
-                    dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: resetValue }));
-                }}
-                icon={IconNames.RESET}
-            />
-        </Tooltip2>
+    const totalOpCycles = graphOnChipList.reduce(
+        (totalOps, { graphOnChip }) => Math.max(totalOps, graphOnChip.totalOpCycles),
+        1,
     );
 
-    if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
-        aiclkRightElement = (
-            <Tooltip2 content='Cycles per input cannot be 0'>
-                <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
+    const aiclkRightElement = (
+        <>
+            <Tooltip2 content='Reset Total OP Cycles'>
+                <Button
+                    minimal
+                    onClick={() => {
+                        dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: totalOpCycles }));
+                    }}
+                    icon={IconNames.RESET}
+                />
             </Tooltip2>
-        );
-    }
+            {graphOnChipList.map(({ graphOnChip }) => {
+                if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
+                    return (
+                        <Tooltip2 content='Cycles per input cannot be 0'>
+                            <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
+                        </Tooltip2>
+                    );
+                }
+
+                return null;
+            })}
+        </>
+    );
+
 
     return (
         <Collapsible label='CLK Controls' isOpen>
