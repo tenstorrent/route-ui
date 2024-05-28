@@ -64,7 +64,7 @@ export default function GridRender() {
                 clusterChipPositioning.contentVisibility = 'auto';
 
                 return (
-                    <div className='grid-container' style={clusterChipPositioning}>
+                    <div className='grid-container' style={clusterChipPositioning} key={id}>
                         <div
                             className='node-container'
                             style={{

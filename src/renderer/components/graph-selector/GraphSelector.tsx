@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { FC, useContext } from 'react';
+import React, { FC, useContext } from 'react';
 import { Popover2 } from '@blueprintjs/popover2';
 import { Button, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -40,13 +40,12 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                     <h3>{label}</h3>
                     <Menu>
                         {temporalEpochs.map(([temporalEpoch, graphRelationships], index) => (
-                            <>
+                            <React.Fragment key={temporalEpoch}>
                                 {IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED && (
                                     <>
                                         {index > 0 && <MenuDivider />}
                                         <MenuItem
                                             icon={IconNames.SERIES_DERIVED}
-                                            key={`temporal-epoch-${temporalEpoch}`}
                                             onClick={() => onSelectTemporalEpoch(temporalEpoch)}
                                             text={`Temporal Epoch ${temporalEpoch}`}
                                             className='graph-selector-temporal-epoch'
@@ -55,13 +54,13 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                 )}
                                 {graphRelationships.map((graphRelationship) => (
                                     <MenuItem
-                                        key={`temporal-epoch-${temporalEpoch}-${graphRelationship.name}`}
+                                        key={`${temporalEpoch}-${graphRelationship.name}`}
                                         text={graphRelationship.name}
                                         onClick={() => onSelectGraph(graphRelationship.name)}
                                         className='graph-selector-graph'
                                     />
                                 ))}
-                            </>
+                            </React.Fragment>
                         ))}
                     </Menu>
                 </div>
