@@ -61,8 +61,8 @@ const linkSaturationSlice = createSlice({
                             } else if (linkState.type === LinkType.PCIE) {
                                 linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
                             }
-                            const { bpc, linkSaturation, nodeSaturation, offChipSaturation } =
-                                recalculateLinkSaturation({
+                            const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
+                                calculateLinkSaturationMetrics({
                                     link: linkState,
                                     totalOpCycles: totalOps,
                                     linkListByLinkId: links,
@@ -71,8 +71,9 @@ const linkSaturationSlice = createSlice({
 
                             linkState.bpc = bpc;
                             linkState.saturation = linkSaturation;
-                            temporalEpochState.nodeLinkAndCongestionMap[nodeUid].saturation = nodeSaturation;
-                            temporalEpochState.nodeLinkAndCongestionMap[nodeUid].offchipSaturation = offChipSaturation;
+                            temporalEpochState.nodeLinkAndCongestionMap[nodeUid].maxLinkSaturation = maxLinkSaturation;
+                            temporalEpochState.nodeLinkAndCongestionMap[nodeUid].offchipMaxSaturation =
+                                offchipMaxSaturation;
                         });
                     },
                 );
@@ -118,8 +119,8 @@ const linkSaturationSlice = createSlice({
                                     linkState.bpc = linkState.totalDataBytes / totalOpPerChip[chipId];
                                 }
 
-                                const { bpc, linkSaturation, nodeSaturation, offChipSaturation } =
-                                    recalculateLinkSaturation({
+                                const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
+                                    calculateLinkSaturationMetrics({
                                         link: linkState,
                                         totalOpCycles: totalOpPerChip[chipId],
                                         linkListByLinkId: links,
@@ -128,8 +129,8 @@ const linkSaturationSlice = createSlice({
 
                                 linkState.bpc = bpc;
                                 linkState.saturation = linkSaturation;
-                                linksPerNodeMap[nodeUid].saturation = nodeSaturation;
-                                linksPerNodeMap[nodeUid].offchipSaturation = offChipSaturation;
+                                linksPerNodeMap[nodeUid].maxLinkSaturation = maxLinkSaturation;
+                                linksPerNodeMap[nodeUid].offchipMaxSaturation = offchipMaxSaturation;
                             });
                         },
                     );
@@ -174,17 +175,18 @@ const updateDRAMLinks = (state: NetworkCongestionState) => {
                 Object.values(links).forEach((linkState) => {
                     if (linkState.type === LinkType.DRAM) {
                         linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
-                        const { bpc, linkSaturation, nodeSaturation, offChipSaturation } = recalculateLinkSaturation({
-                            link: linkState,
-                            totalOpCycles: epochState.totalOps,
-                            linkListByLinkId: links,
-                            offchipLinkIds,
-                        });
+                        const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
+                            calculateLinkSaturationMetrics({
+                                link: linkState,
+                                totalOpCycles: epochState.totalOps,
+                                linkListByLinkId: links,
+                                offchipLinkIds,
+                            });
 
                         linkState.bpc = bpc;
                         linkState.saturation = linkSaturation;
-                        epochState.nodeLinkAndCongestionMap[nodeUid].saturation = nodeSaturation;
-                        epochState.nodeLinkAndCongestionMap[nodeUid].offchipSaturation = offChipSaturation;
+                        epochState.nodeLinkAndCongestionMap[nodeUid].maxLinkSaturation = maxLinkSaturation;
+                        epochState.nodeLinkAndCongestionMap[nodeUid].offchipMaxSaturation = offchipMaxSaturation;
                     }
                 });
             },
@@ -201,17 +203,18 @@ const updatePCILinks = (state: NetworkCongestionState) => {
                 Object.values(links).forEach((linkState) => {
                     if (linkState.type === LinkType.PCIE) {
                         linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
-                        const { bpc, linkSaturation, nodeSaturation, offChipSaturation } = recalculateLinkSaturation({
-                            link: linkState,
-                            totalOpCycles: epochState.totalOps,
-                            linkListByLinkId: links,
-                            offchipLinkIds,
-                        });
+                        const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
+                            calculateLinkSaturationMetrics({
+                                link: linkState,
+                                totalOpCycles: epochState.totalOps,
+                                linkListByLinkId: links,
+                                offchipLinkIds,
+                            });
 
                         linkState.bpc = bpc;
                         linkState.saturation = linkSaturation;
-                        epochState.nodeLinkAndCongestionMap[nodeUid].saturation = nodeSaturation;
-                        epochState.nodeLinkAndCongestionMap[nodeUid].offchipSaturation = offChipSaturation;
+                        epochState.nodeLinkAndCongestionMap[nodeUid].maxLinkSaturation = maxLinkSaturation;
+                        epochState.nodeLinkAndCongestionMap[nodeUid].offchipMaxSaturation = offchipMaxSaturation;
                     }
                 });
             },
@@ -226,7 +229,7 @@ interface RecalculateLinkStaturationArguments {
     offchipLinkIds: string[];
 }
 
-const recalculateLinkSaturation = ({
+const calculateLinkSaturationMetrics = ({
     link,
     totalOpCycles,
     linkListByLinkId,
@@ -240,18 +243,21 @@ const recalculateLinkSaturation = ({
         ...Object.entries(linkListByLinkId).reduce(
             (updatedSaturation, [linkId, { saturation }]) => {
                 if (linkId !== link.id) {
-                    updatedSaturation.nodeSaturation = Math.max(updatedSaturation.nodeSaturation, saturation);
+                    updatedSaturation.maxLinkSaturation = Math.max(updatedSaturation.maxLinkSaturation, saturation);
 
                     if (offchipLinkIds.includes(linkId)) {
-                        updatedSaturation.offChipSaturation = Math.max(updatedSaturation.offChipSaturation, saturation);
+                        updatedSaturation.offchipMaxSaturation = Math.max(
+                            updatedSaturation.offchipMaxSaturation,
+                            saturation,
+                        );
                     }
                 }
 
                 return updatedSaturation;
             },
             {
-                nodeSaturation: newLinkSaturation,
-                offChipSaturation: newLinkSaturation,
+                maxLinkSaturation: newLinkSaturation,
+                offchipMaxSaturation: newLinkSaturation,
             },
         ),
     };

@@ -767,8 +767,8 @@ export default class GraphOnChip {
                     linksByLinkId: {},
                     offchipLinkIds: [],
                     chipId: this.chipId,
-                    saturation: 0,
-                    offchipSaturation: 0,
+                    maxLinkSaturation: 0,
+                    offchipMaxSaturation: 0,
                 };
             }
 
@@ -813,8 +813,8 @@ export default class GraphOnChip {
                     linksByLinkId: {},
                     offchipLinkIds: [],
                     chipId: this.chipId,
-                    saturation: 0,
-                    offchipSaturation: 0,
+                    maxLinkSaturation: 0,
+                    offchipMaxSaturation: 0,
                 };
             }
 
@@ -829,8 +829,8 @@ export default class GraphOnChip {
                             linksByLinkId: {},
                             offchipLinkIds: [],
                             chipId: this.chipId,
-                            saturation: 0,
-                            offchipSaturation: 0,
+                            maxLinkSaturation: 0,
+                            offchipMaxSaturation: 0,
                         };
                     }
 

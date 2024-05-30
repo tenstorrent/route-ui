@@ -73,8 +73,8 @@ export type NodeLinkAndCongestionMap = Record<
     {
         linksByLinkId: Record<string, LinkState>;
         offchipLinkIds: string[];
-        saturation: number;
-        offchipSaturation: number;
+        maxLinkSaturation: number;
+        offchipMaxSaturation: number;
         chipId: number;
     }
 >;

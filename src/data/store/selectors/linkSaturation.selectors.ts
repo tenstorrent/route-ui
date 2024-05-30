@@ -8,8 +8,8 @@ import { RootState } from '../createStore';
 export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.nodeLinkAndCongestionMap[nodeUid];
 export const getOffchipLinkSaturationForNode = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.nodeLinkAndCongestionMap[nodeUid]?.offchipSaturation ??
-    0;
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.nodeLinkAndCongestionMap[nodeUid]
+        ?.offchipMaxSaturation ?? 0;
 export const getLinksPerNodeForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.nodeLinkAndCongestionMap || {};
 export const getTotalOpsForGraph = (temporalEpoch: number) => (state: RootState) =>
