@@ -96,46 +96,44 @@ const linkSaturationSlice = createSlice({
         initialLoadLinkData: (state, action: PayloadAction<NetworkCongestionState['linksPerTemporalEpoch']>) => {
             state.linksPerTemporalEpoch = action.payload;
 
-            action.payload.forEach(
-                ({ nodeLinkAndCongestionMap: linksPerNodeMap, normalizedTotalOps, totalOpPerChip }) => {
-                    const { DRAMBandwidthBytes, PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
+            action.payload.forEach(({ nodeLinkAndCongestionMap, normalizedTotalOps, totalOpPerChip }) => {
+                const { DRAMBandwidthBytes, PCIBandwidthGBs, CLKHz } = getInitialCLKValues(state);
 
-                    Object.entries(linksPerNodeMap).forEach(
-                        ([nodeUid, { linksByLinkId: links, chipId, offchipLinkIds }]) => {
-                            Object.values(links).forEach((linkState) => {
-                                if (linkState.type === LinkType.ETHERNET) {
-                                    linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
-                                    linkState.normalizedSaturation = calculateNormalizedSaturation(
-                                        linkState,
-                                        normalizedTotalOps,
-                                    );
-                                } else if (linkState.type === LinkType.DRAM) {
-                                    linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
-                                } else if (linkState.type === LinkType.PCIE) {
-                                    linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
-                                }
+                Object.entries(nodeLinkAndCongestionMap).forEach(
+                    ([nodeUid, { linksByLinkId: links, chipId, offchipLinkIds }]) => {
+                        Object.values(links).forEach((linkState) => {
+                            if (linkState.type === LinkType.ETHERNET) {
+                                linkState.maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
+                                linkState.normalizedSaturation = calculateNormalizedSaturation(
+                                    linkState,
+                                    normalizedTotalOps,
+                                );
+                            } else if (linkState.type === LinkType.DRAM) {
+                                linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
+                            } else if (linkState.type === LinkType.PCIE) {
+                                linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
+                            }
 
-                                if (linkState.bpc === 0 && linkState.totalDataBytes > 0) {
-                                    linkState.bpc = linkState.totalDataBytes / totalOpPerChip[chipId];
-                                }
+                            if (linkState.bpc === 0 && linkState.totalDataBytes > 0) {
+                                linkState.bpc = linkState.totalDataBytes / totalOpPerChip[chipId];
+                            }
 
-                                const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
-                                    calculateLinkSaturationMetrics({
-                                        link: linkState,
-                                        totalOpCycles: totalOpPerChip[chipId],
-                                        linkListByLinkId: links,
-                                        offchipLinkIds,
-                                    });
+                            const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
+                                calculateLinkSaturationMetrics({
+                                    link: linkState,
+                                    totalOpCycles: totalOpPerChip[chipId],
+                                    linkListByLinkId: links,
+                                    offchipLinkIds,
+                                });
 
-                                linkState.bpc = bpc;
-                                linkState.saturation = linkSaturation;
-                                linksPerNodeMap[nodeUid].maxLinkSaturation = maxLinkSaturation;
-                                linksPerNodeMap[nodeUid].offchipMaxSaturation = offchipMaxSaturation;
-                            });
-                        },
-                    );
-                },
-            );
+                            linkState.bpc = bpc;
+                            linkState.saturation = linkSaturation;
+                            nodeLinkAndCongestionMap[nodeUid].maxLinkSaturation = maxLinkSaturation;
+                            nodeLinkAndCongestionMap[nodeUid].offchipMaxSaturation = offchipMaxSaturation;
+                        });
+                    },
+                );
+            });
         },
         updateCLK: (state, action: PayloadAction<number>) => {
             state.CLKMHz = action.payload;

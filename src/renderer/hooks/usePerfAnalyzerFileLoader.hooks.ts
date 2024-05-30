@@ -112,11 +112,11 @@ const usePerfAnalyzerFileLoader = () => {
                     };
                 }
 
-                const { nodeLinkAndCongestionMap: linksPerNodeMap, totalOps: totalOpsPerEpoch } =
+                const { nodeLinkAndCongestionMap, totalOps: totalOpsPerEpoch } =
                     linkDataByTemporalEpoch[graph.temporalEpoch];
 
                 linkDataByTemporalEpoch[graph.temporalEpoch].nodeLinkAndCongestionMap = {
-                    ...linksPerNodeMap,
+                    ...nodeLinkAndCongestionMap,
                     ...graphOnChip.getAllLinksInitialState(),
                 };
 
