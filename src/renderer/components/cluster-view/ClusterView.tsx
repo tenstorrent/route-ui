@@ -287,9 +287,9 @@ const ClusterView: FC = () => {
                     let graphOnChip: GraphOnChip | undefined;
 
                     selectedEpoch.forEach((graph) => {
-                        const chipByGraphName = getGraphOnChip(graph.temporalEpoch, graph.chipId);
-                        if (chipByGraphName?.chipId === clusterChip.id) {
-                            graphOnChip = chipByGraphName;
+                        const graphOnChipByChipId = getGraphOnChip(graph.temporalEpoch, graph.chipId);
+                        if (graphOnChipByChipId?.chipId === clusterChip.id) {
+                            graphOnChip = graphOnChipByChipId;
                         }
                     });
 
