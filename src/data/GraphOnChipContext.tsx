@@ -165,14 +165,14 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number, chipId?: number) => {
-            let graphArray = [...(state.graphsByTemporalEpoch.get(epoch) ?? [])];
+            const graphArray = state.graphsByTemporalEpoch.get(epoch) ?? [];
 
             if (chipId !== undefined) {
-                if (state.graphsByTemporalEpoch.get(epoch)?.[chipId]) {
-                    graphArray = [state.graphsByTemporalEpoch.get(epoch)![chipId]];
-                } else {
-                    graphArray = [];
+                if (graphArray[chipId]) {
+                    return [graphArray[chipId]];
                 }
+
+                return [];
             }
 
             return graphArray;
