@@ -33,15 +33,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch, chipId } = location.state;
 
-    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
-
-    if (chipId !== undefined) {
-        if (graphOnChipList[chipId] !== undefined) {
-            graphOnChipList = [graphOnChipList[chipId]];
-        } else {
-            graphOnChipList = [];
-        }
-    }
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
 
     const dispatch = useDispatch();
     const dramBandwidth = useSelector(getDRAMBandwidth);

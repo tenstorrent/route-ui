@@ -49,15 +49,7 @@ const TopHeaderComponent: React.FC = () => {
     const { chipId, epoch: temporalEpoch } = location.state;
 
     const { resetGraphOnChipState, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
-    let graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch);
-
-    if (chipId !== undefined) {
-        if (graphOnChipList[chipId] !== undefined) {
-            graphOnChipList = [graphOnChipList[chipId]];
-        } else {
-            graphOnChipList = [];
-        }
-    }
+    const graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
 
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =
         usePerfAnalyzerFileLoader();

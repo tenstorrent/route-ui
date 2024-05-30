@@ -23,11 +23,8 @@ function QueuesTable() {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch, chipId } = location.state;
     const { getGraphOnChipListForTemporalEpoch, getOperand } = useContext(GraphOnChipContext);
-    let graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch);
+    const graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
 
-    if (chipId !== undefined) {
-        graphOnChipList = [graphOnChipList[chipId]];
-    }
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const operandState = useSelector(getOperandState);
     const tableFields = useMemo(() => {

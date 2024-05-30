@@ -39,11 +39,8 @@ function OperationsTable() {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch, chipId } = location.state;
     const dispatch = useDispatch();
-    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch);
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
 
-    if (chipId !== undefined) {
-        graphOnChipList = [graphOnChipList[chipId]];
-    }
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');

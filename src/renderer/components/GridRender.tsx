@@ -25,15 +25,7 @@ export default function GridRender() {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch } = location.state;
 
-    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
-
-    if (chipId !== undefined) {
-        if (graphOnChipList[chipId] !== undefined) {
-            graphOnChipList = [graphOnChipList[chipId]];
-        } else {
-            graphOnChipList = [];
-        }
-    }
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
 
     const { cluster } = useContext(ClusterContext);
     const clusterChipsMap = useMemo(

@@ -34,15 +34,7 @@ export const CongestionControls: FC = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch, chipId } = location.state;
 
-    let graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch);
-
-    if (chipId !== undefined) {
-        if (graphOnChipList[chipId] !== undefined) {
-            graphOnChipList = [graphOnChipList[chipId]];
-        } else {
-            graphOnChipList = [];
-        }
-    }
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
 
     const operationsOnGraph = useMemo(
         () => graphOnChipList.flatMap(({ graphOnChip }) => [...graphOnChip.operations].map(({ name }) => name)),

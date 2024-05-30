@@ -17,12 +17,18 @@ interface OperandDescriptor {
     chipId: number;
 }
 
+interface GraphOnChipAndRelationship {
+    graph: GraphRelationship;
+    graphOnChip: GraphOnChip;
+}
+
 interface ApplicationModelState {
     operands: Map<string, OperandDescriptor>;
     graphOnChipList: {
         [graphName: string]: GraphOnChip;
     };
     graphs: Map<string, GraphRelationship>;
+    graphsByTemporalEpoch: Map<number, GraphOnChipAndRelationship[]>;
 }
 
 interface GraphOnChipContextType {
@@ -33,13 +39,14 @@ interface GraphOnChipContextType {
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
     getGraphOnChip: (temporalEpoch: number, chipId: number) => GraphOnChip | undefined;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
-    getGraphOnChipListForTemporalEpoch: (epoch: number) => { graph: GraphRelationship; graphOnChip: GraphOnChip }[];
+    getGraphOnChipListForTemporalEpoch: (epoch: number, chipId?: number) => GraphOnChipAndRelationship[];
 }
 
 const applicationModelState: ApplicationModelState = {
     operands: new Map<string, OperandDescriptor>(),
     graphOnChipList: {},
     graphs: new Map<string, GraphRelationship>(),
+    graphsByTemporalEpoch: new Map<number, GraphOnChipAndRelationship[]>(),
 };
 
 const GraphOnChipContext = createContext<GraphOnChipContextType>({
@@ -82,10 +89,33 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 ];
             })
             .flat();
+
+        const graphOnChipList = Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip]));
+        const graphRelationships = new Map(graphs.map((graph) => [graph.name, graph]));
+        const graphsByTemporalEpoch = [...graphRelationships.entries()].reduce(
+            (graphsByEpoch, [graphName, graphRelationship]) => {
+                if (!graphsByEpoch.has(graphRelationship.temporalEpoch)) {
+                    graphsByEpoch.set(graphRelationship.temporalEpoch, []);
+                }
+
+                graphsByEpoch.set(graphRelationship.temporalEpoch, [
+                    ...graphsByEpoch.get(graphRelationship.temporalEpoch)!,
+                    {
+                        graph: graphRelationship,
+                        graphOnChip: graphOnChipList[graphName],
+                    },
+                ]);
+
+                return graphsByEpoch;
+            },
+            new Map<number, GraphOnChipAndRelationship[]>(),
+        );
+
         setState({
-            graphOnChipList: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
-            graphs: new Map(graphs.map((graph) => [graph.name, graph])),
+            graphOnChipList,
+            graphs: graphRelationships,
             operands: new Map(operands.map((edge) => [edge.name, edge])),
+            graphsByTemporalEpoch,
         });
     }, []);
 
@@ -101,7 +131,12 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 
     const reset = useCallback(() => {
-        setState({ ...applicationModelState, graphs: new Map() });
+        setState({
+            ...applicationModelState,
+            graphs: new Map(),
+            graphsByTemporalEpoch: new Map(),
+            operands: new Map(),
+        });
     }, []);
 
     const getGraphRelationshipList = useCallback(() => {
@@ -129,19 +164,20 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }, [state.graphs]);
 
     const getGraphOnChipListForTemporalEpoch = useCallback(
-        (epoch: number) => {
-            const graphArray: { graph: GraphRelationship; graphOnChip: GraphOnChip }[] = [];
+        (epoch: number, chipId?: number) => {
+            let graphArray = [...(state.graphsByTemporalEpoch.get(epoch) ?? [])];
 
-            state.graphs.forEach((graph) => {
-                if (graph.temporalEpoch === epoch) {
-                    const { chipId } = state.graphOnChipList[graph.name];
-                    graphArray[chipId] = { graph, graphOnChip: state.graphOnChipList[graph.name] };
+            if (chipId !== undefined) {
+                if (state.graphsByTemporalEpoch.get(epoch)?.[chipId]) {
+                    graphArray = [state.graphsByTemporalEpoch.get(epoch)![chipId]];
+                } else {
+                    graphArray = [];
                 }
-            });
+            }
 
             return graphArray;
         },
-        [state.graphOnChipList, state.graphs],
+        [state.graphsByTemporalEpoch],
     );
 
     const getOperand = useCallback(
