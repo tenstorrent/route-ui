@@ -40,6 +40,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
 
+    // TODO: narrow down the needed list
     const linksData = useSelector(getLinksPerNodeForTemporalEpoch(temporalEpoch));
     const allLinksState = useMemo(
         () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),

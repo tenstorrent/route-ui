@@ -357,6 +357,7 @@ const ComputeNodesPropertiesTab = ({
     graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
     epoch: number;
 }) => {
+    // TODO: narrow down the needed list
     const linksData = useSelector(getLinksPerNodeForTemporalEpoch(epoch));
     const allLinksState = useMemo(
         () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),

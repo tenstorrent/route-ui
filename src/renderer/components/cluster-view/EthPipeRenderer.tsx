@@ -64,6 +64,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
+    // TODO: narrow down the needed list
     const linksData = useSelector(getLinksPerNodeForTemporalEpoch(temporalEpoch));
     const isHighContrast = useSelector(getHighContrastState);
 
