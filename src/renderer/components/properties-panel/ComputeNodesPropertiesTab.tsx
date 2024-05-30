@@ -26,7 +26,7 @@ import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship, LinkState } from '../../../data/StateTypes';
-import { getLinksPerNodeMapForTemporalEpoch } from '../../../data/store/selectors/linkSaturation.selectors';
+import { getLinksPerNodeForTemporalEpoch } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -357,7 +357,7 @@ const ComputeNodesPropertiesTab = ({
     graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
     epoch: number;
 }) => {
-    const linksData = useSelector(getLinksPerNodeMapForTemporalEpoch(epoch));
+    const linksData = useSelector(getLinksPerNodeForTemporalEpoch(epoch));
     const allLinksState = useMemo(
         () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),
         [linksData],

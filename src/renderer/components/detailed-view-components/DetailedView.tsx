@@ -22,7 +22,7 @@ import DetailedViewPCIERenderer from './DetailedViewPCIE';
 
 import './DetailedView.scss';
 import type { LocationState } from '../../../data/StateTypes';
-import { getLinksPerNodeMapForTemporalEpoch } from '../../../data/store/selectors/linkSaturation.selectors';
+import { getLinksPerNodeForTemporalEpoch } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface DetailedViewProps {}
 
@@ -40,7 +40,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
 
-    const linksData = useSelector(getLinksPerNodeMapForTemporalEpoch(temporalEpoch));
+    const linksData = useSelector(getLinksPerNodeForTemporalEpoch(temporalEpoch));
     const allLinksState = useMemo(
         () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),
         [linksData],

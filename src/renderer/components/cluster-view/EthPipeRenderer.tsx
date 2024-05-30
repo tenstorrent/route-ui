@@ -10,7 +10,7 @@ import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
     getLinkSaturation,
-    getLinksPerNodeMapForTemporalEpoch,
+    getLinksPerNodeForTemporalEpoch,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
@@ -64,7 +64,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const linksData = useSelector(getLinksPerNodeMapForTemporalEpoch(temporalEpoch));
+    const linksData = useSelector(getLinksPerNodeForTemporalEpoch(temporalEpoch));
     const isHighContrast = useSelector(getHighContrastState);
 
     useEffect(() => {
