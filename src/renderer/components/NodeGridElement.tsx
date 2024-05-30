@@ -129,7 +129,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
                 node={node}
                 isHighContrast={isHighContrast}
                 showLinkSaturation={showLinkSaturation}
-                linksData={linksData.links}
+                linksData={linksData.linksByLinkId}
             />
             <NodeFocusPipeRenderer node={node} />
 

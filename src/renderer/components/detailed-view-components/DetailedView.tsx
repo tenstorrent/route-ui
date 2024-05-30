@@ -42,7 +42,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
 
     const linksData = useSelector(getLinksPerNodeMapForTemporalEpoch(temporalEpoch));
     const allLinksState = useMemo(
-        () => Object.fromEntries(Object.values(linksData).flatMap(({ links }) => Object.entries(links))),
+        () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),
         [linksData],
     );
 

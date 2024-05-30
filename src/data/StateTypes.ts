@@ -68,19 +68,21 @@ export interface LinkGraphState {
     temporalEpoch: number;
 }
 
+export type NodeLinkAndCongestionMap = Record<
+    string,
+    {
+        linksByLinkId: Record<string, LinkState>;
+        offchipLinkIds: string[];
+        saturation: number;
+        offchipSaturation: number;
+        chipId: number;
+    }
+>;
+
 export interface NetworkCongestionState {
     linkSaturationTreshold: number;
     linksPerTemporalEpoch: {
-        linksPerNodeMap: Record<
-            string,
-            {
-                links: Record<string, LinkState>;
-                offchipLinkIds: string[];
-                saturation: number;
-                offchipSaturation: number;
-                chipId: number;
-            }
-        >;
+        nodeLinkAndCongestionMap: NodeLinkAndCongestionMap;
         totalOps: number;
         totalOpPerChip: number[];
         normalizedTotalOps: number;

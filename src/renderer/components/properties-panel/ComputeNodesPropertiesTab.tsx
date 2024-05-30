@@ -359,7 +359,7 @@ const ComputeNodesPropertiesTab = ({
 }) => {
     const linksData = useSelector(getLinksPerNodeMapForTemporalEpoch(epoch));
     const allLinksState = useMemo(
-        () => Object.fromEntries(Object.values(linksData).flatMap(({ links }) => Object.entries(links))),
+        () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),
         [linksData],
     );
 

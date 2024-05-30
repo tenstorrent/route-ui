@@ -29,7 +29,7 @@ import {
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
-import { LinkState, PipeSelection } from './StateTypes';
+import { LinkState, type NodeLinkAndCongestionMap, PipeSelection } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -759,21 +759,12 @@ export default class GraphOnChip {
     }
 
     getAllLinksInitialState() {
-        const links: Record<
-            string,
-            {
-                chipId: number;
-                links: Record<string, LinkState>;
-                offchipLinkIds: string[];
-                saturation: number;
-                offchipSaturation: number;
-            }
-        > = {};
+        const nodeLinkAndCongestionMap: NodeLinkAndCongestionMap = {};
 
         forEach(this.nodes, (node) => {
-            if (!links[node.uid]) {
-                links[node.uid] = {
-                    links: {},
+            if (!nodeLinkAndCongestionMap[node.uid]) {
+                nodeLinkAndCongestionMap[node.uid] = {
+                    linksByLinkId: {},
                     offchipLinkIds: [],
                     chipId: this.chipId,
                     saturation: 0,
@@ -782,28 +773,28 @@ export default class GraphOnChip {
             }
 
             node.links.forEach((link) => {
-                links[node.uid].links[link.uid] = link.generateInitialState();
+                nodeLinkAndCongestionMap[node.uid].linksByLinkId[link.uid] = link.generateInitialState();
             });
             node.internalLinks.forEach((link) => {
-                links[node.uid].links[link.uid] = link.generateInitialState();
+                nodeLinkAndCongestionMap[node.uid].linksByLinkId[link.uid] = link.generateInitialState();
             });
 
             switch (node.type) {
                 case ComputeNodeType.DRAM:
-                    links[node.uid].offchipLinkIds =
+                    nodeLinkAndCongestionMap[node.uid].offchipLinkIds =
                         node.dramChannel?.links.map((link) => {
                             return link.uid;
                         }) || [];
                     break;
                 case ComputeNodeType.ETHERNET:
-                    links[node.uid].offchipLinkIds =
+                    nodeLinkAndCongestionMap[node.uid].offchipLinkIds =
                         [...node.internalLinks.values()].map((link) => {
                             return link.uid;
                         }) || [];
                     break;
 
                 case ComputeNodeType.PCIE:
-                    links[node.uid].offchipLinkIds =
+                    nodeLinkAndCongestionMap[node.uid].offchipLinkIds =
                         [...node.internalLinks].map(([link]) => {
                             return link.uid;
                         }) || [];
@@ -817,9 +808,9 @@ export default class GraphOnChip {
             // TODO: find correct node Uids for DRAM
             const dramId = `DRAM-${this.chipId}-${dramChannel.id}`;
 
-            if (!links[dramId]) {
-                links[dramId] = {
-                    links: {},
+            if (!nodeLinkAndCongestionMap[dramId]) {
+                nodeLinkAndCongestionMap[dramId] = {
+                    linksByLinkId: {},
                     offchipLinkIds: [],
                     chipId: this.chipId,
                     saturation: 0,
@@ -828,14 +819,14 @@ export default class GraphOnChip {
             }
 
             dramChannel.links.forEach((link) => {
-                links[dramId].links[link.uid] = link.generateInitialState();
+                nodeLinkAndCongestionMap[dramId].linksByLinkId[link.uid] = link.generateInitialState();
 
                 dramChannel.subchannels.forEach((subchannel) => {
                     const dramSubchannelId = `${dramId}-${subchannel.subchannelId}`;
 
-                    if (!links[dramSubchannelId]) {
-                        links[dramSubchannelId] = {
-                            links: {},
+                    if (!nodeLinkAndCongestionMap[dramSubchannelId]) {
+                        nodeLinkAndCongestionMap[dramSubchannelId] = {
+                            linksByLinkId: {},
                             offchipLinkIds: [],
                             chipId: this.chipId,
                             saturation: 0,
@@ -844,12 +835,13 @@ export default class GraphOnChip {
                     }
 
                     subchannel.links.forEach((subchannelLink) => {
-                        links[dramSubchannelId].links[subchannelLink.uid] = subchannelLink.generateInitialState();
+                        nodeLinkAndCongestionMap[dramSubchannelId].linksByLinkId[subchannelLink.uid] =
+                            subchannelLink.generateInitialState();
                     });
                 });
             });
         });
-        return links;
+        return nodeLinkAndCongestionMap;
     }
 
     get ethernetPipes(): PipeSegment[] {
