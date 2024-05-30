@@ -20,6 +20,7 @@ interface GraphSelectorProps {
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
+    // TODO: remove once temporal epoch are production ready
     const IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED = process.env.NODE_ENV === 'development';
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
