@@ -28,7 +28,7 @@ export interface PipeSelectionState {
     focusPipe: string | null;
 }
 
-type NodeUID = string;
+export type NodeUID = string;
 
 export interface ComputeNodeState {
     id: NodeUID;
@@ -68,21 +68,18 @@ export interface LinkGraphState {
     temporalEpoch: number;
 }
 
-export type NodeLinkAndCongestionMap = Record<
-    string,
-    {
-        linksByLinkId: Record<string, LinkState>;
-        offchipLinkIds: string[];
-        maxLinkSaturation: number;
-        offchipMaxSaturation: number;
-        chipId: number;
-    }
->;
+export interface LinkStateCongestion {
+    linksByLinkId: Record<string, LinkState>;
+    offchipLinkIds: string[];
+    maxLinkSaturation: number;
+    offchipMaxSaturation: number;
+    chipId: number;
+}
 
 export interface NetworkCongestionState {
     linkSaturationTreshold: number;
     linksPerTemporalEpoch: {
-        nodeLinkAndCongestionMap: NodeLinkAndCongestionMap;
+        linksStateCongestionByNode: Record<NodeUID, LinkStateCongestion>;
         totalOps: number;
         totalOpPerChip: number[];
         normalizedTotalOps: number;

@@ -104,7 +104,7 @@ const usePerfAnalyzerFileLoader = () => {
 
                 if (!linkDataByTemporalEpoch[graph.temporalEpoch]) {
                     linkDataByTemporalEpoch[graph.temporalEpoch] = {
-                        nodeLinkAndCongestionMap: {},
+                        linksStateCongestionByNode: {},
                         totalOpPerChip: [],
                         totalOps: 0,
                         normalizedTotalOps: 0,
@@ -112,11 +112,11 @@ const usePerfAnalyzerFileLoader = () => {
                     };
                 }
 
-                const { nodeLinkAndCongestionMap, totalOps: totalOpsPerEpoch } =
+                const { linksStateCongestionByNode, totalOps: totalOpsPerEpoch } =
                     linkDataByTemporalEpoch[graph.temporalEpoch];
 
-                linkDataByTemporalEpoch[graph.temporalEpoch].nodeLinkAndCongestionMap = {
-                    ...nodeLinkAndCongestionMap,
+                linkDataByTemporalEpoch[graph.temporalEpoch].linksStateCongestionByNode = {
+                    ...linksStateCongestionByNode,
                     ...graphOnChip.getAllLinksInitialState(),
                 };
 

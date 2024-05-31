@@ -6,12 +6,12 @@ import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
 export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.nodeLinkAndCongestionMap[nodeUid];
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksStateCongestionByNode[nodeUid];
 export const getOffchipLinkSaturationForNode = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.nodeLinkAndCongestionMap[nodeUid]
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksStateCongestionByNode[nodeUid]
         ?.offchipMaxSaturation ?? 0;
 export const getLinksPerNodeForTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.nodeLinkAndCongestionMap || {};
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksStateCongestionByNode || {};
 export const getTotalOpsForGraph = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOps || 0;
 export const getEpochNormalizedTotalOps = createSelector(
