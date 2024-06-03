@@ -365,19 +365,19 @@ const ComputeNodesPropertiesTab = ({
     );
 
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
-    const selectedNodes = useMemo(() => {
-        const selectedNodesList = orderedNodeSelection.reduce((graphList, nodeState) => {
-            const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
+    const selectedNodes = useMemo(
+        () =>
+            orderedNodeSelection.reduce((graphList, nodeState) => {
+                const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
 
-            if (graphOnChip) {
-                graphList.push(graphOnChip?.graphOnChip.getNode(nodeState.id));
-            }
+                if (graphOnChip) {
+                    graphList.push(graphOnChip?.graphOnChip.getNode(nodeState.id));
+                }
 
-            return graphList;
-        }, [] as ComputeNode[]);
-
-        return selectedNodesList;
-    }, [graphs, orderedNodeSelection]);
+                return graphList;
+            }, [] as ComputeNode[]),
+        [graphs, orderedNodeSelection],
+    );
 
     return (
         <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
