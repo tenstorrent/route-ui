@@ -130,7 +130,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         [state.graphs, state.graphOnChipList],
     );
 
-    const reset = useCallback(() => {
+    const resetGraphOnChipState = useCallback(() => {
         setState({
             ...applicationModelState,
             graphs: new Map(),
@@ -194,7 +194,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
-            resetGraphOnChipState: reset,
+            resetGraphOnChipState,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
         }),
@@ -204,7 +204,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
-            reset,
+            resetGraphOnChipState,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
         ],

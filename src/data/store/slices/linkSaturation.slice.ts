@@ -221,7 +221,7 @@ const updatePCILinks = (state: NetworkCongestionState) => {
     });
 };
 
-interface RecalculateLinkStaturationArguments {
+interface LinkStaturationMetrics {
     link: LinkState;
     totalOpCycles: number;
     linkListByLinkId: Record<string, LinkState>;
@@ -233,7 +233,7 @@ const calculateLinkSaturationMetrics = ({
     totalOpCycles,
     linkListByLinkId,
     offchipLinkIds,
-}: RecalculateLinkStaturationArguments) => {
+}: LinkStaturationMetrics) => {
     const newLinkSaturation = (link.bpc / link.maxBandwidth) * 100;
 
     return {
