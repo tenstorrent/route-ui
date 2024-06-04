@@ -58,7 +58,6 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     getGraphOnChip: () => undefined,
     getOperand: () => undefined,
     getGraphOnChipListForTemporalEpoch: () => [],
-    getTemporalEpochList: () => [],
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -164,15 +163,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
     }, [state.graphs]);
 
-    // method to get an array of temporalepoch ids
-    const getTemporalEpochList = useCallback(() => {
-        const temporalEpochList: number[] = [];
-        state.graphs.forEach((graph) => {
-            temporalEpochList[graph.temporalEpoch] = graph.temporalEpoch;
-        });
-        return temporalEpochList.filter((epoch) => epoch !== undefined) || [];
-    }, [state.graphs]);
-
     const getGraphOnChipListForTemporalEpoch = useCallback(
         (epoch: number, chipId?: number) => {
             const graphArray = state.graphsByTemporalEpoch.get(epoch) ?? [];
@@ -207,7 +197,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             resetGraphOnChipState,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
-            getTemporalEpochList,
         }),
         [
             loadGraphOnChips,
@@ -218,7 +207,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             resetGraphOnChipState,
             getOperand,
             getGraphOnChipListForTemporalEpoch,
-            getTemporalEpochList,
         ],
     );
 
