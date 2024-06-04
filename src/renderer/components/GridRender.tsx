@@ -25,7 +25,8 @@ export default function GridRender() {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch } = location.state;
 
-    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChip(epoch, chipId);
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
+
     const { cluster } = useContext(ClusterContext);
     const clusterChipsMap = useMemo(
         () => Object.fromEntries((cluster?.chips ?? []).map((chip) => [chip.id, chip])),
@@ -43,7 +44,7 @@ export default function GridRender() {
 
     return (
         <div className='main-content' style={style}>
-            {graphOnChipList.map(({ graph: { chipId: id, totalCols, nodes }, relationship: { name: graphName } }) => {
+            {graphOnChipList.map(({ graphOnChip: { chipId: id, totalCols, nodes }, graph: { name: graphName } }) => {
                 const clusterChip = clusterChipsMap[id];
                 const clusterChipPositioning: CSSProperties = {};
 
@@ -55,7 +56,7 @@ export default function GridRender() {
                 clusterChipPositioning.contentVisibility = 'auto';
 
                 return (
-                    <div className='grid-container' style={clusterChipPositioning}>
+                    <div className='grid-container' style={clusterChipPositioning} key={id}>
                         <div
                             className='node-container'
                             style={{
@@ -68,7 +69,6 @@ export default function GridRender() {
                                     <NodeGridElement
                                         node={node}
                                         temporalEpoch={epoch}
-                                        graphName={graphName}
                                         key={node.uid}
                                         connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
                                     />

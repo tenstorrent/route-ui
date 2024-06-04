@@ -9,13 +9,14 @@ import LinkDetails from '../LinkDetails';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
+import type { LinkState } from '../../../data/StateTypes';
 
 interface DetailedViewPCIERendererProps {
     node: ComputeNode;
-    graphName: string;
+    allLinksState: Record<string, LinkState>;
 }
 
-const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, graphName }) => {
+const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, allLinksState }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -38,12 +39,32 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                 <div className='node-container'>
                     <div className='node'>
                         <div className='col noc0'>
-                            <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
-                            <DetailedViewNOC2AXIRender links={noc0axi ? [noc0axi] : []} noc={NOC.ANY} />
+                            <DetailedViewNOCRouterRenderer
+                                links={noc0links}
+                                allLinksState={allLinksState}
+                                nodeUid={node.uid}
+                                label='NOC0'
+                            />
+                            <DetailedViewNOC2AXIRender
+                                links={noc0axi ? [noc0axi] : []}
+                                allLinksState={allLinksState}
+                                nodeUid={node.uid}
+                                noc={NOC.ANY}
+                            />
                         </div>
                         <div className='col noc1'>
-                            <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
-                            <DetailedViewNOC2AXIRender links={noc1axi ? [noc1axi] : []} noc={NOC.ANY} />
+                            <DetailedViewNOCRouterRenderer
+                                links={noc1links}
+                                allLinksState={allLinksState}
+                                nodeUid={node.uid}
+                                label='NOC1'
+                            />
+                            <DetailedViewNOC2AXIRender
+                                links={noc1axi ? [noc1axi] : []}
+                                allLinksState={allLinksState}
+                                nodeUid={node.uid}
+                                noc={NOC.ANY}
+                            />
                         </div>
                     </div>
                 </div>
@@ -53,14 +74,27 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                         2:1 XBAR
                     </div>
                     <div className='off-chip'>
-                        <DetailedViewAXIRender links={offChipPCIe ? [offChipPCIe] : []} filter={null} label='PCIe' />
+                        <DetailedViewAXIRender
+                            links={offChipPCIe ? [offChipPCIe] : []}
+                            allLinksState={allLinksState}
+                            nodeUid={node.uid}
+                            filter={null}
+                            label='PCIe'
+                        />
                     </div>
                 </div>
             </div>
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
-                        return <LinkDetails graphName={graphName} key={link.name} link={link} showEmpty={false} />;
+                        return (
+                            <LinkDetails
+                                linkState={allLinksState[link.uid]}
+                                key={link.name}
+                                link={link}
+                                showEmpty={false}
+                            />
+                        );
                     })}
                 </div>
             </div>

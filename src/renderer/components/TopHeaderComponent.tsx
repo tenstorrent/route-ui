@@ -13,7 +13,6 @@ import {
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AnchorButton } from '@blueprintjs/core';
 import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type { FolderLocationType, LocationState } from '../../data/StateTypes';
@@ -46,7 +45,12 @@ const formatRemoteFolderName = (connection?: RemoteConnection, folder?: RemoteFo
 const TopHeaderComponent: React.FC = () => {
     const navigate = useNavigate();
 
-    const { resetGraphOnChipState, getGraphOnChip } = useContext(GraphOnChipContext);
+    const location: Location<LocationState> = useLocation();
+    const { chipId, epoch: temporalEpoch } = location.state;
+
+    const { resetGraphOnChipState, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
+    const graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
+
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =
         usePerfAnalyzerFileLoader();
     const dispatch = useDispatch();
@@ -60,11 +64,7 @@ const TopHeaderComponent: React.FC = () => {
         .getSavedRemoteFolders(remoteConnectionConfig.selectedConnection)
         .filter((folder) => folder.lastSynced);
     const selectedRemoteFolder = useSelector(getSelectedRemoteFolder) ?? availableRemoteFolders[0];
-    const location: Location<LocationState> = useLocation();
-    const { chipId, epoch: temporalEpoch } = location.state;
-    const architecture = [
-        ...new Set(getGraphOnChip(temporalEpoch, chipId).map(({ graph }) => graph.architecture)),
-    ].join(', ');
+    const architecture = [...new Set(graphOnChipList.map(({ graphOnChip }) => graphOnChip.architecture))].join(', ');
 
     const updateSelectedFolder = async (
         newFolder: RemoteFolder | string,
@@ -133,12 +133,13 @@ const TopHeaderComponent: React.FC = () => {
                     onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
-                <Tooltip2 disabled={false} content='Back to previous graph' placement='bottom'>
+                {/* TODO: reenable once we figure out how to disable the buttons from going to the home screen */}
+                {/* <Tooltip2 disabled={false} content='Back to previous graph' placement='bottom'>
                     <AnchorButton minimal disabled={false} icon={IconNames.ARROW_LEFT} onClick={() => navigate(-1)} />
                 </Tooltip2>
                 <Tooltip2 disabled={false} content='Forward next graph' placement='bottom'>
                     <AnchorButton minimal disabled={false} icon={IconNames.ARROW_RIGHT} onClick={() => navigate(1)} />
-                </Tooltip2>
+                </Tooltip2> */}
             </div>
 
             <div className='text-content'>

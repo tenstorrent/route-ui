@@ -25,12 +25,13 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
-import type { GraphRelationship } from '../../../data/StateTypes';
+import type { GraphRelationship, LinkState } from '../../../data/StateTypes';
+import { getLinksPerNodeForTemporalEpoch } from '../../../data/store/selectors/linkSaturation.selectors';
 
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
-    graphName: string;
+    allLinksState: Record<string, LinkState>;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -118,7 +119,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch, allLinksState }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
@@ -341,7 +342,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} graphName={graphName} showEmpty />
+                        <LinkDetails key={link.name} link={link} linkState={allLinksState[link.uid]} showEmpty />
                     ))}
                 </div>
             )}
@@ -353,40 +354,41 @@ const ComputeNodesPropertiesTab = ({
     graphs,
     epoch,
 }: {
-    graphs: { graph: GraphOnChip; relationship: GraphRelationship }[];
+    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
     epoch: number;
 }) => {
+    // TODO: narrow down the needed list
+    const linksData = useSelector(getLinksPerNodeForTemporalEpoch(epoch));
+    const allLinksState = useMemo(
+        () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),
+        [linksData],
+    );
+
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
-    const selectedNodes = useMemo(() => {
-        const selectedNodesList = orderedNodeSelection.reduce(
-            (graphList, nodeState) => {
+    const selectedNodes = useMemo(
+        () =>
+            orderedNodeSelection.reduce((graphList, nodeState) => {
                 const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
 
                 if (graphOnChip) {
-                    graphList.push({
-                        node: graphOnChip?.graph.getNode(nodeState.id),
-                        graphName: graphOnChip?.relationship.name,
-                    });
+                    graphList.push(graphOnChip?.graphOnChip.getNode(nodeState.id));
                 }
 
                 return graphList;
-            },
-            [] as { node: ComputeNode; graphName: string }[],
-        );
-
-        return selectedNodesList;
-    }, [graphs, orderedNodeSelection]);
+            }, [] as ComputeNode[]),
+        [graphs, orderedNodeSelection],
+    );
 
     return (
         <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map(({ node, graphName }) => (
+                    {selectedNodes.map((node) => (
                         <ComputeNodePropertiesCard
                             key={node?.uid}
                             node={node}
                             temporalEpoch={epoch}
-                            graphName={graphName}
+                            allLinksState={allLinksState}
                         />
                     ))}
                 </div>

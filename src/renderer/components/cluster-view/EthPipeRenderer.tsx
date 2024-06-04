@@ -9,8 +9,8 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
-    getAllLinksForGraph,
     getLinkSaturation,
+    getLinksPerNodeForTemporalEpoch,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
@@ -20,7 +20,7 @@ import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../.
 interface EthPipeRendererProps {
     id: string;
     node: ComputeNode | undefined;
-    graphName: string | undefined;
+    temporalEpoch: number;
     ethPosition: CLUSTER_ETH_POSITION;
     index: number;
     clusterChipSize: number;
@@ -30,7 +30,7 @@ interface EthPipeRendererProps {
 const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     id,
     node,
-    graphName,
+    temporalEpoch,
     ethPosition,
     index,
     clusterChipSize,
@@ -64,7 +64,8 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const linksData = useSelector(getAllLinksForGraph(graphName || ''));
+    // TODO: narrow down the needed list
+    const linksData = useSelector(getLinksPerNodeForTemporalEpoch(temporalEpoch));
     const isHighContrast = useSelector(getHighContrastState);
 
     useEffect(() => {
@@ -74,7 +75,8 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
             if (showLinkSaturation && linksData) {
                 node?.internalLinks.forEach((link) => {
                     if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
-                        const linkStateData = linksData[link.uid];
+                        const linkStateData = linksData[node.uid].linksByLinkId[link.uid];
+
                         if (normalizedSaturation) {
                             if (linkStateData && linkStateData.normalizedSaturation >= linkSaturationTreshold) {
                                 const color = calculateLinkCongestionColor(

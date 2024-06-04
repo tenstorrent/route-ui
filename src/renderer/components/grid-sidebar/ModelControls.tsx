@@ -17,26 +17,30 @@ import type { LocationState } from '../../../data/StateTypes';
 
 const ModelControls: FC = () => {
     const location: Location<LocationState> = useLocation();
-    const { epoch } = location.state;
-    // TODO: use multiple graphs
-    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(epoch)[0]?.graph;
+    const { epoch, chipId } = location.state;
+
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
+
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector(getOperationRatioThreshold);
     const { getMaxModelEstimateRatio } = useOperationsTable();
     const maxModelEstimateRatio = useMemo(
         () =>
             getMaxModelEstimateRatio(
-                [...(graphOnChip?.operations ?? [])].map((op) => {
-                    return {
-                        operation: op,
-                        name: op.name,
-                        ...op.details,
-                        slowestOperandRef: op.slowestOperand,
-                    } as unknown as OpTableFields;
-                }),
+                graphOnChipList.flatMap(({ graphOnChip }) =>
+                    [...graphOnChip.operations].map(
+                        (op) =>
+                            ({
+                                operation: op,
+                                name: op.name,
+                                ...op.details,
+                                slowestOperandRef: op.slowestOperand,
+                            }) as unknown as OpTableFields,
+                    ),
+                ),
             ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [graphOnChip?.operations],
+        [graphOnChipList],
     );
 
     const clampNumber = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));

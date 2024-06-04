@@ -285,12 +285,11 @@ const ClusterView: FC = () => {
             >
                 {cluster?.chips.map((clusterChip) => {
                     let graphOnChip: GraphOnChip | undefined;
-                    let graphName: string | undefined;
+
                     selectedEpoch.forEach((graph) => {
-                        const chipByGraphName = getGraphOnChip(graph.temporalEpoch, graph.chipId);
-                        if (chipByGraphName?.chipId === clusterChip.id) {
-                            graphOnChip = chipByGraphName;
-                            graphName = graph.name;
+                        const currentGraphOnChip = getGraphOnChip(graph.temporalEpoch, graph.chipId);
+                        if (currentGraphOnChip?.chipId === clusterChip.id) {
+                            graphOnChip = currentGraphOnChip;
                         }
                     });
 
@@ -353,7 +352,7 @@ const ClusterView: FC = () => {
                                         <EthPipeRenderer
                                             key={uid}
                                             id={uid}
-                                            graphName={graphName}
+                                            temporalEpoch={temporalEpoch}
                                             ethPosition={position}
                                             node={node}
                                             index={index}

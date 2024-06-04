@@ -14,11 +14,11 @@ import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
 
-const PipesPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
+const PipesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
     const [pipeFilter, setPipeFilter] = useState<string>('');
     // TODO: filter dupes
-    const pipeSegments = useMemo(() => graphs.flatMap(({ graph }) => graph.allUniquePipes), [graphs]);
+    const pipeSegments = useMemo(() => graphs.flatMap(({ graphOnChip }) => graphOnChip.allUniquePipes), [graphs]);
 
     const selectFilteredPipes = () => {
         pipeSegments.forEach((pipeSegment) => {

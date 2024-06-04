@@ -25,19 +25,21 @@ import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlig
 import { ClusterChip } from '../../data/Cluster';
 import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
 import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
-import { getAllLinksForGraph, getShowLinkSaturation } from '../../data/store/selectors/linkSaturation.selectors';
+import {
+    getNodeLinksData,
+    getOffchipLinkSaturationForNode,
+    getShowLinkSaturation,
+} from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
-    graphName: string;
     temporalEpoch: number;
     connectedEth?: ClusterChip | null;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temporalEpoch, connectedEth }) => {
-    // const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, connectedEth }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
@@ -48,8 +50,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
     const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
 
-    // TODO: pre-calculate link saturation and memoize it
-    const linksData = useSelector(getAllLinksForGraph(graphName));
+    const linksData = useSelector(getNodeLinksData(temporalEpoch, node.uid));
+    const offchipLinkSaturation = useSelector(getOffchipLinkSaturationForNode(temporalEpoch, node.uid));
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -113,8 +115,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
             {/* Congestion information */}
             <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
             <OffChipNodeLinkCongestionLayer
-                node={node}
-                linksData={linksData}
+                offchipLinkSaturation={offchipLinkSaturation}
                 showLinkSaturation={showLinkSaturation}
                 isHighContrast={isHighContrast}
             />
@@ -128,7 +129,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, graphName, temp
                 node={node}
                 isHighContrast={isHighContrast}
                 showLinkSaturation={showLinkSaturation}
-                linksData={linksData}
+                linksData={linksData.linksByLinkId}
             />
             <NodeFocusPipeRenderer node={node} />
 

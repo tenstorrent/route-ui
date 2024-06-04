@@ -19,15 +19,15 @@ import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { Queue } from '../../../data/GraphTypes';
 
-const QueuesPropertiesTab = ({ graphs }: { graphs: { graph: GraphOnChip; relationship: GraphRelationship }[] }) => {
+const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
     const queuesList = useMemo(
         () => [
             ...graphs
-                .reduce((queueMap, { graph }) => {
-                    [...graph.queues].forEach((queue) => {
+                .reduce((queueMap, { graphOnChip }) => {
+                    [...graphOnChip.queues].forEach((queue) => {
                         if (!queueMap.has(queue.name)) {
                             queueMap.set(queue.name, queue);
                         }
