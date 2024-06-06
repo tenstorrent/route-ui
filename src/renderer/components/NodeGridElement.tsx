@@ -93,8 +93,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
         >
             {connectedEth !== null && node.externalPipes.length > 0 && (
                 <div className='eth-connection'>
-                    {/* TEMPORARY OTPUT */}
-                    <span>ETH {connectedEth?.id}</span>
+                    {/* TEMPORARY OTPUT - we will use this to show engaged eth ports */}
+                    {/* <span>ETH {connectedEth?.id}</span> */}
                     {/* {externalPipes.map((pipe) => ( */}
                     {/*    <div key={pipe.id} className='eth-pipe' >{pipe.id}{pipe.linkName}</div> */}
                     {/* ))} */}
