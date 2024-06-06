@@ -5,10 +5,10 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
+import { clearAllPipes, updateMultiplePipeSelection } from 'data/store/slices/pipeSelection.slice';
 import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import GraphOnChip from '../../../data/GraphOnChip';
+import GraphOnChip, { type PipeSegment } from '../../../data/GraphOnChip';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
@@ -17,16 +17,30 @@ import type { GraphRelationship } from '../../../data/StateTypes';
 const PipesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
     const [pipeFilter, setPipeFilter] = useState<string>('');
-    // TODO: filter dupes
-    const pipeSegments = useMemo(() => graphs.flatMap(({ graphOnChip }) => graphOnChip.allUniquePipes), [graphs]);
+    const pipeSegments = useMemo(() => {
+        const uniquePipeSegments = new Map<string, PipeSegment>();
+
+        graphs.forEach(({ graphOnChip }) =>
+            graphOnChip.allUniquePipes.forEach((pipeSegment) => {
+                if (!uniquePipeSegments.has(pipeSegment.id)) {
+                    uniquePipeSegments.set(pipeSegment.id, pipeSegment);
+                }
+            }),
+        );
+
+        return [...uniquePipeSegments.values()];
+    }, [graphs]);
 
     const selectFilteredPipes = () => {
+        const pipeIdsToSelect: string[] = [];
+
         pipeSegments.forEach((pipeSegment) => {
             if (pipeSegment.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
-                // TODO: batch update
-                dispatch(updatePipeSelection({ id: pipeSegment.id, selected: true }));
+                pipeIdsToSelect.push(pipeSegment.id);
             }
         });
+
+        dispatch(updateMultiplePipeSelection({ ids: pipeIdsToSelect, selected: true }));
     };
 
     return (
