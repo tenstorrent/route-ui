@@ -108,7 +108,7 @@ const usePerfAnalyzerFileLoader = () => {
                         totalOpPerChip: [],
                         totalOps: 0,
                         normalizedTotalOps: 0,
-                        adjustedTotalOps: 0,
+                        initialNormalizedTotalOps: 0,
                     };
                 }
 
@@ -121,7 +121,10 @@ const usePerfAnalyzerFileLoader = () => {
                 };
 
                 const ops = totalOpsPerEpoch ?? 1;
-                linkDataByTemporalEpoch[graph.temporalEpoch].totalOps = Math.max(graphOnChip.totalOpCycles, ops);
+                const totalOps = Math.max(graphOnChip.totalOpCycles, ops);
+                linkDataByTemporalEpoch[graph.temporalEpoch].initialNormalizedTotalOps = totalOps;
+                linkDataByTemporalEpoch[graph.temporalEpoch].normalizedTotalOps = totalOps;
+                linkDataByTemporalEpoch[graph.temporalEpoch].totalOps = totalOps;
                 linkDataByTemporalEpoch[graph.temporalEpoch].totalOpPerChip[graph.chipId] = graphOnChip.totalOpCycles;
 
                 graphOnChipList.push(graphOnChip);

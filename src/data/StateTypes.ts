@@ -83,7 +83,7 @@ export interface NetworkCongestionState {
         totalOps: number;
         totalOpPerChip: number[];
         normalizedTotalOps: number;
-        adjustedTotalOps: number;
+        initialNormalizedTotalOps: number;
     }[];
     CLKMHz: number;
     DRAMBandwidthGBs: number;

@@ -19,10 +19,8 @@ export const getEpochNormalizedTotalOps = createSelector(
     (linksPerTemporalEpoch) => linksPerTemporalEpoch.map(({ normalizedTotalOps }) => normalizedTotalOps),
 );
 
-export const getEpochAdjustedTotalOps = createSelector(
-    (state: RootState) => state.linkSaturation.linksPerTemporalEpoch,
-    (linksPerTemporalEpoch) => linksPerTemporalEpoch.map(({ adjustedTotalOps }) => adjustedTotalOps),
-);
+export const getEpochInitialNormalizedTotalOps = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch].initialNormalizedTotalOps;
 export const getLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturationTreshold;
 export const getShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
 export const getShowNOC0 = (state: RootState) => state.linkSaturation.showNOC0;
