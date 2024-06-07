@@ -39,7 +39,8 @@ function OperationsTable() {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch, chipId } = location.state;
     const dispatch = useDispatch();
-    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId);
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
+
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');
@@ -53,8 +54,8 @@ function OperationsTable() {
         let selectedOperation: BuildableOperation | undefined;
 
         // eslint-disable-next-line no-restricted-syntax
-        for (const { graph } of graphOnChipList) {
-            selectedOperation = graph.getOperation(selectedOperationName);
+        for (const { graphOnChip } of graphOnChipList) {
+            selectedOperation = graphOnChip.getOperation(selectedOperationName);
 
             if (selectedOperation) {
                 break;
@@ -73,7 +74,7 @@ function OperationsTable() {
         } else {
             list = [
                 ...graphOnChipList
-                    .reduce((opMap, { graph: { operations } }) => {
+                    .reduce((opMap, { graphOnChip: { operations } }) => {
                         [...operations].forEach((op) => {
                             if (!opMap.has(op.name)) {
                                 opMap.set(op.name, {

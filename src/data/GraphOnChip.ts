@@ -2,11 +2,12 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-/* eslint-disable no-useless-constructor */
+/* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
+// eslint-disable-next-line import/no-cycle
 import { BuildableOperation, BuildableQueue, Operand } from './Graph';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
 import type { Operation, Queue } from './GraphTypes';
@@ -28,7 +29,7 @@ import {
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
-import { LinkState, PipeSelection } from './StateTypes';
+import { LinkState, type LinkStateCongestion, type NodeUID, PipeSelection } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -757,27 +758,90 @@ export default class GraphOnChip {
         return [...nodes];
     }
 
-    getAllLinks(): NetworkLink[] {
-        const links: NetworkLink[] = [];
+    getAllLinksInitialState() {
+        const linksStateCongestionByNode: Record<NodeUID, LinkStateCongestion> = {};
+
         forEach(this.nodes, (node) => {
+            if (!linksStateCongestionByNode[node.uid]) {
+                linksStateCongestionByNode[node.uid] = {
+                    linksByLinkId: {},
+                    offchipLinkIds: [],
+                    chipId: this.chipId,
+                    maxLinkSaturation: 0,
+                    offchipMaxSaturation: 0,
+                };
+            }
+
             node.links.forEach((link) => {
-                links.push(link);
+                linksStateCongestionByNode[node.uid].linksByLinkId[link.uid] = link.generateInitialState();
             });
             node.internalLinks.forEach((link) => {
-                links.push(link);
+                linksStateCongestionByNode[node.uid].linksByLinkId[link.uid] = link.generateInitialState();
             });
+
+            switch (node.type) {
+                case ComputeNodeType.DRAM:
+                    linksStateCongestionByNode[node.uid].offchipLinkIds =
+                        node.dramChannel?.links.map((link) => {
+                            return link.uid;
+                        }) || [];
+                    break;
+                case ComputeNodeType.ETHERNET:
+                    linksStateCongestionByNode[node.uid].offchipLinkIds =
+                        [...node.internalLinks.values()].map((link) => {
+                            return link.uid;
+                        }) || [];
+                    break;
+
+                case ComputeNodeType.PCIE:
+                    linksStateCongestionByNode[node.uid].offchipLinkIds =
+                        [...node.internalLinks].map(([link]) => {
+                            return link.uid;
+                        }) || [];
+                    break;
+                default:
+                    break;
+            }
         });
+
         this.dramChannels.forEach((dramChannel) => {
+            // TODO: find correct node Uids for DRAM
+            const dramId = `DRAM-${this.chipId}-${dramChannel.id}`;
+
+            if (!linksStateCongestionByNode[dramId]) {
+                linksStateCongestionByNode[dramId] = {
+                    linksByLinkId: {},
+                    offchipLinkIds: [],
+                    chipId: this.chipId,
+                    maxLinkSaturation: 0,
+                    offchipMaxSaturation: 0,
+                };
+            }
+
             dramChannel.links.forEach((link) => {
-                links.push(link);
+                linksStateCongestionByNode[dramId].linksByLinkId[link.uid] = link.generateInitialState();
+
                 dramChannel.subchannels.forEach((subchannel) => {
+                    const dramSubchannelId = `${dramId}-${subchannel.subchannelId}`;
+
+                    if (!linksStateCongestionByNode[dramSubchannelId]) {
+                        linksStateCongestionByNode[dramSubchannelId] = {
+                            linksByLinkId: {},
+                            offchipLinkIds: [],
+                            chipId: this.chipId,
+                            maxLinkSaturation: 0,
+                            offchipMaxSaturation: 0,
+                        };
+                    }
+
                     subchannel.links.forEach((subchannelLink) => {
-                        links.push(subchannelLink);
+                        linksStateCongestionByNode[dramSubchannelId].linksByLinkId[subchannelLink.uid] =
+                            subchannelLink.generateInitialState();
                     });
                 });
             });
         });
-        return links;
+        return linksStateCongestionByNode;
     }
 
     get ethernetPipes(): PipeSegment[] {
@@ -1067,12 +1131,19 @@ export class ComputeNode {
             node.dramSubchannelId = nodeJSON.dram_subchannel || 0;
         }
 
-        const linkId = `${node.loc.x}-${node.loc.y}`;
+        const linkId = node.uid;
 
         Object.entries(nodeJSON.links).forEach(([linkName, linkJson], index) => {
             const link: NetworkLink = NetworkLink.CREATE(linkName as NOCLinkName, `${linkId}-${index}`, linkJson);
             if (link.type === LinkType.NOC) {
-                node.links.set(linkName, link as NOCLink);
+                // Added a const here to avoid casting multiple times
+                const nocLink = link as NOCLink;
+
+                node.links.set(linkName, nocLink);
+
+                if (nocLink.noc === NOC.NOC0 || nocLink.noc === NOC.NOC1) {
+                    node.nocLinks.push(nocLink);
+                }
             }
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
@@ -1080,7 +1151,39 @@ export class ComputeNode {
             if (link.type === LinkType.PCIE) {
                 node.internalLinks.set(linkName, link as PCIeLink);
             }
+
+            if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
+                node.externalPipes.push(...link.pipes);
+            }
         });
+
+        let offChipLinkIds: string[] = [];
+
+        switch (node.type) {
+            case ComputeNodeType.DRAM:
+                offChipLinkIds =
+                    node.dramChannel?.links.map((l) => {
+                        return l.uid;
+                    }) || [];
+                break;
+            case ComputeNodeType.ETHERNET:
+                offChipLinkIds =
+                    [...node.internalLinks.values()].map((l) => {
+                        return l.uid;
+                    }) || [];
+                break;
+
+            case ComputeNodeType.PCIE:
+                offChipLinkIds =
+                    [...node.internalLinks].map(([l]) => {
+                        return l.uid;
+                    }) || [];
+                break;
+            default:
+                break;
+        }
+
+        node.offchipLinkIds = offChipLinkIds;
 
         // Associate with operation
         const opName: OperationName = nodeJSON.op_name;
@@ -1118,6 +1221,10 @@ export class ComputeNode {
 
     public links: Map<any, NOCLink> = new Map();
 
+    public nocLinks: NOCLink[] = [];
+
+    public offchipLinkIds: string[] = [];
+
     /** @description Off chip links that are not part of the NOC, excluding DRAM links */
     public internalLinks: Map<any, NetworkLink> = new Map();
 
@@ -1132,6 +1239,8 @@ export class ComputeNode {
     public producerPipes: Pipe[] = [];
 
     public pipes: Pipe[] = [];
+
+    public externalPipes: PipeSegment[] = [];
 
     /**
      * only relevant for dram nodes

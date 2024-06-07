@@ -12,13 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { type Location, useLocation } from 'react-router-dom';
 import { ClusterContext } from '../../../data/ClusterContext';
 import getPipeColor from '../../../data/ColorGenerator';
-import GraphOnChip, { PipeSegment } from '../../../data/GraphOnChip';
+import GraphOnChip from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { type LocationState } from '../../../data/StateTypes';
+import { GraphRelationship, type LocationState } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
-    getEpochAdjustedTotalOps,
+    getEpochInitialNormalizedTotalOps,
     getEpochNormalizedTotalOps,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
@@ -33,7 +33,7 @@ import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
 import EthPipeRenderer from './EthPipeRenderer';
 
 const renderItem: ItemRenderer<number> = (
-    item,
+    temporalEpoch,
     //
     { handleClick, modifiers },
 ) => {
@@ -41,18 +41,38 @@ const renderItem: ItemRenderer<number> = (
         return null;
     }
 
-    return <MenuItem active={modifiers.active} key={item} onClick={handleClick} text={`Temporal epoch ${item}`} />;
+    return (
+        <MenuItem
+            active={modifiers.active}
+            key={temporalEpoch}
+            onClick={handleClick}
+            text={`Temporal epoch ${temporalEpoch}`}
+        />
+    );
 };
 const ClusterView: FC = () => {
     const location: Location<LocationState> = useLocation();
     const { epoch: temporalEpoch } = location.state;
-    const [selectedEpoch, setSelectedEpoch] = useState<number>(temporalEpoch);
+
     const { cluster } = useContext(ClusterContext);
-    const epochList = useContext(GraphOnChipContext).getTemporalEpochList();
+    const { getGraphOnChip, getGraphRelationshipList } = useContext(GraphOnChipContext);
+    const dispatch = useDispatch();
+    const graphInformation = getGraphRelationshipList();
+    const availableTemporalEpochs: GraphRelationship[][] = [];
+
+    graphInformation.forEach((item) => {
+        if (availableTemporalEpochs[item.temporalEpoch]) {
+            availableTemporalEpochs[item.temporalEpoch].push(item);
+        } else {
+            availableTemporalEpochs[item.temporalEpoch] = [item];
+        }
+    });
+
+    const [pciPipes, setPciPipes] = useState<string[]>([]);
+
     const [pipeFilter, setPipeFilter] = useState<string>('');
 
-    const dispatch = useDispatch();
-    const graphOnChipListForEpoch = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(selectedEpoch);
+    const [selectedEpoch, setSelectedEpoch] = useState<number>(temporalEpoch);
 
     /** we want explicit control over the size of chips based on cluster size */
     let clusterChipSize = 150;
@@ -65,17 +85,15 @@ const ClusterView: FC = () => {
     if (numberOfChips === 2) {
         clusterChipSize = 400;
     }
-    const { uniquePipeList, pciPipeIds } = useMemo((): {
-        pciPipeIds: string[];
-        uniquePipeList: PipeSegment[];
-    } => {
-        const pciListInternal: string[] = [];
-        const pipeList = graphOnChipListForEpoch
-            .map(({ graphOnChip }) => {
+
+    const uniquePipeList = useMemo(() => {
+        const pciList: string[] = [];
+        const pipeList = availableTemporalEpochs[selectedEpoch]
+            .map((graph) => {
                 return [
-                    ...(graphOnChip.ethernetPipes.map((pipe) => pipe) || []),
-                    ...(graphOnChip.pciePipes.map((pipe) => {
-                        pciListInternal.push(pipe.id);
+                    ...(getGraphOnChip(graph.temporalEpoch, graph.chipId)?.ethernetPipes.map((pipe) => pipe) || []),
+                    ...(getGraphOnChip(graph.temporalEpoch, graph.chipId)?.pciePipes.map((pipe) => {
+                        pciList.push(pipe.id);
                         return pipe;
                     }) || []),
                 ];
@@ -83,13 +101,13 @@ const ClusterView: FC = () => {
             .flat()
             .sort((a, b) => a.id.localeCompare(b.id));
 
-        return {
-            uniquePipeList: pipeList.filter((pipeSegment, index, self) => {
-                return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
-            }),
-            pciPipeIds: pciListInternal,
-        };
-    }, [graphOnChipListForEpoch]);
+        setPciPipes(pciList);
+
+        return pipeList.filter((pipeSegment, index, self) => {
+            return self.findIndex((segment) => segment.id === pipeSegment.id) === index;
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedEpoch, getGraphOnChip]);
 
     const pipeIds = uniquePipeList.map((pipe) => pipe.id);
 
@@ -103,19 +121,11 @@ const ClusterView: FC = () => {
         );
     };
 
-    const pciPipeStateList = useSelector(getSelectedPipes(pciPipeIds));
+    const pciPipeStateList = useSelector(getSelectedPipes(pciPipes));
     const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(true);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
-    const normalizedAdjustedOPsList = useSelector(getEpochAdjustedTotalOps);
+    const normalizedOPsInitial = useSelector(getEpochInitialNormalizedTotalOps(selectedEpoch));
     const normalizedOPsList = useSelector(getEpochNormalizedTotalOps);
-
-    const normalizedAdjustedOPs = useMemo(() => {
-        return normalizedAdjustedOPsList[selectedEpoch] || 1;
-    }, [normalizedAdjustedOPsList, selectedEpoch]);
-
-    const normalizedOPsInitial = useMemo(() => {
-        return normalizedOPsList[selectedEpoch] || 1;
-    }, [normalizedOPsList, selectedEpoch]);
 
     return (
         <div className='cluster-view-container'>
@@ -138,8 +148,8 @@ const ClusterView: FC = () => {
                         <NumericInput
                             disabled={!showLinkSaturation || !normalizedSaturation}
                             id='normOpCyclesInput'
-                            value={normalizedAdjustedOPs}
-                            stepSize={normalizedAdjustedOPs / 10}
+                            value={normalizedOPsList[selectedEpoch]}
+                            stepSize={1000}
                             minorStepSize={100}
                             majorStepSize={100000}
                             min={1}
@@ -185,9 +195,9 @@ const ClusterView: FC = () => {
                     </div>
                     <hr />
                 </div>
-                {epochList.length > 1 && (
+                {availableTemporalEpochs.length > 1 && (
                     <Select
-                        items={epochList}
+                        items={[...availableTemporalEpochs.keys()]}
                         itemRenderer={renderItem}
                         onItemSelect={setSelectedEpoch}
                         activeItem={null}
@@ -267,12 +277,12 @@ const ClusterView: FC = () => {
                 }}
             >
                 {cluster?.chips.map((clusterChip) => {
-                    let graphOnChipForCluster: GraphOnChip | undefined;
-                    let graphName: string | undefined;
-                    graphOnChipListForEpoch.forEach(({ graph, graphOnChip }) => {
-                        if (graph.temporalEpoch === selectedEpoch && graph.chipId === clusterChip.id) {
-                            graphOnChipForCluster = graphOnChip;
-                            graphName = graph.name;
+                    let graphOnChip: GraphOnChip | undefined;
+
+                    availableTemporalEpochs[selectedEpoch].forEach((graph) => {
+                        const currentGraphOnChip = getGraphOnChip(graph.temporalEpoch, graph.chipId);
+                        if (currentGraphOnChip?.chipId === clusterChip.id) {
+                            graphOnChip = currentGraphOnChip;
                         }
                     });
 
@@ -330,12 +340,12 @@ const ClusterView: FC = () => {
 
                             {[...ethPosition.entries()].map(([position, value]) => {
                                 return value.map((uid: string, index: number) => {
-                                    const node = graphOnChipForCluster?.getNode(uid);
+                                    const node = graphOnChip?.getNode(uid);
                                     return (
                                         <EthPipeRenderer
                                             key={uid}
                                             id={uid}
-                                            graphName={graphName}
+                                            temporalEpoch={temporalEpoch}
                                             ethPosition={position}
                                             node={node}
                                             index={index}

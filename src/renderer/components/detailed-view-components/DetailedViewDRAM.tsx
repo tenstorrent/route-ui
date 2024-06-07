@@ -15,18 +15,19 @@ import LinkDetails from '../LinkDetails';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
+import type { LinkState } from '../../../data/StateTypes';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
-    graphName: string;
     temporalEpoch: number;
     graphOnChip?: GraphOnChip;
+    allLinksState: Record<string, LinkState>;
 }
 
 const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
     node,
-    graphName,
     temporalEpoch,
+    allLinksState,
     graphOnChip,
 }) => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
@@ -44,21 +45,26 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
     if (dram === null) {
         return null;
     }
+
     return (
         <>
             <div className='detailed-view-chip dram'>
                 <div className='node-container'>
                     {dram.subchannels.map((subchannel) => {
                         const currentNode = nodeList.find((n) => n.dramSubchannelId === subchannel.subchannelId);
+
                         const noc0links: NOCLink[] = [];
                         const noc1links: NOCLink[] = [];
+
                         if (currentNode) {
                             noc0links.push(currentNode.links.get(NOCLinkName.NOC0_IN) as NOCLink);
                             noc0links.push(currentNode.links.get(NOCLinkName.NOC0_OUT) as NOCLink);
                             noc1links.push(currentNode.links.get(NOCLinkName.NOC1_IN) as NOCLink);
                             noc1links.push(currentNode.links.get(NOCLinkName.NOC1_OUT) as NOCLink);
                         }
+
                         const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
+
                         return (
                             <div
                                 key={subchannel.subchannelId}
@@ -95,12 +101,32 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
                                 <DetailedViewPipeControls node={currentNode} numPipes={numPipes} />
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
-                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC0} />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc0links}
+                                            allLinksState={allLinksState}
+                                            label='NOC0'
+                                            nodeUid={node.uid}
+                                        />
+                                        <DetailedViewNOC2AXIRender
+                                            links={subchannel.links}
+                                            allLinksState={allLinksState}
+                                            noc={NOC.NOC0}
+                                            nodeUid={node.uid}
+                                        />
                                     </div>
                                     <div className='col noc1'>
-                                        <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
-                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC1} />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc1links}
+                                            allLinksState={allLinksState}
+                                            label='NOC1'
+                                            nodeUid={node.uid}
+                                        />
+                                        <DetailedViewNOC2AXIRender
+                                            links={subchannel.links}
+                                            allLinksState={allLinksState}
+                                            noc={NOC.NOC1}
+                                            nodeUid={node.uid}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -117,11 +143,15 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
                         <>
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                allLinksState={allLinksState}
+                                nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM0_INOUT}
                                 label='AXI DRAM0'
                             />
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                allLinksState={allLinksState}
+                                nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM1_INOUT}
                                 label='AXI DRAM1'
                             />
@@ -130,6 +160,8 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
                     {architecture === Architecture.GRAYSKULL && (
                         <DetailedViewAXIRender
                             links={dram.links}
+                            allLinksState={allLinksState}
+                            nodeUid={node.uid}
                             filter={DramBankLinkName.DRAM_INOUT}
                             label='Off-chip DRAM'
                         />
@@ -138,13 +170,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
             </div>
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
-                    {nodeList.map((n, index) => {
+                    {nodeList.map((_n, index) => {
                         return node.getInternalLinksForNode().map((link) => {
                             return (
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
-                                    graphName={graphName}
+                                    linkState={allLinksState[link.uid]}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
                                 />
@@ -153,18 +185,22 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({
                     })}
                     {dram.subchannels.map((sub) =>
                         sub.links.map((link) => (
-                            //
                             <LinkDetails
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
-                                graphName={graphName}
+                                linkState={allLinksState[link.uid]}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} graphName={graphName} link={link} showEmpty={false} />
+                        <LinkDetails
+                            key={link.name}
+                            linkState={allLinksState[link.uid]}
+                            link={link}
+                            showEmpty={false}
+                        />
                     ))}
                 </div>
             </div>

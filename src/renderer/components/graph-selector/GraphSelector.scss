@@ -7,7 +7,7 @@
 .graph-selector-picker {
     color: $tt-black;
     padding: 8px 10px;
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable both-edges;
     overflow-y: auto;
     color-scheme: light;
     max-height: 400px;
@@ -24,5 +24,9 @@
 
     .graph-selector-graph {
         padding-inline-start: 28px;
+    }
+
+    &:not(:has( .graph-selector-temporal-epoch)) .graph-selector-graph {
+        padding-inline-start: 5px;
     }
 }
