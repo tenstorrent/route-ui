@@ -4,7 +4,7 @@
 
 import type { RelativeRoutingType } from 'react-router-dom';
 import type { GraphVertexType } from './GraphNames';
-import { LinkType } from './Types';
+import { type EthernetLinkName, LinkType } from './Types';
 
 export interface ExperimentalFeaturesState {}
 
@@ -54,6 +54,7 @@ export interface NodeSelectionState {
 
 export interface LinkState {
     id: string;
+    ethDirection?: EthernetLinkName;
     totalDataBytes: number;
     bpc: number;
     saturation: number;
@@ -70,6 +71,7 @@ export interface LinkGraphState {
 
 export interface LinkStateCongestion {
     linksByLinkId: Record<string, LinkState>;
+    ethLinkIds: string[];
     offchipLinkIds: string[];
     maxLinkSaturation: number;
     offchipMaxSaturation: number;

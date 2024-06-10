@@ -9,14 +9,13 @@ import LinkDetails from '../LinkDetails';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedViewAXIRender';
-import type { LinkState } from '../../../data/StateTypes';
 
 interface DetailedViewPCIERendererProps {
     node: ComputeNode;
-    allLinksState: Record<string, LinkState>;
+    temporalEpoch: number;
 }
 
-const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, allLinksState }) => {
+const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, temporalEpoch }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -41,13 +40,13 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                         <div className='col noc0'>
                             <DetailedViewNOCRouterRenderer
                                 links={noc0links}
-                                allLinksState={allLinksState}
+                                temporalEpoch={temporalEpoch}
                                 nodeUid={node.uid}
                                 label='NOC0'
                             />
                             <DetailedViewNOC2AXIRender
                                 links={noc0axi ? [noc0axi] : []}
-                                allLinksState={allLinksState}
+                                temporalEpoch={temporalEpoch}
                                 nodeUid={node.uid}
                                 noc={NOC.ANY}
                             />
@@ -55,13 +54,13 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                         <div className='col noc1'>
                             <DetailedViewNOCRouterRenderer
                                 links={noc1links}
-                                allLinksState={allLinksState}
+                                temporalEpoch={temporalEpoch}
                                 nodeUid={node.uid}
                                 label='NOC1'
                             />
                             <DetailedViewNOC2AXIRender
                                 links={noc1axi ? [noc1axi] : []}
-                                allLinksState={allLinksState}
+                                temporalEpoch={temporalEpoch}
                                 nodeUid={node.uid}
                                 noc={NOC.ANY}
                             />
@@ -76,7 +75,7 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                     <div className='off-chip'>
                         <DetailedViewAXIRender
                             links={offChipPCIe ? [offChipPCIe] : []}
-                            allLinksState={allLinksState}
+                            temporalEpoch={temporalEpoch}
                             nodeUid={node.uid}
                             filter={null}
                             label='PCIe'
@@ -89,8 +88,9 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
                             <LinkDetails
-                                linkState={allLinksState[link.uid]}
                                 key={link.name}
+                                nodeUid={node.uid}
+                                temporalEpoch={temporalEpoch}
                                 link={link}
                                 showEmpty={false}
                             />

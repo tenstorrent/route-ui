@@ -765,6 +765,7 @@ export default class GraphOnChip {
             if (!linksStateCongestionByNode[node.uid]) {
                 linksStateCongestionByNode[node.uid] = {
                     linksByLinkId: {},
+                    ethLinkIds: [],
                     offchipLinkIds: [],
                     chipId: this.chipId,
                     maxLinkSaturation: 0,
@@ -777,6 +778,10 @@ export default class GraphOnChip {
             });
             node.internalLinks.forEach((link) => {
                 linksStateCongestionByNode[node.uid].linksByLinkId[link.uid] = link.generateInitialState();
+
+                if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
+                    linksStateCongestionByNode[node.uid].ethLinkIds.push(link.uid);
+                }
             });
 
             switch (node.type) {
@@ -812,6 +817,7 @@ export default class GraphOnChip {
                 linksStateCongestionByNode[dramId] = {
                     linksByLinkId: {},
                     offchipLinkIds: [],
+                    ethLinkIds: [],
                     chipId: this.chipId,
                     maxLinkSaturation: 0,
                     offchipMaxSaturation: 0,
@@ -827,6 +833,7 @@ export default class GraphOnChip {
                     if (!linksStateCongestionByNode[dramSubchannelId]) {
                         linksStateCongestionByNode[dramSubchannelId] = {
                             linksByLinkId: {},
+                            ethLinkIds: [],
                             offchipLinkIds: [],
                             chipId: this.chipId,
                             maxLinkSaturation: 0,
@@ -1027,6 +1034,9 @@ export abstract class NetworkLink {
             saturation: 0,
             maxBandwidth: this.maxBandwidth,
             type: this.type,
+            ...((this.name === EthernetLinkName.ETH_IN || this.name === EthernetLinkName.ETH_OUT) && {
+                ethDirection: this.name,
+            }),
         } as LinkState;
     }
 }

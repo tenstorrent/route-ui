@@ -5,11 +5,10 @@
 import React from 'react';
 import { NetworkLink } from '../../../data/GraphOnChip';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
-import type { LinkState } from '../../../data/StateTypes';
 
 interface DetailedViewNOCRouterRendererProps {
     links: NetworkLink[];
-    allLinksState: Record<string, LinkState>;
+    temporalEpoch: number;
     nodeUid: string;
     label: string;
     className?: string;
@@ -17,7 +16,7 @@ interface DetailedViewNOCRouterRendererProps {
 
 const DetailedViewNOCRouterRenderer: React.FC<DetailedViewNOCRouterRendererProps> = ({
     links,
-    allLinksState,
+    temporalEpoch,
     nodeUid,
     label,
     className,
@@ -31,7 +30,7 @@ const DetailedViewNOCRouterRenderer: React.FC<DetailedViewNOCRouterRendererProps
                     Router
                 </p>
             </div>
-            <DetailedViewPipeRenderer links={links} allLinksState={allLinksState} nodeUid={nodeUid} />
+            <DetailedViewPipeRenderer links={links} temporalEpoch={temporalEpoch} nodeUid={nodeUid} />
         </>
     );
 };

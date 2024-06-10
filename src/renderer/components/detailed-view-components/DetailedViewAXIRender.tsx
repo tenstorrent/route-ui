@@ -6,11 +6,10 @@ import React from 'react';
 import { DramBankLink, NOC2AXILink, NOCLink, NetworkLink } from '../../../data/GraphOnChip';
 import { DramBankLinkName, NOC, NetworkLinkName } from '../../../data/Types';
 import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
-import type { LinkState } from '../../../data/StateTypes';
 
 interface DetailedViewAXIRenderProps {
     links: DramBankLink[] | NetworkLink[];
-    allLinksState: Record<string, LinkState>;
+    temporalEpoch: number;
     nodeUid: string;
     filter: DramBankLinkName | NetworkLinkName | null;
     label: string;
@@ -18,7 +17,7 @@ interface DetailedViewAXIRenderProps {
 
 export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
     links,
-    allLinksState,
+    temporalEpoch,
     nodeUid,
     filter,
     label,
@@ -28,7 +27,7 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
             <DetailedViewPipeRenderer
                 className='centered-svg'
                 links={links.filter((link) => (filter === null ? true : link.name === filter))}
-                allLinksState={allLinksState}
+                temporalEpoch={temporalEpoch}
                 nodeUid={nodeUid}
             />
             <div className='axi-dram'>
@@ -40,14 +39,14 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
 
 interface DetailedViewANOC2XIRenderProps {
     links: NOC2AXILink[] | NOCLink[];
-    allLinksState: Record<string, LinkState>;
+    temporalEpoch: number;
     nodeUid: string;
     noc: NOC;
 }
 
 export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({
     links,
-    allLinksState,
+    temporalEpoch,
     nodeUid,
     noc,
 }) => {
@@ -59,7 +58,7 @@ export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps>
             <DetailedViewPipeRenderer
                 className='centered-svg'
                 links={links.filter((link) => (noc === NOC.ANY ? true : link.noc === noc))}
-                allLinksState={allLinksState}
+                temporalEpoch={temporalEpoch}
                 nodeUid={nodeUid}
             />
         </>

@@ -11,14 +11,13 @@ import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 import LinkDetails from '../LinkDetails';
 import DetailedViewPipeControls from './DetailedViewPipeControls';
 import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
-import type { LinkState } from '../../../data/StateTypes';
 
 interface DetailedViewETHRendererProps {
     node: ComputeNode;
-    allLinksState: Record<string, LinkState>;
+    temporalEpoch: number;
 }
 
-const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, allLinksState }) => {
+const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, temporalEpoch }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -42,7 +41,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                     <div className='col noc0'>
                                         <DetailedViewNOCRouterRenderer
                                             links={noc0links}
-                                            allLinksState={allLinksState}
+                                            temporalEpoch={temporalEpoch}
                                             nodeUid={node.uid}
                                             label='NOC0'
                                         />
@@ -50,7 +49,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                     <div className='col noc1'>
                                         <DetailedViewNOCRouterRenderer
                                             links={noc1links}
-                                            allLinksState={allLinksState}
+                                            temporalEpoch={temporalEpoch}
                                             nodeUid={node.uid}
                                             label='NOC1'
                                         />
@@ -61,7 +60,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                         </div>
                                         <DetailedViewPipeRenderer
                                             links={internalNOCLinks}
-                                            allLinksState={allLinksState}
+                                            temporalEpoch={temporalEpoch}
                                             nodeUid={node.uid}
                                         />
                                     </div>
@@ -76,7 +75,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                         <div className='col eth-off-chip'>
                             <DetailedViewPipeRenderer
                                 links={internalNOCLinks}
-                                allLinksState={allLinksState}
+                                temporalEpoch={temporalEpoch}
                                 nodeUid={node.uid}
                                 className='centered-svg'
                             />
@@ -89,7 +88,8 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
                             <LinkDetails
-                                linkState={allLinksState[link.uid]}
+                                nodeUid={node.uid}
+                                temporalEpoch={temporalEpoch}
                                 key={link.name}
                                 link={link}
                                 showEmpty={false}

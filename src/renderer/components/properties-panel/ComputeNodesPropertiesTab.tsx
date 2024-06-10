@@ -25,13 +25,11 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
-import type { GraphRelationship, LinkState } from '../../../data/StateTypes';
-import { getLinksPerNodeForTemporalEpoch } from '../../../data/store/selectors/linkSaturation.selectors';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
-    allLinksState: Record<string, LinkState>;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -119,7 +117,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node, temporalEpoch, allLinksState }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
@@ -342,7 +340,13 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, allLinksState }: Compu
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} linkState={allLinksState[link.uid]} showEmpty />
+                        <LinkDetails
+                            key={link.name}
+                            link={link}
+                            nodeUid={node.uid}
+                            temporalEpoch={temporalEpoch}
+                            showEmpty
+                        />
                     ))}
                 </div>
             )}
@@ -357,13 +361,6 @@ const ComputeNodesPropertiesTab = ({
     graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
     epoch: number;
 }) => {
-    // TODO: narrow down the needed list
-    const linksData = useSelector(getLinksPerNodeForTemporalEpoch(epoch));
-    const allLinksState = useMemo(
-        () => Object.fromEntries(Object.values(linksData).flatMap(({ linksByLinkId: links }) => Object.entries(links))),
-        [linksData],
-    );
-
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
     const selectedNodes = useMemo(
         () =>
@@ -384,12 +381,7 @@ const ComputeNodesPropertiesTab = ({
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
                     {selectedNodes.map((node) => (
-                        <ComputeNodePropertiesCard
-                            key={node?.uid}
-                            node={node}
-                            temporalEpoch={epoch}
-                            allLinksState={allLinksState}
-                        />
+                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} />
                     ))}
                 </div>
             </div>
