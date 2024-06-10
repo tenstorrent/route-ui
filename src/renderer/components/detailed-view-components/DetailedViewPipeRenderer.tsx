@@ -19,26 +19,26 @@ import {
 } from '../../../data/Types';
 import {
     getLinkSaturation,
+    getLinkStaturationStateList,
     getShowLinkSaturation,
     getShowNOC0,
     getShowNOC1,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
-import type { LinkState } from '../../../data/StateTypes';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
-    allLinksState: Record<string, LinkState>;
     nodeUid: string;
+    temporalEpoch: number;
     className?: string;
     size?: number;
 };
 
 const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     links,
-    allLinksState,
     nodeUid,
+    temporalEpoch,
     className,
     size = 80,
 }) => {
@@ -49,6 +49,11 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     const isHighContrast = useSelector(getHighContrastState);
     const noc0Saturation = useSelector(getShowNOC0);
     const noc1Saturation = useSelector(getShowNOC1);
+    const linksState = useSelector(getLinkStaturationStateList)(
+        temporalEpoch,
+        nodeUid,
+        links.map((l) => l.uid),
+    );
 
     // TODO: see if useLayoutEffect is better in a future
     useEffect(() => {
@@ -68,7 +73,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
                     }
                 }
                 if (renderCongestion) {
-                    const linkData = allLinksState[link.uid];
+                    const linkData = linksState[link.uid];
                     if (linkData?.saturation >= linkSaturationTreshold) {
                         drawLink(
                             svg,
@@ -103,7 +108,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
         isHighContrast,
         selectedPipeIds,
         nodeUid,
-        allLinksState,
+        linksState,
     ]);
 
     const linkNames = links.map((link) => link.name).join(' ');
