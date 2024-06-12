@@ -2,7 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { getLinkData } from 'data/store/selectors/linkSaturation.selectors';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
 import React from 'react';
 import { useSelector } from 'react-redux';
@@ -10,17 +9,19 @@ import { NetworkLink, PipeSegment, convertBytes, formatToBytesPerCycle } from '.
 import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
+import { getLinkSaturarionState } from '../../data/store/selectors/linkSaturation.selectors';
 
 type LinkDetailsProps = {
+    temporalEpoch: number;
+    nodeUid: string;
     link: NetworkLink;
-    graphName: string;
     index?: number;
     showEmpty?: boolean;
 };
 
-const LinkDetails: React.FC<LinkDetailsProps> = ({ link, graphName, showEmpty, index }) => {
+const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, nodeUid, showEmpty, index }) => {
     const isHighContrast = useSelector(getHighContrastState);
-    const linkState = useSelector(getLinkData(graphName, link.uid));
+    const linkState = useSelector(getLinkSaturarionState(temporalEpoch, nodeUid, link.uid));
     const color: string = calculateLinkCongestionColor(linkState?.saturation || 0, 0, isHighContrast);
 
     if (!showEmpty) {

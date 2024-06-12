@@ -6,32 +6,41 @@ import { Slider } from '@blueprintjs/core';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { MAX_MODEL_RATIO_THRESHOLD, MIN_MODEL_RATIO_THRESHOLD } from '../../../data/constants';
 import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
 import { updateOperationRatioThreshold } from '../../../data/store/slices/operationPerf.slice';
 import Collapsible from '../Collapsible';
 import useOperationsTable, { type OpTableFields } from '../bottom-dock/useOperationsTable.hooks';
+import type { LocationState } from '../../../data/StateTypes';
 
 const ModelControls: FC = () => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+    const location: Location<LocationState> = useLocation();
+    const { epoch, chipId } = location.state;
+
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
+
     const dispatch = useDispatch();
     const opperationRatioThreshold = useSelector(getOperationRatioThreshold);
     const { getMaxModelEstimateRatio } = useOperationsTable();
     const maxModelEstimateRatio = useMemo(
         () =>
             getMaxModelEstimateRatio(
-                [...(graphOnChip?.operations ?? [])].map((op) => {
-                    return {
-                        operation: op,
-                        name: op.name,
-                        ...op.details,
-                        slowestOperandRef: op.slowestOperand,
-                    } as unknown as OpTableFields;
-                }),
+                graphOnChipList.flatMap(({ graphOnChip }) =>
+                    [...graphOnChip.operations].map(
+                        (op) =>
+                            ({
+                                operation: op,
+                                name: op.name,
+                                ...op.details,
+                                slowestOperandRef: op.slowestOperand,
+                            }) as unknown as OpTableFields,
+                    ),
+                ),
             ),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [graphOnChip?.operations],
+        [graphOnChipList],
     );
 
     const clampNumber = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));

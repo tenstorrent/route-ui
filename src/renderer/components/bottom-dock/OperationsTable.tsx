@@ -32,25 +32,35 @@ import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import type { LocationState } from '../../../data/StateTypes';
+import type { BuildableOperation } from '../../../data/Graph';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
     const location: Location<LocationState> = useLocation();
-    const { epoch: temporalEpoch } = location.state;
+    const { epoch: temporalEpoch, chipId } = location.state;
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
+
     const { operationsTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } =
         useOperationsTable();
     const [selectedOperationName, setSelectedOperationName] = useState('');
     const [filterQuery, setFilterQuery] = useState<string>('');
     const tableFields = useMemo(() => {
-        if (!graphOnChip) {
+        if (!graphOnChipList) {
             return [];
         }
 
-        let list = [];
-        const selectedOperation = graphOnChip.getOperation(selectedOperationName);
+        let list: OpTableFields[] = [];
+        let selectedOperation: BuildableOperation | undefined;
+
+        // eslint-disable-next-line no-restricted-syntax
+        for (const { graphOnChip } of graphOnChipList) {
+            selectedOperation = graphOnChip.getOperation(selectedOperationName);
+
+            if (selectedOperation) {
+                break;
+            }
+        }
 
         if (selectedOperation) {
             list = [...selectedOperation.cores].map((core: ComputeNode) => {
@@ -62,14 +72,24 @@ function OperationsTable() {
                 } as OpTableFields;
             });
         } else {
-            list = [...graphOnChip.operations].map((op) => {
-                return {
-                    operation: op,
-                    name: op.name,
-                    ...op.details,
-                    slowestOperandRef: op.slowestOperand,
-                } as unknown as OpTableFields;
-            });
+            list = [
+                ...graphOnChipList
+                    .reduce((opMap, { graphOnChip: { operations } }) => {
+                        [...operations].forEach((op) => {
+                            if (!opMap.has(op.name)) {
+                                opMap.set(op.name, {
+                                    operation: op,
+                                    name: op.name,
+                                    ...op.details,
+                                    slowestOperandRef: op.slowestOperand,
+                                } as unknown as OpTableFields);
+                            }
+                        });
+
+                        return opMap;
+                    }, new Map<string, OpTableFields>())
+                    .values(),
+            ];
         }
 
         if (filterQuery) {
@@ -79,7 +99,7 @@ function OperationsTable() {
         }
 
         return sortTableFields(list);
-    }, [graphOnChip, selectedOperationName, filterQuery, sortTableFields]);
+    }, [graphOnChipList, selectedOperationName, filterQuery, sortTableFields]);
     const nodesSelectionState = useSelector(getSelectedNodeList(temporalEpoch));
     const allOperandsState = useSelector(getOperandState);
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
@@ -90,7 +110,7 @@ function OperationsTable() {
         setSelectedOperationName('');
         setFilterQuery('');
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [graphOnChip]);
+    }, [temporalEpoch, chipId]);
 
     const operationCellRenderer = (rowIndex: number) => {
         const opName = tableFields[rowIndex].name;
@@ -106,7 +126,7 @@ function OperationsTable() {
                             selectFunc={selectOperand}
                             stringFilter={filterQuery}
                             type={GraphVertexType.OPERATION}
-                            offchip={operation?.isOffchip}
+                            offchip={chipId !== undefined && operation?.isOffchip}
                             offchipClickHandler={navigateToGraph(opName)}
                         >
                             <Button
@@ -172,7 +192,7 @@ function OperationsTable() {
                             selectFunc={selectOperand}
                             stringFilter=''
                             type={slowestOperand.vertexType}
-                            offchip={slowestOperand.isOffchip}
+                            offchip={chipId !== undefined && slowestOperand.isOffchip}
                             offchipClickHandler={navigateToGraph(slowestOperand.name)}
                         >
                             <Button
@@ -225,7 +245,7 @@ function OperationsTable() {
         <>
             <div>
                 <SearchField
-                    disabled={!graphOnChip || selectedOperationName !== ''}
+                    disabled={!graphOnChipList || selectedOperationName !== ''}
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[]}

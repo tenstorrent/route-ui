@@ -5,6 +5,7 @@
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
@@ -12,30 +13,44 @@ import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook'
 import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
+import type { LocationState } from '../../../data/StateTypes';
 
 /**
  * QueuesTable - temporary component to display queues
  * to be merged with OperationsTable as part of the next refactoring
  */
 function QueuesTable() {
-    const { getActiveGraphOnChip, getActiveGraphName, getOperand } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
+    const location: Location<LocationState> = useLocation();
+    const { epoch: temporalEpoch, chipId } = location.state;
+    const { getGraphOnChipListForTemporalEpoch, getOperand } = useContext(GraphOnChipContext);
+    const graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
+
     const { queuesTableColumns, sortTableFields, changeSorting, sortDirection, sortingColumn } = useQueuesTableHook();
     const operandState = useSelector(getOperandState);
     const tableFields = useMemo(() => {
-        if (!graphOnChip) {
+        if (!graphOnChipList) {
             return [];
         }
 
-        const list = [...graphOnChip.queues].map((queue) => {
-            return {
-                name: queue.name,
-                ...queue.details,
-            } as unknown as QueuesTableFields;
-        });
+        const list = [
+            ...graphOnChipList
+                .reduce((queueMap, { graphOnChip }) => {
+                    [...graphOnChip.queues].forEach((queue) => {
+                        if (!queueMap.has(queue.name)) {
+                            queueMap.set(queue.name, {
+                                name: queue.name,
+                                ...queue.details,
+                            } as unknown as QueuesTableFields);
+                        }
+                    });
+
+                    return queueMap;
+                }, new Map<string, QueuesTableFields>())
+                .values(),
+        ];
 
         return sortTableFields(list);
-    }, [graphOnChip, sortTableFields]);
+    }, [graphOnChipList, sortTableFields]);
     const { selected, selectOperand, navigateToGraph } = useSelectableGraphVertex();
 
     const table = useRef<Table2>(null);
@@ -76,7 +91,7 @@ function QueuesTable() {
                 stringFilter=''
                 value={selected(operandDescriptor.name)}
                 type={operandDescriptor.type}
-                offchip={operandDescriptor.graphName !== getActiveGraphName()}
+                offchip={operandDescriptor.operand.isOffchip}
                 offchipClickHandler={navigateToGraph(operandDescriptor.name)}
             />
         );

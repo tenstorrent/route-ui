@@ -7,13 +7,14 @@ import { IconNames } from '@blueprintjs/icons';
 import {
     getDetailedViewOpenState,
     getDetailedViewZoom,
+    getSelectedDetailsViewChipId,
     getSelectedDetailsViewUID,
 } from 'data/store/selectors/uiState.selectors';
 import React, { useContext, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { ComputeNodeType } from '../../../data/Types';
+import { Architecture, ComputeNodeType } from '../../../data/Types';
 import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';
 import DetailedViewETHRenderer from './DetailedViewETH';
@@ -26,17 +27,17 @@ interface DetailedViewProps {}
 
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip, graphOnChipList } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
     const location: Location<LocationState> = useLocation();
-    const { graphName = '', epoch: temporalEpoch } = location.state;
+    const { epoch: temporalEpoch } = location.state;
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
 
-    const architecture = graphOnChipList[graphName]?.architecture;
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
-    const node = uid ? graphOnChip?.getNode(uid) : null;
+    const chipId = useSelector(getSelectedDetailsViewChipId);
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId ?? -1);
+    const architecture = graphOnChip?.architecture ?? Architecture.NONE;
+    const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
 
     useEffect(() => {
         if (detailedViewElement.current) {
@@ -65,16 +66,16 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                         <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
                             {node.type === ComputeNodeType.DRAM && (
                                 <DetailedViewDRAMRenderer
-                                    graphName={graphName}
                                     node={node}
                                     temporalEpoch={temporalEpoch}
+                                    graphOnChip={graphOnChip}
                                 />
                             )}
                             {node.type === ComputeNodeType.ETHERNET && (
-                                <DetailedViewETHRenderer graphName={graphName} node={node} />
+                                <DetailedViewETHRenderer node={node} temporalEpoch={temporalEpoch} />
                             )}
                             {node.type === ComputeNodeType.PCIE && (
-                                <DetailedViewPCIERenderer graphName={graphName} node={node} />
+                                <DetailedViewPCIERenderer node={node} temporalEpoch={temporalEpoch} />
                             )}
                         </div>
                     )}

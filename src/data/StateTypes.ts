@@ -2,8 +2,9 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
+import type { RelativeRoutingType } from 'react-router-dom';
 import type { GraphVertexType } from './GraphNames';
-import { LinkType } from './Types';
+import { type EthernetLinkName, LinkType } from './Types';
 
 export interface ExperimentalFeaturesState {}
 
@@ -27,7 +28,7 @@ export interface PipeSelectionState {
     focusPipe: string | null;
 }
 
-type NodeUID = string;
+export type NodeUID = string;
 
 export interface ComputeNodeState {
     id: NodeUID;
@@ -53,6 +54,7 @@ export interface NodeSelectionState {
 
 export interface LinkState {
     id: string;
+    ethDirection?: EthernetLinkName;
     totalDataBytes: number;
     bpc: number;
     saturation: number;
@@ -61,22 +63,30 @@ export interface LinkState {
     normalizedSaturation: number;
 }
 
-export interface EpochAndLinkStates {
-    linkStates: LinkState[];
-    temporalEpoch: number;
-}
-
 export interface LinkGraphState {
     links: Record<string, LinkState>;
     totalOps: number;
     temporalEpoch: number;
 }
 
+export interface LinkStateCongestion {
+    linksByLinkId: Record<string, LinkState>;
+    ethLinkIds: string[];
+    offchipLinkIds: string[];
+    maxLinkSaturation: number;
+    offchipMaxSaturation: number;
+    chipId: number;
+}
+
 export interface NetworkCongestionState {
     linkSaturationTreshold: number;
-    graphs: Record<string, LinkGraphState>;
-    epochNormalizedTotalOps: number[];
-    epochAdjustedTotalOps: number[];
+    linksPerTemporalEpoch: {
+        linksStateCongestionByNode: Record<NodeUID, LinkStateCongestion>;
+        totalOps: number;
+        totalOpPerChip: number[];
+        normalizedTotalOps: number;
+        initialNormalizedTotalOps: number;
+    }[];
     CLKMHz: number;
     DRAMBandwidthGBs: number;
     PCIBandwidthGBs: number;
@@ -102,4 +112,21 @@ export interface LocationState {
     /** @deprecated */
     graphName?: string;
     chipId?: number;
+    previous?: {
+        path: string;
+        graphName: string;
+    };
+    next?: {
+        path: string;
+        graphName: string;
+    };
+}
+
+export interface NavigateOptions {
+    replace?: boolean;
+    state?: LocationState;
+    preventScrollReset?: boolean;
+    relative?: RelativeRoutingType;
+    unstable_flushSync?: boolean;
+    unstable_viewTransition?: boolean;
 }

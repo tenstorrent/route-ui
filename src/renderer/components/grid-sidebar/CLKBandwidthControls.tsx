@@ -13,6 +13,7 @@ import {
 } from 'data/store/slices/linkSaturation.slice';
 import { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
 import Collapsible from '../Collapsible';
@@ -24,39 +25,51 @@ import {
     getPCIBandwidth,
     getTotalOpsForGraph,
 } from '../../../data/store/selectors/linkSaturation.selectors';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const location: Location<LocationState> = useLocation();
+    const { epoch, chipId } = location.state;
+
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
+
     const dispatch = useDispatch();
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);
     const PCIeBandwidth = useSelector(getPCIBandwidth);
-    const opCycles = useSelector(getTotalOpsForGraph(graphName));
-
-    let aiclkRightElement = (
-        <Tooltip2 content='Reset Total OP Cycles'>
-            <Button
-                minimal
-                onClick={() => {
-                    const resetValue = graphOnChip?.totalOpCycles || 1;
-
-                    dispatch(updateTotalOPs({ graphName, totalOps: resetValue }));
-                }}
-                icon={IconNames.RESET}
-            />
-        </Tooltip2>
+    const opCycles = useSelector(getTotalOpsForGraph(epoch));
+    const totalOpCycles = graphOnChipList.reduce(
+        (totalOps, { graphOnChip }) => Math.max(totalOps, graphOnChip.totalOpCycles),
+        1,
     );
 
-    if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
-        aiclkRightElement = (
-            <Tooltip2 content='Cycles per input cannot be 0'>
-                <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
+    const aiclkRightElement = (
+        <>
+            <Tooltip2 content='Reset Total OP Cycles'>
+                <Button
+                    minimal
+                    onClick={() => {
+                        dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: totalOpCycles }));
+                    }}
+                    icon={IconNames.RESET}
+                />
             </Tooltip2>
-        );
-    }
+            {graphOnChipList.map(({ graphOnChip }) => {
+                if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
+                    return (
+                        <Tooltip2 content='Cycles per input cannot be 0'>
+                            <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
+                        </Tooltip2>
+                    );
+                }
+
+                return null;
+            })}
+        </>
+    );
+
 
     return (
         <Collapsible label='CLK Controls' isOpen>
@@ -83,7 +96,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                             newValue = 1;
                         }
 
-                        dispatch(updateTotalOPs({ graphName, totalOps: newValue }));
+                        dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: newValue }));
                     }}
                     rightElement={aiclkRightElement}
                 />

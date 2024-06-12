@@ -5,9 +5,8 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import React, { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { selectOperandList } from '../../../data/store/slices/nodeSelection.slice';
 import QueueIconMinus from '../../../main/assets/QueueIconMinus';
 import QueueIconPlus from '../../../main/assets/QueueIconPlus';
@@ -16,15 +15,30 @@ import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import type GraphOnChip from '../../../data/GraphOnChip';
+import type { GraphRelationship } from '../../../data/StateTypes';
+import type { Queue } from '../../../data/GraphTypes';
 
-const QueuesPropertiesTab = (): React.ReactElement => {
+const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
-
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const queuesList = useMemo(() => (graphOnChip ? [...graphOnChip.queues] : []), [graphOnChip]);
+    const queuesList = useMemo(
+        () => [
+            ...graphs
+                .reduce((queueMap, { graphOnChip }) => {
+                    [...graphOnChip.queues].forEach((queue) => {
+                        if (!queueMap.has(queue.name)) {
+                            queueMap.set(queue.name, queue);
+                        }
+                    });
+
+                    return queueMap;
+                }, new Map<string, Queue>())
+                .values(),
+        ],
+        [graphs],
+    );
 
     const updateFilteredQueueSelection = (selected: boolean) => {
         if (!queuesList.length) {
@@ -69,14 +83,16 @@ const QueuesPropertiesTab = (): React.ReactElement => {
             </div>
 
             <div className='properties-list'>
-                {queuesList.map((queue) => (
+                {queuesList.map((queue, index) => (
                     <FilterableComponent
-                        key={queue.name}
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`${index}-${queue.name}`}
                         filterableString={queue.name}
                         filterQuery={filterQuery}
                         component={
                             <Collapsible
-                                key={queue.name}
+                                // eslint-disable-next-line react/no-array-index-key
+                                key={`collapsible-${index}-${queue.name}`}
                                 label={
                                     <GraphVertexDetailsSelectables
                                         operand={queue}

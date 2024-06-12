@@ -7,14 +7,12 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
-import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { Fragment, useContext, useMemo } from 'react';
+import { closeDetailedView, openDetailedView } from 'data/store/slices/uiState.slice';
+import React, { Fragment, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
-import { type Location, useLocation } from 'react-router-dom';
 import { GraphVertexType } from '../../../data/GraphNames';
-import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import GraphOnChip, { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
 import { getOrderedSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
@@ -27,12 +25,11 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
-import type { LocationState } from '../../../data/StateTypes';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
-    graphName: string;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -120,7 +117,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
@@ -151,6 +148,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
                         icon={IconNames.CROSS}
                         onClick={() => {
                             dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: false }));
+                            dispatch(closeDetailedView());
                         }}
                     />
                 </Tooltip2>
@@ -303,7 +301,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
                         icon={IconNames.PROPERTIES}
                         disabled={node.uid === selectedDetailsViewUID && isDetailsViewOpen}
                         onClick={() => {
-                            dispatch(openDetailedView(node.uid));
+                            dispatch(openDetailedView({ nodeUid: node.uid, chipId: node.chipId }));
                         }}
                     >
                         Detailed View
@@ -342,7 +340,13 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} graphName={graphName} showEmpty />
+                        <LinkDetails
+                            key={link.name}
+                            link={link}
+                            nodeUid={node.uid}
+                            temporalEpoch={temporalEpoch}
+                            showEmpty
+                        />
                     ))}
                 </div>
             )}
@@ -350,34 +354,34 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, graphName }: ComputeNo
     );
 };
 
-const ComputeNodesPropertiesTab = () => {
-    const location: Location<LocationState> = useLocation();
-    const { epoch: temporalEpoch, graphName = '' } = location.state;
-    const graphList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(temporalEpoch);
-    const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(temporalEpoch));
-    const selectedNodes = useMemo(() => {
-        const selectedNodesList = orderedNodeSelection
-            .map((nodeState) => {
-                const graphOnChip = graphList[nodeState.chipId]?.graphOnChip;
+const ComputeNodesPropertiesTab = ({
+    graphs,
+    epoch,
+}: {
+    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
+    epoch: number;
+}) => {
+    const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
+    const selectedNodes = useMemo(
+        () =>
+            orderedNodeSelection.reduce((graphList, nodeState) => {
+                const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
 
-                return graphOnChip?.getNode(nodeState.id);
-            })
-            .filter((node) => node) as ComputeNode[];
+                if (graphOnChip) {
+                    graphList.push(graphOnChip?.graphOnChip.getNode(nodeState.id));
+                }
 
-        return selectedNodesList;
-    }, [graphList, orderedNodeSelection]);
+                return graphList;
+            }, [] as ComputeNode[]),
+        [graphs, orderedNodeSelection],
+    );
 
     return (
         <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
                     {selectedNodes.map((node) => (
-                        <ComputeNodePropertiesCard
-                            key={node?.uid}
-                            node={node}
-                            temporalEpoch={temporalEpoch}
-                            graphName={graphName}
-                        />
+                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} />
                     ))}
                 </div>
             </div>

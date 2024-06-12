@@ -12,7 +12,8 @@ import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 interface UIState {
     dockOpen: boolean;
     detailsViewOpen: boolean;
-    selectedDetailsViewUID: string | null;
+    selectedDetailsViewUID?: string;
+    selectedDetailsViewChipId?: number;
     highContrastEnabled: boolean;
     folderPath: string;
     selectedRemoteFolder?: RemoteFolder;
@@ -30,7 +31,8 @@ interface UIState {
 const uiStateInitialState: UIState = {
     dockOpen: false,
     detailsViewOpen: false,
-    selectedDetailsViewUID: null,
+    selectedDetailsViewUID: undefined,
+    selectedDetailsViewChipId: undefined,
     highContrastEnabled: false,
     folderPath: '',
     selectedRemoteFolder: undefined,
@@ -94,14 +96,16 @@ const uiStateSlice = createSlice({
         updateDetailedViewHeight: (state, action: PayloadAction<number>) => {
             state.detailedViewHeight = action.payload;
         },
-        openDetailedView: (state, action: PayloadAction<string>) => {
+        openDetailedView: (state, action: PayloadAction<{ nodeUid: string; chipId: number }>) => {
             state.detailsViewOpen = true;
             state.dockOpen = false;
-            state.selectedDetailsViewUID = action.payload;
+            state.selectedDetailsViewUID = action.payload.nodeUid;
+            state.selectedDetailsViewChipId = action.payload.chipId;
         },
         closeDetailedView: (state) => {
             state.detailsViewOpen = false;
-            state.selectedDetailsViewUID = null;
+            state.selectedDetailsViewUID = undefined;
+            state.selectedDetailsViewChipId = undefined;
         },
     },
 });

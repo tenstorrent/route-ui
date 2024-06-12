@@ -10,15 +10,17 @@ import { getApplicationMode, getDetailedViewOpenState, getDockOpenState } from '
 import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import { ClusterContext } from '../../data/ClusterContext';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
+import type { LocationState, NavigateOptions } from '../../data/StateTypes';
 
 export interface SideBarProps {}
 
 export const SideBar: React.FC<SideBarProps> = () => {
     const { resetGraphOnChipState } = useContext(GraphOnChipContext);
+    const location: Location<LocationState> = useLocation();
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { cluster } = useContext(ClusterContext);
@@ -27,7 +29,15 @@ export const SideBar: React.FC<SideBarProps> = () => {
         resetGraphOnChipState();
         dispatch(setSelectedFile(''));
         dispatch(setSelectedFolder(''));
-        navigate('/');
+        navigate('/', {
+            state: {
+                epoch: -1,
+                previous: {
+                    graphName: location.state?.graphName ?? '',
+                    path: location.pathname,
+                },
+            },
+        } satisfies NavigateOptions);
     };
 
     const handleOpenClusterView = () => {
