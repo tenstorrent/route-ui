@@ -10,7 +10,7 @@ import {
     getSelectedDetailsViewChipId,
     getSelectedDetailsViewUID,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { type ReactElement, useContext, useEffect, useRef, useState, useTransition } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -39,6 +39,11 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
 
+    const [dramView, setDramView] = useState<ReactElement | null>(null);
+    const [ethView, setEthView] = useState<ReactElement | null>(null);
+    const [pcieView, setPcieView] = useState<ReactElement | null>(null);
+    const [isLoading, startTransition] = useTransition();
+
     useEffect(() => {
         if (detailedViewElement.current) {
             const { marginBottom, height } = window.getComputedStyle(detailedViewElement.current);
@@ -50,33 +55,39 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [zoom, isOpen, node]);
 
+    if (node && !dramView && !ethView && !pcieView) {
+        startTransition(() => {
+            if (node.type === ComputeNodeType.DRAM) {
+                setDramView(
+                    <DetailedViewDRAMRenderer node={node} temporalEpoch={temporalEpoch} graphOnChip={graphOnChip} />,
+                );
+            }
+
+            if (node.type === ComputeNodeType.ETHERNET) {
+                setEthView(<DetailedViewETHRenderer node={node} temporalEpoch={temporalEpoch} />);
+            }
+
+            if (node.type === ComputeNodeType.PCIE) {
+                setPcieView(<DetailedViewPCIERenderer node={node} temporalEpoch={temporalEpoch} />);
+            }
+        });
+    }
+
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false} transitionDuration={0}>
             <Card className='detailed-view-card'>
                 <div className='detailed-view-container' style={{ zoom }} ref={detailedViewElement}>
                     <div className='detailed-view-header'>
-                        {node && (
-                            <h3>
-                                {node.type} {node.loc.x},{node.loc.y}
-                            </h3>
-                        )}
+                        <h3>{!node || isLoading ? 'Details' : `${node.type} ${node.loc.x},${node.loc.y}`}</h3>
                         <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                     </div>
-                    {node && (
+                    {!node || isLoading ? (
+                        <p>Loading...</p>
+                    ) : (
                         <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
-                            {node.type === ComputeNodeType.DRAM && (
-                                <DetailedViewDRAMRenderer
-                                    node={node}
-                                    temporalEpoch={temporalEpoch}
-                                    graphOnChip={graphOnChip}
-                                />
-                            )}
-                            {node.type === ComputeNodeType.ETHERNET && (
-                                <DetailedViewETHRenderer node={node} temporalEpoch={temporalEpoch} />
-                            )}
-                            {node.type === ComputeNodeType.PCIE && (
-                                <DetailedViewPCIERenderer node={node} temporalEpoch={temporalEpoch} />
-                            )}
+                            {dramView}
+                            {ethView}
+                            {pcieView}
                         </div>
                     )}
                 </div>
