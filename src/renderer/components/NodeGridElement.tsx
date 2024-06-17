@@ -5,7 +5,7 @@
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
@@ -82,6 +82,63 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
         }
     };
 
+    const [children, setChildren] = useState(<div />);
+
+    useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/require-await
+        (async () => {
+            setChildren(
+                <>
+                    {/* Selected operation borders and backgrounds */}
+                    <OperationGroupRender node={node} />
+                    <DramModuleBorder node={node} temporalEpoch={temporalEpoch} />
+
+                    {/* Queues */}
+                    <QueueHighlightRenderer node={node} />
+
+                    {/* Highlights and selections */}
+                    <div className='core-highlight' />
+                    <div className='node-border' />
+
+                    {/* Congestion information */}
+                    <OperationCongestionLayer
+                        node={node}
+                        isHighContrast={isHighContrast}
+                        shouldRender={shouldRenderOpPerf}
+                    />
+                    <OffChipNodeLinkCongestionLayer
+                        offchipLinkSaturation={offchipLinkSaturation}
+                        showLinkSaturation={showLinkSaturation}
+                        isHighContrast={isHighContrast}
+                    />
+
+                    {/* Labels for location and operation */}
+                    <NodeLocation node={node} />
+                    <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
+
+                    {/* Pipes */}
+                    <NodePipeRenderer
+                        node={node}
+                        isHighContrast={isHighContrast}
+                        showLinkSaturation={showLinkSaturation}
+                        linksData={linksData.linksByLinkId}
+                    />
+                    <NodeFocusPipeRenderer node={node} />
+                </>,
+            );
+        })();
+    }, [
+        isHighContrast,
+        linksData.linksByLinkId,
+        node,
+        offchipLinkSaturation,
+        shouldRenderOpPerf,
+        shouldShowLabel,
+        showLinkSaturation,
+        showOperationNames,
+        temporalEpoch,
+    ]);
+
     return (
         <button
             title={showOperationNames && shouldShowLabel ? node.opName : ''}
@@ -101,43 +158,14 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
                 </div>
             )}
 
-            {/* Selected operation borders and backgrounds */}
-            <OperationGroupRender node={node} />
-            <DramModuleBorder node={node} temporalEpoch={temporalEpoch} />
-
-            {/* Queues */}
-            <QueueHighlightRenderer node={node} />
-
-            {/* Highlights and selections */}
-            <div className='core-highlight' />
-            <div className='node-border' />
-
-            {/* Congestion information */}
-            <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
-            <OffChipNodeLinkCongestionLayer
-                offchipLinkSaturation={offchipLinkSaturation}
-                showLinkSaturation={showLinkSaturation}
-                isHighContrast={isHighContrast}
-            />
-
-            {/* Labels for location and operation */}
-            <NodeLocation node={node} />
-            <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
-
-            {/* Pipes */}
-            <NodePipeRenderer
-                node={node}
-                isHighContrast={isHighContrast}
-                showLinkSaturation={showLinkSaturation}
-                linksData={linksData.linksByLinkId}
-            />
-            <NodeFocusPipeRenderer node={node} />
+            {children}
 
             {/* Node type label */}
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
         </button>
     );
 };
+
 NodeGridElement.defaultProps = {
     connectedEth: null,
 };

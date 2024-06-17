@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { CSSProperties, useContext, useMemo } from 'react';
+import { CSSProperties, Suspense, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Icon } from '@blueprintjs/core';
@@ -44,43 +44,47 @@ export default function GridRender() {
 
     return (
         <div className='main-content' style={style}>
-            {graphOnChipList.map(({ graphOnChip: { chipId: id, totalCols, nodes }, graph: { name: graphName } }) => {
-                const clusterChip = clusterChipsMap[id];
-                const clusterChipPositioning: CSSProperties = {};
+            <Suspense fallback={<p className='main-route-loading-overlay'>Loading data...</p>}>
+                {graphOnChipList.map(
+                    ({ graphOnChip: { chipId: id, totalCols, nodes }, graph: { name: graphName } }) => {
+                        const clusterChip = clusterChipsMap[id];
+                        const clusterChipPositioning: CSSProperties = {};
 
-                if (clusterChip) {
-                    clusterChipPositioning.gridColumn = clusterChip.coordinates.x + 1;
-                    clusterChipPositioning.gridRow = clusterChip.coordinates.y + 1;
-                }
+                        if (clusterChip) {
+                            clusterChipPositioning.gridColumn = clusterChip.coordinates.x + 1;
+                            clusterChipPositioning.gridRow = clusterChip.coordinates.y + 1;
+                        }
 
-                clusterChipPositioning.contentVisibility = 'auto';
+                        clusterChipPositioning.contentVisibility = 'auto';
 
-                return (
-                    <div className='grid-container' style={clusterChipPositioning} key={id}>
-                        <div
-                            className='node-container'
-                            style={{
-                                zoom: `${gridZoom}`,
-                                gridTemplateColumns: `repeat(${totalCols + 1}, ${NODE_SIZE}px)`,
-                            }}
-                        >
-                            {[...nodes].map((node: ComputeNode) => {
-                                return (
-                                    <NodeGridElement
-                                        node={node}
-                                        temporalEpoch={epoch}
-                                        key={node.uid}
-                                        connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
-                                    />
-                                );
-                            })}
-                        </div>
-                        <div className='chip-label'>
-                            {id} - {graphName}
-                        </div>
-                    </div>
-                );
-            })}
+                        return (
+                            <div className='grid-container' style={clusterChipPositioning} key={id}>
+                                <div
+                                    className='node-container'
+                                    style={{
+                                        zoom: `${gridZoom}`,
+                                        gridTemplateColumns: `repeat(${totalCols + 1}, ${NODE_SIZE}px)`,
+                                    }}
+                                >
+                                    {[...nodes].map((node: ComputeNode) => {
+                                        return (
+                                            <NodeGridElement
+                                                node={node}
+                                                temporalEpoch={epoch}
+                                                key={node.uid}
+                                                connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                                <div className='chip-label'>
+                                    {id} - {graphName}
+                                </div>
+                            </div>
+                        );
+                    },
+                )}
+            </Suspense>
             {graphOnChipList.length === 0 && (
                 <div className='invalid-data-message'>
                     <Icon icon={IconNames.WARNING_SIGN} size={50} />

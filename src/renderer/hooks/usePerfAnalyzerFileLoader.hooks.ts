@@ -175,6 +175,7 @@ const usePerfAnalyzerFileLoader = () => {
             }
 
             dispatch(closeDetailedView());
+            dispatch(setIsLoadingFolder(true));
 
             navigate('/render', {
                 state: {
@@ -187,6 +188,8 @@ const usePerfAnalyzerFileLoader = () => {
                     },
                 },
             } satisfies NavigateOptions);
+
+            dispatch(setIsLoadingFolder(false));
         } else {
             logging.error('Attempted to load graph but no folder path was available');
         }
@@ -195,6 +198,8 @@ const usePerfAnalyzerFileLoader = () => {
     const loadTemporalEpoch = (epoch: number) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
+            dispatch(setIsLoadingFolder(true));
+
             navigate('/render', {
                 state: {
                     epoch,
@@ -204,6 +209,8 @@ const usePerfAnalyzerFileLoader = () => {
                     },
                 },
             } satisfies NavigateOptions);
+
+            dispatch(setIsLoadingFolder(false));
         } else {
             logging.error('Attempted to load epoch but no folder path was available');
         }
