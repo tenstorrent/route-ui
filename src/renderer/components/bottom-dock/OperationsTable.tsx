@@ -259,6 +259,7 @@ function OperationsTable() {
                 className='operations-table'
                 numRows={tableFields.length}
                 rowHeights={[...new Array(tableFields.length)].fill(24)}
+                minColumnWidth={150}
                 enableColumnHeader
                 numFrozenColumns={1}
                 cellRendererDependencies={[
