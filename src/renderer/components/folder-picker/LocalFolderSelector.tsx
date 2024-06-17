@@ -51,7 +51,7 @@ const LocalFolderOptions: FC = () => {
                 <GraphSelector
                     onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
                     onSelectTemporalEpoch={(temporalEpoch) => loadTemporalEpoch(temporalEpoch)}
-                    disabled={selectedFolderLocationType === 'remote'}
+                    disabled={selectedFolderLocationType === 'remote' || !localFolderPath}
                 />
                 {error && (
                     <div className='loading-error'>
