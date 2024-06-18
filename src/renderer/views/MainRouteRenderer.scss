@@ -330,6 +330,15 @@
     .node-container {
         display: grid;
 
+        &.loading-graph {
+            width: 1000px;
+            height: 1300px;
+            place-items: center;
+            outline: 1px solid $tt-very-dark-gray;
+            font-size: 3em;
+            color: $tt-medium-light-gray;
+        }
+
         .node-item {
             width: 100px;
             height: 100px;
