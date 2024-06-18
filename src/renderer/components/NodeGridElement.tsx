@@ -32,6 +32,7 @@ import {
 } from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
+import AsyncComponent from './AsyncRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
@@ -113,11 +114,25 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             <div className='node-border' />
 
             {/* Congestion information */}
-            <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
-            <OffChipNodeLinkCongestionLayer
-                offchipLinkSaturation={offchipLinkSaturation}
-                showLinkSaturation={showLinkSaturation}
-                isHighContrast={isHighContrast}
+            <AsyncComponent
+                renderer={() => (
+                    <OperationCongestionLayer
+                        node={node}
+                        isHighContrast={isHighContrast}
+                        shouldRender={shouldRenderOpPerf}
+                    />
+                )}
+                loadingContent=''
+            />
+            <AsyncComponent
+                renderer={() => (
+                    <OffChipNodeLinkCongestionLayer
+                        offchipLinkSaturation={offchipLinkSaturation}
+                        showLinkSaturation={showLinkSaturation}
+                        isHighContrast={isHighContrast}
+                    />
+                )}
+                loadingContent=''
             />
 
             {/* Labels for location and operation */}
@@ -125,13 +140,20 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
 
             {/* Pipes */}
-            <NodePipeRenderer
-                node={node}
-                isHighContrast={isHighContrast}
-                showLinkSaturation={showLinkSaturation}
-                linksData={linksData.linksByLinkId}
+            <AsyncComponent
+                renderer={() => (
+                    <>
+                        <NodePipeRenderer
+                            node={node}
+                            isHighContrast={isHighContrast}
+                            showLinkSaturation={showLinkSaturation}
+                            linksData={linksData.linksByLinkId}
+                        />
+                        <NodeFocusPipeRenderer node={node} />
+                    </>
+                )}
+                loadingContent=''
             />
-            <NodeFocusPipeRenderer node={node} />
 
             {/* Node type label */}
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
