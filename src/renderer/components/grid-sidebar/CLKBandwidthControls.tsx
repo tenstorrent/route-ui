@@ -51,7 +51,9 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 <Button
                     minimal
                     onClick={() => {
-                        dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: totalOpCycles }));
+                        requestAnimationFrame(() =>
+                            dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: totalOpCycles })),
+                        );
                     }}
                     icon={IconNames.RESET}
                 />
@@ -69,7 +71,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
             })}
         </>
     );
-
 
     return (
         <Collapsible label='CLK Controls' isOpen>
@@ -96,7 +97,9 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                             newValue = 1;
                         }
 
-                        dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: newValue }));
+                        requestAnimationFrame(() =>
+                            dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: newValue })),
+                        );
                     }}
                     rightElement={aiclkRightElement}
                 />
@@ -125,13 +128,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                         newValue = 1;
                     }
 
-                    dispatch(updateCLK(newValue));
+                    requestAnimationFrame(() => dispatch(updateCLK(newValue)));
                 }}
                 rightElement={
                     <Button
                         minimal
                         onClick={() => {
-                            dispatch(updateCLK(AICLK_INITIAL_MHZ));
+                            requestAnimationFrame(() => dispatch(updateCLK(AICLK_INITIAL_MHZ)));
                         }}
                         icon={IconNames.RESET}
                     />
@@ -157,13 +160,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                         newValue = 0;
                     }
 
-                    dispatch(updateDRAMBandwidth(newValue));
+                    requestAnimationFrame(() => dispatch(updateDRAMBandwidth(newValue)));
                 }}
                 rightElement={
                     <Button
                         minimal
                         onClick={() => {
-                            dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
+                            requestAnimationFrame(() => dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS)));
                         }}
                         icon={IconNames.RESET}
                     />
@@ -189,13 +192,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                         newValue = 0;
                     }
 
-                    dispatch(updatePCIBandwidth(newValue));
+                    requestAnimationFrame(() => dispatch(updatePCIBandwidth(newValue)));
                 }}
                 rightElement={
                     <Button
                         minimal
                         onClick={() => {
-                            dispatch(updatePCIBandwidth(PCIE_BANDWIDTH_INITIAL_GBS));
+                            requestAnimationFrame(() => dispatch(updatePCIBandwidth(PCIE_BANDWIDTH_INITIAL_GBS)));
                         }}
                         icon={IconNames.RESET}
                     />
