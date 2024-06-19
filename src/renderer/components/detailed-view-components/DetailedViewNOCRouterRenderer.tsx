@@ -8,11 +8,19 @@ import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 
 interface DetailedViewNOCRouterRendererProps {
     links: NetworkLink[];
+    temporalEpoch: number;
+    nodeUid: string;
     label: string;
     className?: string;
 }
 
-const DetailedViewNOCRouterRenderer: React.FC<DetailedViewNOCRouterRendererProps> = ({ links, label, className }) => {
+const DetailedViewNOCRouterRenderer: React.FC<DetailedViewNOCRouterRendererProps> = ({
+    links,
+    temporalEpoch,
+    nodeUid,
+    label,
+    className,
+}) => {
     return (
         <>
             <div className='router'>
@@ -22,7 +30,7 @@ const DetailedViewNOCRouterRenderer: React.FC<DetailedViewNOCRouterRendererProps
                     Router
                 </p>
             </div>
-            <DetailedViewPipeRenderer links={links} />
+            <DetailedViewPipeRenderer links={links} temporalEpoch={temporalEpoch} nodeUid={nodeUid} />
         </>
     );
 };

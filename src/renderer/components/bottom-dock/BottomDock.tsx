@@ -26,34 +26,28 @@ const BottomDock: FC<BottomDockProps> = ({ isActive }) => {
 
     return (
         <div className='dock bottom-dock'>
-            <Tabs
-                key={isActive ? 'active-dock-tabs-key' : 'inactive-dock-tabs-key'}
-                id='dock-tabs'
-                selectedTabId={selectedTab}
-                onChange={setSelectedTab}
-                className={Classes.TABS}
-                renderActiveTabPanelOnly
-            >
-                <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
-                <Tab id='tab2' title='Queues' panel={<QueuesTable />} />
-                {/* <Tab */}
-                {/*     id='tab2' */}
-                {/*     title='Operands' */}
-                {/*     panel={ */}
-                {/*         <Table2 numRows={40} className='operands-table' enableColumnResizing> */}
-                {/*             <Column name='Dollars' cellRenderer={dollarCellRenderer} /> */}
-                {/*             <Column name='Euros' cellRenderer={euroCellRenderer} /> */}
-                {/*         </Table2> */}
-                {/*     } */}
-                {/* /> */}
-                {isLogOutputEnabled && <Tab id='tab3' title='Logs' panel={<LogsOutput />} />}
-            </Tabs>
-            <Button
-                minimal
-                icon={IconNames.CROSS}
-                className='dock-close-button'
-                onClick={() => dispatch(setDockOpenState(false))}
-            />
+            {isActive && (
+                <>
+                    <Tabs
+                        key={isActive ? 'active-dock-tabs-key' : 'inactive-dock-tabs-key'}
+                        id='dock-tabs'
+                        selectedTabId={selectedTab}
+                        onChange={setSelectedTab}
+                        className={Classes.TABS}
+                        renderActiveTabPanelOnly
+                    >
+                        <Tab id='tab1' title='Operations' panel={<OperationsTable />} />
+                        <Tab id='tab2' title='Queues' panel={<QueuesTable />} />
+                        {isLogOutputEnabled && <Tab id='tab3' title='Logs' panel={<LogsOutput />} />}
+                    </Tabs>
+                    <Button
+                        minimal
+                        icon={IconNames.CROSS}
+                        className='dock-close-button'
+                        onClick={() => dispatch(setDockOpenState(false))}
+                    />
+                </>
+            )}
         </div>
     );
 };

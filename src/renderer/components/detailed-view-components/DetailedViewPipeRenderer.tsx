@@ -4,11 +4,10 @@
 
 import * as d3 from 'd3';
 import { getHighContrastState } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 import { NOCLink, NetworkLink } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import {
     DramBankLinkName,
     EthernetLinkName,
@@ -19,8 +18,8 @@ import {
     PCIeLinkName,
 } from '../../../data/Types';
 import {
-    getAllLinksForGraph,
     getLinkSaturation,
+    getLinkStaturationStateList,
     getShowLinkSaturation,
     getShowNOC0,
     getShowNOC1,
@@ -30,20 +29,31 @@ import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
+    nodeUid: string;
+    temporalEpoch: number;
     className?: string;
     size?: number;
 };
 
-const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ links, className, size = 80 }) => {
+const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
+    links,
+    nodeUid,
+    temporalEpoch,
+    className,
+    size = 80,
+}) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
     const selectedPipeIds = useSelector(getSelectedPipesIds);
     const isHighContrast = useSelector(getHighContrastState);
-    const linksData = useSelector(getAllLinksForGraph(graphName));
     const noc0Saturation = useSelector(getShowNOC0);
     const noc1Saturation = useSelector(getShowNOC1);
+    const linksState = useSelector(getLinkStaturationStateList)(
+        temporalEpoch,
+        nodeUid,
+        links.map((l) => l.uid),
+    );
 
     // TODO: see if useLayoutEffect is better in a future
     useEffect(() => {
@@ -63,7 +73,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
                     }
                 }
                 if (renderCongestion) {
-                    const linkData = linksData[link.uid];
+                    const linkData = linksState[link.uid];
                     if (linkData?.saturation >= linkSaturationTreshold) {
                         drawLink(
                             svg,
@@ -93,11 +103,12 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
         links,
         showLinkSaturation,
         linkSaturationTreshold,
-        linksData,
         noc0Saturation,
         noc1Saturation,
         isHighContrast,
         selectedPipeIds,
+        nodeUid,
+        linksState,
     ]);
 
     const linkNames = links.map((link) => link.name).join(' ');
@@ -126,6 +137,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({ lin
 };
 DetailedViewPipeRenderer.defaultProps = {
     className: '',
+    size: 80,
 };
 export default DetailedViewPipeRenderer;
 

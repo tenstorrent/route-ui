@@ -5,31 +5,42 @@
 import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import { clearAllPipes, updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
-import { useContext, useState } from 'react';
+import { clearAllPipes, updateMultiplePipeSelection } from 'data/store/slices/pipeSelection.slice';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { PipeSegment } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import GraphOnChip, { type PipeSegment } from '../../../data/GraphOnChip';
 import FilterableComponent from '../FilterableComponent';
 import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
-const PipesPropertiesTab = () => {
+const PipesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-
     const [pipeFilter, setPipeFilter] = useState<string>('');
+    const pipeSegments = useMemo(() => {
+        const uniquePipeSegments = new Map<string, PipeSegment>();
+
+        graphs.forEach(({ graphOnChip }) =>
+            graphOnChip.allUniquePipes.forEach((pipeSegment) => {
+                if (!uniquePipeSegments.has(pipeSegment.id)) {
+                    uniquePipeSegments.set(pipeSegment.id, pipeSegment);
+                }
+            }),
+        );
+
+        return [...uniquePipeSegments.values()];
+    }, [graphs]);
 
     const selectFilteredPipes = () => {
-        if (!graphOnChip) {
-            return;
-        }
+        const pipeIdsToSelect: string[] = [];
 
-        graphOnChip.allUniquePipes.forEach((pipeSegment: PipeSegment) => {
+        pipeSegments.forEach((pipeSegment) => {
             if (pipeSegment.id.toLowerCase().includes(pipeFilter.toLowerCase())) {
-                dispatch(updatePipeSelection({ id: pipeSegment.id, selected: true }));
+                pipeIdsToSelect.push(pipeSegment.id);
             }
         });
+
+        dispatch(updateMultiplePipeSelection({ ids: pipeIdsToSelect, selected: true }));
     };
 
     return (
@@ -57,26 +68,25 @@ const PipesPropertiesTab = () => {
                 />
             </div>
             <div className='properties-list'>
-                {graphOnChip && (
-                    <ul className='pipes-list'>
-                        {graphOnChip.allUniquePipes.map((pipeSegment) => (
-                            <FilterableComponent
-                                key={pipeSegment.id}
-                                filterableString={pipeSegment.id}
-                                filterQuery={pipeFilter}
-                                component={
-                                    <li>
-                                        <SelectablePipe
-                                            pipeSegment={pipeSegment}
-                                            pipeFilter={pipeFilter}
-                                            showBandwidth={false}
-                                        />
-                                    </li>
-                                }
-                            />
-                        ))}
-                    </ul>
-                )}
+                <ul className='pipes-list'>
+                    {pipeSegments.map((pipeSegment, index) => (
+                        <FilterableComponent
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={`${index}-${pipeSegment.id}`}
+                            filterableString={pipeSegment.id}
+                            filterQuery={pipeFilter}
+                            component={
+                                <li>
+                                    <SelectablePipe
+                                        pipeSegment={pipeSegment}
+                                        pipeFilter={pipeFilter}
+                                        showBandwidth={false}
+                                    />
+                                </li>
+                            }
+                        />
+                    ))}
+                </ul>
             </div>
         </div>
     );

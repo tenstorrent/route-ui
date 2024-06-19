@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+
+@import "../../scss/variables";
+
+.graph-selector-picker {
+    color: $tt-black;
+    padding: 8px 10px;
+    scrollbar-gutter: stable both-edges;
+    overflow-y: auto;
+    color-scheme: light;
+    max-height: 400px;
+    height: 100%;
+
+    .bp4-menu {
+        padding: 0;
+    }
+
+    .bp4-menu-item {
+        padding: 3px 5px;
+        align-items: center;
+    }
+
+    .graph-selector-graph {
+        padding-inline-start: 28px;
+    }
+
+    &:not(:has( .graph-selector-temporal-epoch)) .graph-selector-graph {
+        padding-inline-start: 5px;
+    }
+}

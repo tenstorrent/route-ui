@@ -29,3 +29,4 @@ export const getDetailedViewHeight = (state: RootState) => state.uiState.detaile
 export const getDetailedViewOpenState = (state: RootState) => state.uiState.detailsViewOpen;
 
 export const getSelectedDetailsViewUID = (state: RootState) => state.uiState.selectedDetailsViewUID;
+export const getSelectedDetailsViewChipId = (state: RootState) => state.uiState.selectedDetailsViewChipId;

@@ -9,7 +9,7 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
-    getAllLinksForGraph,
+    getEthLinkStateListForNode,
     getLinkSaturation,
     getShowLinkSaturation,
 } from '../../../data/store/selectors/linkSaturation.selectors';
@@ -20,7 +20,7 @@ import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../.
 interface EthPipeRendererProps {
     id: string;
     node: ComputeNode | undefined;
-    graphName: string | undefined;
+    temporalEpoch: number;
     ethPosition: CLUSTER_ETH_POSITION;
     index: number;
     clusterChipSize: number;
@@ -30,7 +30,7 @@ interface EthPipeRendererProps {
 const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     id,
     node,
-    graphName,
+    temporalEpoch,
     ethPosition,
     index,
     clusterChipSize,
@@ -64,7 +64,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const linksData = useSelector(getAllLinksForGraph(graphName || ''));
+    const linksData = useSelector(getEthLinkStateListForNode)(temporalEpoch, node?.uid ?? '');
     const isHighContrast = useSelector(getHighContrastState);
 
     useEffect(() => {
@@ -72,22 +72,19 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
             if (showLinkSaturation && linksData) {
-                node?.internalLinks.forEach((link) => {
-                    if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
-                        const linkStateData = linksData[link.uid];
-                        if (normalizedSaturation) {
-                            if (linkStateData && linkStateData.normalizedSaturation >= linkSaturationTreshold) {
-                                const color = calculateLinkCongestionColor(
-                                    linkStateData.normalizedSaturation,
-                                    0,
-                                    isHighContrast,
-                                );
-                                drawEthLink(svg, ethPosition, link.name, size, color, 6);
-                            }
-                        } else if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
-                            const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
-                            drawEthLink(svg, ethPosition, link.name, size, color, 6);
+                Object.values(linksData).forEach((linkState) => {
+                    if (normalizedSaturation) {
+                        if (linkState && linkState.normalizedSaturation >= linkSaturationTreshold) {
+                            const color = calculateLinkCongestionColor(
+                                linkState.normalizedSaturation,
+                                0,
+                                isHighContrast,
+                            );
+                            drawEthLink(svg, ethPosition, linkState.ethDirection!, size, color, 6);
                         }
+                    } else if (linkState && linkState.saturation >= linkSaturationTreshold) {
+                        const color = calculateLinkCongestionColor(linkState.saturation, 0, isHighContrast);
+                        drawEthLink(svg, ethPosition, linkState.ethDirection!, size, color, 6);
                     }
                 });
             }

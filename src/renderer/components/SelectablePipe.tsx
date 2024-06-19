@@ -42,6 +42,7 @@ const SelectablePipe: FC<SelectablePipeProps> = ({
             <PipeInfoDialog
                 pipeId={pipeSegment.id}
                 onEnter={() => {
+                    // TODO: we should disable this when viewing temporal epoch
                     dispatch(updateFocusPipe(pipeSegment.id));
                 }}
                 onLeave={() => {
