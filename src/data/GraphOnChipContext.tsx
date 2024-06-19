@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import React, { ReactNode, createContext, useCallback, useMemo, useState } from 'react';
 import GraphOnChip from './GraphOnChip';

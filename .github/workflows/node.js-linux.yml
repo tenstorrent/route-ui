@@ -1,0 +1,40 @@
+###
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+###
+
+
+name: Build Linux Application
+
+on:
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [ 20.x ]
+
+        steps:
+            -   uses: actions/checkout@v4
+
+            -   name: Use Node.js ${{ matrix.node-version }}
+                uses: actions/setup-node@v3
+                with:
+                    node-version: ${{ matrix.node-version }}
+                    cache: 'npm'
+
+            -   run: npm install
+
+            -   run: npm run package-linux
+
+            -   uses: actions/upload-artifact@v3
+                with:
+                    name: packaged-app-linux
+                    path: release/build/*.deb
+
