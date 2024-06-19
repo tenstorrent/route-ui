@@ -5,12 +5,13 @@
 import { Icon, Position } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
-import React, { FC, type PropsWithChildren, useCallback, useContext, useEffect, useState } from 'react';
+import { FC, type PropsWithChildren, useContext } from 'react';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
 import './PipeInfoDialog.scss';
 import type { LocationState } from '../../data/StateTypes';
+import AsyncComponent from './AsyncRenderer';
 
 export interface PipeInfoDialogProps {
     pipeId: string;
@@ -28,76 +29,10 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
     const { epoch, chipId } = location.state;
     const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
 
-    const [tooltipContent, setTooltipContent] = useState<React.JSX.Element | undefined>(undefined);
-
-    const setupData = useCallback(() => {
-        const producers = [
-            ...new Set(
-                graphOnChipList.flatMap(({ graphOnChip }) =>
-                    graphOnChip.pipes
-                        .get(pipeId)
-                        ?.producerCores?.map((core) => graphOnChip.getNode(core)?.operation?.name),
-                ),
-            ),
-        ];
-        const consumers = [
-            ...new Set(
-                graphOnChipList.flatMap(({ graphOnChip }) =>
-                    graphOnChip.pipes
-                        .get(pipeId)
-                        ?.consumerCores?.map((core) => graphOnChip.getNode(core)?.operation?.name),
-                ),
-            ),
-        ];
-
-        if (producers.length === 0 && consumers.length === 0) {
-            return undefined;
-        }
-
-        return (
-            <div className='producer-consumer-tooltip'>
-                {producers.length > 0 && (
-                    <>
-                        <h3>
-                            <Icon icon={IconNames.EXPORT} className='producer-icon' />
-                            Producer{producers.length > 1 ? 's' : ''}:
-                        </h3>
-                        <ul>
-                            {producers.map((producer) => (
-                                <li key={producer}>{producer}</li>
-                            ))}
-                        </ul>
-                    </>
-                )}
-                {consumers.length > 0 && (
-                    <>
-                        <h3>
-                            <Icon icon={IconNames.IMPORT} className='consumer-icon' />
-                            Consumer{consumers.length > 1 ? 's' : ''}:
-                        </h3>
-                        <ul>
-                            {consumers.map((consumer) => (
-                                <li key={consumer}>{consumer}</li>
-                            ))}
-                        </ul>
-                    </>
-                )}
-            </div>
-        );
-    }, [graphOnChipList, pipeId]);
-
-    useEffect(() => {
-        setTooltipContent(undefined);
-    }, [graphOnChipList]);
-
     return (
         <div
             className='pipe-info-dialog'
             onMouseEnter={() => {
-                if (!tooltipContent) {
-                    setTooltipContent(setupData());
-                }
-
                 requestAnimationFrame(() => onEnter?.());
             }}
             onFocus={() => {
@@ -111,9 +46,77 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
             }}
         >
             <Tooltip2
-                disabled={hide || !tooltipContent}
+                disabled={hide}
                 usePortal
-                content={tooltipContent}
+                content={
+                    <AsyncComponent
+                        // eslint-disable-next-line @typescript-eslint/require-await
+                        renderer={async () => {
+                            const producers = [
+                                ...new Set(
+                                    graphOnChipList
+                                        .flatMap(({ graphOnChip }) =>
+                                            graphOnChip.pipes
+                                                .get(pipeId)
+                                                ?.producerCores?.map(
+                                                    (core) => graphOnChip.getNode(core)?.operation?.name,
+                                                ),
+                                        )
+                                        .filter((opName) => opName),
+                                ),
+                            ];
+                            const consumers = [
+                                ...new Set(
+                                    graphOnChipList
+                                        .flatMap(({ graphOnChip }) =>
+                                            graphOnChip.pipes
+                                                .get(pipeId)
+                                                ?.consumerCores?.map(
+                                                    (core) => graphOnChip.getNode(core)?.operation?.name,
+                                                ),
+                                        )
+                                        .filter((opName) => opName),
+                                ),
+                            ];
+
+                            return (
+                                <div className='producer-consumer-tooltip'>
+                                    <h3>
+                                        <Icon icon={IconNames.EXPORT} className='producer-icon' />
+                                        Producer{producers.length > 1 ? 's' : ''}:
+                                    </h3>
+                                    {producers.length > 0 ? (
+                                        <ul>
+                                            {producers.map((producer) => (
+                                                <li key={producer}>{producer}</li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <ul>
+                                            <li>&mdash;</li>
+                                        </ul>
+                                    )}
+                                    <h3>
+                                        <Icon icon={IconNames.IMPORT} className='consumer-icon' />
+                                        Consumer{consumers.length > 1 ? 's' : ''}:
+                                    </h3>
+                                    {consumers.length > 0 ? (
+                                        <ul>
+                                            {consumers.map((consumer) => (
+                                                <li key={consumer}>{consumer}</li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <ul>
+                                            <li>&mdash;</li>
+                                        </ul>
+                                    )}
+                                </div>
+                            );
+                        }}
+                        loadingContent='Loading Producers/Consumers...'
+                    />
+                }
                 position={Position.BOTTOM_RIGHT}
                 hoverOpenDelay={100}
             >

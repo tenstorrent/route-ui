@@ -85,7 +85,9 @@ export const CongestionControls: FC = () => {
                 disabled={!showOperationPerformanceGrid}
                 labelStepSize={maxBwLimitedFactor > 5 ? Math.max(5, maxBwLimitedFactor / 5) : 1}
                 value={Math.min(operationPerformanceTreshold, maxBwLimitedFactor)}
-                onChange={(value: number) => dispatch(updateOperationPerformanceThreshold(value))}
+                onChange={(value: number) =>
+                    requestAnimationFrame(() => dispatch(updateOperationPerformanceThreshold(value)))
+                }
                 labelRenderer={(value) => `${value.toFixed(0)}`}
             />
             <hr />

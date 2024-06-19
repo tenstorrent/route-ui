@@ -87,7 +87,7 @@ const LinkCongestionControls: FC<LinkCongestionControlsProps> = ({ showNOCContro
                 disabled={!showLinkSaturation}
                 labelStepSize={50}
                 value={linkSaturationTreshold}
-                onChange={(value: number) => dispatch(updateLinkSaturation(value))}
+                onChange={(value: number) => requestAnimationFrame(() => dispatch(updateLinkSaturation(value)))}
                 labelRenderer={(value) => `${value.toFixed(0)}`}
             />
         </>
