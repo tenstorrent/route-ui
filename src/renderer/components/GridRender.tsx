@@ -5,7 +5,7 @@
 import { CSSProperties, useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Icon } from '@blueprintjs/core';
+import { Icon, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { type Location, useLocation } from 'react-router-dom';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
@@ -98,7 +98,8 @@ export default function GridRender() {
                     loadingContent={
                         <div className='grid-container' key={id}>
                             <div className='node-container loading-graph' style={{ zoom: `${gridZoom}` }}>
-                                Loading {id} - {graphName}...
+                                <Spinner size={50} />
+                                {id} - {graphName}
                             </div>
                         </div>
                     }
