@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { Button, Card, Overlay } from '@blueprintjs/core';
+import { Button, Card, Overlay, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import {
     getDetailedViewOpenState,
@@ -10,7 +10,7 @@ import {
     getSelectedDetailsViewChipId,
     getSelectedDetailsViewUID,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
@@ -22,6 +22,7 @@ import DetailedViewPCIERenderer from './DetailedViewPCIE';
 
 import './DetailedView.scss';
 import type { LocationState } from '../../../data/StateTypes';
+import AsyncComponent from '../AsyncRenderer';
 
 interface DetailedViewProps {}
 
@@ -39,6 +40,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId ?? -1);
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (detailedViewElement.current) {
@@ -47,9 +49,10 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
             const parsedMarginBottom = Number.parseFloat(marginBottom.replace('px', ''));
 
             dispatch(updateDetailedViewHeight((parsedHeight + parsedMarginBottom) * zoom));
+            setIsLoading(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [zoom, isOpen, node]);
+    }, [zoom, isOpen, node, isLoading]);
 
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false} transitionDuration={0}>
@@ -64,21 +67,37 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                         <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                     </div>
                     {node && (
-                        <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
-                            {node.type === ComputeNodeType.DRAM && (
-                                <DetailedViewDRAMRenderer
-                                    node={node}
-                                    temporalEpoch={temporalEpoch}
-                                    graphOnChip={graphOnChip}
-                                />
-                            )}
-                            {node.type === ComputeNodeType.ETHERNET && (
-                                <DetailedViewETHRenderer node={node} temporalEpoch={temporalEpoch} />
-                            )}
-                            {node.type === ComputeNodeType.PCIE && (
-                                <DetailedViewPCIERenderer node={node} temporalEpoch={temporalEpoch} />
-                            )}
-                        </div>
+                        <AsyncComponent
+                            renderer={() => {
+                                const result = (
+                                    <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
+                                        {node.type === ComputeNodeType.DRAM && (
+                                            <DetailedViewDRAMRenderer
+                                                node={node}
+                                                temporalEpoch={temporalEpoch}
+                                                graphOnChip={graphOnChip}
+                                            />
+                                        )}
+                                        {node.type === ComputeNodeType.ETHERNET && (
+                                            <DetailedViewETHRenderer node={node} temporalEpoch={temporalEpoch} />
+                                        )}
+                                        {node.type === ComputeNodeType.PCIE && (
+                                            <DetailedViewPCIERenderer node={node} temporalEpoch={temporalEpoch} />
+                                        )}
+                                    </div>
+                                );
+
+                                setIsLoading(true);
+
+                                return result;
+                            }}
+                            loadingContent={
+                                <div className='details-loading'>
+                                    <Spinner />
+                                    <p>Loading details</p>
+                                </div>
+                            }
+                        />
                     )}
                 </div>
             </Card>
