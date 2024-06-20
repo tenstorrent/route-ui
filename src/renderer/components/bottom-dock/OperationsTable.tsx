@@ -24,7 +24,10 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
 import { getOperandState, getSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
-import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
+import {
+    getOperationRatioThreshold,
+    getShowOperationPerformanceGrid,
+} from '../../../data/store/selectors/operationPerf.selectors';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { numberFormatter, valueRatio } from '../../utils/numbers';
@@ -105,6 +108,7 @@ function OperationsTable() {
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
+    const shouldShowOpPerformance = useSelector(getShowOperationPerformanceGrid);
 
     useEffect(() => {
         setSelectedOperationName('');
@@ -119,7 +123,10 @@ function OperationsTable() {
         return (
             <span className='operand-wrapper'>
                 {opName ? (
-                    <SelectableOperationPerformance operation={tableFields[rowIndex].operation || null}>
+                    <SelectableOperationPerformance
+                        operation={tableFields[rowIndex].operation || null}
+                        shouldShowOpPerformance={shouldShowOpPerformance}
+                    >
                         <SelectableOperation
                             opName={opName}
                             value={selected(opName)}
@@ -185,6 +192,7 @@ function OperationsTable() {
                     )}
                     <SelectableOperationPerformance
                         operation={type === GraphVertexType.OPERATION ? (slowestOperand as Operation) : null}
+                        shouldShowOpPerformance={shouldShowOpPerformance}
                     >
                         <SelectableOperation
                             opName={slowestOperand.name}
