@@ -139,7 +139,7 @@
         .panel-overlay { display: block; }
     }
 
-    &.detailed-view-open {
+    &:has( .detailed-view-open) {
         grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"

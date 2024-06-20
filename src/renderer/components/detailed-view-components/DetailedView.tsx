@@ -31,6 +31,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const { epoch: temporalEpoch } = location.state;
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
+    const isDetailedViewOpen = useSelector(getDetailedViewOpenState);
 
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
@@ -52,7 +53,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
 
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false} transitionDuration={0}>
-            <Card className='detailed-view-card'>
+            <Card className={`detailed-view-card ${isDetailedViewOpen ? 'detailed-view-open' : ''}`}>
                 <div className='detailed-view-container' style={{ zoom }} ref={detailedViewElement}>
                     <div className='detailed-view-header'>
                         {node && (
