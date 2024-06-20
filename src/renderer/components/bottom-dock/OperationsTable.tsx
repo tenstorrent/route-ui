@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import { Button, Checkbox, Icon } from '@blueprintjs/core';
+import { Button, Checkbox, Icon, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import {
@@ -36,6 +36,7 @@ import SelectableOperation, { SelectableOperationPerformance } from '../Selectab
 import { columnRenderer } from './SharedTable';
 import type { LocationState } from '../../../data/StateTypes';
 import type { BuildableOperation } from '../../../data/Graph';
+import AsyncComponent from '../AsyncRenderer';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -250,57 +251,69 @@ function OperationsTable() {
     const columns = Array.from(operationsTableColumns.keys()).filter((key) => excludedColumn !== key);
 
     return (
-        <>
-            <div>
-                <SearchField
-                    disabled={!graphOnChipList || selectedOperationName !== ''}
-                    searchQuery={filterQuery}
-                    onQueryChanged={setFilterQuery}
-                    controls={[]}
-                />
-            </div>
-            <Table2
-                ref={table}
-                renderMode={RenderMode.NONE}
-                forceRerenderOnSelectionChange
-                selectionModes={SelectionModes.NONE}
-                className='operations-table'
-                numRows={tableFields.length}
-                rowHeights={[...new Array(tableFields.length)].fill(24)}
-                enableColumnHeader
-                numFrozenColumns={1}
-                cellRendererDependencies={[
-                    sortDirection,
-                    sortingColumn,
-                    nodesSelectionState,
-                    tableFields,
-                    selectedOperationName,
-                    tableFields.length,
-                    operationRatioThreshold,
-                    filterQuery,
-                    allOperandsState,
-                ]}
-            >
-                {
-                    columns.map((key) =>
-                        columnRenderer({
-                            key: key as keyof OpTableFields,
-                            columnDefinition: operationsTableColumns,
-                            changeSorting,
+        <AsyncComponent
+            renderer={() => (
+                <>
+                    <div>
+                        <SearchField
+                            disabled={!graphOnChipList || selectedOperationName !== ''}
+                            searchQuery={filterQuery}
+                            onQueryChanged={setFilterQuery}
+                            controls={[]}
+                        />
+                    </div>
+                    <Table2
+                        ref={table}
+                        renderMode={RenderMode.NONE}
+                        forceRerenderOnSelectionChange
+                        selectionModes={SelectionModes.NONE}
+                        className='operations-table'
+                        numRows={tableFields.length}
+                        rowHeights={[...new Array(tableFields.length)].fill(24)}
+                        enableColumnHeader
+                        numFrozenColumns={1}
+                        cellRendererDependencies={[
                             sortDirection,
                             sortingColumn,
+                            nodesSelectionState,
                             tableFields,
-                            ...(key === 'model_runtime_per_input' && {
-                                customCellContentRenderer: modelRuntimeCellRenderer,
-                            }),
-                            ...(key === 'slowest_operand' && { customCellContentRenderer: slowestOperandCellRenderer }),
-                            ...(key === 'operation' && { customCellContentRenderer: operationCellRenderer }),
-                            ...(key === 'core_id' && { customCellContentRenderer: coreIdCellRenderer }),
-                        }),
-                    ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
-                }
-            </Table2>
-        </>
+                            selectedOperationName,
+                            tableFields.length,
+                            operationRatioThreshold,
+                            filterQuery,
+                            allOperandsState,
+                        ]}
+                    >
+                        {
+                            columns.map((key) =>
+                                columnRenderer({
+                                    key: key as keyof OpTableFields,
+                                    columnDefinition: operationsTableColumns,
+                                    changeSorting,
+                                    sortDirection,
+                                    sortingColumn,
+                                    tableFields,
+                                    ...(key === 'model_runtime_per_input' && {
+                                        customCellContentRenderer: modelRuntimeCellRenderer,
+                                    }),
+                                    ...(key === 'slowest_operand' && {
+                                        customCellContentRenderer: slowestOperandCellRenderer,
+                                    }),
+                                    ...(key === 'operation' && { customCellContentRenderer: operationCellRenderer }),
+                                    ...(key === 'core_id' && { customCellContentRenderer: coreIdCellRenderer }),
+                                }),
+                            ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+                        }
+                    </Table2>
+                </>
+            )}
+            loadingContent={
+                <div className='table-loading'>
+                    <Spinner />
+                    <p>Loading operations</p>
+                </div>
+            }
+        />
     );
 }
 
