@@ -5,7 +5,6 @@
 import { getDetailedViewHeight, getIsLoadingFolder } from 'data/store/selectors/uiState.selectors';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../data/constants';
 import TenstorrentLogo from '../../main/assets/TenstorrentLogo';
 import GridRender from '../components/GridRender';
 import { SideBar } from '../components/SideBar';
@@ -28,7 +27,7 @@ const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
             className={`main-route ${!loading && error ? 'invalid-data' : ''} ${loading ? 'loading-data' : ''}`}
             style={
                 {
-                    '--js-bottom-dock-height': `${detailedViewHeight ?? INITIAL_DETAILS_VIEW_HEIGHT}px`,
+                    '--js-bottom-dock-height': `${detailedViewHeight}px`,
                 } as React.CSSProperties
             }
         >
