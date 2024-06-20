@@ -5,7 +5,6 @@
 import {
     getDetailedViewHeight,
     getDetailedViewOpenState,
-    getDockOpenState,
     getIsLoadingFolder,
 } from 'data/store/selectors/uiState.selectors';
 import React from 'react';
@@ -24,7 +23,6 @@ import './MainRouteRenderer.scss';
 export interface MainRouteRendererProps {}
 
 const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
-    const isDockOpen = useSelector(getDockOpenState);
     const isDetailedViewOpen = useSelector(getDetailedViewOpenState);
     const detailedViewHeight = useSelector(getDetailedViewHeight);
     const loading = useSelector(getIsLoadingFolder);
@@ -32,7 +30,7 @@ const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
 
     return (
         <div
-            className={`main-route ${isDockOpen ? 'dock-open' : ''} ${isDetailedViewOpen ? 'detailed-view-open' : ''} ${!loading && error ? 'invalid-data' : ''} ${loading ? 'loading-data' : ''}`}
+            className={`main-route ${isDetailedViewOpen ? 'detailed-view-open' : ''} ${!loading && error ? 'invalid-data' : ''} ${loading ? 'loading-data' : ''}`}
             style={
                 {
                     '--js-bottom-dock-height': `${
@@ -49,7 +47,7 @@ const MainRouteRenderer: React.FC<MainRouteRendererProps> = () => {
             <GridSidebar />
             <GridRender />
             <PropertiesPanel />
-            <BottomDock isActive={isDockOpen} />
+            <BottomDock />
             <div className='main-route-loading-overlay'>
                 <p>Loading data...</p>
             </div>

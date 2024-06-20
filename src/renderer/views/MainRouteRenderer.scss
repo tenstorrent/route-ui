@@ -148,7 +148,7 @@
         ;
     }
 
-    &.dock-open {
+    &:has( .dock-open) {
         grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
