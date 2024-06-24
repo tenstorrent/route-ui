@@ -4,24 +4,21 @@
 
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
-import { getLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
+import { getLinkSaturation, getShowLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 
 interface OffChipNodeLinkCongestionLayerProps {
     offchipLinkSaturation: number;
-    showLinkSaturation: boolean;
 }
 
 /**
  * This renders a congestion layer for nodes with off chip links (DRAM, Ethernet, PCIe)  for those links
  */
-const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({
-    offchipLinkSaturation,
-    showLinkSaturation,
-}) => {
+const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({ offchipLinkSaturation }) => {
     const linkSaturationThreshold = useSelector(getLinkSaturation);
     const isHighContrast = useSelector(getHighContrastState);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
 
     let congestionStyle = {};
 

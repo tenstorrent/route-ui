@@ -7,7 +7,12 @@ import { FC, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { NOC, NOCLinkName } from '../../../data/Types';
-import { getLinkSaturation, getShowNOC0, getShowNOC1 } from '../../../data/store/selectors/linkSaturation.selectors';
+import {
+    getLinkSaturation,
+    getShowLinkSaturation,
+    getShowNOC0,
+    getShowNOC1,
+} from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState, getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
 import {
@@ -23,12 +28,12 @@ import type { LinkState } from '../../../data/StateTypes';
 interface NodePipeRendererProps {
     node: ComputeNode;
     linksData: Record<string, LinkState>;
-    showLinkSaturation: boolean;
 }
 
-const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, linksData, showLinkSaturation }) => {
+const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, linksData }) => {
     const focusPipe = useSelector(getFocusPipe);
     const selectedPipeIds = useSelector(getSelectedPipesIds);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);

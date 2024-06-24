@@ -11,7 +11,7 @@ import { type Location, useLocation } from 'react-router-dom';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import { getGridZoom, getShowOperationNames } from '../../data/store/selectors/uiState.selectors';
+import { getGridZoom } from '../../data/store/selectors/uiState.selectors';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import NodeGridElement from './NodeGridElement';
 import ClusterViewDialog from './cluster-view/ClusterViewDialog';
@@ -19,7 +19,6 @@ import DetailedView from './detailed-view-components/DetailedView';
 import type { LocationState } from '../../data/StateTypes';
 import { ClusterContext } from '../../data/ClusterContext';
 import AsyncComponent from './AsyncRenderer';
-import { getShowLinkSaturation } from '../../data/store/selectors/linkSaturation.selectors';
 
 export default function GridRender() {
     const gridZoom = useSelector(getGridZoom);
@@ -34,9 +33,6 @@ export default function GridRender() {
         () => Object.fromEntries((cluster?.chips ?? []).map((chip) => [chip.id, chip])),
         [cluster],
     );
-
-    const showOperationNames = useSelector(getShowOperationNames);
-    const showLinkSaturation = useSelector(getShowLinkSaturation);
 
     const style =
         graphOnChipList.length > 1
@@ -78,8 +74,6 @@ export default function GridRender() {
                                                 temporalEpoch={epoch}
                                                 key={node.uid}
                                                 connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
-                                                renderLinkSaturation={showLinkSaturation}
-                                                showOpNames={showOperationNames}
                                             />
                                         );
                                     })}

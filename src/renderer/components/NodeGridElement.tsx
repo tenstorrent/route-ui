@@ -10,7 +10,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { HighlightType } from '../../data/Types';
 import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
-import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../data/store/selectors/uiState.selectors';
+import {
+    getDetailedViewOpenState,
+    getSelectedDetailsViewUID,
+    getShowOperationNames,
+} from '../../data/store/selectors/uiState.selectors';
 import NodeLocation from './node-grid-elements-components/NodeLocation';
 import OperationCongestionLayer from './node-grid-elements-components/OperationCongestionLayer';
 import DramModuleBorder from './node-grid-elements-components/DramModuleBorder';
@@ -28,17 +32,9 @@ interface NodeGridElementProps {
     node: ComputeNode;
     temporalEpoch: number;
     connectedEth?: ClusterChip | null;
-    showOpNames: boolean;
-    renderLinkSaturation: boolean;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({
-    node,
-    temporalEpoch,
-    connectedEth,
-    renderLinkSaturation,
-    showOpNames,
-}) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, connectedEth }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
@@ -47,6 +43,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 
     const linksData = useSelector(getNodeLinksData(temporalEpoch, node.uid));
     const offchipLinkSaturation = useSelector(getOffchipLinkSaturationForNode(temporalEpoch, node.uid));
+    const showOpNames = useSelector(getShowOperationNames);
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -110,12 +107,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             {/* Congestion information */}
             <AsyncComponent renderer={() => <OperationCongestionLayer node={node} />} loadingContent='' />
             <AsyncComponent
-                renderer={() => (
-                    <OffChipNodeLinkCongestionLayer
-                        offchipLinkSaturation={offchipLinkSaturation}
-                        showLinkSaturation={renderLinkSaturation}
-                    />
-                )}
+                renderer={() => <OffChipNodeLinkCongestionLayer offchipLinkSaturation={offchipLinkSaturation} />}
                 loadingContent=''
             />
 
@@ -127,11 +119,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             <AsyncComponent
                 renderer={() => (
                     <>
-                        <NodePipeRenderer
-                            node={node}
-                            showLinkSaturation={renderLinkSaturation}
-                            linksData={linksData.linksByLinkId}
-                        />
+                        <NodePipeRenderer node={node} linksData={linksData.linksByLinkId} />
                         <NodeFocusPipeRenderer node={node} />
                     </>
                 )}
