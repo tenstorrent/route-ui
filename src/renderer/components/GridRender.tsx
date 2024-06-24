@@ -36,10 +36,10 @@ export default function GridRender() {
         [cluster],
     );
 
-    const shouldShowOperationNames = useSelector(getShowOperationNames);
-    const shouldRenderOpPerf = useSelector(getShowOperationPerformanceGrid);
+    const showOperationNames = useSelector(getShowOperationNames);
+    const renderOpPerf = useSelector(getShowOperationPerformanceGrid);
     const isHighContrast = useSelector(getHighContrastState);
-    const shouldShowLinkSaturation = useSelector(getShowLinkSaturation);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
 
     const style =
         graphOnChipList.length > 1
@@ -81,9 +81,9 @@ export default function GridRender() {
                                                 temporalEpoch={epoch}
                                                 key={node.uid}
                                                 connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
-                                                shouldRenderLinkSaturation={shouldShowLinkSaturation}
-                                                shouldRenderOpPerfomance={shouldRenderOpPerf}
-                                                shouldShowOpNames={shouldShowOperationNames}
+                                                renderLinkSaturation={showLinkSaturation}
+                                                renderOpPerfomance={renderOpPerf}
+                                                showOpNames={showOperationNames}
                                                 isHighContrast={isHighContrast}
                                             />
                                         );

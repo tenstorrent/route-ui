@@ -28,9 +28,9 @@ interface NodeGridElementProps {
     node: ComputeNode;
     temporalEpoch: number;
     connectedEth?: ClusterChip | null;
-    shouldShowOpNames: boolean;
-    shouldRenderOpPerfomance: boolean;
-    shouldRenderLinkSaturation: boolean;
+    showOpNames: boolean;
+    renderOpPerfomance: boolean;
+    renderLinkSaturation: boolean;
     isHighContrast: boolean;
 }
 
@@ -38,9 +38,9 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     node,
     temporalEpoch,
     connectedEth,
-    shouldRenderLinkSaturation,
-    shouldRenderOpPerfomance,
-    shouldShowOpNames,
+    renderLinkSaturation,
+    renderOpPerfomance,
+    showOpNames,
     isHighContrast,
 }) => {
     const dispatch = useDispatch();
@@ -83,7 +83,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 
     return (
         <button
-            title={shouldShowOpNames && shouldShowLabel ? node.opName : ''}
+            title={showOpNames && shouldShowLabel ? node.opName : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
@@ -117,7 +117,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
                     <OperationCongestionLayer
                         node={node}
                         isHighContrast={isHighContrast}
-                        shouldRender={shouldRenderOpPerfomance}
+                        shouldRender={renderOpPerfomance}
                     />
                 )}
                 loadingContent=''
@@ -126,7 +126,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
                 renderer={() => (
                     <OffChipNodeLinkCongestionLayer
                         offchipLinkSaturation={offchipLinkSaturation}
-                        showLinkSaturation={shouldRenderLinkSaturation}
+                        showLinkSaturation={renderLinkSaturation}
                         isHighContrast={isHighContrast}
                     />
                 )}
@@ -135,7 +135,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
 
             {/* Labels for location and operation */}
             <NodeLocation node={node} />
-            <NodeOperationLabel opName={node.opName} shouldRender={shouldShowOpNames && shouldShowLabel} />
+            <NodeOperationLabel opName={node.opName} shouldRender={showOpNames && shouldShowLabel} />
 
             {/* Pipes */}
             <AsyncComponent
@@ -144,7 +144,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
                         <NodePipeRenderer
                             node={node}
                             isHighContrast={isHighContrast}
-                            showLinkSaturation={shouldRenderLinkSaturation}
+                            showLinkSaturation={renderLinkSaturation}
                             linksData={linksData.linksByLinkId}
                         />
                         <NodeFocusPipeRenderer node={node} />
