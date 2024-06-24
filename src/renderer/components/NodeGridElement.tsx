@@ -29,9 +29,7 @@ interface NodeGridElementProps {
     temporalEpoch: number;
     connectedEth?: ClusterChip | null;
     showOpNames: boolean;
-    renderOpPerfomance: boolean;
     renderLinkSaturation: boolean;
-    isHighContrast: boolean;
 }
 
 const NodeGridElement: React.FC<NodeGridElementProps> = ({
@@ -39,9 +37,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
     temporalEpoch,
     connectedEth,
     renderLinkSaturation,
-    renderOpPerfomance,
     showOpNames,
-    isHighContrast,
 }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
@@ -112,22 +108,12 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
             <div className='node-border' />
 
             {/* Congestion information */}
-            <AsyncComponent
-                renderer={() => (
-                    <OperationCongestionLayer
-                        node={node}
-                        isHighContrast={isHighContrast}
-                        shouldRender={renderOpPerfomance}
-                    />
-                )}
-                loadingContent=''
-            />
+            <AsyncComponent renderer={() => <OperationCongestionLayer node={node} />} loadingContent='' />
             <AsyncComponent
                 renderer={() => (
                     <OffChipNodeLinkCongestionLayer
                         offchipLinkSaturation={offchipLinkSaturation}
                         showLinkSaturation={renderLinkSaturation}
-                        isHighContrast={isHighContrast}
                     />
                 )}
                 loadingContent=''
@@ -143,7 +129,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({
                     <>
                         <NodePipeRenderer
                             node={node}
-                            isHighContrast={isHighContrast}
                             showLinkSaturation={renderLinkSaturation}
                             linksData={linksData.linksByLinkId}
                         />

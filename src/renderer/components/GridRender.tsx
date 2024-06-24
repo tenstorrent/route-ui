@@ -11,7 +11,7 @@ import { type Location, useLocation } from 'react-router-dom';
 import { NODE_SIZE } from '../../utils/DrawingAPI';
 import { ComputeNode } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import { getGridZoom, getHighContrastState, getShowOperationNames } from '../../data/store/selectors/uiState.selectors';
+import { getGridZoom, getShowOperationNames } from '../../data/store/selectors/uiState.selectors';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
 import NodeGridElement from './NodeGridElement';
 import ClusterViewDialog from './cluster-view/ClusterViewDialog';
@@ -19,7 +19,6 @@ import DetailedView from './detailed-view-components/DetailedView';
 import type { LocationState } from '../../data/StateTypes';
 import { ClusterContext } from '../../data/ClusterContext';
 import AsyncComponent from './AsyncRenderer';
-import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
 import { getShowLinkSaturation } from '../../data/store/selectors/linkSaturation.selectors';
 
 export default function GridRender() {
@@ -37,8 +36,6 @@ export default function GridRender() {
     );
 
     const showOperationNames = useSelector(getShowOperationNames);
-    const renderOpPerf = useSelector(getShowOperationPerformanceGrid);
-    const isHighContrast = useSelector(getHighContrastState);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
 
     const style =
@@ -82,9 +79,7 @@ export default function GridRender() {
                                                 key={node.uid}
                                                 connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
                                                 renderLinkSaturation={showLinkSaturation}
-                                                renderOpPerfomance={renderOpPerf}
                                                 showOpNames={showOperationNames}
-                                                isHighContrast={isHighContrast}
                                             />
                                         );
                                     })}

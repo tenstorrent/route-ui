@@ -6,11 +6,11 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getLinkSaturation } from '../../../data/store/selectors/linkSaturation.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
+import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 
 interface OffChipNodeLinkCongestionLayerProps {
     offchipLinkSaturation: number;
     showLinkSaturation: boolean;
-    isHighContrast: boolean;
 }
 
 /**
@@ -19,9 +19,9 @@ interface OffChipNodeLinkCongestionLayerProps {
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({
     offchipLinkSaturation,
     showLinkSaturation,
-    isHighContrast,
 }) => {
     const linkSaturationThreshold = useSelector(getLinkSaturation);
+    const isHighContrast = useSelector(getHighContrastState);
 
     let congestionStyle = {};
 
