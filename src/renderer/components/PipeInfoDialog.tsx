@@ -45,83 +45,79 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
                 requestAnimationFrame(() => onLeave?.());
             }}
         >
-            <Tooltip2
-                disabled={hide}
-                usePortal
-                content={
-                    <AsyncComponent
-                        // eslint-disable-next-line @typescript-eslint/require-await
-                        renderer={async () => {
-                            const producers = [
-                                ...new Set(
-                                    graphOnChipList
-                                        .flatMap(({ graphOnChip }) =>
-                                            graphOnChip.pipes
-                                                .get(pipeId)
-                                                ?.producerCores?.map(
-                                                    (core) => graphOnChip.getNode(core)?.operation?.name,
-                                                ),
-                                        )
-                                        .filter((opName) => opName),
-                                ),
-                            ];
-                            const consumers = [
-                                ...new Set(
-                                    graphOnChipList
-                                        .flatMap(({ graphOnChip }) =>
-                                            graphOnChip.pipes
-                                                .get(pipeId)
-                                                ?.consumerCores?.map(
-                                                    (core) => graphOnChip.getNode(core)?.operation?.name,
-                                                ),
-                                        )
-                                        .filter((opName) => opName),
-                                ),
-                            ];
+            <AsyncComponent
+                // eslint-disable-next-line @typescript-eslint/require-await
+                renderer={async () => {
+                    const producers = [
+                        ...new Set(
+                            graphOnChipList
+                                .flatMap(({ graphOnChip }) =>
+                                    graphOnChip.pipes
+                                        .get(pipeId)
+                                        ?.producerCores?.map((core) => graphOnChip.getNode(core)?.operation?.name),
+                                )
+                                .filter((opName) => opName),
+                        ),
+                    ];
+                    const consumers = [
+                        ...new Set(
+                            graphOnChipList
+                                .flatMap(({ graphOnChip }) =>
+                                    graphOnChip.pipes
+                                        .get(pipeId)
+                                        ?.consumerCores?.map((core) => graphOnChip.getNode(core)?.operation?.name),
+                                )
+                                .filter((opName) => opName),
+                        ),
+                    ];
 
-                            return (
+                    if (producers.length === 0 && consumers.length === 0) {
+                        return <div className='pipe-info-dialog-wrapper'>{children}</div>;
+                    }
+
+                    return (
+                        <Tooltip2
+                            disabled={hide}
+                            usePortal
+                            content={
                                 <div className='producer-consumer-tooltip'>
-                                    <h3>
-                                        <Icon icon={IconNames.EXPORT} className='producer-icon' />
-                                        Producer{producers.length > 1 ? 's' : ''}:
-                                    </h3>
-                                    {producers.length > 0 ? (
-                                        <ul>
-                                            {producers.map((producer) => (
-                                                <li key={producer}>{producer}</li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <ul>
-                                            <li>&mdash;</li>
-                                        </ul>
+                                    {producers.length > 0 && (
+                                        <>
+                                            <h3>
+                                                <Icon icon={IconNames.EXPORT} className='producer-icon' />
+                                                Producer{producers.length > 1 ? 's' : ''}:
+                                            </h3>
+                                            <ul>
+                                                {producers.map((producer) => (
+                                                    <li key={producer}>{producer}</li>
+                                                ))}
+                                            </ul>
+                                        </>
                                     )}
-                                    <h3>
-                                        <Icon icon={IconNames.IMPORT} className='consumer-icon' />
-                                        Consumer{consumers.length > 1 ? 's' : ''}:
-                                    </h3>
-                                    {consumers.length > 0 ? (
-                                        <ul>
-                                            {consumers.map((consumer) => (
-                                                <li key={consumer}>{consumer}</li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <ul>
-                                            <li>&mdash;</li>
-                                        </ul>
+                                    {consumers.length > 0 && (
+                                        <>
+                                            <h3>
+                                                <Icon icon={IconNames.IMPORT} className='consumer-icon' />
+                                                Consumer{consumers.length > 1 ? 's' : ''}:
+                                            </h3>
+                                            <ul>
+                                                {consumers.map((consumer) => (
+                                                    <li key={consumer}>{consumer}</li>
+                                                ))}
+                                            </ul>
+                                        </>
                                     )}
                                 </div>
-                            );
-                        }}
-                        loadingContent='Loading Producers/Consumers...'
-                    />
-                }
-                position={Position.BOTTOM_RIGHT}
-                hoverOpenDelay={100}
-            >
-                <div className='pipe-info-dialog-wrapper'>{children}</div>
-            </Tooltip2>
+                            }
+                            position={Position.BOTTOM_RIGHT}
+                            hoverOpenDelay={100}
+                        >
+                            <div className='pipe-info-dialog-wrapper'>{children}</div>
+                        </Tooltip2>
+                    );
+                }}
+                loadingContent={<div className='pipe-info-dialog-wrapper'>{children}</div>}
+            />
         </div>
     );
 };
