@@ -51,8 +51,8 @@ const uiStateSlice = createSlice({
     name: 'uiState',
     initialState: uiStateInitialState,
     reducers: {
-        setDockOpenState: (state, action: PayloadAction<boolean>) => {
-            state.dockOpen = action.payload;
+        toggleDockOpenState: (state) => {
+            state.dockOpen = !state.dockOpen;
         },
         setHighContrastState: (state, action: PayloadAction<boolean>) => {
             state.highContrastEnabled = action.payload;
@@ -112,7 +112,7 @@ const uiStateSlice = createSlice({
 
 export const uiStateReducer = uiStateSlice.reducer;
 export const {
-    setDockOpenState,
+    toggleDockOpenState,
     setHighContrastState,
     setSelectedFile,
     setSelectedFolder,

@@ -6,15 +6,17 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { ComputeNodeType } from '../../../data/Types';
-import { getOperationPerformanceTreshold } from '../../../data/store/selectors/operationPerf.selectors';
+import {
+    getOperationPerformanceTreshold,
+    getShowOperationPerformanceGrid,
+} from '../../../data/store/selectors/operationPerf.selectors';
 import { calculateOpCongestionColor, toRGBA } from '../../../utils/DrawingAPI';
+import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 
-const OperationCongestionLayer: FC<{ node: ComputeNode; isHighContrast: boolean; shouldRender: boolean }> = ({
-    node,
-    isHighContrast,
-    shouldRender,
-}) => {
+const OperationCongestionLayer: FC<{ node: ComputeNode }> = ({ node }) => {
+    const shouldRender = useSelector(getShowOperationPerformanceGrid);
     const threshold = useSelector(getOperationPerformanceTreshold);
+    const isHighContrast = useSelector(getHighContrastState);
 
     const opFactor = node.perfAnalyzerResults?.bw_limited_factor || 1;
     const isCoreNode = node.type === ComputeNodeType.CORE && node.opName !== '';

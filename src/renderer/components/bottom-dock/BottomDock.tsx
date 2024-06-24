@@ -4,7 +4,7 @@
 
 import { Button, Classes, Tab, TabId, Tabs } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { setDockOpenState } from 'data/store/slices/uiState.slice';
+import { toggleDockOpenState } from 'data/store/slices/uiState.slice';
 import { type FC, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getLogOutputEnabled } from '../../../data/store/selectors/logging.selector';
@@ -13,23 +13,23 @@ import OperationsTable from './OperationsTable';
 import QueuesTable from './QueuesTable';
 
 import './BottomDock.scss';
+import { getDockOpenState } from '../../../data/store/selectors/uiState.selectors';
 
-interface BottomDockProps {
-    isActive: boolean;
-}
+interface BottomDockProps {}
 
-const BottomDock: FC<BottomDockProps> = ({ isActive }) => {
+const BottomDock: FC<BottomDockProps> = () => {
     const [selectedTab, setSelectedTab] = useState<TabId>('tab1');
     const dispatch = useDispatch();
 
     const isLogOutputEnabled = useSelector(getLogOutputEnabled);
+    const isDockOpen = useSelector(getDockOpenState);
 
     return (
-        <div className='dock bottom-dock'>
-            {isActive && (
+        <div className={`dock bottom-dock ${isDockOpen ? 'dock-open' : ''}`}>
+            {isDockOpen && (
                 <>
                     <Tabs
-                        key={isActive ? 'active-dock-tabs-key' : 'inactive-dock-tabs-key'}
+                        key={isDockOpen ? 'active-dock-tabs-key' : 'inactive-dock-tabs-key'}
                         id='dock-tabs'
                         selectedTabId={selectedTab}
                         onChange={setSelectedTab}
@@ -44,7 +44,7 @@ const BottomDock: FC<BottomDockProps> = ({ isActive }) => {
                         minimal
                         icon={IconNames.CROSS}
                         className='dock-close-button'
-                        onClick={() => dispatch(setDockOpenState(false))}
+                        onClick={() => dispatch(toggleDockOpenState())}
                     />
                 </>
             )}

@@ -9,10 +9,7 @@ import { useSelector } from 'react-redux';
 import { getGroupColor } from '../../data/ColorGenerator';
 import { GraphVertexType } from '../../data/GraphNames';
 import { Operation } from '../../data/GraphTypes';
-import {
-    getOperationPerformanceTreshold,
-    getShowOperationPerformanceGrid,
-} from '../../data/store/selectors/operationPerf.selectors';
+import { getOperationPerformanceTreshold } from '../../data/store/selectors/operationPerf.selectors';
 import { getHighContrastState } from '../../data/store/selectors/uiState.selectors';
 import QueueIcon from '../../main/assets/QueueIcon';
 import { calculateOpCongestionColor } from '../../utils/DrawingAPI';
@@ -89,10 +86,14 @@ export default SelectableOperation;
 interface SelectableOperationPerformanceProps {
     operation: Operation | null;
     children: React.ReactElement<typeof SelectableOperation>;
+    shouldShowOpPerformance: boolean;
 }
 
-export const SelectableOperationPerformance: FC<SelectableOperationPerformanceProps> = ({ operation, children }) => {
-    const shouldShowOpPerformance = useSelector(getShowOperationPerformanceGrid);
+export const SelectableOperationPerformance: FC<SelectableOperationPerformanceProps> = ({
+    operation,
+    children,
+    shouldShowOpPerformance,
+}) => {
     const threshold = useSelector(getOperationPerformanceTreshold);
     const isHighContrast: boolean = useSelector(getHighContrastState);
     const shouldRenderColor = shouldShowOpPerformance && operation?.details != null;
