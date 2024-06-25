@@ -5,9 +5,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
 
-export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksStateCongestionByNode[nodeUid];
-
 export const getEthLinkStateListForNode = createSelector(
     (state: RootState) => state.linkSaturation.linksPerTemporalEpoch,
     (linksPerEpoch) => (temporalEpoch: number, nodeUid: string) => {
