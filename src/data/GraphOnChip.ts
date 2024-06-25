@@ -1034,9 +1034,6 @@ export abstract class NetworkLink {
             saturation: 0,
             maxBandwidth: this.maxBandwidth,
             type: this.type,
-            ...((this.name === EthernetLinkName.ETH_IN || this.name === EthernetLinkName.ETH_OUT) && {
-                ethDirection: this.name,
-            }),
         } as LinkState;
     }
 }
@@ -1157,6 +1154,7 @@ export class ComputeNode {
             }
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
+                node.ethLinkNames.push(linkName);
             }
             if (link.type === LinkType.PCIE) {
                 node.internalLinks.set(linkName, link as PCIeLink);
@@ -1232,6 +1230,8 @@ export class ComputeNode {
     public links: Map<any, NOCLink> = new Map();
 
     public nocLinks: NOCLink[] = [];
+
+    public ethLinkNames: string[] = [];
 
     public offchipLinkIds: string[] = [];
 

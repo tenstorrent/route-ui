@@ -4,7 +4,7 @@
 
 import type { RelativeRoutingType } from 'react-router-dom';
 import type { GraphVertexType } from './GraphNames';
-import { type EthernetLinkName, LinkType } from './Types';
+import { LinkType } from './Types';
 
 export interface ExperimentalFeaturesState {}
 
@@ -54,13 +54,11 @@ export interface NodeSelectionState {
 
 export interface LinkState {
     id: string;
-    ethDirection?: EthernetLinkName;
     totalDataBytes: number;
     bpc: number;
     saturation: number;
     maxBandwidth: number;
     type: LinkType;
-    normalizedSaturation: number;
 }
 
 export interface LinkGraphState {
