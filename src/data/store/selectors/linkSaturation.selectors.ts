@@ -8,21 +8,6 @@ import { RootState } from '../createStore';
 export const getNodeLinksData = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksStateCongestionByNode[nodeUid];
 
-export const getLinkSaturarionState = (temporalEpoch: number, nodeUid: string, linkUid: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksStateCongestionByNode[nodeUid]?.linksByLinkId[
-        linkUid
-    ];
-
-export const getLinkStaturationStateList = createSelector(
-    (state: RootState) => state.linkSaturation.linksPerTemporalEpoch,
-    (linksPerEpoch) => (temporalEpoch: number, nodeUid: string, linkUidList: string[]) =>
-        Object.fromEntries(
-            Object.entries(
-                linksPerEpoch[temporalEpoch]?.linksStateCongestionByNode[nodeUid]?.linksByLinkId ?? {},
-            )?.filter(([linkUid]) => linkUidList.includes(linkUid)),
-        ),
-);
-
 export const getEthLinkStateListForNode = createSelector(
     (state: RootState) => state.linkSaturation.linksPerTemporalEpoch,
     (linksPerEpoch) => (temporalEpoch: number, nodeUid: string) => {
