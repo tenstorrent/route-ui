@@ -42,7 +42,6 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                         <DetailedViewNOCRouterRenderer
                                             links={noc0links}
                                             temporalEpoch={temporalEpoch}
-                                            nodeUid={node.uid}
                                             label='NOC0'
                                         />
                                     </div>
@@ -50,7 +49,6 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                         <DetailedViewNOCRouterRenderer
                                             links={noc1links}
                                             temporalEpoch={temporalEpoch}
-                                            nodeUid={node.uid}
                                             label='NOC1'
                                         />
                                     </div>
@@ -61,7 +59,6 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                         <DetailedViewPipeRenderer
                                             links={internalNOCLinks}
                                             temporalEpoch={temporalEpoch}
-                                            nodeUid={node.uid}
                                         />
                                     </div>
                                 </div>
@@ -76,7 +73,6 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                             <DetailedViewPipeRenderer
                                 links={internalNOCLinks}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
                                 className='centered-svg'
                             />
                         </div>

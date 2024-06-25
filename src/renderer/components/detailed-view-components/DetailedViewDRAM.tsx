@@ -61,7 +61,6 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                         return (
                             <div
                                 key={subchannel.subchannelId}
-                                // prettier-ignore
                                 className={`subchannel ${node.dramSubchannelId === subchannel.subchannelId ? 'current' : ''}`}
                             >
                                 {dram.subchannels.length > 1 && (
@@ -98,13 +97,11 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                             links={noc0links}
                                             temporalEpoch={temporalEpoch}
                                             label='NOC0'
-                                            nodeUid={node.uid}
                                         />
                                         <DetailedViewNOC2AXIRender
                                             links={subchannel.links}
                                             temporalEpoch={temporalEpoch}
                                             noc={NOC.NOC0}
-                                            nodeUid={node.uid}
                                         />
                                     </div>
                                     <div className='col noc1'>
@@ -112,13 +109,11 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                             links={noc1links}
                                             temporalEpoch={temporalEpoch}
                                             label='NOC1'
-                                            nodeUid={node.uid}
                                         />
                                         <DetailedViewNOC2AXIRender
                                             links={subchannel.links}
                                             temporalEpoch={temporalEpoch}
                                             noc={NOC.NOC1}
-                                            nodeUid={node.uid}
                                         />
                                     </div>
                                 </div>
@@ -137,14 +132,12 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                             <DetailedViewAXIRender
                                 links={dram.links}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM0_INOUT}
                                 label='AXI DRAM0'
                             />
                             <DetailedViewAXIRender
                                 links={dram.links}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
                                 filter={DramBankLinkName.DRAM1_INOUT}
                                 label='AXI DRAM1'
                             />
@@ -154,7 +147,6 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                         <DetailedViewAXIRender
                             links={dram.links}
                             temporalEpoch={temporalEpoch}
-                            nodeUid={node.uid}
                             filter={DramBankLinkName.DRAM_INOUT}
                             label='Off-chip DRAM'
                         />
