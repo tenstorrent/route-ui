@@ -87,13 +87,7 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
-                            <LinkDetails
-                                key={link.name}
-                                nodeUid={node.uid}
-                                temporalEpoch={temporalEpoch}
-                                link={link}
-                                showEmpty={false}
-                            />
+                            <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
                         );
                     })}
                 </div>

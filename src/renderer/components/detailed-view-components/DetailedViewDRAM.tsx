@@ -169,7 +169,6 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
-                                    nodeUid={n.uid}
                                     temporalEpoch={temporalEpoch}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
@@ -183,20 +182,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
-                                nodeUid={node.uid}
                                 temporalEpoch={temporalEpoch}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails
-                            key={link.name}
-                            nodeUid={node.uid}
-                            temporalEpoch={temporalEpoch}
-                            link={link}
-                            showEmpty={false}
-                        />
+                        <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
                     ))}
                 </div>
             </div>
