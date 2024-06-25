@@ -62,7 +62,7 @@ const linkSaturationSlice = createSlice({
                                 linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
                             }
                             const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
-                                calculateLinkSaturationMetrics({
+                                INTERNAL_calculateLinkSaturationMetrics({
                                     link: linkState,
                                     totalOpCycles: totalOps,
                                     linkListByLinkId: links,
@@ -120,7 +120,7 @@ const linkSaturationSlice = createSlice({
                             }
 
                             const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
-                                calculateLinkSaturationMetrics({
+                                INTERNAL_calculateLinkSaturationMetrics({
                                     link: linkState,
                                     totalOpCycles: totalOpPerChip[chipId],
                                     linkListByLinkId: links,
@@ -175,7 +175,7 @@ const updateDRAMLinks = (state: NetworkCongestionState) => {
                     if (linkState.type === LinkType.DRAM) {
                         linkState.maxBandwidth = DRAMBandwidthBytes / CLKHz;
                         const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
-                            calculateLinkSaturationMetrics({
+                            INTERNAL_calculateLinkSaturationMetrics({
                                 link: linkState,
                                 totalOpCycles: epochState.totalOps,
                                 linkListByLinkId: links,
@@ -203,7 +203,7 @@ const updatePCILinks = (state: NetworkCongestionState) => {
                     if (linkState.type === LinkType.PCIE) {
                         linkState.maxBandwidth = PCIBandwidthGBs / CLKHz;
                         const { bpc, linkSaturation, maxLinkSaturation, offchipMaxSaturation } =
-                            calculateLinkSaturationMetrics({
+                            INTERNAL_calculateLinkSaturationMetrics({
                                 link: linkState,
                                 totalOpCycles: epochState.totalOps,
                                 linkListByLinkId: links,
@@ -221,19 +221,19 @@ const updatePCILinks = (state: NetworkCongestionState) => {
     });
 };
 
-interface LinkStaturationMetrics {
+interface INTERNAL_LinkStaturationMetrics {
     link: LinkState;
     totalOpCycles: number;
     linkListByLinkId: Record<string, LinkState>;
     offchipLinkIds: string[];
 }
 
-const calculateLinkSaturationMetrics = ({
+const INTERNAL_calculateLinkSaturationMetrics = ({
     link,
     totalOpCycles,
     linkListByLinkId,
     offchipLinkIds,
-}: LinkStaturationMetrics) => {
+}: INTERNAL_LinkStaturationMetrics) => {
     const newLinkSaturation = (link.bpc / link.maxBandwidth) * 100;
 
     return {
@@ -260,6 +260,87 @@ const calculateLinkSaturationMetrics = ({
             },
         ),
     };
+};
+
+interface LinkSaturationMetrics {
+    linkType: LinkType;
+    totalOps: number;
+    DRAMBandwidth: number;
+    PCIBandwidth: number;
+    CLKMHz: number;
+    totalDataBytes: number;
+}
+
+export const calculateLinkSaturationMetrics = ({
+    linkType,
+    totalOps,
+    DRAMBandwidth,
+    CLKMHz,
+    PCIBandwidth,
+    totalDataBytes,
+}: LinkSaturationMetrics) => {
+    const DRAMBandwidthBytes = DRAMBandwidth * 1000 * 1000 * 1000;
+    const PCIBandwidthGBs = PCIBandwidth * 1000 * 1000 * 1000;
+    const CLKHz = CLKMHz * 1000 * 1000;
+
+    let maxBandwidth = 0;
+
+    if (linkType === LinkType.ETHERNET) {
+        maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
+    } else if (linkType === LinkType.DRAM) {
+        maxBandwidth = DRAMBandwidthBytes / CLKHz;
+    } else if (linkType === LinkType.PCIE) {
+        maxBandwidth = PCIBandwidthGBs / CLKHz;
+    }
+
+    let bpc = totalDataBytes / totalOps;
+
+    // Handle division by zero
+    if (Number.isNaN(bpc) || Math.abs(bpc) === Infinity) {
+        bpc = 0;
+    }
+
+    let saturation = (bpc / maxBandwidth) * 100;
+
+    // Handle division by zero
+    if (Number.isNaN(saturation) || Math.abs(saturation) === Infinity) {
+        saturation = 0;
+    }
+
+    return {
+        saturation,
+        bpc,
+        maxBandwidth,
+    };
+};
+
+export const calculateMaxLinkSaturation = (
+    linkUid: string,
+    linkSaturation: number,
+    linkListByLinkId: Record<string, LinkState>,
+) => {
+    return Object.entries(linkListByLinkId).reduce((updatedSaturation, [linkId, { saturation }]) => {
+        if (linkId !== linkUid) {
+            return Math.max(updatedSaturation, saturation);
+        }
+
+        return updatedSaturation;
+    }, linkSaturation);
+};
+
+export const calculateOffchipMaxSaturation = (
+    linkUid: string,
+    linkSaturation: number,
+    linkListByLinkId: Record<string, LinkState>,
+    offchipLinkIds: string[],
+) => {
+    return Object.entries(linkListByLinkId).reduce((updatedSaturation, [linkId, { saturation }]) => {
+        if (linkId !== linkUid && offchipLinkIds.includes(linkId)) {
+            return Math.max(updatedSaturation, saturation);
+        }
+
+        return updatedSaturation;
+    }, linkSaturation);
 };
 
 const calculateNormalizedSaturation = (link: LinkState, normalizedOpCycles: number) => {
