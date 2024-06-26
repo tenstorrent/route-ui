@@ -23,7 +23,6 @@ import OperationGroupRender from './node-grid-elements-components/OperationGroup
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
 import { ClusterChip } from '../../data/Cluster';
 import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
-import { getOffchipLinkSaturationForNode } from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import AsyncComponent from './AsyncRenderer';
@@ -41,7 +40,6 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
 
-    const offchipLinkSaturation = useSelector(getOffchipLinkSaturationForNode(temporalEpoch, node.uid));
     const showOpNames = useSelector(getShowOperationNames);
 
     // Use the top border to determine if the label should be shown.
@@ -106,7 +104,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             {/* Congestion information */}
             <AsyncComponent renderer={() => <OperationCongestionLayer node={node} />} loadingContent='' />
             <AsyncComponent
-                renderer={() => <OffChipNodeLinkCongestionLayer offchipLinkSaturation={offchipLinkSaturation} />}
+                renderer={() => (
+                    <OffChipNodeLinkCongestionLayer
+                        temporalEpoch={temporalEpoch}
+                        offchipLinkIds={node.offchipLinkIds}
+                        links={node.links}
+                    />
+                )}
                 loadingContent=''
             />
 

@@ -4,9 +4,6 @@
 
 import { RootState } from '../createStore';
 
-export const getOffchipLinkSaturationForNode = (temporalEpoch: number, nodeUid: string) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.linksStateCongestionByNode[nodeUid]
-        ?.offchipMaxSaturation ?? 0;
 export const getTotalOpsForGraph = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOps || 0;
 export const getEpochNormalizedTotalOps = (temporalEpoch: number) => (state: RootState) =>
