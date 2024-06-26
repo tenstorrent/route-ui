@@ -107,8 +107,11 @@ const usePerfAnalyzerFileLoader = () => {
                         totalOps: 0,
                         normalizedTotalOps: 0,
                         initialNormalizedTotalOps: 0,
+                        chipTotalOps: [],
                     };
                 }
+
+                linkDataByTemporalEpoch[graph.temporalEpoch].chipTotalOps[graph.chipId] = graphOnChip.totalOpCycles;
 
                 const { totalOps: totalOpsPerEpoch } = linkDataByTemporalEpoch[graph.temporalEpoch];
 
