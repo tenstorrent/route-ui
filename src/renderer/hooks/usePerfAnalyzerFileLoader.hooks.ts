@@ -104,28 +104,19 @@ const usePerfAnalyzerFileLoader = () => {
 
                 if (!linkDataByTemporalEpoch[graph.temporalEpoch]) {
                     linkDataByTemporalEpoch[graph.temporalEpoch] = {
-                        linksStateCongestionByNode: {},
-                        totalOpPerChip: [],
                         totalOps: 0,
                         normalizedTotalOps: 0,
                         initialNormalizedTotalOps: 0,
                     };
                 }
 
-                const { linksStateCongestionByNode, totalOps: totalOpsPerEpoch } =
-                    linkDataByTemporalEpoch[graph.temporalEpoch];
-
-                linkDataByTemporalEpoch[graph.temporalEpoch].linksStateCongestionByNode = {
-                    ...linksStateCongestionByNode,
-                    ...graphOnChip.getAllLinksInitialState(),
-                };
+                const { totalOps: totalOpsPerEpoch } = linkDataByTemporalEpoch[graph.temporalEpoch];
 
                 const ops = totalOpsPerEpoch ?? 1;
                 const totalOps = Math.max(graphOnChip.totalOpCycles, ops);
                 linkDataByTemporalEpoch[graph.temporalEpoch].initialNormalizedTotalOps = totalOps;
                 linkDataByTemporalEpoch[graph.temporalEpoch].normalizedTotalOps = totalOps;
                 linkDataByTemporalEpoch[graph.temporalEpoch].totalOps = totalOps;
-                linkDataByTemporalEpoch[graph.temporalEpoch].totalOpPerChip[graph.chipId] = graphOnChip.totalOpCycles;
 
                 graphOnChipList.push(graphOnChip);
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());

@@ -3,19 +3,21 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import * as d3 from 'd3';
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { CLUSTER_ETH_POSITION, EthernetLinkName } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
-    getEthLinkStateListForNode,
+    getEpochNormalizedTotalOps,
     getLinkSaturation,
     getShowLinkSaturation,
+    getTotalOpsForGraph,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
+import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
 
 interface EthPipeRendererProps {
     id: string;
@@ -24,7 +26,7 @@ interface EthPipeRendererProps {
     ethPosition: CLUSTER_ETH_POSITION;
     index: number;
     clusterChipSize: number;
-    normalizedSaturation: boolean;
+    showNormalizedSaturation: boolean;
 }
 
 const EthPipeRenderer: FC<EthPipeRendererProps> = ({
@@ -34,60 +36,92 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     ethPosition,
     index,
     clusterChipSize,
-    normalizedSaturation,
+    showNormalizedSaturation,
 }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
     const selectedPipeIds = useSelector(getSelectedPipesIds);
 
     const { x, y } = calculateEthPosition(ethPosition, index);
 
-    const nodePipeIn = !node
-        ? []
-        : node
-              .getInternalLinksForNode()
-              .filter((link) => link.name === EthernetLinkName.ETH_IN)
-              .map((link) => link.pipes)
-              .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
-              .flat();
+    const nodePipeIn = useMemo(
+        () =>
+            !node
+                ? []
+                : node
+                      .getInternalLinksForNode()
+                      .filter((link) => link.name === EthernetLinkName.ETH_IN)
+                      .map((link) => link.pipes)
+                      .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
+                      .flat(),
+        [node],
+    );
 
-    const nodePipeOut = !node
-        ? []
-        : node
-              .getInternalLinksForNode()
-              .filter((link) => link.name === EthernetLinkName.ETH_OUT)
-              .map((link) => link.pipes)
-              .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
-              .flat();
+    const nodePipeOut = useMemo(
+        () =>
+            !node
+                ? []
+                : node
+                      .getInternalLinksForNode()
+                      .filter((link) => link.name === EthernetLinkName.ETH_OUT)
+                      .map((link) => link.pipes)
+                      .map((pipe) => pipe.map((pipeSegment) => pipeSegment.id))
+                      .flat(),
+        [node],
+    );
     const size = clusterChipSize / CLUSTER_NODE_GRID_SIZE - 5; // grid, 5 gap
 
     const focusPipeId = useSelector(getFocusPipe);
 
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
-    const linksData = useSelector(getEthLinkStateListForNode)(temporalEpoch, node?.uid ?? '');
     const isHighContrast = useSelector(getHighContrastState);
+    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const normalizedTotalOps = useSelector(getEpochNormalizedTotalOps(temporalEpoch));
 
     useEffect(() => {
         if (svgRef.current) {
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
-            if (showLinkSaturation && linksData) {
-                Object.values(linksData).forEach((linkState) => {
-                    if (normalizedSaturation) {
-                        if (linkState && linkState.normalizedSaturation >= linkSaturationTreshold) {
-                            const color = calculateLinkCongestionColor(
-                                linkState.normalizedSaturation,
-                                0,
-                                isHighContrast,
-                            );
-                            drawEthLink(svg, ethPosition, linkState.ethDirection!, size, color, 6);
+
+            if (showLinkSaturation && (node?.ethLinkNames ?? []).length > 0) {
+                node?.ethLinkNames.forEach((linkName) => {
+                    const link = node.links.get(linkName);
+
+                    if (link) {
+                        // Set all to 0 as we are not using them here.
+                        const unusedProperties = {
+                            DRAMBandwidth: 0,
+                            CLKMHz: 0,
+                            PCIBandwidth: 0,
+                        };
+
+                        const { saturation } = calculateLinkSaturationMetrics({
+                            ...unusedProperties,
+                            totalOps,
+                            linkType: link.type,
+                            totalDataBytes: link.totalDataBytes,
+                        });
+
+                        if (showNormalizedSaturation) {
+                            const { saturation: normalizedSaturation } = calculateLinkSaturationMetrics({
+                                ...unusedProperties,
+                                totalOps: normalizedTotalOps,
+                                linkType: link.type,
+                                totalDataBytes: link.totalDataBytes,
+                            });
+
+                            if (link && normalizedSaturation >= linkSaturationTreshold) {
+                                const color = calculateLinkCongestionColor(normalizedSaturation, 0, isHighContrast);
+                                drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
+                            }
+                        } else if (link && saturation >= linkSaturationTreshold) {
+                            const color = calculateLinkCongestionColor(saturation, 0, isHighContrast);
+                            drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
                         }
-                    } else if (linkState && linkState.saturation >= linkSaturationTreshold) {
-                        const color = calculateLinkCongestionColor(linkState.saturation, 0, isHighContrast);
-                        drawEthLink(svg, ethPosition, linkState.ethDirection!, size, color, 6);
                     }
                 });
             }
+
             if (focusPipeId) {
                 drawEthPipes(
                     svg,
@@ -120,16 +154,21 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                 );
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        //
         nodePipeIn,
         nodePipeOut,
         focusPipeId,
         selectedPipeIds,
         showLinkSaturation,
         linkSaturationTreshold,
-        linksData,
+        node?.ethLinkNames,
+        node?.links,
+        showNormalizedSaturation,
+        isHighContrast,
+        ethPosition,
+        size,
+        totalOps,
+        normalizedTotalOps,
     ]);
 
     return (

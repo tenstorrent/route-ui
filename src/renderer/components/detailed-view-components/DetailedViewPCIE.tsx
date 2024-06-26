@@ -41,13 +41,11 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                             <DetailedViewNOCRouterRenderer
                                 links={noc0links}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
                                 label='NOC0'
                             />
                             <DetailedViewNOC2AXIRender
                                 links={noc0axi ? [noc0axi] : []}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
                                 noc={NOC.ANY}
                             />
                         </div>
@@ -55,13 +53,11 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                             <DetailedViewNOCRouterRenderer
                                 links={noc1links}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
                                 label='NOC1'
                             />
                             <DetailedViewNOC2AXIRender
                                 links={noc1axi ? [noc1axi] : []}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
                                 noc={NOC.ANY}
                             />
                         </div>
@@ -76,7 +72,6 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                         <DetailedViewAXIRender
                             links={offChipPCIe ? [offChipPCIe] : []}
                             temporalEpoch={temporalEpoch}
-                            nodeUid={node.uid}
                             filter={null}
                             label='PCIe'
                         />
@@ -87,13 +82,7 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
-                            <LinkDetails
-                                key={link.name}
-                                nodeUid={node.uid}
-                                temporalEpoch={temporalEpoch}
-                                link={link}
-                                showEmpty={false}
-                            />
+                            <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
                         );
                     })}
                 </div>
