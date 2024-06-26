@@ -13,23 +13,24 @@ import {
     getCLKMhz,
     getDRAMBandwidth,
     getPCIBandwidth,
-    getTotalOpsForGraph,
+    getTotalOps,
 } from '../../data/store/selectors/linkSaturation.selectors';
 import { calculateLinkSaturationMetrics } from '../../data/store/slices/linkSaturation.slice';
 
 type LinkDetailsProps = {
     temporalEpoch: number;
+    chipId?: number;
     link: NetworkLink;
     index?: number;
     showEmpty?: boolean;
 };
 
-const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, showEmpty, index }) => {
+const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, chipId, showEmpty, index }) => {
     const isHighContrast = useSelector(getHighContrastState);
     const DRAMBandwidth = useSelector(getDRAMBandwidth);
     const PCIBandwidth = useSelector(getPCIBandwidth);
     const CLKMHz = useSelector(getCLKMhz);
-    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const totalOps = useSelector(getTotalOps(temporalEpoch, chipId));
 
     const { bpc, saturation, maxBandwidth } = calculateLinkSaturationMetrics({
         DRAMBandwidth,
@@ -78,6 +79,7 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, showEmpt
     );
 };
 LinkDetails.defaultProps = {
+    chipId: undefined,
     showEmpty: true,
     index: -1,
 };

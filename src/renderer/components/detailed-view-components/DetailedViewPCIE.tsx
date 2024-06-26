@@ -13,9 +13,10 @@ import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedView
 interface DetailedViewPCIERendererProps {
     node: ComputeNode;
     temporalEpoch: number;
+    chipId?: number;
 }
 
-const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, temporalEpoch }) => {
+const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, temporalEpoch, chipId }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -82,13 +83,23 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
-                            <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
+                            <LinkDetails
+                                key={link.name}
+                                temporalEpoch={temporalEpoch}
+                                chipId={chipId}
+                                link={link}
+                                showEmpty={false}
+                            />
                         );
                     })}
                 </div>
             </div>
         </>
     );
+};
+
+DetailedViewPCIERenderer.defaultProps = {
+    chipId: undefined,
 };
 
 export default DetailedViewPCIERenderer;

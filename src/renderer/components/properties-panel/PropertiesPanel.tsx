@@ -28,7 +28,7 @@ export default function PropertiesPanel() {
                 <Tab
                     id='tab-nodes'
                     title='Nodes'
-                    panel={<ComputeNodesPropertiesTab graphs={graphOnChipList} epoch={epoch} />}
+                    panel={<ComputeNodesPropertiesTab graphs={graphOnChipList} epoch={epoch} chipId={chipId} />}
                 />
                 <Tab
                     id='tab-pipes'
