@@ -15,12 +15,14 @@ import {
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
-import type { NOCLink } from '../../../data/GraphOnChip';
+import type { DramBankLink, NetworkLink } from '../../../data/GraphOnChip';
+import { ComputeNodeType } from '../../../data/Types';
 
 interface OffChipNodeLinkCongestionLayerProps {
     temporalEpoch: number;
-    links: Map<any, NOCLink>;
-    offchipLinkIds: string[];
+    nodeType: ComputeNodeType;
+    dramLinks?: DramBankLink[];
+    internalLinks?: Map<any, NetworkLink>;
 }
 
 /**
@@ -28,8 +30,9 @@ interface OffChipNodeLinkCongestionLayerProps {
  */
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({
     temporalEpoch,
-    links,
-    offchipLinkIds,
+    nodeType,
+    dramLinks,
+    internalLinks,
 }) => {
     const linkSaturationThreshold = useSelector(getLinkSaturation);
     const isHighContrast = useSelector(getHighContrastState);
@@ -38,28 +41,36 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
     const PCIBandwidth = useSelector(getPCIBandwidth);
     const CLKMHz = useSelector(getCLKMhz);
     const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const links = useMemo(() => {
+        let resolvedLinks: DramBankLink[] | NetworkLink[] = [];
 
-    const offchipLinkSaturation = useMemo(
-        () =>
-            [...links.entries()].reduce((maxSaturation, [linkId, link]) => {
-                if (offchipLinkIds.includes(linkId)) {
-                    const { saturation } = calculateLinkSaturationMetrics({
-                        DRAMBandwidth,
-                        PCIBandwidth,
-                        CLKMHz,
-                        linkType: link.type,
-                        totalDataBytes: link.totalDataBytes,
-                        totalOps,
+        if (nodeType === ComputeNodeType.DRAM) {
+            resolvedLinks = dramLinks ?? [];
+        }
+
+        if (nodeType === ComputeNodeType.ETHERNET || nodeType === ComputeNodeType.PCIE) {
+            resolvedLinks = [...(internalLinks ?? []).values()];
+        }
+
+        return resolvedLinks;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const offchipLinkSaturation = useMemo(() => {
+        return links.reduce((maxSaturation, link) => {
+            const { saturation } = calculateLinkSaturationMetrics({
+                DRAMBandwidth,
+                PCIBandwidth,
+                CLKMHz,
+                linkType: link.type,
+                totalDataBytes: link.totalDataBytes,
+                totalOps,
                 initialMaxBandwidth: link.maxBandwidth,
-                    });
+            });
 
-                    return Math.max(maxSaturation, saturation);
-                }
-
-                return maxSaturation;
-            }, 0),
-        [CLKMHz, DRAMBandwidth, PCIBandwidth, links, offchipLinkIds, totalOps],
-    );
+            return Math.max(maxSaturation, saturation);
+        }, 0);
+    }, [CLKMHz, DRAMBandwidth, PCIBandwidth, links, totalOps]);
 
     let congestionStyle = {};
 
@@ -70,6 +81,11 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
     }
 
     return <div className='off-chip-congestion' style={congestionStyle} />;
+};
+
+OffChipNodeLinkCongestionLayer.defaultProps = {
+    internalLinks: undefined,
+    dramLinks: undefined,
 };
 
 export default OffChipNodeLinkCongestionLayer;

@@ -107,8 +107,9 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
                 renderer={() => (
                     <OffChipNodeLinkCongestionLayer
                         temporalEpoch={temporalEpoch}
-                        offchipLinkIds={node.offchipLinkIds}
-                        links={node.links}
+                        nodeType={node.type}
+                        internalLinks={node.internalLinks}
+                        dramLinks={node.dramChannel?.links}
                     />
                 )}
                 loadingContent=''
