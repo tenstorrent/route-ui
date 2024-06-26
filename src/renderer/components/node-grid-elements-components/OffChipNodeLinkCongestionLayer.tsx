@@ -10,7 +10,7 @@ import {
     getLinkSaturation,
     getPCIBandwidth,
     getShowLinkSaturation,
-    getTotalOpsForGraph,
+    getTotalOps,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
@@ -20,6 +20,7 @@ import { ComputeNodeType } from '../../../data/Types';
 
 interface OffChipNodeLinkCongestionLayerProps {
     temporalEpoch: number;
+    chipId?: number;
     nodeType: ComputeNodeType;
     dramLinks?: DramBankLink[];
     internalLinks?: Map<any, NetworkLink>;
@@ -30,6 +31,7 @@ interface OffChipNodeLinkCongestionLayerProps {
  */
 const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = ({
     temporalEpoch,
+    chipId,
     nodeType,
     dramLinks,
     internalLinks,
@@ -40,7 +42,7 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
     const DRAMBandwidth = useSelector(getDRAMBandwidth);
     const PCIBandwidth = useSelector(getPCIBandwidth);
     const CLKMHz = useSelector(getCLKMhz);
-    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const totalOps = useSelector(getTotalOps(temporalEpoch, chipId));
     const links = useMemo(() => {
         let resolvedLinks: DramBankLink[] | NetworkLink[] = [];
 
@@ -84,6 +86,7 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
 };
 
 OffChipNodeLinkCongestionLayer.defaultProps = {
+    chipId: undefined,
     internalLinks: undefined,
     dramLinks: undefined,
 };

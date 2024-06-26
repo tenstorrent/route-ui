@@ -30,10 +30,11 @@ import AsyncComponent from './AsyncRenderer';
 interface NodeGridElementProps {
     node: ComputeNode;
     temporalEpoch: number;
+    currentChipId?: number;
     connectedEth?: ClusterChip | null;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, connectedEth }) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, currentChipId, connectedEth }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
@@ -107,6 +108,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
                 renderer={() => (
                     <OffChipNodeLinkCongestionLayer
                         temporalEpoch={temporalEpoch}
+                        chipId={currentChipId}
                         nodeType={node.type}
                         internalLinks={node.internalLinks}
                         dramLinks={node.dramChannel?.links}
@@ -123,7 +125,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             <AsyncComponent
                 renderer={() => (
                     <>
-                        <NodePipeRenderer node={node} temporalEpoch={temporalEpoch} />
+                        <NodePipeRenderer node={node} temporalEpoch={temporalEpoch} chipId={currentChipId} />
                         <NodeFocusPipeRenderer node={node} />
                     </>
                 )}
@@ -136,6 +138,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     );
 };
 NodeGridElement.defaultProps = {
+    currentChipId: undefined,
     connectedEth: null,
 };
 export default NodeGridElement;
