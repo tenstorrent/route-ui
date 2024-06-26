@@ -12,7 +12,7 @@ import {
     getEpochNormalizedTotalOps,
     getLinkSaturation,
     getShowLinkSaturation,
-    getTotalOpsForGraph,
+    getTotalOps,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
@@ -75,7 +75,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const isHighContrast = useSelector(getHighContrastState);
-    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const totalOps = useSelector(getTotalOps(temporalEpoch));
     const normalizedTotalOps = useSelector(getEpochNormalizedTotalOps(temporalEpoch));
 
     useEffect(() => {
