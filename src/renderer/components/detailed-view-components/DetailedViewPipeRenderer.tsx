@@ -83,6 +83,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
                         linkType: link.type,
                         totalDataBytes: link.totalDataBytes,
                         totalOps,
+                        initialMaxBandwidth: link.maxBandwidth,
                     });
 
                     if (saturation >= linkSaturationTreshold) {

@@ -80,6 +80,7 @@ interface LinkSaturationMetrics {
     PCIBandwidth: number;
     CLKMHz: number;
     totalDataBytes: number;
+    initialMaxBandwidth: number;
 }
 
 export const calculateLinkSaturationMetrics = ({
@@ -89,12 +90,13 @@ export const calculateLinkSaturationMetrics = ({
     CLKMHz,
     PCIBandwidth,
     totalDataBytes,
+    initialMaxBandwidth,
 }: LinkSaturationMetrics) => {
     const DRAMBandwidthBytes = DRAMBandwidth * 1000 * 1000 * 1000;
     const PCIBandwidthGBs = PCIBandwidth * 1000 * 1000 * 1000;
     const CLKHz = CLKMHz * 1000 * 1000;
 
-    let maxBandwidth = 0;
+    let maxBandwidth = initialMaxBandwidth;
 
     if (linkType === LinkType.ETHERNET) {
         maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;

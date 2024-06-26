@@ -38,6 +38,7 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, showEmpt
         totalOps,
         linkType: link.type,
         totalDataBytes: link.totalDataBytes,
+        initialMaxBandwidth: link.maxBandwidth,
     });
 
     const color: string = calculateLinkCongestionColor(saturation || 0, 0, isHighContrast);

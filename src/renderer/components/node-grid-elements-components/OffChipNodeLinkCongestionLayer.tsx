@@ -50,6 +50,7 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
                         linkType: link.type,
                         totalDataBytes: link.totalDataBytes,
                         totalOps,
+                initialMaxBandwidth: link.maxBandwidth,
                     });
 
                     return Math.max(maxSaturation, saturation);

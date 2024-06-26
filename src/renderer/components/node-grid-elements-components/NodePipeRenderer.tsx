@@ -84,6 +84,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch }) =>
                         DRAMBandwidth,
                         PCIBandwidth,
                         totalOps,
+                        initialMaxBandwidth: link.maxBandwidth,
                     });
 
                     if (saturation >= linkSaturationTreshold) {

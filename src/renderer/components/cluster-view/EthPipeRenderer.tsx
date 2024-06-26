@@ -100,6 +100,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                             totalOps,
                             linkType: link.type,
                             totalDataBytes: link.totalDataBytes,
+                            initialMaxBandwidth: link.maxBandwidth,
                         });
 
                         if (showNormalizedSaturation) {
@@ -108,6 +109,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                                 totalOps: normalizedTotalOps,
                                 linkType: link.type,
                                 totalDataBytes: link.totalDataBytes,
+                                initialMaxBandwidth: link.maxBandwidth,
                             });
 
                             if (link && normalizedSaturation >= linkSaturationTreshold) {
