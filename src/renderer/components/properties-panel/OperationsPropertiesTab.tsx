@@ -17,7 +17,13 @@ import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { Operation } from '../../../data/GraphTypes';
 
-const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
+const OperationsPropertiesTab = ({
+    graphs,
+    chipId,
+}: {
+    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
+    chipId?: number;
+}) => {
     const dispatch = useDispatch();
 
     const [filterQuery, setFilterQuery] = useState<string>('');
@@ -27,12 +33,15 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
                 .reduce((opMap, { graphOnChip }) => {
                     [...graphOnChip.operations].forEach((op) => {
                         if (!opMap.has(op.name)) {
-                            opMap.set(op.name, op);
+                            opMap.set(op.name, {
+                                operation: op,
+                                chipId: graphOnChip.chipId,
+                            });
                         }
                     });
 
                     return opMap;
-                }, new Map<string, Operation>())
+                }, new Map<string, { operation: Operation; chipId: number }>())
                 .values(),
         ],
         [graphs],
@@ -45,7 +54,7 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
         }
 
         const filter = filterQuery.toLowerCase();
-        const operands = operationsList.reduce<string[]>((filteredOperands, { name }) => {
+        const operands = operationsList.reduce<string[]>((filteredOperands, { operation: { name } }) => {
             if (name.toLowerCase().includes(filter)) {
                 filteredOperands.push(name);
             }
@@ -85,7 +94,7 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
                 <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
             <div className='properties-list'>
-                {operationsList.map((operation, index) => {
+                {operationsList.map(({ operation, chipId: opChipId }, index) => {
                     return (
                         <FilterableComponent
                             // eslint-disable-next-line react/no-array-index-key
@@ -99,6 +108,7 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
                                             operand={operation}
                                             stringFilter={filterQuery}
                                             showType={false}
+                                            isOffchip={chipId === undefined ? false : chipId !== opChipId}
                                         />
                                     }
                                     isOpen={allOpen}
@@ -112,6 +122,10 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
             </div>
         </div>
     );
+};
+
+OperationsPropertiesTab.defaultProps = {
+    chipId: undefined,
 };
 
 export default OperationsPropertiesTab;

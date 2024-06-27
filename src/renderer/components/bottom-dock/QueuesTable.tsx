@@ -60,6 +60,7 @@ function QueuesTable() {
 
     const queueCellRenderer = (rowIndex: number) => {
         const queueName = tableFields[rowIndex].name;
+        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
 
         return queueName ? (
             <SelectableOperation
@@ -68,6 +69,8 @@ function QueuesTable() {
                 selectFunc={selectOperand}
                 stringFilter=''
                 type={GraphVertexType.QUEUE}
+                offchip={isOffchip}
+                offchipClickHandler={navigateToGraph(queueName)}
             />
         ) : (
             ''
