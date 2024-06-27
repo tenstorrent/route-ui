@@ -88,35 +88,17 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                     const link = node.links.get(linkName);
 
                     if (link) {
-                        // Set all to 0 as we are not using them here.
-                        const unusedProperties = {
+                        const { saturation } = calculateLinkSaturationMetrics({
                             DRAMBandwidth: 0,
                             CLKMHz: 0,
                             PCIBandwidth: 0,
-                        };
-
-                        const { saturation } = calculateLinkSaturationMetrics({
-                            ...unusedProperties,
-                            totalOps,
+                            totalOps: showNormalizedSaturation ? normalizedTotalOps : totalOps,
                             linkType: link.type,
                             totalDataBytes: link.totalDataBytes,
                             initialMaxBandwidth: link.maxBandwidth,
                         });
 
-                        if (showNormalizedSaturation) {
-                            const { saturation: normalizedSaturation } = calculateLinkSaturationMetrics({
-                                ...unusedProperties,
-                                totalOps: normalizedTotalOps,
-                                linkType: link.type,
-                                totalDataBytes: link.totalDataBytes,
-                                initialMaxBandwidth: link.maxBandwidth,
-                            });
-
-                            if (link && normalizedSaturation >= linkSaturationTreshold) {
-                                const color = calculateLinkCongestionColor(normalizedSaturation, 0, isHighContrast);
-                                drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
-                            }
-                        } else if (link && saturation >= linkSaturationTreshold) {
+                        if (link && saturation >= linkSaturationTreshold) {
                             const color = calculateLinkCongestionColor(saturation, 0, isHighContrast);
                             drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
                         }
