@@ -8,6 +8,8 @@ export const getTotalOps = (temporalEpoch: number, chipId?: number) => (state: R
     (chipId !== undefined
         ? state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.chipTotalOps?.[chipId]
         : state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOps) || 0;
+export const getTotalOpsList = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch].chipTotalOps;
 export const getEpochNormalizedTotalOps = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch].normalizedTotalOps;
 

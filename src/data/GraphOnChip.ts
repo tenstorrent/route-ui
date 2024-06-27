@@ -1038,20 +1038,21 @@ export class ComputeNode {
 
         Object.entries(nodeJSON.links).forEach(([linkName, linkJson], index) => {
             const link: NetworkLink = NetworkLink.CREATE(linkName as NOCLinkName, `${linkId}-${index}`, linkJson);
+
             if (link.type === LinkType.NOC) {
                 // Added a const here to avoid casting multiple times
                 const nocLink = link as NOCLink;
 
-                node.links.set(linkName, nocLink);
-
                 if (nocLink.noc === NOC.NOC0 || nocLink.noc === NOC.NOC1) {
-                    node.nocLinks.push(nocLink);
+                    node.nocLinks.set(linkName, nocLink);
                 }
             }
+
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
-                node.ethLinkNames.push(linkName);
+                node.ethLinks.set(linkName, link as EthernetLink);
             }
+
             if (link.type === LinkType.PCIE) {
                 node.internalLinks.set(linkName, link as PCIeLink);
             }
@@ -1059,6 +1060,8 @@ export class ComputeNode {
             if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
                 node.externalPipes.push(...link.pipes);
             }
+
+            node.links.set(linkName, link);
         });
 
         // Associate with operation
@@ -1095,11 +1098,11 @@ export class ComputeNode {
 
     public opCycles: number = 0;
 
-    public links: Map<any, NOCLink> = new Map();
+    public links = new Map<string, NOCLink | EthernetLink | PCIeLink>();
 
-    public nocLinks: NOCLink[] = [];
+    public nocLinks = new Map<string, NOCLink>();
 
-    public ethLinkNames: string[] = [];
+    public ethLinks = new Map<string, EthernetLink>();
 
     /** @description Off chip links that are not part of the NOC, excluding DRAM links */
     public internalLinks: Map<any, NetworkLink> = new Map();
@@ -1177,7 +1180,7 @@ export class ComputeNode {
      * @description Returns the links for node in the order defined by the NOC.
      */
     public getNOCLinksForNode = (): NOCLink[] => {
-        return [...this.links.values()].sort((a, b) => {
+        return [...this.nocLinks.values()].sort((a, b) => {
             const firstKeyOrder = GraphOnChip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
             const secondKeyOrder = GraphOnChip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
             return firstKeyOrder - secondKeyOrder;
