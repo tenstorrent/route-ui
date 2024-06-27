@@ -84,7 +84,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
             svg.selectAll('*').remove();
 
             if (showLinkSaturation) {
-                node?.ethLinks.forEach((link) => {
+                node?.ethLinks?.forEach((link) => {
                     const { saturation } = calculateLinkSaturationMetrics({
                         DRAMBandwidth: 0,
                         CLKMHz: 0,
