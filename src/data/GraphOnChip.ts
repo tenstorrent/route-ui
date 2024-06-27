@@ -1050,7 +1050,7 @@ export class ComputeNode {
 
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
-                node.ehtLinks.set(linkName, link as EthernetLink);
+                node.ethLinks.set(linkName, link as EthernetLink);
             }
 
             if (link.type === LinkType.PCIE) {
@@ -1102,7 +1102,7 @@ export class ComputeNode {
 
     public nocLinks = new Map<string, NOCLink>();
 
-    public ehtLinks = new Map<string, EthernetLink>();
+    public ethLinks = new Map<string, EthernetLink>();
 
     /** @description Off chip links that are not part of the NOC, excluding DRAM links */
     public internalLinks: Map<any, NetworkLink> = new Map();
