@@ -97,7 +97,7 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; g
                                     <GraphVertexDetailsSelectables
                                         operand={queue}
                                         stringFilter={filterQuery}
-                                        displayType={false}
+                                        showType={false}
                                     />
                                 }
                                 isOpen={allOpen}

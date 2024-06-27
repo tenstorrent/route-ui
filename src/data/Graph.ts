@@ -16,8 +16,6 @@ export abstract class AbstractGraphVertex implements Operand {
 
     abstract readonly vertexType: GraphVertexType;
 
-    abstract get isOffchip(): boolean;
-
     protected inputOperands: Operand[];
 
     protected outputOperands: Operand[];
@@ -136,11 +134,6 @@ export abstract class AbstractGraphVertex implements Operand {
 export class BuildableQueue extends AbstractGraphVertex implements Queue {
     readonly vertexType = GraphVertexType.QUEUE;
 
-    get isOffchip(): boolean {
-        // TODO: requires implementation
-        return false;
-    }
-
     details?: QueueDetailsJson;
 }
 
@@ -184,8 +177,11 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         if (core.type !== ComputeNodeType.CORE) {
             throw new Error(`Can't assign the non-core ${core.uid} to an operation (${this.name})`);
         }
+
         core.operation = this;
+
         if (this._cores.includes(core)) {
+            // eslint-disable-next-line no-console
             console.warn(
                 `Assigning core ${core.uid} to operation ${this.name}; core is already assigned to this operation.`,
             );
@@ -195,11 +191,7 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     }
 
     get cores() {
-        return this._cores.values();
-    }
-
-    get isOffchip(): boolean {
-        return this._cores.length === 0;
+        return [...this._cores.values()];
     }
 }
 
@@ -223,6 +215,4 @@ export interface Operand {
     getAllPipeIds(): Iterable<string[]>;
 
     isConnected(): boolean;
-
-    isOffchip: boolean;
 }

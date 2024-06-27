@@ -98,7 +98,7 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
                                         <GraphVertexDetailsSelectables
                                             operand={operation}
                                             stringFilter={filterQuery}
-                                            displayType={false}
+                                            showType={false}
                                         />
                                     }
                                     isOpen={allOpen}

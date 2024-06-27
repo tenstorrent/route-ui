@@ -42,6 +42,7 @@ function QueuesTable() {
                             queueMap.set(queue.name, {
                                 name: queue.name,
                                 ...queue.details,
+                                chipId: graphOnChip.chipId,
                             } as unknown as QueuesTableFields);
                         }
                     });
@@ -75,6 +76,7 @@ function QueuesTable() {
 
     const inputCellRenderer = (rowIndex: number) => {
         const { input } = tableFields[rowIndex];
+        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
 
         if (input === 'HOST') {
             return 'HOST';
@@ -93,7 +95,7 @@ function QueuesTable() {
                 stringFilter=''
                 value={selected(operandDescriptor.name)}
                 type={operandDescriptor.type}
-                offchip={operandDescriptor.operand.isOffchip}
+                offchip={isOffchip}
                 offchipClickHandler={navigateToGraph(operandDescriptor.name)}
             />
         );

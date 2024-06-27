@@ -642,7 +642,7 @@ export default class GraphOnChip {
                     queue.assignOutputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
                 } else if (newChip.operationsByName.has(operand.name)) {
                     const op = newChip.operationsByName.get(operand.name);
-                    if (op?.isOffchip) {
+                    if (op?.cores.length === 0) {
                         const operation = newChip.operationsByName.get(opName);
                         operation?.assignInputs([newChip.createOperand(operand.name, GraphVertexType.OPERATION)]);
                     }
@@ -659,7 +659,7 @@ export default class GraphOnChip {
                     queue.assignInputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
                 } else if (newChip.operationsByName.has(operand.name)) {
                     const op = newChip.operationsByName.get(operand.name);
-                    if (op?.isOffchip) {
+                    if (op?.cores.length === 0) {
                         const operation = newChip.operationsByName.get(opName);
                         operation?.assignOutputs([newChip.createOperand(operand.name, GraphVertexType.OPERATION)]);
                     }

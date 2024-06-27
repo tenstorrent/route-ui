@@ -67,25 +67,27 @@ function OperationsTable() {
         }
 
         if (selectedOperation) {
-            list = [...selectedOperation.cores].map((core: ComputeNode) => {
+            list = selectedOperation.cores.map((core: ComputeNode) => {
                 return {
                     name: core.opName,
                     ...core.perfAnalyzerResults,
                     core_id: core.uid,
                     slowestOperandRef: core.operation?.slowestOperand,
+                    chipId: core.chipId,
                 } as OpTableFields;
             });
         } else {
             list = [
                 ...graphOnChipList
-                    .reduce((opMap, { graphOnChip: { operations } }) => {
-                        [...operations].forEach((op) => {
+                    .reduce((opMap, { graphOnChip }) => {
+                        [...graphOnChip.operations].forEach((op) => {
                             if (!opMap.has(op.name)) {
                                 opMap.set(op.name, {
                                     operation: op,
                                     name: op.name,
                                     ...op.details,
                                     slowestOperandRef: op.slowestOperand,
+                                    chipId: graphOnChip.chipId,
                                 } as unknown as OpTableFields);
                             }
                         });
@@ -119,7 +121,7 @@ function OperationsTable() {
 
     const operationCellRenderer = (rowIndex: number) => {
         const opName = tableFields[rowIndex].name;
-        const operation = tableFields[rowIndex].operation || null;
+        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
 
         return (
             <span className='operand-wrapper'>
@@ -134,14 +136,14 @@ function OperationsTable() {
                             selectFunc={selectOperand}
                             stringFilter={filterQuery}
                             type={GraphVertexType.OPERATION}
-                            offchip={chipId !== undefined && operation?.isOffchip}
+                            offchip={isOffchip}
                             offchipClickHandler={navigateToGraph(opName)}
                         >
                             <Button
                                 style={{ height: '18px' }}
                                 small
                                 minimal
-                                disabled={operation?.isOffchip}
+                                disabled={isOffchip}
                                 title={selectedOperationName ? 'Back to operations view' : 'View operation cores'}
                                 icon={selectedOperationName ? IconNames.ARROW_LEFT : IconNames.ARROW_RIGHT}
                                 onClick={() => setSelectedOperationName(selectedOperationName ? '' : opName)}
@@ -181,6 +183,7 @@ function OperationsTable() {
     const slowestOperandCellRenderer = (rowIndex: number) => {
         const slowOpString = tableFields[rowIndex].slowest_operand;
         const slowestOperand = tableFields[rowIndex].slowestOperandRef;
+        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
 
         if (slowestOperand) {
             const type: GraphVertexType = slowestOperand.vertexType;
@@ -201,14 +204,14 @@ function OperationsTable() {
                             selectFunc={selectOperand}
                             stringFilter=''
                             type={slowestOperand.vertexType}
-                            offchip={chipId !== undefined && slowestOperand.isOffchip}
+                            offchip={isOffchip}
                             offchipClickHandler={navigateToGraph(slowestOperand.name)}
                         >
                             <Button
                                 style={{ height: '18px' }}
                                 small
                                 minimal
-                                disabled={slowestOperand.isOffchip}
+                                disabled={isOffchip}
                                 icon={IconNames.ARROW_RIGHT}
                                 onClick={() => {
                                     setSelectedOperationName(slowestOperand.name);
