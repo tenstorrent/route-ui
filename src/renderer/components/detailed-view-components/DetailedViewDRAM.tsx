@@ -96,11 +96,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                         <DetailedViewNOCRouterRenderer
                                             links={noc0links}
                                             temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
                                             label='NOC0'
                                         />
                                         <DetailedViewNOC2AXIRender
                                             links={subchannel.links}
                                             temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
                                             noc={NOC.NOC0}
                                         />
                                     </div>
@@ -108,11 +110,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                         <DetailedViewNOCRouterRenderer
                                             links={noc1links}
                                             temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
                                             label='NOC1'
                                         />
                                         <DetailedViewNOC2AXIRender
                                             links={subchannel.links}
                                             temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
                                             noc={NOC.NOC1}
                                         />
                                     </div>
@@ -132,12 +136,14 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                             <DetailedViewAXIRender
                                 links={dram.links}
                                 temporalEpoch={temporalEpoch}
+                                chipId={graphOnChip?.chipId}
                                 filter={DramBankLinkName.DRAM0_INOUT}
                                 label='AXI DRAM0'
                             />
                             <DetailedViewAXIRender
                                 links={dram.links}
                                 temporalEpoch={temporalEpoch}
+                                chipId={graphOnChip?.chipId}
                                 filter={DramBankLinkName.DRAM1_INOUT}
                                 label='AXI DRAM1'
                             />
@@ -147,6 +153,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                         <DetailedViewAXIRender
                             links={dram.links}
                             temporalEpoch={temporalEpoch}
+                            chipId={graphOnChip?.chipId}
                             filter={DramBankLinkName.DRAM_INOUT}
                             label='Off-chip DRAM'
                         />
@@ -162,6 +169,7 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                     key={link.name}
                                     link={link}
                                     temporalEpoch={temporalEpoch}
+                                    chipId={graphOnChip?.chipId}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
                                 />
@@ -175,12 +183,19 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
                                 temporalEpoch={temporalEpoch}
+                                chipId={graphOnChip?.chipId}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} temporalEpoch={temporalEpoch} link={link} showEmpty={false} />
+                        <LinkDetails
+                            key={link.name}
+                            temporalEpoch={temporalEpoch}
+                            chipId={graphOnChip?.chipId}
+                            link={link}
+                            showEmpty={false}
+                        />
                     ))}
                 </div>
             </div>

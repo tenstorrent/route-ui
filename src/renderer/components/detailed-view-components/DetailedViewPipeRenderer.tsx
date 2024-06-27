@@ -25,15 +25,16 @@ import {
     getShowLinkSaturation,
     getShowNOC0,
     getShowNOC1,
-    getTotalOpsForGraph,
+    getTotalOps,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
     temporalEpoch: number;
+    chipId?: number;
     className?: string;
     size?: number;
 };
@@ -41,6 +42,7 @@ type DetailedViewPipeRendererProps = {
 const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     links,
     temporalEpoch,
+    chipId,
     className,
     size = 80,
 }) => {
@@ -54,7 +56,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     const DRAMBandwidth = useSelector(getDRAMBandwidth);
     const PCIBandwidth = useSelector(getPCIBandwidth);
     const CLKMHz = useSelector(getCLKMhz);
-    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const totalOps = useSelector(getTotalOps(temporalEpoch, chipId));
 
     // TODO: see if useLayoutEffect is better in a future
     useEffect(() => {
@@ -83,6 +85,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
                         linkType: link.type,
                         totalDataBytes: link.totalDataBytes,
                         totalOps,
+                        initialMaxBandwidth: link.maxBandwidth,
                     });
 
                     if (saturation >= linkSaturationTreshold) {
@@ -139,6 +142,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     );
 };
 DetailedViewPipeRenderer.defaultProps = {
+    chipId: undefined,
     className: '',
     size: 80,
 };

@@ -1061,34 +1061,6 @@ export class ComputeNode {
             }
         });
 
-        let offChipLinkIds: string[] = [];
-
-        switch (node.type) {
-            case ComputeNodeType.DRAM:
-                offChipLinkIds =
-                    node.dramChannel?.links.map((l) => {
-                        return l.uid;
-                    }) || [];
-                break;
-            case ComputeNodeType.ETHERNET:
-                offChipLinkIds =
-                    [...node.internalLinks.values()].map((l) => {
-                        return l.uid;
-                    }) || [];
-                break;
-
-            case ComputeNodeType.PCIE:
-                offChipLinkIds =
-                    [...node.internalLinks].map(([l]) => {
-                        return l.uid;
-                    }) || [];
-                break;
-            default:
-                break;
-        }
-
-        node.offchipLinkIds = offChipLinkIds;
-
         // Associate with operation
         const opName: OperationName = nodeJSON.op_name;
         if (opName) {
@@ -1128,8 +1100,6 @@ export class ComputeNode {
     public nocLinks: NOCLink[] = [];
 
     public ethLinkNames: string[] = [];
-
-    public offchipLinkIds: string[] = [];
 
     /** @description Off chip links that are not part of the NOC, excluding DRAM links */
     public internalLinks: Map<any, NetworkLink> = new Map();

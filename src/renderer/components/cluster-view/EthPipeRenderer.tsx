@@ -12,12 +12,12 @@ import {
     getEpochNormalizedTotalOps,
     getLinkSaturation,
     getShowLinkSaturation,
-    getTotalOpsForGraph,
+    getTotalOps,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 interface EthPipeRendererProps {
     id: string;
@@ -75,7 +75,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const isHighContrast = useSelector(getHighContrastState);
-    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const totalOps = useSelector(getTotalOps(temporalEpoch));
     const normalizedTotalOps = useSelector(getEpochNormalizedTotalOps(temporalEpoch));
 
     useEffect(() => {
@@ -88,33 +88,17 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                     const link = node.links.get(linkName);
 
                     if (link) {
-                        // Set all to 0 as we are not using them here.
-                        const unusedProperties = {
+                        const { saturation } = calculateLinkSaturationMetrics({
                             DRAMBandwidth: 0,
                             CLKMHz: 0,
                             PCIBandwidth: 0,
-                        };
-
-                        const { saturation } = calculateLinkSaturationMetrics({
-                            ...unusedProperties,
-                            totalOps,
+                            totalOps: showNormalizedSaturation ? normalizedTotalOps : totalOps,
                             linkType: link.type,
                             totalDataBytes: link.totalDataBytes,
+                            initialMaxBandwidth: link.maxBandwidth,
                         });
 
-                        if (showNormalizedSaturation) {
-                            const { saturation: normalizedSaturation } = calculateLinkSaturationMetrics({
-                                ...unusedProperties,
-                                totalOps: normalizedTotalOps,
-                                linkType: link.type,
-                                totalDataBytes: link.totalDataBytes,
-                            });
-
-                            if (link && normalizedSaturation >= linkSaturationTreshold) {
-                                const color = calculateLinkCongestionColor(normalizedSaturation, 0, isHighContrast);
-                                drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
-                            }
-                        } else if (link && saturation >= linkSaturationTreshold) {
+                        if (link && saturation >= linkSaturationTreshold) {
                             const color = calculateLinkCongestionColor(saturation, 0, isHighContrast);
                             drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
                         }

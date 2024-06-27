@@ -72,6 +72,7 @@ export default function GridRender() {
                                             <NodeGridElement
                                                 node={node}
                                                 temporalEpoch={epoch}
+                                                currentChipId={chipId}
                                                 key={node.uid}
                                                 connectedEth={clusterChip?.connectedChipsByEthId.get(node.uid) || null}
                                             />

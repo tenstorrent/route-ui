@@ -23,7 +23,7 @@ import {
     getCLKMhz,
     getDRAMBandwidth,
     getPCIBandwidth,
-    getTotalOpsForGraph,
+    getTotalOps,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import type { LocationState } from '../../../data/StateTypes';
 
@@ -39,7 +39,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);
     const PCIeBandwidth = useSelector(getPCIBandwidth);
-    const opCycles = useSelector(getTotalOpsForGraph(epoch));
+    const opCycles = useSelector(getTotalOps(epoch, chipId));
     const totalOpCycles = graphOnChipList.reduce(
         (totalOps, { graphOnChip }) => Math.max(totalOps, graphOnChip.totalOpCycles),
         1,
@@ -52,7 +52,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                     minimal
                     onClick={() => {
                         requestAnimationFrame(() =>
-                            dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: totalOpCycles })),
+                            dispatch(updateTotalOPs({ temporalEpoch: epoch, chipId, totalOps: totalOpCycles })),
                         );
                     }}
                     icon={IconNames.RESET}
@@ -98,7 +98,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                         }
 
                         requestAnimationFrame(() =>
-                            dispatch(updateTotalOPs({ temporalEpoch: epoch, totalOps: newValue })),
+                            dispatch(updateTotalOPs({ temporalEpoch: epoch, chipId, totalOps: newValue })),
                         );
                     }}
                     rightElement={aiclkRightElement}

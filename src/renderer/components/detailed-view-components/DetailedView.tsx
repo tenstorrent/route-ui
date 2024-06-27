@@ -79,10 +79,18 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                                             />
                                         )}
                                         {node.type === ComputeNodeType.ETHERNET && (
-                                            <DetailedViewETHRenderer node={node} temporalEpoch={temporalEpoch} />
+                                            <DetailedViewETHRenderer
+                                                node={node}
+                                                temporalEpoch={temporalEpoch}
+                                                chipId={chipId}
+                                            />
                                         )}
                                         {node.type === ComputeNodeType.PCIE && (
-                                            <DetailedViewPCIERenderer node={node} temporalEpoch={temporalEpoch} />
+                                            <DetailedViewPCIERenderer
+                                                node={node}
+                                                temporalEpoch={temporalEpoch}
+                                                chipId={chipId}
+                                            />
                                         )}
                                     </div>
                                 );

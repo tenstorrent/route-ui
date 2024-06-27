@@ -55,6 +55,7 @@ export interface NetworkCongestionState {
     linkSaturationTreshold: number;
     linksPerTemporalEpoch: {
         totalOps: number;
+        chipTotalOps: number[];
         normalizedTotalOps: number;
         initialNormalizedTotalOps: number;
     }[];

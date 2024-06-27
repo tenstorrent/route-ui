@@ -30,6 +30,7 @@ import type { GraphRelationship } from '../../../data/StateTypes';
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
+    chipId?: number;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -117,7 +118,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
@@ -340,7 +341,13 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} temporalEpoch={temporalEpoch} showEmpty />
+                        <LinkDetails
+                            key={link.name}
+                            link={link}
+                            temporalEpoch={temporalEpoch}
+                            chipId={chipId}
+                            showEmpty
+                        />
                     ))}
                 </div>
             )}
@@ -348,12 +355,18 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
     );
 };
 
+ComputeNodePropertiesCard.defaultProps = {
+    chipId: undefined,
+};
+
 const ComputeNodesPropertiesTab = ({
     graphs,
     epoch,
+    chipId,
 }: {
     graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
     epoch: number;
+    chipId?: number;
 }) => {
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
     const selectedNodes = useMemo(
@@ -375,12 +388,16 @@ const ComputeNodesPropertiesTab = ({
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
                     {selectedNodes.map((node) => (
-                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} />
+                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} chipId={chipId} />
                     ))}
                 </div>
             </div>
         </div>
     );
+};
+
+ComputeNodesPropertiesTab.defaultProps = {
+    chipId: undefined,
 };
 
 export default ComputeNodesPropertiesTab;
