@@ -29,7 +29,7 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];

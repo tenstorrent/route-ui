@@ -17,7 +17,7 @@ import {
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 interface EthPipeRendererProps {
     id: string;

@@ -27,7 +27,7 @@ import {
     drawNOCRouter,
     drawSelections,
 } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 interface NodePipeRendererProps {
     node: ComputeNode;

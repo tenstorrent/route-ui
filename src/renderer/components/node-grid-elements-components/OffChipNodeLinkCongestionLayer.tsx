@@ -14,7 +14,7 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
-import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 import type { DramBankLink, NetworkLink } from '../../../data/GraphOnChip';
 import { ComputeNodeType } from '../../../data/Types';
 

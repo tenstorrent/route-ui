@@ -15,7 +15,7 @@ import {
     getPCIBandwidth,
     getTotalOps,
 } from '../../data/store/selectors/linkSaturation.selectors';
-import { calculateLinkSaturationMetrics } from '../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../utils/linkSaturation';
 
 type LinkDetailsProps = {
     temporalEpoch: number;
