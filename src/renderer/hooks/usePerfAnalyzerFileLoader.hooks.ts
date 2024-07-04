@@ -24,6 +24,7 @@ import type { NodeInitialState } from '../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import type {
     FolderLocationType,
+    GraphRelationship,
     LocationState,
     NavigateOptions,
     NetworkCongestionState,
@@ -72,17 +73,19 @@ const usePerfAnalyzerFileLoader = () => {
         return folderPath;
     };
 
-    const loadFolder = async (folderPath: string): Promise<void> => {
+    const loadFolder = async (folderPath: string) => {
         resetGraphOnChipState();
         dispatch(resetPipeSelection());
         dispatch(resetNetworksState());
         setError(null);
         dispatch(setIsLoadingFolder(true));
 
+        let graphs: GraphRelationship[] = [];
+
         try {
             // TODO: needs gone once we are happy with performance
             const entireRunStartTime = performance.now();
-            const graphs = await getAvailableGraphNames(folderPath);
+            graphs = await getAvailableGraphNames(folderPath);
 
             if (!graphs.length) {
                 throw new Error(`No graphs found in\n${folderPath}`);
@@ -158,6 +161,8 @@ const usePerfAnalyzerFileLoader = () => {
 
         setCluster(await loadCluster(folderPath));
         dispatch(setIsLoadingFolder(false));
+
+        return graphs;
     };
 
     const loadPerfAnalyzerGraph = (graphName: string) => {
@@ -206,13 +211,15 @@ const usePerfAnalyzerFileLoader = () => {
     const loadPerfAnalyzerFolder = async (
         folderPath?: string | null,
         folderLocationType: FolderLocationType = 'local',
-    ): Promise<void> => {
+    ) => {
         if (folderPath) {
             dispatch(setApplicationMode(ApplicationMode.PERF_ANALYZER));
             dispatch(setSelectedFolderLocationType(folderLocationType));
 
-            await loadFolder(folderPath);
+            return loadFolder(folderPath);
         }
+
+        return [] as GraphRelationship[];
     };
 
     return {

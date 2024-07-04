@@ -48,7 +48,7 @@ const TopHeaderComponent: React.FC = () => {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch: temporalEpoch } = location.state;
 
-    const { resetGraphOnChipState, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
+    const { getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
     const graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
 
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =
@@ -78,11 +78,8 @@ const TopHeaderComponent: React.FC = () => {
             dispatch(setSelectedRemoteFolder(newFolder));
         }
 
-        // TODO: do we need this call?
-        resetGraphOnChipState();
-
         if (checkLocalFolderExists(folderPath)) {
-            await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
+            const [firstGraph] = await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
 
             if (newFolderLocationType === 'local') {
                 sendEventToMain(ElectronEvents.UPDATE_WINDOW_TITLE, `(Local Folder) — ${getTestName(folderPath)}`);
@@ -92,6 +89,14 @@ const TopHeaderComponent: React.FC = () => {
                     formatRemoteFolderName(remoteConnectionConfig.selectedConnection, newFolder as RemoteFolder),
                 );
             }
+
+            navigate('/render', {
+                state: {
+                    epoch: firstGraph?.temporalEpoch ?? 0,
+                    chipId: firstGraph?.chipId ?? 0,
+                    graphName: firstGraph?.name ?? '',
+                },
+            });
         }
     };
 
