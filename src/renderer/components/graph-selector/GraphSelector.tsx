@@ -42,7 +42,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                     <Menu>
                         {temporalEpochs.map(([temporalEpoch, graphRelationships], index) => (
                             <React.Fragment key={temporalEpoch}>
-                                {IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED && (
+                                {IS_TEMPORAL_EPOCH_NAVIGATION_ENABLED && graphRelationships.length > 1 && (
                                     <>
                                         {index > 0 && <MenuDivider />}
                                         <MenuItem
