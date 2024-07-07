@@ -36,6 +36,22 @@
         }
 
     }
+
+    .details-loading {
+        width: 640px;
+        height: 340px;
+        display: grid;
+        place-content: center;
+        gap: 15px;
+
+        .bp4-spinner .bp4-spinner-track {
+            stroke: rgba(0, 0, 0, 0.2);
+        }
+
+        .bp4-spinner .bp4-spinner-head {
+            stroke: $tt-medium-light-gray;
+        }
+    }
 }
 
 .detailed-view-wrap {

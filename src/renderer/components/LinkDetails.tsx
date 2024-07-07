@@ -9,26 +9,45 @@ import { NetworkLink, PipeSegment, convertBytes, formatToBytesPerCycle } from '.
 import { calculateLinkCongestionColor } from '../../utils/DrawingAPI';
 import ProgressBar from './ProgressBar';
 import SelectablePipe from './SelectablePipe';
-import { getLinkSaturarionState } from '../../data/store/selectors/linkSaturation.selectors';
+import {
+    getCLKMhz,
+    getDRAMBandwidth,
+    getPCIBandwidth,
+    getTotalOpsForGraph,
+} from '../../data/store/selectors/linkSaturation.selectors';
+import { calculateLinkSaturationMetrics } from '../../data/store/slices/linkSaturation.slice';
 
 type LinkDetailsProps = {
     temporalEpoch: number;
-    nodeUid: string;
     link: NetworkLink;
     index?: number;
     showEmpty?: boolean;
 };
 
-const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, nodeUid, showEmpty, index }) => {
+const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, showEmpty, index }) => {
     const isHighContrast = useSelector(getHighContrastState);
-    const linkState = useSelector(getLinkSaturarionState(temporalEpoch, nodeUid, link.uid));
-    const color: string = calculateLinkCongestionColor(linkState?.saturation || 0, 0, isHighContrast);
+    const DRAMBandwidth = useSelector(getDRAMBandwidth);
+    const PCIBandwidth = useSelector(getPCIBandwidth);
+    const CLKMHz = useSelector(getCLKMhz);
+    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+
+    const { bpc, saturation, maxBandwidth } = calculateLinkSaturationMetrics({
+        DRAMBandwidth,
+        PCIBandwidth,
+        CLKMHz,
+        totalOps,
+        linkType: link.type,
+        totalDataBytes: link.totalDataBytes,
+    });
+
+    const color: string = calculateLinkCongestionColor(saturation || 0, 0, isHighContrast);
 
     if (!showEmpty) {
         if (link.totalDataBytes === 0) {
             return null;
         }
     }
+
     return (
         <div key={link.name}>
             <h5 className={`link-title-details ${link.totalDataBytes === 0 ? 'inactive' : ''}`}>
@@ -39,13 +58,13 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, nodeUid,
                     </span>
                     <br />
                     <span>
-                        {formatToBytesPerCycle(linkState?.bpc || 0, 2)}
+                        {formatToBytesPerCycle(bpc || 0, 2)}
                         &nbsp;of&nbsp;
-                        {formatToBytesPerCycle(linkState?.maxBandwidth)}
-                        <span style={{ color }}> {linkState?.saturation.toFixed(2)}%</span>
+                        {formatToBytesPerCycle(maxBandwidth)}
+                        <span style={{ color }}> {saturation.toFixed(2)}%</span>
                     </span>
                 </span>
-                {link.totalDataBytes > 0 && <ProgressBar percent={linkState?.saturation || 0} color={color} />}
+                {link.totalDataBytes > 0 && <ProgressBar percent={saturation || 0} color={color} />}
             </h5>
             <ul className='node-pipelist'>
                 {link.pipes.map((pipeSegment: PipeSegment) => (

@@ -139,7 +139,7 @@
         .panel-overlay { display: block; }
     }
 
-    &.detailed-view-open {
+    &:has( .detailed-view-open) {
         grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
@@ -148,8 +148,8 @@
         ;
     }
 
-    &.dock-open {
-        grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
+    &:has( .dock-open) {
+        grid-template-rows: $top-bar-height auto 340px;
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
@@ -184,70 +184,6 @@
         grid-template-columns: $sidebar-width $controls-panel-width auto calc($properties-panel-width + 30px);
 
         .main-content { width: auto; }
-    }
-}
-
-.outer-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-
-
-    .dock {
-        margin: 0 20px;
-        width: calc(100% - 40px);
-        height: 0px;
-        overflow: hidden;
-    }
-
-    $dock-height: 420px;
-
-    &.dock-open {
-        .dock {
-            height: $dock-height - 20px;
-            bottom: 0;
-        }
-
-        .main-wrapper {
-            height: calc(100vh - $dock-height);
-            overflow: hidden;
-        }
-
-        .grid-container {
-            height: calc(100vh - 10px - $dock-height);
-        }
-
-        .properties-panel {
-            margin-block-end: 10px;
-        }
-
-        .properties-panel-nodes {
-            max-height: calc(100vh - 70px - $dock-height);
-        }
-
-        .list-wrap {
-            max-height: calc(100vh - 150px - $dock-height);
-        }
-
-        .properties-panel__content .list-wrap {
-            max-height: calc(100vh - 120px - $dock-height);
-        }
-
-        .inner-sidebar {
-            max-height: calc(100vh - 20px - $dock-height);
-        }
-    }
-
-    &.detailed-view-open {
-        .inner-sidebar {
-            max-height: calc(100vh - 640px);
-        }
-
-        .grid-container {
-            height: calc(100vh - 640px);
-        }
     }
 }
 
@@ -333,10 +269,20 @@
         &.loading-graph {
             width: 1000px;
             height: 1300px;
-            place-items: center;
+            align-content: center;
+            justify-content: center;
+            gap: 15px;
             outline: 1px solid $tt-very-dark-gray;
-            font-size: 3em;
+            font-size: 1em;
             color: $tt-medium-light-gray;
+
+            .bp4-spinner .bp4-spinner-track {
+                stroke: $progress-bar-track;
+            }
+
+            .bp4-spinner .bp4-spinner-head {
+                stroke: $tt-medium-gray;
+            }
         }
 
         .node-item {

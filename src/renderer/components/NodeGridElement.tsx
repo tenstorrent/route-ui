@@ -12,7 +12,6 @@ import { HighlightType } from '../../data/Types';
 import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
 import {
     getDetailedViewOpenState,
-    getHighContrastState,
     getSelectedDetailsViewUID,
     getShowOperationNames,
 } from '../../data/store/selectors/uiState.selectors';
@@ -24,12 +23,6 @@ import OperationGroupRender from './node-grid-elements-components/OperationGroup
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
 import { ClusterChip } from '../../data/Cluster';
 import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
-import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
-import {
-    getNodeLinksData,
-    getOffchipLinkSaturationForNode,
-    getShowLinkSaturation,
-} from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
 import AsyncComponent from './AsyncRenderer';
@@ -46,13 +39,8 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
-    const showOperationNames = useSelector(getShowOperationNames);
-    const shouldRenderOpPerf = useSelector(getShowOperationPerformanceGrid);
-    const isHighContrast = useSelector(getHighContrastState);
-    const showLinkSaturation = useSelector(getShowLinkSaturation);
 
-    const linksData = useSelector(getNodeLinksData(temporalEpoch, node.uid));
-    const offchipLinkSaturation = useSelector(getOffchipLinkSaturationForNode(temporalEpoch, node.uid));
+    const showOpNames = useSelector(getShowOperationNames);
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -85,7 +73,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
     return (
         <button
-            title={showOperationNames && shouldShowLabel ? node.opName : ''}
+            title={showOpNames && shouldShowLabel ? node.opName : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
@@ -114,22 +102,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             <div className='node-border' />
 
             {/* Congestion information */}
-            <AsyncComponent
-                renderer={() => (
-                    <OperationCongestionLayer
-                        node={node}
-                        isHighContrast={isHighContrast}
-                        shouldRender={shouldRenderOpPerf}
-                    />
-                )}
-                loadingContent=''
-            />
+            <AsyncComponent renderer={() => <OperationCongestionLayer node={node} />} loadingContent='' />
             <AsyncComponent
                 renderer={() => (
                     <OffChipNodeLinkCongestionLayer
-                        offchipLinkSaturation={offchipLinkSaturation}
-                        showLinkSaturation={showLinkSaturation}
-                        isHighContrast={isHighContrast}
+                        temporalEpoch={temporalEpoch}
+                        offchipLinkIds={node.offchipLinkIds}
+                        links={node.links}
                     />
                 )}
                 loadingContent=''
@@ -137,18 +116,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
             {/* Labels for location and operation */}
             <NodeLocation node={node} />
-            <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
+            <NodeOperationLabel opName={node.opName} shouldRender={showOpNames && shouldShowLabel} />
 
             {/* Pipes */}
             <AsyncComponent
                 renderer={() => (
                     <>
-                        <NodePipeRenderer
-                            node={node}
-                            isHighContrast={isHighContrast}
-                            showLinkSaturation={showLinkSaturation}
-                            linksData={linksData.linksByLinkId}
-                        />
+                        <NodePipeRenderer node={node} temporalEpoch={temporalEpoch} />
                         <NodeFocusPipeRenderer node={node} />
                     </>
                 )}

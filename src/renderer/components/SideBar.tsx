@@ -6,8 +6,8 @@ import { AnchorButton, Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ApplicationMode } from 'data/Types';
-import { getApplicationMode, getDetailedViewOpenState, getDockOpenState } from 'data/store/selectors/uiState.selectors';
-import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
+import { getApplicationMode, getDetailedViewOpenState } from 'data/store/selectors/uiState.selectors';
+import { setSelectedFile, setSelectedFolder, toggleDockOpenState } from 'data/store/slices/uiState.slice';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Location, useLocation, useNavigate } from 'react-router-dom';
@@ -43,7 +43,6 @@ export const SideBar: React.FC<SideBarProps> = () => {
     const handleOpenClusterView = () => {
         dispatch(openClusterView());
     };
-    const isDockOpen = useSelector(getDockOpenState);
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
 
     const clusterViewButtonEnabled = cluster?.chips !== undefined && cluster?.chips.length > 1;
@@ -59,7 +58,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
                         disabled={isDetailsViewOpen}
                         icon={IconNames.APPLICATION}
                         text=''
-                        onClick={() => dispatch(setDockOpenState(!isDockOpen))}
+                        onClick={() => requestAnimationFrame(() => dispatch(toggleDockOpenState()))}
                     />
                 </Tooltip2>
             )}

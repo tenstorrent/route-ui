@@ -7,9 +7,18 @@ import { FC, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import { NOC, NOCLinkName } from '../../../data/Types';
-import { getLinkSaturation, getShowNOC0, getShowNOC1 } from '../../../data/store/selectors/linkSaturation.selectors';
+import {
+    getCLKMhz,
+    getDRAMBandwidth,
+    getLinkSaturation,
+    getPCIBandwidth,
+    getShowLinkSaturation,
+    getShowNOC0,
+    getShowNOC1,
+    getTotalOpsForGraph,
+} from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
-import { getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
+import { getHighContrastState, getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
 import {
     NOC_CONFIGURATION,
     NODE_SIZE,
@@ -18,18 +27,21 @@ import {
     drawNOCRouter,
     drawSelections,
 } from '../../../utils/DrawingAPI';
-import type { LinkState } from '../../../data/StateTypes';
+import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
 
 interface NodePipeRendererProps {
     node: ComputeNode;
-    linksData: Record<string, LinkState>;
-    isHighContrast: boolean;
-    showLinkSaturation: boolean;
+    temporalEpoch: number;
 }
 
-const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, linksData, isHighContrast, showLinkSaturation }) => {
+const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch }) => {
     const focusPipe = useSelector(getFocusPipe);
     const selectedPipeIds = useSelector(getSelectedPipesIds);
+    const showLinkSaturation = useSelector(getShowLinkSaturation);
+    const DRAMBandwidth = useSelector(getDRAMBandwidth);
+    const PCIBandwidth = useSelector(getPCIBandwidth);
+    const CLKMHz = useSelector(getCLKMhz);
+    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
@@ -40,6 +52,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, linksData, isHighCo
     const noc1Saturation = useSelector(getShowNOC1);
 
     const showEmptyLinks = useSelector(getShowEmptyLinks);
+    const isHighContrast = useSelector(getHighContrastState);
 
     svg.selectAll('*').remove();
 
@@ -64,24 +77,34 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, linksData, isHighCo
         if (showLinkSaturation) {
             node.nocLinks.forEach((link) => {
                 if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
-                    const linkStateData = linksData[link.uid];
+                    const { saturation } = calculateLinkSaturationMetrics({
+                        linkType: link.type,
+                        totalDataBytes: link.totalDataBytes,
+                        CLKMHz,
+                        DRAMBandwidth,
+                        PCIBandwidth,
+                        totalOps,
+                    });
 
-                    if (linkStateData && linkStateData.saturation >= linkSaturationTreshold) {
-                        const color = calculateLinkCongestionColor(linkStateData.saturation, 0, isHighContrast);
+                    if (saturation >= linkSaturationTreshold) {
+                        const color = calculateLinkCongestionColor(saturation, 0, isHighContrast);
                         drawLink(svg, link.name, color, 5);
                     }
                 }
             });
         }
     }, [
-        showLinkSaturation,
+        CLKMHz,
+        DRAMBandwidth,
+        PCIBandwidth,
+        isHighContrast,
+        linkSaturationTreshold,
         noc0Saturation,
         noc1Saturation,
-        linkSaturationTreshold,
-        linksData,
         node.nocLinks,
+        showLinkSaturation,
         svg,
-        isHighContrast,
+        totalOps,
     ]);
 
     useEffect(() => {
