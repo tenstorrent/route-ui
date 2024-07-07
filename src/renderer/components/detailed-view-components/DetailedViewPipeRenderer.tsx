@@ -18,18 +18,21 @@ import {
     PCIeLinkName,
 } from '../../../data/Types';
 import {
+    getCLKMhz,
+    getDRAMBandwidth,
     getLinkSaturation,
-    getLinkStaturationStateList,
+    getPCIBandwidth,
     getShowLinkSaturation,
     getShowNOC0,
     getShowNOC1,
+    getTotalOpsForGraph,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
+import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
-    nodeUid: string;
     temporalEpoch: number;
     className?: string;
     size?: number;
@@ -37,7 +40,6 @@ type DetailedViewPipeRendererProps = {
 
 const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     links,
-    nodeUid,
     temporalEpoch,
     className,
     size = 80,
@@ -49,11 +51,10 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     const isHighContrast = useSelector(getHighContrastState);
     const noc0Saturation = useSelector(getShowNOC0);
     const noc1Saturation = useSelector(getShowNOC1);
-    const linksState = useSelector(getLinkStaturationStateList)(
-        temporalEpoch,
-        nodeUid,
-        links.map((l) => l.uid),
-    );
+    const DRAMBandwidth = useSelector(getDRAMBandwidth);
+    const PCIBandwidth = useSelector(getPCIBandwidth);
+    const CLKMHz = useSelector(getCLKMhz);
+    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
 
     // TODO: see if useLayoutEffect is better in a future
     useEffect(() => {
@@ -62,6 +63,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
         const drawCongestion = (link: NetworkLink, linkName: NetworkLinkName) => {
             if (showLinkSaturation) {
                 let renderCongestion: boolean = false;
+
                 if (!NOC_LINK_NAMES.includes(linkName)) {
                     renderCongestion = true;
                 } else if (NOC_LINK_NAMES.includes(linkName)) {
@@ -72,13 +74,22 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
                         renderCongestion = true;
                     }
                 }
+
                 if (renderCongestion) {
-                    const linkData = linksState[link.uid];
-                    if (linkData?.saturation >= linkSaturationTreshold) {
+                    const { saturation } = calculateLinkSaturationMetrics({
+                        DRAMBandwidth,
+                        PCIBandwidth,
+                        CLKMHz,
+                        linkType: link.type,
+                        totalDataBytes: link.totalDataBytes,
+                        totalOps,
+                    });
+
+                    if (saturation >= linkSaturationTreshold) {
                         drawLink(
                             svg,
                             linkName,
-                            calculateLinkCongestionColor(linkData.saturation, 0, isHighContrast),
+                            calculateLinkCongestionColor(saturation, 0, isHighContrast),
                             5,
                             LinkRenderType.DETAILED_VIEW,
                         );
@@ -99,30 +110,22 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
             }
         });
     }, [
-        svgRef,
-        links,
-        showLinkSaturation,
+        CLKMHz,
+        DRAMBandwidth,
+        PCIBandwidth,
+        isHighContrast,
         linkSaturationTreshold,
+        links,
         noc0Saturation,
         noc1Saturation,
-        isHighContrast,
         selectedPipeIds,
-        nodeUid,
-        linksState,
+        showLinkSaturation,
+        totalOps,
     ]);
 
     const linkNames = links.map((link) => link.name).join(' ');
     return (
         <div className='pipe-renderer' data-links={linkNames}>
-            {/* DEBUGGING CODE BELOW */}
-            {/* {links.map((link) => ( */}
-            {/*   <div style={{color: '#fff'}} key={link.name}> */}
-            {/*       {link.name} - {link.numOccupants} */}
-            {/*       {link.pipes.map((pipeSegment) => ( */}
-            {/*           <div key={pipeSegment.id}>{pipeSegment.id}</div> */}
-            {/*       ))} */}
-            {/*   </div> */}
-            {/* ))} */}
             <svg
                 width={size}
                 height={size}

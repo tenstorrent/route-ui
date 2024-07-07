@@ -31,6 +31,7 @@ import SearchField from '../SearchField';
 import SelectablePipe from '../SelectablePipe';
 import LinkCongestionControls from '../grid-sidebar/LinkCongestionControl';
 import EthPipeRenderer from './EthPipeRenderer';
+import AsyncComponent from '../AsyncRenderer';
 
 const renderItem: ItemRenderer<number> = (
     temporalEpoch,
@@ -122,10 +123,10 @@ const ClusterView: FC = () => {
     };
 
     const pciPipeStateList = useSelector(getSelectedPipes(pciPipes));
-    const [normalizedSaturation, setNormalizedSaturation] = useState<boolean>(true);
+    const [showNormalizedSaturation, setShowNormalizedSaturation] = useState<boolean>(true);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const normalizedOPsInitial = useSelector(getEpochInitialNormalizedTotalOps(selectedEpoch));
-    const normalizedOPsList = useSelector(getEpochNormalizedTotalOps);
+    const normalizedOPs = useSelector(getEpochNormalizedTotalOps(selectedEpoch));
 
     return (
         <div className='cluster-view-container'>
@@ -133,11 +134,11 @@ const ClusterView: FC = () => {
                 <div className='congestion-container'>
                     <LinkCongestionControls showNOCControls={false} />
                     <Checkbox
-                        checked={normalizedSaturation}
+                        checked={showNormalizedSaturation}
                         label='Normalized congestion'
                         disabled={!showLinkSaturation}
                         onChange={(event) => {
-                            setNormalizedSaturation(event.currentTarget.checked);
+                            setShowNormalizedSaturation(event.currentTarget.checked);
                         }}
                     />
                     <div>
@@ -146,9 +147,9 @@ const ClusterView: FC = () => {
                             Normalized cycles/input
                         </label>
                         <NumericInput
-                            disabled={!showLinkSaturation || !normalizedSaturation}
+                            disabled={!showLinkSaturation || !showNormalizedSaturation}
                             id='normOpCyclesInput'
-                            value={normalizedOPsList[selectedEpoch]}
+                            value={normalizedOPs}
                             stepSize={1000}
                             minorStepSize={100}
                             majorStepSize={100000}
@@ -276,115 +277,124 @@ const ClusterView: FC = () => {
                     gridTemplateColumns: `repeat(${cluster?.totalCols || 0}, ${clusterChipSize}px)`,
                 }}
             >
-                {cluster?.chips.map((clusterChip) => {
-                    let graphOnChip: GraphOnChip | undefined;
+                {cluster?.chips.map((clusterChip) => (
+                    <AsyncComponent
+                        renderer={() => {
+                            let graphOnChip: GraphOnChip | undefined;
 
-                    availableTemporalEpochs[selectedEpoch].forEach((graph) => {
-                        const currentGraphOnChip = getGraphOnChip(graph.temporalEpoch, graph.chipId);
-                        if (currentGraphOnChip?.chipId === clusterChip.id) {
-                            graphOnChip = currentGraphOnChip;
-                        }
-                    });
+                            availableTemporalEpochs[selectedEpoch].forEach((graph) => {
+                                const currentGraphOnChip = getGraphOnChip(graph.temporalEpoch, graph.chipId);
+                                if (currentGraphOnChip?.chipId === clusterChip.id) {
+                                    graphOnChip = currentGraphOnChip;
+                                }
+                            });
 
-                    const ethPosition: Map<CLUSTER_ETH_POSITION, string[]> = new Map();
+                            const ethPosition: Map<CLUSTER_ETH_POSITION, string[]> = new Map();
 
-                    clusterChip.design?.nodes.forEach((node) => {
-                        const connectedChip = clusterChip.connectedChipsByEthId.get(node.uid);
-                        let position: CLUSTER_ETH_POSITION | null = null;
-                        if (connectedChip) {
-                            if (connectedChip?.coordinates.x < clusterChip.coordinates.x) {
-                                position = CLUSTER_ETH_POSITION.LEFT;
-                            }
-                            if (connectedChip?.coordinates.x > clusterChip.coordinates.x) {
-                                position = CLUSTER_ETH_POSITION.RIGHT;
-                            }
-                            if (connectedChip?.coordinates.y < clusterChip.coordinates.y) {
-                                position = CLUSTER_ETH_POSITION.TOP;
-                            }
-                            if (connectedChip?.coordinates.y > clusterChip.coordinates.y) {
-                                position = CLUSTER_ETH_POSITION.BOTTOM;
-                            }
-                        }
-                        if (position) {
-                            if (ethPosition.has(position)) {
-                                ethPosition.get(position)?.push(node.uid);
-                            } else {
-                                ethPosition.set(position, [node.uid]);
-                            }
-                        }
-                    });
+                            clusterChip.design?.nodes.forEach((node) => {
+                                const connectedChip = clusterChip.connectedChipsByEthId.get(node.uid);
+                                let position: CLUSTER_ETH_POSITION | null = null;
+                                if (connectedChip) {
+                                    if (connectedChip?.coordinates.x < clusterChip.coordinates.x) {
+                                        position = CLUSTER_ETH_POSITION.LEFT;
+                                    }
+                                    if (connectedChip?.coordinates.x > clusterChip.coordinates.x) {
+                                        position = CLUSTER_ETH_POSITION.RIGHT;
+                                    }
+                                    if (connectedChip?.coordinates.y < clusterChip.coordinates.y) {
+                                        position = CLUSTER_ETH_POSITION.TOP;
+                                    }
+                                    if (connectedChip?.coordinates.y > clusterChip.coordinates.y) {
+                                        position = CLUSTER_ETH_POSITION.BOTTOM;
+                                    }
+                                }
+                                if (position) {
+                                    if (ethPosition.has(position)) {
+                                        ethPosition.get(position)?.push(node.uid);
+                                    } else {
+                                        ethPosition.set(position, [node.uid]);
+                                    }
+                                }
+                            });
 
-                    return (
-                        <div
-                            className='chip'
-                            key={clusterChip.id}
-                            style={{
-                                width: `${clusterChipSize}px`,
-                                height: `${clusterChipSize}px`,
-                                gridColumn: clusterChip.coordinates.x + 1,
-                                gridRow: clusterChip.coordinates.y + 1,
-                                gridTemplateColumns: `repeat(${CLUSTER_NODE_GRID_SIZE}, 1fr)`,
-                                gridTemplateRows: `repeat(${CLUSTER_NODE_GRID_SIZE}, 1fr)`,
-                            }}
-                        >
-                            <span
-                                className='chip-id'
-                                style={{
-                                    lineHeight: `${clusterChipSize}px`,
-                                    paddingRight: `${clusterChipSize / 4}px`,
-                                    paddingTop: `${clusterChipSize / 5}px`,
-                                }}
-                            >
-                                {clusterChip.id}
-                            </span>
-
-                            {[...ethPosition.entries()].map(([position, value]) => {
-                                return value.map((uid: string, index: number) => {
-                                    const node = graphOnChip?.getNode(uid);
-                                    return (
-                                        <EthPipeRenderer
-                                            key={uid}
-                                            id={uid}
-                                            temporalEpoch={temporalEpoch}
-                                            ethPosition={position}
-                                            node={node}
-                                            index={index}
-                                            clusterChipSize={clusterChipSize}
-                                            normalizedSaturation={normalizedSaturation}
-                                        />
-                                    );
-                                });
-                            })}
-                            {clusterChip.mmio && (
+                            return (
                                 <div
+                                    className='chip'
+                                    key={clusterChip.id}
                                     style={{
-                                        gridColumn: 3,
-                                        gridRow: 3,
-                                        border: '1px solid #ff8800',
-                                        fontSize: '10px',
-                                        color: '#fff',
-                                        textAlign: 'center',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        gap: '5px',
+                                        width: `${clusterChipSize}px`,
+                                        height: `${clusterChipSize}px`,
+                                        gridColumn: clusterChip.coordinates.x + 1,
+                                        gridRow: clusterChip.coordinates.y + 1,
+                                        gridTemplateColumns: `repeat(${CLUSTER_NODE_GRID_SIZE}, 1fr)`,
+                                        gridTemplateRows: `repeat(${CLUSTER_NODE_GRID_SIZE}, 1fr)`,
                                     }}
                                 >
-                                    PCIe
-                                    {pciPipeStateList.map((pipeState) => {
-                                        return (
-                                            <ColorSwatch
-                                                key={pipeState.id}
-                                                isVisible={pipeState?.selected}
-                                                color={pipeState?.selected ? getPipeColor(pipeState.id) : 'transparent'}
-                                            />
-                                        );
+                                    <span
+                                        className='chip-id'
+                                        style={{
+                                            lineHeight: `${clusterChipSize}px`,
+                                            paddingRight: `${clusterChipSize / 4}px`,
+                                            paddingTop: `${clusterChipSize / 5}px`,
+                                        }}
+                                    >
+                                        {clusterChip.id}
+                                    </span>
+
+                                    {[...ethPosition.entries()].map(([position, value]) => {
+                                        return value.map((uid: string, index: number) => {
+                                            const node = graphOnChip?.getNode(uid);
+                                            return (
+                                                <EthPipeRenderer
+                                                    key={uid}
+                                                    id={uid}
+                                                    temporalEpoch={temporalEpoch}
+                                                    ethPosition={position}
+                                                    node={node}
+                                                    index={index}
+                                                    clusterChipSize={clusterChipSize}
+                                                    showNormalizedSaturation={showNormalizedSaturation}
+                                                />
+                                            );
+                                        });
                                     })}
+                                    {clusterChip.mmio && (
+                                        <div
+                                            style={{
+                                                gridColumn: 3,
+                                                gridRow: 3,
+                                                border: '1px solid #ff8800',
+                                                fontSize: '10px',
+                                                color: '#fff',
+                                                textAlign: 'center',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                gap: '5px',
+                                            }}
+                                        >
+                                            PCIe
+                                            {pciPipeStateList.map((pipeState) => {
+                                                return (
+                                                    <ColorSwatch
+                                                        key={pipeState.id}
+                                                        isVisible={pipeState?.selected}
+                                                        color={
+                                                            pipeState?.selected
+                                                                ? getPipeColor(pipeState.id)
+                                                                : 'transparent'
+                                                        }
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    );
-                })}
+                            );
+                        }}
+                        loadingContent=''
+                    />
+                ))}
             </div>
         </div>
     );
