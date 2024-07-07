@@ -35,7 +35,6 @@ import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import type { LocationState } from '../../../data/StateTypes';
-import type { BuildableOperation } from '../../../data/Graph';
 import AsyncComponent from '../AsyncRenderer';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
@@ -55,19 +54,15 @@ function OperationsTable() {
         }
 
         let list: OpTableFields[] = [];
-        let selectedOperation: BuildableOperation | undefined;
+        const selectedOperationCores: ComputeNode[] = [];
 
         // eslint-disable-next-line no-restricted-syntax
         for (const { graphOnChip } of graphOnChipList) {
-            selectedOperation = graphOnChip.getOperation(selectedOperationName);
-
-            if (selectedOperation) {
-                break;
-            }
+            selectedOperationCores.push(...(graphOnChip.getOperation(selectedOperationName)?.cores ?? []));
         }
 
-        if (selectedOperation) {
-            list = selectedOperation.cores.map((core: ComputeNode) => {
+        if (selectedOperationCores.length > 0) {
+            list = selectedOperationCores.map((core: ComputeNode) => {
                 return {
                     name: core.opName,
                     ...core.perfAnalyzerResults,
