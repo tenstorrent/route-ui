@@ -12,7 +12,7 @@ import {
     getEpochNormalizedTotalOps,
     getLinkSaturation,
     getShowLinkSaturation,
-    getTotalOps,
+    getTotalOpsList,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
@@ -75,7 +75,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const linkSaturationTreshold = useSelector(getLinkSaturation);
     const isHighContrast = useSelector(getHighContrastState);
-    const totalOps = useSelector(getTotalOps(temporalEpoch));
+    const totalOpsList = useSelector(getTotalOpsList(temporalEpoch));
     const normalizedTotalOps = useSelector(getEpochNormalizedTotalOps(temporalEpoch));
 
     useEffect(() => {
@@ -83,25 +83,21 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
             const svg = d3.select(svgRef.current);
             svg.selectAll('*').remove();
 
-            if (showLinkSaturation && (node?.ethLinkNames ?? []).length > 0) {
-                node?.ethLinkNames.forEach((linkName) => {
-                    const link = node.links.get(linkName);
+            if (showLinkSaturation) {
+                node?.ethLinks?.forEach((link) => {
+                    const { saturation } = calculateLinkSaturationMetrics({
+                        DRAMBandwidth: 0,
+                        CLKMHz: 0,
+                        PCIBandwidth: 0,
+                        totalOps: showNormalizedSaturation ? normalizedTotalOps : totalOpsList[node.chipId],
+                        linkType: link.type,
+                        totalDataBytes: link.totalDataBytes,
+                        initialMaxBandwidth: link.maxBandwidth,
+                    });
 
-                    if (link) {
-                        const { saturation } = calculateLinkSaturationMetrics({
-                            DRAMBandwidth: 0,
-                            CLKMHz: 0,
-                            PCIBandwidth: 0,
-                            totalOps: showNormalizedSaturation ? normalizedTotalOps : totalOps,
-                            linkType: link.type,
-                            totalDataBytes: link.totalDataBytes,
-                            initialMaxBandwidth: link.maxBandwidth,
-                        });
-
-                        if (link && saturation >= linkSaturationTreshold) {
-                            const color = calculateLinkCongestionColor(saturation, 0, isHighContrast);
-                            drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
-                        }
+                    if (link && saturation >= linkSaturationTreshold) {
+                        const color = calculateLinkCongestionColor(saturation, 0, isHighContrast);
+                        drawEthLink(svg, ethPosition, link.name as EthernetLinkName, size, color, 6);
                     }
                 });
             }
@@ -145,13 +141,13 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
         selectedPipeIds,
         showLinkSaturation,
         linkSaturationTreshold,
-        node?.ethLinkNames,
-        node?.links,
+        node?.ethLinks,
+        node?.chipId,
         showNormalizedSaturation,
         isHighContrast,
         ethPosition,
         size,
-        totalOps,
+        totalOpsList,
         normalizedTotalOps,
     ]);
 
