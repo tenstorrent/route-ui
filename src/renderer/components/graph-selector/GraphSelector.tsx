@@ -10,12 +10,12 @@ import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 import './GraphSelector.scss';
-import type { LocationState } from '../../../data/StateTypes';
+import type { GraphRelationship, LocationState } from '../../../data/StateTypes';
 
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph: (graphName: string) => void;
+    onSelectGraph: (graphRelationship: GraphRelationship) => void;
     onSelectTemporalEpoch: (temporalEpoch: number) => void;
 }
 
@@ -55,7 +55,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                     <MenuItem
                                         key={`${temporalEpoch}-${graphRelationship.name}`}
                                         text={graphRelationship.name}
-                                        onClick={() => onSelectGraph(graphRelationship.name)}
+                                        onClick={() => onSelectGraph(graphRelationship)}
                                         className='graph-selector-graph'
                                     />
                                 ))}

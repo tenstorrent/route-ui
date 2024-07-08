@@ -135,7 +135,7 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector
-                    onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
+                    onSelectGraph={(graphRelationship) => loadPerfAnalyzerGraph(graphRelationship)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
                 {/* TODO: reenable once we figure out how to disable the buttons from going to the home screen */}
