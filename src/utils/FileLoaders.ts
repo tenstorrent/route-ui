@@ -98,13 +98,14 @@ export const findFiles = async (
  * this used to check for all of the important folders. we no longer care
  * the app can work as long as there is at least something usable there.
  */
-export const validatePerfResultsFolder = async (dirPath: string): Promise<[isValid: boolean, error: string | null]> => {
+export const validatePerfResultsFolder = (dirPath: string): [boolean, string | null] => {
     if (!fs.existsSync(dirPath)) {
         return [false, 'Folder does not exist'];
     }
     return [true, null];
 };
-const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Promise<GraphRelationship[]> => {
+
+const getAvailableGraphRelationshipsFromNetlistAnalyzer = async (folderPath: string) => {
     try {
         const netlistAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
         return netlistAnalyzerFiles
@@ -126,7 +127,7 @@ const getAvailableGraphNamesFromNetlistAnalyzer = async (folderPath: string): Pr
     }
 };
 
-export const getAvailableGraphNames = async (perfResultsPath: string): Promise<GraphRelationship[]> => {
+export const getAvailableGraphRelationships = async (perfResultsPath: string) => {
     try {
         const runtimeDataPath = path.join(perfResultsPath, 'runtime_data.yaml');
         const runtimeDataYaml = await readFile(runtimeDataPath);
@@ -146,7 +147,7 @@ export const getAvailableGraphNames = async (perfResultsPath: string): Promise<G
         console.error('Failed to read runtime_data.yaml', err);
     }
 
-    return getAvailableGraphNamesFromNetlistAnalyzer(perfResultsPath);
+    return getAvailableGraphRelationshipsFromNetlistAnalyzer(perfResultsPath);
 };
 
 export const loadCluster = async (perfResultsPath: string): Promise<Cluster | null> => {

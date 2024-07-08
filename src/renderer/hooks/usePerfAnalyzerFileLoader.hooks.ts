@@ -11,13 +11,13 @@ import {
     setSelectedFolderLocationType,
 } from 'data/store/slices/uiState.slice';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAvailableGraphNames, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
+import { getAvailableGraphRelationships, loadCluster, loadGraph, validatePerfResultsFolder } from 'utils/FileLoaders';
 
 import { dialog } from '@electron/remote';
 import { ApplicationMode } from 'data/Types';
 import { useContext, useEffect, useState } from 'react';
 import { type Location, useLocation, useNavigate } from 'react-router-dom';
-import { sortPerfAnalyzerGraphnames } from 'utils/FilenameSorters';
+import { sortPerfAnalyzerGraphRelationships } from 'utils/FilenameSorters';
 import { ClusterContext, ClusterModel } from '../../data/ClusterContext';
 import type GraphOnChip from '../../data/GraphOnChip';
 import type { NodeInitialState } from '../../data/GraphOnChip';
@@ -85,14 +85,14 @@ const usePerfAnalyzerFileLoader = () => {
         try {
             // TODO: needs gone once we are happy with performance
             const entireRunStartTime = performance.now();
-            graphs = await getAvailableGraphNames(folderPath);
+            graphs = await getAvailableGraphRelationships(folderPath);
 
             if (!graphs.length) {
                 throw new Error(`No graphs found in\n${folderPath}`);
             }
 
             dispatch(setSelectedFolder(folderPath));
-            const sortedGraphs = sortPerfAnalyzerGraphnames(graphs);
+            const sortedGraphs = sortPerfAnalyzerGraphRelationships(graphs);
             const graphOnChipList: GraphOnChip[] = [];
             const linkDataByTemporalEpoch: NetworkCongestionState['linksPerTemporalEpoch'] = [];
             const pipeSelectionData: PipeSelection[] = [];

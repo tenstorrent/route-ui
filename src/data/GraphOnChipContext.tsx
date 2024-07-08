@@ -35,7 +35,6 @@ interface GraphOnChipContextType {
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
     resetGraphOnChipState: () => void;
     getGraphRelationshipList: () => GraphRelationship[];
-    getGraphRelationshipByGraphName: (graphName: string) => GraphRelationship | undefined;
     getGraphsListByTemporalEpoch: () => Map<number, GraphRelationship[]>;
     getGraphOnChip: (temporalEpoch: number, chipId: number) => GraphOnChip | undefined;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
@@ -53,7 +52,6 @@ const GraphOnChipContext = createContext<GraphOnChipContextType>({
     loadGraphOnChips: () => {},
     resetGraphOnChipState: () => {},
     getGraphRelationshipList: () => [],
-    getGraphRelationshipByGraphName: () => undefined,
     getGraphsListByTemporalEpoch: () => new Map(),
     getGraphOnChip: () => undefined,
     getOperand: () => undefined,
@@ -143,11 +141,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return [...state.graphs.values()];
     }, [state]);
 
-    const getGraphRelationshipByGraphName = useCallback(
-        (graphName: string) => state.graphs.get(graphName),
-        [state.graphs],
-    );
-
     const getGraphsListByTemporalEpoch = useCallback(() => {
         return [...state.graphs.values()].reduce<Map<number, GraphRelationship[]>>(
             (temporalEpochList, graphRelationship) => {
@@ -191,7 +184,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         () => ({
             loadGraphOnChips,
             getGraphRelationshipList,
-            getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
             resetGraphOnChipState,
@@ -201,7 +193,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         [
             loadGraphOnChips,
             getGraphRelationshipList,
-            getGraphRelationshipByGraphName,
             getGraphsListByTemporalEpoch,
             getGraphOnChip,
             resetGraphOnChipState,
