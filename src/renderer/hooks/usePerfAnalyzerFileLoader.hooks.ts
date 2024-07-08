@@ -43,7 +43,7 @@ const usePerfAnalyzerFileLoader = () => {
     const [error, setError] = useState<string | null>(null);
     const logging = useLogging();
     const { setCluster } = useContext<ClusterModel>(ClusterContext);
-    const { loadGraphOnChips, resetGraphOnChipState, getGraphRelationshipByGraphName } = useContext(GraphOnChipContext);
+    const { loadGraphOnChips, resetGraphOnChipState } = useContext(GraphOnChipContext);
     const navigate = useNavigate();
     const location: Location<LocationState> = useLocation();
     const logger = useLogging();
@@ -53,7 +53,7 @@ const usePerfAnalyzerFileLoader = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state]);
 
-    const openPerfAnalyzerFolderDialog = async () => {
+    const openPerfAnalyzerFolderDialog = () => {
         const folderList = dialog.showOpenDialogSync({
             properties: ['openDirectory'],
         });
@@ -63,7 +63,7 @@ const usePerfAnalyzerFileLoader = () => {
             return undefined;
         }
 
-        const [isValid, err] = await validatePerfResultsFolder(folderPath);
+        const [isValid, err] = validatePerfResultsFolder(folderPath);
         if (!isValid) {
             // eslint-disable-next-line no-alert
             alert(`Invalid folder selected: ${err}`);
