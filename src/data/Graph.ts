@@ -193,6 +193,10 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     get cores() {
         return [...this._cores.values()];
     }
+
+    get isOffchip() {
+        return this._cores.length === 0;
+    }
 }
 
 export interface Operand {
