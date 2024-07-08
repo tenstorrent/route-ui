@@ -41,7 +41,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
 
-    const showOpNames = useSelector(getShowOperationNames);
+    const showOperationNames = useSelector(getShowOperationNames);
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -74,7 +74,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
     return (
         <button
-            title={showOpNames && shouldShowLabel ? node.opName : ''}
+            title={showOperationNames && shouldShowLabel ? node.opName : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
@@ -119,7 +119,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
             {/* Labels for location and operation */}
             <NodeLocation node={node} />
-            <NodeOperationLabel opName={node.opName} shouldRender={showOpNames && shouldShowLabel} />
+            <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
 
             {/* Pipes */}
             <AsyncComponent
