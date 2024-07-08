@@ -12,6 +12,10 @@ import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import './GraphSelector.scss';
 import type { GraphRelationship, LocationState } from '../../../data/StateTypes';
 
+function formatDisplayGraphName({ name = '', temporalEpoch = -1, chipId = -1 }: Partial<GraphRelationship>) {
+    return `${name} (Epoch: ${temporalEpoch} Chip: ${chipId})`;
+}
+
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
@@ -27,7 +31,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
     let selectedItemText = '';
 
     if (chipId !== undefined) {
-        selectedItemText = getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph.name;
+        selectedItemText = formatDisplayGraphName(getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph ?? {});
     } else if (epoch >= 0) {
         selectedItemText = `Temporal Epoch ${epoch}`;
     }
@@ -54,7 +58,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                 {graphRelationships.map((graphRelationship) => (
                                     <MenuItem
                                         key={`${temporalEpoch}-${graphRelationship.name}`}
-                                        text={graphRelationship.name}
+                                        text={formatDisplayGraphName(graphRelationship)}
                                         onClick={() => onSelectGraph(graphRelationship)}
                                         className='graph-selector-graph'
                                     />
