@@ -125,7 +125,7 @@ const TopHeaderComponent: React.FC = () => {
                     <FolderPicker
                         icon={IconNames.FolderSharedOpen}
                         onSelectFolder={async () => {
-                            const folderPath = await openPerfAnalyzerFolderDialog();
+                            const folderPath = openPerfAnalyzerFolderDialog();
 
                             if (folderPath) {
                                 await updateSelectedFolder(folderPath, 'local');

@@ -35,7 +35,7 @@ const LocalFolderOptions: FC = () => {
             <div className='buttons-container'>
                 <FolderPicker
                     onSelectFolder={async () => {
-                        const folderPath = await openPerfAnalyzerFolderDialog();
+                        const folderPath = openPerfAnalyzerFolderDialog();
 
                         await loadPerfAnalyzerFolder(folderPath);
 
