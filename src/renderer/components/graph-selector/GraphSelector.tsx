@@ -26,8 +26,8 @@ interface GraphSelectorProps {
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
-    const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
-    const temporalEpochs = [...getGraphsListByTemporalEpoch().entries()];
+    const { getGraphsByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
+    const temporalEpochs = [...getGraphsByTemporalEpoch().entries()];
     let selectedItemText = '';
 
     if (chipId !== undefined) {
@@ -55,7 +55,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                         />
                                     </>
                                 )}
-                                {graphRelationships.map((graphRelationship) => (
+                                {graphRelationships.map(({ graph: graphRelationship }) => (
                                     <MenuItem
                                         key={`${temporalEpoch}-${graphRelationship.name}`}
                                         text={formatDisplayGraphName(graphRelationship)}

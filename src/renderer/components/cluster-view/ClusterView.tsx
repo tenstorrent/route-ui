@@ -14,7 +14,7 @@ import { ClusterContext } from '../../../data/ClusterContext';
 import getPipeColor from '../../../data/ColorGenerator';
 import GraphOnChip from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { GraphRelationship, type LocationState } from '../../../data/StateTypes';
+import { type LocationState } from '../../../data/StateTypes';
 import { CLUSTER_ETH_POSITION } from '../../../data/Types';
 import { CLUSTER_NODE_GRID_SIZE } from '../../../data/constants';
 import {
@@ -56,18 +56,9 @@ const ClusterView: FC = () => {
     const { epoch: temporalEpoch } = location.state;
 
     const { cluster } = useContext(ClusterContext);
-    const { getGraphOnChip, getGraphRelationshipList } = useContext(GraphOnChipContext);
+    const { getGraphOnChip, getGraphsByTemporalEpoch } = useContext(GraphOnChipContext);
     const dispatch = useDispatch();
-    const graphInformation = getGraphRelationshipList();
-    const availableTemporalEpochs: GraphRelationship[][] = [];
-
-    graphInformation.forEach((item) => {
-        if (availableTemporalEpochs[item.temporalEpoch]) {
-            availableTemporalEpochs[item.temporalEpoch].push(item);
-        } else {
-            availableTemporalEpochs[item.temporalEpoch] = [item];
-        }
-    });
+    const availableTemporalEpochs = getGraphsByTemporalEpoch();
 
     const [pciPipes, setPciPipes] = useState<string[]>([]);
 
@@ -89,8 +80,8 @@ const ClusterView: FC = () => {
 
     const uniquePipeList = useMemo(() => {
         const pciList: string[] = [];
-        const pipeList = availableTemporalEpochs[selectedEpoch]
-            .map((graph) => {
+        const pipeList = (availableTemporalEpochs.get(selectedEpoch) ?? [])
+            .map(({ graph }) => {
                 return [
                     ...(getGraphOnChip(graph.temporalEpoch, graph.chipId)?.ethernetPipes.map((pipe) => pipe) || []),
                     ...(getGraphOnChip(graph.temporalEpoch, graph.chipId)?.pciePipes.map((pipe) => {
@@ -196,7 +187,7 @@ const ClusterView: FC = () => {
                     </div>
                     <hr />
                 </div>
-                {availableTemporalEpochs.length > 1 && (
+                {availableTemporalEpochs.size > 1 && (
                     <Select
                         items={[...availableTemporalEpochs.keys()]}
                         itemRenderer={renderItem}
@@ -282,7 +273,7 @@ const ClusterView: FC = () => {
                         renderer={() => {
                             let graphOnChip: GraphOnChip | undefined;
 
-                            availableTemporalEpochs[selectedEpoch].forEach((graph) => {
+                            (availableTemporalEpochs.get(selectedEpoch) ?? []).forEach(({ graph }) => {
                                 const currentGraphOnChip = getGraphOnChip(graph.temporalEpoch, graph.chipId);
                                 if (currentGraphOnChip?.chipId === clusterChip.id) {
                                     graphOnChip = currentGraphOnChip;
