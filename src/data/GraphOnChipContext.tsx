@@ -96,13 +96,14 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     graphsByEpoch.set(graphRelationship.temporalEpoch, []);
                 }
 
-                graphsByEpoch.set(graphRelationship.temporalEpoch, [
-                    ...graphsByEpoch.get(graphRelationship.temporalEpoch)!,
-                    {
-                        graph: graphRelationship,
-                        graphOnChip: graphOnChipList[graphName],
-                    },
-                ]);
+                const normalizedGraphsList = graphsByEpoch.get(graphRelationship.temporalEpoch)!;
+
+                normalizedGraphsList[graphRelationship.chipId] = {
+                    graph: graphRelationship,
+                    graphOnChip: graphOnChipList[graphName],
+                };
+
+                graphsByEpoch.set(graphRelationship.temporalEpoch, normalizedGraphsList);
 
                 return graphsByEpoch;
             },
