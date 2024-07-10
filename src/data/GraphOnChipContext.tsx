@@ -10,7 +10,6 @@ import { Operand } from './Graph';
 
 interface OperandDescriptor {
     name: string;
-    graphName: string;
     temporalEpoch: number;
     type: GraphVertexType;
     operand: Operand;
@@ -62,7 +61,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         .filter((op) => !op?.isOffchip ?? true)
                         .map((operation) => ({
                             name: operation.name,
-                            graphName: graphs[index].name,
                             temporalEpoch,
                             type: GraphVertexType.OPERATION,
                             operand: operation as Operand,
@@ -70,7 +68,6 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         })),
                     ...[...graphOnChip.queues].map((queue) => ({
                         name: queue.name,
-                        graphName: graphs[index].name,
                         temporalEpoch,
                         type: GraphVertexType.QUEUE,
                         operand: queue as Operand,

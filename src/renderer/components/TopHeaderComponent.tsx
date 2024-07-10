@@ -94,7 +94,6 @@ const TopHeaderComponent: React.FC = () => {
                 state: {
                     epoch: firstGraph?.temporalEpoch ?? 0,
                     chipId: firstGraph?.chipId ?? 0,
-                    graphName: firstGraph?.name ?? '',
                 },
             });
         }

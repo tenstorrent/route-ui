@@ -224,7 +224,6 @@ const isFileMatchByIdOrEpoch = (filename: string, id: number | null, epoch: numb
 
 const loadChipFromNetlistAnalyzer = async (
     folderPath: string,
-    graphName: string,
     chipId: number | null,
     temporalEpoch: number | null,
 ): Promise<GraphOnChip | null> => {
@@ -284,7 +283,6 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
 
     let graphOnChip: GraphOnChip | null = await loadChipFromNetlistAnalyzer(
         path.join(folderPath),
-        name,
         chipId,
         temporalEpoch,
     );

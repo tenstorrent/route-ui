@@ -81,16 +81,12 @@ export type FolderLocationType = 'local' | 'remote';
 
 export interface LocationState {
     epoch: number;
-    /** @deprecated */
-    graphName?: string;
     chipId?: number;
     previous?: {
         path: string;
-        graphName: string;
     };
     next?: {
         path: string;
-        graphName: string;
     };
 }
 

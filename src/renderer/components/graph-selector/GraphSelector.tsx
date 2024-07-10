@@ -65,7 +65,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                 )}
                                 {graphRelationships.map(({ graph: graphRelationship }) => (
                                     <MenuItem
-                                        key={`${temporalEpoch}-${graphRelationship.name}`}
+                                        key={`${temporalEpoch}-${graphRelationship.chipId}`}
                                         text={formatDisplayGraphName({
                                             ...graphRelationship,
                                             showTemporalEpoch: graphRelationships.length <= 1,

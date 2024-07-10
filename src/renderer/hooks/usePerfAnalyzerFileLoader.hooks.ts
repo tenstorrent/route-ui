@@ -165,17 +165,15 @@ const usePerfAnalyzerFileLoader = () => {
         return graphs;
     };
 
-    const loadPerfAnalyzerGraph = ({ name, chipId, temporalEpoch }: GraphRelationship) => {
+    const loadPerfAnalyzerGraph = ({ chipId, temporalEpoch }: Omit<GraphRelationship, 'name'>) => {
         if (selectedFolder) {
             dispatch(closeDetailedView());
 
             navigate('/render', {
                 state: {
                     epoch: temporalEpoch,
-                    graphName: name,
                     chipId,
                     previous: {
-                        graphName: location.state?.graphName ?? '',
                         path: location.pathname,
                     },
                 },
@@ -192,7 +190,6 @@ const usePerfAnalyzerFileLoader = () => {
                 state: {
                     epoch,
                     previous: {
-                        graphName: location.state?.graphName ?? '',
                         path: location.pathname,
                     },
                 },
