@@ -3,6 +3,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
+// eslint-disable-next-line import/no-cycle
 import { ComputeNode } from './GraphOnChip';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { OpPerfDetails, OperandDirection, OperandPerformance } from './OpPerfDetails';
@@ -20,11 +21,13 @@ export abstract class AbstractGraphVertex implements Operand {
 
     protected outputOperands: Operand[];
 
-    private _pipeIdsByCore: Map<string, string[]> = new Map();
-
     private pipesPerOperator: Map<string, string[]> = new Map();
 
     private pipesPerOperatorIndexed: Map<string, string[][]> = new Map();
+
+    public inputPipesByCore: Map<string, string[]> = new Map();
+
+    public outputPipesByCore: Map<string, string[]> = new Map();
 
     public getPipesForOperator(operator: string): string[] {
         return this.pipesPerOperator.get(operator) || [];
@@ -56,28 +59,6 @@ export abstract class AbstractGraphVertex implements Operand {
 
     public toString(): string {
         return `${this.name} (${this.vertexType})`;
-    }
-
-    public get pipeIdsByCore(): Map<string, string[]> {
-        return this._pipeIdsByCore;
-    }
-
-    public set pipeIdsByCore(value: Map<string, string[]>) {
-        if (this._pipeIdsByCore.size > 0) {
-            value.forEach((pipeIds, coreId) => {
-                if (this._pipeIdsByCore.has(coreId)) {
-                    this._pipeIdsByCore.get(coreId)!.push(...pipeIds);
-                } else {
-                    this._pipeIdsByCore.set(coreId, pipeIds);
-                }
-            });
-        }
-
-        this._pipeIdsByCore = value;
-
-        this._pipeIdsByCore.forEach((pipeIds, coreId) => {
-            this._pipeIdsByCore.set(coreId, [...new Set(pipeIds.map((pipeId) => pipeId.toString()))]);
-        });
     }
 
     public bandwidth: number = 0;
@@ -114,20 +95,8 @@ export abstract class AbstractGraphVertex implements Operand {
         this.outputOperands = [...this.outputOperands, ...outputs];
     }
 
-    get uniquePipeIds(): string[] {
-        return [...new Set([...this.pipeIdsByCore.values()].flat())];
-    }
-
     isConnected(): boolean {
         return !!(this.from && this.to);
-    }
-
-    public getPipeIdsForCore(coreId: string): string[] {
-        return this.pipeIdsByCore.get(coreId) || [];
-    }
-
-    public getAllPipeIds() {
-        return this.pipeIdsByCore.values();
     }
 }
 
@@ -204,19 +173,15 @@ export interface Operand {
     vertexType: GraphVertexType;
     from?: GraphVertex;
     to?: GraphVertex;
-    pipeIdsByCore: Map<string, string[]>;
+    inputPipesByCore: Map<string, string[]>;
+    outputPipesByCore: Map<string, string[]>;
     perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
-    uniquePipeIds: string[];
 
     getPipesForOperator(operator: string): string[];
 
     setPipesForOperator(operator: string, pipeIds: string[], index: number): void;
 
     getPipesForOperatorIndexed(operator: string, index: number): string[];
-
-    getPipeIdsForCore(coreId: string): string[];
-
-    getAllPipeIds(): Iterable<string[]>;
 
     isConnected(): boolean;
 }

@@ -223,7 +223,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className=' scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.inputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
@@ -272,7 +272,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className='scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.outputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={

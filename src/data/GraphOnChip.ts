@@ -244,10 +244,22 @@ export default class GraphOnChip {
             this.operationsByName.set(operation.name, operation);
         } else {
             const existingOperation = this.operationsByName.get(operation.name);
+
             if (existingOperation) {
                 existingOperation.assignInputs(operation.inputs);
                 existingOperation.assignOutputs(operation.outputs);
-                existingOperation.pipeIdsByCore = operation.pipeIdsByCore;
+
+                operation.inputPipesByCore.forEach((pipes, coreId) => {
+                    const existingPipes = existingOperation.inputPipesByCore.get(coreId) ?? [];
+
+                    existingOperation.inputPipesByCore.set(coreId, [...new Set([...existingPipes, ...pipes])]);
+                });
+
+                operation.outputPipesByCore.forEach((pipes, coreId) => {
+                    const existingPipes = existingOperation.outputPipesByCore.get(coreId) ?? [];
+
+                    existingOperation.outputPipesByCore.set(coreId, [...new Set([...existingPipes, ...pipes])]);
+                });
             }
         }
     }
@@ -546,7 +558,7 @@ export default class GraphOnChip {
                 operation.assignOutputs(outputs);
 
                 outputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
+                    operand.outputPipesByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = augmentedChip.pipes.get(pipeId);
                             if (pipe) {
@@ -567,7 +579,7 @@ export default class GraphOnChip {
                 });
 
                 inputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
+                    operand.inputPipesByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = augmentedChip.pipes.get(pipeId);
                             if (pipe) {
