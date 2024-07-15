@@ -17,9 +17,9 @@ export abstract class AbstractGraphVertex implements Operand {
 
     abstract readonly vertexType: GraphVertexType;
 
-    protected inputOperands: Operand[];
+    protected inputOperands = new Map<string, Operand>();
 
-    protected outputOperands: Operand[];
+    protected outputOperands = new Map<string, Operand>();
 
     private pipesPerOperator: Map<string, string[]> = new Map();
 
@@ -71,28 +71,30 @@ export abstract class AbstractGraphVertex implements Operand {
 
     constructor(name: string, inputOperands?: Operand[], outputOperands?: Operand[]) {
         this.name = name;
-        this.inputOperands = [];
-        this.outputOperands = [];
         this.assignInputs(inputOperands || []);
         this.assignOutputs(outputOperands || []);
     }
 
     /** All input operands */
-    get inputs(): Operand[] {
-        return this.inputOperands;
+    get inputs() {
+        return [...this.inputOperands.values()];
     }
 
     /** All output operands */
-    get outputs(): Operand[] {
-        return this.outputOperands;
+    get outputs() {
+        return [...this.outputOperands.values()];
     }
 
     assignInputs(inputs: Operand[]) {
-        this.inputOperands = [...this.inputOperands, ...inputs];
+        inputs.forEach((operand) => {
+            this.inputOperands.set(operand.name, operand);
+        });
     }
 
     assignOutputs(outputs: Operand[]) {
-        this.outputOperands = [...this.outputOperands, ...outputs];
+        outputs.forEach((operand) => {
+            this.outputOperands.set(operand.name, operand);
+        });
     }
 
     isConnected(): boolean {
