@@ -540,22 +540,37 @@ export default class GraphOnChip {
                 inputs.forEach((operand) => {
                     if (operand.vertexType === GraphVertexType.QUEUE) {
                         let queue = augmentedChip.queuesByName.get(operand.name);
+
                         if (!queue) {
                             queue = new BuildableQueue(operand.name);
                             augmentedChip.addQueue(queue);
                         }
-                        queue.assignOutputs([operand]);
+
+                        queue.assignOutputs([
+                            augmentedChip.createOperand({
+                                name: operationName,
+                                type: GraphVertexType.OPERATION,
+                            }),
+                        ]);
                     }
                 });
+
                 // Extract queues from output operands
                 outputs.forEach((operand) => {
                     if (operand.vertexType === GraphVertexType.QUEUE) {
                         let queue = augmentedChip.queuesByName.get(operand.name);
+
                         if (!queue) {
                             queue = new BuildableQueue(operand.name);
                             augmentedChip.addQueue(queue);
                         }
-                        queue.assignInputs([operand]);
+
+                        queue.assignInputs([
+                            augmentedChip.createOperand({
+                                name: operationName,
+                                type: GraphVertexType.OPERATION,
+                            }),
+                        ]);
                     }
                 });
 
