@@ -18,6 +18,7 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { Queue } from '../../../data/GraphTypes';
+import { QueueLocation } from '../../../data/Types';
 
 const QueuesPropertiesTab = ({
     graphs,
@@ -105,6 +106,7 @@ const QueuesPropertiesTab = ({
                                         stringFilter={filterQuery}
                                         showType={false}
                                         isOffchip={chipId === undefined ? false : chipId !== queueChipId}
+                                        disabled={queue.details?.processedLocation === QueueLocation.HOST}
                                     />
                                 }
                                 isOpen={allOpen}
