@@ -21,6 +21,7 @@ import {
 } from './JSONDataTypes';
 import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
 import {
+    type CoreID,
     GraphDescriptorJSON,
     OperandJSON,
     OperationDescription,
@@ -45,12 +46,11 @@ import {
     QueueLocation,
 } from './Types';
 
-
 interface CreateOperandParams {
     name: string;
     type: GraphVertexType;
-    inputPipesPerCore?: Map<string, string[]>;
-    outputPipesByCore?: Map<string, string[]>;
+    inputPipesByCore?: Map<CoreID, string[]>;
+    outputPipesByCore?: Map<CoreID, string[]>;
     pipesPerOperator?: { operator: string; pipes: string[]; index: number };
 }
 
@@ -299,7 +299,7 @@ export default class GraphOnChip {
     protected createOperand({
         name,
         type,
-        inputPipesPerCore,
+        inputPipesByCore,
         outputPipesByCore,
         pipesPerOperator,
     }: CreateOperandParams): Operand {
@@ -333,8 +333,8 @@ export default class GraphOnChip {
             );
         }
 
-        if (inputPipesPerCore) {
-            inputPipesPerCore.forEach((pipes, coreId) => {
+        if (inputPipesByCore) {
+            inputPipesByCore.forEach((pipes, coreId) => {
                 const existingPipes = operand.inputPipesByCore.get(coreId) ?? [];
 
                 operand.inputPipesByCore.set(coreId, [...new Set([...existingPipes, ...pipes])]);
@@ -523,7 +523,7 @@ export default class GraphOnChip {
                     return augmentedChip.createOperand({
                         name: operandJson.name,
                         type: operandJson.type as GraphVertexType,
-                        inputPipesPerCore: coreToPipeRemap(operandJson.pipes),
+                        inputPipesByCore: coreToPipeRemap(operandJson.pipes),
                         pipesPerOperator: { operator: operation.name, pipes: operatorPipes, index },
                     });
                 });
@@ -1321,8 +1321,10 @@ export class ComputeNode {
     }
 }
 
+export type PipeID = string;
+
 export class Pipe {
-    readonly id: string;
+    readonly id: PipeID;
 
     nodes: ComputeNode[] = [];
 

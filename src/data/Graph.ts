@@ -4,10 +4,11 @@
 
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
 // eslint-disable-next-line import/no-cycle
-import { ComputeNode } from './GraphOnChip';
+import { ComputeNode, type PipeID } from './GraphOnChip';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { OpPerfDetails, OperandDirection, OperandPerformance } from './OpPerfDetails';
 import { ComputeNodeType } from './Types';
+import type { CoreID } from './sources/GraphDescriptor';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 
 /** Provides common functionality for Graph Nodes.
@@ -25,9 +26,9 @@ export abstract class AbstractGraphVertex implements Operand {
 
     private pipesPerOperatorIndexed: Map<string, string[][]> = new Map();
 
-    public inputPipesByCore: Map<string, string[]> = new Map();
+    public inputPipesByCore: Map<CoreID, PipeID[]> = new Map();
 
-    public outputPipesByCore: Map<string, string[]> = new Map();
+    public outputPipesByCore: Map<CoreID, PipeID[]> = new Map();
 
     public getPipesForOperator(operator: string): string[] {
         return this.pipesPerOperator.get(operator) || [];
