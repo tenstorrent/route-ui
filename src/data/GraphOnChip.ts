@@ -45,6 +45,15 @@ import {
     QueueLocation,
 } from './Types';
 
+
+interface CreateOperandParams {
+    name: string;
+    type: GraphVertexType;
+    inputPipesPerCore?: Map<string, string[]>;
+    outputPipesByCore?: Map<string, string[]>;
+    pipesPerOperator?: { operator: string; pipes: string[]; index: number };
+}
+
 export default class GraphOnChip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
 
@@ -293,13 +302,7 @@ export default class GraphOnChip {
         inputPipesPerCore,
         outputPipesByCore,
         pipesPerOperator,
-    }: {
-        name: string;
-        type: GraphVertexType;
-        inputPipesPerCore?: Map<string, string[]>;
-        outputPipesByCore?: Map<string, string[]>;
-        pipesPerOperator?: { operator: string; pipes: string[]; index: number };
-    }) {
+    }: CreateOperandParams): Operand {
         let operand: Operand | undefined;
 
         if (type === GraphVertexType.QUEUE) {

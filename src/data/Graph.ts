@@ -17,9 +17,9 @@ export abstract class AbstractGraphVertex implements Operand {
 
     abstract readonly vertexType: GraphVertexType;
 
-    protected inputOperands = new Map<string, Operand>();
+    protected inputOperands: Map<string, Operand> = new Map();
 
-    protected outputOperands = new Map<string, Operand>();
+    protected outputOperands: Map<string, Operand> = new Map();
 
     private pipesPerOperator: Map<string, string[]> = new Map();
 
@@ -76,12 +76,12 @@ export abstract class AbstractGraphVertex implements Operand {
     }
 
     /** All input operands */
-    get inputs() {
+    get inputs(): Operand[] {
         return [...this.inputOperands.values()];
     }
 
     /** All output operands */
-    get outputs() {
+    get outputs(): Operand[] {
         return [...this.outputOperands.values()];
     }
 
