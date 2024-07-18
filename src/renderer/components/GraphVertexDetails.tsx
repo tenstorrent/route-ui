@@ -16,16 +16,28 @@ import type { BuildableOperation } from '../../data/Graph';
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;
     showQueueDetails?: boolean;
+    isTemporalEpochView?: boolean;
 }
 
 const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
     graphNode,
     showQueueDetails = true,
+    isTemporalEpochView = false,
 }): React.ReactElement | null => {
     const inputs = [...graphNode.inputs];
     const outputs = [...graphNode.outputs];
+
     if (inputs.length === 0 && outputs.length === 0) {
         return null;
+    }
+
+    let queueLocationLabel = '';
+    if (graphNode.vertexType === GraphVertexType.QUEUE) {
+        queueLocationLabel = (graphNode as Queue).details?.processedLocation ?? '';
+
+        if (isTemporalEpochView) {
+            queueLocationLabel += ` (Device: ${(graphNode as Queue).details!['device-id']})`;
+        }
     }
 
     return (
@@ -37,10 +49,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                               so we're not parsing raw data
                           */}
                         <h5 className='queue-detail-label'>Queue Location:</h5>
-                        <div className='queue-detail-value'>
-                            {(graphNode as Queue).details?.processedLocation} (Device{' '}
-                            {(graphNode as Queue).details!['device-id']})
-                        </div>
+                        <div className='queue-detail-value'>{queueLocationLabel}</div>
                     </div>
                 </div>
             )}
@@ -121,6 +130,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
 
 GraphVertexDetails.defaultProps = {
     showQueueDetails: true,
+    isTemporalEpochView: undefined,
 };
 
 export default GraphVertexDetails;
