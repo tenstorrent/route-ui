@@ -11,6 +11,7 @@ import { GraphVertex, Queue } from '../../data/GraphTypes';
 import { NOCLinkName } from '../../data/Types';
 import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
 import SelectablePipe from './SelectablePipe';
+import type { BuildableOperation } from '../../data/Graph';
 
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;
@@ -46,7 +47,10 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables operand={operand} />
+                    <GraphVertexDetailsSelectables
+                        operand={operand}
+                        isOffchip={(operand as BuildableOperation)?.isOffchip}
+                    />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
@@ -79,7 +83,10 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
             {outputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables operand={operand} />
+                    <GraphVertexDetailsSelectables
+                        operand={operand}
+                        isOffchip={(operand as BuildableOperation)?.isOffchip}
+                    />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
