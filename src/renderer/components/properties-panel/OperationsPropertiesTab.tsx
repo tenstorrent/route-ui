@@ -15,7 +15,7 @@ import SearchField from '../SearchField';
 import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
-import type { Operation } from '../../../data/GraphTypes';
+import type { BuildableOperation } from '../../../data/Graph';
 
 const OperationsPropertiesTab = ({
     graphs,
@@ -41,7 +41,7 @@ const OperationsPropertiesTab = ({
                     });
 
                     return opMap;
-                }, new Map<string, { operation: Operation; chipId: number }>())
+                }, new Map<string, { operation: BuildableOperation; chipId: number }>())
                 .values(),
         ],
         [graphs],
@@ -108,7 +108,10 @@ const OperationsPropertiesTab = ({
                                             operand={operation}
                                             stringFilter={filterQuery}
                                             showType={false}
-                                            isOffchip={chipId === undefined ? false : chipId !== opChipId}
+                                            isOffchip={
+                                                operation.isOffchip ||
+                                                (chipId === undefined ? false : chipId !== opChipId)
+                                            }
                                         />
                                     }
                                     isOpen={allOpen}

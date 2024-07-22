@@ -94,7 +94,6 @@ const TopHeaderComponent: React.FC = () => {
                 state: {
                     epoch: firstGraph?.temporalEpoch ?? 0,
                     chipId: firstGraph?.chipId ?? 0,
-                    graphName: firstGraph?.name ?? '',
                 },
             });
         }
@@ -125,7 +124,7 @@ const TopHeaderComponent: React.FC = () => {
                     <FolderPicker
                         icon={IconNames.FolderSharedOpen}
                         onSelectFolder={async () => {
-                            const folderPath = await openPerfAnalyzerFolderDialog();
+                            const folderPath = openPerfAnalyzerFolderDialog();
 
                             if (folderPath) {
                                 await updateSelectedFolder(folderPath, 'local');
@@ -135,7 +134,7 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector
-                    onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
+                    onSelectGraph={(graphRelationship) => loadPerfAnalyzerGraph(graphRelationship)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
                 {/* TODO: reenable once we figure out how to disable the buttons from going to the home screen */}

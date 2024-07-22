@@ -10,24 +10,36 @@ import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 
 import './GraphSelector.scss';
-import type { LocationState } from '../../../data/StateTypes';
+import type { GraphRelationship, LocationState } from '../../../data/StateTypes';
+
+function formatDisplayGraphName({
+    name = '',
+    temporalEpoch = -1,
+    chipId = -1,
+    showTemporalEpoch = false,
+}: Partial<GraphRelationship & { showTemporalEpoch: boolean }>) {
+    return `${name} (${showTemporalEpoch ? `Epoch ${temporalEpoch} ` : ''}Chip ${chipId})`;
+}
 
 interface GraphSelectorProps {
     disabled?: boolean;
     label?: string;
-    onSelectGraph: (graphName: string) => void;
+    onSelectGraph: (graphRelationship: GraphRelationship) => void;
     onSelectTemporalEpoch: (temporalEpoch: number) => void;
 }
 
 const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
-    const { getGraphsListByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
-    const temporalEpochs = [...getGraphsListByTemporalEpoch().entries()];
+    const { getGraphsByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
+    const temporalEpochs = [...getGraphsByTemporalEpoch().entries()];
     let selectedItemText = '';
 
     if (chipId !== undefined) {
-        selectedItemText = getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph.name;
+        selectedItemText = formatDisplayGraphName({
+            ...(getGraphOnChipListForTemporalEpoch(epoch)[chipId]?.graph ?? {}),
+            showTemporalEpoch: getGraphOnChipListForTemporalEpoch(epoch).length <= 1,
+        });
     } else if (epoch >= 0) {
         selectedItemText = `Temporal Epoch ${epoch}`;
     }
@@ -51,11 +63,14 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
                                         />
                                     </>
                                 )}
-                                {graphRelationships.map((graphRelationship) => (
+                                {graphRelationships.map(({ graph: graphRelationship }) => (
                                     <MenuItem
-                                        key={`${temporalEpoch}-${graphRelationship.name}`}
-                                        text={graphRelationship.name}
-                                        onClick={() => onSelectGraph(graphRelationship.name)}
+                                        key={`${temporalEpoch}-${graphRelationship.chipId}`}
+                                        text={formatDisplayGraphName({
+                                            ...graphRelationship,
+                                            showTemporalEpoch: graphRelationships.length <= 1,
+                                        })}
+                                        onClick={() => onSelectGraph(graphRelationship)}
                                         className='graph-selector-graph'
                                     />
                                 ))}

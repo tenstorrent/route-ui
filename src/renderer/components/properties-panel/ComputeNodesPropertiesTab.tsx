@@ -26,6 +26,7 @@ import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
+import type { BuildableOperation } from '../../../data/Graph';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -202,7 +203,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                         <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables
                                                 operand={operand}
-                                                isOffchip={chipId === undefined ? false : chipId === node.chipId}
+                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
                                             />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
@@ -226,7 +227,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className=' scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.inputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
@@ -254,7 +255,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                         <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables
                                                 operand={operand}
-                                                isOffchip={chipId === undefined ? false : chipId === node.chipId}
+                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
                                             />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
@@ -278,7 +279,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className='scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.outputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={

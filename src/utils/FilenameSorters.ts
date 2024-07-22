@@ -21,19 +21,20 @@ export function sortNetlistAnalyzerFiles(filenames: GraphRelationship[]) {
     });
 }
 
-export function sortPerfAnalyzerGraphnames(filenames: GraphRelationship[]) {
-    return filenames.sort((a, b) => {
-        const parsedA = PERF_ANALYZER_REGEX.exec(a.name);
-        const parsedB = PERF_ANALYZER_REGEX.exec(b.name);
-        if (!parsedA?.[1] || !parsedB?.[1]) {
-            return 1;
-        }
-        if (Number(parsedA[1]) === Number(parsedB[1])) {
-            if (Number(parsedA[2]) === Number(parsedB[2])) {
-                return Number(parsedA[3]) > Number(parsedB[3]) ? 1 : -1;
-            }
-            return Number(parsedA[2]) > Number(parsedB[2]) ? 1 : -1;
-        }
-        return Number(parsedA[1]) > Number(parsedB[1]) ? 1 : -1;
+export function sortPerfAnalyzerGraphRelationships(graphRelationships: GraphRelationship[]) {
+    const sortedRelationships = graphRelationships.sort((a, b) => {
+        const temporalEpochDelta = a.temporalEpoch - b.temporalEpoch;
+        const chipIdDelta = a.chipId - b.chipId;
+
+        const [, aFirstDigit, aSecondDigit, aThirdDigit] = PERF_ANALYZER_REGEX.exec(a.name) ?? [];
+        const [, bFirstDigit, bSecondDigit, bThirdDigit] = PERF_ANALYZER_REGEX.exec(b.name) ?? [];
+
+        const firstDigitDelta = Number.parseInt(aFirstDigit, 10) - Number.parseInt(bFirstDigit, 10);
+        const secondDigitDelta = Number.parseInt(aSecondDigit, 10) - Number.parseInt(bSecondDigit, 10);
+        const thirdDigitDelta = Number.parseInt(aThirdDigit, 10) - Number.parseInt(bThirdDigit, 10);
+
+        return temporalEpochDelta || chipIdDelta || firstDigitDelta || secondDigitDelta || thirdDigitDelta;
     });
+
+    return sortedRelationships;
 }
