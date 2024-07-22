@@ -12,6 +12,7 @@ interface GraphVertexDetailsSelectablesProps {
     stringFilter?: string;
     showType?: boolean;
     isOffchip?: boolean;
+    disabled?: boolean;
 }
 
 const GraphVertexDetailsSelectables: FC<GraphVertexDetailsSelectablesProps> = ({
@@ -19,6 +20,7 @@ const GraphVertexDetailsSelectables: FC<GraphVertexDetailsSelectablesProps> = ({
     stringFilter = '',
     showType = true,
     isOffchip,
+    disabled = false,
 }) => {
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
 
@@ -31,6 +33,7 @@ const GraphVertexDetailsSelectables: FC<GraphVertexDetailsSelectablesProps> = ({
             offchip={isOffchip}
             type={showType ? operand.vertexType : null}
             offchipClickHandler={navigateToGraph(operand.name)}
+            disabled={disabled}
         />
     );
 };
@@ -39,6 +42,7 @@ GraphVertexDetailsSelectables.defaultProps = {
     showType: true,
     stringFilter: '',
     isOffchip: undefined,
+    disabled: undefined,
 };
 
 export default GraphVertexDetailsSelectables;
