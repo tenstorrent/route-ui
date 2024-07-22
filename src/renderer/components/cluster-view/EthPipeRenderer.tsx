@@ -17,7 +17,7 @@ import {
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
 import { calculateLinkCongestionColor, drawEthLink, drawEthPipes } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
+import { recalculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 interface EthPipeRendererProps {
     id: string;
@@ -85,7 +85,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
 
             if (showLinkSaturation) {
                 node?.ethLinks?.forEach((link) => {
-                    const { saturation } = calculateLinkSaturationMetrics({
+                    const { saturation } = recalculateLinkSaturationMetrics({
                         DRAMBandwidth: 0,
                         CLKMHz: 0,
                         PCIBandwidth: 0,

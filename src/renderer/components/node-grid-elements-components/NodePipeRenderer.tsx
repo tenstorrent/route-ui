@@ -27,7 +27,7 @@ import {
     drawNOCRouter,
     drawSelections,
 } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
+import { recalculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 interface NodePipeRendererProps {
     node: ComputeNode;
@@ -78,7 +78,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch, chip
         if (showLinkSaturation) {
             node.nocLinks.forEach((link) => {
                 if ((link.noc === NOC.NOC0 && noc0Saturation) || (link.noc === NOC.NOC1 && noc1Saturation)) {
-                    const { saturation } = calculateLinkSaturationMetrics({
+                    const { saturation } = recalculateLinkSaturationMetrics({
                         linkType: link.type,
                         totalDataBytes: link.totalDataBytes,
                         CLKMHz,

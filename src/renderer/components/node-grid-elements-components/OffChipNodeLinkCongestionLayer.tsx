@@ -14,7 +14,7 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { calculateLinkCongestionColor, getOffChipCongestionStyles, toRGBA } from '../../../utils/DrawingAPI';
 import { getHighContrastState } from '../../../data/store/selectors/uiState.selectors';
-import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
+import { recalculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 import type { DramBankLink, NetworkLink } from '../../../data/GraphOnChip';
 import { ComputeNodeType } from '../../../data/Types';
 
@@ -60,7 +60,7 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
 
     const offchipLinkSaturation = useMemo(() => {
         return links.reduce((maxSaturation, link) => {
-            const { saturation } = calculateLinkSaturationMetrics({
+            const { saturation } = recalculateLinkSaturationMetrics({
                 DRAMBandwidth,
                 PCIBandwidth,
                 CLKMHz,

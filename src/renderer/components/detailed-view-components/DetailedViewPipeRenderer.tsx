@@ -29,7 +29,7 @@ import {
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
+import { recalculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 type DetailedViewPipeRendererProps = {
     links: NetworkLink[];
@@ -78,7 +78,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
                 }
 
                 if (renderCongestion) {
-                    const { saturation } = calculateLinkSaturationMetrics({
+                    const { saturation } = recalculateLinkSaturationMetrics({
                         DRAMBandwidth,
                         PCIBandwidth,
                         CLKMHz,
