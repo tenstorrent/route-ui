@@ -11,7 +11,6 @@ import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
 import { BuildableOperation, BuildableQueue, Operand } from './Graph';
 import { GraphVertexType, OperationName, QueueName } from './GraphNames';
 import type { Operation, Queue } from './GraphTypes';
-import { GraphVertex } from './GraphTypes';
 import {
     ChipDesignJSON,
     DramChannelJSON,
@@ -22,6 +21,7 @@ import {
 } from './JSONDataTypes';
 import { MeasurementDetails, OpPerfDetails } from './OpPerfDetails';
 import {
+    type CoreID,
     GraphDescriptorJSON,
     OperandJSON,
     OperationDescription,
@@ -29,7 +29,7 @@ import {
 } from './sources/GraphDescriptor';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
-import { LinkState, type LinkStateCongestion, type NodeUID, PipeSelection } from './StateTypes';
+import { PipeSelection } from './StateTypes';
 import {
     Architecture,
     ComputeNodeType,
@@ -45,6 +45,14 @@ import {
     PCIeLinkName,
     QueueLocation,
 } from './Types';
+
+interface CreateOperandParams {
+    name: string;
+    type: GraphVertexType;
+    inputPipesByCore?: Map<CoreID, string[]>;
+    outputPipesByCore?: Map<CoreID, string[]>;
+    pipesPerOperator?: { operator: string; pipes: string[]; index: number };
+}
 
 export default class GraphOnChip {
     private static NOC_ORDER: Map<NOCLinkName, number>;
@@ -221,7 +229,7 @@ export default class GraphOnChip {
     /**
      * Iterates over all operations.
      */
-    public get operations(): Iterable<Operation> {
+    public get operations() {
         return this.operationsByName.values();
     }
 
@@ -244,10 +252,22 @@ export default class GraphOnChip {
             this.operationsByName.set(operation.name, operation);
         } else {
             const existingOperation = this.operationsByName.get(operation.name);
+
             if (existingOperation) {
                 existingOperation.assignInputs(operation.inputs);
                 existingOperation.assignOutputs(operation.outputs);
-                existingOperation.pipeIdsByCore = operation.pipeIdsByCore;
+
+                operation.inputPipesByCore.forEach((pipes, coreId) => {
+                    const existingPipes = existingOperation.inputPipesByCore.get(coreId) ?? [];
+
+                    existingOperation.inputPipesByCore.set(coreId, [...new Set([...existingPipes, ...pipes])]);
+                });
+
+                operation.outputPipesByCore.forEach((pipes, coreId) => {
+                    const existingPipes = existingOperation.outputPipesByCore.get(coreId) ?? [];
+
+                    existingOperation.outputPipesByCore.set(coreId, [...new Set([...existingPipes, ...pipes])]);
+                });
             }
         }
     }
@@ -276,52 +296,59 @@ export default class GraphOnChip {
         }
     }
 
-    protected createOperand(
-        name: string,
-        type: GraphVertexType,
-        pipesByCore?: Map<string, string[]>,
-        pipesPerOperator?: { operator: string; pipes: string[]; index: number },
-        from?: GraphVertex,
-        to?: GraphVertex,
-    ): Operand {
-        let operand: GraphVertex | undefined;
+    protected createOperand({
+        name,
+        type,
+        inputPipesByCore,
+        outputPipesByCore,
+        pipesPerOperator,
+    }: CreateOperandParams): Operand {
+        let operand: Operand | undefined;
 
         if (type === GraphVertexType.QUEUE) {
             if (!this.queuesByName.has(name)) {
                 this.queuesByName.set(name, new BuildableQueue(name));
             }
+
             operand = this.queuesByName.get(name) as BuildableQueue;
         }
+
         if (type === GraphVertexType.OPERATION) {
             if (!this.operationsByName.has(name)) {
                 this.operationsByName.set(name, new BuildableOperation(name, [], [], []));
             }
+
             operand = this.operationsByName.get(name) as BuildableOperation;
         }
+
+        if (operand === undefined) {
+            throw new Error(`Operand ${name} is neither a queue nor an operation`);
+        }
+
         if (pipesPerOperator) {
-            operand?.setPipesForOperator(
+            operand.setPipesForOperator(
                 pipesPerOperator.operator,
                 pipesPerOperator.pipes || [],
                 pipesPerOperator.index,
             );
         }
-        if (operand === undefined) {
-            throw new Error(`Operand ${name} is neither a queue nor an operation`);
+
+        if (inputPipesByCore) {
+            inputPipesByCore.forEach((pipes, coreId) => {
+                const existingPipes = operand.inputPipesByCore.get(coreId) ?? [];
+
+                operand.inputPipesByCore.set(coreId, [...new Set([...existingPipes, ...pipes])]);
+            });
         }
-        if (pipesByCore && pipesByCore.size > 0) {
-            if (operand.pipeIdsByCore.size > 0) {
-                pipesByCore.forEach((newPipeIds, coreId) => {
-                    if (operand!.pipeIdsByCore.has(coreId)) {
-                        const existingPipesIds = operand!.pipeIdsByCore.get(coreId) || [];
-                        pipesByCore.set(coreId, [...existingPipesIds, ...newPipeIds]);
-                    }
-                });
-                operand.pipeIdsByCore.forEach((pipeIds, coreId) => {
-                    pipesByCore.set(coreId, pipeIds);
-                });
-            }
-            operand.pipeIdsByCore = pipesByCore;
+
+        if (outputPipesByCore) {
+            outputPipesByCore.forEach((pipes, coreId) => {
+                const existingPipes = operand.outputPipesByCore.get(coreId) ?? [];
+
+                operand.outputPipesByCore.set(coreId, [...new Set([...existingPipes, ...pipes])]);
+            });
         }
+
         return operand;
     }
 
@@ -469,11 +496,11 @@ export default class GraphOnChip {
             Object.assign(augmentedChip, graphOnChip);
             const regex = /^(\d+)-(\d+)-(\d+)$/;
 
-            const pipesAsMap = (coresToPipes: Record<string, string[]>) => {
+            const coreToPipeRemap = (coresToPipes: Record<string, string[]>) => {
                 return new Map(
                     Object.entries(coresToPipes).map(([coreID, pipes]) => [
                         // TODO: we will need to address this to keep all core IDs consistent
-                        coreID.replace(regex, '$1-$3-$2'),
+                        coreID.replace(regex, '$1-$3-$2') as string,
                         pipes.map((pipeId) => pipeId.toString()),
                     ]),
                 );
@@ -483,62 +510,70 @@ export default class GraphOnChip {
                 const operation = augmentedChip.operationsByName.get(operationName);
 
                 if (operation === undefined) {
-                    // console.log(operationName, operation)
-                    /** this is perfectly normal, optopipe is a singlefile per temporal epoch and is multichip
-                     * we will want to capture ALL information for multichip routing */
-                    // console.warn(
-                    //     `Operation ${operationName} was found in the op-to-pipe map, but is not present in existing graphOnChip data; no core mapping available.`,
-                    // );
-                    // operation = new BuildableOperation(operationName, [], [], []);
-                    // augmentedChip.addOperation(operation);
-                    // TODO: we should add ALL operations but only add the operations that run on this graphOnChip to the augmentedChip. likely requires a separate structure (graph?)
-                    //
-                    return null;
+                    /**
+                     * This is perfectly normal, optopipe is a singlefile per temporal epoch and is multichip.
+                     */
+                    return;
                 }
 
                 const inputs = opJson.inputs.map((operandJson, index) => {
-                    const operatorPipes: string[] = Object.values(operandJson.pipes)
+                    const operatorPipes = Object.values(operandJson.pipes)
                         .map((pipes) => pipes.map((pipe) => pipe.toString()))
                         .flat();
-                    return augmentedChip.createOperand(
-                        operandJson.name,
-                        operandJson.type as GraphVertexType,
-                        pipesAsMap(operandJson.pipes),
-                        { operator: operation.name, pipes: operatorPipes, index },
-                    );
+                    return augmentedChip.createOperand({
+                        name: operandJson.name,
+                        type: operandJson.type as GraphVertexType,
+                        inputPipesByCore: coreToPipeRemap(operandJson.pipes),
+                        pipesPerOperator: { operator: operation.name, pipes: operatorPipes, index },
+                    });
                 });
                 const outputs = opJson.outputs.map((operandJson, index) => {
-                    const operatorPipes: string[] = Object.values(operandJson.pipes)
+                    const operatorPipes = Object.values(operandJson.pipes)
                         .map((pipes) => pipes.map((pipe) => pipe.toString()))
                         .flat();
-                    return augmentedChip.createOperand(
-                        operandJson.name,
-                        operandJson.type as GraphVertexType,
-                        pipesAsMap(operandJson.pipes),
-                        { operator: operation.name, pipes: operatorPipes, index },
-                    );
+                    return augmentedChip.createOperand({
+                        name: operandJson.name,
+                        type: operandJson.type as GraphVertexType,
+                        outputPipesByCore: coreToPipeRemap(operandJson.pipes),
+                        pipesPerOperator: { operator: operation.name, pipes: operatorPipes, index },
+                    });
                 });
 
                 // Extract queues from input operands
                 inputs.forEach((operand) => {
                     if (operand.vertexType === GraphVertexType.QUEUE) {
                         let queue = augmentedChip.queuesByName.get(operand.name);
+
                         if (!queue) {
                             queue = new BuildableQueue(operand.name);
                             augmentedChip.addQueue(queue);
                         }
-                        queue.assignOutputs([augmentedChip.createOperand(operationName, GraphVertexType.OPERATION)]);
+
+                        queue.assignOutputs([
+                            augmentedChip.createOperand({
+                                name: operationName,
+                                type: GraphVertexType.OPERATION,
+                            }),
+                        ]);
                     }
                 });
+
                 // Extract queues from output operands
                 outputs.forEach((operand) => {
                     if (operand.vertexType === GraphVertexType.QUEUE) {
                         let queue = augmentedChip.queuesByName.get(operand.name);
+
                         if (!queue) {
                             queue = new BuildableQueue(operand.name);
                             augmentedChip.addQueue(queue);
                         }
-                        queue.assignInputs([augmentedChip.createOperand(operationName, GraphVertexType.OPERATION)]);
+
+                        queue.assignInputs([
+                            augmentedChip.createOperand({
+                                name: operationName,
+                                type: GraphVertexType.OPERATION,
+                            }),
+                        ]);
                     }
                 });
 
@@ -546,7 +581,7 @@ export default class GraphOnChip {
                 operation.assignOutputs(outputs);
 
                 outputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
+                    operand.outputPipesByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = augmentedChip.pipes.get(pipeId);
                             if (pipe) {
@@ -567,7 +602,7 @@ export default class GraphOnChip {
                 });
 
                 inputs.forEach((operand: Operand) => {
-                    operand.pipeIdsByCore.forEach((pipeIds, nodeId) => {
+                    operand.inputPipesByCore.forEach((pipeIds, nodeId) => {
                         pipeIds.forEach((pipeId) => {
                             const pipe = augmentedChip.pipes.get(pipeId);
                             if (pipe) {
@@ -585,7 +620,6 @@ export default class GraphOnChip {
                         });
                     });
                 });
-                return operation;
             });
 
             return augmentedChip;
@@ -625,10 +659,16 @@ export default class GraphOnChip {
             //     // `core.id` is only an x-y locations and doesn't include Chip ID
             //     .map((core) => newChip.getNode(`${graphOnChip.chipId}-${core.id}`));
             const inputs = opDescriptor.inputs.map((operandJson) =>
-                newChip.createOperand(operandJson.name, operandJson.type),
+                newChip.createOperand({
+                    name: operandJson.name,
+                    type: operandJson.type,
+                }),
             );
             const outputs = opDescriptor.outputs.map((operandJson: OperandJSON) =>
-                newChip.createOperand(operandJson.name, operandJson.type),
+                newChip.createOperand({
+                    name: operandJson.name,
+                    type: operandJson.type,
+                }),
             );
 
             // Extract queues from input operands
@@ -639,12 +679,22 @@ export default class GraphOnChip {
                         queue = new BuildableQueue(operand.name);
                         graphOnChip.addQueue(queue);
                     }
-                    queue.assignOutputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
+                    queue.assignOutputs([
+                        newChip.createOperand({
+                            name: opName,
+                            type: GraphVertexType.OPERATION,
+                        }),
+                    ]);
                 } else if (newChip.operationsByName.has(operand.name)) {
                     const op = newChip.operationsByName.get(operand.name);
                     if (op?.isOffchip) {
                         const operation = newChip.operationsByName.get(opName);
-                        operation?.assignInputs([newChip.createOperand(operand.name, GraphVertexType.OPERATION)]);
+                        operation?.assignInputs([
+                            newChip.createOperand({
+                                name: operand.name,
+                                type: GraphVertexType.OPERATION,
+                            }),
+                        ]);
                     }
                 }
             });
@@ -656,12 +706,22 @@ export default class GraphOnChip {
                         queue = new BuildableQueue(operand.name);
                         graphOnChip.addQueue(queue);
                     }
-                    queue.assignInputs([newChip.createOperand(opName, GraphVertexType.OPERATION)]);
+                    queue.assignInputs([
+                        newChip.createOperand({
+                            name: opName,
+                            type: GraphVertexType.OPERATION,
+                        }),
+                    ]);
                 } else if (newChip.operationsByName.has(operand.name)) {
                     const op = newChip.operationsByName.get(operand.name);
                     if (op?.isOffchip) {
                         const operation = newChip.operationsByName.get(opName);
-                        operation?.assignOutputs([newChip.createOperand(operand.name, GraphVertexType.OPERATION)]);
+                        operation?.assignOutputs([
+                            newChip.createOperand({
+                                name: operand.name,
+                                type: GraphVertexType.OPERATION,
+                            }),
+                        ]);
                     }
                 }
             });
@@ -756,99 +816,6 @@ export default class GraphOnChip {
             return hasPipe;
         });
         return [...nodes];
-    }
-
-    getAllLinksInitialState() {
-        const linksStateCongestionByNode: Record<NodeUID, LinkStateCongestion> = {};
-
-        forEach(this.nodes, (node) => {
-            if (!linksStateCongestionByNode[node.uid]) {
-                linksStateCongestionByNode[node.uid] = {
-                    linksByLinkId: {},
-                    ethLinkIds: [],
-                    offchipLinkIds: [],
-                    chipId: this.chipId,
-                    maxLinkSaturation: 0,
-                    offchipMaxSaturation: 0,
-                };
-            }
-
-            node.links.forEach((link) => {
-                linksStateCongestionByNode[node.uid].linksByLinkId[link.uid] = link.generateInitialState();
-            });
-            node.internalLinks.forEach((link) => {
-                linksStateCongestionByNode[node.uid].linksByLinkId[link.uid] = link.generateInitialState();
-
-                if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
-                    linksStateCongestionByNode[node.uid].ethLinkIds.push(link.uid);
-                }
-            });
-
-            switch (node.type) {
-                case ComputeNodeType.DRAM:
-                    linksStateCongestionByNode[node.uid].offchipLinkIds =
-                        node.dramChannel?.links.map((link) => {
-                            return link.uid;
-                        }) || [];
-                    break;
-                case ComputeNodeType.ETHERNET:
-                    linksStateCongestionByNode[node.uid].offchipLinkIds =
-                        [...node.internalLinks.values()].map((link) => {
-                            return link.uid;
-                        }) || [];
-                    break;
-
-                case ComputeNodeType.PCIE:
-                    linksStateCongestionByNode[node.uid].offchipLinkIds =
-                        [...node.internalLinks].map(([link]) => {
-                            return link.uid;
-                        }) || [];
-                    break;
-                default:
-                    break;
-            }
-        });
-
-        this.dramChannels.forEach((dramChannel) => {
-            // TODO: find correct node Uids for DRAM
-            const dramId = `DRAM-${this.chipId}-${dramChannel.id}`;
-
-            if (!linksStateCongestionByNode[dramId]) {
-                linksStateCongestionByNode[dramId] = {
-                    linksByLinkId: {},
-                    offchipLinkIds: [],
-                    ethLinkIds: [],
-                    chipId: this.chipId,
-                    maxLinkSaturation: 0,
-                    offchipMaxSaturation: 0,
-                };
-            }
-
-            dramChannel.links.forEach((link) => {
-                linksStateCongestionByNode[dramId].linksByLinkId[link.uid] = link.generateInitialState();
-
-                dramChannel.subchannels.forEach((subchannel) => {
-                    const dramSubchannelId = `${dramId}-${subchannel.subchannelId}`;
-
-                    if (!linksStateCongestionByNode[dramSubchannelId]) {
-                        linksStateCongestionByNode[dramSubchannelId] = {
-                            linksByLinkId: {},
-                            ethLinkIds: [],
-                            offchipLinkIds: [],
-                            chipId: this.chipId,
-                            maxLinkSaturation: 0,
-                            offchipMaxSaturation: 0,
-                        };
-                    }
-
-                    subchannel.links.forEach((subchannelLink) => {
-                        linksStateCongestionByNode[dramSubchannelId].linksByLinkId[subchannelLink.uid] =
-                            subchannelLink.generateInitialState();
-                    });
-                });
-            });
-        });
-        return linksStateCongestionByNode;
     }
 
     get ethernetPipes(): PipeSegment[] {
@@ -1025,20 +992,6 @@ export abstract class NetworkLink {
             ([pipeId, bandwidth]) => new PipeSegment(pipeId, bandwidth, name, this.totalDataBytes),
         );
     }
-
-    public generateInitialState(): LinkState {
-        return {
-            id: this.uid,
-            totalDataBytes: this.totalDataBytes,
-            bpc: 0,
-            saturation: 0,
-            maxBandwidth: this.maxBandwidth,
-            type: this.type,
-            ...((this.name === EthernetLinkName.ETH_IN || this.name === EthernetLinkName.ETH_OUT) && {
-                ethDirection: this.name,
-            }),
-        } as LinkState;
-    }
 }
 
 export class NOCLink extends NetworkLink {
@@ -1145,19 +1098,21 @@ export class ComputeNode {
 
         Object.entries(nodeJSON.links).forEach(([linkName, linkJson], index) => {
             const link: NetworkLink = NetworkLink.CREATE(linkName as NOCLinkName, `${linkId}-${index}`, linkJson);
+
             if (link.type === LinkType.NOC) {
                 // Added a const here to avoid casting multiple times
                 const nocLink = link as NOCLink;
 
-                node.links.set(linkName, nocLink);
-
                 if (nocLink.noc === NOC.NOC0 || nocLink.noc === NOC.NOC1) {
-                    node.nocLinks.push(nocLink);
+                    node.nocLinks.set(linkName, nocLink);
                 }
             }
+
             if (link.type === LinkType.ETHERNET) {
                 node.internalLinks.set(linkName, link as EthernetLink);
+                node.ethLinks.set(linkName, link as EthernetLink);
             }
+
             if (link.type === LinkType.PCIE) {
                 node.internalLinks.set(linkName, link as PCIeLink);
             }
@@ -1165,35 +1120,9 @@ export class ComputeNode {
             if (link.name === EthernetLinkName.ETH_IN || link.name === EthernetLinkName.ETH_OUT) {
                 node.externalPipes.push(...link.pipes);
             }
+
+            node.links.set(linkName, link);
         });
-
-        let offChipLinkIds: string[] = [];
-
-        switch (node.type) {
-            case ComputeNodeType.DRAM:
-                offChipLinkIds =
-                    node.dramChannel?.links.map((l) => {
-                        return l.uid;
-                    }) || [];
-                break;
-            case ComputeNodeType.ETHERNET:
-                offChipLinkIds =
-                    [...node.internalLinks.values()].map((l) => {
-                        return l.uid;
-                    }) || [];
-                break;
-
-            case ComputeNodeType.PCIE:
-                offChipLinkIds =
-                    [...node.internalLinks].map(([l]) => {
-                        return l.uid;
-                    }) || [];
-                break;
-            default:
-                break;
-        }
-
-        node.offchipLinkIds = offChipLinkIds;
 
         // Associate with operation
         const opName: OperationName = nodeJSON.op_name;
@@ -1229,11 +1158,11 @@ export class ComputeNode {
 
     public opCycles: number = 0;
 
-    public links: Map<any, NOCLink> = new Map();
+    public links = new Map<string, NOCLink | EthernetLink | PCIeLink>();
 
-    public nocLinks: NOCLink[] = [];
+    public nocLinks = new Map<string, NOCLink>();
 
-    public offchipLinkIds: string[] = [];
+    public ethLinks = new Map<string, EthernetLink>();
 
     /** @description Off chip links that are not part of the NOC, excluding DRAM links */
     public internalLinks: Map<any, NetworkLink> = new Map();
@@ -1311,7 +1240,7 @@ export class ComputeNode {
      * @description Returns the links for node in the order defined by the NOC.
      */
     public getNOCLinksForNode = (): NOCLink[] => {
-        return [...this.links.values()].sort((a, b) => {
+        return [...this.nocLinks.values()].sort((a, b) => {
             const firstKeyOrder = GraphOnChip.GET_NOC_ORDER().get(a.name as NOCLinkName) ?? Infinity;
             const secondKeyOrder = GraphOnChip.GET_NOC_ORDER().get(b.name as NOCLinkName) ?? Infinity;
             return firstKeyOrder - secondKeyOrder;
@@ -1392,8 +1321,10 @@ export class ComputeNode {
     }
 }
 
+export type PipeID = string;
+
 export class Pipe {
-    readonly id: string;
+    readonly id: PipeID;
 
     nodes: ComputeNode[] = [];
 

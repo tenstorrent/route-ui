@@ -18,8 +18,15 @@ import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { Queue } from '../../../data/GraphTypes';
+import { QueueLocation } from '../../../data/Types';
 
-const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
+const QueuesPropertiesTab = ({
+    graphs,
+    chipId,
+}: {
+    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
+    chipId?: number;
+}) => {
     const dispatch = useDispatch();
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
@@ -29,12 +36,12 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; g
                 .reduce((queueMap, { graphOnChip }) => {
                     [...graphOnChip.queues].forEach((queue) => {
                         if (!queueMap.has(queue.name)) {
-                            queueMap.set(queue.name, queue);
+                            queueMap.set(queue.name, { queue, chipId: graphOnChip.chipId });
                         }
                     });
 
                     return queueMap;
-                }, new Map<string, Queue>())
+                }, new Map<string, { queue: Queue; chipId: number }>())
                 .values(),
         ],
         [graphs],
@@ -46,7 +53,7 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; g
         }
 
         const filter = filterQuery.toLowerCase();
-        const operands = queuesList.reduce<string[]>((filteredOperands, { name }) => {
+        const operands = queuesList.reduce<string[]>((filteredOperands, { queue: { name } }) => {
             if (name.toLowerCase().includes(filter)) {
                 filteredOperands.push(name);
             }
@@ -83,7 +90,7 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; g
             </div>
 
             <div className='properties-list'>
-                {queuesList.map((queue, index) => (
+                {queuesList.map(({ queue, chipId: queueChipId }, index) => (
                     <FilterableComponent
                         // eslint-disable-next-line react/no-array-index-key
                         key={`${index}-${queue.name}`}
@@ -97,12 +104,16 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; g
                                     <GraphVertexDetailsSelectables
                                         operand={queue}
                                         stringFilter={filterQuery}
-                                        displayType={false}
+                                        showType={false}
+                                        isOffchip={chipId === undefined ? false : chipId !== queueChipId}
+                                        disabled={queue.details?.processedLocation === QueueLocation.HOST}
                                     />
                                 }
                                 isOpen={allOpen}
                             >
-                                {queue && <GraphVertexDetails graphNode={queue} />}
+                                {queue && (
+                                    <GraphVertexDetails graphNode={queue} isTemporalEpochView={chipId === undefined} />
+                                )}
                             </Collapsible>
                         }
                     />
@@ -110,6 +121,10 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; g
             </div>
         </div>
     );
+};
+
+QueuesPropertiesTab.defaultProps = {
+    chipId: undefined,
 };
 
 export default QueuesPropertiesTab;

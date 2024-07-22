@@ -26,10 +26,12 @@ import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
+import type { BuildableOperation } from '../../../data/Graph';
 
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
+    chipId?: number;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -117,7 +119,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
@@ -199,7 +201,10 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectables operand={operand} />
+                                            <GraphVertexDetailsSelectables
+                                                operand={operand}
+                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
+                                            />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand
@@ -222,7 +227,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className=' scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.inputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
@@ -248,7 +253,10 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectables operand={operand} />
+                                            <GraphVertexDetailsSelectables
+                                                operand={operand}
+                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
+                                            />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand
@@ -271,7 +279,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className='scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.outputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
@@ -343,8 +351,8 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
                         <LinkDetails
                             key={link.name}
                             link={link}
-                            nodeUid={node.uid}
                             temporalEpoch={temporalEpoch}
+                            chipId={chipId}
                             showEmpty
                         />
                     ))}
@@ -354,12 +362,18 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch }: ComputeNodeProps): R
     );
 };
 
+ComputeNodePropertiesCard.defaultProps = {
+    chipId: undefined,
+};
+
 const ComputeNodesPropertiesTab = ({
     graphs,
     epoch,
+    chipId,
 }: {
     graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
     epoch: number;
+    chipId?: number;
 }) => {
     const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
     const selectedNodes = useMemo(
@@ -381,12 +395,16 @@ const ComputeNodesPropertiesTab = ({
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
                     {selectedNodes.map((node) => (
-                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} />
+                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} chipId={chipId} />
                     ))}
                 </div>
             </div>
         </div>
     );
+};
+
+ComputeNodesPropertiesTab.defaultProps = {
+    chipId: undefined,
 };
 
 export default ComputeNodesPropertiesTab;

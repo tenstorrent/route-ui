@@ -12,7 +12,6 @@ import { HighlightType } from '../../data/Types';
 import { getFocusPipe } from '../../data/store/selectors/pipeSelection.selectors';
 import {
     getDetailedViewOpenState,
-    getHighContrastState,
     getSelectedDetailsViewUID,
     getShowOperationNames,
 } from '../../data/store/selectors/uiState.selectors';
@@ -24,34 +23,25 @@ import OperationGroupRender from './node-grid-elements-components/OperationGroup
 import QueueHighlightRenderer from './node-grid-elements-components/QueueHighlightRenderer';
 import { ClusterChip } from '../../data/Cluster';
 import OffChipNodeLinkCongestionLayer from './node-grid-elements-components/OffChipNodeLinkCongestionLayer';
-import { getShowOperationPerformanceGrid } from '../../data/store/selectors/operationPerf.selectors';
-import {
-    getNodeLinksData,
-    getOffchipLinkSaturationForNode,
-    getShowLinkSaturation,
-} from '../../data/store/selectors/linkSaturation.selectors';
 import NodePipeRenderer from './node-grid-elements-components/NodePipeRenderer';
 import NodeFocusPipeRenderer from './node-grid-elements-components/NodeFocusPipeRenderer';
+import AsyncComponent from './AsyncRenderer';
 
 interface NodeGridElementProps {
     node: ComputeNode;
     temporalEpoch: number;
+    currentChipId?: number;
     connectedEth?: ClusterChip | null;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, connectedEth }) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, currentChipId, connectedEth }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
-    const showOperationNames = useSelector(getShowOperationNames);
-    const shouldRenderOpPerf = useSelector(getShowOperationPerformanceGrid);
-    const isHighContrast = useSelector(getHighContrastState);
-    const showLinkSaturation = useSelector(getShowLinkSaturation);
 
-    const linksData = useSelector(getNodeLinksData(temporalEpoch, node.uid));
-    const offchipLinkSaturation = useSelector(getOffchipLinkSaturationForNode(temporalEpoch, node.uid));
+    const showOperationNames = useSelector(getShowOperationNames);
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -113,11 +103,18 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             <div className='node-border' />
 
             {/* Congestion information */}
-            <OperationCongestionLayer node={node} isHighContrast={isHighContrast} shouldRender={shouldRenderOpPerf} />
-            <OffChipNodeLinkCongestionLayer
-                offchipLinkSaturation={offchipLinkSaturation}
-                showLinkSaturation={showLinkSaturation}
-                isHighContrast={isHighContrast}
+            <AsyncComponent renderer={() => <OperationCongestionLayer node={node} />} loadingContent='' />
+            <AsyncComponent
+                renderer={() => (
+                    <OffChipNodeLinkCongestionLayer
+                        temporalEpoch={temporalEpoch}
+                        chipId={currentChipId}
+                        nodeType={node.type}
+                        internalLinks={node.internalLinks}
+                        dramLinks={node.dramChannel?.links}
+                    />
+                )}
+                loadingContent=''
             />
 
             {/* Labels for location and operation */}
@@ -125,13 +122,15 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
             <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
 
             {/* Pipes */}
-            <NodePipeRenderer
-                node={node}
-                isHighContrast={isHighContrast}
-                showLinkSaturation={showLinkSaturation}
-                linksData={linksData.linksByLinkId}
+            <AsyncComponent
+                renderer={() => (
+                    <>
+                        <NodePipeRenderer node={node} temporalEpoch={temporalEpoch} chipId={currentChipId} />
+                        <NodeFocusPipeRenderer node={node} />
+                    </>
+                )}
+                loadingContent=''
             />
-            <NodeFocusPipeRenderer node={node} />
 
             {/* Node type label */}
             <div className={`node-type-label node-type-${node.getNodeLabel()}`}>{node.getNodeLabel()}</div>
@@ -139,6 +138,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     );
 };
 NodeGridElement.defaultProps = {
+    currentChipId: undefined,
     connectedEth: null,
 };
 export default NodeGridElement;

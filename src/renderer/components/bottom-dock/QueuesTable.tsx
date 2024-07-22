@@ -6,6 +6,7 @@ import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/t
 import { JSXElementConstructor, ReactElement, useContext, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { type Location, useLocation } from 'react-router-dom';
+import { Spinner } from '@blueprintjs/core';
 import { GraphVertexType } from '../../../data/GraphNames';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { getOperandState } from '../../../data/store/selectors/nodeSelection.selectors';
@@ -14,6 +15,7 @@ import SelectableOperation from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import useQueuesTableHook, { QueuesTableFields } from './useQueuesTable.hook';
 import type { LocationState } from '../../../data/StateTypes';
+import AsyncComponent from '../AsyncRenderer';
 
 /**
  * QueuesTable - temporary component to display queues
@@ -40,6 +42,7 @@ function QueuesTable() {
                             queueMap.set(queue.name, {
                                 name: queue.name,
                                 ...queue.details,
+                                chipId: graphOnChip.chipId,
                             } as unknown as QueuesTableFields);
                         }
                     });
@@ -57,6 +60,7 @@ function QueuesTable() {
 
     const queueCellRenderer = (rowIndex: number) => {
         const queueName = tableFields[rowIndex].name;
+        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
 
         return queueName ? (
             <SelectableOperation
@@ -65,6 +69,8 @@ function QueuesTable() {
                 selectFunc={selectOperand}
                 stringFilter=''
                 type={GraphVertexType.QUEUE}
+                offchip={isOffchip}
+                offchipClickHandler={navigateToGraph(queueName)}
             />
         ) : (
             ''
@@ -73,6 +79,7 @@ function QueuesTable() {
 
     const inputCellRenderer = (rowIndex: number) => {
         const { input } = tableFields[rowIndex];
+        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
 
         if (input === 'HOST') {
             return 'HOST';
@@ -91,40 +98,56 @@ function QueuesTable() {
                 stringFilter=''
                 value={selected(operandDescriptor.name)}
                 type={operandDescriptor.type}
-                offchip={operandDescriptor.operand.isOffchip}
+                offchip={isOffchip}
                 offchipClickHandler={navigateToGraph(operandDescriptor.name)}
             />
         );
     };
 
     return (
-        <Table2
-            ref={table}
-            renderMode={RenderMode.NONE}
-            forceRerenderOnSelectionChange
-            selectionModes={SelectionModes.NONE}
-            className='queues-table'
-            numRows={tableFields.length}
-            rowHeights={[...new Array(tableFields.length)].fill(24)}
-            enableColumnHeader
-            numFrozenColumns={1}
-            cellRendererDependencies={[sortDirection, sortingColumn, operandState, tableFields, tableFields.length]}
-        >
-            {
-                [...queuesTableColumns.keys()].map((key) =>
-                    columnRenderer({
-                        key,
-                        columnDefinition: queuesTableColumns,
-                        changeSorting,
+        <AsyncComponent
+            renderer={() => (
+                <Table2
+                    ref={table}
+                    renderMode={RenderMode.NONE}
+                    forceRerenderOnSelectionChange
+                    selectionModes={SelectionModes.NONE}
+                    className='queues-table'
+                    numRows={tableFields.length}
+                    rowHeights={[...new Array(tableFields.length)].fill(24)}
+                    enableColumnHeader
+                    numFrozenColumns={1}
+                    cellRendererDependencies={[
                         sortDirection,
                         sortingColumn,
+                        operandState,
                         tableFields,
-                        ...(key === 'queue' && { customCellContentRenderer: queueCellRenderer }),
-                        ...(key === 'input' && { customCellContentRenderer: inputCellRenderer }),
-                    }),
-                ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+                        tableFields.length,
+                    ]}
+                >
+                    {
+                        [...queuesTableColumns.keys()].map((key) =>
+                            columnRenderer({
+                                key,
+                                columnDefinition: queuesTableColumns,
+                                changeSorting,
+                                sortDirection,
+                                sortingColumn,
+                                tableFields,
+                                ...(key === 'queue' && { customCellContentRenderer: queueCellRenderer }),
+                                ...(key === 'input' && { customCellContentRenderer: inputCellRenderer }),
+                            }),
+                        ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+                    }
+                </Table2>
+            )}
+            loadingContent={
+                <div className='table-loading'>
+                    <Spinner />
+                    <p>Loading queues</p>
+                </div>
             }
-        </Table2>
+        />
     );
 }
 

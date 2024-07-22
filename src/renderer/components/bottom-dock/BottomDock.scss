@@ -157,4 +157,21 @@
             }
         }
     }
+
+    .table-loading {
+        display: grid;
+        align-content: center;
+        justify-content: center;
+        gap: 15px;
+        color: $tt-dark-gray;
+        height: 290px;
+
+        .bp4-spinner .bp4-spinner-track {
+            stroke: $tt-medium-light-gray;
+        }
+
+        .bp4-spinner .bp4-spinner-head {
+            stroke: $tt-dark-gray;
+        }
+    }
 }

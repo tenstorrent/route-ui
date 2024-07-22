@@ -10,7 +10,7 @@ import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 interface DetailedViewAXIRenderProps {
     links: DramBankLink[] | NetworkLink[];
     temporalEpoch: number;
-    nodeUid: string;
+    chipId?: number;
     filter: DramBankLinkName | NetworkLinkName | null;
     label: string;
 }
@@ -18,7 +18,7 @@ interface DetailedViewAXIRenderProps {
 export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
     links,
     temporalEpoch,
-    nodeUid,
+    chipId,
     filter,
     label,
 }) => {
@@ -28,7 +28,7 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
                 className='centered-svg'
                 links={links.filter((link) => (filter === null ? true : link.name === filter))}
                 temporalEpoch={temporalEpoch}
-                nodeUid={nodeUid}
+                chipId={chipId}
             />
             <div className='axi-dram'>
                 <p className='label'>{label}</p>
@@ -37,17 +37,19 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
     );
 };
 
+DetailedViewAXIRender.defaultProps = { chipId: undefined };
+
 interface DetailedViewANOC2XIRenderProps {
     links: NOC2AXILink[] | NOCLink[];
     temporalEpoch: number;
-    nodeUid: string;
+    chipId?: number;
     noc: NOC;
 }
 
 export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({
     links,
     temporalEpoch,
-    nodeUid,
+    chipId,
     noc,
 }) => {
     return (
@@ -59,8 +61,10 @@ export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps>
                 className='centered-svg'
                 links={links.filter((link) => (noc === NOC.ANY ? true : link.noc === noc))}
                 temporalEpoch={temporalEpoch}
-                nodeUid={nodeUid}
+                chipId={chipId}
             />
         </>
     );
 };
+
+DetailedViewNOC2AXIRender.defaultProps = { chipId: undefined };

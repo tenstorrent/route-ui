@@ -13,9 +13,10 @@ import { DetailedViewAXIRender, DetailedViewNOC2AXIRender } from './DetailedView
 interface DetailedViewPCIERendererProps {
     node: ComputeNode;
     temporalEpoch: number;
+    chipId?: number;
 }
 
-const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, temporalEpoch }) => {
+const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ node, temporalEpoch, chipId }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -41,13 +42,13 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                             <DetailedViewNOCRouterRenderer
                                 links={noc0links}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
+                                chipId={chipId}
                                 label='NOC0'
                             />
                             <DetailedViewNOC2AXIRender
                                 links={noc0axi ? [noc0axi] : []}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
+                                chipId={chipId}
                                 noc={NOC.ANY}
                             />
                         </div>
@@ -55,13 +56,13 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                             <DetailedViewNOCRouterRenderer
                                 links={noc1links}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
+                                chipId={chipId}
                                 label='NOC1'
                             />
                             <DetailedViewNOC2AXIRender
                                 links={noc1axi ? [noc1axi] : []}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
+                                chipId={chipId}
                                 noc={NOC.ANY}
                             />
                         </div>
@@ -76,7 +77,7 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                         <DetailedViewAXIRender
                             links={offChipPCIe ? [offChipPCIe] : []}
                             temporalEpoch={temporalEpoch}
-                            nodeUid={node.uid}
+                            chipId={chipId}
                             filter={null}
                             label='PCIe'
                         />
@@ -89,8 +90,8 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
                         return (
                             <LinkDetails
                                 key={link.name}
-                                nodeUid={node.uid}
                                 temporalEpoch={temporalEpoch}
+                                chipId={chipId}
                                 link={link}
                                 showEmpty={false}
                             />
@@ -100,6 +101,10 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
             </div>
         </>
     );
+};
+
+DetailedViewPCIERenderer.defaultProps = {
+    chipId: undefined,
 };
 
 export default DetailedViewPCIERenderer;

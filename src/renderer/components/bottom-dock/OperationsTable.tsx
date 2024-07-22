@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, Checkbox, Icon } from '@blueprintjs/core';
+import { Button, Checkbox, Icon, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { IColumnProps, RenderMode, SelectionModes, Table2 } from '@blueprintjs/table';
 import {
@@ -24,7 +24,10 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
 import { Operation } from '../../../data/GraphTypes';
 import { getOperandState, getSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
-import { getOperationRatioThreshold } from '../../../data/store/selectors/operationPerf.selectors';
+import {
+    getOperationRatioThreshold,
+    getShowOperationPerformanceGrid,
+} from '../../../data/store/selectors/operationPerf.selectors';
 import { updateNodeSelection } from '../../../data/store/slices/nodeSelection.slice';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import { numberFormatter, valueRatio } from '../../utils/numbers';
@@ -32,6 +35,7 @@ import SearchField from '../SearchField';
 import SelectableOperation, { SelectableOperationPerformance } from '../SelectableOperation';
 import { columnRenderer } from './SharedTable';
 import type { LocationState } from '../../../data/StateTypes';
+import AsyncComponent from '../AsyncRenderer';
 import type { BuildableOperation } from '../../../data/Graph';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
@@ -51,37 +55,35 @@ function OperationsTable() {
         }
 
         let list: OpTableFields[] = [];
-        let selectedOperation: BuildableOperation | undefined;
+        const selectedOperationCores: ComputeNode[] = [];
 
         // eslint-disable-next-line no-restricted-syntax
         for (const { graphOnChip } of graphOnChipList) {
-            selectedOperation = graphOnChip.getOperation(selectedOperationName);
-
-            if (selectedOperation) {
-                break;
-            }
+            selectedOperationCores.push(...(graphOnChip.getOperation(selectedOperationName)?.cores ?? []));
         }
 
-        if (selectedOperation) {
-            list = [...selectedOperation.cores].map((core: ComputeNode) => {
+        if (selectedOperationCores.length > 0) {
+            list = selectedOperationCores.map((core: ComputeNode) => {
                 return {
                     name: core.opName,
                     ...core.perfAnalyzerResults,
                     core_id: core.uid,
                     slowestOperandRef: core.operation?.slowestOperand,
+                    chipId: core.chipId,
                 } as OpTableFields;
             });
         } else {
             list = [
                 ...graphOnChipList
-                    .reduce((opMap, { graphOnChip: { operations } }) => {
-                        [...operations].forEach((op) => {
+                    .reduce((opMap, { graphOnChip }) => {
+                        [...graphOnChip.operations].forEach((op) => {
                             if (!opMap.has(op.name)) {
                                 opMap.set(op.name, {
                                     operation: op,
                                     name: op.name,
                                     ...op.details,
                                     slowestOperandRef: op.slowestOperand,
+                                    chipId: graphOnChip.chipId,
                                 } as unknown as OpTableFields);
                             }
                         });
@@ -105,6 +107,7 @@ function OperationsTable() {
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
     const table = useRef<Table2>(null);
     const operationRatioThreshold = useSelector(getOperationRatioThreshold);
+    const shouldShowOpPerformance = useSelector(getShowOperationPerformanceGrid);
 
     useEffect(() => {
         setSelectedOperationName('');
@@ -114,26 +117,31 @@ function OperationsTable() {
 
     const operationCellRenderer = (rowIndex: number) => {
         const opName = tableFields[rowIndex].name;
-        const operation = tableFields[rowIndex].operation || null;
+        const isOffchip =
+            (tableFields[rowIndex].operation as BuildableOperation)?.isOffchip ||
+            (chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId);
 
         return (
             <span className='operand-wrapper'>
                 {opName ? (
-                    <SelectableOperationPerformance operation={tableFields[rowIndex].operation || null}>
+                    <SelectableOperationPerformance
+                        operation={tableFields[rowIndex].operation || null}
+                        shouldShowOpPerformance={shouldShowOpPerformance}
+                    >
                         <SelectableOperation
                             opName={opName}
                             value={selected(opName)}
                             selectFunc={selectOperand}
                             stringFilter={filterQuery}
                             type={GraphVertexType.OPERATION}
-                            offchip={chipId !== undefined && operation?.isOffchip}
+                            offchip={isOffchip}
                             offchipClickHandler={navigateToGraph(opName)}
                         >
                             <Button
                                 style={{ height: '18px' }}
                                 small
                                 minimal
-                                disabled={operation?.isOffchip}
+                                disabled={isOffchip}
                                 title={selectedOperationName ? 'Back to operations view' : 'View operation cores'}
                                 icon={selectedOperationName ? IconNames.ARROW_LEFT : IconNames.ARROW_RIGHT}
                                 onClick={() => setSelectedOperationName(selectedOperationName ? '' : opName)}
@@ -173,6 +181,9 @@ function OperationsTable() {
     const slowestOperandCellRenderer = (rowIndex: number) => {
         const slowOpString = tableFields[rowIndex].slowest_operand;
         const slowestOperand = tableFields[rowIndex].slowestOperandRef;
+        const isOffchip =
+            (tableFields[rowIndex].operation as BuildableOperation)?.isOffchip ||
+            (chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId);
 
         if (slowestOperand) {
             const type: GraphVertexType = slowestOperand.vertexType;
@@ -185,6 +196,7 @@ function OperationsTable() {
                     )}
                     <SelectableOperationPerformance
                         operation={type === GraphVertexType.OPERATION ? (slowestOperand as Operation) : null}
+                        shouldShowOpPerformance={shouldShowOpPerformance}
                     >
                         <SelectableOperation
                             opName={slowestOperand.name}
@@ -192,14 +204,14 @@ function OperationsTable() {
                             selectFunc={selectOperand}
                             stringFilter=''
                             type={slowestOperand.vertexType}
-                            offchip={chipId !== undefined && slowestOperand.isOffchip}
+                            offchip={isOffchip}
                             offchipClickHandler={navigateToGraph(slowestOperand.name)}
                         >
                             <Button
                                 style={{ height: '18px' }}
                                 small
                                 minimal
-                                disabled={slowestOperand.isOffchip}
+                                disabled={isOffchip}
                                 icon={IconNames.ARROW_RIGHT}
                                 onClick={() => {
                                     setSelectedOperationName(slowestOperand.name);
@@ -242,58 +254,70 @@ function OperationsTable() {
     const columns = Array.from(operationsTableColumns.keys()).filter((key) => excludedColumn !== key);
 
     return (
-        <>
-            <div>
-                <SearchField
-                    disabled={!graphOnChipList || selectedOperationName !== ''}
-                    searchQuery={filterQuery}
-                    onQueryChanged={setFilterQuery}
-                    controls={[]}
-                />
-            </div>
-            <Table2
-                ref={table}
-                renderMode={RenderMode.NONE}
-                forceRerenderOnSelectionChange
-                selectionModes={SelectionModes.NONE}
-                className='operations-table'
-                numRows={tableFields.length}
-                rowHeights={[...new Array(tableFields.length)].fill(24)}
-                minColumnWidth={150}
-                enableColumnHeader
-                numFrozenColumns={1}
-                cellRendererDependencies={[
-                    sortDirection,
-                    sortingColumn,
-                    nodesSelectionState,
-                    tableFields,
-                    selectedOperationName,
-                    tableFields.length,
-                    operationRatioThreshold,
-                    filterQuery,
-                    allOperandsState,
-                ]}
-            >
-                {
-                    columns.map((key) =>
-                        columnRenderer({
-                            key: key as keyof OpTableFields,
-                            columnDefinition: operationsTableColumns,
-                            changeSorting,
+        <AsyncComponent
+            renderer={() => (
+                <>
+                    <div>
+                        <SearchField
+                            disabled={!graphOnChipList || selectedOperationName !== ''}
+                            searchQuery={filterQuery}
+                            onQueryChanged={setFilterQuery}
+                            controls={[]}
+                        />
+                    </div>
+                    <Table2
+                        ref={table}
+                        renderMode={RenderMode.NONE}
+                        forceRerenderOnSelectionChange
+                        selectionModes={SelectionModes.NONE}
+                        className='operations-table'
+                        numRows={tableFields.length}
+                        rowHeights={[...new Array(tableFields.length)].fill(24)}
+                        minColumnWidth={150}
+                        enableColumnHeader
+                        numFrozenColumns={1}
+                        cellRendererDependencies={[
                             sortDirection,
                             sortingColumn,
+                            nodesSelectionState,
                             tableFields,
-                            ...(key === 'model_runtime_per_input' && {
-                                customCellContentRenderer: modelRuntimeCellRenderer,
-                            }),
-                            ...(key === 'slowest_operand' && { customCellContentRenderer: slowestOperandCellRenderer }),
-                            ...(key === 'operation' && { customCellContentRenderer: operationCellRenderer }),
-                            ...(key === 'core_id' && { customCellContentRenderer: coreIdCellRenderer }),
-                        }),
-                    ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
-                }
-            </Table2>
-        </>
+                            selectedOperationName,
+                            tableFields.length,
+                            operationRatioThreshold,
+                            filterQuery,
+                            allOperandsState,
+                        ]}
+                    >
+                        {
+                            columns.map((key) =>
+                                columnRenderer({
+                                    key: key as keyof OpTableFields,
+                                    columnDefinition: operationsTableColumns,
+                                    changeSorting,
+                                    sortDirection,
+                                    sortingColumn,
+                                    tableFields,
+                                    ...(key === 'model_runtime_per_input' && {
+                                        customCellContentRenderer: modelRuntimeCellRenderer,
+                                    }),
+                                    ...(key === 'slowest_operand' && {
+                                        customCellContentRenderer: slowestOperandCellRenderer,
+                                    }),
+                                    ...(key === 'operation' && { customCellContentRenderer: operationCellRenderer }),
+                                    ...(key === 'core_id' && { customCellContentRenderer: coreIdCellRenderer }),
+                                }),
+                            ) as unknown as ReactElement<IColumnProps, JSXElementConstructor<any>>
+                        }
+                    </Table2>
+                </>
+            )}
+            loadingContent={
+                <div className='table-loading'>
+                    <Spinner />
+                    <p>Loading operations</p>
+                </div>
+            }
+        />
     );
 }
 

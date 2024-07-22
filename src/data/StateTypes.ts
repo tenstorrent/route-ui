@@ -4,7 +4,6 @@
 
 import type { RelativeRoutingType } from 'react-router-dom';
 import type { GraphVertexType } from './GraphNames';
-import { type EthernetLinkName, LinkType } from './Types';
 
 export interface ExperimentalFeaturesState {}
 
@@ -52,38 +51,11 @@ export interface NodeSelectionState {
     focusNode: string | null;
 }
 
-export interface LinkState {
-    id: string;
-    ethDirection?: EthernetLinkName;
-    totalDataBytes: number;
-    bpc: number;
-    saturation: number;
-    maxBandwidth: number;
-    type: LinkType;
-    normalizedSaturation: number;
-}
-
-export interface LinkGraphState {
-    links: Record<string, LinkState>;
-    totalOps: number;
-    temporalEpoch: number;
-}
-
-export interface LinkStateCongestion {
-    linksByLinkId: Record<string, LinkState>;
-    ethLinkIds: string[];
-    offchipLinkIds: string[];
-    maxLinkSaturation: number;
-    offchipMaxSaturation: number;
-    chipId: number;
-}
-
 export interface NetworkCongestionState {
     linkSaturationTreshold: number;
     linksPerTemporalEpoch: {
-        linksStateCongestionByNode: Record<NodeUID, LinkStateCongestion>;
         totalOps: number;
-        totalOpPerChip: number[];
+        chipTotalOps: number[];
         normalizedTotalOps: number;
         initialNormalizedTotalOps: number;
     }[];
@@ -109,16 +81,12 @@ export type FolderLocationType = 'local' | 'remote';
 
 export interface LocationState {
     epoch: number;
-    /** @deprecated */
-    graphName?: string;
     chipId?: number;
     previous?: {
         path: string;
-        graphName: string;
     };
     next?: {
         path: string;
-        graphName: string;
     };
 }
 

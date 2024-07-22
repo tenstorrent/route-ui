@@ -15,9 +15,10 @@ import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 interface DetailedViewETHRendererProps {
     node: ComputeNode;
     temporalEpoch: number;
+    chipId?: number;
 }
 
-const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, temporalEpoch }) => {
+const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, temporalEpoch, chipId }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -42,7 +43,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                         <DetailedViewNOCRouterRenderer
                                             links={noc0links}
                                             temporalEpoch={temporalEpoch}
-                                            nodeUid={node.uid}
+                                            chipId={chipId}
                                             label='NOC0'
                                         />
                                     </div>
@@ -50,7 +51,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                         <DetailedViewNOCRouterRenderer
                                             links={noc1links}
                                             temporalEpoch={temporalEpoch}
-                                            nodeUid={node.uid}
+                                            chipId={chipId}
                                             label='NOC1'
                                         />
                                     </div>
@@ -61,7 +62,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                                         <DetailedViewPipeRenderer
                                             links={internalNOCLinks}
                                             temporalEpoch={temporalEpoch}
-                                            nodeUid={node.uid}
+                                            chipId={chipId}
                                         />
                                     </div>
                                 </div>
@@ -76,7 +77,7 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                             <DetailedViewPipeRenderer
                                 links={internalNOCLinks}
                                 temporalEpoch={temporalEpoch}
-                                nodeUid={node.uid}
+                                chipId={chipId}
                                 className='centered-svg'
                             />
                         </div>
@@ -88,8 +89,8 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
                         return (
                             <LinkDetails
-                                nodeUid={node.uid}
                                 temporalEpoch={temporalEpoch}
+                                chipId={chipId}
                                 key={link.name}
                                 link={link}
                                 showEmpty={false}
@@ -100,6 +101,10 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
             </div>
         </>
     );
+};
+
+DetailedViewETHRenderer.defaultProps = {
+    chipId: undefined,
 };
 
 export default DetailedViewETHRenderer;
