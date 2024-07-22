@@ -27,7 +27,7 @@ export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState)
 
 export const getOrderedSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
     (state.nodeSelection.selectedNodeList[temporalEpoch] ?? [])
-        .map((id) => state.nodeSelection.nodeList[temporalEpoch][id])
+        .map((id) => state.nodeSelection.nodeList[temporalEpoch]![id]!)
         .toReversed();
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;
