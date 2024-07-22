@@ -18,7 +18,7 @@ function formatDisplayGraphName({
     chipId = -1,
     showTemporalEpoch = false,
 }: Partial<GraphRelationship & { showTemporalEpoch: boolean }>) {
-    return `${name} (${showTemporalEpoch ? `Epoch: ${temporalEpoch} ` : ''}Chip: ${chipId})`;
+    return `${name} (${showTemporalEpoch ? `Epoch ${temporalEpoch} ` : ''}Chip ${chipId})`;
 }
 
 interface GraphSelectorProps {
