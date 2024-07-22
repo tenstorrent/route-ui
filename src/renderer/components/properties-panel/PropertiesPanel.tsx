@@ -46,7 +46,7 @@ export default function PropertiesPanel() {
                             Operations <Icon icon={IconNames.CUBE} />
                         </span>
                     }
-                    panel={<OperationsPropertiesTab graphs={graphOnChipList} />}
+                    panel={<OperationsPropertiesTab graphs={graphOnChipList} chipId={chipId} />}
                 />
                 <Tab
                     id='tab-queues'
@@ -55,7 +55,7 @@ export default function PropertiesPanel() {
                             Queues <QueueIcon />{' '}
                         </span>
                     }
-                    panel={<QueuesPropertiesTab graphs={graphOnChipList} />}
+                    panel={<QueuesPropertiesTab graphs={graphOnChipList} chipId={chipId} />}
                 />
             </Tabs>
             <div className='panel-overlay' />

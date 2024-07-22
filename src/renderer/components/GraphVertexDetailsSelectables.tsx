@@ -2,36 +2,47 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
 
-import React, { useContext } from 'react';
+import { type FC } from 'react';
 import { Operand } from '../../data/Graph';
 import SelectableOperation from './SelectableOperation';
 import useSelectableGraphVertex from '../hooks/useSelectableGraphVertex.hook';
-import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
-import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
-const GraphVertexDetailsSelectables = (props: {
-    operand: Operand,
-    stringFilter?: string,
-    displayType?: boolean
+interface GraphVertexDetailsSelectablesProps {
+    operand: Operand;
+    stringFilter?: string;
+    showType?: boolean;
+    isOffchip?: boolean;
+    disabled?: boolean;
+}
 
-}): React.ReactElement | null => {
-    const { operand, stringFilter = '', displayType = true } = props;
+const GraphVertexDetailsSelectables: FC<GraphVertexDetailsSelectablesProps> = ({
+    operand,
+    stringFilter = '',
+    showType = true,
+    isOffchip,
+    disabled = false,
+}) => {
     const { selectOperand, selected, navigateToGraph } = useSelectableGraphVertex();
 
-    return <SelectableOperation
-        opName={operand.name}
-        value={selected(operand.name)}
-        selectFunc={selectOperand}
-        stringFilter={stringFilter}
-        offchip={operand.isOffchip}
-        type={displayType ? operand.vertexType : null}
-        offchipClickHandler={navigateToGraph(operand.name)}
-    />;
+    return (
+        <SelectableOperation
+            opName={operand.name}
+            value={selected(operand.name)}
+            selectFunc={selectOperand}
+            stringFilter={stringFilter}
+            offchip={isOffchip}
+            type={showType ? operand.vertexType : null}
+            offchipClickHandler={navigateToGraph(operand.name)}
+            disabled={disabled}
+        />
+    );
 };
 
 GraphVertexDetailsSelectables.defaultProps = {
-    displayType: true,
+    showType: true,
     stringFilter: '',
+    isOffchip: undefined,
+    disabled: undefined,
 };
 
 export default GraphVertexDetailsSelectables;

@@ -48,7 +48,7 @@ const TopHeaderComponent: React.FC = () => {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch: temporalEpoch } = location.state;
 
-    const { resetGraphOnChipState, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
+    const { getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
     const graphOnChipList = getGraphOnChipListForTemporalEpoch(temporalEpoch, chipId);
 
     const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, loadPerfAnalyzerGraph, loadTemporalEpoch } =
@@ -78,11 +78,8 @@ const TopHeaderComponent: React.FC = () => {
             dispatch(setSelectedRemoteFolder(newFolder));
         }
 
-        // TODO: do we need this call?
-        resetGraphOnChipState();
-
         if (checkLocalFolderExists(folderPath)) {
-            await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
+            const [firstGraph] = await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
 
             if (newFolderLocationType === 'local') {
                 sendEventToMain(ElectronEvents.UPDATE_WINDOW_TITLE, `(Local Folder) — ${getTestName(folderPath)}`);
@@ -92,6 +89,13 @@ const TopHeaderComponent: React.FC = () => {
                     formatRemoteFolderName(remoteConnectionConfig.selectedConnection, newFolder as RemoteFolder),
                 );
             }
+
+            navigate('/render', {
+                state: {
+                    epoch: firstGraph?.temporalEpoch ?? 0,
+                    chipId: firstGraph?.chipId ?? 0,
+                },
+            });
         }
     };
 
@@ -120,7 +124,7 @@ const TopHeaderComponent: React.FC = () => {
                     <FolderPicker
                         icon={IconNames.FolderSharedOpen}
                         onSelectFolder={async () => {
-                            const folderPath = await openPerfAnalyzerFolderDialog();
+                            const folderPath = openPerfAnalyzerFolderDialog();
 
                             if (folderPath) {
                                 await updateSelectedFolder(folderPath, 'local');
@@ -130,7 +134,7 @@ const TopHeaderComponent: React.FC = () => {
                     />
                 </Tooltip2>
                 <GraphSelector
-                    onSelectGraph={(graphName) => loadPerfAnalyzerGraph(graphName)}
+                    onSelectGraph={(graphRelationship) => loadPerfAnalyzerGraph(graphRelationship)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}
                 />
                 {/* TODO: reenable once we figure out how to disable the buttons from going to the home screen */}
