@@ -39,8 +39,8 @@ const linkSaturationSlice = createSlice({
             const temporalEpochState = state.linksPerTemporalEpoch[temporalEpoch];
 
             if (temporalEpochState) {
-                if (chipId !== undefined && temporalEpochState.chipTotalOps[chipId] !== undefined) {
-                    temporalEpochState.chipTotalOps[chipId] = totalOps;
+                if (chipId !== undefined && temporalEpochState.totalOpsByChipId[chipId] !== undefined) {
+                    temporalEpochState.totalOpsByChipId[chipId] = totalOps;
                 } else {
                     temporalEpochState.totalOps = totalOps;
                 }
@@ -48,7 +48,7 @@ const linkSaturationSlice = createSlice({
         },
         updateEpochNormalizedOP: (state, action: PayloadAction<{ epoch: number; updatedValue: number }>) => {
             const { epoch, updatedValue } = action.payload;
-            state.linksPerTemporalEpoch[epoch].normalizedTotalOps = updatedValue;
+            state.linksPerTemporalEpoch[epoch]!.normalizedTotalOps = updatedValue;
         },
         initialLoadLinkData: (state, action: PayloadAction<NetworkCongestionState['linksPerTemporalEpoch']>) => {
             state.linksPerTemporalEpoch = action.payload;

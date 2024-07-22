@@ -35,7 +35,7 @@ const nodeSelectionSlice = createSlice({
                 state.dramNodesHighlight[epochNumber] = {};
 
                 computeNodeStateList.forEach((item) => {
-                    state.nodeList[epochNumber][item.uid] = {
+                    state.nodeList[epochNumber]![item.uid] = {
                         id: item.uid,
                         opName: item.opName,
                         queueNameList: item.queueNameList,
@@ -44,15 +44,13 @@ const nodeSelectionSlice = createSlice({
                     };
 
                     if (item.dramChannelId !== -1) {
-                        const dramGroup = action.payload[epochNumber]
-                            .filter(
-                                ({ dramChannelId, chipId }) =>
-                                    dramChannelId === item.dramChannelId && chipId === item.chipId,
-                            )
-                            .map(({ uid }) => uid);
+                        const dramGroup = action.payload[epochNumber]!.filter(
+                            ({ dramChannelId, chipId }) =>
+                                dramChannelId === item.dramChannelId && chipId === item.chipId,
+                        ).map(({ uid }) => uid);
 
-                        state.nodeList[epochNumber][item.uid].dramGroup = dramGroup;
-                        state.dramNodesHighlight[epochNumber][item.uid] = false;
+                        state.nodeList[epochNumber]![item.uid]!.dramGroup = dramGroup;
+                        state.dramNodesHighlight[epochNumber]![item.uid] = false;
                     }
 
                     if (item.queueNameList.length > 0) {
@@ -88,25 +86,25 @@ const nodeSelectionSlice = createSlice({
 
             node.selected = selected;
 
-            const nodeIndex = state.selectedNodeList[temporalEpoch].indexOf(id);
+            const nodeIndex = state.selectedNodeList[temporalEpoch]!.indexOf(id);
             if (nodeIndex > -1 && !selected) {
-                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch]].toSpliced(
+                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch]!].toSpliced(
                     nodeIndex,
                     1,
                 );
             }
 
             if (nodeIndex === -1 && selected) {
-                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch], id];
+                state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch]!, id];
             }
 
             const shouldKeepHighlighted =
-                state.nodeList[temporalEpoch][id].dramGroup?.some(
-                    (dramId) => state.nodeList[temporalEpoch][dramId].selected,
+                state.nodeList[temporalEpoch]![id]!.dramGroup?.some(
+                    (dramId) => state.nodeList[temporalEpoch]![dramId]!.selected,
                 ) ?? false;
 
-            state.nodeList[temporalEpoch][id].dramGroup?.forEach((dramId) => {
-                state.dramNodesHighlight[temporalEpoch][dramId] = shouldKeepHighlighted || selected;
+            state.nodeList[temporalEpoch]![id]!.dramGroup?.forEach((dramId) => {
+                state.dramNodesHighlight[temporalEpoch]![dramId] = shouldKeepHighlighted || selected;
             });
         },
         selectOperandList(state, action: PayloadAction<{ operands: string[]; selected: boolean }>) {
@@ -114,7 +112,7 @@ const nodeSelectionSlice = createSlice({
 
             operandsToSelect.forEach((operandName) => {
                 if (state.operands[operandName]) {
-                    state.operands[operandName].selected = selected;
+                    state.operands[operandName]!.selected = selected;
                 }
             });
         },
@@ -122,7 +120,7 @@ const nodeSelectionSlice = createSlice({
             const { operandName, selected } = action.payload;
 
             if (state.operands[operandName]) {
-                state.operands[operandName].selected = selected;
+                state.operands[operandName]!.selected = selected;
             }
         },
         updateFocusNode(state, action: PayloadAction<string | null>) {
