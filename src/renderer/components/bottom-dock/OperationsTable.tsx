@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { Button, Checkbox, Icon, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
@@ -273,6 +273,7 @@ function OperationsTable() {
                         className='operations-table'
                         numRows={tableFields.length}
                         rowHeights={[...new Array(tableFields.length)].fill(24)}
+                        minColumnWidth={150}
                         enableColumnHeader
                         numFrozenColumns={1}
                         cellRendererDependencies={[

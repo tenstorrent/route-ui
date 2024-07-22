@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// SPDX-FileCopyrightText: © 2024 Tenstorrent Inc.
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { selectNodeSelectionById } from 'data/store/selectors/nodeSelection.selectors';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';

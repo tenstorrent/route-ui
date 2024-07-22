@@ -33,11 +33,18 @@ To package apps for the local platform:
 ```bash
 npm run package
 ```
+```bash
+npm run package-linux
+```
+
+#### Post Installation (mac only)
+run `xattr -d com.apple.quarantine /Applications/Route\ UI.app` in terminal after installation to bypass Apple security settings
 
 
-## required and expected files and folders
 
-Inside the folder containing a test you want to visualize, the following files and folders are expected:
+### required and expected files and folders in run folder
+
+Inside the folder containing a run you want to visualize, the following files and folders are expected:
 
 - `runtime_data.yaml`
 - `cluster_desc.yaml`
