@@ -5,11 +5,10 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import { NetworkCongestionState } from 'data/StateTypes';
-import { LinkType, NOC } from 'data/Types';
+import { NOC } from 'data/Types';
 import {
     AICLK_INITIAL_MHZ,
     DRAM_BANDWIDTH_INITIAL_GBS,
-    ETH_BANDWIDTH_INITIAL_GBS,
     LINK_SATURATION_INITIAIL_PERCENT,
     PCIE_BANDWIDTH_INITIAL_GBS,
 } from 'data/constants';
@@ -32,12 +31,19 @@ const linkSaturationSlice = createSlice({
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturationTreshold = action.payload;
         },
-        updateTotalOPs: (state, action: PayloadAction<{ temporalEpoch: number; totalOps: number }>) => {
-            const { temporalEpoch, totalOps } = action.payload;
+        updateTotalOPs: (
+            state,
+            action: PayloadAction<{ temporalEpoch: number; chipId?: number; totalOps: number }>,
+        ) => {
+            const { temporalEpoch, totalOps, chipId } = action.payload;
             const temporalEpochState = state.linksPerTemporalEpoch[temporalEpoch];
 
             if (temporalEpochState) {
-                temporalEpochState.totalOps = totalOps;
+                if (chipId !== undefined && temporalEpochState.chipTotalOps[chipId] !== undefined) {
+                    temporalEpochState.chipTotalOps[chipId] = totalOps;
+                } else {
+                    temporalEpochState.totalOps = totalOps;
+                }
             }
         },
         updateEpochNormalizedOP: (state, action: PayloadAction<{ epoch: number; updatedValue: number }>) => {
@@ -72,58 +78,6 @@ const linkSaturationSlice = createSlice({
         },
     },
 });
-
-interface LinkSaturationMetrics {
-    linkType: LinkType;
-    totalOps: number;
-    DRAMBandwidth: number;
-    PCIBandwidth: number;
-    CLKMHz: number;
-    totalDataBytes: number;
-}
-
-export const calculateLinkSaturationMetrics = ({
-    linkType,
-    totalOps,
-    DRAMBandwidth,
-    CLKMHz,
-    PCIBandwidth,
-    totalDataBytes,
-}: LinkSaturationMetrics) => {
-    const DRAMBandwidthBytes = DRAMBandwidth * 1000 * 1000 * 1000;
-    const PCIBandwidthGBs = PCIBandwidth * 1000 * 1000 * 1000;
-    const CLKHz = CLKMHz * 1000 * 1000;
-
-    let maxBandwidth = 0;
-
-    if (linkType === LinkType.ETHERNET) {
-        maxBandwidth = ETH_BANDWIDTH_INITIAL_GBS;
-    } else if (linkType === LinkType.DRAM) {
-        maxBandwidth = DRAMBandwidthBytes / CLKHz;
-    } else if (linkType === LinkType.PCIE) {
-        maxBandwidth = PCIBandwidthGBs / CLKHz;
-    }
-
-    let bpc = totalDataBytes / totalOps;
-
-    // Handle division by zero
-    if (Number.isNaN(bpc) || Math.abs(bpc) === Infinity) {
-        bpc = 0;
-    }
-
-    let saturation = (bpc / maxBandwidth) * 100;
-
-    // Handle division by zero
-    if (Number.isNaN(saturation) || Math.abs(saturation) === Infinity) {
-        saturation = 0;
-    }
-
-    return {
-        saturation,
-        bpc,
-        maxBandwidth,
-    };
-};
 
 export const {
     initialLoadLinkData,

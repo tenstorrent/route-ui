@@ -15,6 +15,7 @@ import { DataTableColumnDefinition, SortingDirection, sortAsc, sortDesc } from '
 export interface QueuesTableFields extends QueueDetailsJson {
     queue?: Queue;
     name: string;
+    chipId: number;
 }
 
 type QueuesTableColumn = keyof QueuesTableFields | 'queue' | `blockDimensions.${keyof QueueBlockDimensions}`;

@@ -15,7 +15,7 @@ import {
     getShowLinkSaturation,
     getShowNOC0,
     getShowNOC1,
-    getTotalOpsForGraph,
+    getTotalOps,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState, getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
@@ -27,21 +27,22 @@ import {
     drawNOCRouter,
     drawSelections,
 } from '../../../utils/DrawingAPI';
-import { calculateLinkSaturationMetrics } from '../../../data/store/slices/linkSaturation.slice';
+import { calculateLinkSaturationMetrics } from '../../utils/linkSaturation';
 
 interface NodePipeRendererProps {
     node: ComputeNode;
     temporalEpoch: number;
+    chipId?: number;
 }
 
-const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch }) => {
+const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch, chipId }) => {
     const focusPipe = useSelector(getFocusPipe);
     const selectedPipeIds = useSelector(getSelectedPipesIds);
     const showLinkSaturation = useSelector(getShowLinkSaturation);
     const DRAMBandwidth = useSelector(getDRAMBandwidth);
     const PCIBandwidth = useSelector(getPCIBandwidth);
     const CLKMHz = useSelector(getCLKMhz);
-    const totalOps = useSelector(getTotalOpsForGraph(temporalEpoch));
+    const totalOps = useSelector(getTotalOps(temporalEpoch, chipId));
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);
@@ -84,6 +85,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch }) =>
                         DRAMBandwidth,
                         PCIBandwidth,
                         totalOps,
+                        initialMaxBandwidth: link.maxBandwidth,
                     });
 
                     if (saturation >= linkSaturationTreshold) {
@@ -141,5 +143,7 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch }) =>
         />
     );
 };
+
+NodePipeRenderer.defaultProps = { chipId: undefined };
 
 export default NodePipeRenderer;

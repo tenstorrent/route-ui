@@ -30,17 +30,18 @@ import AsyncComponent from './AsyncRenderer';
 interface NodeGridElementProps {
     node: ComputeNode;
     temporalEpoch: number;
+    currentChipId?: number;
     connectedEth?: ClusterChip | null;
 }
 
-const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, connectedEth }) => {
+const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, currentChipId, connectedEth }) => {
     const dispatch = useDispatch();
     const nodeState = useSelector(selectNodeSelectionById(temporalEpoch, node.uid));
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
     const focusPipe = useSelector(getFocusPipe);
 
-    const showOpNames = useSelector(getShowOperationNames);
+    const showOperationNames = useSelector(getShowOperationNames);
 
     // Use the top border to determine if the label should be shown.
     // It will only show for the items that are the "first" in that selected group.
@@ -73,7 +74,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
     return (
         <button
-            title={showOpNames && shouldShowLabel ? node.opName : ''}
+            title={showOperationNames && shouldShowLabel ? node.opName : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
@@ -107,8 +108,10 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
                 renderer={() => (
                     <OffChipNodeLinkCongestionLayer
                         temporalEpoch={temporalEpoch}
-                        offchipLinkIds={node.offchipLinkIds}
-                        links={node.links}
+                        chipId={currentChipId}
+                        nodeType={node.type}
+                        internalLinks={node.internalLinks}
+                        dramLinks={node.dramChannel?.links}
                     />
                 )}
                 loadingContent=''
@@ -116,13 +119,13 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
             {/* Labels for location and operation */}
             <NodeLocation node={node} />
-            <NodeOperationLabel opName={node.opName} shouldRender={showOpNames && shouldShowLabel} />
+            <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
 
             {/* Pipes */}
             <AsyncComponent
                 renderer={() => (
                     <>
-                        <NodePipeRenderer node={node} temporalEpoch={temporalEpoch} />
+                        <NodePipeRenderer node={node} temporalEpoch={temporalEpoch} chipId={currentChipId} />
                         <NodeFocusPipeRenderer node={node} />
                     </>
                 )}
@@ -135,6 +138,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
     );
 };
 NodeGridElement.defaultProps = {
+    currentChipId: undefined,
     connectedEth: null,
 };
 export default NodeGridElement;
