@@ -55,7 +55,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadGraphOnChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationship[]) => {
         const operands: OperandDescriptor[] = newChips
             .map((graphOnChip, index) => {
-                const { temporalEpoch } = graphs[index];
+                const { temporalEpoch } = graphs[index]!;
                 return [
                     ...[...graphOnChip.operations]
                         .filter((op) => !op?.isOffchip ?? true)
@@ -77,7 +77,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             })
             .flat();
 
-        const graphOnChipList = Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip]));
+        const graphOnChipList = Object.fromEntries(newChips.map((chip, index) => [graphs[index]!.name, chip]));
         const graphsByTemporalEpoch = graphs.reduce((graphsByEpoch, graphRelationship) => {
             if (!graphsByEpoch.has(graphRelationship.temporalEpoch)) {
                 graphsByEpoch.set(graphRelationship.temporalEpoch, []);
@@ -87,7 +87,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             normalizedGraphsList[graphRelationship.chipId] = {
                 graph: graphRelationship,
-                graphOnChip: graphOnChipList[graphRelationship.name],
+                graphOnChip: graphOnChipList[graphRelationship.name]!,
             };
 
             graphsByEpoch.set(graphRelationship.temporalEpoch, normalizedGraphsList);
@@ -124,7 +124,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             if (chipId !== undefined) {
                 if (graphArray[chipId]) {
-                    return [graphArray[chipId]];
+                    return [graphArray[chipId]!];
                 }
 
                 return [];
