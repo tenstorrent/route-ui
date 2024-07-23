@@ -52,7 +52,10 @@ const linkSaturationSlice = createSlice({
         },
         updateEpochNormalizedOP: (state, action: PayloadAction<{ epoch: number; updatedValue: number }>) => {
             const { epoch, updatedValue } = action.payload;
-            state.linksPerTemporalEpoch[epoch]!.normalizedTotalOps = updatedValue;
+
+            if (state.linksPerTemporalEpoch[epoch]) {
+                state.linksPerTemporalEpoch[epoch]!.normalizedTotalOps = updatedValue;
+            }
         },
         initialLoadLinkData: (state, action: PayloadAction<NetworkCongestionState['linksPerTemporalEpoch']>) => {
             state.linksPerTemporalEpoch = action.payload;

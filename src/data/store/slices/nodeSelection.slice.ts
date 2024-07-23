@@ -86,7 +86,7 @@ const nodeSelectionSlice = createSlice({
 
             node.selected = selected;
 
-            const nodeIndex = state.selectedNodeList[temporalEpoch]!.indexOf(id);
+            const nodeIndex = state.selectedNodeList[temporalEpoch]?.indexOf(id) ?? -1;
             if (nodeIndex > -1 && !selected) {
                 state.selectedNodeList[temporalEpoch] = [...state.selectedNodeList[temporalEpoch]!].toSpliced(
                     nodeIndex,
@@ -99,11 +99,11 @@ const nodeSelectionSlice = createSlice({
             }
 
             const shouldKeepHighlighted =
-                state.nodeList[temporalEpoch]![id]!.dramGroup?.some(
-                    (dramId) => state.nodeList[temporalEpoch]![dramId]!.selected,
+                state.nodeList[temporalEpoch]?.[id]?.dramGroup?.some(
+                    (dramId) => state.nodeList[temporalEpoch]?.[dramId]?.selected ?? false,
                 ) ?? false;
 
-            state.nodeList[temporalEpoch]![id]!.dramGroup?.forEach((dramId) => {
+            state.nodeList[temporalEpoch]?.[id]?.dramGroup?.forEach((dramId) => {
                 state.dramNodesHighlight[temporalEpoch]![dramId] = shouldKeepHighlighted || selected;
             });
         },

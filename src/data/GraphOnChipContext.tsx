@@ -56,6 +56,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const operands: OperandDescriptor[] = newChips
             .map((graphOnChip, index) => {
                 const { temporalEpoch } = graphs[index]!;
+
                 return [
                     ...[...graphOnChip.operations]
                         .filter((op) => !op?.isOffchip ?? true)
