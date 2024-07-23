@@ -4,10 +4,11 @@
 
 import { RootState } from '../createStore';
 
-export const getTotalOps = (temporalEpoch: number, chipId?: number) => (state: RootState) =>
-    chipId !== undefined
-        ? state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]!.totalOpsByChipId[chipId]!
-        : state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]!.totalOps;
+export const getTotalOpsforTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]!.totalOps;
+
+export const getTotalOpsForChipId = (temporalEpoch: number, chipId: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]!.totalOpsByChipId[chipId]!;
 export const getTotalOpsList = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]!.totalOpsByChipId;
 export const getEpochNormalizedTotalOps = (temporalEpoch: number) => (state: RootState) =>

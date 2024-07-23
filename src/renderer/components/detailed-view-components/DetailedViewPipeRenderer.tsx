@@ -25,7 +25,8 @@ import {
     getShowLinkSaturation,
     getShowNOC0,
     getShowNOC1,
-    getTotalOps,
+    getTotalOpsForChipId,
+    getTotalOpsforTemporalEpoch,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { LinkRenderType, calculateLinkCongestionColor, drawLink, drawPipesDirect } from '../../../utils/DrawingAPI';
@@ -56,7 +57,9 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     const DRAMBandwidth = useSelector(getDRAMBandwidth);
     const PCIBandwidth = useSelector(getPCIBandwidth);
     const CLKMHz = useSelector(getCLKMhz);
-    const totalOps = useSelector(getTotalOps(temporalEpoch, chipId));
+    const totalOps = useSelector(
+        chipId !== undefined ? getTotalOpsForChipId(temporalEpoch, chipId) : getTotalOpsforTemporalEpoch(temporalEpoch),
+    );
 
     // TODO: see if useLayoutEffect is better in a future
     useEffect(() => {

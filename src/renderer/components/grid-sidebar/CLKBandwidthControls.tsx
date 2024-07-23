@@ -7,9 +7,10 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     updateCLK,
+    updateChipTotalOps,
     updateDRAMBandwidth,
+    updateEpochTotalOPs,
     updatePCIBandwidth,
-    updateTotalOPs,
 } from 'data/store/slices/linkSaturation.slice';
 import { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +24,8 @@ import {
     getCLKMhz,
     getDRAMBandwidth,
     getPCIBandwidth,
-    getTotalOps,
+    getTotalOpsForChipId,
+    getTotalOpsforTemporalEpoch,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import type { LocationState } from '../../../data/StateTypes';
 
@@ -39,7 +41,9 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);
     const PCIeBandwidth = useSelector(getPCIBandwidth);
-    const opCycles = useSelector(getTotalOps(epoch, chipId));
+    const opCycles = useSelector(
+        chipId !== undefined ? getTotalOpsForChipId(epoch, chipId) : getTotalOpsforTemporalEpoch(epoch),
+    );
     const totalOpCycles = graphOnChipList.reduce(
         (totalOps, { graphOnChip }) => Math.max(totalOps, graphOnChip.totalOpCycles),
         1,
@@ -51,9 +55,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                 <Button
                     minimal
                     onClick={() => {
-                        requestAnimationFrame(() =>
-                            dispatch(updateTotalOPs({ temporalEpoch: epoch, chipId, totalOps: totalOpCycles })),
-                        );
+                        requestAnimationFrame(() => {
+                            if (chipId !== undefined) {
+                                dispatch(updateChipTotalOps({ temporalEpoch: epoch, chipId, totalOps: totalOpCycles }));
+                            } else {
+                                dispatch(updateEpochTotalOPs({ temporalEpoch: epoch, totalOps: totalOpCycles }));
+                            }
+                        });
                     }}
                     icon={IconNames.RESET}
                 />
@@ -97,9 +105,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                             newValue = 1;
                         }
 
-                        requestAnimationFrame(() =>
-                            dispatch(updateTotalOPs({ temporalEpoch: epoch, chipId, totalOps: newValue })),
-                        );
+                        requestAnimationFrame(() => {
+                            if (chipId !== undefined) {
+                                dispatch(updateChipTotalOps({ temporalEpoch: epoch, chipId, totalOps: newValue }));
+                            } else {
+                                dispatch(updateEpochTotalOPs({ temporalEpoch: epoch, totalOps: newValue }));
+                            }
+                        });
                     }}
                     rightElement={aiclkRightElement}
                 />

@@ -15,7 +15,8 @@ import {
     getShowLinkSaturation,
     getShowNOC0,
     getShowNOC1,
-    getTotalOps,
+    getTotalOpsForChipId,
+    getTotalOpsforTemporalEpoch,
 } from '../../../data/store/selectors/linkSaturation.selectors';
 import { getFocusPipe, getSelectedPipesIds } from '../../../data/store/selectors/pipeSelection.selectors';
 import { getHighContrastState, getShowEmptyLinks } from '../../../data/store/selectors/uiState.selectors';
@@ -42,7 +43,9 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch, chip
     const DRAMBandwidth = useSelector(getDRAMBandwidth);
     const PCIBandwidth = useSelector(getPCIBandwidth);
     const CLKMHz = useSelector(getCLKMhz);
-    const totalOps = useSelector(getTotalOps(temporalEpoch, chipId));
+    const totalOps = useSelector(
+        chipId !== undefined ? getTotalOpsForChipId(temporalEpoch, chipId) : getTotalOpsforTemporalEpoch(temporalEpoch),
+    );
 
     const svgRef = useRef<SVGSVGElement | null>(null);
     const svg = d3.select(svgRef.current);

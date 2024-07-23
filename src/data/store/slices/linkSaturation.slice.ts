@@ -31,19 +31,23 @@ const linkSaturationSlice = createSlice({
         updateLinkSaturation: (state, action: PayloadAction<number>) => {
             state.linkSaturationTreshold = action.payload;
         },
-        updateTotalOPs: (
+        updateEpochTotalOPs: (state, action: PayloadAction<{ temporalEpoch: number; totalOps: number }>) => {
+            const { temporalEpoch, totalOps } = action.payload;
+            const temporalEpochState = state.linksPerTemporalEpoch[temporalEpoch];
+
+            if (temporalEpochState) {
+                temporalEpochState.totalOps = totalOps;
+            }
+        },
+        updateChipTotalOps: (
             state,
-            action: PayloadAction<{ temporalEpoch: number; chipId?: number; totalOps: number }>,
+            action: PayloadAction<{ temporalEpoch: number; chipId: number; totalOps: number }>,
         ) => {
             const { temporalEpoch, totalOps, chipId } = action.payload;
             const temporalEpochState = state.linksPerTemporalEpoch[temporalEpoch];
 
-            if (temporalEpochState) {
-                if (chipId !== undefined && temporalEpochState.totalOpsByChipId[chipId] !== undefined) {
-                    temporalEpochState.totalOpsByChipId[chipId] = totalOps;
-                } else {
-                    temporalEpochState.totalOps = totalOps;
-                }
+            if (temporalEpochState && temporalEpochState.totalOpsByChipId[chipId] !== undefined) {
+                temporalEpochState.totalOpsByChipId[chipId] = totalOps;
             }
         },
         updateEpochNormalizedOP: (state, action: PayloadAction<{ epoch: number; updatedValue: number }>) => {
@@ -81,7 +85,8 @@ const linkSaturationSlice = createSlice({
 
 export const {
     initialLoadLinkData,
-    updateTotalOPs,
+    updateEpochTotalOPs,
+    updateChipTotalOps,
     updateLinkSaturation,
     updateCLK,
     updateDRAMBandwidth,
