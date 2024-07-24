@@ -116,16 +116,18 @@ function OperationsTable() {
     }, [temporalEpoch, chipId]);
 
     const operationCellRenderer = (rowIndex: number) => {
-        const opName = tableFields[rowIndex].name;
+        const tableField = tableFields[rowIndex]!;
+        const opName = tableField.name;
         const isOffchip =
-            (tableFields[rowIndex].operation as BuildableOperation)?.isOffchip ||
-            (chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId);
+            chipId === undefined
+                ? false
+                : (tableField.operation as BuildableOperation)?.isOffchip || chipId !== tableField.chipId;
 
         return (
             <span className='operand-wrapper'>
                 {opName ? (
                     <SelectableOperationPerformance
-                        operation={tableFields[rowIndex].operation || null}
+                        operation={tableField.operation || null}
                         shouldShowOpPerformance={shouldShowOpPerformance}
                     >
                         <SelectableOperation
@@ -157,12 +159,12 @@ function OperationsTable() {
 
     const coreIdCellRenderer = (rowIndex: number) => {
         const definition = operationsTableColumns.get('core_id');
-        const cellContent = definition?.formatter(tableFields[rowIndex].core_id ?? '') ?? '';
+        const cellContent = definition?.formatter(tableFields[rowIndex]!.core_id ?? '') ?? '';
 
         return (
             <div className='op-element'>
                 <Checkbox
-                    checked={nodesSelectionState[cellContent]?.selected}
+                    checked={nodesSelectionState?.[cellContent]?.selected}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         dispatch(
                             updateNodeSelection({
@@ -179,11 +181,13 @@ function OperationsTable() {
     };
 
     const slowestOperandCellRenderer = (rowIndex: number) => {
-        const slowOpString = tableFields[rowIndex].slowest_operand;
-        const slowestOperand = tableFields[rowIndex].slowestOperandRef;
+        const tableField = tableFields[rowIndex]!;
+        const slowOpString = tableField.slowest_operand;
+        const slowestOperand = tableField.slowestOperandRef;
         const isOffchip =
-            (tableFields[rowIndex].operation as BuildableOperation)?.isOffchip ||
-            (chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId);
+            chipId === undefined
+                ? false
+                : (tableField.operation as BuildableOperation)?.isOffchip || chipId !== tableField.chipId;
 
         if (slowestOperand) {
             const type: GraphVertexType = slowestOperand.vertexType;
@@ -228,8 +232,8 @@ function OperationsTable() {
     };
 
     const modelRuntimeCellRenderer = (rowIndex: number) => {
-        const value = tableFields[rowIndex].model_runtime_per_input;
-        const ratio = valueRatio(value, tableFields[rowIndex].kernel_runtime_per_input);
+        const value = tableFields[rowIndex]!.model_runtime_per_input;
+        const ratio = valueRatio(value, tableFields[rowIndex]!.kernel_runtime_per_input);
 
         // eslint-disable-next-line no-restricted-globals
         if (isNaN(ratio)) {

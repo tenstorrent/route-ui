@@ -203,7 +203,11 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                         <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables
                                                 operand={operand}
-                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
+                                                isOffchip={
+                                                    chipId === undefined
+                                                        ? false
+                                                        : (operand as BuildableOperation)?.isOffchip
+                                                }
                                             />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
@@ -255,7 +259,11 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                         <div style={{ fontSize: '12px' }}>
                                             <GraphVertexDetailsSelectables
                                                 operand={operand}
-                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
+                                                isOffchip={
+                                                    chipId === undefined
+                                                        ? false
+                                                        : (operand as BuildableOperation)?.isOffchip
+                                                }
                                             />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>

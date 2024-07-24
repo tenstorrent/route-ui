@@ -109,14 +109,15 @@ const OperationsPropertiesTab = ({
                                             stringFilter={filterQuery}
                                             showType={false}
                                             isOffchip={
-                                                operation.isOffchip ||
-                                                (chipId === undefined ? false : chipId !== opChipId)
+                                                chipId === undefined
+                                                    ? false
+                                                    : chipId !== opChipId || operation.isOffchip
                                             }
                                         />
                                     }
                                     isOpen={allOpen}
                                 >
-                                    {operation && <GraphVertexDetails graphNode={operation} />}
+                                    {operation && <GraphVertexDetails graphNode={operation} chipId={chipId} />}
                                 </Collapsible>
                             }
                         />

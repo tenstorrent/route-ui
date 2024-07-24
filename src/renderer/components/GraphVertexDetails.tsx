@@ -16,13 +16,13 @@ import type { BuildableOperation } from '../../data/Graph';
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;
     showQueueDetails?: boolean;
-    isTemporalEpochView?: boolean;
+    chipId?: number;
 }
 
 const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
     graphNode,
     showQueueDetails = true,
-    isTemporalEpochView = false,
+    chipId = undefined,
 }): React.ReactElement | null => {
     const inputs = [...graphNode.inputs];
     const outputs = [...graphNode.outputs];
@@ -35,7 +35,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
     if (graphNode.vertexType === GraphVertexType.QUEUE) {
         queueLocationLabel = (graphNode as Queue).details?.processedLocation ?? '';
 
-        if (isTemporalEpochView) {
+        if (chipId === undefined) {
             queueLocationLabel += ` (Device: ${(graphNode as Queue).details!['device-id']})`;
         }
     }
@@ -58,7 +58,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables
                         operand={operand}
-                        isOffchip={(operand as BuildableOperation)?.isOffchip}
+                        isOffchip={chipId === undefined ? false : (operand as BuildableOperation)?.isOffchip}
                     />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
@@ -94,7 +94,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
                     <GraphVertexDetailsSelectables
                         operand={operand}
-                        isOffchip={(operand as BuildableOperation)?.isOffchip}
+                        isOffchip={chipId === undefined ? false : (operand as BuildableOperation)?.isOffchip}
                     />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
@@ -130,7 +130,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
 
 GraphVertexDetails.defaultProps = {
     showQueueDetails: true,
-    isTemporalEpochView: undefined,
+    chipId: undefined,
 };
 
 export default GraphVertexDetails;

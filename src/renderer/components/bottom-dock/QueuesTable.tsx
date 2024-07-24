@@ -59,8 +59,8 @@ function QueuesTable() {
     const table = useRef<Table2>(null);
 
     const queueCellRenderer = (rowIndex: number) => {
-        const queueName = tableFields[rowIndex].name;
-        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
+        const { name: queueName, chipId: queueChipId } = tableFields[rowIndex]!;
+        const isOffchip = chipId === undefined ? false : chipId !== queueChipId;
 
         return queueName ? (
             <SelectableOperation
@@ -78,8 +78,8 @@ function QueuesTable() {
     };
 
     const inputCellRenderer = (rowIndex: number) => {
-        const { input } = tableFields[rowIndex];
-        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
+        const { input, chipId: queueChipId } = tableFields[rowIndex]!;
+        const isOffchip = chipId === undefined ? false : chipId !== queueChipId;
 
         if (input === 'HOST') {
             return 'HOST';

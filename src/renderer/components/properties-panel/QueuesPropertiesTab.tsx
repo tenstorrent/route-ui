@@ -111,9 +111,7 @@ const QueuesPropertiesTab = ({
                                 }
                                 isOpen={allOpen}
                             >
-                                {queue && (
-                                    <GraphVertexDetails graphNode={queue} isTemporalEpochView={chipId === undefined} />
-                                )}
+                                {queue && <GraphVertexDetails graphNode={queue} chipId={chipId} />}
                             </Collapsible>
                         }
                     />
