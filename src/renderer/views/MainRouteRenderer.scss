@@ -700,7 +700,10 @@
         }
     }
 
-    .op-element .offchip-button svg { color: $tt-medium-light-gray; }
+    .op-element .offchip-button svg {
+        color: $tt-medium-light-gray;
+        margin-top: 4px;
+    }
 
     .op-type.icon {
         &.op {
