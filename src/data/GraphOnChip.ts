@@ -408,7 +408,7 @@ export default class GraphOnChip {
 
         graphOnChip.nodes = data.nodes
             .map((nodeJSON) => {
-                const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
+                const loc: Loc = { x: nodeJSON.location[1]!, y: nodeJSON.location[0]! };
                 graphOnChip.totalCols = Math.max(loc.y, graphOnChip.totalCols);
                 graphOnChip.totalRows = Math.max(loc.x, graphOnChip.totalRows);
                 const [node, newOperation] = ComputeNode.fromNetlistJSON(
@@ -744,17 +744,20 @@ export default class GraphOnChip {
     static AUGMENT_WITH_QUEUE_DETAILS(graphOnChip: GraphOnChip, queueDescriptorJson: QueueDescriptorJson) {
         forEach(graphOnChip.queuesByName.values(), (queue) => {
             const details = queueDescriptorJson[queue.name];
-            details.processedLocation = parsedQueueLocation(details.location);
-            queue.details = { ...details };
-            details['allocation-info'].forEach((allocationInfo) => {
-                if (details.processedLocation === QueueLocation.DRAM) {
-                    graphOnChip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
-                        if (!node.queueList.includes(queue)) {
-                            node.queueList.push(queue);
-                        }
-                    });
-                }
-            });
+
+            if (details) {
+                details.processedLocation = parsedQueueLocation(details.location);
+                queue.details = { ...details };
+                details['allocation-info'].forEach((allocationInfo) => {
+                    if (details.processedLocation === QueueLocation.DRAM) {
+                        graphOnChip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
+                            if (!node.queueList.includes(queue)) {
+                                node.queueList.push(queue);
+                            }
+                        });
+                    }
+                });
+            }
         });
 
         const newChip = new GraphOnChip(graphOnChip.chipId);
@@ -770,7 +773,7 @@ export default class GraphOnChip {
         forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
             const node = graphOnChip.getNode(nodeUid);
             if (node.type === ComputeNodeType.CORE) {
-                node.perfAnalyzerResults = new MeasurementDetails(perfAnalyzerJson[node.uid]);
+                node.perfAnalyzerResults = new MeasurementDetails(perfAnalyzerJson[node.uid]!);
                 newChip.details.maxBwLimitedFactor = Math.max(
                     newChip.details.maxBwLimitedFactor,
                     node.perfAnalyzerResults.bw_limited_factor,
@@ -890,7 +893,7 @@ export default class GraphOnChip {
     get allUniquePipes(): PipeSegment[] {
         if (!this.uniquePipeSegmentList.length) {
             this.uniquePipeSegmentList = [...this.pipes.values()]
-                .map((pipe) => pipe.segments[0])
+                .map((pipe) => pipe.segments[0]!)
                 .sort((a, b) => {
                     if (a.id < b.id) {
                         return -1;
@@ -1123,7 +1126,7 @@ export class ComputeNode {
             node.dramChannelId = nodeJSON.dram_channel;
             node.dramSubchannelId = nodeJSON.dram_subchannel || 0;
         }
-        node.loc = { x: nodeJSON.location[0], y: nodeJSON.location[1] };
+        node.loc = { x: nodeJSON.location[0]!, y: nodeJSON.location[1]! };
         node.uid = `${node.chipId}-${node.loc.x}-${node.loc.y}`;
 
         if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {

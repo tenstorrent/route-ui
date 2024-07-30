@@ -205,7 +205,7 @@ const getTemporalEpochFromGraphName = (filename: string): number | null => {
 const getChipIdFromFilename = (filename: string): number | null => {
     const regex = /chip(?:_|)(\d+)/;
     const match = filename.match(regex);
-    return match ? parseInt(match[1], 10) : null;
+    return match?.[1] ? parseInt(match[1], 10) : null;
 };
 
 /** @description only for netlist analizer files */
