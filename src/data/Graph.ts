@@ -86,6 +86,8 @@ export abstract class AbstractGraphVertex implements Operand {
         return [...this.outputOperands.values()];
     }
 
+    abstract isOffchip(chipId?: number): boolean;
+
     assignInputs(inputs: Operand[]) {
         inputs.forEach((operand) => {
             this.inputOperands.set(operand.name, operand);
@@ -107,6 +109,11 @@ export class BuildableQueue extends AbstractGraphVertex implements Queue {
     readonly vertexType = GraphVertexType.QUEUE;
 
     details?: QueueDetailsJson;
+
+    // eslint-disable-next-line class-methods-use-this
+    isOffchip() {
+        return false;
+    }
 }
 
 /**
@@ -132,9 +139,9 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     getOperandByPerformance(op: OperandPerformance | null): Operand | null {
         if (op) {
             if (op.direction === OperandDirection.INPUT) {
-                return [...this.inputs][op.index];
+                return [...this.inputs][op.index] ?? null;
             }
-            return [...this.outputs][op.index];
+            return [...this.outputs][op.index] ?? null;
         }
         return null;
     }
@@ -166,8 +173,16 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         return [...this._cores.values()];
     }
 
-    get isOffchip() {
-        return this._cores.length === 0;
+    isOffchip(chipId?: number) {
+        if (chipId === undefined) {
+            return false;
+        }
+
+        if (this._cores.length === 0) {
+            return true;
+        }
+
+        return this._cores[0]?.chipId !== chipId;
     }
 }
 
@@ -187,4 +202,5 @@ export interface Operand {
     getPipesForOperatorIndexed(operator: string, index: number): string[];
 
     isConnected(): boolean;
+    isOffchip(chipId?: number): boolean;
 }

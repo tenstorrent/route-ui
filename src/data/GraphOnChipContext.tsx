@@ -55,11 +55,11 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadGraphOnChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationship[]) => {
         const operands: OperandDescriptor[] = newChips
             .map((graphOnChip, index) => {
-                const { temporalEpoch } = graphs[index]!;
+                const { temporalEpoch, chipId } = graphs[index]!;
 
                 return [
                     ...[...graphOnChip.operations]
-                        .filter((op) => !op?.isOffchip ?? true)
+                        .filter((op) => !op?.isOffchip(chipId) ?? true)
                         .map((operation) => ({
                             name: operation.name,
                             temporalEpoch,

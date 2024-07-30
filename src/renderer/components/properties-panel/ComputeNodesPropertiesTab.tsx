@@ -26,7 +26,6 @@ import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
-import type { BuildableOperation } from '../../../data/Graph';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -201,14 +200,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectable
-                                                operand={operand}
-                                                isOffchip={
-                                                    chipId === undefined
-                                                        ? false
-                                                        : (operand as BuildableOperation)?.isOffchip
-                                                }
-                                            />
+                                            <GraphVertexDetailsSelectable operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand
@@ -257,14 +249,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectable
-                                                operand={operand}
-                                                isOffchip={
-                                                    chipId === undefined
-                                                        ? false
-                                                        : (operand as BuildableOperation)?.isOffchip
-                                                }
-                                            />
+                                            <GraphVertexDetailsSelectable operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand

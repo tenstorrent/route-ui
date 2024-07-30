@@ -687,7 +687,7 @@ export default class GraphOnChip {
                     ]);
                 } else if (newChip.operationsByName.has(operand.name)) {
                     const op = newChip.operationsByName.get(operand.name);
-                    if (op?.isOffchip) {
+                    if (op?.isOffchip(newChip.chipId)) {
                         const operation = newChip.operationsByName.get(opName);
                         operation?.assignInputs([
                             newChip.createOperand({
@@ -714,7 +714,7 @@ export default class GraphOnChip {
                     ]);
                 } else if (newChip.operationsByName.has(operand.name)) {
                     const op = newChip.operationsByName.get(operand.name);
-                    if (op?.isOffchip) {
+                    if (op?.isOffchip(newChip.chipId)) {
                         const operation = newChip.operationsByName.get(opName);
                         operation?.assignOutputs([
                             newChip.createOperand({

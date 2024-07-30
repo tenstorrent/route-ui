@@ -20,13 +20,7 @@ import type { GraphRelationship } from '../../../data/StateTypes';
 import type { Queue } from '../../../data/GraphTypes';
 import { QueueLocation } from '../../../data/Types';
 
-const QueuesPropertiesTab = ({
-    graphs,
-    chipId,
-}: {
-    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
-    chipId?: number;
-}) => {
+const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
     const [allOpen, setAllOpen] = useState(true);
     const [filterQuery, setFilterQuery] = useState<string>('');
@@ -36,12 +30,12 @@ const QueuesPropertiesTab = ({
                 .reduce((queueMap, { graphOnChip }) => {
                     [...graphOnChip.queues].forEach((queue) => {
                         if (!queueMap.has(queue.name)) {
-                            queueMap.set(queue.name, { queue, chipId: graphOnChip.chipId });
+                            queueMap.set(queue.name, queue);
                         }
                     });
 
                     return queueMap;
-                }, new Map<string, { queue: Queue; chipId: number }>())
+                }, new Map<string, Queue>())
                 .values(),
         ],
         [graphs],
@@ -53,7 +47,7 @@ const QueuesPropertiesTab = ({
         }
 
         const filter = filterQuery.toLowerCase();
-        const operands = queuesList.reduce<string[]>((filteredOperands, { queue: { name } }) => {
+        const operands = queuesList.reduce<string[]>((filteredOperands, { name }) => {
             if (name.toLowerCase().includes(filter)) {
                 filteredOperands.push(name);
             }
@@ -90,7 +84,7 @@ const QueuesPropertiesTab = ({
             </div>
 
             <div className='properties-list'>
-                {queuesList.map(({ queue, chipId: queueChipId }, index) => (
+                {queuesList.map((queue, index) => (
                     <FilterableComponent
                         // eslint-disable-next-line react/no-array-index-key
                         key={`${index}-${queue.name}`}
@@ -105,13 +99,12 @@ const QueuesPropertiesTab = ({
                                         operand={queue}
                                         stringFilter={filterQuery}
                                         showType={false}
-                                        isOffchip={chipId === undefined ? false : chipId !== queueChipId}
                                         disabled={queue.details?.processedLocation === QueueLocation.HOST}
                                     />
                                 }
                                 isOpen={allOpen}
                             >
-                                {queue && <GraphVertexDetails graphNode={queue} chipId={chipId} />}
+                                {queue && <GraphVertexDetails graphNode={queue} />}
                             </Collapsible>
                         }
                     />
@@ -119,10 +112,6 @@ const QueuesPropertiesTab = ({
             </div>
         </div>
     );
-};
-
-QueuesPropertiesTab.defaultProps = {
-    chipId: undefined,
 };
 
 export default QueuesPropertiesTab;

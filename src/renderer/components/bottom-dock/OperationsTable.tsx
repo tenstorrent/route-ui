@@ -36,7 +36,6 @@ import SelectableOperation, { SelectableOperationPerformance } from '../Selectab
 import { columnRenderer } from './SharedTable';
 import type { LocationState } from '../../../data/StateTypes';
 import AsyncComponent from '../AsyncRenderer';
-import type { BuildableOperation } from '../../../data/Graph';
 
 // TODO: This component will benefit from refactoring. in the interest of introducing a useful feature sooner this is staying as is for now.
 function OperationsTable() {
@@ -118,10 +117,7 @@ function OperationsTable() {
     const operationCellRenderer = (rowIndex: number) => {
         const tableField = tableFields[rowIndex]!;
         const opName = tableField.name;
-        const isOffchip =
-            chipId === undefined
-                ? false
-                : (tableField.operation as BuildableOperation)?.isOffchip || chipId !== tableField.chipId;
+        const isOffchip = tableField.operation?.isOffchip(chipId) ?? false;
 
         return (
             <span className='operand-wrapper'>
@@ -184,10 +180,7 @@ function OperationsTable() {
         const tableField = tableFields[rowIndex]!;
         const slowOpString = tableField.slowest_operand;
         const slowestOperand = tableField.slowestOperandRef;
-        const isOffchip =
-            chipId === undefined
-                ? false
-                : (tableField.operation as BuildableOperation)?.isOffchip || chipId !== tableField.chipId;
+        const isOffchip = tableField.operation?.isOffchip(chipId) ?? false;
 
         if (slowestOperand) {
             const type: GraphVertexType = slowestOperand.vertexType;
