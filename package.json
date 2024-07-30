@@ -166,7 +166,7 @@
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
-    "typescript": "^5.2.2",
+    "typescript": "^5.5.4",
     "url-loader": "^4.1.1",
     "webpack": "^5.85.0",
     "webpack-bundle-analyzer": "^4.9.0",
