@@ -296,7 +296,8 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
             <div className='node-controls'>
                 {(node.type === ComputeNodeType.DRAM ||
                     node.type === ComputeNodeType.ETHERNET ||
-                    node.type === ComputeNodeType.PCIE) && (
+                    node.type === ComputeNodeType.PCIE ||
+                    node.type === ComputeNodeType.CORE) && (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}
