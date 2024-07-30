@@ -14,7 +14,7 @@ import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
-import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from '../GraphVertexDetailsSelectable';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { Queue } from '../../../data/GraphTypes';
@@ -101,7 +101,7 @@ const QueuesPropertiesTab = ({
                                 // eslint-disable-next-line react/no-array-index-key
                                 key={`collapsible-${index}-${queue.name}`}
                                 label={
-                                    <GraphVertexDetailsSelectables
+                                    <GraphVertexDetailsSelectable
                                         operand={queue}
                                         stringFilter={filterQuery}
                                         showType={false}

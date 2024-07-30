@@ -9,7 +9,7 @@ import { PipeSegment } from '../../data/GraphOnChip';
 import { GraphVertexType } from '../../data/GraphNames';
 import { GraphVertex, Queue } from '../../data/GraphTypes';
 import { NOCLinkName } from '../../data/Types';
-import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from './GraphVertexDetailsSelectable';
 import SelectablePipe from './SelectablePipe';
 import type { BuildableOperation } from '../../data/Graph';
 
@@ -56,7 +56,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables
+                    <GraphVertexDetailsSelectable
                         operand={operand}
                         isOffchip={chipId === undefined ? false : (operand as BuildableOperation)?.isOffchip}
                     />
@@ -92,7 +92,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
             {outputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables
+                    <GraphVertexDetailsSelectable
                         operand={operand}
                         isOffchip={chipId === undefined ? false : (operand as BuildableOperation)?.isOffchip}
                     />

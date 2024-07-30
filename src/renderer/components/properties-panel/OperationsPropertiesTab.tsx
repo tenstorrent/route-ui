@@ -12,7 +12,7 @@ import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
-import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from '../GraphVertexDetailsSelectable';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { BuildableOperation } from '../../../data/Graph';
@@ -104,7 +104,7 @@ const OperationsPropertiesTab = ({
                             component={
                                 <Collapsible
                                     label={
-                                        <GraphVertexDetailsSelectables
+                                        <GraphVertexDetailsSelectable
                                             operand={operation}
                                             stringFilter={filterQuery}
                                             showType={false}

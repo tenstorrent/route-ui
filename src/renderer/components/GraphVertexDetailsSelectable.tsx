@@ -7,7 +7,7 @@ import { Operand } from '../../data/Graph';
 import SelectableOperation from './SelectableOperation';
 import useSelectableGraphVertex from '../hooks/useSelectableGraphVertex.hook';
 
-interface GraphVertexDetailsSelectablesProps {
+interface GraphVertexDetailsSelectableProps {
     operand: Operand;
     stringFilter?: string;
     showType?: boolean;
@@ -15,7 +15,7 @@ interface GraphVertexDetailsSelectablesProps {
     disabled?: boolean;
 }
 
-const GraphVertexDetailsSelectables: FC<GraphVertexDetailsSelectablesProps> = ({
+const GraphVertexDetailsSelectable: FC<GraphVertexDetailsSelectableProps> = ({
     operand,
     stringFilter = '',
     showType = true,
@@ -38,11 +38,11 @@ const GraphVertexDetailsSelectables: FC<GraphVertexDetailsSelectablesProps> = ({
     );
 };
 
-GraphVertexDetailsSelectables.defaultProps = {
+GraphVertexDetailsSelectable.defaultProps = {
     showType: true,
     stringFilter: '',
     isOffchip: undefined,
     disabled: undefined,
 };
 
-export default GraphVertexDetailsSelectables;
+export default GraphVertexDetailsSelectable;
