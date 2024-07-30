@@ -5,6 +5,7 @@
 /* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
+import { L1MemoryChunk } from './L1MemoryChunk';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
 // eslint-disable-next-line import/no-cycle
@@ -27,6 +28,7 @@ import {
     OperationDescription,
     aggregateCoresByOperation,
 } from './sources/GraphDescriptor';
+import type { L1ProfileJSON } from './sources/L1Profile';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
 import { PipeSelection } from './StateTypes';
@@ -799,6 +801,41 @@ export default class GraphOnChip {
         return newChip;
     }
 
+    static AUGMENT_WITH_L1_MEMORY(graphOnChip: GraphOnChip, L1Profile: L1ProfileJSON) {
+        const newChip = new GraphOnChip(graphOnChip.chipId);
+        Object.assign(newChip, graphOnChip);
+
+        if (L1Profile.metadata['target-device'] === newChip.chipId) {
+            Object.entries(L1Profile['worker-cores']).forEach(([coreCoords, profile]) => {
+                const node = newChip.getNode(`${newChip.chipId}-${coreCoords}`);
+
+                profile['binary-buffers'].forEach((bufferChunk) => {
+                    node.L1Chunks.push(
+                        new L1MemoryChunk(
+                            bufferChunk['start-address'],
+                            bufferChunk['reserved-size-bytes'],
+                            bufferChunk['consumed-size-bytes'],
+                        ),
+                    );
+                });
+
+                profile['data-buffers'].forEach((bufferChunk) => {
+                    node.L1Chunks.push(
+                        new L1MemoryChunk(
+                            bufferChunk['start-address'],
+                            bufferChunk['reserved-size-bytes'],
+                            bufferChunk['consumed-size-bytes'],
+                        ),
+                    );
+                });
+
+                node.L1Chunks.sort((a, b) => a.address - b.address);
+            });
+        }
+
+        return newChip;
+    }
+
     public generateInitialPipesSelectionState(): PipeSelection[] {
         return this.allUniquePipes.map((pipeSegment) => {
             return { id: pipeSegment.id, selected: false } as PipeSelection;
@@ -1195,6 +1232,8 @@ export class ComputeNode {
     public dramBorder = { top: false, right: false, bottom: false, left: false };
 
     public opSiblingNodes: ComputeNodeSiblings = {};
+
+    public L1Chunks: L1MemoryChunk[] = [];
 
     // TODO: check if reassigend operation is updated here.
     private _operation: Operation | undefined = undefined;

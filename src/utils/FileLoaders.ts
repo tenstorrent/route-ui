@@ -30,6 +30,7 @@ import path from 'path';
 import Cluster from '../data/Cluster';
 import { GraphRelationship } from '../data/StateTypes';
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from '../data/sources/ClusterDescriptor';
+import type { L1ProfileJSON } from '../data/sources/L1Profile';
 
 export const readFile = async (filename: string): Promise<string> =>
     new Promise((resolve, reject) => {
@@ -376,6 +377,15 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
         graphOnChip = GraphOnChip.AUGMENT_WITH_OP_PERFORMANCE(graphOnChip, opPerformanceByOp);
     } catch (err) {
         console.error('graph_perf_report_per_op.json not found, skipping \n', err);
+    }
+
+    try {
+        const L1ProfilePath = path.join(folderPath, 'l1_profile', `${name}.json`);
+        const L1Profile = await loadJsonFile<L1ProfileJSON>(L1ProfilePath);
+
+        graphOnChip = GraphOnChip.AUGMENT_WITH_L1_MEMORY(graphOnChip, L1Profile);
+    } catch (err) {
+        console.error('L1 profile not found, skipping\n', err);
     }
 
     return graphOnChip;
