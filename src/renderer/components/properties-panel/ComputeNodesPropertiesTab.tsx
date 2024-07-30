@@ -27,6 +27,9 @@ import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
 
+const shouldShowDetailedViewButton = (nodeType: ComputeNodeType) =>
+    [ComputeNodeType.DRAM, ComputeNodeType.ETHERNET, ComputeNodeType.PCIE, ComputeNodeType.CORE].includes(nodeType);
+
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
@@ -294,10 +297,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                 </div>
             )}
             <div className='node-controls'>
-                {(node.type === ComputeNodeType.DRAM ||
-                    node.type === ComputeNodeType.ETHERNET ||
-                    node.type === ComputeNodeType.PCIE ||
-                    node.type === ComputeNodeType.CORE) && (
+                {shouldShowDetailedViewButton(node.type) ? (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}
@@ -308,7 +308,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                     >
                         Detailed View
                     </Button>
-                )}
+                ) : null}
                 {/* TODO: abstract this into a global state */}
                 {/* TODO: controls shoudl disable if node has no pipes and hide if pipe data is not loaded */}
                 {node.pipes.length > 0 && (
