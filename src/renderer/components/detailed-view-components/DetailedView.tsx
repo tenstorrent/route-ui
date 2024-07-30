@@ -19,6 +19,7 @@ import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';
 import DetailedViewETHRenderer from './DetailedViewETH';
 import DetailedViewPCIERenderer from './DetailedViewPCIE';
+import DetailedViewCoreRenderer from './DetailedViewCore';
 
 import './DetailedView.scss';
 import type { LocationState } from '../../../data/StateTypes';
@@ -91,6 +92,9 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                                                 temporalEpoch={temporalEpoch}
                                                 chipId={chipId}
                                             />
+                                        )}
+                                        {node.type === ComputeNodeType.CORE && (
+                                            <DetailedViewCoreRenderer node={node} temporalEpoch={temporalEpoch} />
                                         )}
                                     </div>
                                 );

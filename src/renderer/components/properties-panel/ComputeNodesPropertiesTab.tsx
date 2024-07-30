@@ -27,8 +27,9 @@ import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
 
-const shouldShowDetailedViewButton = (nodeType: ComputeNodeType) =>
-    [ComputeNodeType.DRAM, ComputeNodeType.ETHERNET, ComputeNodeType.PCIE, ComputeNodeType.CORE].includes(nodeType);
+const shouldShowDetailedViewButton = (node: ComputeNode) =>
+    [ComputeNodeType.DRAM, ComputeNodeType.ETHERNET, ComputeNodeType.PCIE].includes(node.type) ||
+    (ComputeNodeType.CORE === node.type && node.L1Chunks.length > 0);
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -297,7 +298,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                 </div>
             )}
             <div className='node-controls'>
-                {shouldShowDetailedViewButton(node.type) ? (
+                {shouldShowDetailedViewButton(node) ? (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}
