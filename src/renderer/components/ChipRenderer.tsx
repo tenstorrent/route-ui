@@ -10,7 +10,7 @@ import NodeGridElement from './NodeGridElement';
 import type { ComputeNode } from '../../data/GraphOnChip';
 import type { LocationState } from '../../data/StateTypes';
 
-const ChipRendered: FC<{
+const ChipRenderer: FC<{
     id: number;
     totalCols: number;
     nodes: ComputeNode[];
@@ -88,4 +88,4 @@ const ChipRendered: FC<{
     );
 };
 
-export default ChipRendered;
+export default ChipRenderer;

@@ -12,7 +12,7 @@ import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks'
 import ClusterViewDialog from './cluster-view/ClusterViewDialog';
 import DetailedView from './detailed-view-components/DetailedView';
 import type { LocationState } from '../../data/StateTypes';
-import ChipRendered from './ChipRenderer';
+import ChipRenderer from './ChipRenderer';
 
 export default function GridRender() {
     const { error } = usePerfAnalyzerFileLoader();
@@ -33,7 +33,7 @@ export default function GridRender() {
     return (
         <div className='main-content' style={style}>
             {graphOnChipList.map(({ graphOnChip: { chipId: id, totalCols, nodes }, graph: { name: graphName } }) => (
-                <ChipRendered id={id} totalCols={totalCols} nodes={[...nodes]} graphName={graphName} />
+                <ChipRenderer id={id} totalCols={totalCols} nodes={[...nodes]} graphName={graphName} />
             ))}
             {graphOnChipList.length === 0 && (
                 <div className='invalid-data-message'>
