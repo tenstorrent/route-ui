@@ -25,7 +25,6 @@ export interface Operation extends HasOperands, Operand {
     readonly cores: Iterable<ComputeNode>;
     details?: OpPerfDetails;
     slowestOperand: Operand | null;
-    isOffchip: boolean;
     getOperandByPerformance(op: OperandPerformance | null): Operand | null;
 }
 

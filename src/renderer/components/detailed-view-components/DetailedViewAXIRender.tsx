@@ -9,16 +9,26 @@ import DetailedViewPipeRenderer from './DetailedViewPipeRenderer';
 
 interface DetailedViewAXIRenderProps {
     links: DramBankLink[] | NetworkLink[];
+    temporalEpoch: number;
+    chipId?: number;
     filter: DramBankLinkName | NetworkLinkName | null;
     label: string;
 }
 
-export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ links, filter, label }) => {
+export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
+    links,
+    temporalEpoch,
+    chipId,
+    filter,
+    label,
+}) => {
     return (
         <div className='axi-dram-wrap'>
             <DetailedViewPipeRenderer
                 className='centered-svg'
                 links={links.filter((link) => (filter === null ? true : link.name === filter))}
+                temporalEpoch={temporalEpoch}
+                chipId={chipId}
             />
             <div className='axi-dram'>
                 <p className='label'>{label}</p>
@@ -27,12 +37,21 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({ li
     );
 };
 
+DetailedViewAXIRender.defaultProps = { chipId: undefined };
+
 interface DetailedViewANOC2XIRenderProps {
     links: NOC2AXILink[] | NOCLink[];
+    temporalEpoch: number;
+    chipId?: number;
     noc: NOC;
 }
 
-export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({ links, noc }) => {
+export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps> = ({
+    links,
+    temporalEpoch,
+    chipId,
+    noc,
+}) => {
     return (
         <>
             <div className='noc2axi'>
@@ -41,7 +60,11 @@ export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps>
             <DetailedViewPipeRenderer
                 className='centered-svg'
                 links={links.filter((link) => (noc === NOC.ANY ? true : link.noc === noc))}
+                temporalEpoch={temporalEpoch}
+                chipId={chipId}
             />
         </>
     );
 };
+
+DetailedViewNOC2AXIRender.defaultProps = { chipId: undefined };

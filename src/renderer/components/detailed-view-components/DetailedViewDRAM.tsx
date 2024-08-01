@@ -6,10 +6,9 @@ import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import GraphOnChip, { ComputeNode, NOCLink } from '../../../data/GraphOnChip';
 import { Architecture, DramBankLinkName, NOC, NOCLinkName } from '../../../data/Types';
 import { filterIterable } from '../../../utils/IterableHelpers';
 import LinkDetails from '../LinkDetails';
@@ -19,11 +18,11 @@ import DetailedViewPipeControls from './DetailedViewPipeControls';
 
 interface DetailedViewDRAMRendererProps {
     node: ComputeNode;
-    graphName: string;
+    temporalEpoch: number;
+    graphOnChip?: GraphOnChip;
 }
 
-const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, graphName }) => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
+const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ node, temporalEpoch, graphOnChip }) => {
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
     const dispatch = useDispatch();
 
@@ -39,25 +38,29 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
     if (dram === null) {
         return null;
     }
+
     return (
         <>
             <div className='detailed-view-chip dram'>
                 <div className='node-container'>
                     {dram.subchannels.map((subchannel) => {
                         const currentNode = nodeList.find((n) => n.dramSubchannelId === subchannel.subchannelId);
+
                         const noc0links: NOCLink[] = [];
                         const noc1links: NOCLink[] = [];
+
                         if (currentNode) {
                             noc0links.push(currentNode.links.get(NOCLinkName.NOC0_IN) as NOCLink);
                             noc0links.push(currentNode.links.get(NOCLinkName.NOC0_OUT) as NOCLink);
                             noc1links.push(currentNode.links.get(NOCLinkName.NOC1_IN) as NOCLink);
                             noc1links.push(currentNode.links.get(NOCLinkName.NOC1_OUT) as NOCLink);
                         }
+
                         const numPipes = subchannel.links.map((link) => link.pipes).flat().length;
+
                         return (
                             <div
                                 key={subchannel.subchannelId}
-                                // prettier-ignore
                                 className={`subchannel ${node.dramSubchannelId === subchannel.subchannelId ? 'current' : ''}`}
                             >
                                 {dram.subchannels.length > 1 && (
@@ -70,12 +73,17 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                                 onClick={() => {
                                                     dispatch(
                                                         updateNodeSelection({
-                                                            graphName,
+                                                            temporalEpoch,
                                                             id: currentNode.uid,
                                                             selected: true,
                                                         }),
                                                     );
-                                                    dispatch(openDetailedView(currentNode.uid));
+                                                    dispatch(
+                                                        openDetailedView({
+                                                            nodeUid: currentNode.uid,
+                                                            chipId: currentNode.chipId,
+                                                        }),
+                                                    );
                                                 }}
                                             />
                                         )}
@@ -85,12 +93,32 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                                 <DetailedViewPipeControls node={currentNode} numPipes={numPipes} />
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
-                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC0} />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc0links}
+                                            temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
+                                            label='NOC0'
+                                        />
+                                        <DetailedViewNOC2AXIRender
+                                            links={subchannel.links}
+                                            temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
+                                            noc={NOC.NOC0}
+                                        />
                                     </div>
                                     <div className='col noc1'>
-                                        <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
-                                        <DetailedViewNOC2AXIRender links={subchannel.links} noc={NOC.NOC1} />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc1links}
+                                            temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
+                                            label='NOC1'
+                                        />
+                                        <DetailedViewNOC2AXIRender
+                                            links={subchannel.links}
+                                            temporalEpoch={temporalEpoch}
+                                            chipId={graphOnChip?.chipId}
+                                            noc={NOC.NOC1}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -107,11 +135,15 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                         <>
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                temporalEpoch={temporalEpoch}
+                                chipId={graphOnChip?.chipId}
                                 filter={DramBankLinkName.DRAM0_INOUT}
                                 label='AXI DRAM0'
                             />
                             <DetailedViewAXIRender
                                 links={dram.links}
+                                temporalEpoch={temporalEpoch}
+                                chipId={graphOnChip?.chipId}
                                 filter={DramBankLinkName.DRAM1_INOUT}
                                 label='AXI DRAM1'
                             />
@@ -120,6 +152,8 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                     {architecture === Architecture.GRAYSKULL && (
                         <DetailedViewAXIRender
                             links={dram.links}
+                            temporalEpoch={temporalEpoch}
+                            chipId={graphOnChip?.chipId}
                             filter={DramBankLinkName.DRAM_INOUT}
                             label='Off-chip DRAM'
                         />
@@ -129,12 +163,13 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {nodeList.map((n, index) => {
-                        return node.getInternalLinksForNode().map((link) => {
+                        return n.getInternalLinksForNode().map((link) => {
                             return (
                                 <LinkDetails
                                     key={link.name}
                                     link={link}
-                                    graphName={graphName}
+                                    temporalEpoch={temporalEpoch}
+                                    chipId={graphOnChip?.chipId}
                                     index={nodeList.length > 1 ? index : -1}
                                     showEmpty={false}
                                 />
@@ -143,23 +178,33 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
                     })}
                     {dram.subchannels.map((sub) =>
                         sub.links.map((link) => (
-                            //
                             <LinkDetails
                                 key={link.name}
                                 index={nodeList.length > 1 ? sub.subchannelId : -1}
                                 link={link}
-                                graphName={graphName}
+                                temporalEpoch={temporalEpoch}
+                                chipId={graphOnChip?.chipId}
                                 showEmpty={false}
                             />
                         )),
                     )}
                     {dram.links.map((link) => (
-                        <LinkDetails key={link.name} graphName={graphName} link={link} showEmpty={false} />
+                        <LinkDetails
+                            key={link.name}
+                            temporalEpoch={temporalEpoch}
+                            chipId={graphOnChip?.chipId}
+                            link={link}
+                            showEmpty={false}
+                        />
                     ))}
                 </div>
             </div>
         </>
     );
+};
+
+DetailedViewDRAMRenderer.defaultProps = {
+    graphOnChip: undefined,
 };
 
 export default DetailedViewDRAMRenderer;

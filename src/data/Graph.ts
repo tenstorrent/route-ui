@@ -3,10 +3,12 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { GraphVertexId, GraphVertexType, OperandName, OperationName } from './GraphNames';
-import { ComputeNode } from './GraphOnChip';
+// eslint-disable-next-line import/no-cycle
+import { ComputeNode, type PipeID } from './GraphOnChip';
 import type { GraphVertex, Operation, Queue } from './GraphTypes';
 import { OpPerfDetails, OperandDirection, OperandPerformance } from './OpPerfDetails';
 import { ComputeNodeType } from './Types';
+import type { CoreID } from './sources/GraphDescriptor';
 import { QueueDetailsJson } from './sources/QueueDescriptor';
 
 /** Provides common functionality for Graph Nodes.
@@ -16,17 +18,17 @@ export abstract class AbstractGraphVertex implements Operand {
 
     abstract readonly vertexType: GraphVertexType;
 
-    abstract get isOffchip(): boolean;
+    protected inputOperands: Map<string, Operand> = new Map();
 
-    protected inputOperands: Operand[];
-
-    protected outputOperands: Operand[];
-
-    private _pipeIdsByCore: Map<string, string[]> = new Map();
+    protected outputOperands: Map<string, Operand> = new Map();
 
     private pipesPerOperator: Map<string, string[]> = new Map();
 
     private pipesPerOperatorIndexed: Map<string, string[][]> = new Map();
+
+    public inputPipesByCore: Map<CoreID, PipeID[]> = new Map();
+
+    public outputPipesByCore: Map<CoreID, PipeID[]> = new Map();
 
     public getPipesForOperator(operator: string): string[] {
         return this.pipesPerOperator.get(operator) || [];
@@ -60,28 +62,6 @@ export abstract class AbstractGraphVertex implements Operand {
         return `${this.name} (${this.vertexType})`;
     }
 
-    public get pipeIdsByCore(): Map<string, string[]> {
-        return this._pipeIdsByCore;
-    }
-
-    public set pipeIdsByCore(value: Map<string, string[]>) {
-        if (this._pipeIdsByCore.size > 0) {
-            value.forEach((pipeIds, coreId) => {
-                if (this._pipeIdsByCore.has(coreId)) {
-                    this._pipeIdsByCore.get(coreId)!.push(...pipeIds);
-                } else {
-                    this._pipeIdsByCore.set(coreId, pipeIds);
-                }
-            });
-        }
-
-        this._pipeIdsByCore = value;
-
-        this._pipeIdsByCore.forEach((pipeIds, coreId) => {
-            this._pipeIdsByCore.set(coreId, [...new Set(pipeIds.map((pipeId) => pipeId.toString()))]);
-        });
-    }
-
     public bandwidth: number = 0;
 
     readonly from?: GraphVertex;
@@ -92,56 +72,48 @@ export abstract class AbstractGraphVertex implements Operand {
 
     constructor(name: string, inputOperands?: Operand[], outputOperands?: Operand[]) {
         this.name = name;
-        this.inputOperands = [];
-        this.outputOperands = [];
         this.assignInputs(inputOperands || []);
         this.assignOutputs(outputOperands || []);
     }
 
     /** All input operands */
     get inputs(): Operand[] {
-        return this.inputOperands;
+        return [...this.inputOperands.values()];
     }
 
     /** All output operands */
     get outputs(): Operand[] {
-        return this.outputOperands;
+        return [...this.outputOperands.values()];
     }
 
+    abstract isOffchip(chipId?: number): boolean;
+
     assignInputs(inputs: Operand[]) {
-        this.inputOperands = [...this.inputOperands, ...inputs];
+        inputs.forEach((operand) => {
+            this.inputOperands.set(operand.name, operand);
+        });
     }
 
     assignOutputs(outputs: Operand[]) {
-        this.outputOperands = [...this.outputOperands, ...outputs];
-    }
-
-    get uniquePipeIds(): string[] {
-        return [...new Set([...this.pipeIdsByCore.values()].flat())];
+        outputs.forEach((operand) => {
+            this.outputOperands.set(operand.name, operand);
+        });
     }
 
     isConnected(): boolean {
         return !!(this.from && this.to);
-    }
-
-    public getPipeIdsForCore(coreId: string): string[] {
-        return this.pipeIdsByCore.get(coreId) || [];
-    }
-
-    public getAllPipeIds() {
-        return this.pipeIdsByCore.values();
     }
 }
 
 export class BuildableQueue extends AbstractGraphVertex implements Queue {
     readonly vertexType = GraphVertexType.QUEUE;
 
-    get isOffchip(): boolean {
-        // TODO: requires implementation
+    details?: QueueDetailsJson;
+
+    // eslint-disable-next-line class-methods-use-this
+    isOffchip() {
         return false;
     }
-
-    details?: QueueDetailsJson;
 }
 
 /**
@@ -167,9 +139,9 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     getOperandByPerformance(op: OperandPerformance | null): Operand | null {
         if (op) {
             if (op.direction === OperandDirection.INPUT) {
-                return [...this.inputs][op.index];
+                return [...this.inputs][op.index] ?? null;
             }
-            return [...this.outputs][op.index];
+            return [...this.outputs][op.index] ?? null;
         }
         return null;
     }
@@ -184,8 +156,11 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         if (core.type !== ComputeNodeType.CORE) {
             throw new Error(`Can't assign the non-core ${core.uid} to an operation (${this.name})`);
         }
+
         core.operation = this;
+
         if (this._cores.includes(core)) {
+            // eslint-disable-next-line no-console
             console.warn(
                 `Assigning core ${core.uid} to operation ${this.name}; core is already assigned to this operation.`,
             );
@@ -195,11 +170,19 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
     }
 
     get cores() {
-        return this._cores.values();
+        return [...this._cores.values()];
     }
 
-    get isOffchip(): boolean {
-        return this._cores.length === 0;
+    isOffchip(chipId?: number) {
+        if (chipId === undefined) {
+            return false;
+        }
+
+        if (this._cores.length === 0) {
+            return true;
+        }
+
+        return this._cores[0]?.chipId !== chipId;
     }
 }
 
@@ -208,9 +191,9 @@ export interface Operand {
     vertexType: GraphVertexType;
     from?: GraphVertex;
     to?: GraphVertex;
-    pipeIdsByCore: Map<string, string[]>;
+    inputPipesByCore: Map<string, string[]>;
+    outputPipesByCore: Map<string, string[]>;
     perCoreMapping?: [from: ComputeNode, to: ComputeNode][];
-    uniquePipeIds: string[];
 
     getPipesForOperator(operator: string): string[];
 
@@ -218,11 +201,6 @@ export interface Operand {
 
     getPipesForOperatorIndexed(operator: string, index: number): string[];
 
-    getPipeIdsForCore(coreId: string): string[];
-
-    getAllPipeIds(): Iterable<string[]>;
-
     isConnected(): boolean;
-
-    isOffchip: boolean;
+    isOffchip(chipId?: number): boolean;
 }

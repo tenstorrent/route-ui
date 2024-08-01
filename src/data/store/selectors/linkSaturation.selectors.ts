@@ -4,14 +4,18 @@
 
 import { RootState } from '../createStore';
 
-export const getLinkData = (graphName: string, id: string) => (state: RootState) =>
-    state.linkSaturation.graphs[graphName]?.links[id];
-export const getAllLinksForGraph = (graphName: string) => (state: RootState) =>
-    state.linkSaturation.graphs[graphName]?.links || [];
-export const getTotalOpsForGraph = (graphName: string) => (state: RootState) =>
-    state.linkSaturation.graphs[graphName]?.totalOps || 0;
-export const getEpochNormalizedTotalOps = (state: RootState) => state.linkSaturation.epochNormalizedTotalOps;
-export const getEpochAdjustedTotalOps = (state: RootState) => state.linkSaturation.epochAdjustedTotalOps;
+export const getTotalOpsforTemporalEpoch = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOps ?? 0;
+
+export const getTotalOpsForChipId = (temporalEpoch: number, chipId: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOpsByChipId[chipId] ?? 0;
+export const getTotalOpsList = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOpsByChipId ?? 0;
+export const getEpochNormalizedTotalOps = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.normalizedTotalOps ?? 0;
+
+export const getEpochInitialNormalizedTotalOps = (temporalEpoch: number) => (state: RootState) =>
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.initialNormalizedTotalOps ?? 0;
 export const getLinkSaturation = (state: RootState) => state.linkSaturation.linkSaturationTreshold;
 export const getShowLinkSaturation = (state: RootState) => state.linkSaturation.showLinkSaturation;
 export const getShowNOC0 = (state: RootState) => state.linkSaturation.showNOC0;

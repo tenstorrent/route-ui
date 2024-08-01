@@ -4,13 +4,15 @@
 
 /* eslint-disable react/no-array-index-key */
 
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
+import { type Location, useLocation } from 'react-router-dom';
 import { PipeSegment } from '../../data/GraphOnChip';
 import { GraphVertexType } from '../../data/GraphNames';
 import { GraphVertex, Queue } from '../../data/GraphTypes';
 import { NOCLinkName } from '../../data/Types';
-import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from './GraphVertexDetailsSelectable';
 import SelectablePipe from './SelectablePipe';
+import type { LocationState } from '../../data/StateTypes';
 
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;
@@ -23,6 +25,21 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
 }): React.ReactElement | null => {
     const inputs = [...graphNode.inputs];
     const outputs = [...graphNode.outputs];
+    const location: Location<LocationState> = useLocation();
+    const { chipId } = location.state;
+    const queueLocationLabel = useMemo(() => {
+        let label = '';
+        if (graphNode.vertexType === GraphVertexType.QUEUE) {
+            label = (graphNode as Queue).details?.processedLocation ?? '';
+
+            if (chipId === undefined) {
+                label += ` (Device: ${(graphNode as Queue).details!['device-id']})`;
+            }
+        }
+
+        return label;
+    }, [chipId, graphNode]);
+
     if (inputs.length === 0 && outputs.length === 0) {
         return null;
     }
@@ -36,17 +53,14 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
                               so we're not parsing raw data
                           */}
                         <h5 className='queue-detail-label'>Queue Location:</h5>
-                        <div className='queue-detail-value'>
-                            {(graphNode as Queue).details?.processedLocation} (Device{' '}
-                            {(graphNode as Queue).details!['device-id']})
-                        </div>
+                        <div className='queue-detail-value'>{queueLocationLabel}</div>
                     </div>
                 </div>
             )}
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables operand={operand} />
+                    <GraphVertexDetailsSelectable operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
@@ -79,7 +93,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
             {outputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables operand={operand} />
+                    <GraphVertexDetailsSelectable operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (

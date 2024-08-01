@@ -14,10 +14,11 @@ import DetailedViewNOCRouterRenderer from './DetailedViewNOCRouterRenderer';
 
 interface DetailedViewETHRendererProps {
     node: ComputeNode;
-    graphName: string;
+    temporalEpoch: number;
+    chipId?: number;
 }
 
-const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, graphName }) => {
+const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node, temporalEpoch, chipId }) => {
     const noc0links: NOCLink[] = [
         node.links.get(NOCLinkName.NOC0_IN) as NOCLink,
         node.links.get(NOCLinkName.NOC0_OUT) as NOCLink,
@@ -39,16 +40,30 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                             <div className='node-container'>
                                 <div className='node'>
                                     <div className='col noc0'>
-                                        <DetailedViewNOCRouterRenderer links={noc0links} label='NOC0' />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc0links}
+                                            temporalEpoch={temporalEpoch}
+                                            chipId={chipId}
+                                            label='NOC0'
+                                        />
                                     </div>
                                     <div className='col noc1'>
-                                        <DetailedViewNOCRouterRenderer links={noc1links} label='NOC1' />
+                                        <DetailedViewNOCRouterRenderer
+                                            links={noc1links}
+                                            temporalEpoch={temporalEpoch}
+                                            chipId={chipId}
+                                            label='NOC1'
+                                        />
                                     </div>
                                     <div className='col'>
                                         <div className='router'>
                                             <p className='label single-line'>Ethernet</p>
                                         </div>
-                                        <DetailedViewPipeRenderer links={internalNOCLinks} />
+                                        <DetailedViewPipeRenderer
+                                            links={internalNOCLinks}
+                                            temporalEpoch={temporalEpoch}
+                                            chipId={chipId}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -59,7 +74,12 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
                             </div>
                         </div>
                         <div className='col eth-off-chip'>
-                            <DetailedViewPipeRenderer links={internalNOCLinks} className='centered-svg' />
+                            <DetailedViewPipeRenderer
+                                links={internalNOCLinks}
+                                temporalEpoch={temporalEpoch}
+                                chipId={chipId}
+                                className='centered-svg'
+                            />
                         </div>
                     </div>
                 </div>
@@ -67,12 +87,24 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>
                     {node.getInternalLinksForNode().map((link: NetworkLink) => {
-                        return <LinkDetails graphName={graphName} key={link.name} link={link} showEmpty={false} />;
+                        return (
+                            <LinkDetails
+                                temporalEpoch={temporalEpoch}
+                                chipId={chipId}
+                                key={link.name}
+                                link={link}
+                                showEmpty={false}
+                            />
+                        );
                     })}
                 </div>
             </div>
         </>
     );
+};
+
+DetailedViewETHRenderer.defaultProps = {
+    chipId: undefined,
 };
 
 export default DetailedViewETHRenderer;

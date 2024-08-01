@@ -2,38 +2,45 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, Card, Overlay } from '@blueprintjs/core';
+import { Button, Card, Overlay, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import {
     getDetailedViewOpenState,
     getDetailedViewZoom,
+    getSelectedDetailsViewChipId,
     getSelectedDetailsViewUID,
 } from 'data/store/selectors/uiState.selectors';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { ComputeNodeType } from '../../../data/Types';
+import { Architecture, ComputeNodeType } from '../../../data/Types';
 import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store/slices/uiState.slice';
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';
 import DetailedViewETHRenderer from './DetailedViewETH';
 import DetailedViewPCIERenderer from './DetailedViewPCIE';
 
 import './DetailedView.scss';
+import type { LocationState } from '../../../data/StateTypes';
+import AsyncComponent from '../AsyncRenderer';
 
 interface DetailedViewProps {}
 
 const DetailedView: React.FC<DetailedViewProps> = () => {
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip, getActiveGraphName, graphOnChipList } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
-    const graphName = getActiveGraphName();
+    const location: Location<LocationState> = useLocation();
+    const { epoch: temporalEpoch } = location.state;
     const detailedViewElement = useRef<HTMLDivElement>(null);
     const zoom = useSelector(getDetailedViewZoom);
+    const isDetailedViewOpen = useSelector(getDetailedViewOpenState);
 
-    const architecture = graphOnChipList[graphName]?.architecture;
     const isOpen = useSelector(getDetailedViewOpenState);
     const uid = useSelector(getSelectedDetailsViewUID);
-    const node = uid ? graphOnChip?.getNode(uid) : null;
+    const chipId = useSelector(getSelectedDetailsViewChipId);
+    const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId ?? -1);
+    const architecture = graphOnChip?.architecture ?? Architecture.NONE;
+    const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (detailedViewElement.current) {
@@ -42,13 +49,14 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
             const parsedMarginBottom = Number.parseFloat(marginBottom.replace('px', ''));
 
             dispatch(updateDetailedViewHeight((parsedHeight + parsedMarginBottom) * zoom));
+            setIsLoading(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [zoom, isOpen, node]);
+    }, [zoom, isOpen, node, isLoading]);
 
     return (
         <Overlay isOpen={isOpen} enforceFocus={false} hasBackdrop={false} usePortal={false} transitionDuration={0}>
-            <Card className='detailed-view-card'>
+            <Card className={`detailed-view-card ${isDetailedViewOpen ? 'detailed-view-open' : ''}`}>
                 <div className='detailed-view-container' style={{ zoom }} ref={detailedViewElement}>
                     <div className='detailed-view-header'>
                         {node && (
@@ -59,17 +67,45 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                         <Button small icon={IconNames.CROSS} onClick={() => dispatch(closeDetailedView())} />
                     </div>
                     {node && (
-                        <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
-                            {node.type === ComputeNodeType.DRAM && (
-                                <DetailedViewDRAMRenderer graphName={graphName} node={node} />
-                            )}
-                            {node.type === ComputeNodeType.ETHERNET && (
-                                <DetailedViewETHRenderer graphName={graphName} node={node} />
-                            )}
-                            {node.type === ComputeNodeType.PCIE && (
-                                <DetailedViewPCIERenderer graphName={graphName} node={node} />
-                            )}
-                        </div>
+                        <AsyncComponent
+                            renderer={() => {
+                                const result = (
+                                    <div className={`detailed-view-wrap arch-${architecture} type-${node.type}`}>
+                                        {node.type === ComputeNodeType.DRAM && (
+                                            <DetailedViewDRAMRenderer
+                                                node={node}
+                                                temporalEpoch={temporalEpoch}
+                                                graphOnChip={graphOnChip}
+                                            />
+                                        )}
+                                        {node.type === ComputeNodeType.ETHERNET && (
+                                            <DetailedViewETHRenderer
+                                                node={node}
+                                                temporalEpoch={temporalEpoch}
+                                                chipId={chipId}
+                                            />
+                                        )}
+                                        {node.type === ComputeNodeType.PCIE && (
+                                            <DetailedViewPCIERenderer
+                                                node={node}
+                                                temporalEpoch={temporalEpoch}
+                                                chipId={chipId}
+                                            />
+                                        )}
+                                    </div>
+                                );
+
+                                setIsLoading(true);
+
+                                return result;
+                            }}
+                            loadingContent={
+                                <div className='details-loading'>
+                                    <Spinner />
+                                    <p>Loading details</p>
+                                </div>
+                            }
+                        />
                     )}
                 </div>
             </Card>
