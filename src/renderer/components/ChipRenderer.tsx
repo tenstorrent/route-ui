@@ -26,6 +26,12 @@ const ChipRenderer: FC<{
         [cluster],
     );
 
+    /**
+     * This is needed to force a second render of the whole chip.
+     *
+     * The reason for a second render is that pipes do not render correctly when changing chips,
+     * so we need to force a re-render to actually show the pipes.
+     */
     const [shouldRerender, setShouldRerender] = useState(1);
     useEffect(() => {
         setShouldRerender(1);
