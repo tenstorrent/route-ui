@@ -4,40 +4,44 @@
 
 /* eslint-disable react/no-array-index-key */
 
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
+import { type Location, useLocation } from 'react-router-dom';
 import { PipeSegment } from '../../data/GraphOnChip';
 import { GraphVertexType } from '../../data/GraphNames';
 import { GraphVertex, Queue } from '../../data/GraphTypes';
 import { NOCLinkName } from '../../data/Types';
-import GraphVertexDetailsSelectables from './GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from './GraphVertexDetailsSelectable';
 import SelectablePipe from './SelectablePipe';
-import type { BuildableOperation } from '../../data/Graph';
+import type { LocationState } from '../../data/StateTypes';
 
 interface GraphVertexDetailsProps {
     graphNode: GraphVertex;
     showQueueDetails?: boolean;
-    isTemporalEpochView?: boolean;
 }
 
 const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
     graphNode,
     showQueueDetails = true,
-    isTemporalEpochView = false,
 }): React.ReactElement | null => {
     const inputs = [...graphNode.inputs];
     const outputs = [...graphNode.outputs];
+    const location: Location<LocationState> = useLocation();
+    const { chipId } = location.state;
+    const queueLocationLabel = useMemo(() => {
+        let label = '';
+        if (graphNode.vertexType === GraphVertexType.QUEUE) {
+            label = (graphNode as Queue).details?.processedLocation ?? '';
+
+            if (chipId === undefined) {
+                label += ` (Device: ${(graphNode as Queue).details!['device-id']})`;
+            }
+        }
+
+        return label;
+    }, [chipId, graphNode]);
 
     if (inputs.length === 0 && outputs.length === 0) {
         return null;
-    }
-
-    let queueLocationLabel = '';
-    if (graphNode.vertexType === GraphVertexType.QUEUE) {
-        queueLocationLabel = (graphNode as Queue).details?.processedLocation ?? '';
-
-        if (isTemporalEpochView) {
-            queueLocationLabel += ` (Device: ${(graphNode as Queue).details!['device-id']})`;
-        }
     }
 
     return (
@@ -56,10 +60,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {inputs.length > 0 && <h5 className='io-label'>Inputs:</h5>}
             {inputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables
-                        operand={operand}
-                        isOffchip={(operand as BuildableOperation)?.isOffchip}
-                    />
+                    <GraphVertexDetailsSelectable operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
@@ -92,10 +93,7 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
             {outputs.length > 0 && <h5 className='io-label'>Outputs:</h5>}
             {outputs.map((operand, index) => (
                 <div className='operation-operand' key={`${index}-${graphNode.name}-${operand.name}`}>
-                    <GraphVertexDetailsSelectables
-                        operand={operand}
-                        isOffchip={(operand as BuildableOperation)?.isOffchip}
-                    />
+                    <GraphVertexDetailsSelectable operand={operand} />
                     {graphNode.vertexType === GraphVertexType.OPERATION && (
                         <ul className='scrollable-content'>
                             {operand.getPipesForOperatorIndexed(graphNode.name, index).map((pipeId) => (
@@ -130,7 +128,6 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
 
 GraphVertexDetails.defaultProps = {
     showQueueDetails: true,
-    isTemporalEpochView: undefined,
 };
 
 export default GraphVertexDetails;

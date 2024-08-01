@@ -110,19 +110,20 @@ const usePerfAnalyzerFileLoader = () => {
                         totalOps: 0,
                         normalizedTotalOps: 0,
                         initialNormalizedTotalOps: 0,
-                        chipTotalOps: [],
+                        totalOpsByChipId: [],
                     };
                 }
 
-                linkDataByTemporalEpoch[graph.temporalEpoch].chipTotalOps[graph.chipId] = graphOnChip.totalOpCycles;
+                linkDataByTemporalEpoch[graph.temporalEpoch]!.totalOpsByChipId[graph.chipId] =
+                    graphOnChip.totalOpCycles;
 
-                const { totalOps: totalOpsPerEpoch } = linkDataByTemporalEpoch[graph.temporalEpoch];
+                const { totalOps: totalOpsPerEpoch } = linkDataByTemporalEpoch[graph.temporalEpoch]!;
 
                 const ops = totalOpsPerEpoch ?? 1;
                 const totalOps = Math.max(graphOnChip.totalOpCycles, ops);
-                linkDataByTemporalEpoch[graph.temporalEpoch].initialNormalizedTotalOps = totalOps;
-                linkDataByTemporalEpoch[graph.temporalEpoch].normalizedTotalOps = totalOps;
-                linkDataByTemporalEpoch[graph.temporalEpoch].totalOps = totalOps;
+                linkDataByTemporalEpoch[graph.temporalEpoch]!.initialNormalizedTotalOps = totalOps;
+                linkDataByTemporalEpoch[graph.temporalEpoch]!.normalizedTotalOps = totalOps;
+                linkDataByTemporalEpoch[graph.temporalEpoch]!.totalOps = totalOps;
 
                 graphOnChipList.push(graphOnChip);
                 pipeSelectionData.push(...graphOnChip.generateInitialPipesSelectionState());
@@ -131,7 +132,7 @@ const usePerfAnalyzerFileLoader = () => {
                     nodesDataPerTemporalEpoch[graph.temporalEpoch] = [];
                 }
 
-                nodesDataPerTemporalEpoch[graph.temporalEpoch].push(
+                nodesDataPerTemporalEpoch[graph.temporalEpoch]!.push(
                     ...mapIterable(graphOnChip.nodes, (node) => node.generateInitialState()),
                 );
 

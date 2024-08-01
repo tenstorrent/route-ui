@@ -59,8 +59,7 @@ function QueuesTable() {
     const table = useRef<Table2>(null);
 
     const queueCellRenderer = (rowIndex: number) => {
-        const queueName = tableFields[rowIndex].name;
-        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
+        const { name: queueName, queue } = tableFields[rowIndex]!;
 
         return queueName ? (
             <SelectableOperation
@@ -69,7 +68,7 @@ function QueuesTable() {
                 selectFunc={selectOperand}
                 stringFilter=''
                 type={GraphVertexType.QUEUE}
-                offchip={isOffchip}
+                offchip={queue?.isOffchip(chipId) ?? false}
                 offchipClickHandler={navigateToGraph(queueName)}
             />
         ) : (
@@ -78,8 +77,7 @@ function QueuesTable() {
     };
 
     const inputCellRenderer = (rowIndex: number) => {
-        const { input } = tableFields[rowIndex];
-        const isOffchip = chipId === undefined ? false : chipId !== tableFields[rowIndex].chipId;
+        const { input, queue } = tableFields[rowIndex]!;
 
         if (input === 'HOST') {
             return 'HOST';
@@ -98,7 +96,7 @@ function QueuesTable() {
                 stringFilter=''
                 value={selected(operandDescriptor.name)}
                 type={operandDescriptor.type}
-                offchip={isOffchip}
+                offchip={queue?.isOffchip(chipId) ?? false}
                 offchipClickHandler={navigateToGraph(operandDescriptor.name)}
             />
         );

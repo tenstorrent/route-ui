@@ -12,18 +12,12 @@ import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
-import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from '../GraphVertexDetailsSelectable';
 import type GraphOnChip from '../../../data/GraphOnChip';
 import type { GraphRelationship } from '../../../data/StateTypes';
 import type { BuildableOperation } from '../../../data/Graph';
 
-const OperationsPropertiesTab = ({
-    graphs,
-    chipId,
-}: {
-    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
-    chipId?: number;
-}) => {
+const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
 
     const [filterQuery, setFilterQuery] = useState<string>('');
@@ -33,15 +27,12 @@ const OperationsPropertiesTab = ({
                 .reduce((opMap, { graphOnChip }) => {
                     [...graphOnChip.operations].forEach((op) => {
                         if (!opMap.has(op.name)) {
-                            opMap.set(op.name, {
-                                operation: op,
-                                chipId: graphOnChip.chipId,
-                            });
+                            opMap.set(op.name, op);
                         }
                     });
 
                     return opMap;
-                }, new Map<string, { operation: BuildableOperation; chipId: number }>())
+                }, new Map<string, BuildableOperation>())
                 .values(),
         ],
         [graphs],
@@ -54,7 +45,7 @@ const OperationsPropertiesTab = ({
         }
 
         const filter = filterQuery.toLowerCase();
-        const operands = operationsList.reduce<string[]>((filteredOperands, { operation: { name } }) => {
+        const operands = operationsList.reduce<string[]>((filteredOperands, { name }) => {
             if (name.toLowerCase().includes(filter)) {
                 filteredOperands.push(name);
             }
@@ -94,7 +85,7 @@ const OperationsPropertiesTab = ({
                 <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
             <div className='properties-list'>
-                {operationsList.map(({ operation, chipId: opChipId }, index) => {
+                {operationsList.map((operation, index) => {
                     return (
                         <FilterableComponent
                             // eslint-disable-next-line react/no-array-index-key
@@ -104,14 +95,10 @@ const OperationsPropertiesTab = ({
                             component={
                                 <Collapsible
                                     label={
-                                        <GraphVertexDetailsSelectables
+                                        <GraphVertexDetailsSelectable
                                             operand={operation}
                                             stringFilter={filterQuery}
                                             showType={false}
-                                            isOffchip={
-                                                operation.isOffchip ||
-                                                (chipId === undefined ? false : chipId !== opChipId)
-                                            }
                                         />
                                     }
                                     isOpen={allOpen}
@@ -125,10 +112,6 @@ const OperationsPropertiesTab = ({
             </div>
         </div>
     );
-};
-
-OperationsPropertiesTab.defaultProps = {
-    chipId: undefined,
 };
 
 export default OperationsPropertiesTab;

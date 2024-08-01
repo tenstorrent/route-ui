@@ -30,25 +30,25 @@ const pipeSelectionSlice = createSlice({
         updatePipeSelection(state, action: PayloadAction<{ id: string; selected: boolean }>) {
             const { id, selected } = action.payload;
             if (state.pipes[id]) {
-                state.pipes[id].selected = selected;
+                state.pipes[id]!.selected = selected;
             }
         },
         updateMultiplePipeSelection(state, action: PayloadAction<{ ids: string[]; selected: boolean }>) {
             const { ids, selected } = action.payload;
             ids.forEach((id) => {
                 if (state.pipes[id]) {
-                    state.pipes[id].selected = selected;
+                    state.pipes[id]!.selected = selected;
                 }
             });
         },
         clearAllPipes(state) {
             state.pipeIds.forEach((id) => {
-                state.pipes[id].selected = false;
+                state.pipes[id]!.selected = false;
             });
         },
         selectAllPipes(state) {
             state.pipeIds.forEach((id) => {
-                state.pipes[id].selected = true;
+                state.pipes[id]!.selected = true;
             });
         },
         resetPipeSelection(state) {

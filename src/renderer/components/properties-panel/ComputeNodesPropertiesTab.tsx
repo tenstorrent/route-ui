@@ -21,12 +21,11 @@ import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
 import GraphVertexDetails from '../GraphVertexDetails';
-import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from '../GraphVertexDetailsSelectable';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
-import type { BuildableOperation } from '../../../data/Graph';
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -201,10 +200,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectables
-                                                operand={operand}
-                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
-                                            />
+                                            <GraphVertexDetailsSelectable operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand
@@ -253,10 +249,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectables
-                                                operand={operand}
-                                                isOffchip={(operand as BuildableOperation)?.isOffchip}
-                                            />
+                                            <GraphVertexDetailsSelectable operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand
