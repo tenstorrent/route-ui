@@ -22,7 +22,7 @@ const getTestName = (path: string) => {
 };
 
 const LocalFolderOptions: FC = () => {
-    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error, loadPerfAnalyzerGraph } =
+    const { loadPerfAnalyzerFolder, openPerfAnalyzerFolderDialog, error, loadPerfAnalyzerGraph, loadTemporalEpoch } =
         usePerfAnalyzerFileLoader();
     const localFolderPath = useSelector(getFolderPathSelector);
     const selectedFolderLocationType = useSelector(getSelectedFolderLocationType);
@@ -35,7 +35,7 @@ const LocalFolderOptions: FC = () => {
             <div className='buttons-container'>
                 <FolderPicker
                     onSelectFolder={async () => {
-                        const folderPath = await openPerfAnalyzerFolderDialog();
+                        const folderPath = openPerfAnalyzerFolderDialog();
 
                         await loadPerfAnalyzerFolder(folderPath);
 
@@ -49,8 +49,9 @@ const LocalFolderOptions: FC = () => {
                     text={selectedFolderLocationType === 'local' ? getTestName(localFolderPath) : undefined}
                 />
                 <GraphSelector
-                    onSelectGraph={(graph) => loadPerfAnalyzerGraph(graph)}
-                    disabled={selectedFolderLocationType === 'remote'}
+                    onSelectGraph={(graphRelationship) => loadPerfAnalyzerGraph(graphRelationship)}
+                    onSelectTemporalEpoch={(temporalEpoch) => loadTemporalEpoch(temporalEpoch)}
+                    disabled={selectedFolderLocationType === 'remote' || !localFolderPath}
                 />
                 {error && (
                     <div className='loading-error'>

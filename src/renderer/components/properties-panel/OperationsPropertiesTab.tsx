@@ -6,23 +6,37 @@ import { Button, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { selectOperandList } from 'data/store/slices/nodeSelection.slice';
-import React, { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
-import { Operation } from '../../../data/GraphTypes';
 import Collapsible from '../Collapsible';
 import FilterableComponent from '../FilterableComponent';
 import GraphVertexDetails from '../GraphVertexDetails';
 import SearchField from '../SearchField';
-import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from '../GraphVertexDetailsSelectable';
+import type GraphOnChip from '../../../data/GraphOnChip';
+import type { GraphRelationship } from '../../../data/StateTypes';
+import type { BuildableOperation } from '../../../data/Graph';
 
-const OperationsPropertiesTab = (): React.ReactElement => {
+const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[] }) => {
     const dispatch = useDispatch();
-    const { getActiveGraphOnChip } = useContext(GraphOnChipContext);
-    const graphOnChip = getActiveGraphOnChip();
 
     const [filterQuery, setFilterQuery] = useState<string>('');
-    const operationsList = useMemo(() => (graphOnChip ? [...graphOnChip.operations] : []), [graphOnChip]);
+    const operationsList = useMemo(
+        () => [
+            ...graphs
+                .reduce((opMap, { graphOnChip }) => {
+                    [...graphOnChip.operations].forEach((op) => {
+                        if (!opMap.has(op.name)) {
+                            opMap.set(op.name, op);
+                        }
+                    });
+
+                    return opMap;
+                }, new Map<string, BuildableOperation>())
+                .values(),
+        ],
+        [graphs],
+    );
     const [allOpen, setAllOpen] = useState(true);
 
     const updateFilteredOperationSelection = (selected: boolean) => {
@@ -71,19 +85,20 @@ const OperationsPropertiesTab = (): React.ReactElement => {
                 <Button onClick={() => setAllOpen(false)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_UP} />
             </div>
             <div className='properties-list'>
-                {operationsList.map((operation: Operation) => {
+                {operationsList.map((operation, index) => {
                     return (
                         <FilterableComponent
-                            key={operation.name}
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={`${index}-${operation.name}`}
                             filterableString={operation.name}
                             filterQuery={filterQuery}
                             component={
                                 <Collapsible
                                     label={
-                                        <GraphVertexDetailsSelectables
+                                        <GraphVertexDetailsSelectable
                                             operand={operation}
                                             stringFilter={filterQuery}
-                                            displayType={false}
+                                            showType={false}
                                         />
                                     }
                                     isOpen={allOpen}

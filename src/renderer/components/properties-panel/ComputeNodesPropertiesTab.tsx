@@ -7,28 +7,30 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { updateNodeSelection } from 'data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from 'data/store/slices/pipeSelection.slice';
-import { openDetailedView } from 'data/store/slices/uiState.slice';
-import React, { Fragment, useContext, useMemo } from 'react';
+import { closeDetailedView, openDetailedView } from 'data/store/slices/uiState.slice';
+import React, { Fragment, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { JSX } from 'react/jsx-runtime';
 import { GraphVertexType } from '../../../data/GraphNames';
-import { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
-import { GraphOnChipContext } from '../../../data/GraphOnChipContext';
+import GraphOnChip, { ComputeNode, NOCLink, PipeSegment } from '../../../data/GraphOnChip';
 import { OperandDirection } from '../../../data/OpPerfDetails';
 import { ComputeNodeType, NOCLinkName } from '../../../data/Types';
-import { getOrderedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
+import { getOrderedSelectedNodeList } from '../../../data/store/selectors/nodeSelection.selectors';
 import { getDetailedViewOpenState, getSelectedDetailsViewUID } from '../../../data/store/selectors/uiState.selectors';
 import { calculateSlowestOperand, formatNodeUID } from '../../../utils/DataUtils';
 import useSelectableGraphVertex from '../../hooks/useSelectableGraphVertex.hook';
 import Collapsible from '../Collapsible';
 import GraphVertexDetails from '../GraphVertexDetails';
-import GraphVertexDetailsSelectables from '../GraphVertexDetailsSelectables';
+import GraphVertexDetailsSelectable from '../GraphVertexDetailsSelectable';
 import LinkDetails from '../LinkDetails';
 import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
+import type { GraphRelationship } from '../../../data/StateTypes';
 
 interface ComputeNodeProps {
     node: ComputeNode;
+    temporalEpoch: number;
+    chipId?: number;
 }
 
 const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
@@ -67,7 +69,6 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
 
         slowestOperandText = `${actualText} / ${requiredText}`;
     }
-
 
     const runtimeMetrics: [string | JSX.Element, string | number | JSX.Element, string?][] = [
         // TODO: This is only a small subset of all details
@@ -117,11 +118,10 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     );
 };
 
-const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactElement => {
+const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeProps): React.ReactElement => {
     const dispatch = useDispatch();
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
     const selectedDetailsViewUID = useSelector(getSelectedDetailsViewUID);
-    const activeGraphName = useContext(GraphOnChipContext).getActiveGraphName();
     const { selected, selectOperand, disabledOperand } = useSelectableGraphVertex();
 
     const updatePipesState = (pipeList: string[], state: boolean) => {
@@ -140,9 +140,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     return (
         <Card className='node-element'>
             <h3 className={classList.join(' ')}>
-                <span
-                    className='hover-wrapper'
-                >
+                <span className='hover-wrapper'>
                     {node.type.toUpperCase()} {formatNodeUID(node.uid)}
                 </span>
                 <Tooltip2 content='Close ComputeNode'>
@@ -150,9 +148,8 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         small
                         icon={IconNames.CROSS}
                         onClick={() => {
-                            dispatch(
-                                updateNodeSelection({ graphName: activeGraphName, id: node.uid, selected: false }),
-                            );
+                            dispatch(updateNodeSelection({ temporalEpoch, id: node.uid, selected: false }));
+                            dispatch(closeDetailedView());
                         }}
                     />
                 </Tooltip2>
@@ -203,7 +200,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectables operand={operand} />
+                                            <GraphVertexDetailsSelectable operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand
@@ -226,7 +223,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className=' scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.inputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
@@ -252,7 +249,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                 <ul className='scrollable-content' key={operand.name}>
                                     <div title={operand.name}>
                                         <div style={{ fontSize: '12px' }}>
-                                            <GraphVertexDetailsSelectables operand={operand} />
+                                            <GraphVertexDetailsSelectable operand={operand} />
                                             {operand.vertexType === GraphVertexType.OPERATION && (
                                                 <ul className='scrollable-content'>
                                                     {operand
@@ -275,7 +272,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                                             )}
                                             {operand.vertexType === GraphVertexType.QUEUE && (
                                                 <ul className='scrollable-content pipe-ids-for-core'>
-                                                    {operand.getPipeIdsForCore(node.uid).map((pipeId) => (
+                                                    {(operand.outputPipesByCore.get(node.uid) ?? []).map((pipeId) => (
                                                         <li key={`${operand.name}-${pipeId}`}>
                                                             <SelectablePipe
                                                                 pipeSegment={
@@ -305,7 +302,7 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                         icon={IconNames.PROPERTIES}
                         disabled={node.uid === selectedDetailsViewUID && isDetailsViewOpen}
                         onClick={() => {
-                            dispatch(openDetailedView(node.uid));
+                            dispatch(openDetailedView({ nodeUid: node.uid, chipId: node.chipId }));
                         }}
                     >
                         Detailed View
@@ -344,7 +341,13 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
                 <div className='node-links-wrap'>
                     <h4>Links</h4>
                     {node.getNOCLinksForNode().map((link: NOCLink) => (
-                        <LinkDetails key={link.name} link={link} graphName={activeGraphName} showEmpty />
+                        <LinkDetails
+                            key={link.name}
+                            link={link}
+                            temporalEpoch={temporalEpoch}
+                            chipId={chipId}
+                            showEmpty
+                        />
                     ))}
                 </div>
             )}
@@ -352,30 +355,49 @@ const ComputeNodePropertiesCard = ({ node }: ComputeNodeProps): React.ReactEleme
     );
 };
 
-const ComputeNodesPropertiesTab = (): React.ReactElement => {
-    const { getActiveGraphOnChip, getActiveGraphName } = useContext(GraphOnChipContext);
-    const graphName = getActiveGraphName();
-    const graphOnChip = getActiveGraphOnChip();
-    const orderedNodeSelection = useSelector(getOrderedNodeList(graphName));
-    const selectedNodes: ComputeNode[] = useMemo(() => {
-        if (!graphOnChip) {
-            return [];
-        }
-        return orderedNodeSelection.map((nodeState) => graphOnChip.getNode(nodeState.id));
-    }, [graphOnChip, orderedNodeSelection]);
+ComputeNodePropertiesCard.defaultProps = {
+    chipId: undefined,
+};
+
+const ComputeNodesPropertiesTab = ({
+    graphs,
+    epoch,
+    chipId,
+}: {
+    graphs: { graphOnChip: GraphOnChip; graph: GraphRelationship }[];
+    epoch: number;
+    chipId?: number;
+}) => {
+    const orderedNodeSelection = useSelector(getOrderedSelectedNodeList(epoch));
+    const selectedNodes = useMemo(
+        () =>
+            orderedNodeSelection.reduce((graphList, nodeState) => {
+                const graphOnChip = graphs.find(({ graph }) => graph.chipId === nodeState.chipId);
+
+                if (graphOnChip) {
+                    graphList.push(graphOnChip?.graphOnChip.getNode(nodeState.id));
+                }
+
+                return graphList;
+            }, [] as ComputeNode[]),
+        [graphs, orderedNodeSelection],
+    );
 
     return (
-        // TODO: give this a greyed out look when data is not available
-        <div className={`properties-container ${graphOnChip ? '' : 'empty'}`}>
+        <div className={`properties-container ${selectedNodes.length > 0 ? '' : 'empty'}`}>
             <div className='properties-list'>
                 <div className='properties-panel-nodes'>
-                    {selectedNodes.map((node: ComputeNode) => (
-                        <ComputeNodePropertiesCard key={node?.uid} node={node} />
+                    {selectedNodes.map((node) => (
+                        <ComputeNodePropertiesCard key={node?.uid} node={node} temporalEpoch={epoch} chipId={chipId} />
                     ))}
                 </div>
             </div>
         </div>
     );
+};
+
+ComputeNodesPropertiesTab.defaultProps = {
+    chipId: undefined,
 };
 
 export default ComputeNodesPropertiesTab;

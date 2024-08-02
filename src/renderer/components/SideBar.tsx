@@ -6,19 +6,21 @@ import { AnchorButton, Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { ApplicationMode } from 'data/Types';
-import { getApplicationMode, getDetailedViewOpenState, getDockOpenState } from 'data/store/selectors/uiState.selectors';
-import { setDockOpenState, setSelectedFile, setSelectedFolder } from 'data/store/slices/uiState.slice';
+import { getApplicationMode, getDetailedViewOpenState } from 'data/store/selectors/uiState.selectors';
+import { setSelectedFile, setSelectedFolder, toggleDockOpenState } from 'data/store/slices/uiState.slice';
 import React, { useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { type Location, useLocation, useNavigate } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 import { ClusterContext } from '../../data/ClusterContext';
 import { openClusterView } from '../../data/store/slices/clusterView.slice';
+import type { LocationState, NavigateOptions } from '../../data/StateTypes';
 
 export interface SideBarProps {}
 
 export const SideBar: React.FC<SideBarProps> = () => {
     const { resetGraphOnChipState } = useContext(GraphOnChipContext);
+    const location: Location<LocationState> = useLocation();
     const navigate = useNavigate();
     const applicationMode = useSelector(getApplicationMode);
     const { cluster } = useContext(ClusterContext);
@@ -27,13 +29,19 @@ export const SideBar: React.FC<SideBarProps> = () => {
         resetGraphOnChipState();
         dispatch(setSelectedFile(''));
         dispatch(setSelectedFolder(''));
-        navigate('/');
+        navigate('/', {
+            state: {
+                epoch: -1,
+                previous: {
+                    path: location.pathname,
+                },
+            },
+        } satisfies NavigateOptions);
     };
 
     const handleOpenClusterView = () => {
         dispatch(openClusterView());
     };
-    const isDockOpen = useSelector(getDockOpenState);
     const isDetailsViewOpen = useSelector(getDetailedViewOpenState);
 
     const clusterViewButtonEnabled = cluster?.chips !== undefined && cluster?.chips.length > 1;
@@ -49,7 +57,7 @@ export const SideBar: React.FC<SideBarProps> = () => {
                         disabled={isDetailsViewOpen}
                         icon={IconNames.APPLICATION}
                         text=''
-                        onClick={() => dispatch(setDockOpenState(!isDockOpen))}
+                        onClick={() => requestAnimationFrame(() => dispatch(toggleDockOpenState()))}
                     />
                 </Tooltip2>
             )}

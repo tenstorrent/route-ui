@@ -31,7 +31,7 @@ export const ZoomControls: FC = () => {
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label htmlFor='gridZoom'>Zoom</label>
             <Slider
-                min={0.5}
+                min={0.3}
                 max={3}
                 stepSize={0.25}
                 labelStepSize={1}

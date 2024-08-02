@@ -2,23 +2,34 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
+import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../createStore';
+import type { ComputeNodeState } from '../../StateTypes';
 
-export const getDramGroup = (graphName: string, dramChannelId?: number) => (state: RootState) =>
-    dramChannelId !== undefined && dramChannelId > -1
-        ? state.nodeSelection.dram[graphName]?.[dramChannelId]
-        : undefined;
+export const getDramHighlightState = (temporalEpoch: number, id: string) => (state: RootState) =>
+    state.nodeSelection.dramNodesHighlight[temporalEpoch]?.[id];
 
-export const selectNodeSelectionById = (graphName: string, id: string) => (state: RootState) =>
-    state.nodeSelection.nodeList[graphName]?.[id];
+export const selectNodeSelectionById = (temporalEpoch: number, nodeUID: string) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch]?.[nodeUID];
 export const getOperand = (opName: string) => (state: RootState) => state.nodeSelection.operands[opName];
-export const getOperandState = (state: RootState) => state.nodeSelection.operands;
 
-export const getSelectedNodeList = (graphName: string) => (state: RootState) => state.nodeSelection.nodeList[graphName];
+export const getOperandState = createSelector(
+    (state: RootState) => state.nodeSelection,
+    (nodeSelection) => nodeSelection.operands,
+);
 
-export const getOrderedNodeList = (graphName: string) => (state: RootState) =>
-    (state.nodeSelection.nodeListOrder[graphName] ?? [])
-        .map((id) => state.nodeSelection.nodeList[graphName][id])
-        .toReversed();
+export const getOperandStateList = createSelector(
+    (state: RootState) => state.nodeSelection,
+    (nodeSelection) => (operandNames: string[]) => operandNames.map((name) => nodeSelection.operands[name]),
+);
+
+export const getSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
+    state.nodeSelection.nodeList[temporalEpoch];
+
+export const getOrderedSelectedNodeList = (temporalEpoch: number) => (state: RootState) =>
+    (state.nodeSelection.selectedNodeList[temporalEpoch] ?? [])
+        .map((nodeUID) => state.nodeSelection.nodeList[temporalEpoch]?.[nodeUID])
+        .filter((nodeState) => nodeState !== undefined)
+        .toReversed() as ComputeNodeState[];
 
 export const getFocusNode = (state: RootState) => state.nodeSelection.focusNode;

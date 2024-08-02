@@ -10,62 +10,43 @@ import { Operand } from './Graph';
 
 interface OperandDescriptor {
     name: string;
-    graphName: string;
     temporalEpoch: number;
     type: GraphVertexType;
     operand: Operand;
+    chipId: number;
+}
+
+interface GraphOnChipAndRelationship {
+    graph: GraphRelationship;
+    graphOnChip: GraphOnChip;
 }
 
 interface ApplicationModelState {
     operands: Map<string, OperandDescriptor>;
-    visitedGraphsHistory: string[];
-    currentGraphIndex: number;
-    graphOnChipList: {
-        [graphName: string]: GraphOnChip;
-    };
-    graphs: Map<string, GraphRelationship>;
+    graphsByTemporalEpoch: Map<number, GraphOnChipAndRelationship[]>;
 }
 
 interface GraphOnChipContextType {
     loadGraphOnChips: (newChips: GraphOnChip[], graphs: GraphRelationship[]) => void;
     resetGraphOnChipState: () => void;
-    getGraphRelationshipList: () => GraphRelationship[];
-    getActiveGraphRelationship: () => GraphRelationship | undefined;
-    getActiveGraphOnChip: () => GraphOnChip | undefined;
-    getPreviousGraphName: () => string | undefined;
-    getNextGraphName: () => string | undefined;
-    setActiveGraph: (graphName: string) => void;
-    selectPreviousGraph: () => void;
-    selectNextGraph: () => void;
-    getGraphOnChip: (graphName: string) => GraphOnChip | undefined;
-    getActiveGraphName: () => string;
-    graphOnChipList: Record<string, GraphOnChip>;
+    getGraphsByTemporalEpoch: () => Map<number, GraphOnChipAndRelationship[]>;
+    getGraphOnChip: (temporalEpoch: number, chipId: number) => GraphOnChip | undefined;
     getOperand: (edgeName: string) => OperandDescriptor | undefined;
+    getGraphOnChipListForTemporalEpoch: (epoch: number, chipId?: number) => GraphOnChipAndRelationship[];
 }
 
 const applicationModelState: ApplicationModelState = {
     operands: new Map<string, OperandDescriptor>(),
-    visitedGraphsHistory: [],
-    currentGraphIndex: 0,
-    graphOnChipList: {},
-    graphs: new Map<string, GraphRelationship>(),
+    graphsByTemporalEpoch: new Map<number, GraphOnChipAndRelationship[]>(),
 };
 
 const GraphOnChipContext = createContext<GraphOnChipContextType>({
     loadGraphOnChips: () => {},
     resetGraphOnChipState: () => {},
-    getGraphRelationshipList: () => [],
-    getActiveGraphRelationship: () => undefined,
-    getActiveGraphOnChip: () => undefined,
-    getPreviousGraphName: () => undefined,
-    getNextGraphName: () => undefined,
-    setActiveGraph: () => {},
-    selectPreviousGraph: () => {},
-    selectNextGraph: () => {},
+    getGraphsByTemporalEpoch: () => new Map(),
     getGraphOnChip: () => undefined,
-    getActiveGraphName: () => '',
-    graphOnChipList: {},
     getOperand: () => undefined,
+    getGraphOnChipListForTemporalEpoch: () => [],
 });
 
 const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -74,106 +55,86 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const loadGraphOnChips = useCallback((newChips: GraphOnChip[], graphs: GraphRelationship[]) => {
         const operands: OperandDescriptor[] = newChips
             .map((graphOnChip, index) => {
-                const { temporalEpoch } = graphs[index];
+                const { temporalEpoch, chipId } = graphs[index]!;
+
                 return [
                     ...[...graphOnChip.operations]
-                        .filter((operation) => !operation.isOffchip)
+                        .filter((op) => !op?.isOffchip(chipId) ?? true)
                         .map((operation) => ({
                             name: operation.name,
-                            graphName: graphs[index].name,
                             temporalEpoch,
                             type: GraphVertexType.OPERATION,
                             operand: operation as Operand,
+                            chipId: graphOnChip.chipId,
                         })),
                     ...[...graphOnChip.queues].map((queue) => ({
                         name: queue.name,
-                        graphName: graphs[index].name,
                         temporalEpoch,
                         type: GraphVertexType.QUEUE,
                         operand: queue as Operand,
+                        chipId: graphOnChip.chipId,
                     })),
                 ];
             })
             .flat();
+
+        const graphOnChipList = Object.fromEntries(newChips.map((chip, index) => [graphs[index]!.name, chip]));
+        const graphsByTemporalEpoch = graphs.reduce((graphsByEpoch, graphRelationship) => {
+            if (!graphsByEpoch.has(graphRelationship.temporalEpoch)) {
+                graphsByEpoch.set(graphRelationship.temporalEpoch, []);
+            }
+
+            const normalizedGraphsList = graphsByEpoch.get(graphRelationship.temporalEpoch)!;
+
+            normalizedGraphsList[graphRelationship.chipId] = {
+                graph: graphRelationship,
+                graphOnChip: graphOnChipList[graphRelationship.name]!,
+            };
+
+            graphsByEpoch.set(graphRelationship.temporalEpoch, normalizedGraphsList);
+
+            return graphsByEpoch;
+        }, new Map<number, GraphOnChipAndRelationship[]>());
+
         setState({
-            visitedGraphsHistory: [],
-            currentGraphIndex: 0,
-            graphOnChipList: Object.fromEntries(newChips.map((chip, index) => [graphs[index].name, chip])),
-            graphs: new Map(graphs.map((graph) => [graph.name, graph])),
             operands: new Map(operands.map((edge) => [edge.name, edge])),
+            graphsByTemporalEpoch,
         });
     }, []);
 
     const getGraphOnChip = useCallback(
-        (graphName: string) => {
-            return state.graphOnChipList[graphName];
+        (temporalEpoch: number, chipId: number) => {
+            return state.graphsByTemporalEpoch.get(temporalEpoch)?.[chipId]?.graphOnChip;
         },
-        [state.graphOnChipList],
+        [state.graphsByTemporalEpoch],
     );
 
-    const reset = useCallback(() => {
-        setState({ ...applicationModelState, graphs: new Map() });
-    }, []);
-
-    const getGraphRelationshipList = useCallback(() => {
-        return [...state.graphs.values()];
-    }, [state]);
-
-    const getActiveGraphRelationship = useCallback(() => {
-        return state.graphs.get(state.visitedGraphsHistory[state.currentGraphIndex] ?? '');
-    }, [state]);
-
-    const getActiveGraphOnChip = useCallback(() => {
-        return state.graphOnChipList[state.visitedGraphsHistory[state.currentGraphIndex] ?? ''];
-    }, [state]);
-
-    const getPreviousGraphName = useCallback(() => {
-        return state.visitedGraphsHistory[state.currentGraphIndex - 1];
-    }, [state.currentGraphIndex, state.visitedGraphsHistory]);
-
-    const getNextGraphName = useCallback(() => {
-        return state.visitedGraphsHistory[state.currentGraphIndex + 1];
-    }, [state.currentGraphIndex, state.visitedGraphsHistory]);
-
-    const setActiveGraph = useCallback((graphName: string) => {
-        setState((prevState) => {
-            if (prevState.visitedGraphsHistory[prevState.currentGraphIndex] === graphName) {
-                return prevState;
-            }
-
-            const newGraphList = [
-                ...prevState.visitedGraphsHistory.slice(0, Math.max(0, prevState.currentGraphIndex + 1)),
-                graphName,
-            ];
-
-            return {
-                ...prevState,
-                currentGraphIndex: newGraphList.length - 1,
-                visitedGraphsHistory: newGraphList,
-            };
+    const resetGraphOnChipState = useCallback(() => {
+        setState({
+            ...applicationModelState,
+            graphsByTemporalEpoch: new Map(),
+            operands: new Map(),
         });
     }, []);
 
-    const selectPreviousGraph = useCallback(() => {
-        setState((prevState) => ({
-            ...prevState,
-            currentGraphIndex: Math.max(0, prevState.currentGraphIndex - 1),
-            visitedGraphsHistory: [...prevState.visitedGraphsHistory],
-        }));
-    }, []);
+    const getGraphsByTemporalEpoch = useCallback(() => state.graphsByTemporalEpoch, [state.graphsByTemporalEpoch]);
 
-    const selectNextGraph = useCallback(() => {
-        setState((prevState) => ({
-            ...prevState,
-            currentGraphIndex: Math.min(prevState.visitedGraphsHistory.length - 1, prevState.currentGraphIndex + 1),
-            visitedGraphsHistory: [...prevState.visitedGraphsHistory],
-        }));
-    }, []);
+    const getGraphOnChipListForTemporalEpoch = useCallback(
+        (epoch: number, chipId?: number) => {
+            const graphArray = state.graphsByTemporalEpoch.get(epoch) ?? [];
 
-    const getActiveGraphName = useCallback(() => {
-        return state.visitedGraphsHistory[state.currentGraphIndex] ?? '';
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.visitedGraphsHistory]);
+            if (chipId !== undefined) {
+                if (graphArray[chipId]) {
+                    return [graphArray[chipId]!];
+                }
+
+                return [];
+            }
+
+            return graphArray;
+        },
+        [state.graphsByTemporalEpoch],
+    );
 
     const getOperand = useCallback(
         (edgeName: string) => {
@@ -185,35 +146,19 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const value = useMemo<GraphOnChipContextType>(
         () => ({
             loadGraphOnChips,
-            getActiveGraphOnChip,
-            getActiveGraphRelationship,
-            getGraphRelationshipList,
+            getGraphsByTemporalEpoch,
             getGraphOnChip,
-            getActiveGraphName,
-            resetGraphOnChipState: reset,
-            getPreviousGraphName,
-            getNextGraphName,
-            setActiveGraph,
-            selectPreviousGraph,
-            selectNextGraph,
-            graphOnChipList: state.graphOnChipList,
+            resetGraphOnChipState,
             getOperand,
+            getGraphOnChipListForTemporalEpoch,
         }),
         [
             loadGraphOnChips,
-            getActiveGraphOnChip,
-            getActiveGraphRelationship,
-            getGraphRelationshipList,
+            getGraphsByTemporalEpoch,
             getGraphOnChip,
-            getActiveGraphName,
-            reset,
-            getPreviousGraphName,
-            getNextGraphName,
-            setActiveGraph,
-            selectPreviousGraph,
-            selectNextGraph,
-            state.graphOnChipList,
+            resetGraphOnChipState,
             getOperand,
+            getGraphOnChipListForTemporalEpoch,
         ],
     );
 

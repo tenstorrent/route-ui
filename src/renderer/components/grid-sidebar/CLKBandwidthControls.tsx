@@ -7,12 +7,14 @@ import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     updateCLK,
+    updateChipTotalOps,
     updateDRAMBandwidth,
+    updateEpochTotalOPs,
     updatePCIBandwidth,
-    updateTotalOPs,
 } from 'data/store/slices/linkSaturation.slice';
 import { FC, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { type Location, useLocation } from 'react-router-dom';
 import { DataIntegrityErrorType } from '../../../data/DataIntegrity';
 import { AICLK_INITIAL_MHZ, DRAM_BANDWIDTH_INITIAL_GBS, PCIE_BANDWIDTH_INITIAL_GBS } from '../../../data/constants';
 import Collapsible from '../Collapsible';
@@ -22,41 +24,61 @@ import {
     getCLKMhz,
     getDRAMBandwidth,
     getPCIBandwidth,
-    getTotalOpsForGraph,
+    getTotalOpsForChipId,
+    getTotalOpsforTemporalEpoch,
 } from '../../../data/store/selectors/linkSaturation.selectors';
+import type { LocationState } from '../../../data/StateTypes';
 
 interface DRAMBandwidthControlsProps {}
 
 export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
-    const graphOnChip = useContext(GraphOnChipContext).getActiveGraphOnChip();
-    const graphName = useContext(GraphOnChipContext).getActiveGraphName();
+    const location: Location<LocationState> = useLocation();
+    const { epoch, chipId } = location.state;
+
+    const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
+
     const dispatch = useDispatch();
     const dramBandwidth = useSelector(getDRAMBandwidth);
     const clkMHz = useSelector(getCLKMhz);
     const PCIeBandwidth = useSelector(getPCIBandwidth);
-    const opCycles = useSelector(getTotalOpsForGraph(graphName));
-
-    let aiclkRightElement = (
-        <Tooltip2 content='Reset Total OP Cycles'>
-            <Button
-                minimal
-                onClick={() => {
-                    const resetValue = graphOnChip?.totalOpCycles || 1;
-
-                    dispatch(updateTotalOPs({ graphName, totalOps: resetValue }));
-                }}
-                icon={IconNames.RESET}
-            />
-        </Tooltip2>
+    const opCycles = useSelector(
+        chipId !== undefined ? getTotalOpsForChipId(epoch, chipId) : getTotalOpsforTemporalEpoch(epoch),
+    );
+    const totalOpCycles = graphOnChipList.reduce(
+        (totalOps, { graphOnChip }) => Math.max(totalOps, graphOnChip.totalOpCycles),
+        1,
     );
 
-    if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
-        aiclkRightElement = (
-            <Tooltip2 content='Cycles per input cannot be 0'>
-                <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
+    const aiclkRightElement = (
+        <>
+            <Tooltip2 content='Reset Total OP Cycles'>
+                <Button
+                    minimal
+                    onClick={() => {
+                        requestAnimationFrame(() => {
+                            if (chipId !== undefined) {
+                                dispatch(updateChipTotalOps({ temporalEpoch: epoch, chipId, totalOps: totalOpCycles }));
+                            } else {
+                                dispatch(updateEpochTotalOPs({ temporalEpoch: epoch, totalOps: totalOpCycles }));
+                            }
+                        });
+                    }}
+                    icon={IconNames.RESET}
+                />
             </Tooltip2>
-        );
-    }
+            {graphOnChipList.map(({ graphOnChip }) => {
+                if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
+                    return (
+                        <Tooltip2 content='Cycles per input cannot be 0'>
+                            <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
+                        </Tooltip2>
+                    );
+                }
+
+                return null;
+            })}
+        </>
+    );
 
     return (
         <Collapsible label='CLK Controls' isOpen>
@@ -83,7 +105,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                             newValue = 1;
                         }
 
-                        dispatch(updateTotalOPs({ graphName, totalOps: newValue }));
+                        requestAnimationFrame(() => {
+                            if (chipId !== undefined) {
+                                dispatch(updateChipTotalOps({ temporalEpoch: epoch, chipId, totalOps: newValue }));
+                            } else {
+                                dispatch(updateEpochTotalOPs({ temporalEpoch: epoch, totalOps: newValue }));
+                            }
+                        });
                     }}
                     rightElement={aiclkRightElement}
                 />
@@ -112,13 +140,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                         newValue = 1;
                     }
 
-                    dispatch(updateCLK(newValue));
+                    requestAnimationFrame(() => dispatch(updateCLK(newValue)));
                 }}
                 rightElement={
                     <Button
                         minimal
                         onClick={() => {
-                            dispatch(updateCLK(AICLK_INITIAL_MHZ));
+                            requestAnimationFrame(() => dispatch(updateCLK(AICLK_INITIAL_MHZ)));
                         }}
                         icon={IconNames.RESET}
                     />
@@ -144,13 +172,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                         newValue = 0;
                     }
 
-                    dispatch(updateDRAMBandwidth(newValue));
+                    requestAnimationFrame(() => dispatch(updateDRAMBandwidth(newValue)));
                 }}
                 rightElement={
                     <Button
                         minimal
                         onClick={() => {
-                            dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS));
+                            requestAnimationFrame(() => dispatch(updateDRAMBandwidth(DRAM_BANDWIDTH_INITIAL_GBS)));
                         }}
                         icon={IconNames.RESET}
                     />
@@ -176,13 +204,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                         newValue = 0;
                     }
 
-                    dispatch(updatePCIBandwidth(newValue));
+                    requestAnimationFrame(() => dispatch(updatePCIBandwidth(newValue)));
                 }}
                 rightElement={
                     <Button
                         minimal
                         onClick={() => {
-                            dispatch(updatePCIBandwidth(PCIE_BANDWIDTH_INITIAL_GBS));
+                            requestAnimationFrame(() => dispatch(updatePCIBandwidth(PCIE_BANDWIDTH_INITIAL_GBS)));
                         }}
                         icon={IconNames.RESET}
                     />

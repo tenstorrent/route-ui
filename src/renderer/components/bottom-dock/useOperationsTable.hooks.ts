@@ -17,6 +17,7 @@ export interface OpTableFields extends MeasurementDetails {
     grid_size: number;
     core_id: string;
     slowestOperandRef?: Operand;
+    chipId: number;
 }
 
 type OperationTableColumn = keyof OpTableFields | 'operation';

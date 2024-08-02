@@ -11,7 +11,7 @@ import { formatNodeUID } from '../../../utils/DataUtils';
 const NodeLocation: FC<{ node: ComputeNode }> = ({ node }) => {
     const showNodeLocation = useSelector(getShowNodeUID);
 
-    return showNodeLocation && <div className='node-location'>{formatNodeUID(node.uid)}</div>;
+    return <div className='node-location'>{showNodeLocation ? formatNodeUID(node.uid) : ''}</div>;
 };
 
 export default NodeLocation;
