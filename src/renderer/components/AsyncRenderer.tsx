@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+
 import { type FC, type ReactElement, useEffect, useState } from 'react';
 
 export function asyncRenderer<T>(renderer: (() => Promise<T>) | (() => T), delay = 0) {
@@ -16,7 +20,8 @@ const AsyncComponent: FC<{
     renderer: () => Promise<any> | any;
     loadingContent: ReactElement | string;
     delay?: number;
-}> = ({ renderer, loadingContent: fallback, delay = 0 }) => {
+    postRenderCallback?: () => any;
+}> = ({ renderer, loadingContent: fallback, delay = 0, postRenderCallback }) => {
     const [content, setContent] = useState(fallback);
 
     // This effect is so we can have both micro and micro tasks queued.
@@ -25,6 +30,7 @@ const AsyncComponent: FC<{
     useEffect(() => {
         (async () => {
             setContent(await asyncRenderer(renderer, delay));
+            postRenderCallback?.();
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [renderer]);
