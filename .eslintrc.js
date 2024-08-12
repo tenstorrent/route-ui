@@ -37,7 +37,8 @@ module.exports = {
         "unused-imports/no-unused-vars": [
             "warn",
             { vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" }
-        ]
+        ],
+        "react/require-default-props": "off", // this is actually now being depricated in react so we shouldnt use default props
         // "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }],  // May conflict with prettier
     },
     parserOptions: {

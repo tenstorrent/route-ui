@@ -4,7 +4,6 @@
 
 export interface Chunk {
     address: number;
-    hexAddress: number;
     size: number;
 }
 

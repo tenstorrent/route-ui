@@ -5,7 +5,7 @@
 /* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
-import { MemoryChunk } from './MemoryChunk';
+import MemoryChunk from './MemoryChunk';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
 // eslint-disable-next-line import/no-cycle
