@@ -5,6 +5,7 @@
 import React from 'react';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import LinkDetails from '../LinkDetails';
+import MemoryChunk from '../../../data/MemoryChunk';
 
 interface DetailedViewCoreRendererProps {
     node: ComputeNode;
@@ -15,11 +16,23 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
     return (
         <>
             <div className='detailed-view-chip core'>
+                <h4>data</h4>
                 <div className='l1-memory'>
-                    {node.L1Chunks.map(({ hexAddress, size }) => (
+                    {node.coreL1Memory.dataBuffers.map((chunk: MemoryChunk) => (
                         <>
                             <span>
-                                {hexAddress} / {size}
+                                {chunk.address} / {chunk.size}
+                            </span>
+                            <br />
+                        </>
+                    ))}
+                </div>
+                <h4>binary</h4>
+                <div className='l1-memory'>
+                    {node.coreL1Memory.binaryBuffers.map((chunk: MemoryChunk) => (
+                        <>
+                            <span>
+                                {chunk.address} / {chunk.size}
                             </span>
                             <br />
                         </>

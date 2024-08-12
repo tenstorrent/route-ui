@@ -5,7 +5,7 @@
 /* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
-import { L1MemoryChunk } from './L1MemoryChunk';
+import { MemoryChunk } from './MemoryChunk';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
 // eslint-disable-next-line import/no-cycle
@@ -812,27 +812,29 @@ export default class GraphOnChip {
             Object.entries(L1Profile['worker-cores']).forEach(([coreCoords, profile]) => {
                 const node = newChip.getNode(`${newChip.chipId}-${coreCoords}`);
 
+                node.coreL1Memory.l1Size = profile['core-attributes']['l1-size-bytes'];
                 profile['binary-buffers'].forEach((bufferChunk) => {
-                    node.L1Chunks.push(
-                        new L1MemoryChunk(
-                            bufferChunk['start-address'],
-                            bufferChunk['reserved-size-bytes'],
-                            bufferChunk['consumed-size-bytes'],
+                    node.coreL1Memory.binaryBuffers.push(
+                        new MemoryChunk(
+                            Number(bufferChunk['start-address']),
+                            Number(bufferChunk['reserved-size-bytes']),
+                            Number(bufferChunk['consumed-size-bytes']),
                         ),
                     );
                 });
 
                 profile['data-buffers'].forEach((bufferChunk) => {
-                    node.L1Chunks.push(
-                        new L1MemoryChunk(
-                            bufferChunk['start-address'],
-                            bufferChunk['reserved-size-bytes'],
-                            bufferChunk['consumed-size-bytes'],
+                    node.coreL1Memory.dataBuffers.push(
+                        new MemoryChunk(
+                            Number(bufferChunk['start-address']),
+                            Number(bufferChunk['reserved-size-bytes']),
+                            Number(bufferChunk['consumed-size-bytes']),
                         ),
                     );
                 });
 
-                node.L1Chunks.sort((a, b) => a.address - b.address);
+                node.coreL1Memory.binaryBuffers.sort((a, b) => a.address - b.address);
+                node.coreL1Memory.dataBuffers.sort((a, b) => a.address - b.address);
             });
         }
 
@@ -1101,6 +1103,12 @@ export interface NodeInitialState {
     chipId: number;
 }
 
+export interface CoreL1Memory {
+    binaryBuffers: MemoryChunk[];
+    dataBuffers: MemoryChunk[];
+    l1Size: number;
+}
+
 export class ComputeNode {
     /** Creates a ComputeNode from a Node JSON object in a Netlist Analyzer output file.
      *
@@ -1236,7 +1244,11 @@ export class ComputeNode {
 
     public opSiblingNodes: ComputeNodeSiblings = {};
 
-    public L1Chunks: L1MemoryChunk[] = [];
+    public coreL1Memory: CoreL1Memory = {
+        binaryBuffers: [],
+        dataBuffers: [],
+        l1Size: 0,
+    };
 
     // TODO: check if reassigend operation is updated here.
     private _operation: Operation | undefined = undefined;

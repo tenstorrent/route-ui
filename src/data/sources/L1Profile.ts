@@ -10,7 +10,7 @@ export interface L1BufferJSON {
     'consumed-size-bytes': number;
     'percent-consumed': number;
     'reserved-size-bytes': number;
-    'start-address': `0x${number}`;
+    'start-address': number;
 }
 
 export interface WorkerCoreL1ProfileJSON {
