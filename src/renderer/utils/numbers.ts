@@ -28,7 +28,9 @@ export const numberFormatter = (value: any, unit = '', fractionDigits = 2) => {
     return `${formatter.format(parsedValue)}${unit}`;
 };
 
-
+/**
+ * @description Convert number to hex string for rendering
+ */
 export const toHex = (num: number): string => {
     if (num < 0) {
         return toHex(0xffffffff + num + 1);
@@ -40,6 +42,9 @@ export const formatSize = (number: number): string => {
     return new Intl.NumberFormat('en-US').format(number);
 };
 
+/**
+ * @description  Pretty print 10 base address for memory legend
+ */
 export const prettyPrintAddress = (address: number | null, memorySize: number): string => {
     if (address === null) {
         return '0'.padStart(memorySize.toString().length, '0');
