@@ -214,4 +214,52 @@
         max-height: 476px;
         overflow-y: auto;
     }
+    .legend {
+        display: inline-flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-direction: column;
+        row-gap: 5px;
+
+        hr {
+            margin: 10px 0;
+        }
+
+        .full-dram-legend {
+            display: grid;
+        }
+
+        .legend-item {
+            display: inline-grid;
+            gap: 5px;
+            grid-template-columns: 20px 1fr;
+
+            &.dimmed {
+                opacity: 0.4;
+            }
+
+            .legend-details {
+                display: inline-grid;
+                grid-template-columns: 1fr 1fr 0.75fr 1fr;
+                gap: 15px;
+
+                .format-numbers {
+                    text-align: right;
+
+                    &.keep-left {
+                        text-align: left;
+                    }
+                }
+            }
+
+            .legend-text {
+                font-size: 0.875rem;
+            }
+        }
+    }
+    .memory-color-block {
+        width: 15px;
+        height: 15px;
+        display: inline-block;
+    }
 }
