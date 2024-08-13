@@ -80,7 +80,16 @@
 
     .header {
         grid-area: top-bar;
-        margin: 0;
+        margin-inline: -10px;
+        margin-block-start: -10px;
+        background-color: #202020;
+
+        .logo {
+            align-self: center;
+            justify-self: start;
+            height: 100%;
+            width: auto;
+        }
     }
 
     .sidebar { grid-area: sidebar; }
