@@ -5,6 +5,8 @@
 export interface Chunk {
     address: number;
     size: number;
+    consumedSize: number;
+    // TODO: we shoudl record % used from the client provided data nd not calculate it in getChartData.
 }
 
 export default class MemoryChunk implements Chunk {

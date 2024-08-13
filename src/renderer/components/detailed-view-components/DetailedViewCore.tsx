@@ -8,6 +8,7 @@ import { ComputeNode } from '../../../data/GraphOnChip';
 import LinkDetails from '../LinkDetails';
 import MemoryPlotRenderer from '../memory-renderer/MemoryPlotRenderer';
 import { L1RenderConfiguration, getChartData } from '../memory-renderer/PlotConfigurations';
+import { MemoryLegendElement } from '../memory-renderer/MemoryLegendElement';
 
 interface DetailedViewCoreRendererProps {
     node: ComputeNode;
@@ -38,11 +39,11 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
     // TODO: we need to find a creative way to render CONSUMED size vs SIZE - this might become interesting metrics to show
     // TODO: maybe a toggle to flip between the two with a ghosting allocated size overlay
 
-    const dataBuffers = getChartData(node.coreL1Memory.dataBuffers);
+    const dataBuffers = getChartData(node.coreL1Memory.dataBuffers, false); // usage shoudl always be false
     const dataBuffersConfig = { ...L1RenderConfiguration };
     dataBuffersConfig.title = 'Data Buffers';
 
-    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers);
+    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers, true);
     const binaryBuffersConfig = { ...L1RenderConfiguration };
     binaryBuffersConfig.title = 'Binary Buffers';
 
@@ -80,13 +81,40 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     plotZoomRangeEnd={plotZoomRangeEnd}
                 />
 
+                <div className='legend'>
+                    {node.coreL1Memory.dataBuffers.map((buffer) => {
+                        return (
+                            <MemoryLegendElement
+                                chunk={buffer}
+                                memSize={node.coreL1Memory.l1Size}
+                                selectedTensorAddress={null}
+                            />
+                        );
+                    })}
+                </div>
+
                 <MemoryPlotRenderer
                     chartData={binaryBuffers}
                     isZoomedIn={zoomedInView}
                     memorySize={node.coreL1Memory.l1Size}
                     title=''
                     configuration={binaryBuffersConfig}
+                    plotZoomRangeStart={0}
+                    plotZoomRangeEnd={250000}
                 />
+                <div className='legend'>
+                    {/* we want to add consumed vs allocated here below */}
+                    {node.coreL1Memory.binaryBuffers.map((buffer) => {
+                        return (
+                            <MemoryLegendElement
+                                chunk={buffer}
+                                memSize={node.coreL1Memory.l1Size}
+                                selectedTensorAddress={null}
+                            />
+                        );
+                    })}
+                </div>
+                {/* above zoom range is hardcoded temporarily */}
             </div>
             {/* TODO: we may want to do buffers legend below each chart */}
             {/* TODO: we may also want fragmentation report. ei: find empty memory in between buffers and report it */}
