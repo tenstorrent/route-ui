@@ -32,11 +32,8 @@ export const numberFormatter = (value: any, unit = '', fractionDigits = 2) => {
  * @description Convert number to hex string for rendering
  */
 export const toHex = (num: number): string => {
-    if (num < 0) {
-        // handling negative numbers as a 32-bit unsigned integer
-        return toHex(0xffffffff + num + 1);
-    }
-    return `0x${num.toString(16).toUpperCase()}`;
+    // eslint-disable-next-line no-bitwise
+    return `0x${(num >>> 0).toString(16).toUpperCase()}`;
 };
 
 export const formatSize = (number: number): string => {
