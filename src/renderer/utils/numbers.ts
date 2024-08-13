@@ -33,6 +33,7 @@ export const numberFormatter = (value: any, unit = '', fractionDigits = 2) => {
  */
 export const toHex = (num: number): string => {
     if (num < 0) {
+        // handling negative numbers as a 32-bit unsigned integer
         return toHex(0xffffffff + num + 1);
     }
     return `0x${num.toString(16).toUpperCase()}`;
