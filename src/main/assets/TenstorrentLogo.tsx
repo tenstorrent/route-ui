@@ -5,7 +5,7 @@
 function TenstorrentLogo() {
     // from the style guide
     return (
-        <svg width='250px' height='auto' viewBox='0 0 2737 1036' xmlns='http://www.w3.org/2000/svg'>
+        <svg width='350px' height='auto' viewBox='0 0 2737 1036' xmlns='http://www.w3.org/2000/svg'>
             <g fill='#7C68FA'>
                 <path d='M602.014,542.68l-86.012,49.659l-86.013,-49.659l0.001,99.319l86.012,49.659l86.012,-49.659l-0,-99.319Z' />
                 <path d='M602.014,443.364l-86.012,49.659l-86.013,-49.659l0.004,99.315l-86.013,-49.659l-0,-99.318l86.012,-49.66l172.022,99.322Z' />
