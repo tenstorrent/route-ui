@@ -3,7 +3,7 @@ import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
 import { formatSize, toHex } from '../../utils/numbers';
 
-export const L1RenderConfiguration = {
+export const L1RenderConfiguration: PlotConfiguration = {
     height: 110,
     margin: {
         l: 5,
@@ -12,8 +12,7 @@ export const L1RenderConfiguration = {
         t: 25,
     },
     title: 'L1 Address Space',
-} as PlotConfiguration;
-
+};
 
 export interface PlotConfiguration {
     height: number;
@@ -27,7 +26,6 @@ export interface PlotConfiguration {
 }
 
 export const CONDENSED_PLOT_CHUNK_COLOR = '#9c9e9f';
-
 
 export const getChartData = (memory: Chunk[]): Partial<PlotData>[] => {
     return memory.map((chunk) => {
@@ -71,4 +69,4 @@ ${address} (${toHex(address)}) <br>Size: ${formatSize(size)}
             },
         };
     });
-}
+};
