@@ -39,25 +39,38 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
     // TODO: we need to find a creative way to render CONSUMED size vs SIZE - this might become interesting metrics to show
     // TODO: maybe a toggle to flip between the two with a ghosting allocated size overlay
 
-    const dataBuffers = getChartData(node.coreL1Memory.dataBuffers, false); // usage shoudl always be false
+    // usage should always be false
+    const dataBuffers = getChartData(node.coreL1Memory.dataBuffers, false);
     const dataBuffersConfig = { ...L1RenderConfiguration };
     dataBuffersConfig.title = 'Data Buffers';
+    const dataBufferZoomRangeStart = useMemo(
+        () => (node.coreL1Memory.dataBuffers[0]?.address ?? 0) * MINIMAL_MEMORY_RANGE_OFFSET,
+        [node.coreL1Memory.dataBuffers],
+    );
+
+    const dataBufferZoomRangeEnd = useMemo(() => {
+        const lastItem = node.coreL1Memory.dataBuffers.at(-1);
+        const lastAddress = lastItem?.address ?? 0;
+        const lastSize = lastItem?.size ?? 0;
+
+        return (lastAddress + lastSize) * (1 / MINIMAL_MEMORY_RANGE_OFFSET) || node.coreL1Memory.l1Size;
+    }, [node.coreL1Memory.dataBuffers, node.coreL1Memory.l1Size]);
 
     const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers, true);
     const binaryBuffersConfig = { ...L1RenderConfiguration };
     binaryBuffersConfig.title = 'Binary Buffers';
+    const binaryBufferZoomRangeStart = useMemo(
+        () => (node.coreL1Memory.binaryBuffers[0]?.address ?? 0) * MINIMAL_MEMORY_RANGE_OFFSET,
+        [node.coreL1Memory.binaryBuffers],
+    );
 
-    // TODO: the below zoom range needs an abstraction, implementation for the binaryBuffers and preventing errors
-    // @ts-ignore
-    // eslint-disable-next-line no-unsafe-optional-chaining
-    const plotZoomRangeStart = node.coreL1Memory.dataBuffers[0]?.address * MINIMAL_MEMORY_RANGE_OFFSET || 0;
+    const binaryBufferZoomRangeEnd = useMemo(() => {
+        const lastItem = node.coreL1Memory.binaryBuffers.at(-1);
+        const lastAddress = lastItem?.address ?? 0;
+        const lastSize = lastItem?.size ?? 0;
 
-    const plotZoomRangeEnd =
-        // @ts-ignore
-        (node.coreL1Memory.dataBuffers[node.coreL1Memory.dataBuffers.length - 1].address +
-            // @ts-ignore
-            node.coreL1Memory.dataBuffers[node.coreL1Memory.dataBuffers.length - 1].size) *
-            (1 / MINIMAL_MEMORY_RANGE_OFFSET) || node.coreL1Memory.l1Size;
+        return (lastAddress + lastSize) * (1 / MINIMAL_MEMORY_RANGE_OFFSET) || node.coreL1Memory.l1Size;
+    }, [node.coreL1Memory.binaryBuffers, node.coreL1Memory.l1Size]);
 
     return (
         <>
@@ -77,8 +90,8 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     memorySize={node.coreL1Memory.l1Size}
                     title=''
                     configuration={dataBuffersConfig}
-                    plotZoomRangeStart={plotZoomRangeStart}
-                    plotZoomRangeEnd={plotZoomRangeEnd}
+                    plotZoomRangeStart={dataBufferZoomRangeStart}
+                    plotZoomRangeEnd={dataBufferZoomRangeEnd}
                 />
 
                 <div className='bp4-dark l1-table-wrapper'>
@@ -111,8 +124,8 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     memorySize={node.coreL1Memory.l1Size}
                     title=''
                     configuration={binaryBuffersConfig}
-                    plotZoomRangeStart={0}
-                    plotZoomRangeEnd={250000}
+                    plotZoomRangeStart={binaryBufferZoomRangeStart}
+                    plotZoomRangeEnd={binaryBufferZoomRangeEnd}
                 />
                 <div className='bp4-dark l1-table-wrapper'>
                     <HTMLTable striped compact>
