@@ -2,8 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import React, { useState } from 'react';
-import { Switch } from '@blueprintjs/core';
+import React, { useMemo, useState } from 'react';
+import { HTMLTable, Switch } from '@blueprintjs/core';
 import { ComputeNode } from '../../../data/GraphOnChip';
 import LinkDetails from '../LinkDetails';
 import MemoryPlotRenderer from '../memory-renderer/MemoryPlotRenderer';
