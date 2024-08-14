@@ -82,7 +82,6 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                                 {formatSize(node.coreL1Memory.totalReservedSize)}
                             </output>
                         </p>
-                        {/* TODO: potentially add op type to operation model (it exists in other sources) */}
                     </div>
                 )}
 

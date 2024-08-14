@@ -1,35 +1,25 @@
 import React, { useRef } from 'react';
 import Plot from 'react-plotly.js';
-import { Config, Layout, PlotData, PlotMouseEvent } from 'plotly.js';
-// import useOutsideClick from '../../hooks/useOutsideClick';
+import { Config, Layout, PlotData } from 'plotly.js';
 import { PlotConfiguration } from './PlotConfigurations';
-
 
 export interface MemoryPlotRendererProps {
     chartData: Partial<PlotData>[];
     isZoomedIn: boolean;
     memorySize: number;
     title: string;
-    onBufferClick?: (event: PlotMouseEvent) => void;
-    onClickOutside?: (event: MouseEvent) => void;
     plotZoomRangeStart?: number;
     plotZoomRangeEnd?: number;
-    className?: string;
-    additionalReferences?: React.RefObject<HTMLDivElement>[];
     configuration: PlotConfiguration;
 }
-// TODO: this needs an overal cleanup
+
 const MemoryPlotRenderer: React.FC<MemoryPlotRendererProps> = ({
     chartData,
     isZoomedIn,
     memorySize,
-    className = '',
     title,
-    onBufferClick,
-    onClickOutside,
     plotZoomRangeStart,
     plotZoomRangeEnd,
-    additionalReferences = [],
     configuration,
 }) => {
     const layout: Partial<Layout> = {
@@ -78,26 +68,15 @@ const MemoryPlotRenderer: React.FC<MemoryPlotRendererProps> = ({
     const config: Partial<Config> = {
         displayModeBar: false,
         displaylogo: false,
-        staticPlot: false, //onBufferClick === undefined,
+        staticPlot: false,
     };
 
     const plotRef = useRef<HTMLDivElement>(null);
 
-    // useOutsideClick([plotRef, ...additionalReferences], onClickOutside);
-
     return (
-        <div
-            className={className}
-            ref={plotRef}
-        >
+        <div ref={plotRef}>
             <h3 className='plot-title'>{title}</h3>
-            <Plot
-                className='memory-plot'
-                data={chartData}
-                layout={layout}
-                config={config}
-                onClick={onBufferClick}
-            />
+            <Plot className='memory-plot' data={chartData} layout={layout} config={config} />
         </div>
     );
 };
