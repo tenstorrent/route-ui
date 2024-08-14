@@ -242,14 +242,6 @@
                 display: inline-grid;
                 grid-template-columns: 1fr 1fr 0.75fr 1fr;
                 gap: 15px;
-
-                .format-numbers {
-                    text-align: right;
-
-                    &.keep-left {
-                        text-align: left;
-                    }
-                }
             }
 
             .legend-text {
@@ -257,6 +249,33 @@
             }
         }
     }
+
+    .l1-table-wrapper {
+        overflow: auto;
+        height: 120px;
+        min-width: 420px;
+        width: fit-content;
+
+        table {
+            min-width: fit-content;
+            width: 100%;
+        }
+
+        thead {
+            top: 0;
+            position: sticky;
+            background-color: $tt-background;
+        }
+
+        .format-numbers {
+            text-align: right;
+
+            &.keep-left {
+                text-align: left;
+            }
+        }
+    }
+
     .memory-color-block {
         width: 15px;
         height: 15px;

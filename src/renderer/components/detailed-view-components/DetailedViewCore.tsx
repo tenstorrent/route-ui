@@ -81,7 +81,17 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     plotZoomRangeEnd={plotZoomRangeEnd}
                 />
 
-                <div className='legend'>
+                <div className='bp4-dark l1-table-wrapper'>
+                    <HTMLTable striped compact>
+                        <thead>
+                            <tr>
+                                <th>Color</th>
+                                <th>Address (Decimal)</th>
+                                <th>Addres (Hex)</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                     {node.coreL1Memory.dataBuffers.map((buffer) => {
                         return (
                             <MemoryLegendElement
@@ -91,6 +101,8 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                             />
                         );
                     })}
+                        </tbody>
+                    </HTMLTable>
                 </div>
 
                 <MemoryPlotRenderer
@@ -102,7 +114,17 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     plotZoomRangeStart={0}
                     plotZoomRangeEnd={250000}
                 />
-                <div className='legend'>
+                <div className='bp4-dark l1-table-wrapper'>
+                    <HTMLTable striped compact>
+                        <thead>
+                            <tr>
+                                <th>Color</th>
+                                <th>Address (Decimal)</th>
+                                <th>Addres (Hex)</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                     {/* we want to add consumed vs allocated here below */}
                     {node.coreL1Memory.binaryBuffers.map((buffer) => {
                         return (
@@ -113,6 +135,8 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                             />
                         );
                     })}
+                        </tbody>
+                    </HTMLTable>
                 </div>
                 {/* above zoom range is hardcoded temporarily */}
             </div>

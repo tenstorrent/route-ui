@@ -4,6 +4,7 @@ import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
 import { formatSize, prettyPrintAddress, toHex } from '../../utils/numbers';
 
+// eslint-disable-next-line import/prefer-default-export
 export const MemoryLegendElement: React.FC<{
     chunk: Chunk;
     memSize: number;
@@ -15,25 +16,26 @@ export const MemoryLegendElement: React.FC<{
     selectedTensorAddress,
 }) => {
     return (
-        <div
+        <tr
             key={chunk.address}
-            className={classNames('legend-item', {
+            className={classNames({
                 dimmed: selectedTensorAddress !== null && selectedTensorAddress !== chunk.address,
             })}
         >
-            <div
-                className='memory-color-block'
-                style={{
-                    backgroundColor: getBufferColor(chunk.address),
-                }}
-            />
-            <div className='legend-details'>
-                <div className='format-numbers monospace'>{prettyPrintAddress(chunk.address, memSize)}</div>
-                <div className='format-numbers monospace keep-left'>({toHex(chunk.address)})</div>
-                {/* TODO: something like this but prettier and with % */}
-                {/* <div className='format-numbers monospace'>{formatSize(chunk.consumedSize)} </div> */}
-                <div className='format-numbers monospace'>{formatSize(chunk.size)} </div>
-            </div>
-        </div>
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+            <td>
+                <span
+                    className='memory-color-block'
+                    style={{
+                        backgroundColor: getBufferColor(chunk.address),
+                    }}
+                />
+            </td>
+            <td className='format-numbers monospace'>{prettyPrintAddress(chunk.address, memSize)}</td>
+            <td className='format-numbers monospace keep-left'>({toHex(chunk.address)})</td>
+            {/* TODO: something like this but prettier and with % */}
+            {/* <td className='format-numbers monospace'>{formatSize(chunk.consumedSize)} </td> */}
+            <td className='format-numbers monospace'>{formatSize(chunk.size)} </td>
+        </tr>
     );
 };
