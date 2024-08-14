@@ -6,22 +6,29 @@ export interface Chunk {
     address: number;
     size: number;
     consumedSize: number;
-    // TODO: we shoudl record % used from the client provided data nd not calculate it in getChartData.
+    percentConsumed: number;
+    name?: string;
 }
 
 export default class MemoryChunk implements Chunk {
     public address: number;
 
-    public hexAddress: number;
-
     public size: number;
 
     public consumedSize: number;
 
-    constructor(address: number, size: number, consumedSize: number) {
+    public percentConsumed: number;
+
+    public name?: string;
+
+    constructor(address: number, size: number, consumedSize: number, percentConsumed?: number, name?: string) {
         this.address = parseInt(String(address), 10);
-        this.hexAddress = address;
         this.size = size;
         this.consumedSize = consumedSize;
+        this.percentConsumed = percentConsumed ?? (consumedSize / size) * 100;
+
+        if (name) {
+            this.name = name;
+        }
     }
 }

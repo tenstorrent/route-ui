@@ -24,6 +24,7 @@ export interface Operation extends HasOperands, Operand {
     readonly vertexType: GraphVertexType.OPERATION;
     readonly cores: Iterable<ComputeNode>;
     details?: OpPerfDetails;
+    type?: string;
     slowestOperand: Operand | null;
     getOperandByPerformance(op: OperandPerformance | null): Operand | null;
 }

@@ -813,12 +813,21 @@ export default class GraphOnChip {
                 const node = newChip.getNode(`${newChip.chipId}-${coreCoords}`);
 
                 node.coreL1Memory.l1Size = profile['core-attributes']['l1-size-bytes'];
+                node.coreL1Memory.totalConsumedSize = profile['core-attributes']['total-consumed-size-bytes'];
+                node.coreL1Memory.totalReservedSize = profile['core-attributes']['total-reserved-size-bytes'];
+
+                if (node.operation) {
+                    node.operation.type = profile['core-attributes']['op-type'];
+                }
+
                 profile['binary-buffers'].forEach((bufferChunk) => {
                     node.coreL1Memory.binaryBuffers.push(
                         new MemoryChunk(
                             Number(bufferChunk['start-address']),
                             Number(bufferChunk['reserved-size-bytes']),
                             Number(bufferChunk['consumed-size-bytes']),
+                            Number(bufferChunk['percent-consumed']),
+                            bufferChunk['buffer-name'],
                         ),
                     );
                 });
@@ -829,6 +838,8 @@ export default class GraphOnChip {
                             Number(bufferChunk['start-address']),
                             Number(bufferChunk['reserved-size-bytes']),
                             Number(bufferChunk['consumed-size-bytes']),
+                            Number(bufferChunk['percent-consumed']),
+                            bufferChunk['buffer-name'],
                         ),
                     );
                 });
@@ -1107,6 +1118,8 @@ export interface CoreL1Memory {
     binaryBuffers: MemoryChunk[];
     dataBuffers: MemoryChunk[];
     l1Size: number;
+    totalConsumedSize: number;
+    totalReservedSize: number;
 }
 
 export class ComputeNode {
@@ -1248,6 +1261,8 @@ export class ComputeNode {
         binaryBuffers: [],
         dataBuffers: [],
         l1Size: 0,
+        totalConsumedSize: 0,
+        totalReservedSize: 0,
     };
 
     // TODO: check if reassigend operation is updated here.
@@ -1273,8 +1288,8 @@ export class ComputeNode {
 
     // TODO: this doesnt look like it shoudl still be here, keeping to retain code changes
 
-    /** @Deprecated
-     * Superceded by `this.operation.name`
+    /**
+     * @deprecated Superceded by `this.operation.name`
      */
     get opName(): string {
         return this.operation?.name || '';
