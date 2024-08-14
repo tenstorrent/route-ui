@@ -16,23 +16,6 @@ interface DetailedViewCoreRendererProps {
 }
 
 const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ node, temporalEpoch }) => {
-    /**
-     * Binary buffers: These are buffers statically allocated in L1, containing NCRISC binaries,
-     * Overlay Binaries, and Trisc Binaries. Every worker core should all have these buffers
-     * (though the sizes of these buffers may differ across cores).
-     * Since these buffers are statically allocated, they have a static reserved size that may be larger
-     * than the actual consumed size. For example I could allocate 4096 bytes (reserved size) for trisc0 binaries,
-     * but the actual trisc0 binary may only be 1024 bytes large (consumed size).
-     * We also show the address that this buffer is allocated at.
-     *
-     *
-     * Data buffers: These are dynamically allocated, and therefore differ between worker cores.
-     * These buffers serve different purposes. For example relay buffers hold temporary data to be forwarded to other cores,
-     * packer stream buffers hold data packed to L1 from the packer kernel.
-     * For these buffers it's assumed that the consumed size equals the reserved size.
-     * We also show the address that this buffer is allocated at.
-     */
-
     const MINIMAL_MEMORY_RANGE_OFFSET = 0.998;
     const [zoomedInView, setZoomedInView] = useState(false);
 
@@ -99,8 +82,8 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                         <thead>
                             <tr>
                                 <th>Color</th>
-                                <th>Address (Decimal)</th>
-                                <th>Addres (Hex)</th>
+                                <th>Address (Dec / Hex)</th>
+                                {/* For data buffers it is assumed the allocated size and consumed size are equal */}
                                 <th>Size</th>
                             </tr>
                         </thead>
@@ -111,6 +94,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                                 chunk={buffer}
                                 memSize={node.coreL1Memory.l1Size}
                                 selectedTensorAddress={null}
+                                        shouldShowConsumedSize={false}
                             />
                         );
                     })}
@@ -132,13 +116,13 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                         <thead>
                             <tr>
                                 <th>Color</th>
-                                <th>Address (Decimal)</th>
-                                <th>Addres (Hex)</th>
-                                <th>Size</th>
+                                <th>Address (Dec / Hex)</th>
+                                <th>Consumed Size</th>
+                                <th>Total Size</th>
+                                <th>Consumed Percent</th>
                             </tr>
                         </thead>
                         <tbody>
-                    {/* we want to add consumed vs allocated here below */}
                     {node.coreL1Memory.binaryBuffers.map((buffer) => {
                         return (
                             <MemoryLegendElement
@@ -151,9 +135,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                         </tbody>
                     </HTMLTable>
                 </div>
-                {/* above zoom range is hardcoded temporarily */}
             </div>
-            {/* TODO: we may want to do buffers legend below each chart */}
             {/* TODO: we may also want fragmentation report. ei: find empty memory in between buffers and report it */}
             <div className='detailed-view-link-info'>
                 <div className='node-links-wrap'>

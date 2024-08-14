@@ -2,18 +2,20 @@ import React from 'react';
 import classNames from 'classnames';
 import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
-import { formatMemoryAddress, formatSize, formatToHex } from '../../utils/numbers';
+import { formatMemoryAddress, formatSize, formatToHex, numberFormatter } from '../../utils/numbers';
 
 // eslint-disable-next-line import/prefer-default-export
 export const MemoryLegendElement: React.FC<{
     chunk: Chunk;
     memSize: number;
     selectedTensorAddress: number | null;
+    shouldShowConsumedSize?: boolean;
 }> = ({
     // no wrap eslint
     chunk,
     memSize,
     selectedTensorAddress,
+    shouldShowConsumedSize = true,
 }) => {
     return (
         <tr
@@ -31,11 +33,30 @@ export const MemoryLegendElement: React.FC<{
                     }}
                 />
             </td>
-            <td className='format-numbers monospace'>{formatMemoryAddress(chunk.address, memSize)}</td>
-            <td className='format-numbers monospace keep-left'>({formatToHex(chunk.address)})</td>
-            {/* TODO: something like this but prettier and with % */}
-            {/* <td className='format-numbers monospace'>{formatSize(chunk.consumedSize)} </td> */}
-            <td className='format-numbers monospace'>{formatSize(chunk.size)} </td>
+            <td>
+                <code>
+                    {formatMemoryAddress(chunk.address, memSize)}
+                    {' / '}
+                    {formatToHex(chunk.address)}
+                </code>
+            </td>
+            {shouldShowConsumedSize && (
+                <td>
+                    <code>{formatSize(chunk.consumedSize)}</code>
+                </td>
+            )}
+            <td>
+                <code>{formatSize(chunk.size)}</code>
+            </td>
+            {shouldShowConsumedSize && (
+                <td>
+                    <code>{numberFormatter(chunk.percentConsumed, '%')}</code>
+                </td>
+            )}
         </tr>
     );
+};
+
+MemoryLegendElement.defaultProps = {
+    shouldShowConsumedSize: true,
 };
