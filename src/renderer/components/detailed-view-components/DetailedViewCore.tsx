@@ -9,6 +9,7 @@ import LinkDetails from '../LinkDetails';
 import MemoryPlotRenderer from '../memory-renderer/MemoryPlotRenderer';
 import { L1RenderConfiguration, getChartData } from '../memory-renderer/PlotConfigurations';
 import { MemoryLegendElement } from '../memory-renderer/MemoryLegendElement';
+import { formatSize } from '../../utils/numbers';
 
 interface DetailedViewCoreRendererProps {
     node: ComputeNode;
@@ -58,15 +59,41 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
     return (
         <>
             <div className='detailed-view-chip core'>
-                {/* TODO: render operation name here */}
-                {/* TODO: render operation type here, that might come from core-attributes */}
-                {/* potentially add op type to operation model (it exists in other sources) */}
+                {node.operation && (
+                    <div className='op-details'>
+                        <p>
+                            <strong>Operation name:</strong>
+                            &nbsp;
+                            <output>{node.operation.name}</output>
+                        </p>
+                        {node.operation.type && (
+                            <p>
+                                <strong>Operation type:</strong>
+                                &nbsp;
+                                <output>{node.operation.type}</output>
+                            </p>
+                        )}
+                        <p>
+                            <strong>Memory (Consumed / Reserved):</strong>
+                            &nbsp;
+                            <output>
+                                {formatSize(node.coreL1Memory.totalConsumedSize)}
+                                &nbsp; / &nbsp;
+                                {formatSize(node.coreL1Memory.totalReservedSize)}
+                            </output>
+                        </p>
+                        {/* TODO: potentially add op type to operation model (it exists in other sources) */}
+                    </div>
+                )}
 
-                <Switch
-                    label={zoomedInView ? 'Full buffer reports' : 'Zoom buffer reports'}
-                    checked={zoomedInView}
-                    onChange={() => setZoomedInView(!zoomedInView)}
-                />
+                <p>
+                    <Switch
+                        label={zoomedInView ? 'Full buffer reports' : 'Zoom buffer reports'}
+                        checked={zoomedInView}
+                        onChange={() => setZoomedInView(!zoomedInView)}
+                    />
+                </p>
+
                 <MemoryPlotRenderer
                     chartData={dataBuffers}
                     isZoomedIn={zoomedInView}
@@ -88,16 +115,16 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                             </tr>
                         </thead>
                         <tbody>
-                    {node.coreL1Memory.dataBuffers.map((buffer) => {
-                        return (
-                            <MemoryLegendElement
-                                chunk={buffer}
-                                memSize={node.coreL1Memory.l1Size}
-                                selectedTensorAddress={null}
+                            {node.coreL1Memory.dataBuffers.map((buffer) => {
+                                return (
+                                    <MemoryLegendElement
+                                        chunk={buffer}
+                                        memSize={node.coreL1Memory.l1Size}
+                                        selectedTensorAddress={null}
                                         shouldShowConsumedSize={false}
-                            />
-                        );
-                    })}
+                                    />
+                                );
+                            })}
                         </tbody>
                     </HTMLTable>
                 </div>
@@ -123,15 +150,15 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                             </tr>
                         </thead>
                         <tbody>
-                    {node.coreL1Memory.binaryBuffers.map((buffer) => {
-                        return (
-                            <MemoryLegendElement
-                                chunk={buffer}
-                                memSize={node.coreL1Memory.l1Size}
-                                selectedTensorAddress={null}
-                            />
-                        );
-                    })}
+                            {node.coreL1Memory.binaryBuffers.map((buffer) => {
+                                return (
+                                    <MemoryLegendElement
+                                        chunk={buffer}
+                                        memSize={node.coreL1Memory.l1Size}
+                                        selectedTensorAddress={null}
+                                    />
+                                );
+                            })}
                         </tbody>
                     </HTMLTable>
                 </div>
