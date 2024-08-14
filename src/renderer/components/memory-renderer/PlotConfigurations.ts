@@ -1,7 +1,7 @@
 import { PlotData } from 'plotly.js';
 import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
-import { formatSize, toHex } from '../../utils/numbers';
+import { formatSize, formatToHex } from '../../utils/numbers';
 import { toRGBA } from '../../../utils/DrawingAPI';
 
 export const L1RenderConfiguration: PlotConfiguration = {
@@ -49,7 +49,7 @@ export const getChartData = (memory: Chunk[], includeUsage: boolean = false): Pa
             hoverinfo: 'none',
             hovertemplate: `
 <span style="color:${color};font-size:20px;">&#9632;</span>
-${address} (${toHex(address)}) <br>
+${address} (${formatToHex(address)}) <br>
 <span>${label}:</span> ${formatSize(size)}
 <extra></extra>`,
 
@@ -95,7 +95,7 @@ ${address} (${toHex(address)}) <br>
                 hoverinfo: 'none',
                 hovertemplate: `
 <span style="color:${color};font-size:20px;">&#9632;</span>
-${address} (${toHex(address)}) <br>
+${address} (${formatToHex(address)}) <br>
 <span>Size:</span> ${formatSize(consumedSize)} / ${formatSize(size)} (${((consumedSize / size) * 100).toFixed(2)}%)
 <extra></extra>`,
 

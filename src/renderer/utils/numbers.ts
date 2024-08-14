@@ -28,25 +28,21 @@ export const numberFormatter = (value: any, unit = '', fractionDigits = 2) => {
     return `${formatter.format(parsedValue)}${unit}`;
 };
 
-/**
- * @description Convert number to hex string for rendering
- */
-export const toHex = (num: number): string => {
-    // eslint-disable-next-line no-bitwise
-    return `0x${(num >>> 0).toString(16).toUpperCase()}`;
+export const formatToHex = (number: number, numberSize = 8): string => {
+    const absoluteNumber = Math.abs(number);
+    const signal = Math.sign(number);
+
+    return `${signal < 0 ? '-' : ''}0x${absoluteNumber.toString(16).padStart(numberSize, '0').toUpperCase()}`;
 };
 
 export const formatSize = (number: number): string => {
     return new Intl.NumberFormat('en-US').format(number);
 };
 
-/**
- * @description  Pretty print 10 base address for memory legend
- */
-export const prettyPrintAddress = (address: number | null, memorySize: number): string => {
+export const formatMemoryAddress = (address: number | null, maxSize: number): string => {
     if (address === null) {
-        return '0'.padStart(memorySize.toString().length, '0');
+        return '0'.padStart(Math.trunc(maxSize).toString().length, '0');
     }
 
-    return address.toString().padStart(memorySize.toString().length, '0');
+    return address.toString().padStart(Math.trunc(maxSize).toString().length, '0');
 };

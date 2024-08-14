@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
-import { formatSize, prettyPrintAddress, toHex } from '../../utils/numbers';
+import { formatMemoryAddress, formatSize, formatToHex } from '../../utils/numbers';
 
 // eslint-disable-next-line import/prefer-default-export
 export const MemoryLegendElement: React.FC<{
@@ -31,8 +31,8 @@ export const MemoryLegendElement: React.FC<{
                     }}
                 />
             </td>
-            <td className='format-numbers monospace'>{prettyPrintAddress(chunk.address, memSize)}</td>
-            <td className='format-numbers monospace keep-left'>({toHex(chunk.address)})</td>
+            <td className='format-numbers monospace'>{formatMemoryAddress(chunk.address, memSize)}</td>
+            <td className='format-numbers monospace keep-left'>({formatToHex(chunk.address)})</td>
             {/* TODO: something like this but prettier and with % */}
             {/* <td className='format-numbers monospace'>{formatSize(chunk.consumedSize)} </td> */}
             <td className='format-numbers monospace'>{formatSize(chunk.size)} </td>
