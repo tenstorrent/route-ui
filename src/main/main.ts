@@ -81,7 +81,8 @@ const createWindow = async () => {
 
     remoteMain.enable(mainWindow.webContents);
 
-    await mainWindow.loadURL(resolveHtmlPath('index.html'));
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    mainWindow.loadURL(resolveHtmlPath('index.html'));
 
     mainWindow.on('ready-to-show', () => {
         if (!mainWindow) {
