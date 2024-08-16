@@ -63,7 +63,7 @@ function OperationsTable() {
         if (selectedOperationCores.length > 0) {
             list = selectedOperationCores.map((core: ComputeNode) => {
                 return {
-                    name: core.opName,
+                    name: core.operation?.name,
                     ...core.perfAnalyzerResults,
                     core_id: core.uid,
                     slowestOperandRef: core.operation?.slowestOperand,

@@ -77,7 +77,7 @@ export default class GraphOnChip {
     private nodeByChannelId: Map<number, ComputeNode[]> = new Map();
 
     private findSiblingNodeLocations(node: ComputeNode) {
-        const sameOperandNodes = [...this.nodesById.values()].filter((n) => n.opName === node.opName);
+        const sameOperandNodes = [...this.nodesById.values()].filter((n) => n.operation?.name === node.operation?.name);
 
         const top = sameOperandNodes
             .filter((n) => n.loc.x === node.loc.x && n.loc.y <= node.loc.y - 1)
@@ -1288,20 +1288,11 @@ export class ComputeNode {
         this.operation = operation;
     }
 
-    // TODO: this doesnt look like it shoudl still be here, keeping to retain code changes
-
-    /**
-     * @deprecated Superceded by `this.operation.name`
-     */
-    get opName(): string {
-        return this.operation?.name || '';
-    }
-
     public generateInitialState(): NodeInitialState {
         return {
             uid: this.uid,
             queueNameList: this.queueList.map((queue) => queue.name),
-            opName: this.opName,
+            opName: this.operation?.name ?? '',
             dramChannelId: this.dramChannelId,
             chipId: this.chipId,
         };
@@ -1424,10 +1415,6 @@ export class Pipe {
 
 export class PipeSegment {
     readonly id: string;
-
-    /** @description unused?
-     @Deprecated */
-    location: Loc = { x: 0, y: 0 };
 
     readonly bandwidth: number;
 
