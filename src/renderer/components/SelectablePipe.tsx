@@ -69,8 +69,5 @@ const SelectablePipe: FC<SelectablePipeProps> = ({
         </>
     );
 };
-SelectablePipe.defaultProps = {
-    showBandwidthUse: false,
-    showBandwidth: true,
-};
+
 export default SelectablePipe;

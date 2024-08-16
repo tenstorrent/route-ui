@@ -137,8 +137,5 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
         </button>
     );
 };
-NodeGridElement.defaultProps = {
-    currentChipId: undefined,
-    connectedEth: null,
-};
+
 export default NodeGridElement;

@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 interface HighlightedTextProps {
     text: string;

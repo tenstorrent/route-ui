@@ -28,7 +28,7 @@ interface GraphSelectorProps {
     onSelectTemporalEpoch: (temporalEpoch: number) => void;
 }
 
-const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph, onSelectTemporalEpoch }) => {
+const GraphSelector: FC<GraphSelectorProps> = ({ disabled = false, label, onSelectGraph, onSelectTemporalEpoch }) => {
     const location: Location<LocationState> = useLocation();
     const { chipId, epoch = -1 } = location?.state ?? {};
     const { getGraphsByTemporalEpoch, getGraphOnChipListForTemporalEpoch } = useContext(GraphOnChipContext);
@@ -87,11 +87,6 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled, label, onSelectGraph,
             </Button>
         </Popover2>
     );
-};
-
-GraphSelector.defaultProps = {
-    disabled: false,
-    label: undefined,
 };
 
 export default GraphSelector;

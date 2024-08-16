@@ -192,10 +192,4 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
     );
 };
 
-RemoteFolderDialog.defaultProps = {
-    title: 'Add new remote connection',
-    buttonLabel: 'Add connection',
-    remoteConnection: undefined,
-};
-
 export default RemoteFolderDialog;

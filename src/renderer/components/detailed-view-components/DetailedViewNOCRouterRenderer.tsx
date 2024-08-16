@@ -19,7 +19,7 @@ const DetailedViewNOCRouterRenderer: React.FC<DetailedViewNOCRouterRendererProps
     temporalEpoch,
     chipId,
     label,
-    className,
+    className = '',
 }) => {
     return (
         <>
@@ -35,8 +35,4 @@ const DetailedViewNOCRouterRenderer: React.FC<DetailedViewNOCRouterRendererProps
     );
 };
 
-DetailedViewNOCRouterRenderer.defaultProps = {
-    chipId: undefined,
-    className: '',
-};
 export default DetailedViewNOCRouterRenderer;

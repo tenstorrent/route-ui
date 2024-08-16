@@ -54,7 +54,3 @@ export const MemoryLegendElement: React.FC<{
         </tr>
     );
 };
-
-MemoryLegendElement.defaultProps = {
-    shouldShowConsumedSize: true,
-};

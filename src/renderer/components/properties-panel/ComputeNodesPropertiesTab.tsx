@@ -357,10 +357,6 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
     );
 };
 
-ComputeNodePropertiesCard.defaultProps = {
-    chipId: undefined,
-};
-
 const ComputeNodesPropertiesTab = ({
     graphs,
     epoch,
@@ -396,10 +392,6 @@ const ComputeNodesPropertiesTab = ({
             </div>
         </div>
     );
-};
-
-ComputeNodesPropertiesTab.defaultProps = {
-    chipId: undefined,
 };
 
 export default ComputeNodesPropertiesTab;

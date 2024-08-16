@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 interface ProgressBarProps {
     percent: number;
@@ -21,7 +21,4 @@ const ProgressBar: FC<ProgressBarProps> = ({ percent, color }) => {
     );
 };
 
-ProgressBar.defaultProps = {
-    color: undefined,
-};
 export default ProgressBar;

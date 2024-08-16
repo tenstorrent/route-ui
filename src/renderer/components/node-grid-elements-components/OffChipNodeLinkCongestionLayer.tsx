@@ -88,10 +88,4 @@ const OffChipNodeLinkCongestionLayer: FC<OffChipNodeLinkCongestionLayerProps> = 
     return <div className='off-chip-congestion' style={congestionStyle} />;
 };
 
-OffChipNodeLinkCongestionLayer.defaultProps = {
-    chipId: undefined,
-    internalLinks: undefined,
-    dramLinks: undefined,
-};
-
 export default OffChipNodeLinkCongestionLayer;

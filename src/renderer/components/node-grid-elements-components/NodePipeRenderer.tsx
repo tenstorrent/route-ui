@@ -147,6 +147,4 @@ const NodePipeRenderer: FC<NodePipeRendererProps> = ({ node, temporalEpoch, chip
     );
 };
 
-NodePipeRenderer.defaultProps = { chipId: undefined };
-
 export default NodePipeRenderer;
