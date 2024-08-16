@@ -32,5 +32,6 @@ export const generateRuntimeData = () => {
         // target_device: ${e}\n`;
         output += string;
     }
+    // eslint-disable-next-line no-console
     console.log(output);
 };

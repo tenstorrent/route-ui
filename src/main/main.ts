@@ -81,7 +81,7 @@ const createWindow = async () => {
 
     remoteMain.enable(mainWindow.webContents);
 
-    mainWindow.loadURL(resolveHtmlPath('index.html'));
+    await mainWindow.loadURL(resolveHtmlPath('index.html'));
 
     mainWindow.on('ready-to-show', () => {
         if (!mainWindow) {
@@ -115,7 +115,10 @@ const createWindow = async () => {
 
     // Open urls in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
-        shell.openExternal(edata.url);
+        (async () => {
+            await shell.openExternal(edata.url);
+        })();
+
         return { action: 'deny' };
     });
 };
@@ -132,15 +135,19 @@ app.on('window-all-closed', () => {
     }
 });
 
-app.whenReady()
-    .then(() => {
-        createWindow();
-        app.on('activate', () => {
+(async () => {
+    try {
+        await app.whenReady();
+        await createWindow();
+
+        app.on('activate', async () => {
             // On macOS it's common to re-create a window in the app when the
             // dock icon is clicked and there are no other windows open.
             if (mainWindow === null) {
-                createWindow();
+                await createWindow();
             }
         });
-    })
-    .catch(console.log);
+    } catch (err) {
+        console.error(err);
+    }
+})();

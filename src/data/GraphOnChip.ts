@@ -2,7 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-/* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
 import MemoryChunk from './MemoryChunk';
@@ -1062,6 +1061,7 @@ export class NOCLink extends NetworkLink {
 }
 
 export class NOC2AXILink extends NOCLink {
+    // eslint-disable-next-line no-useless-constructor
     constructor(name: NOC2AXILinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
@@ -1070,6 +1070,7 @@ export class NOC2AXILink extends NOCLink {
 export class EthernetLink extends NetworkLink {
     public readonly type: LinkType = LinkType.ETHERNET;
 
+    // eslint-disable-next-line no-useless-constructor
     constructor(name: EthernetLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
@@ -1078,6 +1079,7 @@ export class EthernetLink extends NetworkLink {
 export class PCIeLink extends NetworkLink {
     public readonly type: LinkType = LinkType.PCIE;
 
+    // eslint-disable-next-line no-useless-constructor
     constructor(name: PCIeLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }

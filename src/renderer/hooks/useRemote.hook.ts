@@ -2,6 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
+/* eslint-disable no-console */
+
 import { spawn } from 'child_process';
 import dns from 'dns';
 import { existsSync } from 'fs';
@@ -182,7 +184,7 @@ const useRemoteConnection = () => {
                 .split('\n')
                 .filter((s) => s.length > 0)
                 .map<RemoteFolder>((folderInfo) => {
-                    const [_createdDate, lastModified, remoteFolderPath] = folderInfo.split(';');
+                    const [, lastModified = Date.now().toString(), remoteFolderPath = ''] = folderInfo.split(';');
                     const configDir = remote.app.getPath('userData');
                     const folderName = path.basename(remoteFolderPath);
                     const localFolderForRemote = `${connection.name}-${connection.host}${connection.port}`;

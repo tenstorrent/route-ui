@@ -30,7 +30,7 @@ const SelectablePipe: FC<SelectablePipeProps> = ({
     const dispatch = useDispatch();
     const pipeState = useSelector(selectPipeSelectionById(pipeSegment.id));
     const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-        dispatch(updatePipeSelection({ id: pipeState.id, selected: e.target.checked }));
+        dispatch(updatePipeSelection({ id: pipeState?.id ?? '', selected: e.target.checked }));
     };
     return (
         <>

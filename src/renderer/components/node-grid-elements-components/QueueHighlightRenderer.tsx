@@ -15,10 +15,12 @@ const QueueHighlightRenderer: FC<{ node: ComputeNode }> = ({ node }) => {
         () =>
             selected.map((queue, index) => (
                 <div
-                    key={node.queueList[index].name}
+                    key={node.queueList[index]?.name}
                     className='queue-highlighter'
                     style={{
-                        backgroundColor: queue.selected ? getGroupColor(node.queueList[index].name) : 'transparent',
+                        backgroundColor: queue.selected
+                            ? getGroupColor(node.queueList[index]?.name ?? '')
+                            : 'transparent',
                     }}
                 />
             )),

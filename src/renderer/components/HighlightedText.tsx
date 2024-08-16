@@ -28,6 +28,7 @@ const HighlightedText: FC<HighlightedTextProps> = ({ text, filter }) => {
         <span
             title={text}
             className='highlighted-text'
+            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: `${before}<mark>${match}</mark>${after}` }}
         />
     );

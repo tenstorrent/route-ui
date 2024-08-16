@@ -56,7 +56,6 @@ function OperationsTable() {
         let list: OpTableFields[] = [];
         const selectedOperationCores: ComputeNode[] = [];
 
-        // eslint-disable-next-line no-restricted-syntax
         for (const { graphOnChip } of graphOnChipList) {
             selectedOperationCores.push(...(graphOnChip.getOperation(selectedOperationName)?.cores ?? []));
         }
@@ -111,7 +110,6 @@ function OperationsTable() {
     useEffect(() => {
         setSelectedOperationName('');
         setFilterQuery('');
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [temporalEpoch, chipId]);
 
     const operationCellRenderer = (rowIndex: number) => {
@@ -228,8 +226,7 @@ function OperationsTable() {
         const value = tableFields[rowIndex]!.model_runtime_per_input;
         const ratio = valueRatio(value, tableFields[rowIndex]!.kernel_runtime_per_input);
 
-        // eslint-disable-next-line no-restricted-globals
-        if (isNaN(ratio)) {
+        if (Number.isNaN(ratio)) {
             return numberFormatter(value, '', 0);
         }
 

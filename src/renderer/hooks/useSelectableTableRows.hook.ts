@@ -58,7 +58,7 @@ const useSelectedTableRows = () => {
             dispatch(selectOperandList({ operands: operandNames, selected: isSelected }));
         },
         getCoreSelectedState: getSelectedState<OpTableFields>(
-            (row) => nodesSelectionState[row.core_id]?.selected ?? false,
+            (row) => nodesSelectionState?.[row.core_id]?.selected ?? false,
         ),
         getOperandSelectedState: getSelectedState<OpTableFields | QueuesTableFields>(
             (row) => selected(row.name),

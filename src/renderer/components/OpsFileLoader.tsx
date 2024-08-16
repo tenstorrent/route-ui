@@ -40,12 +40,13 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = () => {
             fs.readFile(String(filelist), 'utf-8', (err, data) => {
                 if (err) {
                     logger.error(`An error occurred reading the file: ${err.message}`);
+                    // eslint-disable-next-line no-alert
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
-                filelist.forEach((filename) => {
+                filelist.forEach(() => {
                     try {
-                        const json = JSON.parse(data);
+                        JSON.parse(data);
                     } catch (error) {
                         logger.error(`Error parsing JSON file: ${(error as Error).message}`);
                     }

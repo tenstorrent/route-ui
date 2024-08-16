@@ -161,8 +161,8 @@ const RemoteFolderDialog: FC<RemoteFolderDialogProps> = ({
                 <fieldset>
                     <legend>Test Connection</legend>
 
-                    <ConnectionTestMessage status={connectionTests[0].status} message={connectionTests[0].message} />
-                    <ConnectionTestMessage status={connectionTests[1].status} message={connectionTests[1].message} />
+                    <ConnectionTestMessage status={connectionTests[0]!.status} message={connectionTests[0]!.message} />
+                    <ConnectionTestMessage status={connectionTests[1]!.status} message={connectionTests[1]!.message} />
 
                     <br />
                     <Button

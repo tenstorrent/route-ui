@@ -16,7 +16,6 @@ export const ZoomControls: FC = () => {
 
     return (
         <>
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label htmlFor='detailedViewZoom'>Detailed view zoom</label>
             <Slider
                 min={0.5}
@@ -28,7 +27,6 @@ export const ZoomControls: FC = () => {
                 labelRenderer={(value) => `${value.toFixed(1)}`}
             />
 
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label htmlFor='gridZoom'>Zoom</label>
             <Slider
                 min={0.3}

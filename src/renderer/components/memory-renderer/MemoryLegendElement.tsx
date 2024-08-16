@@ -4,7 +4,6 @@ import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
 import { formatMemoryAddress, formatSize, formatToHex, numberFormatter } from '../../utils/numbers';
 
-// eslint-disable-next-line import/prefer-default-export
 export const MemoryLegendElement: React.FC<{
     chunk: Chunk;
     memSize: number;
@@ -24,7 +23,6 @@ export const MemoryLegendElement: React.FC<{
                 dimmed: selectedTensorAddress !== null && selectedTensorAddress !== chunk.address,
             })}
         >
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td>
                 <span
                     className='memory-color-block'

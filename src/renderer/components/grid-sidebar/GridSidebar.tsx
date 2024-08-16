@@ -33,7 +33,7 @@ export const GridSidebar: FC = () => {
                 <hr />
                 <ModelControls />
             </div>
-            <div className='panel-overlay'></div>
+            <div className='panel-overlay' />
         </div>
     );
 };

@@ -2,8 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-/* eslint-disable no-console */
-
 import GraphOnChip from 'data/GraphOnChip';
 import {
     ChipDesignJSON,

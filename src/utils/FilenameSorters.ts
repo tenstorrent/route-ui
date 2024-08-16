@@ -26,8 +26,8 @@ export function sortPerfAnalyzerGraphRelationships(graphRelationships: GraphRela
         const temporalEpochDelta = a.temporalEpoch - b.temporalEpoch;
         const chipIdDelta = a.chipId - b.chipId;
 
-        const [, aFirstDigit, aSecondDigit, aThirdDigit] = PERF_ANALYZER_REGEX.exec(a.name) ?? [];
-        const [, bFirstDigit, bSecondDigit, bThirdDigit] = PERF_ANALYZER_REGEX.exec(b.name) ?? [];
+        const [, aFirstDigit = '0', aSecondDigit = '0', aThirdDigit = '0'] = PERF_ANALYZER_REGEX.exec(a.name) ?? [];
+        const [, bFirstDigit = '0', bSecondDigit = '0', bThirdDigit = '0'] = PERF_ANALYZER_REGEX.exec(b.name) ?? [];
 
         const firstDigitDelta = Number.parseInt(aFirstDigit, 10) - Number.parseInt(bFirstDigit, 10);
         const secondDigitDelta = Number.parseInt(aSecondDigit, 10) - Number.parseInt(bSecondDigit, 10);
