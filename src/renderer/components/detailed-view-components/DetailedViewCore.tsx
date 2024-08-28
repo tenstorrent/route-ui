@@ -20,9 +20,6 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
     const MINIMAL_MEMORY_RANGE_OFFSET = 0.998;
     const [zoomedInView, setZoomedInView] = useState(false);
 
-    // TODO: we need to find a creative way to render CONSUMED size vs SIZE - this might become interesting metrics to show
-    // TODO: maybe a toggle to flip between the two with a ghosting allocated size overlay
-
     // usage should always be false
     const dataBuffers = getChartData(node.coreL1Memory.dataBuffers, false);
     const dataBuffersConfig = { ...L1RenderConfiguration };
