@@ -27,3 +27,22 @@ export const numberFormatter = (value: any, unit = '', fractionDigits = 2) => {
 
     return `${formatter.format(parsedValue)}${unit}`;
 };
+
+export const formatToHex = (number: number, numberSize = 8): string => {
+    const absoluteNumber = Math.abs(number);
+    const signal = Math.sign(number);
+
+    return `${signal < 0 ? '-' : ''}0x${absoluteNumber.toString(16).padStart(numberSize, '0').toUpperCase()}`;
+};
+
+export const formatSize = (number: number): string => {
+    return new Intl.NumberFormat('en-US').format(number);
+};
+
+export const formatMemoryAddress = (address: number | null, maxSize: number): string => {
+    if (address === null) {
+        return '0'.padStart(Math.trunc(maxSize).toString().length, '0');
+    }
+
+    return address.toString().padStart(Math.trunc(maxSize).toString().length, '0');
+};

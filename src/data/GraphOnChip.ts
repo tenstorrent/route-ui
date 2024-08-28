@@ -5,6 +5,7 @@
 /* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
+import MemoryChunk from './MemoryChunk';
 import { INTERNAL_LINK_NAMES, INTERNAL_NOC_LINK_NAMES } from './constants';
 import { DataIntegrityError, DataIntegrityErrorType } from './DataIntegrity';
 // eslint-disable-next-line import/no-cycle
@@ -27,6 +28,7 @@ import {
     OperationDescription,
     aggregateCoresByOperation,
 } from './sources/GraphDescriptor';
+import type { L1ProfileJSON } from './sources/L1Profile';
 import { OpPerformanceByOp, PerfAnalyzerResultsJson } from './sources/PerfAnalyzerResults';
 import { QueueDescriptorJson, parsedQueueLocation } from './sources/QueueDescriptor';
 import { PipeSelection } from './StateTypes';
@@ -406,7 +408,7 @@ export default class GraphOnChip {
 
         graphOnChip.nodes = data.nodes
             .map((nodeJSON) => {
-                const loc: Loc = { x: nodeJSON.location[1], y: nodeJSON.location[0] };
+                const loc: Loc = { x: nodeJSON.location[1]!, y: nodeJSON.location[0]! };
                 graphOnChip.totalCols = Math.max(loc.y, graphOnChip.totalCols);
                 graphOnChip.totalRows = Math.max(loc.x, graphOnChip.totalRows);
                 const [node, newOperation] = ComputeNode.fromNetlistJSON(
@@ -742,17 +744,20 @@ export default class GraphOnChip {
     static AUGMENT_WITH_QUEUE_DETAILS(graphOnChip: GraphOnChip, queueDescriptorJson: QueueDescriptorJson) {
         forEach(graphOnChip.queuesByName.values(), (queue) => {
             const details = queueDescriptorJson[queue.name];
-            details.processedLocation = parsedQueueLocation(details.location);
-            queue.details = { ...details };
-            details['allocation-info'].forEach((allocationInfo) => {
-                if (details.processedLocation === QueueLocation.DRAM) {
-                    graphOnChip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
-                        if (!node.queueList.includes(queue)) {
-                            node.queueList.push(queue);
-                        }
-                    });
-                }
-            });
+
+            if (details) {
+                details.processedLocation = parsedQueueLocation(details.location);
+                queue.details = { ...details };
+                details['allocation-info'].forEach((allocationInfo) => {
+                    if (details.processedLocation === QueueLocation.DRAM) {
+                        graphOnChip.getNodeByChannelId(allocationInfo.channel).forEach((node: ComputeNode) => {
+                            if (!node.queueList.includes(queue)) {
+                                node.queueList.push(queue);
+                            }
+                        });
+                    }
+                });
+            }
         });
 
         const newChip = new GraphOnChip(graphOnChip.chipId);
@@ -768,7 +773,7 @@ export default class GraphOnChip {
         forEach(Object.keys(perfAnalyzerJson), (nodeUid: string) => {
             const node = graphOnChip.getNode(nodeUid);
             if (node.type === ComputeNodeType.CORE) {
-                node.perfAnalyzerResults = new MeasurementDetails(perfAnalyzerJson[node.uid]);
+                node.perfAnalyzerResults = new MeasurementDetails(perfAnalyzerJson[node.uid]!);
                 newChip.details.maxBwLimitedFactor = Math.max(
                     newChip.details.maxBwLimitedFactor,
                     node.perfAnalyzerResults.bw_limited_factor,
@@ -795,6 +800,54 @@ export default class GraphOnChip {
                 );
             }
         });
+
+        return newChip;
+    }
+
+    static AUGMENT_WITH_L1_MEMORY(graphOnChip: GraphOnChip, L1Profile: L1ProfileJSON) {
+        const newChip = new GraphOnChip(graphOnChip.chipId);
+        Object.assign(newChip, graphOnChip);
+
+        if (L1Profile.metadata['target-device'] === newChip.chipId) {
+            Object.entries(L1Profile['worker-cores']).forEach(([coreCoords, profile]) => {
+                const node = newChip.getNode(`${newChip.chipId}-${coreCoords}`);
+
+                node.coreL1Memory.l1Size = profile['core-attributes']['l1-size-bytes'];
+                node.coreL1Memory.totalConsumedSize = profile['core-attributes']['total-consumed-size-bytes'];
+                node.coreL1Memory.totalReservedSize = profile['core-attributes']['total-reserved-size-bytes'];
+
+                if (node.operation) {
+                    node.operation.type = profile['core-attributes']['op-type'];
+                }
+
+                profile['binary-buffers'].forEach((bufferChunk) => {
+                    node.coreL1Memory.binaryBuffers.push(
+                        new MemoryChunk(
+                            Number(bufferChunk['start-address']),
+                            Number(bufferChunk['reserved-size-bytes']),
+                            Number(bufferChunk['consumed-size-bytes']),
+                            Number(bufferChunk['percent-consumed']),
+                            bufferChunk['buffer-name'],
+                        ),
+                    );
+                });
+
+                profile['data-buffers'].forEach((bufferChunk) => {
+                    node.coreL1Memory.dataBuffers.push(
+                        new MemoryChunk(
+                            Number(bufferChunk['start-address']),
+                            Number(bufferChunk['reserved-size-bytes']),
+                            Number(bufferChunk['consumed-size-bytes']),
+                            Number(bufferChunk['percent-consumed']),
+                            bufferChunk['buffer-name'],
+                        ),
+                    );
+                });
+
+                node.coreL1Memory.binaryBuffers.sort((a, b) => a.address - b.address);
+                node.coreL1Memory.dataBuffers.sort((a, b) => a.address - b.address);
+            });
+        }
 
         return newChip;
     }
@@ -853,7 +906,7 @@ export default class GraphOnChip {
     get allUniquePipes(): PipeSegment[] {
         if (!this.uniquePipeSegmentList.length) {
             this.uniquePipeSegmentList = [...this.pipes.values()]
-                .map((pipe) => pipe.segments[0])
+                .map((pipe) => pipe.segments[0]!)
                 .sort((a, b) => {
                     if (a.id < b.id) {
                         return -1;
@@ -1061,6 +1114,14 @@ export interface NodeInitialState {
     chipId: number;
 }
 
+export interface CoreL1Memory {
+    binaryBuffers: MemoryChunk[];
+    dataBuffers: MemoryChunk[];
+    l1Size: number;
+    totalConsumedSize: number;
+    totalReservedSize: number;
+}
+
 export class ComputeNode {
     /** Creates a ComputeNode from a Node JSON object in a Netlist Analyzer output file.
      *
@@ -1086,7 +1147,7 @@ export class ComputeNode {
             node.dramChannelId = nodeJSON.dram_channel;
             node.dramSubchannelId = nodeJSON.dram_subchannel || 0;
         }
-        node.loc = { x: nodeJSON.location[0], y: nodeJSON.location[1] };
+        node.loc = { x: nodeJSON.location[0]!, y: nodeJSON.location[1]! };
         node.uid = `${node.chipId}-${node.loc.x}-${node.loc.y}`;
 
         if (nodeJSON.dram_channel !== undefined && nodeJSON.dram_channel !== null) {
@@ -1196,6 +1257,14 @@ export class ComputeNode {
 
     public opSiblingNodes: ComputeNodeSiblings = {};
 
+    public coreL1Memory: CoreL1Memory = {
+        binaryBuffers: [],
+        dataBuffers: [],
+        l1Size: 0,
+        totalConsumedSize: 0,
+        totalReservedSize: 0,
+    };
+
     // TODO: check if reassigend operation is updated here.
     private _operation: Operation | undefined = undefined;
 
@@ -1219,8 +1288,8 @@ export class ComputeNode {
 
     // TODO: this doesnt look like it shoudl still be here, keeping to retain code changes
 
-    /** @Deprecated
-     * Superceded by `this.operation.name`
+    /**
+     * @deprecated Superceded by `this.operation.name`
      */
     get opName(): string {
         return this.operation?.name || '';
