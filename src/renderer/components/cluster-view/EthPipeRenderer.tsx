@@ -89,7 +89,7 @@ const EthPipeRenderer: FC<EthPipeRendererProps> = ({
                         DRAMBandwidth: 0,
                         CLKMHz: 0,
                         PCIBandwidth: 0,
-                        totalOps: showNormalizedSaturation ? normalizedTotalOps : totalOpsList[node.chipId] ?? 0,
+                        totalOps: showNormalizedSaturation ? normalizedTotalOps : (totalOpsList[node.chipId] ?? 0),
                         linkType: link.type,
                         totalDataBytes: link.totalDataBytes,
                         initialMaxBandwidth: link.maxBandwidth,
