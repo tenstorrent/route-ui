@@ -2,7 +2,6 @@ import { PlotData } from 'plotly.js';
 import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
 import { formatSize, formatToHex } from '../../utils/numbers';
-import { toRGBA } from '../../../utils/DrawingAPI';
 
 export const L1RenderConfiguration: PlotConfiguration = {
     height: 110,
@@ -26,12 +25,13 @@ export interface PlotConfiguration {
     title?: string;
 }
 
-export const getChartData = (memory: Chunk[], includeUsage: boolean = false): Partial<PlotData>[] => {
+export const getChartData = (memory: Chunk[], includeUsage = false, showUsage = false): Partial<PlotData>[] => {
     const allocated: Partial<PlotData>[] = memory.map((chunk) => {
-        const { address, size } = chunk;
-        const rgb = getBufferColor(address);
-        const color = includeUsage ? toRGBA(rgb || 'rgb(255,255,255)', 0.3) : rgb;
-        const label = includeUsage ? 'Allocated' : 'Size';
+        const { address, size, consumedSize } = chunk;
+        const color = getBufferColor(address);
+        const sizeLabel = includeUsage
+            ? `<span>Size:</span> ${formatSize(consumedSize)} / ${formatSize(size)} (${((consumedSize / size) * 100).toFixed(2)}%)`
+            : `<span>Size:</span> ${formatSize(size)}`;
         return {
             x: [address + size / 2],
             y: [1],
@@ -50,7 +50,7 @@ export const getChartData = (memory: Chunk[], includeUsage: boolean = false): Pa
             hovertemplate: `
 <span style="color:${color};font-size:20px;">&#9632;</span>
 ${address} (${formatToHex(address)}) <br>
-<span>${label}:</span> ${formatSize(size)}
+${sizeLabel}
 <extra></extra>`,
 
             hoverlabel: {
@@ -72,21 +72,24 @@ ${address} (${formatToHex(address)}) <br>
         };
     });
 
-    let consumed: Partial<PlotData>[] = [];
-    if (includeUsage) {
-        consumed = memory.map((chunk) => {
+    const consumed: Partial<PlotData>[] = [];
+    if (includeUsage && showUsage) {
+        memory.forEach((chunk) => {
             const { address, size, consumedSize } = chunk;
             const barsize = consumedSize;
             const color = getBufferColor(address);
-            return {
+            const overlayColor = 'rgba(0, 0, 0, 0.3)';
+
+            consumed.push({
                 x: [address + barsize / 2],
                 y: [1],
                 type: 'bar',
                 width: [barsize],
                 marker: {
-                    color,
+                    color: overlayColor,
                     line: {
                         width: 0,
+                        // @ts-expect-error
                         opacity: 0,
                         simplify: false,
                     },
@@ -111,12 +114,13 @@ ${address} (${formatToHex(address)}) <br>
 
                     font: {
                         color: 'black',
+                        // @ts-expect-error
                         weight: 'bold',
                         size: 14,
                     },
                 },
-            };
+            });
         });
     }
-    return [...consumed, ...allocated];
+    return [...allocated, ...consumed];
 };

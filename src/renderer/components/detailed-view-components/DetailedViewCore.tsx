@@ -19,6 +19,7 @@ interface DetailedViewCoreRendererProps {
 const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ node, temporalEpoch }) => {
     const MINIMAL_MEMORY_RANGE_OFFSET = 0.998;
     const [zoomedInView, setZoomedInView] = useState(false);
+    const [showMemoryUsage, setShowMemoryUsage] = useState(false);
 
     // usage should always be false
     const dataBuffers = getChartData(node.coreL1Memory.dataBuffers, false);
@@ -37,7 +38,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
         return (lastAddress + lastSize) * (1 / MINIMAL_MEMORY_RANGE_OFFSET) || node.coreL1Memory.l1Size;
     }, [node.coreL1Memory.dataBuffers, node.coreL1Memory.l1Size]);
 
-    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers, true);
+    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers, true, showMemoryUsage);
     const binaryBuffersConfig = { ...L1RenderConfiguration };
     binaryBuffersConfig.title = 'Binary Buffers';
     const binaryBufferZoomRangeStart = useMemo(
@@ -124,6 +125,15 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                         </tbody>
                     </HTMLTable>
                 </div>
+
+                <br />
+                <p>
+                    <Switch
+                        label={showMemoryUsage ? 'Hide memory usage' : 'Show memory usage'}
+                        checked={showMemoryUsage}
+                        onChange={() => setShowMemoryUsage(!showMemoryUsage)}
+                    />
+                </p>
 
                 <MemoryPlotRenderer
                     chartData={binaryBuffers}
