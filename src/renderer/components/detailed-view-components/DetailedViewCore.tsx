@@ -72,7 +72,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                             </p>
                         )}
                         <p>
-                            <strong>Memory (Consumed / Reserved):</strong>
+                            <strong>Memory (Consumed / Allocated):</strong>
                             &nbsp;
                             <output>
                                 {formatSize(node.coreL1Memory.totalConsumedSize)}
@@ -129,7 +129,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                 <br />
                 <p>
                     <Switch
-                        label={showMemoryUsage ? 'Hide memory usage' : 'Show memory usage'}
+                        label={showMemoryUsage ? 'Hide memory consumption' : 'Show memory consumption'}
                         checked={showMemoryUsage}
                         onChange={() => setShowMemoryUsage(!showMemoryUsage)}
                     />
@@ -151,7 +151,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                                 <th>Color</th>
                                 <th>Address (Dec / Hex)</th>
                                 <th>Consumed Size</th>
-                                <th>Total Size</th>
+                                <th>Allocated Size</th>
                                 <th>Consumed Percent</th>
                             </tr>
                         </thead>

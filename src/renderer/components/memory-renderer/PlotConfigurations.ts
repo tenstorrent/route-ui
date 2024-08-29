@@ -25,11 +25,15 @@ export interface PlotConfiguration {
     title?: string;
 }
 
-export const getChartData = (memory: Chunk[], includeUsage = false, showUsage = false): Partial<PlotData>[] => {
+export const getChartData = (
+    memory: Chunk[],
+    includeUsageLabel = false,
+    showMemoryConsumption = false,
+): Partial<PlotData>[] => {
     const allocated: Partial<PlotData>[] = memory.map((chunk) => {
         const { address, size, consumedSize } = chunk;
         const color = getBufferColor(address);
-        const sizeLabel = includeUsage
+        const sizeLabel = includeUsageLabel
             ? `<span>Size:</span> ${formatSize(consumedSize)} / ${formatSize(size)} (${((consumedSize / size) * 100).toFixed(2)}%)`
             : `<span>Size:</span> ${formatSize(size)}`;
         return {
@@ -73,7 +77,7 @@ ${sizeLabel}
     });
 
     const consumed: Partial<PlotData>[] = [];
-    if (includeUsage && showUsage) {
+    if (showMemoryConsumption) {
         memory.forEach((chunk) => {
             const { address, size, consumedSize } = chunk;
             const barsize = consumedSize;
