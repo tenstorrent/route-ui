@@ -1,5 +1,9 @@
 # Route UI
 
+Tool for visualizing test data for Tenstorrent hardware, with support for displaying multiple chips, analyzing operation performance, and link congestion.
+
+## Videos and Screenshots
+
 ## Pre-requisites
 
 - [Node.js](https://nodejs.org/en/download/) (v20.11.1)
