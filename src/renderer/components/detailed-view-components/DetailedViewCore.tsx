@@ -19,6 +19,7 @@ interface DetailedViewCoreRendererProps {
 const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ node, temporalEpoch }) => {
     const MINIMAL_MEMORY_RANGE_OFFSET = 0.998;
     const [zoomedInView, setZoomedInView] = useState(false);
+    const [showMemoryConsumption, setShowMemoryConsumption] = useState(false);
 
     // usage should always be false
     const dataBuffers = getChartData(node.coreL1Memory.dataBuffers, false);
@@ -37,7 +38,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
         return (lastAddress + lastSize) * (1 / MINIMAL_MEMORY_RANGE_OFFSET) || node.coreL1Memory.l1Size;
     }, [node.coreL1Memory.dataBuffers, node.coreL1Memory.l1Size]);
 
-    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers, true);
+    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers,  showMemoryConsumption);
     const binaryBuffersConfig = { ...L1RenderConfiguration };
     binaryBuffersConfig.title = 'Binary Buffers';
     const binaryBufferZoomRangeStart = useMemo(
@@ -71,7 +72,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                             </p>
                         )}
                         <p>
-                            <strong>Memory (Consumed / Reserved):</strong>
+                            <strong>Memory (Consumed / Allocated):</strong>
                             &nbsp;
                             <output>
                                 {formatSize(node.coreL1Memory.totalConsumedSize)}
@@ -125,6 +126,15 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     </HTMLTable>
                 </div>
 
+                <br />
+                <p>
+                    <Switch
+                        label={showMemoryConsumption ? 'Hide memory consumption' : 'Show memory consumption'}
+                        checked={showMemoryConsumption}
+                        onChange={() => setShowMemoryConsumption(!showMemoryConsumption)}
+                    />
+                </p>
+
                 <MemoryPlotRenderer
                     chartData={binaryBuffers}
                     isZoomedIn={zoomedInView}
@@ -141,7 +151,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                                 <th>Color</th>
                                 <th>Address (Dec / Hex)</th>
                                 <th>Consumed Size</th>
-                                <th>Total Size</th>
+                                <th>Allocated Size</th>
                                 <th>Consumed Percent</th>
                             </tr>
                         </thead>
