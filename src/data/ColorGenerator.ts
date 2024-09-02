@@ -56,7 +56,7 @@ const opColors = [
 function* colorGenerator(): IterableIterator<string> {
     let i = 0;
     while (true) {
-        yield colorList[i];
+        yield colorList[i]!;
         i = (i + 1) % colorList.length;
     }
 }
@@ -64,7 +64,7 @@ function* colorGenerator(): IterableIterator<string> {
 function* opColorGenerator(): IterableIterator<string> {
     let i = 0;
     while (true) {
-        yield opColors[i];
+        yield opColors[i]!;
         i = (i + 1) % opColors.length;
     }
 }

@@ -74,7 +74,7 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
     return (
         <button
-            title={showOperationNames && shouldShowLabel ? node.opName : ''}
+            title={showOperationNames && shouldShowLabel ? node.operation?.name : ''}
             type='button'
             className={`node-item ${highlightClass} ${nodeState?.selected ? 'selected' : ''} ${
                 node.uid === uid && isOpen ? 'detailed-view' : ''
@@ -119,7 +119,10 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
 
             {/* Labels for location and operation */}
             <NodeLocation node={node} />
-            <NodeOperationLabel opName={node.opName} shouldRender={showOperationNames && shouldShowLabel} />
+            <NodeOperationLabel
+                opName={node.operation?.name ?? ''}
+                shouldRender={showOperationNames && shouldShowLabel}
+            />
 
             {/* Pipes */}
             <AsyncComponent
@@ -137,8 +140,5 @@ const NodeGridElement: React.FC<NodeGridElementProps> = ({ node, temporalEpoch, 
         </button>
     );
 };
-NodeGridElement.defaultProps = {
-    currentChipId: undefined,
-    connectedEth: null,
-};
+
 export default NodeGridElement;

@@ -29,7 +29,8 @@ import type { GraphRelationship } from '../../../data/StateTypes';
 
 const shouldShowDetailedViewButton = (node: ComputeNode) =>
     [ComputeNodeType.DRAM, ComputeNodeType.ETHERNET, ComputeNodeType.PCIE].includes(node.type) ||
-    (ComputeNodeType.CORE === node.type && (node.coreL1Memory.dataBuffers.length > 0 || node.coreL1Memory.binaryBuffers.length > 0));
+    (ComputeNodeType.CORE === node.type &&
+        (node.coreL1Memory.dataBuffers.length > 0 || node.coreL1Memory.binaryBuffers.length > 0));
 
 interface ComputeNodeProps {
     node: ComputeNode;
@@ -357,10 +358,6 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
     );
 };
 
-ComputeNodePropertiesCard.defaultProps = {
-    chipId: undefined,
-};
-
 const ComputeNodesPropertiesTab = ({
     graphs,
     epoch,
@@ -396,10 +393,6 @@ const ComputeNodesPropertiesTab = ({
             </div>
         </div>
     );
-};
-
-ComputeNodesPropertiesTab.defaultProps = {
-    chipId: undefined,
 };
 
 export default ComputeNodesPropertiesTab;

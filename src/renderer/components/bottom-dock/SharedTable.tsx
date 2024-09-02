@@ -123,10 +123,11 @@ export const headerRenderer = <T extends TableFields>({
             <>
                 {definition?.sortable && (
                     <>
-                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus */}
+                        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
                         <div
                             className='sortable-table-header'
                             role='button'
+                            tabIndex={0}
                             onClick={() => changeSorting(column as keyof T)(targetSortDirection)}
                             title={columnLabel}
                         >
@@ -180,7 +181,7 @@ export const cellRenderer = <T extends TableFields>({
     customContent,
 }: CellRenderingProps<T>) => {
     const propertyName = definition?.lookupProperty ?? key;
-    const formattedContent = definition?.formatter(tableFields[rowIndex][propertyName as keyof T]) ?? '';
+    const formattedContent = definition?.formatter(tableFields[rowIndex]![propertyName as keyof T]) ?? '';
 
     const alignClass = (definition?.align && `align-${definition?.align}`) || '';
 

@@ -16,7 +16,7 @@ export const calculateSlowestOperand = (operand: string): OperandPerformance | n
 
     return {
         direction: operandType,
-        index: parseInt(operand.split('-')[1], 10) || 0,
+        index: parseInt(operand.split('-')[1] ?? '0', 10) || 0,
     };
 };
 

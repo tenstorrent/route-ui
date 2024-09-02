@@ -24,7 +24,13 @@ export interface PipeInfoDialogProps {
  * PipeInfoDialog
  * @description This wrapper component is used to display information about a Pipe Segment when the user hovers over it
  */
-const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, pipeId, hide, onEnter, onLeave }) => {
+const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({
+    children,
+    pipeId,
+    hide = false,
+    onEnter,
+    onLeave,
+}) => {
     const location: Location<LocationState> = useLocation();
     const { epoch, chipId } = location.state;
     const graphOnChipList = useContext(GraphOnChipContext).getGraphOnChipListForTemporalEpoch(epoch, chipId);
@@ -120,12 +126,6 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({ children, 
             />
         </div>
     );
-};
-
-PipeInfoDialog.defaultProps = {
-    hide: false,
-    onEnter: undefined,
-    onLeave: undefined,
 };
 
 export default PipeInfoDialog;

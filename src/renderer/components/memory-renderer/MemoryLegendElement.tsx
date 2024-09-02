@@ -1,10 +1,13 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+
 import React from 'react';
 import classNames from 'classnames';
 import { Chunk } from '../../../data/MemoryChunk';
 import { getBufferColor } from '../../../MemoryColorGenerator';
 import { formatMemoryAddress, formatSize, formatToHex, numberFormatter } from '../../utils/numbers';
 
-// eslint-disable-next-line import/prefer-default-export
 export const MemoryLegendElement: React.FC<{
     chunk: Chunk;
     memSize: number;
@@ -24,7 +27,6 @@ export const MemoryLegendElement: React.FC<{
                 dimmed: selectedTensorAddress !== null && selectedTensorAddress !== chunk.address,
             })}
         >
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td>
                 <span
                     className='memory-color-block'
@@ -55,8 +57,4 @@ export const MemoryLegendElement: React.FC<{
             )}
         </tr>
     );
-};
-
-MemoryLegendElement.defaultProps = {
-    shouldShowConsumedSize: true,
 };

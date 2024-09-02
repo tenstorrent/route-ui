@@ -15,7 +15,6 @@ interface LinkSaturationMetrics {
     initialMaxBandwidth: number;
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const recalculateLinkSaturationMetrics = ({
     linkType,
     totalOps,

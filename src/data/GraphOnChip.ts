@@ -2,7 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-/* eslint-disable no-useless-constructor, no-console */
 import { filterIterable, forEach, mapIterable } from '../utils/IterableHelpers';
 import ChipDesign from './ChipDesign';
 import MemoryChunk from './MemoryChunk';
@@ -78,7 +77,7 @@ export default class GraphOnChip {
     private nodeByChannelId: Map<number, ComputeNode[]> = new Map();
 
     private findSiblingNodeLocations(node: ComputeNode) {
-        const sameOperandNodes = [...this.nodesById.values()].filter((n) => n.opName === node.opName);
+        const sameOperandNodes = [...this.nodesById.values()].filter((n) => n.operation?.name === node.operation?.name);
 
         const top = sameOperandNodes
             .filter((n) => n.loc.x === node.loc.x && n.loc.y <= node.loc.y - 1)
@@ -1062,6 +1061,7 @@ export class NOCLink extends NetworkLink {
 }
 
 export class NOC2AXILink extends NOCLink {
+    // eslint-disable-next-line no-useless-constructor
     constructor(name: NOC2AXILinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
@@ -1070,6 +1070,7 @@ export class NOC2AXILink extends NOCLink {
 export class EthernetLink extends NetworkLink {
     public readonly type: LinkType = LinkType.ETHERNET;
 
+    // eslint-disable-next-line no-useless-constructor
     constructor(name: EthernetLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
@@ -1078,6 +1079,7 @@ export class EthernetLink extends NetworkLink {
 export class PCIeLink extends NetworkLink {
     public readonly type: LinkType = LinkType.PCIE;
 
+    // eslint-disable-next-line no-useless-constructor
     constructor(name: PCIeLinkName, uid: string, json: NOCLinkJSON) {
         super(name, uid, json);
     }
@@ -1286,20 +1288,11 @@ export class ComputeNode {
         this.operation = operation;
     }
 
-    // TODO: this doesnt look like it shoudl still be here, keeping to retain code changes
-
-    /**
-     * @deprecated Superceded by `this.operation.name`
-     */
-    get opName(): string {
-        return this.operation?.name || '';
-    }
-
     public generateInitialState(): NodeInitialState {
         return {
             uid: this.uid,
             queueNameList: this.queueList.map((queue) => queue.name),
-            opName: this.opName,
+            opName: this.operation?.name ?? '',
             dramChannelId: this.dramChannelId,
             chipId: this.chipId,
         };
@@ -1422,10 +1415,6 @@ export class Pipe {
 
 export class PipeSegment {
     readonly id: string;
-
-    /** @description unused?
-     @Deprecated */
-    location: Loc = { x: 0, y: 0 };
 
     readonly bandwidth: number;
 

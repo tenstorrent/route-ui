@@ -31,7 +31,7 @@ const colorList = [
 function* colorGenerator(): IterableIterator<string> {
     let i = 0;
     while (true) {
-        yield colorList[i];
+        yield colorList[i]!;
         i = (i + 1) % colorList.length;
     }
 }

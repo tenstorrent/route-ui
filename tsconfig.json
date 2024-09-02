@@ -15,7 +15,9 @@
     "noUncheckedIndexedAccess": true,
     "allowJs": true,
     "outDir": ".erb/dll",
-     "skipLibCheck": true
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
 
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll", "node_modules"]

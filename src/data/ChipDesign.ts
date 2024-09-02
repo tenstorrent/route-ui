@@ -78,8 +78,9 @@ export class ComputeNodeSimple {
     public ethId = 0;
 
     constructor(type: ComputeNodeType, location: string, chipId: number = 0, ethId: number = 0) {
+        const [x = '-1', y = '-1'] = location.split('-');
         this.type = type;
-        this.loc = { x: parseInt(location.split('-')[0], 10), y: parseInt(location.split('-')[1], 10) };
+        this.loc = { x: parseInt(x, 10), y: parseInt(y, 10) };
         this.uid = `${chipId}-${location}`; // TODO: consider passing constructed UID
         this.ethId = ethId;
     }

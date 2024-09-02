@@ -40,7 +40,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const chipId = useSelector(getSelectedDetailsViewChipId);
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId ?? -1);
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
-    const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
+    const node = uid ? (graphOnChip?.getNode(uid) ?? null) : null;
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {

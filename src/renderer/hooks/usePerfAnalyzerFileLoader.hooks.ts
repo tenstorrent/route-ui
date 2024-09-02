@@ -98,11 +98,10 @@ const usePerfAnalyzerFileLoader = () => {
             const pipeSelectionData: PipeSelection[] = [];
             const nodesDataPerTemporalEpoch: Record<number, NodeInitialState[]> = {};
             const times = [];
-            // eslint-disable-next-line no-restricted-syntax
-            for (const graph of sortedGraphs) {
+
+            for await (const graph of sortedGraphs) {
                 const start = performance.now();
 
-                // eslint-disable-next-line no-await-in-loop
                 const graphOnChip = await loadGraph(folderPath, graph);
 
                 if (!linkDataByTemporalEpoch[graph.temporalEpoch]) {

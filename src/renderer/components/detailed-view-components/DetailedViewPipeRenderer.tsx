@@ -44,7 +44,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
     links,
     temporalEpoch,
     chipId,
-    className,
+    className = '',
     size = 80,
 }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
@@ -144,11 +144,7 @@ const DetailedViewPipeRenderer: React.FC<DetailedViewPipeRendererProps> = ({
         </div>
     );
 };
-DetailedViewPipeRenderer.defaultProps = {
-    chipId: undefined,
-    className: '',
-    size: 80,
-};
+
 export default DetailedViewPipeRenderer;
 
 const LINK_NAMES = [

@@ -126,8 +126,4 @@ const GraphVertexDetails: FC<GraphVertexDetailsProps> = ({
     );
 };
 
-GraphVertexDetails.defaultProps = {
-    showQueueDetails: true,
-};
-
 export default GraphVertexDetails;

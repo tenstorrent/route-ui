@@ -114,9 +114,9 @@ interface RemoteFolderSelectorProps {
 
 const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = ({
     remoteFolder,
-    remoteFolders,
+    remoteFolders = [],
     remoteConnection,
-    loading,
+    loading = false,
     updatingFolderList = false,
     onSelectFolder,
     children,
@@ -145,16 +145,6 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
             {children}
         </div>
     );
-};
-
-RemoteFolderSelector.defaultProps = {
-    loading: false,
-    updatingFolderList: false,
-    remoteFolders: [],
-    remoteFolder: undefined,
-    remoteConnection: undefined,
-    falbackLabel: undefined,
-    icon: undefined,
 };
 
 export default RemoteFolderSelector;

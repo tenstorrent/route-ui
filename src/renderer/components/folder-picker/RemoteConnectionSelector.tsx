@@ -46,8 +46,8 @@ interface RemoteConnectionSelectorProps {
     offline: boolean;
     onSelectConnection: (connection: RemoteConnection) => void;
     onEditConnection: (newConnection: RemoteConnection, oldConnection?: RemoteConnection) => void;
-    onRemoveConnection: (connection: RemoteConnection) => void;
-    onSyncRemoteFolders: (connection: RemoteConnection) => void;
+    onRemoveConnection: (connection?: RemoteConnection) => void;
+    onSyncRemoteFolders: (connection?: RemoteConnection) => void;
 }
 
 const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
@@ -121,10 +121,6 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
             />
         </div>
     );
-};
-
-RemoteConnectionSelector.defaultProps = {
-    connection: undefined,
 };
 
 export default RemoteConnectionSelector;

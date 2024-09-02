@@ -111,8 +111,8 @@ export default class MenuBuilder {
                 submenu: [
                     {
                         label: 'Report Issue',
-                        click: () => {
-                            shell.openExternal('https://github.com/tenstorrent/route-ui/issues/new');
+                        click: async () => {
+                            await shell.openExternal('https://github.com/tenstorrent/route-ui/issues/new');
                         },
                     },
                 ],
