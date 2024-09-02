@@ -203,8 +203,4 @@ const DetailedViewDRAMRenderer: React.FC<DetailedViewDRAMRendererProps> = ({ nod
     );
 };
 
-DetailedViewDRAMRenderer.defaultProps = {
-    graphOnChip: undefined,
-};
-
 export default DetailedViewDRAMRenderer;

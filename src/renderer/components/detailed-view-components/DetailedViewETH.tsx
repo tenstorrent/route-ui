@@ -103,8 +103,4 @@ const DetailedViewETHRenderer: React.FC<DetailedViewETHRendererProps> = ({ node,
     );
 };
 
-DetailedViewETHRenderer.defaultProps = {
-    chipId: undefined,
-};
-
 export default DetailedViewETHRenderer;

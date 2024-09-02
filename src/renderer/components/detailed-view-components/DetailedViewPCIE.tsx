@@ -103,8 +103,4 @@ const DetailedViewPCIERenderer: React.FC<DetailedViewPCIERendererProps> = ({ nod
     );
 };
 
-DetailedViewPCIERenderer.defaultProps = {
-    chipId: undefined,
-};
-
 export default DetailedViewPCIERenderer;

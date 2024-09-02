@@ -9,14 +9,12 @@ export const isIterable = (value: unknown): value is Iterable<unknown> =>
     typeof value[Symbol.iterator] === 'function';
 
 export function* mapIterable<T, U>(iterable: Iterable<T>, f: (val: T) => U): Iterable<U> {
-    // eslint-disable-next-line no-restricted-syntax
     for (const item of iterable) {
         yield f(item);
     }
 }
 
 export function* filterIterable<T>(iterable: Iterable<T>, predicate: (val: T) => boolean): Iterable<T> {
-    // eslint-disable-next-line no-restricted-syntax
     for (const item of iterable) {
         if (predicate(item)) {
             yield item;
@@ -27,7 +25,6 @@ export function* filterIterable<T>(iterable: Iterable<T>, predicate: (val: T) =>
 type NestedIterable<T> = Iterable<T> | Iterable<NestedIterable<T>>;
 
 export function* flattenIterable<T>(iterable: NestedIterable<T>, depth = 1): Generator<T> {
-    // eslint-disable-next-line no-restricted-syntax
     for (const item of iterable) {
         if (!isIterable(item)) {
             yield item;
@@ -43,7 +40,7 @@ export function reduceIterable<T, U>(
     reducer: (accumulator: U, currentValue: T) => U,
 ) {
     let reduced = initial;
-    // eslint-disable-next-line no-restricted-syntax
+
     for (const item of iterable) {
         reduced = reducer(reduced, item);
     }
@@ -51,7 +48,6 @@ export function reduceIterable<T, U>(
 }
 
 export function forEach<T>(iterable: Iterable<T>, consumer: (value: T) => void) {
-    // eslint-disable-next-line no-restricted-syntax
     for (const item of iterable) {
         consumer(item);
     }

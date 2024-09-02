@@ -26,7 +26,7 @@ type LinkDetailsProps = {
     showEmpty?: boolean;
 };
 
-const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, chipId, showEmpty, index }) => {
+const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, chipId, showEmpty = true, index = -1 }) => {
     const isHighContrast = useSelector(getHighContrastState);
     const DRAMBandwidth = useSelector(getDRAMBandwidth);
     const PCIBandwidth = useSelector(getPCIBandwidth);
@@ -81,9 +81,5 @@ const LinkDetails: React.FC<LinkDetailsProps> = ({ link, temporalEpoch, chipId, 
         </div>
     );
 };
-LinkDetails.defaultProps = {
-    chipId: undefined,
-    showEmpty: true,
-    index: -1,
-};
+
 export default LinkDetails;

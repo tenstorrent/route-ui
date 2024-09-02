@@ -2,8 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import React from 'react';
-
 const QueueIconMinus = () => {
     return (
         // prettier-ignore

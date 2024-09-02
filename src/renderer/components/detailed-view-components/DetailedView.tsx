@@ -19,6 +19,7 @@ import { closeDetailedView, updateDetailedViewHeight } from '../../../data/store
 import DetailedViewDRAMRenderer from './DetailedViewDRAM';
 import DetailedViewETHRenderer from './DetailedViewETH';
 import DetailedViewPCIERenderer from './DetailedViewPCIE';
+import DetailedViewCoreRenderer from './DetailedViewCore';
 
 import './DetailedView.scss';
 import type { LocationState } from '../../../data/StateTypes';
@@ -39,7 +40,7 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
     const chipId = useSelector(getSelectedDetailsViewChipId);
     const graphOnChip = useContext(GraphOnChipContext).getGraphOnChip(temporalEpoch, chipId ?? -1);
     const architecture = graphOnChip?.architecture ?? Architecture.NONE;
-    const node = uid ? graphOnChip?.getNode(uid) ?? null : null;
+    const node = uid ? (graphOnChip?.getNode(uid) ?? null) : null;
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -91,6 +92,9 @@ const DetailedView: React.FC<DetailedViewProps> = () => {
                                                 temporalEpoch={temporalEpoch}
                                                 chipId={chipId}
                                             />
+                                        )}
+                                        {node.type === ComputeNodeType.CORE && (
+                                            <DetailedViewCoreRenderer node={node} temporalEpoch={temporalEpoch} />
                                         )}
                                     </div>
                                 );

@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+
 import { LinkType } from 'data/Types';
 import { ETH_BANDWIDTH_INITIAL_GBS } from 'data/constants';
 
@@ -11,7 +15,6 @@ interface LinkSaturationMetrics {
     initialMaxBandwidth: number;
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const recalculateLinkSaturationMetrics = ({
     linkType,
     totalOps,

@@ -91,7 +91,7 @@ export default class Cluster {
                 chipId,
                 coords,
                 mmioChips.includes(chipId),
-                deviceDescriptorList[chipId].eth.map((coreId) => `${ClusterChipId}-${coreId}`),
+                deviceDescriptorList[chipId]?.eth.map((coreId) => `${ClusterChipId}-${coreId}`),
             );
             chip.design = new ChipDesign(deviceDescriptorList[chipId] as ChipDesignJSON, chipId);
             return chip;
@@ -102,8 +102,8 @@ export default class Cluster {
             const chip1 = this.chips[connection[0].chip];
             const chip2 = this.chips[connection[1].chip];
             if (chip1 && chip2) {
-                chip1.connectedChipsByEthId.set(chip1.eth[connection[0].chan], chip2);
-                chip2.connectedChipsByEthId.set(chip2.eth[connection[1].chan], chip1);
+                chip1.connectedChipsByEthId.set(chip1.eth[connection[0].chan] ?? '', chip2);
+                chip2.connectedChipsByEthId.set(chip2.eth[connection[1].chan] ?? '', chip1);
             }
         });
     }

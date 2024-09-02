@@ -11,17 +11,13 @@ interface ColorSwatchProps {
     color?: string;
 }
 
-const ColorSwatch: FC<ColorSwatchProps> = ({ isVisible, color }) => {
+const ColorSwatch: FC<ColorSwatchProps> = ({ isVisible, color = 'transparent' }) => {
     return (
         <span
             className={`color-swatch ${isVisible ? '' : 'transparent'}`}
             style={{ '--js-color-swatch': color } as CSSProperties}
         />
     );
-};
-
-ColorSwatch.defaultProps = {
-    color: 'transparent',
 };
 
 export default ColorSwatch;

@@ -4,7 +4,7 @@
 
 import { Tooltip2 } from '@blueprintjs/popover2';
 import { Position, Slider, Switch } from '@blueprintjs/core';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     updateLinkSaturation,
@@ -92,9 +92,6 @@ const LinkCongestionControls: FC<LinkCongestionControlsProps> = ({ showNOCContro
             />
         </>
     );
-};
-LinkCongestionControls.defaultProps = {
-    showNOCControls: true,
 };
 
 export default LinkCongestionControls;

@@ -27,6 +27,11 @@ import SelectableOperation from '../SelectableOperation';
 import SelectablePipe from '../SelectablePipe';
 import type { GraphRelationship } from '../../../data/StateTypes';
 
+const shouldShowDetailedViewButton = (node: ComputeNode) =>
+    [ComputeNodeType.DRAM, ComputeNodeType.ETHERNET, ComputeNodeType.PCIE].includes(node.type) ||
+    (ComputeNodeType.CORE === node.type &&
+        (node.coreL1Memory.dataBuffers.length > 0 || node.coreL1Memory.binaryBuffers.length > 0));
+
 interface ComputeNodeProps {
     node: ComputeNode;
     temporalEpoch: number;
@@ -294,9 +299,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                 </div>
             )}
             <div className='node-controls'>
-                {(node.type === ComputeNodeType.DRAM ||
-                    node.type === ComputeNodeType.ETHERNET ||
-                    node.type === ComputeNodeType.PCIE) && (
+                {shouldShowDetailedViewButton(node) ? (
                     <Button
                         small
                         icon={IconNames.PROPERTIES}
@@ -307,7 +310,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                     >
                         Detailed View
                     </Button>
-                )}
+                ) : null}
                 {/* TODO: abstract this into a global state */}
                 {/* TODO: controls shoudl disable if node has no pipes and hide if pipe data is not loaded */}
                 {node.pipes.length > 0 && (
@@ -355,10 +358,6 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
     );
 };
 
-ComputeNodePropertiesCard.defaultProps = {
-    chipId: undefined,
-};
-
 const ComputeNodesPropertiesTab = ({
     graphs,
     epoch,
@@ -394,10 +393,6 @@ const ComputeNodesPropertiesTab = ({
             </div>
         </div>
     );
-};
-
-ComputeNodesPropertiesTab.defaultProps = {
-    chipId: undefined,
 };
 
 export default ComputeNodesPropertiesTab;

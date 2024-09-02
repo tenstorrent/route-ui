@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 interface HighlightedTextProps {
     text: string;
@@ -28,6 +28,7 @@ const HighlightedText: FC<HighlightedTextProps> = ({ text, filter }) => {
         <span
             title={text}
             className='highlighted-text'
+            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: `${before}<mark>${match}</mark>${after}` }}
         />
     );

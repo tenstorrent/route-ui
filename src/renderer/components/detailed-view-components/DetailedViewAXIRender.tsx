@@ -37,8 +37,6 @@ export const DetailedViewAXIRender: React.FC<DetailedViewAXIRenderProps> = ({
     );
 };
 
-DetailedViewAXIRender.defaultProps = { chipId: undefined };
-
 interface DetailedViewANOC2XIRenderProps {
     links: NOC2AXILink[] | NOCLink[];
     temporalEpoch: number;
@@ -66,5 +64,3 @@ export const DetailedViewNOC2AXIRender: React.FC<DetailedViewANOC2XIRenderProps>
         </>
     );
 };
-
-DetailedViewNOC2AXIRender.defaultProps = { chipId: undefined };

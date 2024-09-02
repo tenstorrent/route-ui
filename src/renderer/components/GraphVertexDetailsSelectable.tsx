@@ -40,10 +40,4 @@ const GraphVertexDetailsSelectable: FC<GraphVertexDetailsSelectableProps> = ({
     );
 };
 
-GraphVertexDetailsSelectable.defaultProps = {
-    showType: true,
-    stringFilter: '',
-    disabled: undefined,
-};
-
 export default GraphVertexDetailsSelectable;

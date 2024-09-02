@@ -160,7 +160,6 @@ export class BuildableOperation extends AbstractGraphVertex implements Operation
         core.operation = this;
 
         if (this._cores.includes(core)) {
-            // eslint-disable-next-line no-console
             console.warn(
                 `Assigning core ${core.uid} to operation ${this.name}; core is already assigned to this operation.`,
             );

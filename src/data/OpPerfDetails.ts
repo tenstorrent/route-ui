@@ -4,7 +4,7 @@
 
 import { MeasurementsJSON, OpPerfJSON } from './sources/PerfAnalyzerResults';
 import { GraphName, OperationName } from './GraphNames';
-/*  eslint-disable no-undef */
+
 export class MeasurementDetails implements MeasurementsJSON {
     [key: `input_pipe_bw_${number}`]: number; // available bandwidth (hole size)
 
@@ -13,6 +13,8 @@ export class MeasurementDetails implements MeasurementsJSON {
     [key: `required_input_bw_${number}`]: number; // actual bandwidth (packet size)
 
     [key: `required_output_bw_${number}`]: number;
+
+    [key: `required_output_pipe_bw_${number}`]: number;
 
     bw_bound_math_utilization: number;
 
@@ -75,7 +77,7 @@ export class MeasurementDetails implements MeasurementsJSON {
 
         this._slowestOperandPerformance = {
             direction: operandType,
-            index: parseInt(this.slowest_operand.split('-')[1], 10) || 0,
+            index: parseInt(this.slowest_operand.split('-')[1] ?? '-1', 10) || 0,
         };
 
         return this._slowestOperandPerformance;
@@ -90,9 +92,7 @@ export class MeasurementDetails implements MeasurementsJSON {
             return {
                 type: this.slowestOperandPerformance?.direction,
                 index: this.slowestOperandPerformance?.index,
-                // @ts-expect-error
                 actual: this[`${actual}${this.slowestOperandPerformance?.index}`],
-                // @ts-expect-error
                 required: this[`${required}${this.slowestOperandPerformance?.index}`],
                 bw_limited_factor: this.bw_limited_factor,
             };
@@ -104,20 +104,19 @@ export class MeasurementDetails implements MeasurementsJSON {
     // TODO: not clear if these will ne needed, to reevaluate
 
     public getInputPipeBw(index: number): number {
-        return this[`${OpPerfDynamicProperties.INPUT_PIPE_BW}${index}`];
+        return this[`${OpPerfDynamicProperties.INPUT_PIPE_BW}${index}`] ?? 0;
     }
 
     public getRequiredInputBw(index: number): number {
-        return this[`${OpPerfDynamicProperties.REQUIRED_INPUT_BW}${index}`];
+        return this[`${OpPerfDynamicProperties.REQUIRED_INPUT_BW}${index}`] ?? 0;
     }
 
     public getOutputPipeBw(index: number): number {
-        return this[`${OpPerfDynamicProperties.OUTPUT_PIPE_BW}${index}`];
+        return this[`${OpPerfDynamicProperties.OUTPUT_PIPE_BW}${index}`] ?? 0;
     }
 
     public getRequiredOutputBw(index: number): number {
-        // @ts-expect-error
-        return this[`${OpPerfDynamicProperties.REQUIRED_OUTPUT_BW}${index}`];
+        return this[`${OpPerfDynamicProperties.REQUIRED_OUTPUT_BW}${index}`] ?? 0;
     }
 }
 

@@ -209,7 +209,6 @@ export const drawEthLink = (
         lineEndY,
         lineStartX,
         lineStartY,
-        arrow,
     } = getEthLinkPoints(ethPosition, direction, size);
 
     svg.append('line')
@@ -254,7 +253,7 @@ export const drawEthPipes = (
             .attr('stroke-width', 2)
             .attr('stroke', getPipeColor(pipeId))
             .attr('stroke-dasharray', dashArray.join(','))
-            .attr('stroke-dashoffset', index * dashArray[0]);
+            .attr('stroke-dashoffset', index * dashArray[0]!);
     });
 };
 
@@ -590,7 +589,7 @@ export const drawPipesDirect = (
             .attr('stroke-width', 2)
             .attr('stroke', getPipeColor(pipeId))
             .attr('stroke-dasharray', dashArray.join(','))
-            .attr('stroke-dashoffset', index * dashArray[0]);
+            .attr('stroke-dashoffset', index * dashArray[0]!);
     });
 };
 

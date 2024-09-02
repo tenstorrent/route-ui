@@ -19,7 +19,7 @@ const OperationCongestionLayer: FC<{ node: ComputeNode }> = ({ node }) => {
     const isHighContrast = useSelector(getHighContrastState);
 
     const opFactor = node.perfAnalyzerResults?.bw_limited_factor || 1;
-    const isCoreNode = node.type === ComputeNodeType.CORE && node.opName !== '';
+    const isCoreNode = node.type === ComputeNodeType.CORE && node.operation?.name !== '';
     let congestionColor = 'transparent';
     let opFactorLabel = '';
 

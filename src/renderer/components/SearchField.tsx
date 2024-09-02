@@ -16,7 +16,12 @@ interface SearchFieldProps {
 /**
  * Renders a search field. Controlled component.
  */
-function SearchField({ searchQuery, onQueryChanged, controls, disabled }: SearchFieldProps): React.ReactElement {
+function SearchField({
+    searchQuery,
+    onQueryChanged,
+    controls,
+    disabled = false,
+}: SearchFieldProps): React.ReactElement {
     return (
         <div className='search-field'>
             <InputGroup
@@ -43,9 +48,5 @@ function SearchField({ searchQuery, onQueryChanged, controls, disabled }: Search
         </div>
     );
 }
-
-SearchField.defaultProps = {
-    disabled: false,
-};
 
 export default SearchField;

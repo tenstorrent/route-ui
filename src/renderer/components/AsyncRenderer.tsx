@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+
 import { type FC, type ReactElement, useEffect, useState } from 'react';
 
 export function asyncRenderer<T>(renderer: (() => Promise<T>) | (() => T), delay = 0) {

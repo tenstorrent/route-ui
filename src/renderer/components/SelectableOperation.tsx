@@ -75,12 +75,6 @@ const SelectableOperation: FC<SelectableOperationProps> = ({
     );
 };
 
-SelectableOperation.defaultProps = {
-    type: null,
-    disabled: false,
-    offchip: false,
-    offchipClickHandler: undefined,
-};
 export default SelectableOperation;
 
 interface SelectableOperationPerformanceProps {

@@ -55,7 +55,7 @@ const RemoteSyncConfigurator: FC = () => {
         }
     };
 
-    const updateSelectedConnection = async (connection: RemoteConnection) => {
+    const updateSelectedConnection = async (connection?: RemoteConnection) => {
         remote.persistentState.selectedConnection = connection;
         setRemoteFolders(remote.persistentState.getSavedRemoteFolders(connection));
 
@@ -150,6 +150,10 @@ const RemoteSyncConfigurator: FC = () => {
                         await updateSelectedConnection(updatedConnection);
                     }}
                     onRemoveConnection={async (connection) => {
+                        if (!connection) {
+                            return;
+                        }
+
                         const updatedConnections = [...remote.persistentState.savedConnectionList];
 
                         updatedConnections.splice(findConnectionIndex(connection), 1);

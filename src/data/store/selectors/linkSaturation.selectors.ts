@@ -10,7 +10,7 @@ export const getTotalOpsforTemporalEpoch = (temporalEpoch: number) => (state: Ro
 export const getTotalOpsForChipId = (temporalEpoch: number, chipId: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOpsByChipId[chipId] ?? 0;
 export const getTotalOpsList = (temporalEpoch: number) => (state: RootState) =>
-    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOpsByChipId ?? 0;
+    state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.totalOpsByChipId ?? [0];
 export const getEpochNormalizedTotalOps = (temporalEpoch: number) => (state: RootState) =>
     state.linkSaturation.linksPerTemporalEpoch[temporalEpoch]?.normalizedTotalOps ?? 0;
 

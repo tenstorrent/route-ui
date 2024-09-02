@@ -2,7 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import { Button, Checkbox, Classes, MenuItem, NumericInput, PopoverPosition } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
@@ -133,7 +132,6 @@ const ClusterView: FC = () => {
                         }}
                     />
                     <div>
-                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                         <label className={Classes.LABEL} htmlFor='normOpCyclesInput' style={{ marginBottom: '5px' }}>
                             Normalized cycles/input
                         </label>
@@ -368,8 +366,8 @@ const ClusterView: FC = () => {
                                             {pciPipeStateList.map((pipeState) => {
                                                 return (
                                                     <ColorSwatch
-                                                        key={pipeState.id}
-                                                        isVisible={pipeState?.selected}
+                                                        key={pipeState?.id}
+                                                        isVisible={pipeState?.selected ?? false}
                                                         color={
                                                             pipeState?.selected
                                                                 ? getPipeColor(pipeState.id)

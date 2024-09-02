@@ -83,7 +83,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
     return (
         <Collapsible label='CLK Controls' isOpen>
             <div>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label className={Classes.LABEL} htmlFor='opCyclesInput' style={{ marginBottom: '5px' }}>
                     AICLK cycles/input
                 </label>
@@ -118,7 +117,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
             </div>
             <hr />
 
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className={Classes.LABEL} htmlFor='clkMHzInput' style={{ marginBottom: '5px' }}>
                 AICLK (MHz)
             </label>
@@ -154,7 +152,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
             />
             <br />
 
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className={Classes.LABEL} htmlFor='dramBandwidthInput' style={{ marginBottom: '5px' }}>
                 DRAM channel BW (GB/s)
             </label>
@@ -186,7 +183,6 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
             />
             <br />
 
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className={Classes.LABEL} htmlFor='pcieBandwidthInput' style={{ marginBottom: '5px' }}>
                 PCIe channel BW (GB/s)
             </label>
