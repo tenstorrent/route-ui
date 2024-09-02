@@ -38,7 +38,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
         return (lastAddress + lastSize) * (1 / MINIMAL_MEMORY_RANGE_OFFSET) || node.coreL1Memory.l1Size;
     }, [node.coreL1Memory.dataBuffers, node.coreL1Memory.l1Size]);
 
-    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers, true, showMemoryConsumption);
+    const binaryBuffers = getChartData(node.coreL1Memory.binaryBuffers,  showMemoryConsumption);
     const binaryBuffersConfig = { ...L1RenderConfiguration };
     binaryBuffersConfig.title = 'Binary Buffers';
     const binaryBufferZoomRangeStart = useMemo(

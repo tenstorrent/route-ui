@@ -27,13 +27,12 @@ export interface PlotConfiguration {
 
 export const getChartData = (
     memory: Chunk[],
-    includeUsageLabel = false,
     showMemoryConsumption = false,
 ): Partial<PlotData>[] => {
     const allocated: Partial<PlotData>[] = memory.map((chunk) => {
         const { address, size, consumedSize } = chunk;
         const color = getBufferColor(address);
-        const sizeLabel = includeUsageLabel
+        const sizeLabel = showMemoryConsumption
             ? `<span>Size:</span> ${formatSize(consumedSize)} / ${formatSize(size)} (${((consumedSize / size) * 100).toFixed(2)}%)`
             : `<span>Size:</span> ${formatSize(size)}`;
         return {
