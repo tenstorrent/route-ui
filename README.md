@@ -2,23 +2,31 @@
 
 Tool for visualizing test data for Tenstorrent hardware, with support for displaying multiple chips, analyzing operation performance, and link congestion.
 
-## Videos and Screenshots
+## Demo
 
+#### Application demo
 https://github.com/user-attachments/assets/7ced6517-72c2-45bb-9ec3-f1b7a90ccfcf
 
+#### Multichip view and L1 memory reports per core
 https://github.com/user-attachments/assets/3d4174ac-e83f-4324-8c4d-f1fa6413be08
 
-<img width="400" alt="Screenshot 2024-08-30 at 2 32 55 PM" src="https://github.com/user-attachments/assets/8bdca077-fe3d-4a45-9bce-5fb77b65a2de">
+#### Operations and table view
+<img width="400" alt="Operations and table view" src="https://github.com/user-attachments/assets/8bdca077-fe3d-4a45-9bce-5fb77b65a2de">
 
-<img width="400" alt="Screenshot 2024-08-30 at 2 34 25 PM" src="https://github.com/user-attachments/assets/c3174f8a-3c1e-4f31-b066-69df187ec824">
+#### DRAM detailed view
+<img width="400" alt="DRAM detailed view" src="https://github.com/user-attachments/assets/c3174f8a-3c1e-4f31-b066-69df187ec824">
 
-<img width="400" alt="Screenshot 2024-08-30 at 2 34 50 PM" src="https://github.com/user-attachments/assets/3bd879d7-c6ef-4d31-8c07-e330ffeeba83">
+#### Pipes
+<img width="400" alt="Pipes" src="https://github.com/user-attachments/assets/3bd879d7-c6ef-4d31-8c07-e330ffeeba83">
 
-<img width="400" alt="Screenshot 2024-08-30 at 2 35 21 PM" src="https://github.com/user-attachments/assets/3d5b6df8-e5ff-4043-b2e0-41e2fd8b43b1">
+#### Operation performance
+<img width="400" alt="Operation performance" src="https://github.com/user-attachments/assets/3d5b6df8-e5ff-4043-b2e0-41e2fd8b43b1">
 
-<img width="400" alt="Screenshot 2024-08-30 at 2 35 41 PM" src="https://github.com/user-attachments/assets/3dd66c21-ea70-49cf-a665-59f6801ff0be">
+#### Links and external links performace
+<img width="400" alt="Links and external links performace" src="https://github.com/user-attachments/assets/3dd66c21-ea70-49cf-a665-59f6801ff0be">
 
-<img width="400" alt="Screenshot 2024-08-30 at 2 36 09 PM" src="https://github.com/user-attachments/assets/3b87c52a-b316-42a0-b9a6-80703757ed74">
+#### Cluster view
+<img width="400" alt="Cluster view" src="https://github.com/user-attachments/assets/3b87c52a-b316-42a0-b9a6-80703757ed74">
 
 ## Pre-requisites
 
