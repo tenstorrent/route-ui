@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { createSlice } from '@reduxjs/toolkit';
-import { ExperimentalFeaturesState } from 'data/StateTypes';
+import { ExperimentalFeaturesState } from '../../../data/StateTypes';
 
 const experimentalFeaturesInitialState: ExperimentalFeaturesState = {};
 

@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { PipeSelection, PipeSelectionState } from 'data/StateTypes';
+import { PipeSelection, PipeSelectionState } from '../../../data/StateTypes';
 
 const pipesInitialState: PipeSelectionState = {
     pipes: {},

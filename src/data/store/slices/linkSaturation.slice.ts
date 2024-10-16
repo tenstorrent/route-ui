@@ -4,14 +4,14 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { NetworkCongestionState } from 'data/StateTypes';
-import { NOC } from 'data/Types';
+import { NetworkCongestionState } from '../../StateTypes';
+import { NOC } from '../../Types';
 import {
     AICLK_INITIAL_MHZ,
     DRAM_BANDWIDTH_INITIAL_GBS,
     LINK_SATURATION_INITIAIL_PERCENT,
     PCIE_BANDWIDTH_INITIAL_GBS,
-} from 'data/constants';
+} from '../../constants';
 
 const networkCongestionInitialState: NetworkCongestionState = {
     linkSaturationTreshold: LINK_SATURATION_INITIAIL_PERCENT,

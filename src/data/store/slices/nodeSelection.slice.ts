@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { NodeSelectionState } from 'data/StateTypes';
+import { NodeSelectionState } from '../../../data/StateTypes';
 import { GraphVertexType } from '../../GraphNames';
 import type { NodeInitialState } from '../../GraphOnChip';
 

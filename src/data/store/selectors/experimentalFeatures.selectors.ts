@@ -2,7 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { ExperimentalFeaturesState } from 'data/StateTypes';
+import { ExperimentalFeaturesState } from '../../../data/StateTypes';
 import { RootState } from '../createStore';
 
 export const getExperimentalFeature = (featureName: keyof ExperimentalFeaturesState) => (state: RootState) =>

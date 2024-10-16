@@ -2,22 +2,22 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import GraphOnChip from 'data/GraphOnChip';
+import GraphOnChip from '../data/GraphOnChip';
 import {
     ChipDesignJSON,
     GraphnameToEpochToDeviceJSON,
     MetadataJSON,
     NetlistAnalyzerDataJSON,
-} from 'data/JSONDataTypes';
-import { Architecture } from 'data/Types';
-import { GraphDescriptorJSON } from 'data/sources/GraphDescriptor';
+} from '../data/JSONDataTypes';
+import { Architecture } from '../data/Types';
+import { GraphDescriptorJSON } from '../data/sources/GraphDescriptor';
 import {
     OpPerfJSON,
     OpPerformanceByOp,
     PerfAnalyzerResultsJson,
     PerfAnalyzerResultsPerOpJSON,
-} from 'data/sources/PerfAnalyzerResults';
-import { QUEUE_BLOCK_FIELDS, type QueueBlockDimensions, QueueDescriptorJson } from 'data/sources/QueueDescriptor';
+} from '../data/sources/PerfAnalyzerResults';
+import { QUEUE_BLOCK_FIELDS, type QueueBlockDimensions, QueueDescriptorJson } from '../data/sources/QueueDescriptor';
 // TODO: Replace FS to use the native promise one
 // Node 20 supports FS using promises instead of callbacks
 // update this to use the new pattern
@@ -175,8 +175,8 @@ const loadChipFromArchitecture = async (architecture: Architecture): Promise<Gra
     if (architecture === Architecture.NONE) {
         throw new Error('Unable to parse selected folder, insufficient data provided.');
     }
-    const grayskullArch = await import('data/architectures/arch-grayskull.json');
-    const wormholeArch = await import('data/architectures/arch-wormhole.json');
+    const grayskullArch = await import('../data/architectures/arch-grayskull.json');
+    const wormholeArch = await import('../data/architectures/arch-wormhole.json');
 
     const architectureJson = {
         [Architecture.GRAYSKULL]: grayskullArch.default,

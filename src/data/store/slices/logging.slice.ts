@@ -4,7 +4,7 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-import { isDebug } from '../../../renderer/utils/env';
+import { isDebug } from '../../../utils/env';
 import { LogLevel } from '../../Types';
 
 export interface LogEntry {

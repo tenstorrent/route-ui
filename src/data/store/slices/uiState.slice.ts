@@ -3,9 +3,9 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { ApplicationMode } from 'data/Types';
+import { ApplicationMode } from '../../Types';
 import path from 'path';
-import type { RemoteFolder } from '../../../renderer/hooks/useRemote.hook';
+import type { RemoteFolder } from '../../../hooks/useRemote.hook';
 import { type FolderLocationType } from '../../StateTypes';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
 

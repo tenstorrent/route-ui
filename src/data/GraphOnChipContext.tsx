@@ -59,7 +59,7 @@ const GraphOnChipProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
                 return [
                     ...[...graphOnChip.operations]
-                        .filter((op) => !op?.isOffchip(chipId) ?? true)
+                        .filter((op) => op?.isOffchip(chipId) ?? true)
                         .map((operation) => ({
                             name: operation.name,
                             temporalEpoch,
