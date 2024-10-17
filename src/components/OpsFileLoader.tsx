@@ -5,9 +5,9 @@
 // import yaml from 'js-yaml';
 import { Button } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import fs from 'fs';
 import { FC } from 'react';
 import useLogging from '../hooks/useLogging.hook';
+import { showFileDialog } from '../utils/bridge.js';
 
 interface OpsFileLoaderProps {}
 
@@ -23,27 +23,24 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = () => {
     const logger = useLogging();
 
     const loadFile = async () => {
-        // eslint-disable-next-line global-require
-        const remote = require('@electron/remote');
-        const { dialog } = remote;
-
         await (async () => {
-            const filelist: string[] = await dialog.showOpenDialogSync({
+            const filelist = await showFileDialog({
                 properties: ['openFile'],
                 filters: [{ name: 'file', extensions: ['yaml', 'json'] }],
             });
 
-            if (!filelist) {
+            if (!filelist || filelist?.length === 0) {
                 return;
             }
 
-            fs.readFile(String(filelist), 'utf-8', (err, data) => {
+            window.electron.fs.readFile(String(filelist), (err, data) => {
                 if (err) {
                     logger.error(`An error occurred reading the file: ${err.message}`);
                     // eslint-disable-next-line no-alert
                     alert(`An error occurred reading the file: ${err.message}`);
                     return;
                 }
+
                 filelist.forEach(() => {
                     try {
                         JSON.parse(data);

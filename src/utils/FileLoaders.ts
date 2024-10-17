@@ -22,17 +22,16 @@ import { QUEUE_BLOCK_FIELDS, type QueueBlockDimensions, QueueDescriptorJson } fr
 // Node 20 supports FS using promises instead of callbacks
 // update this to use the new pattern
 // ref: https://nodejs.org/dist/latest-v20.x/docs/api/fs.html#fspromisesopendirpath-options
-import fs, { Dirent, existsSync } from 'fs';
 import { load } from 'js-yaml';
-import path from 'path';
 import Cluster from '../data/Cluster';
 import { GraphRelationship } from '../data/StateTypes';
 import { ClusterDescriptorJSON, DeviceDescriptorJSON } from '../data/sources/ClusterDescriptor';
 import type { L1ProfileJSON } from '../data/sources/L1Profile';
+import type { Dirent } from 'fs';
 
 export const readFile = async (filename: string): Promise<string> =>
     new Promise((resolve, reject) => {
-        fs.readFile(filename, 'utf-8', (err, data) => {
+        window.electron.fs.readFile(filename, (err, data) => {
             if (err) {
                 reject(err);
             } else {
@@ -48,7 +47,7 @@ export const loadJsonFile = async <T extends unknown>(filePath: string) => {
 
 export const readDirEntries = async (dirPath: string): Promise<Dirent[]> => {
     return new Promise<Dirent[]>((resolve, reject) => {
-        fs.readdir(dirPath, { withFileTypes: true }, (err, files) => {
+        window.electron.fs.readdir(dirPath, { withFileTypes: true }, (err, files) => {
             if (err) {
                 reject(err);
             } else {
@@ -76,7 +75,7 @@ export const findFiles = async (
         (file) => ((isDir && file.isDirectory()) || (!isDir && file.isFile())) && file.name === searchQuery,
     );
     if (matches.length > 0) {
-        return matches.map((dirEntry) => path.join(searchPath, dirEntry.name));
+        return matches.map((dirEntry) => window.electron.path.join(searchPath, dirEntry.name));
     }
     if (maxDepth === 0) {
         return [];
@@ -84,7 +83,7 @@ export const findFiles = async (
     const subdirectories = allEntries.filter((dirEntry) => dirEntry.isDirectory());
     const subfolderResults = await Promise.all(
         subdirectories.map(async (dirEntry) =>
-            findFiles(path.join(searchPath, dirEntry.name), searchQuery, {
+            findFiles(window.electron.path.join(searchPath, dirEntry.name), searchQuery, {
                 isDir,
                 maxDepth: maxDepth - 1,
             }),
@@ -98,7 +97,7 @@ export const findFiles = async (
  * the app can work as long as there is at least something usable there.
  */
 export const validatePerfResultsFolder = (dirPath: string): [boolean, string | null] => {
-    if (!fs.existsSync(dirPath)) {
+    if (!window.electron.fs.existsSync(dirPath)) {
         return [false, 'Folder does not exist'];
     }
     return [true, null];
@@ -106,7 +105,7 @@ export const validatePerfResultsFolder = (dirPath: string): [boolean, string | n
 
 const getAvailableGraphRelationshipsFromNetlistAnalyzer = async (folderPath: string) => {
     try {
-        const netlistAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
+        const netlistAnalyzerFiles = await readDirEntries(window.electron.path.join(folderPath, 'netlist_analyzer'));
         return netlistAnalyzerFiles
             .filter((file) => file.isFile() && file.name.includes('temporal_epoch'))
             .map((file) => file.name)
@@ -128,7 +127,7 @@ const getAvailableGraphRelationshipsFromNetlistAnalyzer = async (folderPath: str
 
 export const getAvailableGraphRelationships = async (perfResultsPath: string) => {
     try {
-        const runtimeDataPath = path.join(perfResultsPath, 'runtime_data.yaml');
+        const runtimeDataPath = window.electron.path.join(perfResultsPath, 'runtime_data.yaml');
         const runtimeDataYaml = await readFile(runtimeDataPath);
         const runtimeData = load(runtimeDataYaml) as any;
 
@@ -151,14 +150,14 @@ export const getAvailableGraphRelationships = async (perfResultsPath: string) =>
 
 export const loadCluster = async (perfResultsPath: string): Promise<Cluster | null> => {
     try {
-        const clusterDescFilePath = path.join(perfResultsPath, 'cluster_desc.yaml');
+        const clusterDescFilePath = window.electron.path.join(perfResultsPath, 'cluster_desc.yaml');
         const clusterDescYaml = await readFile(clusterDescFilePath);
         const clusterDescriptor = load(clusterDescYaml) as ClusterDescriptorJSON;
 
-        const deviceDescFolder = path.join(perfResultsPath, 'device_desc_runtime');
+        const deviceDescFolder = window.electron.path.join(perfResultsPath, 'device_desc_runtime');
         const deviceDescFiles = await readDirEntries(deviceDescFolder);
         const deviceDescriptorResults = deviceDescFiles.map(async (file) => {
-            const descriptorPath = path.join(deviceDescFolder, file.name);
+            const descriptorPath = window.electron.path.join(deviceDescFolder, file.name);
             const descriptorYaml = await readFile(descriptorPath);
             return load(descriptorYaml) as DeviceDescriptorJSON;
         });
@@ -227,7 +226,7 @@ const loadChipFromNetlistAnalyzer = async (
     temporalEpoch: number | null,
 ): Promise<GraphOnChip | null> => {
     try {
-        const netListAnalyzerFiles = await readDirEntries(path.join(folderPath, 'netlist_analyzer'));
+        const netListAnalyzerFiles = await readDirEntries(window.electron.path.join(folderPath, 'netlist_analyzer'));
         let netlistAnalyzerFilepath: string = '';
         let netlistAnalyzerOptoPipeFilepath: string = '';
         netListAnalyzerFiles.forEach((file) => {
@@ -236,10 +235,10 @@ const loadChipFromNetlistAnalyzer = async (
                 file.name.includes('temporal_epoch') &&
                 isFileMatchByIdOrEpoch(file.name, chipId, temporalEpoch)
             ) {
-                netlistAnalyzerFilepath = path.join(folderPath, 'netlist_analyzer', file.name);
+                netlistAnalyzerFilepath = window.electron.path.join(folderPath, 'netlist_analyzer', file.name);
             }
         });
-        const optoPipesReportsFolder = path.join(folderPath, 'reports');
+        const optoPipesReportsFolder = window.electron.path.join(folderPath, 'reports');
         const optoPipesFiles = await readDirEntries(optoPipesReportsFolder);
         const opToPipeFile = optoPipesFiles.find(
             (file) =>
@@ -248,7 +247,7 @@ const loadChipFromNetlistAnalyzer = async (
                 getTemporalEpochFromGraphName(file.name) === temporalEpoch,
         );
         if (opToPipeFile) {
-            netlistAnalyzerOptoPipeFilepath = path.join(optoPipesReportsFolder, opToPipeFile.name);
+            netlistAnalyzerOptoPipeFilepath = window.electron.path.join(optoPipesReportsFolder, opToPipeFile.name);
         }
         if (netlistAnalyzerFilepath !== '') {
             const data = await readFile(netlistAnalyzerFilepath);
@@ -281,7 +280,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
     let architecture = Architecture.NONE;
 
     let graphOnChip: GraphOnChip | null = await loadChipFromNetlistAnalyzer(
-        path.join(folderPath),
+        window.electron.path.join(folderPath),
         chipId,
         temporalEpoch,
     );
@@ -289,7 +288,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
     if (graphOnChip === null) {
         try {
             const metadata = await loadJsonFile<MetadataJSON>(
-                path.join(folderPath, 'perf_results', 'metadata', `${name}.json`),
+                window.electron.path.join(folderPath, 'perf_results', 'metadata', `${name}.json`),
             );
             const arch = metadata.arch_name;
             if (arch.includes(Architecture.GRAYSKULL)) {
@@ -305,7 +304,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
     }
 
     try {
-        const graphPath = path.join(folderPath, `perf_results`, 'graph_descriptor', name, 'cores_to_ops.json');
+        const graphPath = window.electron.path.join(folderPath, `perf_results`, 'graph_descriptor', name, 'cores_to_ops.json');
         const graphDescriptorJson = await loadJsonFile<GraphDescriptorJSON>(graphPath);
 
         graphOnChip = GraphOnChip.AUGMENT_FROM_GRAPH_DESCRIPTOR(graphOnChip, graphDescriptorJson);
@@ -313,7 +312,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
     try {
-        const queuesPath = path.join(folderPath, `perf_results`, 'queue_descriptor', 'queue_descriptor.json');
+        const queuesPath = window.electron.path.join(folderPath, `perf_results`, 'queue_descriptor', 'queue_descriptor.json');
         const queueDescriptorJson = await loadJsonFile<QueueDescriptorJson>(queuesPath);
 
         Object.values(queueDescriptorJson).forEach((queueDescriptor) => {
@@ -340,7 +339,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
         console.error('graph_descriptor.json not found, skipping \n', err);
     }
     try {
-        const analyzerResultsPath = path.join(
+        const analyzerResultsPath = window.electron.path.join(
             folderPath,
             `perf_results`,
             'analyzer_results',
@@ -378,7 +377,7 @@ export const loadGraph = async (folderPath: string, graph: GraphRelationship): P
     }
 
     try {
-        const L1ProfilePath = path.join(folderPath, 'l1_profile', `${name}.json`);
+        const L1ProfilePath = window.electron.path.join(folderPath, 'l1_profile', `${name}.json`);
         const L1Profile = await loadJsonFile<L1ProfileJSON>(L1ProfilePath);
 
         graphOnChip = GraphOnChip.AUGMENT_WITH_L1_MEMORY(graphOnChip, L1Profile);
@@ -396,5 +395,5 @@ export const getAvailableNetlistFiles = async (folderPath: string): Promise<stri
 };
 
 export const checkLocalFolderExists = (localPath?: string) => {
-    return (localPath && existsSync(localPath)) || false;
+    return (localPath && window.electron.fs.existsSync(localPath)) || false;
 };

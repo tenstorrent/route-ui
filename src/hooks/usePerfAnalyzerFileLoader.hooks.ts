@@ -18,7 +18,6 @@ import {
     validatePerfResultsFolder,
 } from '../utils/FileLoaders';
 
-import { dialog } from '@electron/remote';
 import { ApplicationMode } from '../data/Types';
 import { useContext, useEffect, useState } from 'react';
 import { type Location, useLocation, useNavigate } from 'react-router-dom';
@@ -41,6 +40,7 @@ import { updateRandomRedux } from '../data/store/slices/operationPerf.slice';
 import { loadPipeSelection, resetPipeSelection } from '../data/store/slices/pipeSelection.slice';
 import { mapIterable } from '../utils/IterableHelpers';
 import useLogging from './useLogging.hook';
+import { showFileDialog } from '../utils/bridge.js';
 
 const usePerfAnalyzerFileLoader = () => {
     const dispatch = useDispatch();
@@ -58,8 +58,8 @@ const usePerfAnalyzerFileLoader = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.state]);
 
-    const openPerfAnalyzerFolderDialog = () => {
-        const folderList = dialog.showOpenDialogSync({
+    const openPerfAnalyzerFolderDialog = async () => {
+        const folderList = await showFileDialog({
             properties: ['openDirectory'],
         });
 

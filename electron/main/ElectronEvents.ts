@@ -6,6 +6,7 @@ export enum ElectronEvents {
     TOGGLE_LOG_OUTPUT = 'toggle-log-output',
     ENABLE_LOGGING_MENU = 'enable-logging-menu',
     UPDATE_WINDOW_TITLE = 'update-window-title',
+    SHOW_OPEN_DIALOG = 'show-open-dialog',
 }
 
 export default ElectronEvents;

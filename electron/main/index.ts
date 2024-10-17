@@ -2,12 +2,12 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { app, BrowserWindow, shell, ipcMain, nativeImage } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, nativeImage, type OpenDialogOptions, dialog } from 'electron';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
-import { listenToEventFromWindow } from './utils/bridge';
+import { listenToEventFromWindow, sendEventToWindow } from './utils/bridge';
 import ElectronEvents from './ElectronEvents';
 import packageJson from '../../package.json';
 import MenuBuilder from './menu';
@@ -73,7 +73,7 @@ async function createWindow() {
         icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false,
+            contextIsolation: true,
             preload,
         },
     });
@@ -113,6 +113,16 @@ async function createWindow() {
             } else {
                 mainWindow?.setTitle(baseAppTitle);
             }
+        });
+
+        listenToEventFromWindow(ElectronEvents.SHOW_OPEN_DIALOG, async (options: OpenDialogOptions) => {
+            if (!mainWindow) {
+                return;
+            }
+
+            const fileList = await dialog.showOpenDialog(options);
+
+            sendEventToWindow(mainWindow, ElectronEvents.SHOW_OPEN_DIALOG, fileList);
         });
     });
 

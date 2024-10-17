@@ -2,17 +2,16 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { ipcRenderer } from 'electron';
-
 import store from '../data/store/createStore';
-import type ElectronEvents from '../../electron/main/ElectronEvents';
+import ElectronEvents from '../../electron/main/ElectronEvents';
+import type { OpenDialogOptions } from 'electron';
 
 export function updateStateOnEvent<T extends Array<any>>(
     eventName: ElectronEvents,
     reducer: (...args: T) => any,
     saveToLocalStorage = false,
 ) {
-    ipcRenderer.on(eventName, (_event, ...args) => {
+    window.electron.ipcRenderer.on(eventName, (_event, ...args) => {
         if (saveToLocalStorage) {
             localStorage.setItem(eventName, JSON.stringify(args));
         }
@@ -22,5 +21,15 @@ export function updateStateOnEvent<T extends Array<any>>(
 }
 
 export function sendEventToMain<T extends Array<any>>(eventName: ElectronEvents, ...args: T) {
-    ipcRenderer.send(eventName, ...args);
+    window.electron.ipcRenderer.send(eventName, ...args);
+}
+
+export async function showFileDialog(options: OpenDialogOptions) {
+    sendEventToMain(ElectronEvents.SHOW_OPEN_DIALOG, options);
+
+    return new Promise((resolve: (fileList: string[] | undefined) => void) => {
+        window.electron.ipcRenderer.once(ElectronEvents.SHOW_OPEN_DIALOG, ({ filePaths }: { filePaths: string[] | undefined }) => {
+            resolve(filePaths);
+        });
+    });
 }

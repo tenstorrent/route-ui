@@ -4,27 +4,69 @@
 
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
-import { IpcRendererEvent, contextBridge, ipcRenderer } from 'electron';
-
-export type Channels = 'ipc-example';
+import { IpcRendererEvent, app, contextBridge, ipcRenderer } from 'electron';
+import type ElectronEvents from '../main/ElectronEvents';
+import path from 'path';
+import fs, { type Dirent } from 'fs';
+import { mkdir } from 'fs/promises';
+import { spawn } from 'child_process';
+import { setDefaultResultOrder } from 'dns';
 
 const electronHandler = {
     ipcRenderer: {
-        sendMessage(channel: Channels, ...args: unknown[]) {
-            ipcRenderer.send(channel, ...args);
-        },
-        on(channel: Channels, func: (...args: unknown[]) => void) {
-            const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => func(...args);
+        on<T extends Array<unknown>>(channel: ElectronEvents, func: (...args: T) => void) {
+            const subscription = (_event: IpcRendererEvent, ...args: T) => func(...args);
             ipcRenderer.on(channel, subscription);
 
             return () => {
                 ipcRenderer.removeListener(channel, subscription);
             };
         },
-        once(channel: Channels, func: (...args: unknown[]) => void) {
-            ipcRenderer.once(channel, (_event, ...args) => func(...args));
+        once<T extends Array<unknown>>(channel: ElectronEvents, func: (...args: T) => void) {
+            ipcRenderer.once(channel, (_event, ...args) => func(...args as T));
         },
+        send<T extends Array<unknown>>(channel: ElectronEvents, ...args: T) {
+            ipcRenderer.send(channel, ...args);
+        }
     },
+    app: {
+        getPath(pathName: string) {
+            // @ts-expect-error
+            return app.getPath(pathName);
+        }
+    },
+    path: {
+        separator: path.sep,
+        join(...args: string[]) {
+            return path.join(...args);
+        },
+        dirname(filePath: string) {
+            return path.dirname(filePath);
+        },
+        basename(filePath: string, suffix?: string) {
+            return path.basename(filePath, suffix);
+        }
+    },
+    fs: {
+        existsSync(filePath: string) {
+            return fs.existsSync(filePath);
+        },
+        readFile(filePath: string, callback: (err: Error | null, data: string) => void) {
+            return fs.readFile(filePath, 'utf-8', callback);
+        },
+        readdir(dirPath: string, options: { withFileTypes: true }, callback: (err: Error | null, entries: Dirent[]) => void) {
+            return fs.readdir(dirPath, options, callback);
+        },
+        mkdir(dirPath: string, options: { recursive: true }) {
+            return mkdir(dirPath, options);
+        }
+    },
+    'child_process': {
+        spawn
+    },
+    dns: {
+        setDefaultResultOrder
+    }
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);

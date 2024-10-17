@@ -4,7 +4,6 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { ApplicationMode } from '../../Types';
-import path from 'path';
 import type { RemoteFolder } from '../../../hooks/useRemote.hook';
 import { type FolderLocationType } from '../../StateTypes';
 import { INITIAL_DETAILS_VIEW_HEIGHT } from '../../constants';
@@ -58,7 +57,7 @@ const uiStateSlice = createSlice({
             state.highContrastEnabled = action.payload;
         },
         setSelectedFile(state, action: PayloadAction<string>) {
-            state.folderPath = path.dirname(action.payload);
+            state.folderPath = window.electron.path.dirname(action.payload);
         },
         setSelectedRemoteFolder(state, action: PayloadAction<RemoteFolder | undefined>) {
             state.selectedRemoteFolder = action.payload;

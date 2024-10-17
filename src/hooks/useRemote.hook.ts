@@ -4,16 +4,10 @@
 
 /* eslint-disable no-console */
 
-import { spawn } from 'child_process';
-import dns from 'dns';
-import { existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
-import path from 'path';
-
 import useAppConfig from './useAppConfig.hook';
 
 // Required for connecting to a socket on localhost
-dns.setDefaultResultOrder('ipv4first');
+window.electron.dns.setDefaultResultOrder('ipv4first');
 
 export interface RemoteConnection {
     name: string;
@@ -57,7 +51,7 @@ const useRemoteConnection = () => {
         return new Promise<string>((resolve, reject) => {
             console.info(`Running command: ${cmd} ${params.join(' ')}`);
 
-            const command = spawn(cmd, params, {
+            const command = window.electron.child_process.spawn(cmd, params, {
                 stdio: ['ignore', 'pipe', 'pipe'],
                 shell: true,
                 windowsHide: true,
@@ -177,22 +171,20 @@ const useRemoteConnection = () => {
             throw new Error('No connection provided');
         }
 
-        const remote = await import('@electron/remote');
-
         const parseResults = (results: string) =>
             results
                 .split('\n')
                 .filter((s) => s.length > 0)
                 .map<RemoteFolder>((folderInfo) => {
                     const [, lastModified = Date.now().toString(), remoteFolderPath = ''] = folderInfo.split(';');
-                    const configDir = remote.app.getPath('userData');
-                    const folderName = path.basename(remoteFolderPath);
+                    const configDir = window.electron.app.getPath('userData');
+                    const folderName = window.electron.path.basename(remoteFolderPath);
                     const localFolderForRemote = `${connection.name}-${connection.host}${connection.port}`;
 
                     return {
                         testName: folderName,
                         remotePath: remoteFolderPath,
-                        localPath: path.join(configDir, 'remote-tests', localFolderForRemote, folderName),
+                        localPath: window.electron.path.join(configDir, 'remote-tests', localFolderForRemote, folderName),
                         lastModified: new Date(lastModified).toISOString(),
                     };
                 });
@@ -241,8 +233,8 @@ const useRemoteConnection = () => {
             throw new Error('No remote folder provided');
         }
 
-        if (!existsSync(remoteFolder.localPath)) {
-            await mkdir(remoteFolder.localPath, { recursive: true });
+        if (!window.electron.fs.existsSync(remoteFolder.localPath)) {
+            await window.electron.fs.mkdir(remoteFolder.localPath, { recursive: true });
         }
 
         const sourcePath = `${connection.host}:${escapeWhitespace(remoteFolder.remotePath)}`;

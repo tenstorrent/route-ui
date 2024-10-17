@@ -2,8 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { sep as pathSeparator } from 'path';
-
 import { FormGroup } from '@blueprintjs/core';
 import type { FC } from 'react';
 import { useSelector } from 'react-redux';
@@ -17,7 +15,7 @@ import { sendEventToMain } from '../../utils/bridge';
 import ElectronEvents from '../../../electron/main/ElectronEvents';
 
 const getTestName = (path: string) => {
-    const lastFolder = path.split(pathSeparator).pop();
+    const lastFolder = path.split(window.electron.path.separator).pop();
     return lastFolder || undefined;
 };
 
@@ -35,7 +33,7 @@ const LocalFolderOptions: FC = () => {
             <div className='buttons-container'>
                 <FolderPicker
                     onSelectFolder={async () => {
-                        const folderPath = openPerfAnalyzerFolderDialog();
+                        const folderPath = await openPerfAnalyzerFolderDialog();
 
                         await loadPerfAnalyzerFolder(folderPath);
 

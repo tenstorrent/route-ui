@@ -2,8 +2,6 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { sep as pathSeparator } from 'path';
-
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import {
@@ -30,7 +28,7 @@ import { sendEventToMain } from '../utils/bridge';
 import ElectronEvents from '../../electron/main/ElectronEvents';
 
 const getTestName = (path: string) => {
-    const lastFolder = path.split(pathSeparator).pop();
+    const lastFolder = path.split(window.electron.path.separator).pop();
     return lastFolder || 'n/a';
 };
 
@@ -124,7 +122,7 @@ const TopHeaderComponent: React.FC = () => {
                     <FolderPicker
                         icon={IconNames.FolderSharedOpen}
                         onSelectFolder={async () => {
-                            const folderPath = openPerfAnalyzerFolderDialog();
+                            const folderPath = await openPerfAnalyzerFolderDialog();
 
                             if (folderPath) {
                                 await updateSelectedFolder(folderPath, 'local');
