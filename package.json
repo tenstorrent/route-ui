@@ -82,15 +82,14 @@
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.4",
     "@types/react-plotly.js": "^2.6.3",
-    "@vitejs/plugin-react": "^4.2.1",
-    "electron": "^29.1.1",
-    "electron-builder": "^24.13.3",
+    "@vitejs/plugin-react": "^4.3.2",
+    "electron": "^33.0.1",
+    "electron-builder": "^25.1.8",
     "electron-extension-installer": "^1.2.0",
-    "sass-embedded": "^1.79.5",
-    "typescript": "^5.4.2",
-    "vite": "^5.1.5",
-    "vite-plugin-electron": "^0.28.4",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "typescript": "^5.6.3",
+    "vite": "^5.4.9",
+    "vite-plugin-electron": "^0.28.8",
+    "vite-plugin-electron-renderer": "^0.14.6"
   },
   "volta": {
     "node": "20.11.1"
