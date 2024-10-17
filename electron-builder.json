@@ -1,21 +1,52 @@
 {
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/refs/heads/master/packages/app-builder-lib/scheme.json",
+  "productName": "Route UI",
   "appId": "com.tenstorrent.route-ui",
   "asar": true,
+  "asarUnpack": "**\\*.{node,dll}",
+  "extraResources": [
+    "./assets/**"
+  ],
   "directories": {
-    "output": "release/${version}"
+    "buildResources": "assets",
+    "output": "release/build"
   },
   "files": [
     "dist-electron",
     "dist"
   ],
+  "afterSign": "build/scripts/notarize.cjs",
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
-    "target": [
-      "dmg",
-      "zip"
-    ]
+    "target": {
+        "target": "dmg",
+        "arch": [
+          "arm64",
+          "x64"
+        ]
+    },
+    "type": "distribution",
+    "hardenedRuntime": true,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist",
+    "gatekeeperAssess": false
   },
+  "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
   "win": {
+    "artifactName": "${productName}_${version}.${ext}",
     "target": [
       {
         "target": "nsis",
@@ -23,8 +54,7 @@
           "x64"
         ]
       }
-    ],
-    "artifactName": "${productName}_${version}.${ext}"
+    ]
   },
   "nsis": {
     "oneClick": false,
@@ -32,9 +62,14 @@
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false
   },
+  "linux": {
+      "artifactName": "${productName}_${version}.${ext}",
+      "target": "deb",
+      "category": "Development"
+  },
   "publish": {
-    "provider": "generic",
-    "channel": "latest",
-    "url": "https://github.com/electron-vite/electron-vite-react/releases/download/v0.9.9/"
+    "provider": "github",
+    "owner": "tenstorrent",
+    "repo": "route-ui"
   }
 }
