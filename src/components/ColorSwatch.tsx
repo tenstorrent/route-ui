@@ -4,7 +4,7 @@
 
 import { type CSSProperties, type FC } from 'react';
 
-import './ColorSwatch.scss';
+import './ColorSwatch.css';
 
 interface ColorSwatchProps {
     isVisible: boolean;

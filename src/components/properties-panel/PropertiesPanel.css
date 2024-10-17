@@ -1,11 +1,11 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../../scss/_variables.css";
 
 .properties-panel {
-    background-color: $tt-medium-light-gray;
+    background-color: var(--tt-medium-light-gray);
     flex-grow: 1;
     overflow-x: auto;
     white-space: nowrap;
@@ -23,7 +23,7 @@
         }
 
         .bp4-icon svg {
-            fill: $tt-dark-gray;
+            fill: var(--tt-dark-gray);
         }
     }
 }
@@ -42,16 +42,16 @@
     height: fit-content;
 
     .node-element {
-        width: $compute-node-width;
+        width: var(--compute-node-width);
         height: fit-content;
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background-color: $tt-off-background;
+        background-color: var(--tt-off-background);
         padding: 10px;
 
         h3 {
-            color: $tt-black;
+            color: var(--tt-black);
             padding: 0;
             display: flex;
             align-items: center;
@@ -83,7 +83,7 @@
         }
 
         .io-label {
-            color: $tt-white-text;
+            color: var(--tt-white-text);
             margin-bottom: 5px;
         }
 
@@ -102,7 +102,7 @@
 
         h3 {
             margin-left: -10px;
-            color: $tt-white-text;
+            color: var(--tt-white-text);
         }
 
         h2 {
@@ -110,7 +110,7 @@
             display: inline-block;
             text-wrap: wrap;
             word-break: break-word;
-            color: $tt-white-text;
+            color: var(--tt-white-text);
         }
     }
 }
@@ -128,23 +128,23 @@
     }
 
     .bp4-tab {
-        background-color: $tt-medium-light-gray;
-        color: $tt-black;
+        background-color: var(--tt-medium-light-gray);
+        color: var(--tt-black);
         font-size: 16px;
 
         &[aria-selected="true"] {
-            color: $tt-black;
+            color: var(--tt-black);
         }
 
         &[data-tab-id="tab-ops"] {
             svg {
-                fill: $tt-dark-gray;
+                fill: var(--tt-dark-gray);
             }
         }
 
         &[data-tab-id="tab-queues"] {
             svg {
-                stroke: $tt-dark-gray;
+                stroke: var(--tt-dark-gray);
             }
         }
     }
@@ -203,7 +203,7 @@
 
             .bp4-icon {
                 svg {
-                    fill: $tt-yellow;
+                    fill: var(--tt-yellow);
                 }
 
                 &.out-of-memory {
@@ -287,7 +287,7 @@
             display: inline-flex;
             align-items: center;
             font-weight: 100;
-            color: $tt-very-dark-gray;
+            color: var(--tt-very-dark-gray);
 
             .bp4-control.bp4-checkbox {
                 margin-bottom: 0;

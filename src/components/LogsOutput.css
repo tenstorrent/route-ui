@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../scss/_variables.css";
 
 .logs-container {
     overflow: auto;
@@ -30,11 +30,11 @@
         overflow-wrap: break-word;
     }
 
-    &:nth-last-of-type(odd) { background-color: $tt-light-gray; }
-    &:nth-last-of-type(even) { background-color: $tt-medium-light-gray; }
+    &:nth-last-of-type(odd) { background-color: var(--tt-light-gray); }
+    &:nth-last-of-type(even) { background-color: var(--tt-medium-light-gray); }
 
-    &.log-error { color: $tt-red; }
+    &.log-error { color: var(--tt-red); }
     &.log-warning { color: darkgoldenrod; }
-    &.log-info { color: $tt-dark-blue; }
-    &.log-log { color: $tt-dark-gray; }
+    &.log-info { color: var(--tt-dark-blue); }
+    &.log-log { color: var(--tt-dark-gray); }
 }

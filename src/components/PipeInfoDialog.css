@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import '../scss/variables';
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import '../scss/_variables.css';
 
 .pipe-info-dialog-wrapper {
 	pointer-events: none;
@@ -16,11 +16,11 @@
 	}
 
 	.producer-icon svg {
-		color: $core-highlight-inout;
+		color: var(--core-highlight-inout);
 	}
 
 	.consumer-icon svg {
-		color: $core-highlight-output;
+		color: var(--core-highlight-output);
 	}
 
 	ul {

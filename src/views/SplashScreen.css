@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../scss/_variables.css";
 
 #splash-debug-panel {
     display: grid;
@@ -16,7 +16,7 @@
     margin: 10px;
     overflow: hidden;
 
-    background-color: $tt-off-background;
-    border: thin solid $tt-medium-gray;
+    background-color: var(--tt-off-background);
+    border: thin solid var(--tt-medium-gray);
     border-radius: 5px;
 }

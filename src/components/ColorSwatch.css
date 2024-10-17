@@ -1,16 +1,16 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import '../scss/variables';
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import '../scss/_variables.css';
 
 .color-swatch {
-    // This property is set in react.
+    /* This property is set in react. */
     --js-color-swatch: transparent;
 
     width: 10px;
     height: 10px;
-    border: 1px solid $tt-white-text;
+    border: 1px solid var(--tt-white-text);
     display: inline-block;
     flex-shrink: 0;
 

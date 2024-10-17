@@ -11,7 +11,7 @@ import { Cell, Column, ColumnHeaderCell2, ColumnProps } from '@blueprintjs/table
 import type { OpTableFields } from './useOperationsTable.hooks';
 import type { QueuesTableFields } from './useQueuesTable.hook';
 
-import './SharedTable.scss';
+import './SharedTable.css';
 
 export type TableFields = OpTableFields | QueuesTableFields;
 

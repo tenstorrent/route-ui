@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import '../../scss/_variables.css';
+
+.ratio-number {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+
+    svg {
+        fill: var(--alert-color) !important;
+    }
+}

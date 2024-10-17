@@ -23,7 +23,7 @@ import FolderPicker from './folder-picker/FolderPicker';
 import RemoteFolderSelector from './folder-picker/RemoteFolderSelector';
 import GraphSelector from './graph-selector/GraphSelector';
 
-import './TopHeaderComponent.scss';
+import './TopHeaderComponent.css';
 import { sendEventToMain } from '../utils/bridge';
 import ElectronEvents from '../../electron/main/ElectronEvents';
 

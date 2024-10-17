@@ -10,7 +10,7 @@ import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hoo
 import GraphSelector from '../graph-selector/GraphSelector';
 import FolderPicker from './FolderPicker';
 
-import './FolderPicker.scss';
+import './FolderPicker.css';
 import { sendEventToMain } from '../../utils/bridge';
 import ElectronEvents from '../../../electron/main/ElectronEvents';
 

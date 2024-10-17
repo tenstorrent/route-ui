@@ -1,24 +1,24 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../../scss/_variables.css";
 
 .bp4-dialog.remote-connection-dialog {
-    background-color: $tt-slight-off-background;
+    background-color: var(--tt-slight-off-background);
 
     .bp4-dialog-header {
-        background-color: $tt-off-background;
+        background-color: var(--tt-off-background);
 
         .bp4-icon, .bp4-heading {
-            color: $tt-light-gray;
+            color: var(--tt-light-gray);
         }
     }
 
-    .bp4-form-group-sub-label { color: $tt-light-gray; }
+    .bp4-form-group-sub-label { color: var(--tt-light-gray); }
 
     fieldset {
-        border: solid 1px $tt-medium-gray;
+        border: solid 1px var(--tt-medium-gray);
         border-radius: 5px;
     }
 }

@@ -1,75 +1,75 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../scss/_variables.css";
 
 .node {
     &:hover {
-        fill: $tt-light-gray;
+        fill: var(--tt-light-gray);
     }
 }
 
 .node-type-d {
-    fill: $c-dram;
-    background-color: $c-dram;
+    fill: var(--c-dram);
+    background-color: var(--c-dram);
 }
 
 .node-type-c {
-    fill: $c-core;
-    background-color: $c-core;
+    fill: var(--c-core);
+    background-color: var(--c-core);
 }
 
 .node-type-hc {
-    fill: $hc-core;
-    background-color: $hc-core;
+    fill: var(--hc-core);
+    background-color: var(--hc-core);
 
     &.node-type-label::before {
-        $line-thickness: 1px;
+        --line-thickness: 1px;
 
         content: '';
         position: absolute;
         inset: 0;
         background-image: linear-gradient(
             -45deg,
-            transparent calc(50% - $line-thickness),
-            $tt-very-dark-gray calc(50% - $line-thickness),
-            $tt-very-dark-gray calc(50% + $line-thickness),
-            transparent calc(50% + $line-thickness)
+            transparent calc(50% - var(--line-thickness)),
+            --tt-very-dark-gray calc(50% - var(--line-thickness)),
+            --tt-very-dark-gray calc(50% + var(--line-thickness)),
+            transparent calc(50% + var(--line-thickness))
         );
     }
 }
 
 .node-type-r {
-    fill: $c-router;
-    background-color: $c-router;
+    fill: var(--c-router);
+    background-color: var(--c-router);
 }
 
 .node-type-e {
-    fill: $c-eth;
-    background-color: $c-eth;
+    fill: var(--c-eth);
+    background-color: var(--c-eth);
 }
 
 .node-type-p {
-    fill: $c-pcix;
-    background-color: $c-pcix;
+    fill: var(--c-pcix);
+    background-color: var(--c-pcix);
 }
 
 .node-type {
     border-bottom: 2px solid transparent;
 
     &.detailed-view {
-        border-bottom: 2px solid $bright-highlight;
+        border-bottom: 2px solid var(--bright-highlight);
     }
 }
 
 .main-route {
-    // This is a CSS variable because the value is set dynamically in react.
-    --js-bottom-dock-height: $initial-dock-height;
+    /* This is a CSS variable because the value is set dynamically in react. */
+    --js-bottom-dock-height: var(--initial-dock-height);
 
     display: grid;
-    grid-template-columns: $sidebar-width $controls-panel-width min-content 1fr;
-    grid-template-rows: $top-bar-height auto;
+    grid-template-columns: var(--sidebar-width) var(--controls-panel-width) min-content 1fr;
+    grid-template-rows: var(--top-bar-height) auto;
     grid-template-areas:
         "top-bar top-bar top-bar top-bar"
         "sidebar controls main properties";
@@ -104,7 +104,7 @@
         overflow: auto;
     }
     .properties-panel {
-        min-width: $properties-panel-width;
+        min-width: var(--properties-panel-width);
         grid-area: properties;
         position: relative;
     }
@@ -112,13 +112,13 @@
     .bottom-dock {
         grid-area: bottom-dock;
         display: none;
-        height: $initial-dock-height;
+        height: var(--initial-dock-height);
         align-self: end;
     }
 
     .main-route-loading-overlay {
         grid-area: main;
-        background: $tt-background;
+        background: var(--tt-background);
         display: grid;
         place-items: center;
         z-index: calc(infinity * 1);
@@ -133,7 +133,7 @@
     .panel-overlay {
         position: absolute;
         inset: 0;
-        background: color-mix(in srgb, $tt-background 80%, transparent);
+        background: color-mix(in srgb, var(--tt-background) 80%, transparent);
         display: none;
     }
 
@@ -149,7 +149,7 @@
     }
 
     &:has( .detailed-view-open) {
-        grid-template-rows: $top-bar-height auto var(--js-bottom-dock-height);
+        grid-template-rows: var(--top-bar-height) auto var(--js-bottom-dock-height);
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
@@ -158,7 +158,7 @@
     }
 
     &:has( .dock-open) {
-        grid-template-rows: $top-bar-height auto 340px;
+        grid-template-rows: var(--top-bar-height) auto 340px;
         grid-template-areas:
             "top-bar top-bar top-bar top-bar"
             "sidebar controls main properties"
@@ -173,7 +173,7 @@
             text-align: center;
             justify-self: center;
             align-self: center;
-            margin-block-start: -$top-bar-height;
+            margin-block-start: -var(--top-bar-height);
 
             p {
                 margin-block: 20px;
@@ -181,7 +181,7 @@
             }
 
             svg {
-                color: $tt-yellow;
+                color: var(--tt-yellow);
             }
         }
 
@@ -189,10 +189,12 @@
     }
 
     @media (max-width: 1280px) {
-        // Make the properties bar have a fixed width on smaller sizes without creating horizontal scrollbars
-        grid-template-columns: $sidebar-width $controls-panel-width auto calc($properties-panel-width + 30px);
+        & {
+            /* Make the properties bar have a fixed width on smaller sizes without creating horizontal scrollbars */
+            grid-template-columns: var(--sidebar-width) var(--controls-panel-width) auto calc(var(--properties-panel-width) + 30px);
+        }
 
-        .main-content { width: auto; }
+        & .main-content { width: auto; }
     }
 }
 
@@ -216,7 +218,7 @@
 }
 
 .inner-sidebar {
-    // max-height: calc(100vh - 100px);
+    /* max-height: calc(100vh - 100px); */
     overflow-y: auto;
     scrollbar-gutter: stable;
     min-width: 220px;
@@ -241,7 +243,7 @@
     hr {
         border: none;
         width: 100%;
-        border-top: 1px solid $hr;
+        border-top: 1px solid var(--hr);
 
     }
 
@@ -253,10 +255,10 @@
 }
 
 .grid-container {
-    // flex: none;
-    // overflow: auto;
-    // height: calc(100vh - 150px);
-    // max-width: 50vw;
+    /* flex: none;
+    overflow: auto;
+    height: calc(100vh - 150px);
+    max-width: 50vw; */
     margin: 0;
     padding: 5px;
 
@@ -269,7 +271,7 @@
         width: 100%;
         text-align: center;
         margin-top: 10px;
-        color: $tt-medium-light-gray;
+        color: var(--tt-medium-light-gray);
     }
 
     .node-container {
@@ -281,16 +283,16 @@
             align-content: center;
             justify-content: center;
             gap: 15px;
-            outline: 1px solid $tt-very-dark-gray;
+            outline: 1px solid var(--tt-very-dark-gray);
             font-size: 1em;
-            color: $tt-medium-light-gray;
+            color: var(--tt-medium-light-gray);
 
             .bp4-spinner .bp4-spinner-track {
-                stroke: $progress-bar-track;
+                stroke: var(--progress-bar-track);
             }
 
             .bp4-spinner .bp4-spinner-head {
-                stroke: $tt-medium-gray;
+                stroke: var(--tt-medium-gray);
             }
         }
 
@@ -298,7 +300,7 @@
             width: 100px;
             height: 100px;
             position: relative;
-            border: 1px solid $tt-very-dark-gray;
+            border: 1px solid var(--tt-very-dark-gray);
 
             & * {
                 pointer-events: none;
@@ -328,25 +330,25 @@
 
             &.selected {
                 .node-border {
-                    $inset: 4px;
-                    border: 2px solid $node-select;
+                    --inset: 4px;
+                    border: 2px solid var(--node-select);
                     position: absolute;
-                    top: $inset;
-                    left: $inset;
-                    bottom: $inset;
-                    right: $inset;
+                    top: var(--inset);
+                    left: var(--inset);
+                    bottom: var(--inset);
+                    right: var(--inset);
                 }
             }
 
             &.detailed-view {
                 .node-border {
-                    border: 2px solid $bright-highlight;
+                    border: 2px solid var(--bright-highlight);
                 }
             }
 
             &.focus {
                 .node-border {
-                    border-color: $node-select-focus;
+                    border-color: var(--node-select-focus);
                 }
             }
 
@@ -361,25 +363,25 @@
 
             &.core-highlight-input {
                 .core-highlight {
-                    border: 2px solid $core-highlight-inout;
+                    border: 2px solid var(--core-highlight-inout);
                 }
             }
 
             &.core-highlight-output {
                 .core-highlight {
-                    border: 2px solid $core-highlight-output;
+                    border: 2px solid var(--core-highlight-output);
                 }
             }
 
             &.core-highlight-both {
                 .core-highlight {
-                    $dash-size: 10deg;
+                    --dash-size: 10deg;
                     border: 2px solid transparent;
                     border-image: repeating-conic-gradient(
-                        $core-highlight-inout 0deg,
-                        $core-highlight-inout $dash-size,
-                        $core-highlight-output $dash-size,
-                        $core-highlight-output calc(2 * $dash-size)
+                        --core-highlight-inout 0deg,
+                        --core-highlight-inout var(--dash-size),
+                        --core-highlight-output var(--dash-size),
+                        --core-highlight-output calc(2 * var(--dash-size))
                     ) 1;
 
                 }
@@ -409,11 +411,11 @@
             .off-chip-congestion {
                 width: unset;
                 height: unset;
-                $inset: 6px;
-                top: $inset;
-                left: $inset;
-                bottom: $inset;
-                right: $inset;
+                --inset: 6px;
+                top: var(--inset);
+                left: var(--inset);
+                bottom: var(--inset);
+                right: var(--inset);
             }
 
             .operand-wrap {
@@ -434,7 +436,7 @@
                 height: 20px;
                 top: 0;
                 right: 0;
-                color: $tt-very-dark-gray;
+                color: var(--tt-very-dark-gray);
                 font-size: 16px;
                 line-height: 1;
                 display: flex;
@@ -476,7 +478,7 @@
 }
 
 .node-links-wrap {
-    background-color: $tt-off-background; //#494949;
+    background-color: var(--tt-off-background); /* #494949; */
 
     .link-title-details {
         position: relative;
@@ -486,15 +488,15 @@
         align-content: center;
         gap: 10px;
         margin-bottom: 5px;
-        color: $tt-white-text;
+        color: var(--tt-white-text);
 
         span {
-            color: $tt-white-text;
+            color: var(--tt-white-text);
         }
 
         &.inactive,
         &.inactive span {
-            color: $tt-medium-gray;
+            color: var(--tt-medium-gray);
 
             input {
                 opacity: 0.5;
@@ -562,7 +564,7 @@
     }
 
     .is-selected-pipe {
-        background-color: $pipe-select;
+        background-color: var(--pipe-select);
     }
 }
 
@@ -581,7 +583,7 @@
                 margin-right: 5px;
 
                 svg {
-                    fill: $tt-dark-gray
+                    fill: var(--tt-dark-gray)
                 }
             }
         }
@@ -616,7 +618,7 @@
 
             .bp4-icon {
                 svg {
-                    fill: $tt-yellow;
+                    fill: var(--tt-yellow);
                 }
 
                 &.out-of-memory {
@@ -690,7 +692,7 @@
     }
 
     span {
-        color: $tt-white-text;
+        color: var(--tt-white-text);
     }
 }
 
@@ -704,33 +706,33 @@
     .foreign {
         .bp4-icon {
             svg {
-                fill: $tt-extra-light-gray;
+                fill: var(--tt-extra-light-gray);
             }
         }
     }
 
     .op-element .offchip-button svg {
-        color: $tt-medium-light-gray;
+        color: var(--tt-medium-light-gray);
         margin-top: 4px;
     }
 
     .op-type.icon {
         &.op {
             svg {
-                fill: $tt-light-gray;
+                fill: var(--tt-light-gray);
             }
         }
 
         &.queue {
             svg {
-                stroke: $tt-light-gray;
+                stroke: var(--tt-light-gray);
             }
         }
     }
 }
 
 .bp4-control input:focus ~ .bp4-control-indicator {
-    //outline: none;
+    /* outline: none; */
 }
 
 .congested-link {
@@ -739,13 +741,13 @@
 
 .progress-bar {
     width: 100px;
-    background-color: $progress-bar-track;
+    background-color: var(--progress-bar-track);
     height: 4px;
     position: absolute;
     bottom: -2px;
 
     span {
-        background-color: $progress-bar-fill;
+        background-color: var(--progress-bar-fill);
         height: 4px;
         display: block;
     }
@@ -755,11 +757,11 @@
 .link-saturation-slider {
     .bp4-slider-track {
         .bp4-slider-progress {
-            background-color: $link-saturation-track;
+            background-color: var(--link-saturation-track);
 
             &.bp4-intent-primary,
             &:first-of-type {
-                background-color: $link-saturation-fill;
+                background-color: var(--link-saturation-fill);
             }
         }
     }

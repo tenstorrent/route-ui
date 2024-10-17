@@ -18,7 +18,7 @@ import {
 } from '../../data/store/slices/uiState.slice';
 import Collapsible from '../Collapsible';
 
-import './GridControls.scss';
+import './GridControls.css';
 
 export const GridControls: FC = () => {
     const dispatch = useDispatch();

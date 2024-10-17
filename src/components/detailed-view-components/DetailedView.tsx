@@ -21,7 +21,7 @@ import DetailedViewETHRenderer from './DetailedViewETH';
 import DetailedViewPCIERenderer from './DetailedViewPCIE';
 import DetailedViewCoreRenderer from './DetailedViewCore';
 
-import './DetailedView.scss';
+import './DetailedView.css';
 import type { LocationState } from '../../data/StateTypes';
 import AsyncComponent from '../AsyncRenderer';
 

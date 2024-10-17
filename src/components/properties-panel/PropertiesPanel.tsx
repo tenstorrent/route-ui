@@ -13,7 +13,7 @@ import OperationsPropertiesTab from './OperationsPropertiesTab';
 import PipesPropertiesTab from './PipesPropertiesTab';
 import QueuesPropertiesTab from './QueuesPropertiesTab';
 
-import './PropertiesPanel.scss';
+import './PropertiesPanel.css';
 import type { LocationState } from '../../data/StateTypes';
 
 export default function PropertiesPanel() {

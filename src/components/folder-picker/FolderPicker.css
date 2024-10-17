@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../../scss/_variables.css";
 
 .folder-picker-options {
     display: flex;
@@ -10,7 +10,7 @@
     gap: 20px;
 
     fieldset {
-        border: solid 1px $tt-medium-gray;
+        border: solid 1px var(--tt-medium-gray);
         border-radius: 5px;
         padding: 5px 20px 10px;
         display: flex;
@@ -23,7 +23,7 @@
         width: 35vw;
 
         & > .bp4-icon {
-            color: $tt-dark-gray;
+            color: var(--tt-dark-gray);
         }
 
         .folder-picker-wrapper {
@@ -47,7 +47,7 @@
             white-space: nowrap;
         }
 
-        .bp4-form-group-sub-label { color: $tt-light-gray; }
+        .bp4-form-group-sub-label { color: var(--tt-light-gray); }
     }
 
     legend {

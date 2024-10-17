@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
 
 :root {
     color-scheme: dark;
@@ -16,8 +16,8 @@
 
 body {
     margin: 0;
-    background: $tt-background;
-    color: $tt-white-text;
+    background: var(--tt-background);
+    color: var(--tt-white-text);
     font-family: 'Arial Nova', Arial, sans-serif;
     overflow-y: hidden;
     overflow-x: hidden;
@@ -30,12 +30,12 @@ body {
 }
 
 a {
-    color: $tt-light-blue;
+    color: var(--tt-light-blue);
 }
 
 
 :focus {
-    outline-offset: 0px;
+    outline-offset: 0;
 }
 
 .bp4-control input:focus ~ .bp4-control-indicator {
@@ -43,50 +43,51 @@ a {
 }
 
 :focus {
-    outline: $focus-ring solid 2px;
-    outline-offset: 0px;
+    outline: var(--focus-ring) solid 2px;
+    outline-offset: 0;
 }
 
 .bp4-control input:focus ~ .bp4-control-indicator {
-    outline: $focus-ring solid 2px;
+    outline: var(--focus-ring) solid 2px;
     outline-offset: 0;
 }
 
 
 .node-item:focus {
     outline: none;
-    //outline-offset: -2px;
+    /* outline-offset: -2px; */
 }
 
 .tt-keyboard-focus {
     .node-item:focus {
-        outline: $focus-ring solid 2px;
+        outline: var(--focus-ring) solid 2px;
         outline-offset: -2px;
     }
 }
 
-$top-nav-height: 70px;
-$footer-height: 20px;
 
-// Ful app layout, which is side bar, top nav, main content, and footer
+/* Ful app layout, which is side bar, top nav, main content, and footer */
 .App {
-    color: $tt-white-text;
+    --top-nav-height: 70px;
+    --footer-height: 20px;
+
+    color: var(--tt-white-text);
     display: grid;
     grid-template-columns: 50px 1fr;
-    grid-template-rows: $top-nav-height 1fr;
+    grid-template-rows: var(--top-nav-height) 1fr;
 }
 
 .Footer {
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     min-width: 100vw;
-    background: $tt-purple;
-    min-height: #{$footer-height};
+    background: var(--tt-purple);
+    min-height: var(--footer-height);
     display: flex;
 }
 
 .data-box {
-    border: 2px solid $tt-light-gray;
+    border: 2px solid var(--tt-light-gray);
     border-radius: 15px;
     padding: 10px;
     margin-right: 10px;
@@ -123,7 +124,7 @@ $footer-height: 20px;
 }
 
 button, .button {
-    background-color: $tt-medium-blue;
+    background-color: var(--tt-medium-blue);
     border: none;
     border-radius: 2px;
     color: #fff;
@@ -142,12 +143,12 @@ button, .button {
 
     &:not(.node-item) {
         &:hover {
-            background-color: lighten($tt-medium-blue, 20%);
+            background-color: color-mix(in hsl, var(--tt-medium-blue), white 80%);
         }
 
-        //&:focus {
-        //    outline: none;
-        //}
+        /* &:focus {
+            outline: none;
+        } */
     }
 
     &.node-item {
@@ -156,7 +157,7 @@ button, .button {
         transition: color 100ms linear, background-color 100ms linear;
 
         &:hover {
-            background-color: transparentize($tt-medium-blue, 0.9);
+            background-color: color-mix(in srgb, var(--tt-medium-blue), transparent 90%);
         }
     }
 }

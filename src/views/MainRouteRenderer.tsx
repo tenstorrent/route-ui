@@ -13,7 +13,7 @@ import BottomDock from '../components/bottom-dock/BottomDock';
 import { GridSidebar } from '../components/grid-sidebar/GridSidebar';
 import PropertiesPanel from '../components/properties-panel/PropertiesPanel';
 import usePerfAnalyzerFileLoader from '../hooks/usePerfAnalyzerFileLoader.hooks';
-import './MainRouteRenderer.scss';
+import './MainRouteRenderer.css';
 
 export interface MainRouteRendererProps {}
 

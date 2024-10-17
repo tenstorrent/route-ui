@@ -10,7 +10,7 @@ import { closeClusterView } from '../../data/store/slices/clusterView.slice';
 import ClusterView from './ClusterView';
 
 import { getClusterView } from '../../data/store/selectors/clusterView.selector';
-import './ClusterView.scss';
+import './ClusterView.css';
 
 const ClusterViewDialog: React.FC = () => {
     const dispatch = useDispatch();

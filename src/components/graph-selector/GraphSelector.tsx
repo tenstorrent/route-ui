@@ -9,7 +9,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
 
-import './GraphSelector.scss';
+import './GraphSelector.css';
 import type { GraphRelationship, LocationState } from '../../data/StateTypes';
 
 function formatDisplayGraphName({

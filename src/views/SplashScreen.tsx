@@ -15,7 +15,7 @@ import TenstorrentLogo from '../assets/TenstorrentLogo';
 import RemoteSyncConfigurator from '../components/folder-picker/RemoteSyncConfigurator';
 
 import LocalFolderSelector from '../components/folder-picker/LocalFolderSelector';
-import './SplashScreen.scss';
+import './SplashScreen.css';
 
 const SplashScreen: FC = () => {
     const errorLogs = useSelector(getLogEntriesByType(LogLevel.ERROR));

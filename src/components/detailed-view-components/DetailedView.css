@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../../scss/_variables.css";
 
 
 .bp4-card.detailed-view-card {
@@ -10,15 +10,15 @@
     border-radius: 0;
     bottom: 0;
     left: 0;
-    z-index: $detailed-view-zindex;
+    z-index: var(--detailed-view-zindex);
     border: none;
     background: none;
 
     .detailed-view-container {
-        background-color: $tt-background;
-        color: $tt-white-text;
+        background-color: var(--tt-background);
+        color: var(--tt-white-text);
         box-shadow: 0 0 0 2px rgba(17, 20, 24, 0.25);
-        border: 1px solid $tt-medium-gray;
+        border: 1px solid var(--tt-medium-gray);
         padding: 15px;
         padding-bottom: 20px;
         margin-bottom: 10px;
@@ -49,13 +49,13 @@
         }
 
         .bp4-spinner .bp4-spinner-head {
-            stroke: $tt-medium-light-gray;
+            stroke: var(--tt-medium-light-gray);
         }
     }
 }
 
 .detailed-view-wrap {
-    background-color: $tt-background;
+    background-color: var(--tt-background);
     display: flex;
     flex-direction: row;
     gap: 20px;
@@ -110,7 +110,7 @@
         .subchannel {
             .subchannel-name {
                 margin-bottom: 5px;
-                color: $detailed-vew-light-text;
+                color: var(--detailed-vew-light-text);
                 button{
                     margin-right: 5px;
                 }
@@ -118,7 +118,7 @@
 
             &.current {
                 .subchannel-name {
-                    color: $bright-highlight;
+                    color: var(--bright-highlight);
                 }
             }
         }
@@ -139,8 +139,8 @@
 
         .noc2axi,
         .router {
-            background-color: $detailed-vew-component;
-            color: $tt-very-dark-gray;
+            background-color: var(--detailed-vew-component);
+            color: var(--tt-very-dark-gray);
             width: 120px;
             text-align: center;
             padding: 6px;
@@ -149,8 +149,8 @@
     }
 
     .axi {
-        background-color: $detailed-vew-component;
-        color: $tt-very-dark-gray;
+        background-color: var(--detailed-vew-component);
+        color: var(--tt-very-dark-gray);
         width: 100%;
         text-align: center;
         padding: 6px;
@@ -167,8 +167,8 @@
             flex-direction: column;
 
             .axi-dram {
-                background-color: $detailed-vew-component;
-                color: $tt-very-dark-gray;
+                background-color: var(--detailed-vew-component);
+                color: var(--tt-very-dark-gray);
                 text-align: center;
                 padding: 6px;
             }
@@ -184,7 +184,7 @@
             margin-left: 15px;
 
             &.centered-svg {
-                margin-left: 0px;
+                margin-left: 0;
             }
         }
     }
@@ -206,7 +206,7 @@
 
         .bp4-button:not([class*=bp4-intent-]):disabled,
         .bp4-button:not([class*=bp4-intent-]).bp4-disabled {
-            color: $tt-very-dark-gray;
+            color: var(--tt-very-dark-gray);
         }
     }
 
@@ -264,7 +264,7 @@
         thead {
             top: 0;
             position: sticky;
-            background-color: $tt-background;
+            background-color: var(--tt-background);
         }
     }
 

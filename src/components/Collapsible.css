@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../scss/_variables.css";
 
 .collapsible-component {
     > [type="button"] {
@@ -18,11 +18,11 @@
         &.bp4-button { padding: 0; }
 
         &:hover {
-            color: $tt-white-text;
+            color: var(--tt-white-text);
         }
 
         .bp4-button-text {
-            color: $tt-white-text;
+            color: var(--tt-white-text);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -34,7 +34,7 @@
         }
 
         .bp4-icon svg {
-            fill: $tt-white-text;
+            fill: var(--tt-white-text);
         }
     }
 }

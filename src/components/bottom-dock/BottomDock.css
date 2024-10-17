@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
 
-@import "../../scss/variables";
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
+
+@import "../../scss/_variables.css";
 
 .bottom-dock {
     padding: 0 20px;
-    background-color: $tt-light-gray;
+    background-color: var(--tt-light-gray);
     position: relative;
     color-scheme: light;
 
@@ -21,24 +21,24 @@
     }
 
     .operations-table pre {
-        color: $tt-dark-gray;
+        color: var(--tt-dark-gray);
     }
 
     .bp4-tab-panel {
-        margin-top: 0px;
+        margin-top: 0;
     }
 
     .bp4-tab {
         border: none;
-        color: $tt-dark-gray;
+        color: var(--tt-dark-gray);
         transition: background-color 250ms linear, color 250ms linear, border 250ms ease-out;
 
         &:hover {
-            color: $tt-medium-gray;
+            color: var(--tt-medium-gray);
         }
 
         &[aria-selected="true"] {
-            color: $tt-dark-blue;
+            color: var(--tt-dark-blue);
             background-color: transparent;
         }
     }
@@ -47,7 +47,7 @@
     .bp4-tab-indicator-wrapper .bp4-tab-indicator {
         bottom: 2px;
         height: 1px;
-        background-color: $tt-dark-blue;
+        background-color: var(--tt-dark-blue);
     }
 
     .queues-table,
@@ -57,7 +57,7 @@
         margin-top: 5px;
 
         .bp4-table-cell-ledger-odd {
-            background-color: $tt-extra-light-gray;
+            background-color: var(--tt-extra-light-gray);
         }
 
         .bp4-table-cell {
@@ -101,7 +101,7 @@
         justify-content: center;
         align-items: center;
         height: 255px;
-        color: $tt-dark-gray;
+        color: var(--tt-dark-gray);
         font-weight: bold;
     }
 
@@ -127,19 +127,19 @@
         cursor: pointer;
         position: absolute;
         width: 100%;
-        // this is a little hackish, maybe find a more elegant solution
+        /* this is a little hackish, maybe find a more elegant solution */
         height: 30px;
         top: -30px;
 
         .sort-icon {
             right: 5px;
-            top: 0; //calc(50% - 8px);
+            top: 0; /* calc(50% - 8px); */
             position: absolute;
             padding-left: 25px;
-            background: linear-gradient(to left, $sort-header, transparent);
+            background: linear-gradient(to left, var(--sort-header), transparent);
 
             > span {
-                background-color: $sort-header;
+                background-color: var(--sort-header);
             }
         }
     }
@@ -147,9 +147,9 @@
     .bp4-table-header {
         &.current-sort {
             .bp4-table-column-name {
-                //color: $tt-white-text;
-                //background-color: $tt-dark-gray;
-                background-color: $sort-header;
+                /* color: var(--tt-white-text); */
+                /* background-color: var(--tt-dark-gray); */
+                background-color: var(--sort-header);
             }
 
             &.sorted-desc {
@@ -163,15 +163,15 @@
         align-content: center;
         justify-content: center;
         gap: 15px;
-        color: $tt-dark-gray;
+        color: var(--tt-dark-gray);
         height: 290px;
 
         .bp4-spinner .bp4-spinner-track {
-            stroke: $tt-medium-light-gray;
+            stroke: var(--tt-medium-light-gray);
         }
 
         .bp4-spinner .bp4-spinner-head {
-            stroke: $tt-dark-gray;
+            stroke: var(--tt-dark-gray);
         }
     }
 }

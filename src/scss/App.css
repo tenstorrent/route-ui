@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: Apache-2.0
-//
-// SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
 
 /*
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
@@ -13,5 +13,5 @@
 @import '@blueprintjs/table/lib/css/table.css';
 @import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 
-@import "../scss/variables";
-@import "../scss/common";
+@import "../scss/_variables.css";
+@import "../scss/_common.css";

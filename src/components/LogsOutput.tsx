@@ -9,7 +9,7 @@ import { IconNames } from '@blueprintjs/icons';
 import { getLogEntries } from '../data/store/selectors/logging.selector';
 import { LogLevel } from '../data/Types';
 
-import './LogsOutput.scss';
+import './LogsOutput.css';
 
 const ICON_MAP = {
     [LogLevel.ERROR]: IconNames.ERROR,

@@ -14,7 +14,7 @@ import useKeyboardFocus from './hooks/useKeyboardFocus.hook.js';
 import MainRouteRenderer from './views/MainRouteRenderer';
 import SplashScreen from './views/SplashScreen';
 
-import './scss/App.scss';
+import './scss/App.css';
 
 export default function App() {
     useKeyboardFocus();

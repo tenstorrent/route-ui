@@ -12,7 +12,7 @@ import LogsOutput from '../LogsOutput';
 import OperationsTable from './OperationsTable';
 import QueuesTable from './QueuesTable';
 
-import './BottomDock.scss';
+import './BottomDock.css';
 import { getDockOpenState } from '../../data/store/selectors/uiState.selectors';
 
 interface BottomDockProps {}

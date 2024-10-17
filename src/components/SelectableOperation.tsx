@@ -15,7 +15,7 @@ import QueueIcon from '../assets/QueueIcon';
 import { calculateOpCongestionColor } from '../utils/DrawingAPI';
 import ColorSwatch from './ColorSwatch';
 import HighlightedText from './HighlightedText';
-import './SelectableOperation.scss';
+import './SelectableOperation.css';
 
 interface SelectableOperationProps extends PropsWithChildren {
     opName: string;

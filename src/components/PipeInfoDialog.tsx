@@ -9,7 +9,7 @@ import { FC, type PropsWithChildren, useContext } from 'react';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../data/GraphOnChipContext';
 
-import './PipeInfoDialog.scss';
+import './PipeInfoDialog.css';
 import type { LocationState } from '../data/StateTypes';
 import AsyncComponent from './AsyncRenderer';
 
