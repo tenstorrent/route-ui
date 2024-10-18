@@ -76,7 +76,7 @@ const TopHeaderComponent: React.FC = () => {
             dispatch(setSelectedRemoteFolder(newFolder));
         }
 
-        if (checkLocalFolderExists(folderPath)) {
+        if (await checkLocalFolderExists(folderPath)) {
             const [firstGraph] = await loadPerfAnalyzerFolder(folderPath, newFolderLocationType);
 
             if (newFolderLocationType === 'local') {

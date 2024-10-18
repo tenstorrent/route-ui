@@ -47,7 +47,7 @@ const RemoteSyncConfigurator: FC = () => {
         dispatch(setSelectedFolderLocationType('remote'));
         dispatch(setSelectedRemoteFolder(folder));
 
-        if (checkLocalFolderExists(folder?.localPath)) {
+        if (await checkLocalFolderExists(folder?.localPath)) {
             await loadPerfAnalyzerFolder(folder?.localPath, 'remote');
         } else {
             // TODO: fix this

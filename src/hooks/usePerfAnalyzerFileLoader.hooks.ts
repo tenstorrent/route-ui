@@ -68,7 +68,7 @@ const usePerfAnalyzerFileLoader = () => {
             return undefined;
         }
 
-        const [isValid, err] = validatePerfResultsFolder(folderPath);
+        const [isValid, err] = await validatePerfResultsFolder(folderPath);
         if (!isValid) {
             // eslint-disable-next-line no-alert
             alert(`Invalid folder selected: ${err}`);

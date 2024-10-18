@@ -33,22 +33,21 @@ const OpsFileLoader: FC<OpsFileLoaderProps> = () => {
                 return;
             }
 
-            window.electron.fs.readFile(String(filelist), (err, data) => {
-                if (err) {
-                    logger.error(`An error occurred reading the file: ${err.message}`);
-                    // eslint-disable-next-line no-alert
-                    alert(`An error occurred reading the file: ${err.message}`);
-                    return;
-                }
+            try {
+                const data = await window.electron.fs.readFile(String(filelist[0]));
 
-                filelist.forEach(() => {
-                    try {
-                        JSON.parse(data);
-                    } catch (error) {
-                        logger.error(`Error parsing JSON file: ${(error as Error).message}`);
-                    }
-                });
-            });
+                try {
+                    JSON.parse(data);
+                } catch (error) {
+                    logger.error(`Error parsing JSON file: ${(error as Error).message}`);
+                }
+            } catch (err) {
+                logger.error(`An error occurred reading the file: ${(err as Error).message}`);
+                // eslint-disable-next-line no-alert
+                alert(`An error occurred reading the file: ${(err as Error).message}`);
+                return;
+            }
+
         })();
     };
 

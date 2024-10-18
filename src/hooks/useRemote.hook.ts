@@ -233,7 +233,7 @@ const useRemoteConnection = () => {
             throw new Error('No remote folder provided');
         }
 
-        if (!window.electron.fs.existsSync(remoteFolder.localPath)) {
+        if (!(await window.electron.fs.exists(remoteFolder.localPath))) {
             await window.electron.fs.mkdir(remoteFolder.localPath, { recursive: true });
         }
 

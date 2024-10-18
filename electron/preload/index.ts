@@ -7,10 +7,16 @@
 import { IpcRendererEvent, app, contextBridge, ipcRenderer } from 'electron';
 import type ElectronEvents from '../main/ElectronEvents';
 import path from 'path';
-import fs, { type Dirent } from 'fs';
-import { mkdir } from 'fs/promises';
+import fs from 'fs/promises';
 import { spawn } from 'child_process';
 import { setDefaultResultOrder } from 'dns';
+
+interface FileEntry {
+    name: string;
+    path: string;
+    isFile: boolean;
+    isDirectory: boolean;
+}
 
 const electronHandler = {
     ipcRenderer: {
@@ -23,17 +29,17 @@ const electronHandler = {
             };
         },
         once<T extends Array<unknown>>(channel: ElectronEvents, func: (...args: T) => void) {
-            ipcRenderer.once(channel, (_event, ...args) => func(...args as T));
+            ipcRenderer.once(channel, (_event, ...args) => func(...(args as T)));
         },
         send<T extends Array<unknown>>(channel: ElectronEvents, ...args: T) {
             ipcRenderer.send(channel, ...args);
-        }
+        },
     },
     app: {
         getPath(pathName: string) {
             // @ts-expect-error
             return app.getPath(pathName);
-        }
+        },
     },
     path: {
         separator: path.sep,
@@ -45,28 +51,40 @@ const electronHandler = {
         },
         basename(filePath: string, suffix?: string) {
             return path.basename(filePath, suffix);
-        }
+        },
     },
     fs: {
-        existsSync(filePath: string) {
-            return fs.existsSync(filePath);
+        async exists(filePath: string) {
+            try {
+                await fs.access(filePath, fs.constants.F_OK | fs.constants.W_OK);
+                return true;
+            } catch {
+                return false;
+            }
         },
-        readFile(filePath: string, callback: (err: Error | null, data: string) => void) {
-            return fs.readFile(filePath, 'utf-8', callback);
+        readFile(filePath: string) {
+            return fs.readFile(filePath, 'utf-8');
         },
-        readdir(dirPath: string, options: { withFileTypes: true }, callback: (err: Error | null, entries: Dirent[]) => void) {
-            return fs.readdir(dirPath, options, callback);
+        async readdir(dirPath: string): Promise<FileEntry[]> {
+            const fileList = await fs.readdir(dirPath, { encoding: 'utf-8', withFileTypes: true });
+
+            return fileList.map((file) => ({
+                name: file.name,
+                path: file.path,
+                isFile: file.isFile(),
+                isDirectory: file.isDirectory(),
+            }));
         },
         mkdir(dirPath: string, options: { recursive: true }) {
-            return mkdir(dirPath, options);
-        }
+            return fs.mkdir(dirPath, options);
+        },
     },
-    'child_process': {
-        spawn
+    child_process: {
+        spawn,
     },
     dns: {
-        setDefaultResultOrder
-    }
+        setDefaultResultOrder,
+    },
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
