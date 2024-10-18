@@ -13,7 +13,7 @@ files:
       startBlock: "/**\n"
       linePrefix: " * "
       endBlock: " */\n\n"
-  "**/*.scss":
+  "**/*.css":
     header:
       startBlock: "/**\n"
       linePrefix: " * "

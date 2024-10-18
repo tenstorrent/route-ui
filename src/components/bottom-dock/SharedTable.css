@@ -2,7 +2,7 @@
 
 /* SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC */
 
-@import '../../scss/_variables.css';
+@import '../../css/_variables.css';
 
 .ratio-number {
     display: inline-flex;
