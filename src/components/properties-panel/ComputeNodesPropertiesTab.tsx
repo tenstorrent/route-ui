@@ -57,7 +57,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
                     : `Netlist model estimate of ${node.opCycles.toLocaleString()} does not match perf model estimate`
             }
         >
-            <Icon iconSize={11} icon={IconNames.WARNING_SIGN} className={outOfMemory ? 'out-of-memory' : ''} />
+            <Icon size={11} icon={IconNames.WARNING_SIGN} className={outOfMemory ? 'out-of-memory' : ''} />
         </Tooltip>
     );
 
