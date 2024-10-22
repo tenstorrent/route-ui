@@ -18,10 +18,6 @@ import {
     PerfAnalyzerResultsPerOpJSON,
 } from '../data/sources/PerfAnalyzerResults';
 import { QUEUE_BLOCK_FIELDS, type QueueBlockDimensions, QueueDescriptorJson } from '../data/sources/QueueDescriptor';
-// TODO: Replace FS to use the native promise one
-// Node 20 supports FS using promises instead of callbacks
-// update this to use the new pattern
-// ref: https://nodejs.org/dist/latest-v20.x/docs/api/fs.html#fspromisesopendirpath-options
 import { load } from 'js-yaml';
 import Cluster from '../data/Cluster';
 import { GraphRelationship } from '../data/StateTypes';
