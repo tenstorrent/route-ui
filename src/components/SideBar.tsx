@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { AnchorButton, Button } from '@blueprintjs/core';
+import { AnchorButton, Button, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { ApplicationMode } from '../data/Types';
 import { getApplicationMode, getDetailedViewOpenState } from '../data/store/selectors/uiState.selectors';
 import { setSelectedFile, setSelectedFolder, toggleDockOpenState } from '../data/store/slices/uiState.slice';
@@ -48,28 +47,28 @@ export const SideBar: React.FC<SideBarProps> = () => {
 
     return (
         <div className='sidebar'>
-            <Tooltip2 content='Load new dataset'>
+            <Tooltip content='Load new dataset'>
                 <Button icon={IconNames.Home} text='' onClick={reloadAppData} />
-            </Tooltip2>
+            </Tooltip>
             {applicationMode === ApplicationMode.PERF_ANALYZER && (
-                <Tooltip2 content='Show/Hide table dock'>
+                <Tooltip content='Show/Hide table dock'>
                     <AnchorButton
                         disabled={isDetailsViewOpen}
                         icon={IconNames.APPLICATION}
                         text=''
                         onClick={() => requestAnimationFrame(() => dispatch(toggleDockOpenState()))}
                     />
-                </Tooltip2>
+                </Tooltip>
             )}
 
-            <Tooltip2 content='Cluster view' disabled={!clusterViewButtonEnabled}>
+            <Tooltip content='Cluster view' disabled={!clusterViewButtonEnabled}>
                 <Button
                     disabled={!clusterViewButtonEnabled}
                     icon={IconNames.LAYOUT_GRID}
                     text=''
                     onClick={handleOpenClusterView}
                 />
-            </Tooltip2>
+            </Tooltip>
         </div>
     );
 };

@@ -4,16 +4,12 @@
 
 import { FC, useContext, useEffect, useState } from 'react';
 
-import { AnchorButton, FormGroup } from '@blueprintjs/core';
+import { AnchorButton, FormGroup, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
-import {
-    getSelectedFolderLocationType,
-    getSelectedRemoteFolder,
-} from '../../data/store/selectors/uiState.selectors';
+import { getSelectedFolderLocationType, getSelectedRemoteFolder } from '../../data/store/selectors/uiState.selectors';
 import { setSelectedFolderLocationType, setSelectedRemoteFolder } from '../../data/store/slices/uiState.slice';
 import { checkLocalFolderExists } from '../../utils/FileLoaders';
 import usePerfAnalyzerFileLoader from '../../hooks/usePerfAnalyzerFileLoader.hooks';
@@ -222,7 +218,7 @@ const RemoteSyncConfigurator: FC = () => {
                         }
                     }}
                 >
-                    <Tooltip2 content='Sync remote folder'>
+                    <Tooltip content='Sync remote folder'>
                         <AnchorButton
                             icon={IconNames.REFRESH}
                             loading={isSyncingRemoteFolder}
@@ -262,7 +258,7 @@ const RemoteSyncConfigurator: FC = () => {
                                 }
                             }}
                         />
-                    </Tooltip2>
+                    </Tooltip>
                     <GraphSelector
                         onSelectGraph={(graphRelationship) => loadPerfAnalyzerGraph(graphRelationship)}
                         onSelectTemporalEpoch={(temporalEpoch) => loadTemporalEpoch(temporalEpoch)}

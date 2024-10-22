@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, Card, Icon } from '@blueprintjs/core';
+import { Button, Card, Icon, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { updateNodeSelection } from '../../data/store/slices/nodeSelection.slice';
 import { updatePipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { closeDetailedView, openDetailedView } from '../../data/store/slices/uiState.slice';
@@ -51,7 +50,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
     // eslint-disable-next-line no-restricted-globals
     const outOfMemory = isNaN(node.perfAnalyzerResults.model_runtime_per_input);
     const modelRuntimeIcon = (node.opCycles !== node.perfAnalyzerResults.model_runtime_per_input || outOfMemory) && (
-        <Tooltip2
+        <Tooltip
             content={
                 outOfMemory
                     ? 'Out of memory, using Netlist analyzer data'
@@ -59,7 +58,7 @@ const CoreOperationRuntimeMetrics = (props: { node: ComputeNode }) => {
             }
         >
             <Icon iconSize={11} icon={IconNames.WARNING_SIGN} className={outOfMemory ? 'out-of-memory' : ''} />
-        </Tooltip2>
+        </Tooltip>
     );
 
     const modelRuntimeValue = outOfMemory
@@ -148,7 +147,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                 <span className='hover-wrapper'>
                     {node.type.toUpperCase()} {formatNodeUID(node.uid)}
                 </span>
-                <Tooltip2 content='Close ComputeNode'>
+                <Tooltip content='Close ComputeNode'>
                     <Button
                         small
                         icon={IconNames.CROSS}
@@ -157,7 +156,7 @@ const ComputeNodePropertiesCard = ({ node, temporalEpoch, chipId }: ComputeNodeP
                             dispatch(closeDetailedView());
                         }}
                     />
-                </Tooltip2>
+                </Tooltip>
             </h3>
             {node.type === ComputeNodeType.DRAM && (
                 <p>

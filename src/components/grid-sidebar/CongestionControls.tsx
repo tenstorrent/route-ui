@@ -4,8 +4,7 @@
 
 import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Slider, Switch } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
+import { Button, Slider, Switch, Tooltip } from '@blueprintjs/core';
 
 import { IconNames } from '@blueprintjs/icons';
 import { type Location, useLocation } from 'react-router-dom';
@@ -105,18 +104,20 @@ export const CongestionControls: FC = () => {
                         <LinkCongestionControl />
                         <hr />
                         <div>
-                            <Tooltip2 content='Select all pipes'>
+                            <Tooltip content='Select all pipes'>
                                 <Button icon={IconNames.FILTER_OPEN} onClick={() => dispatch(selectAllPipes())} />
-                            </Tooltip2>
+                            </Tooltip>
                             &nbsp;
-                            <Tooltip2 content='Deselect all pipes'>
+                            <Tooltip content='Deselect all pipes'>
                                 <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
-                            </Tooltip2>
+                            </Tooltip>
                         </div>
                         <hr />
                         <div>
-                            <Tooltip2
-                                content={`Select all operations for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
+                            <Tooltip
+                                content={`Select all operations for active graph${
+                                    graphOnChipList.length > 1 ? 's' : ''
+                                }`}
                             >
                                 <Button
                                     icon={IconNames.CUBE_ADD}
@@ -129,10 +130,12 @@ export const CongestionControls: FC = () => {
                                         )
                                     }
                                 />
-                            </Tooltip2>
+                            </Tooltip>
                             &nbsp;
-                            <Tooltip2
-                                content={`Deselect all operations for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
+                            <Tooltip
+                                content={`Deselect all operations for active graph${
+                                    graphOnChipList.length > 1 ? 's' : ''
+                                }`}
                             >
                                 <Button
                                     icon={IconNames.CUBE_REMOVE}
@@ -145,11 +148,11 @@ export const CongestionControls: FC = () => {
                                         )
                                     }
                                 />
-                            </Tooltip2>
+                            </Tooltip>
                         </div>
                         <hr />
                         <div>
-                            <Tooltip2
+                            <Tooltip
                                 content={`Select all queues for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
                             >
                                 <Button
@@ -163,9 +166,9 @@ export const CongestionControls: FC = () => {
                                         )
                                     }
                                 />
-                            </Tooltip2>
+                            </Tooltip>
                             &nbsp;
-                            <Tooltip2
+                            <Tooltip
                                 content={`Deselect all queues for active graph${graphOnChipList.length > 1 ? 's' : ''}`}
                             >
                                 <Button
@@ -179,7 +182,7 @@ export const CongestionControls: FC = () => {
                                         )
                                     }
                                 />
-                            </Tooltip2>
+                            </Tooltip>
                         </div>
                         <hr />
                     </>

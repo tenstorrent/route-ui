@@ -2,10 +2,9 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, Icon, MenuItem, Spinner } from '@blueprintjs/core';
+import { Button, Icon, MenuItem, Spinner, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
-import { type ItemPredicate, ItemRenderer, Select2 } from '@blueprintjs/select';
+import { type ItemPredicate, ItemRenderer, Select } from '@blueprintjs/select';
 import { FC, type PropsWithChildren } from 'react';
 import { type RemoteConnection, RemoteFolder } from '../../hooks/useRemote.hook';
 
@@ -53,35 +52,35 @@ const remoteFolderRenderer =
         const { lastSynced, lastModified } = folder;
 
         let statusIcon = (
-            <Tooltip2
+            <Tooltip
                 content={`Fetching folder status, last sync: ${
                     lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'
                 }`}
             >
                 <Spinner size={16} />
-            </Tooltip2>
+            </Tooltip>
         );
 
         if (!syncingFolderList) {
             if (isLocalFolderOutdated(folder)) {
                 statusIcon = (
-                    <Tooltip2
+                    <Tooltip
                         content={`Folder is stale, last sync: ${
                             lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'
                         }`}
                     >
                         <Icon icon={IconNames.HISTORY} color='goldenrod' />
-                    </Tooltip2>
+                    </Tooltip>
                 );
             } else {
                 statusIcon = (
-                    <Tooltip2
+                    <Tooltip
                         content={`Folder is up to date, last sync: ${
                             lastSynced ? formatter.format(new Date(lastSynced)) : 'Never'
                         }`}
                     >
                         <Icon icon={IconNames.UPDATED} color='green' />
-                    </Tooltip2>
+                    </Tooltip>
                 );
             }
         }
@@ -125,7 +124,7 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
 }) => {
     return (
         <div className='buttons-container'>
-            <Select2
+            <Select
                 className='remote-folder-select'
                 items={remoteFolders ?? []}
                 itemRenderer={remoteFolderRenderer(updatingFolderList, remoteConnection)}
@@ -141,7 +140,7 @@ const RemoteFolderSelector: FC<PropsWithChildren<RemoteFolderSelectorProps>> = (
                     disabled={loading || remoteFolders?.length === 0}
                     text={remoteFolder ? formatRemoteFolderName(remoteFolder, remoteConnection) : falbackLabel}
                 />
-            </Select2>
+            </Select>
             {children}
         </div>
     );

@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, Classes, Icon, NumericInput } from '@blueprintjs/core';
+import { Button, Classes, Icon, NumericInput, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import {
     updateCLK,
     updateChipTotalOps,
@@ -51,7 +50,7 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
 
     const aiclkRightElement = (
         <>
-            <Tooltip2 content='Reset Total OP Cycles'>
+            <Tooltip content='Reset Total OP Cycles'>
                 <Button
                     minimal
                     onClick={() => {
@@ -65,13 +64,13 @@ export const CLKBandwidthControls: FC<DRAMBandwidthControlsProps> = () => {
                     }}
                     icon={IconNames.RESET}
                 />
-            </Tooltip2>
+            </Tooltip>
             {graphOnChipList.map(({ graphOnChip }) => {
                 if (graphOnChip?.hasDataIntegrityError(DataIntegrityErrorType.TOTAL_OP_CYCLES_IS_ZERO)) {
                     return (
-                        <Tooltip2 content='Cycles per input cannot be 0'>
+                        <Tooltip content='Cycles per input cannot be 0'>
                             <Icon icon={IconNames.WARNING_SIGN} className='warning-button' />
-                        </Tooltip2>
+                        </Tooltip>
                     );
                 }
 

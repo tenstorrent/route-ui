@@ -2,8 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, Icon } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
+import { Button, Icon, Tooltip } from '@blueprintjs/core';
 import React, { useReducer } from 'react';
 
 /**
@@ -78,12 +77,12 @@ const ExpandableGroup: React.FC<ExpandableGroupProps> = ({ items }: ExpandableGr
     return (
         <>
             <div>
-                <Tooltip2 content='Collapse All'>
+                <Tooltip content='Collapse All'>
                     <Button icon='collapse-all' onClick={(_e) => collapseAll()} />
-                </Tooltip2>
-                <Tooltip2 content='Expand All'>
+                </Tooltip>
+                <Tooltip content='Expand All'>
                     <Button icon='expand-all' onClick={(_e) => expandAll()} />
-                </Tooltip2>
+                </Tooltip>
             </div>
             <div>
                 {items.map(({ key, target, expandedContent, className }) => (

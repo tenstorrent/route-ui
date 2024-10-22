@@ -2,8 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Slider } from '@blueprintjs/core';
-import { Tooltip2 } from '@blueprintjs/popover2';
+import { Slider, Tooltip } from '@blueprintjs/core';
 import { FC, useContext, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type Location, useLocation } from 'react-router-dom';
@@ -35,7 +34,7 @@ const ModelControls: FC = () => {
                                 name: op.name,
                                 ...op.details,
                                 slowestOperandRef: op.slowestOperand,
-                            }) as unknown as OpTableFields,
+                            } as unknown as OpTableFields),
                     ),
                 ),
             ),
@@ -51,7 +50,7 @@ const ModelControls: FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
             }}
-            label={<Tooltip2 content='Model estimate difference with runtime'>Model Estimate Diff.</Tooltip2>}
+            label={<Tooltip content='Model estimate difference with runtime'>Model Estimate Diff.</Tooltip>}
             isOpen={false}
         >
             <Slider

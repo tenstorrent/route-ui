@@ -2,8 +2,7 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Tooltip2 } from '@blueprintjs/popover2';
-import { Position, Slider, Switch } from '@blueprintjs/core';
+import { Position, Slider, Switch, Tooltip } from '@blueprintjs/core';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -42,13 +41,13 @@ const LinkCongestionControls: FC<LinkCongestionControlsProps> = ({ showNOCContro
     return (
         <>
             {/* Link saturation */}
-            <Tooltip2 content='Show link congestion' position={Position.RIGHT}>
+            <Tooltip content='Show link congestion' position={Position.RIGHT}>
                 <Switch
                     checked={showLinkSaturation}
                     label='link congestion'
                     onChange={(event) => dispatch(updateShowLinkSaturation(event.currentTarget.checked))}
                 />
-            </Tooltip2>
+            </Tooltip>
             {showNOCControls && (
                 <>
                     <Switch

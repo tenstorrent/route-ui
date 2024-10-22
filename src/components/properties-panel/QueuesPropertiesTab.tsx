@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, PopoverPosition } from '@blueprintjs/core';
+import { Button, PopoverPosition, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { selectOperandList } from '../../data/store/slices/nodeSelection.slice';
@@ -63,20 +62,20 @@ const QueuesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; g
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[
-                        <Tooltip2
+                        <Tooltip
                             content='Select all filtered queues'
                             position={PopoverPosition.RIGHT}
                             key='select-all-ops'
                         >
                             <Button icon={<QueueIconPlus />} onClick={() => updateFilteredQueueSelection(true)} />
-                        </Tooltip2>,
-                        <Tooltip2
+                        </Tooltip>,
+                        <Tooltip
                             content='Deselect all filtered queues'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
                         >
                             <Button icon={<QueueIconMinus />} onClick={() => updateFilteredQueueSelection(false)} />
-                        </Tooltip2>,
+                        </Tooltip>,
                     ]}
                 />
                 <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />

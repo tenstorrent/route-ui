@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Icon, Position } from '@blueprintjs/core';
+import { Icon, Position, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { FC, type PropsWithChildren, useContext } from 'react';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../data/GraphOnChipContext';
@@ -82,7 +81,7 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({
                     }
 
                     return (
-                        <Tooltip2
+                        <Tooltip
                             disabled={hide}
                             usePortal
                             content={
@@ -119,7 +118,7 @@ const PipeInfoDialog: FC<PropsWithChildren<PipeInfoDialogProps>> = ({
                             hoverOpenDelay={100}
                         >
                             <div className='pipe-info-dialog-wrapper'>{children}</div>
-                        </Tooltip2>
+                        </Tooltip>
                     );
                 }}
                 loadingContent={<div className='pipe-info-dialog-wrapper'>{children}</div>}

@@ -2,10 +2,9 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { AnchorButton, Button, MenuItem } from '@blueprintjs/core';
+import { AnchorButton, Button, MenuItem, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
-import { ItemRenderer, Select2 } from '@blueprintjs/select';
+import { ItemRenderer, Select } from '@blueprintjs/select';
 import { FC, useState } from 'react';
 import { RemoteConnection } from '../../hooks/useRemote.hook';
 import RemoteFolderDialog from './RemoteConnectionDialog';
@@ -66,7 +65,7 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
 
     return (
         <div className='buttons-container'>
-            <Select2
+            <Select
                 className='remote-connection-select'
                 items={connections}
                 itemRenderer={renderRemoteConnection}
@@ -82,21 +81,21 @@ const RemoteConnectionSelector: FC<RemoteConnectionSelectorProps> = ({
                     disabled={disabled}
                     text={formatConnectionString(selectedConnection)}
                 />
-            </Select2>
-            <Tooltip2 content='Edit selected connection'>
+            </Select>
+            <Tooltip content='Edit selected connection'>
                 <AnchorButton
                     icon={IconNames.EDIT}
                     disabled={disabled || !selectedConnection}
                     onClick={() => setIsEditDialogOpen(true)}
                 />
-            </Tooltip2>
-            <Tooltip2 content='Remove selected connection'>
+            </Tooltip>
+            <Tooltip content='Remove selected connection'>
                 <AnchorButton
                     icon={IconNames.TRASH}
                     disabled={disabled || !selectedConnection}
                     onClick={() => onRemoveConnection(selectedConnection)}
                 />
-            </Tooltip2>
+            </Tooltip>
 
             <RemoteFolderDialog
                 key={`${selectedConnection?.name}${selectedConnection?.host}${selectedConnection?.port}${selectedConnection?.path}`}

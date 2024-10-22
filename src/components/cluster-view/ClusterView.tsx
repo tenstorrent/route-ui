@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, Checkbox, Classes, MenuItem, NumericInput, PopoverPosition } from '@blueprintjs/core';
+import { Button, Checkbox, Classes, MenuItem, NumericInput, PopoverPosition, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import { FC, useContext, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -162,7 +161,7 @@ const ClusterView: FC = () => {
                                 );
                             }}
                             rightElement={
-                                <Tooltip2
+                                <Tooltip
                                     content='Reset to initial normalized value'
                                     usePortal
                                     portalClassName='cluster-reset-tooltip'
@@ -179,7 +178,7 @@ const ClusterView: FC = () => {
                                         }}
                                         icon={IconNames.RESET}
                                     />
-                                </Tooltip2>
+                                </Tooltip>
                             }
                         />
                     </div>
@@ -201,7 +200,7 @@ const ClusterView: FC = () => {
                     searchQuery={pipeFilter}
                     onQueryChanged={setPipeFilter}
                     controls={[
-                        <Tooltip2
+                        <Tooltip
                             disabled={uniquePipeList.length === 0}
                             content='Select filtered pipes'
                             position={PopoverPosition.RIGHT}
@@ -213,8 +212,8 @@ const ClusterView: FC = () => {
                                 icon={IconNames.FILTER_LIST}
                                 onClick={() => selectFilteredPipes()}
                             />
-                        </Tooltip2>,
-                        <Tooltip2
+                        </Tooltip>,
+                        <Tooltip
                             disabled={uniquePipeList.length === 0}
                             content='Deselect ethernet pipes'
                             position={PopoverPosition.RIGHT}
@@ -233,7 +232,7 @@ const ClusterView: FC = () => {
                                     )
                                 }
                             />
-                        </Tooltip2>,
+                        </Tooltip>,
                     ]}
                 />
                 <div className='pipe-list'>

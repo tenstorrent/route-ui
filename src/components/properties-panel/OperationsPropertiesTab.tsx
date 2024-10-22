@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, PopoverPosition } from '@blueprintjs/core';
+import { Button, PopoverPosition, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { selectOperandList } from '../../data/store/slices/nodeSelection.slice';
 import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -62,14 +61,14 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
                     searchQuery={filterQuery}
                     onQueryChanged={setFilterQuery}
                     controls={[
-                        <Tooltip2
+                        <Tooltip
                             content='Select all filtered operations'
                             position={PopoverPosition.RIGHT}
                             key='select-all-ops'
                         >
                             <Button icon={IconNames.CUBE_ADD} onClick={() => updateFilteredOperationSelection(true)} />
-                        </Tooltip2>,
-                        <Tooltip2
+                        </Tooltip>,
+                        <Tooltip
                             content='Deselect all filtered operations'
                             position={PopoverPosition.RIGHT}
                             key='deselect-all-ops'
@@ -78,7 +77,7 @@ const OperationsPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChi
                                 icon={IconNames.CUBE_REMOVE}
                                 onClick={() => updateFilteredOperationSelection(false)}
                             />
-                        </Tooltip2>,
+                        </Tooltip>,
                     ]}
                 />
                 <Button onClick={() => setAllOpen(true)} minimal rightIcon={IconNames.DOUBLE_CHEVRON_DOWN} />

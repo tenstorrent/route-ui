@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
+import { Tooltip } from '@blueprintjs/core';
 import {
     getFolderPathSelector,
     getSelectedFolderLocationType,
@@ -100,7 +100,7 @@ const TopHeaderComponent: React.FC = () => {
     return (
         <div className='top-header-component'>
             <div className='text-content'>
-                <Tooltip2
+                <Tooltip
                     content={folderLocationType === 'local' ? 'Select remote folder' : undefined}
                     placement='bottom'
                 >
@@ -114,8 +114,8 @@ const TopHeaderComponent: React.FC = () => {
                             await updateSelectedFolder(folder, 'remote');
                         }}
                     />
-                </Tooltip2>
-                <Tooltip2
+                </Tooltip>
+                <Tooltip
                     content={folderLocationType === 'remote' ? 'Select local folder' : localFolderPath}
                     placement='bottom'
                 >
@@ -130,7 +130,7 @@ const TopHeaderComponent: React.FC = () => {
                         }}
                         text={folderLocationType === 'local' ? getTestName(localFolderPath) : ''}
                     />
-                </Tooltip2>
+                </Tooltip>
                 <GraphSelector
                     onSelectGraph={(graphRelationship) => loadPerfAnalyzerGraph(graphRelationship)}
                     onSelectTemporalEpoch={(newTemporalEpoch) => loadTemporalEpoch(newTemporalEpoch)}

@@ -3,8 +3,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
 import React, { FC, useContext } from 'react';
-import { Popover2 } from '@blueprintjs/popover2';
-import { Button, Menu, MenuDivider, MenuItem } from '@blueprintjs/core';
+import { Button, Menu, MenuDivider, MenuItem, Popover } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { type Location, useLocation } from 'react-router-dom';
 import { GraphOnChipContext } from '../../data/GraphOnChipContext';
@@ -45,7 +44,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled = false, label, onSele
     }
 
     return (
-        <Popover2
+        <Popover
             content={
                 <div className='graph-selector-picker'>
                     <h3>{label}</h3>
@@ -85,7 +84,7 @@ const GraphSelector: FC<GraphSelectorProps> = ({ disabled = false, label, onSele
             <Button icon={IconNames.GRAPH} disabled={disabled}>
                 {selectedItemText || (label ?? 'Select graph')}
             </Button>
-        </Popover2>
+        </Popover>
     );
 };
 

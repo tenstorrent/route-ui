@@ -2,9 +2,8 @@
 //
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 
-import { Button, PopoverPosition } from '@blueprintjs/core';
+import { Button, PopoverPosition, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { Tooltip2 } from '@blueprintjs/popover2';
 import { clearAllPipes, updateMultiplePipeSelection } from '../../data/store/slices/pipeSelection.slice';
 import { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -50,20 +49,16 @@ const PipesPropertiesTab = ({ graphs }: { graphs: { graphOnChip: GraphOnChip; gr
                     searchQuery={pipeFilter}
                     onQueryChanged={setPipeFilter}
                     controls={[
-                        <Tooltip2
+                        <Tooltip
                             content='Select all filtered pipes'
                             position={PopoverPosition.RIGHT}
                             key='select-all-pipes'
                         >
                             <Button icon={IconNames.FILTER_LIST} onClick={() => selectFilteredPipes()} />
-                        </Tooltip2>,
-                        <Tooltip2
-                            content='Deselect all pipes'
-                            position={PopoverPosition.RIGHT}
-                            key='deselect-all-pipes'
-                        >
+                        </Tooltip>,
+                        <Tooltip content='Deselect all pipes' position={PopoverPosition.RIGHT} key='deselect-all-pipes'>
                             <Button icon={IconNames.FILTER_REMOVE} onClick={() => dispatch(clearAllPipes())} />
-                        </Tooltip2>,
+                        </Tooltip>,
                     ]}
                 />
             </div>
