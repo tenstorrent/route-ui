@@ -53,10 +53,9 @@
     "package-linux": "electron-builder build --linux --publish never"
   },
   "dependencies": {
-    "@blueprintjs/core": "^4.20.2",
-    "@blueprintjs/popover2": "^1.14.11",
-    "@blueprintjs/select": "^4.9.24",
-    "@blueprintjs/table": "^4.10.12",
+    "@blueprintjs/core": "^5.13.1",
+    "@blueprintjs/select": "^5.2.5",
+    "@blueprintjs/table": "^5.2.2",
     "@reduxjs/toolkit": "^2.3.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
