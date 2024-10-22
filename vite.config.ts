@@ -13,6 +13,9 @@ export default defineConfig(({ command }) => {
     const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
 
     const config: UserConfig = {
+        build: {
+            target: 'chrome130',
+        },
         plugins: [
             react(),
             electron({
