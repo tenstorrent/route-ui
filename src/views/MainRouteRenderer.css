@@ -235,7 +235,7 @@
             margin-bottom: 2px;
         }
 
-        .bp4-slider {
+        .bp5-slider {
             width: calc(100% - 10px);
         }
     }
@@ -247,8 +247,8 @@
 
     }
 
-    .bp4-numeric-input {
-        .bp4-input-group {
+    .bp5-numeric-input {
+        .bp5-input-group {
             max-width: 150px;
         }
     }
@@ -287,11 +287,11 @@
             font-size: 1em;
             color: var(--tt-medium-light-gray);
 
-            .bp4-spinner .bp4-spinner-track {
+            .bp5-spinner .bp5-spinner-track {
                 stroke: var(--progress-bar-track);
             }
 
-            .bp4-spinner .bp4-spinner-head {
+            .bp5-spinner .bp5-spinner-head {
                 stroke: var(--tt-medium-gray);
             }
         }
@@ -527,7 +527,7 @@
         align-items: center;
         font-weight: 100;
 
-        .bp4-control.bp4-checkbox {
+        .bp5-control.bp5-checkbox {
             margin-bottom: 0;
         }
 
@@ -572,14 +572,14 @@
     display: flex;
     min-width: 250px;
 
-    .bp4-input-group {
+    .bp5-input-group {
         display: flex;
         align-items: center;
 
-        .bp4-input-action {
+        .bp5-input-action {
             top: unset;
 
-            > .bp4-icon {
+            > .bp5-icon {
                 margin-right: 5px;
 
                 svg {
@@ -616,7 +616,7 @@
             align-items: center;
             gap: 4px;
 
-            .bp4-icon {
+            .bp5-icon {
                 svg {
                     fill: var(--tt-yellow);
                 }
@@ -634,7 +634,7 @@
             margin-bottom: 4px;
             display: flex;
 
-            .bp4-popover2-target {
+            .bp5-popover2-target {
                 display: flex;
             }
 
@@ -704,7 +704,7 @@
     }
 
     .foreign {
-        .bp4-icon {
+        .bp5-icon {
             svg {
                 fill: var(--tt-extra-light-gray);
             }
@@ -731,7 +731,7 @@
     }
 }
 
-.bp4-control input:focus ~ .bp4-control-indicator {
+.bp5-control input:focus ~ .bp5-control-indicator {
     /* outline: none; */
 }
 
@@ -755,11 +755,11 @@
 
 
 .link-saturation-slider {
-    .bp4-slider-track {
-        .bp4-slider-progress {
+    .bp5-slider-track {
+        .bp5-slider-progress {
             background-color: var(--link-saturation-track);
 
-            &.bp4-intent-primary,
+            &.bp5-intent-primary,
             &:first-of-type {
                 background-color: var(--link-saturation-fill);
             }

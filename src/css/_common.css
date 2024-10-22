@@ -38,7 +38,7 @@ a {
     outline-offset: 0;
 }
 
-.bp4-control input:focus ~ .bp4-control-indicator {
+.bp5-control input:focus ~ .bp5-control-indicator {
     outline-offset: 0;
 }
 
@@ -47,7 +47,7 @@ a {
     outline-offset: 0;
 }
 
-.bp4-control input:focus ~ .bp4-control-indicator {
+.bp5-control input:focus ~ .bp5-control-indicator {
     outline: var(--focus-ring) solid 2px;
     outline-offset: 0;
 }

@@ -24,11 +24,11 @@
         color: var(--tt-dark-gray);
     }
 
-    .bp4-tab-panel {
+    .bp5-tab-panel {
         margin-top: 0;
     }
 
-    .bp4-tab {
+    .bp5-tab {
         border: none;
         color: var(--tt-dark-gray);
         transition: background-color 250ms linear, color 250ms linear, border 250ms ease-out;
@@ -44,7 +44,7 @@
     }
 
 
-    .bp4-tab-indicator-wrapper .bp4-tab-indicator {
+    .bp5-tab-indicator-wrapper .bp5-tab-indicator {
         bottom: 2px;
         height: 1px;
         background-color: var(--tt-dark-blue);
@@ -56,11 +56,11 @@
         height: 255px;
         margin-top: 5px;
 
-        .bp4-table-cell-ledger-odd {
+        .bp5-table-cell-ledger-odd {
             background-color: var(--tt-extra-light-gray);
         }
 
-        .bp4-table-cell {
+        .bp5-table-cell {
             display: flex;
             align-items: center;
             justify-content: start;
@@ -71,7 +71,7 @@
             }
         }
 
-        .bp4-table-truncated-text:has( .slowest-operand-wrapper) {
+        .bp5-table-truncated-text:has( .slowest-operand-wrapper) {
             width: 100%;
         }
 
@@ -107,11 +107,11 @@
 
     .slowest-operand-direction-icon { margin-left: 2px; }
 
-    .bp4-table-column-name-text {
+    .bp5-table-column-name-text {
         padding-right: 25px;
     }
 
-    .can-select-all-rows .bp4-table-column-name-text {
+    .can-select-all-rows .bp5-table-column-name-text {
         padding-left: 35px;
     }
 
@@ -144,9 +144,9 @@
         }
     }
 
-    .bp4-table-header {
+    .bp5-table-header {
         &.current-sort {
-            .bp4-table-column-name {
+            .bp5-table-column-name {
                 /* color: var(--tt-white-text); */
                 /* background-color: var(--tt-dark-gray); */
                 background-color: var(--sort-header);
@@ -166,11 +166,11 @@
         color: var(--tt-dark-gray);
         height: 290px;
 
-        .bp4-spinner .bp4-spinner-track {
+        .bp5-spinner .bp5-spinner-track {
             stroke: var(--tt-medium-light-gray);
         }
 
-        .bp4-spinner .bp4-spinner-head {
+        .bp5-spinner .bp5-spinner-head {
             stroke: var(--tt-dark-gray);
         }
     }

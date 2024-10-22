@@ -22,7 +22,7 @@
             margin-bottom: 0;
         }
 
-        .bp4-icon svg {
+        .bp5-icon svg {
             fill: var(--tt-dark-gray);
         }
     }
@@ -69,7 +69,7 @@
                 }
             }
 
-            .bp4-button {
+            .bp5-button {
                 margin: 5px;
             }
 
@@ -122,12 +122,12 @@
     align-items: stretch;
     height: 100%;
 
-    .bp4-tab-list {
+    .bp5-tab-list {
         padding-inline: 10px;
         padding-block-start: 10px;
     }
 
-    .bp4-tab {
+    .bp5-tab {
         background-color: var(--tt-medium-light-gray);
         color: var(--tt-black);
         font-size: 16px;
@@ -149,7 +149,7 @@
         }
     }
 
-    .bp4-tab-panel {
+    .bp5-tab-panel {
         flex-grow: 1;
         height: 100%;
         overflow: auto;
@@ -201,7 +201,7 @@
             align-items: center;
             gap: 4px;
 
-            .bp4-icon {
+            .bp5-icon {
                 svg {
                     fill: var(--tt-yellow);
                 }
@@ -219,7 +219,7 @@
             margin-bottom: 4px;
             display: flex;
 
-            .bp4-popover2-target {
+            .bp5-popover2-target {
                 display: flex;
             }
 
@@ -289,7 +289,7 @@
             font-weight: 100;
             color: var(--tt-very-dark-gray);
 
-            .bp4-control.bp4-checkbox {
+            .bp5-control.bp5-checkbox {
                 margin-bottom: 0;
             }
 

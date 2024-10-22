@@ -5,7 +5,7 @@
 @import "../../css/_variables.css";
 
 
-.bp4-card.detailed-view-card {
+.bp5-card.detailed-view-card {
     padding: 0;
     border-radius: 0;
     bottom: 0;
@@ -44,11 +44,11 @@
         place-content: center;
         gap: 15px;
 
-        .bp4-spinner .bp4-spinner-track {
+        .bp5-spinner .bp5-spinner-track {
             stroke: rgba(0, 0, 0, 0.2);
         }
 
-        .bp4-spinner .bp4-spinner-head {
+        .bp5-spinner .bp5-spinner-head {
             stroke: var(--tt-medium-light-gray);
         }
     }
@@ -204,8 +204,8 @@
         display: flex;
         gap: 5px;
 
-        .bp4-button:not([class*=bp4-intent-]):disabled,
-        .bp4-button:not([class*=bp4-intent-]).bp4-disabled {
+        .bp5-button:not([class*=bp5-intent-]):disabled,
+        .bp5-button:not([class*=bp5-intent-]).bp5-disabled {
             color: var(--tt-very-dark-gray);
         }
     }

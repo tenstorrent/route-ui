@@ -4,18 +4,18 @@
 
 @import "../../css/_variables.css";
 
-.bp4-dialog.remote-connection-dialog {
+.bp5-dialog.remote-connection-dialog {
     background-color: var(--tt-slight-off-background);
 
-    .bp4-dialog-header {
+    .bp5-dialog-header {
         background-color: var(--tt-off-background);
 
-        .bp4-icon, .bp4-heading {
+        .bp5-icon, .bp5-heading {
             color: var(--tt-light-gray);
         }
     }
 
-    .bp4-form-group-sub-label { color: var(--tt-light-gray); }
+    .bp5-form-group-sub-label { color: var(--tt-light-gray); }
 
     fieldset {
         border: solid 1px var(--tt-medium-gray);

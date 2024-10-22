@@ -11,11 +11,11 @@
 .cluster-view-overlay {
 
     .cluster-view-wrap,
-    .bp4-overlay-backdrop {
+    .bp5-overlay-backdrop {
         z-index: var(--cluster-view-zindex);
     }
 
-    .bp4-overlay-backdrop {
+    .bp5-overlay-backdrop {
         backdrop-filter: blur(3px);
     }
 }
@@ -90,7 +90,7 @@
         margin-bottom: 2px;
     }
 
-    .bp4-slider {
+    .bp5-slider {
         width: calc(100% - 10px);
     }
 
@@ -145,9 +145,9 @@
 
 }
 
-.bp4-overlay {
-    .bp4-transition-container,
-    .bp4-popover2-transition-container {
+.bp5-overlay {
+    .bp5-transition-container,
+    .bp5-popover2-transition-container {
         z-index: var(--cluster-view-zindex);
     }
 }

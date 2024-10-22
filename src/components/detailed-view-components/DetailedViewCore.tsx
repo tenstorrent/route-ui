@@ -101,7 +101,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     plotZoomRangeEnd={dataBufferZoomRangeEnd}
                 />
 
-                <div className='bp4-dark l1-table-wrapper'>
+                <div className='bp5-dark l1-table-wrapper'>
                     <HTMLTable striped compact>
                         <thead>
                             <tr>
@@ -144,7 +144,7 @@ const DetailedViewCoreRenderer: React.FC<DetailedViewCoreRendererProps> = ({ nod
                     plotZoomRangeStart={binaryBufferZoomRangeStart}
                     plotZoomRangeEnd={binaryBufferZoomRangeEnd}
                 />
-                <div className='bp4-dark l1-table-wrapper'>
+                <div className='bp5-dark l1-table-wrapper'>
                     <HTMLTable striped compact>
                         <thead>
                             <tr>

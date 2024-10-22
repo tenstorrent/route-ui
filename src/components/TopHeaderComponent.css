@@ -11,7 +11,7 @@
     gap: 20px;
     align-items: center;
 
-    .bp4-control.bp4-switch {
+    .bp5-control.bp5-switch {
         margin-bottom: 0;
     }
 
@@ -25,12 +25,12 @@
         }
     }
 
-    .bp4-button.no-text .bp4-icon {
+    .bp5-button.no-text .bp5-icon {
         margin-right: 0;
     }
 
-    .bp4-button.bp4-minimal svg { color: var(--tt-medium-light-gray); }
-    .bp4-button.bp4-minimal.bp4-disabled svg { color: var(--tt-dark-gray); }
+    .bp5-button.bp5-minimal svg { color: var(--tt-medium-light-gray); }
+    .bp5-button.bp5-minimal.bp5-disabled svg { color: var(--tt-dark-gray); }
 
     .path-label {
         max-width: clamp(150px, 15vw, 250px);

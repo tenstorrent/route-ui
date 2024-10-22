@@ -5,7 +5,7 @@
 const QueueIconMinus = () => {
     return (
         // prettier-ignore
-        <span aria-hidden="true" className="bp4-icon">
+        <span aria-hidden="true" className="bp5-icon">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4.25 11.0625L3.5 11.375L2 12L8 14.5L14 12L12.5 11.375L11.75 11.0625" stroke="#5F6B7C" />
                 <path d="M4.25 9.0625L3.5 9.375L2 10L8 12.5L14 10L12.5 9.375L11.75 9.0625" stroke="#5F6B7C" />

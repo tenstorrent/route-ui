@@ -15,13 +15,13 @@
         justify-content: flex-start;
         flex-wrap: nowrap;
 
-        &.bp4-button { padding: 0; }
+        &.bp5-button { padding: 0; }
 
         &:hover {
             color: var(--tt-white-text);
         }
 
-        .bp4-button-text {
+        .bp5-button-text {
             color: var(--tt-white-text);
             overflow: hidden;
             text-overflow: ellipsis;
@@ -33,7 +33,7 @@
             margin-bottom: 0;
         }
 
-        .bp4-icon svg {
+        .bp5-icon svg {
             fill: var(--tt-white-text);
         }
     }
